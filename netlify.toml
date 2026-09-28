@@ -1,0 +1,30 @@
+# BECONIC Technology Growth Navigator — Netlify 배포 설정
+# 사이트: https://beconic-diagnosis-tech.netlify.app
+# Phase 1부터 Vite 빌드(dist). Phase 3 이후 Netlify Functions 추가 예정.
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# 보안 헤더
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# OG 이미지·로고는 오래 캐시 (파일명 변경 시 버전 쿼리로 갱신)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
