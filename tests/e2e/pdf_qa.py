@@ -95,3 +95,9 @@ if __name__ == "__main__":
             print("   -", x)
     with open("tests/e2e/out/pdf/pdf-qa.json", "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=1)
+    # v0.9 원본(v09-*)은 비교 기준선이므로 실패 판정에서 제외, 신규 PDF에 이슈가 있으면 실패
+    failed = {p: r["issues"] for p, r in result.items() if "/v09-" not in p and r["issues"]}
+    if not paths or failed:
+        print("\n❌ PDF 검수 실패" if failed else "\n❌ 검수할 PDF 없음")
+        sys.exit(1)
+    print(f"\n✅ PDF 검수 통과 ({len(result)}개 PDF)")

@@ -1,0 +1,88 @@
+# BECONIC CI — PR마다 설치·lint·build·테스트·회귀를 실행한다.
+# main 보호 규칙(Required status checks)에 아래 job 이름을 등록하면 전부 통과해야 merge 가능.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  lint:
+    name: Lint · 저장소 위생
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - name: 저장소 위생 (.env·비밀키·PDF 원본·대용량)
+        run: node scripts/check-repo-hygiene.mjs
+      - name: ESLint
+        run: npm run lint
+
+  build:
+    name: Build (타입체크·번들 비밀키 검사)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - run: npm run build
+
+  test:
+    name: Unit · v0.9 Regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - run: npm ci
+      - run: npm test
+
+  e2e:
+    name: E2E · 사용자 플로우 · PDF QA
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: npm ci
+      - name: Chromium 설치
+        run: npx playwright install --with-deps chromium
+      - name: 한글 폰트 설치 (PDF 검수용)
+        run: sudo apt-get install -y fonts-noto-cjk
+      - run: pip install pymupdf
+      - run: npm run build
+      - name: 스모크 E2E (6개 화면 크기·전부 모름·PDF 섹션)
+        run: node tests/e2e/smoke.mjs
+      - name: v0.9 대비 사용자 플로우 동등성 (실제 클릭)
+        run: node tests/e2e/flow-parity.mjs
+      - name: A4 PDF 페이지별 검수 (7종)
+        run: npm run test:pdf
+      - name: 검수 결과물 업로드
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-output
+          path: tests/e2e/out/
+          retention-days: 14

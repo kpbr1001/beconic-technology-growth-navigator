@@ -82,3 +82,8 @@ v0.9와 **달라지지 않는 것**(회귀 테스트로 고정): 문항·가중�
 | 8 | 결과 막대 점수 "0"→"0/100" 표기 변경 | 이번 PR | v0.9 표기로 복원 |
 
 **재검증**: 단위·회귀 1,557 · 스모크 E2E · 플로우 동등성 · PDF 7종(이슈 0) · 클린 클론 `npm ci && npm run build` 통과
+
+## CI 도입 (2026-09-28)
+- `.github/workflows/ci.yml`: PR·main push마다 Lint·저장소 위생 / Build / Unit·v0.9 Regression / E2E·플로우·PDF QA 4개 Check
+- `eslint.config.js` (legacy-ui.ts는 Phase 6 재작성 전까지 제외), `scripts/check-repo-hygiene.mjs`
+- `pdf_qa.py`: 신규 PDF에 이슈가 있으면 실패 처리(v0.9 원본은 기준선이라 제외)

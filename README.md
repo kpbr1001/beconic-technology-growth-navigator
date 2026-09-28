@@ -31,8 +31,24 @@ npm install
 npm run dev          # 로컬 개발 서버 http://localhost:8787
 npm test             # 회귀 + 단위 테스트
 npm run build        # 타입체크 + 빌드(dist) + 번들 비밀키 검사
-npm run test:e2e     # 빌드본 E2E (build 후 실행)
+npm run lint         # ESLint
+npm run test:e2e     # 빌드본 E2E + v0.9 대비 사용자 플로우 (build 후 실행)
+npm run test:pdf     # A4 PDF 7종 생성·페이지별 검수 (pymupdf 필요)
+npm run ci           # CI와 동일한 전체 검사
 ```
+
+## CI (GitHub Actions)
+
+PR·main push마다 `.github/workflows/ci.yml`이 4개 검사를 실행합니다.
+
+| Check | 내용 |
+|---|---|
+| Lint · 저장소 위생 | .env·비밀키·PDF 원본·2MB 초과 파일 차단, ESLint |
+| Build | 타입체크, Vite 빌드, 번들 비밀키 검사 |
+| Unit · v0.9 Regression | Rule Engine 원칙 테스트 + v0.9 원본 대비 308 시나리오 |
+| E2E · 사용자 플로우 · PDF QA | 6개 화면 크기, v0.9 대비 실제 클릭 플로우, A4 PDF 7종 페이지별 검수 |
+
+main 보호: Settings → Rules → Rulesets → main 대상 **Require status checks to pass**에 위 4개 Check 등록.
 
 ## 배포 (Netlify)
 
