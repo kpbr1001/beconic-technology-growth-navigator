@@ -7,6 +7,8 @@ const PATTERNS = [
   /SUPABASE_SERVICE_ROLE_KEY/,
   /ANTHROPIC_API_KEY/,
   /EMBEDDING_API_KEY/,
+  /VOYAGE_API_KEY/,
+  /api\.voyageai\.com/, // 임베딩 호출은 서버 전용 — 브라우저 번들에 들어오면 안 됨
   /eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}/, // JWT(service role 등)
 ];
 const walk = (d) => readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : [join(d, f)]));

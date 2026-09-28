@@ -7,7 +7,7 @@ const MAX_BYTES = 2 * 1024 * 1024;
 const SECRET = [
   /sk-ant-[A-Za-z0-9_-]{10,}/, /sk-[A-Za-z0-9]{32,}/, /pa-[A-Za-z0-9_-]{30,}/, /AKIA[0-9A-Z]{16}/,
   /eyJhbGciOi[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}/,
-  /^(ANTHROPIC_API_KEY|SUPABASE_SERVICE_ROLE_KEY|SUPABASE_ANON_KEY|EMBEDDING_API_KEY)=\S+/m,
+  /^(ANTHROPIC_API_KEY|SUPABASE_SERVICE_ROLE_KEY|SUPABASE_ANON_KEY|EMBEDDING_API_KEY|VOYAGE_API_KEY)=\S+/m,
 ];
 const problems = [];
 for (const f of files) {

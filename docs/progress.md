@@ -87,3 +87,9 @@ v0.9와 **달라지지 않는 것**(회귀 테스트로 고정): 문항·가중�
 - `.github/workflows/ci.yml`: PR·main push마다 Lint·저장소 위생 / Build / Unit·v0.9 Regression / E2E·플로우·PDF QA 4개 Check
 - `eslint.config.js` (legacy-ui.ts는 Phase 6 재작성 전까지 제외), `scripts/check-repo-hygiene.mjs`
 - `pdf_qa.py`: 신규 PDF에 이슈가 있으면 실패 처리(v0.9 원본은 기준선이라 제외)
+
+## Embedding adapter·검색 fallback (2026-09-28)
+- `src/rag/embedding/`: `EmbeddingProvider` 인터페이스, 비활성 공급자, Voyage HTTP 어댑터(SDK 없음), 환경변수 기반 선택(`EMBEDDING_PROVIDER`, `VOYAGE_API_KEY`)
+- `src/rag/hybrid-search.ts`: Keyword + Semantic RRF 병합. 키 없음·임베딩 실패 시 `keyword_only`로 계속(사유 반환), 키워드 검색 실패만 오류
+- 격리: 브라우저 앱·Rule Engine·보고서·로드맵 코드는 `src/rag` 미의존(테스트), 번들에 `api.voyageai.com`·`VOYAGE_API_KEY` 포함 시 빌드 실패
+- 테스트 17건 추가(공급자 선택·Voyage 요청 형식/배치/오류 마스킹·fallback 4경로·RRF·격리) — 실제 키·네트워크 없이 실행

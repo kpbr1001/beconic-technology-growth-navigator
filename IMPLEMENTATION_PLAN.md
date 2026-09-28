@@ -151,6 +151,12 @@ roadmap_nodes *─* roadmap_nodes via roadmap_crosswalks
 4. `chunk`: 의미 단락, 10~15% overlap, 표는 행 단위 직렬화, contextual prefix(`[문서][전략분야][전략품목][핵심기술][페이지]`)
 5. `embed`: `EmbeddingProvider` 어댑터(`embedText`, `embedBatch`), 모델명은 환경변수
 
+**Embedding 정책 (2026-09-28 확정)**
+- Voyage는 Phase 3 Hybrid RAG의 **1차 후보**이며 Phase 0~2에서는 필수 의존성이 아님. SDK 미설치, HTTP 어댑터만 보유
+- `src/rag/embedding`: `EmbeddingProvider` 인터페이스(`embedText`/`embedBatch`) + 등록부 방식 → 공급자 교체 시 어댑터 1개 추가
+- `VOYAGE_API_KEY`(서버 환경변수 전용)가 없거나 호출이 실패하면 **의미 검색만 비활성**, Keyword/FTS 검색으로 계속 응답(`mode: keyword_only` + 사유)
+- 브라우저 앱·Rule Engine·보고서·로드맵 파싱은 임베딩 코드에 의존하지 않음(테스트로 고정, 번들 검사로 `api.voyageai.com`·키 이름 차단)
+
 **Search** (`netlify/functions/hybrid-search`)
 - Stage A 질의 정규화(Claude, 원문·정규화 둘 다 저장) → B FTS·trigram·벡터 병렬 + 메타필터(version, type, field, active) → C RRF(k=50, 가중치 1:1 시작) → D Top 30~50 재정렬 → Top 8 반환, UI Top 3
 - 반환 필수 필드: `source_document, roadmap_version, strategic_field, strategic_item, technology, source_page, retrieval_score, matched_terms, evidence_text`
@@ -232,7 +238,7 @@ Rule 결과 + RAG citations + Claude narrative
 
 | # | 항목 | 권장안 | 비고 |
 |---|---|---|---|
-| 1 | 임베딩 공급자 | 한국어 성능 기준 후보 2~3개를 Gold Set 20건으로 비교 후 확정 | Claude는 임베딩 미제공 |
+| 1 | 임베딩 공급자 | **Voyage `voyage-4`(1024차원) 1차 후보**, Phase 3에서 Gold Set으로 대안 비교 | 키는 Phase 3부터, 서버 환경변수에만 |
 | 2 | Supabase | 신규 프로젝트(서울 리전) + pgvector 활성화 | URL·anon·service-role 키 |
 | 3 | Anthropic API Key | Console 발급, 월 사용 한도 설정 | Netlify 환경변수에만 등록 |
 | 4 | 로드맵 PDF 전달 | Supabase Storage 비공개 버킷 업로드 또는 세션에 분할 업로드 | 저장소 커밋 X (용량·배포 무게) |
