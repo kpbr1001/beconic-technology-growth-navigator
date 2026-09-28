@@ -50,6 +50,11 @@ PR·main push마다 `.github/workflows/ci.yml`이 4개 검사를 실행합니다
 
 main 보호: Settings → Rules → Rulesets → main 대상 **Require status checks to pass**에 위 4개 Check 등록.
 
+## 버전 관리
+
+- **App 버전**: `package.json`의 `version`. 배포 단위 변경 시 올립니다. 화면 푸터·PDF 부록에 `v버전 · 업데이트 일자`로 자동 표기되며, 업데이트 일자는 빌드(배포) 시각(한국시간)입니다.
+- **진단 로직 버전**: `src/diagnosis/versions.ts`(Assessment·Question·Scoring·Roadmap KB). 점수식·문항이 바뀔 때만 올립니다.
+
 ## 배포 (Netlify)
 
 `netlify.toml`이 빌드 설정을 지정합니다(Build command `npm run build`, Publish `dist`, Node 22).
