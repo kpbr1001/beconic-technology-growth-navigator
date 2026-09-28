@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.netlify/
+.DS_Store
+*.log
+# 로드맵 원본 PDF는 용량·저작권 문제로 저장소에 커밋하지 않음 (manifest·checksum만 커밋)
+data/roadmaps/raw/**/*.pdf
