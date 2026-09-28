@@ -37,7 +37,7 @@
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Pretendard,"Pretendard Variable","Noto Sans KR",Arial,sans-serif;line-height:1.58}
+body{margin:0;word-break:keep-all;overflow-wrap:break-word;background:var(--bg);color:var(--text);font-family:Pretendard,"Pretendard Variable","Noto Sans KR",Arial,sans-serif;line-height:1.58}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 a{color:inherit}
@@ -182,7 +182,7 @@ main{min-width:0}
 .sf-bottom p{margin:0;max-width:880px;word-break:keep-all}
 @media(max-width:1100px){.cert-chip{display:none}.sf-inner{grid-template-columns:1fr 1fr}.sf-cert-wrap{grid-column:1/-1}}
 @media(max-width:720px){.brand-logo{width:32px}.brand-text b{font-size:13.5px}.brand-text small{display:none}.header-inner{flex-wrap:wrap;gap:10px}.sf-inner{grid-template-columns:1fr;padding:28px 16px 18px;gap:20px}.sf-bottom{padding:12px 16px 24px}.sf-logo{height:38px}}
-@media print{.site-footer{display:none!important}.pr-cover .cover-logo{height:13mm;width:auto;display:block;margin-bottom:6mm}.pr-cover .cover-issuer{margin-top:3mm;font-size:8pt;color:#dbe4ff}.pr-cover .cover-issuer b{color:#fff}}
+@media print{.site-footer{display:none!important}.pr-footer{gap:4mm}.pr-footer span{white-space:nowrap}.pr-table tr:last-child td{border-bottom:1px solid #e1e6ee}.pr-footer span:first-child{overflow:hidden;text-overflow:ellipsis;min-width:0}.pr-cover .cover-logo{height:13mm;width:auto;display:block;margin-bottom:6mm}.pr-cover .cover-issuer{margin-top:3mm;font-size:8pt;color:#dbe4ff}.pr-cover .cover-issuer b{color:#fff}}
 </style>
 </head>
 <body>
