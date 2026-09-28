@@ -49,6 +49,14 @@ for (const [w, h] of VIEWPORTS) {
   await page.close();
 }
 
+// 1-b) 푸터 버전·업데이트 일자 표기
+{
+  const { page } = await openPage(1440, 900);
+  const label = await page.textContent('[data-build-version]');
+  check(/^v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트$/.test(label.trim()), `푸터 버전 표기 형식 오류: ${label}`);
+  await page.close();
+}
+
 // 2) 누락 CSS 보완 확인 (진단방식 선택 버튼)
 {
   const { page } = await openPage(1440, 900);
@@ -83,6 +91,7 @@ for (const [w, h] of VIEWPORTS) {
   check(pages === 13, `PDF 섹션 수 ${pages} (기대 13)`);
   const pr = await page.textContent('#printReport');
   check(/Scoring rule-v1\.0/.test(pr), 'PDF에 Scoring 버전 누락');
+  check(/App v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트/.test(pr), 'PDF에 앱 버전·업데이트 일자 누락');
   check(/그로스벤처스/.test(pr) && /제2025-684호/.test(pr), 'PDF에 발행사·인증번호 누락');
   const logoOk = await page.$eval('#printReport .cover-logo', (i) => i.complete && i.naturalWidth > 0);
   check(logoOk, 'PDF 표지 로고 로드 실패');

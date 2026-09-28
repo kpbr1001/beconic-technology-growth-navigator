@@ -93,3 +93,8 @@ v0.9와 **달라지지 않는 것**(회귀 테스트로 고정): 문항·가중�
 - `src/rag/hybrid-search.ts`: Keyword + Semantic RRF 병합. 키 없음·임베딩 실패 시 `keyword_only`로 계속(사유 반환), 키워드 검색 실패만 오류
 - 격리: 브라우저 앱·Rule Engine·보고서·로드맵 코드는 `src/rag` 미의존(테스트), 번들에 `api.voyageai.com`·`VOYAGE_API_KEY` 포함 시 빌드 실패
 - 테스트 17건 추가(공급자 선택·Voyage 요청 형식/배치/오류 마스킹·fallback 4경로·RRF·격리) — 실제 키·네트워크 없이 실행
+
+## v0.9.3 — 버전·업데이트 일자 표기 (2026-09-29)
+- 푸터 우측(모바일은 하단)에 `v{버전} · {YYYY.MM.DD} 업데이트` 배지, PDF 부록 버전 줄에 `App v… · … 업데이트` 추가
+- 버전은 `package.json`, 업데이트 일자는 **빌드(배포) 시각 한국시간**을 빌드 때 자동 주입(`vite.config.ts` → `src/build-info.ts`). 마우스를 올리면 배포 커밋 해시 표시(Netlify `COMMIT_REF`)
+- 앱 버전(App)과 진단 로직 버전(Assessment/Scoring)은 별개: 화면·문구 변경은 App만 올리고, 점수식 변경 시에만 Scoring/Assessment를 올림
