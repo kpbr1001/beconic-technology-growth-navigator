@@ -8,33 +8,38 @@
 ## 구조
 
 ```text
-public/                     # Netlify publish 디렉터리 (정적 사이트)
-├─ index.html               # v0.9 진단 UI + 그로스벤처스 헤더/푸터·OG 메타 (v0.9.1)
-└─ assets/
-   ├─ gv-shield.svg / gv-shield-white.svg      # 방패 로고 (원본 .ai에서 벡터 추출)
-   ├─ gv-logo-en.svg / gv-logo-en-white.svg    # Growth Ventures 가로형 로고
-   ├─ og-beconic-tech-diagnosis.jpg            # 카카오톡·SNS 공유 이미지 1200×630
-   └─ favicon-32.png, apple-touch-icon.png, icon-512.png
-reference/                  # 기준선 원본 v0.9 (수정 금지 — 회귀 비교용)
-netlify.toml                # 배포·보안헤더·캐시 설정
-.env.example                # 향후 Phase(RAG·Claude API·Supabase) 환경변수 템플릿
+index.html                  # 화면 마크업·스타일 (Vite 진입점)
+src/
+├─ diagnosis/               # Rule Engine — 점수·신뢰도·우선순위·TRL (순수 함수, 테스트 대상)
+├─ roadmap/                 # 로드맵 참고 후보 (RAG 연결 전, 원문 검증 전 라벨)
+├─ reports/                 # ReportViewModel (화면·PDF 공용 데이터)
+└─ app/                     # 화면 렌더링 (v0.9 이관)
+public/assets/              # 로고·OG 이미지·파비콘 (빌드 시 그대로 복사)
+tests/
+├─ regression/              # v0.9 원본과 판정 비교 (오라클)
+├─ unit/                    # Rule Engine 원칙 테스트
+└─ e2e/                     # Chromium 뷰포트·PDF 스모크
+reference/                  # 기준선 원본 v0.9 (수정 금지)
+docs/progress.md            # Phase별 진행 기록
+IMPLEMENTATION_PLAN.md      # 전체 설계·Phase 계획
+```
+
+## 개발
+
+```bash
+npm install
+npm run dev          # 로컬 개발 서버 http://localhost:8787
+npm test             # 회귀 + 단위 테스트
+npm run build        # 타입체크 + 빌드(dist) + 번들 비밀키 검사
+npm run test:e2e     # 빌드본 E2E (build 후 실행)
 ```
 
 ## 배포 (Netlify)
 
-Project configuration → Build & deploy → Continuous deployment → Link repository
-
-- Repository: `kpbr1001/beconic-technology-growth-navigator`
-- Branch: `main` (병합 전에는 작업 브랜치)
-- Build command: 비움 / Publish directory: `public`
+`netlify.toml`이 빌드 설정을 지정합니다(Build command `npm run build`, Publish `dist`, Node 22).
+Netlify 화면에서 저장소만 연결하면 되고, 화면의 빌드 설정값보다 `netlify.toml`이 우선합니다.
 
 ## 카카오톡 공유 미리보기 갱신
 
 카카오는 OG 정보를 캐시합니다. 이미지·문구 변경 후
 https://developers.kakao.com/tool/debugger/sharing 에서 URL 입력 → **캐시 초기화**.
-
-## 로컬 실행
-
-```bash
-npx http-server public -p 8787
-```

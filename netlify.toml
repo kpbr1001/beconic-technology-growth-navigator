@@ -1,13 +1,13 @@
 # BECONIC Technology Growth Navigator — Netlify 배포 설정
 # 사이트: https://beconic-diagnosis-tech.netlify.app
-# 현재(Phase 0)는 빌드 없는 정적 사이트. Phase 1 이후 Netlify Functions 추가 예정.
+# Phase 1부터 Vite 빌드(dist). Phase 3 이후 Netlify Functions 추가 예정.
 
 [build]
-  publish = "public"
-  command = ""
+  publish = "dist"
+  command = "npm run build"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
 
 # 보안 헤더
 [[headers]]
