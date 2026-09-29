@@ -53,8 +53,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
       - run: npm ci
       - run: npm test
+      - name: 로드맵 파서·공개 색인 무결성 (원문 PDF 불필요)
+        run: npm run test:roadmap
 
   e2e:
     name: E2E · 사용자 플로우 · PDF QA
