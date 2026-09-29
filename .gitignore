@@ -9,3 +9,7 @@ node_modules/
 data/roadmaps/raw/**/*.pdf
 tests/e2e/out/
 dist/
+
+# Python
+__pycache__/
+*.pyc
