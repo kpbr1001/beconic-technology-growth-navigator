@@ -56,6 +56,10 @@ npm run test:roadmap
 
 Supabase·Voyage 설정 방법은 [docs/phase3-rag-setup.md](docs/phase3-rag-setup.md). 설정 전에도 앱은 원문 색인 후보로 정상 동작합니다.
 
+## Claude 진단 해석(Phase 5)
+
+Anthropic API 키 설정 방법은 [docs/phase5-ai-setup.md](docs/phase5-ai-setup.md). 설정 전에도 앱은 규칙 기반 해석으로 정상 동작합니다.
+
 ## CI (GitHub Actions)
 
 PR·main push마다 `.github/workflows/ci.yml`이 4개 검사를 실행합니다.
