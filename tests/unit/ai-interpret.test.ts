@@ -83,6 +83,7 @@ describe('Claude 입력 구성', () => {
   it('점수는 Rule Engine 값, 원문은 발췌 그대로, 근거 없는 품목은 노트 금지 표시', () => {
     const text = buildUserContent(input, r, { ...req, roadmap: [...req.roadmap, { uid: 'X-1@p2', name: '근거없음', code: null }] }, evidence);
     expect(text).toContain(`리스크대응: ${risk}/100`);
+    expect(text).toContain(`진단 신뢰도: ${Math.round(r.confidence)}/100 `); // 소수점 없이(화면 표기와 동일)
     expect(text).toContain('"고장 예측 정확도 확보 … 예지보전 알림 자동화"');
     expect(text).toContain('이상패턴 탐지 모델 · 자체 가능 · TRL 5');
     expect(text).toContain('원문 근거 없음(이 품목은 roadmap_notes에 쓰지 말 것)');

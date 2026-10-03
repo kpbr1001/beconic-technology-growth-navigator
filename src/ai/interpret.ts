@@ -85,7 +85,7 @@ export function buildUserContent(input: AssessmentInput, r: AssessmentResult, re
     ...(techs.length ? techs : ['- 핵심기술 미지정']),
     '',
     '## Rule Engine 결과(변경 금지)',
-    `- 기술역량: ${r.capability === null ? '판단 보류' : `${Math.round(r.capability)}/100`} · 진단 신뢰도: ${r.confidence}/100 · 진단 단계: ${r.level}`,
+    `- 기술역량: ${r.capability === null ? '판단 보류' : `${Math.round(r.capability)}/100`} · 진단 신뢰도: ${Math.round(r.confidence)}/100 · 진단 단계: ${r.level}`,
     `- 응답 ${r.answered}개, '모름' ${r.unknown}개('모름'은 0점이 아니라 불확실성)`,
     ...dims,
     '- 우선순위(Rule Engine 산정 순서 그대로):',
