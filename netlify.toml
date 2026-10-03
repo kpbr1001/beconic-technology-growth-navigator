@@ -1,6 +1,6 @@
 # BECONIC Technology Growth Navigator — Netlify 배포 설정
 # 사이트: https://beconic-diagnosis-tech.netlify.app
-# Phase 1부터 Vite 빌드(dist). Phase 3 이후 Netlify Functions 추가 예정.
+# Phase 1부터 Vite 빌드(dist). Phase 3: 서버 함수 netlify/functions (비밀키는 여기서만 사용).
 
 [build]
   publish = "dist"
@@ -8,6 +8,10 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 
 # 보안 헤더
 [[headers]]

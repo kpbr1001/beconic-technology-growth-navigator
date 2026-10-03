@@ -11,5 +11,5 @@
     "resolveJsonModule": true,
     "types": ["vite/client", "node"]
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests", "netlify", "scripts/rag"]
 }

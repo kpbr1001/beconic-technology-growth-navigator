@@ -185,3 +185,14 @@ v0.9와 **달라지지 않는 것**(회귀 테스트로 고정): 문항·가중�
 - 앱 색인 `src/roadmap/kb-app-index.json`(18개 선택 분야, 품목 559·핵심기술 2,117, gzip 64KB)은 별도 파일로 비동기 로드 — 메인 번들 크기 변화 없음. 생성: `python3 scripts/roadmap/build_app_index.py`
 - 버전: App 0.9.4, Roadmap KB `static-v0.9` → `index-kb-v2` (Scoring·Assessment 불변)
 - 테스트: 후보 엔진 9건, v0.9 회귀의 '후보 순서 동일' → 의도된 차이 D4로 고정, 앱 색인 동기화 검사, E2E(쪽 번호·품목코드 표시)
+
+## v0.9.5 — Phase 3: 원문 근거 검색(Hybrid RAG) (2026-10-03)
+- `supabase/migrations/20261003000000_roadmap_kb.sql`: `roadmap_chunks`(원문 문단·출처·쪽·TRL·1024차원 벡터), 키워드 검색 RPC(한국어 부분일치 + **KB 전체 기준 희소어(IDF) 가중**, 품목명·기술명 일치 2배), 의미 검색 RPC(pgvector HNSW), RLS·실행권한 service_role 전용
+- `src/rag/supabase.ts`(PostgREST 호출, SDK 없음), `src/rag/evidence.ts`(후보 품목별 원문 발췌 2개 + 인용표기), `netlify/functions/roadmap-evidence.ts`(`POST /api/roadmap-evidence`)
+- `scripts/rag/load_kb.ts`: 비공개 KB `chunks.jsonl` → Supabase 적재(+Voyage 임베딩 선택), 재실행 안전·이전 KB 버전 비활성
+- 화면: `VITE_ROADMAP_EVIDENCE=on`일 때만 호출 → 후보 카드에 '원문 근거'(라벨·기술명·TRL·인용문·출처), PDF 7쪽에 인용 1개. 미설정·실패 시 표시하지 않음
+- fallback: Supabase 없음 → `not_configured`, Voyage 키 없음 → `keyword_only`(원문 발췌는 정상)
+- **실검증(로컬 Postgres 16 + pgvector 0.6 + PostgREST 12)**: 실제 문단 3,520개 REST 적재 3초, 키워드 검색 70ms, 샘플기업 → 'AI 설비 예지보전 솔루션' 인쇄 p.272·273 원문 발췌, anon 키로 표·함수 접근 거부 확인, 브라우저 E2E(근거 6개 표시·PDF 13쪽 이슈 0)
+- CI 잡 추가 `DB · 로드맵 KB 마이그레이션`(pgvector 컨테이너, 마이그레이션 2회 적용·검색·접근통제 검증, 가짜 문단)
+- 테스트: 단위 17건(가짜 fetch — 헤더·필터·키 비노출·fallback·입력검증·적재 변환)
+- 켜는 법: `docs/phase3-rag-setup.md`

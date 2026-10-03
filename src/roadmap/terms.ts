@@ -1,0 +1,17 @@
+// 검색어 분리 — 화면의 로드맵 후보(candidates.ts)와 서버 원문 검색(src/rag)이 같은 규칙을 쓴다.
+// 한국어 형태소 분석기 없이: 영숫자·한글 단위로 자르고, 끝 조사를 떼고, 어느 품목에나 붙는 일반어를 뺀다.
+
+// 매칭에서 제외할 일반어(어느 품목에나 붙는 말)
+const STOP = new Set(['기술', '개발', '기반', '위한', '통한', '관련', '제품', '서비스', '고객', '기업', '중소', '사용', '활용',
+  '적용', '제공', '있는', '하는', '합니다', '입니다', '시스템', '솔루션', '플랫폼', '주요', '분야', '현장', '담당자', '등의', '및']);
+const JOSA = /(으로|에서|에게|까지|부터|처럼|이며|이고|하고|과|와|을|를|이|가|은|는|의|에|로|도|만)$/;
+
+export function terms(text: string): string[] {
+  const out = new Set<string>();
+  for (let w of text.toLowerCase().split(/[^0-9a-z가-힣]+/)) {
+    if (/[가-힣]/.test(w) && w.length > 2) w = w.replace(JOSA, '');
+    if (w.length >= 2 && !STOP.has(w) && !/^\d+$/.test(w)) out.add(w);
+  }
+  return [...out];
+}
+

@@ -3,6 +3,9 @@
 // 키워드 일치일 뿐 내용 적합성 판정이 아니므로 '높음/중간' 같은 적합도 등급과 '공식근거' 표기를 하지 않는다
 // (마스터 프롬프트 금지사항 2·3, 17장). 원문 문장 검색·근거 인용은 Phase 3 Hybrid RAG에서 붙는다.
 import taxonomy from './static-taxonomy.json';
+import { terms } from './terms';
+
+export { terms };
 
 export const ROADMAP_GROUPS: Record<string, string[]> = taxonomy.ROADMAP_GROUPS;
 /** 세부분야 목록(원문 색인 기준으로 동기화: scripts/roadmap/build_app_index.py) */
@@ -29,6 +32,8 @@ export interface RoadmapCandidate {
   /** 원문 인쇄 쪽 번호(없으면 null) */
   page: number | null;
   pdfPage?: number | null;
+  /** 원문 색인 품목 고유키(원문 근거 조회용) */
+  uid?: string;
   /** 공식 품목코드(2026~2028 판) 또는 null */
   code?: string | null;
   itemNo?: string | null;
@@ -74,20 +79,6 @@ export const roadmapIndexReady = () => INDEX !== null;
 /** 테스트용 */
 export function setRoadmapIndex(ix: AppIndex | null) {
   INDEX = ix;
-}
-
-// 매칭에서 제외할 일반어(어느 품목에나 붙는 말)
-const STOP = new Set(['기술', '개발', '기반', '위한', '통한', '관련', '제품', '서비스', '고객', '기업', '중소', '사용', '활용',
-  '적용', '제공', '있는', '하는', '합니다', '입니다', '시스템', '솔루션', '플랫폼', '주요', '분야', '현장', '담당자', '등의', '및']);
-const JOSA = /(으로|에서|에게|까지|부터|처럼|이며|이고|하고|과|와|을|를|이|가|은|는|의|에|로|도|만)$/;
-
-export function terms(text: string): string[] {
-  const out = new Set<string>();
-  for (let w of text.toLowerCase().split(/[^0-9a-z가-힣]+/)) {
-    if (/[가-힣]/.test(w) && w.length > 2) w = w.replace(JOSA, '');
-    if (w.length >= 2 && !STOP.has(w) && !/^\d+$/.test(w)) out.add(w);
-  }
-  return [...out];
 }
 
 const itemText = (i: AppItem) => `${i.name} ${i.techs.map((t) => t[0]).join(' ')}`.toLowerCase();
@@ -187,6 +178,7 @@ function toCandidate(field: AppField, { item, hits, matched, techHits, score }: 
     evidenceGrade: 'retrieved' as const,
     page: item.pp,
     pdfPage: item.pdf,
+    uid: item.uid,
     code: item.code,
     itemNo: item.no,
     subfield: item.sub,

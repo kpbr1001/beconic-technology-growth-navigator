@@ -90,3 +90,31 @@ jobs:
           name: e2e-output
           path: tests/e2e/out/
           retention-days: 14
+
+  db:
+    name: DB · 로드맵 KB 마이그레이션
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Supabase 역할 준비 (anon·authenticated·service_role)
+        run: |
+          psql -v ON_ERROR_STOP=1 -c "create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls; grant usage on schema public to anon, authenticated, service_role;"
+      - name: 마이그레이션 적용 (2회 — 재실행 안전성)
+        run: |
+          for f in supabase/migrations/*.sql; do psql -v ON_ERROR_STOP=1 -q -f "$f"; done
+          for f in supabase/migrations/*.sql; do psql -v ON_ERROR_STOP=1 -q -f "$f"; done
+      - name: 검색 함수·접근 통제 검증 (가짜 문단)
+        run: psql -v ON_ERROR_STOP=1 -q -f tests/db/verify_roadmap_kb.sql
