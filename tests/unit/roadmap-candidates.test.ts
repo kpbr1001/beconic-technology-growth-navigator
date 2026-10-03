@@ -32,6 +32,15 @@ describe('원문 색인 기반 후보', () => {
     expect(top.matchedTechs?.[0]).toMatchObject({ trl: '5' });
   });
 
+  it('넓은 맥락어(생산·공정)가 섞여도 기업이 밝힌 핵심기술과 맞는 품목이 1순위 (미리보기 피드백)', () => {
+    const [top] = roadmapCandidates({
+      roadmapField: '스마트제조(특화)',
+      texts: [...PDM, '생산 공정 데이터 생산라인'],
+      coreTexts: ['AI 기반 설비 예지보전', '이상징후 탐지 모델', '예지보전 플랫폼'],
+    });
+    expect(top.code).toBe('SMESTR-2025-B-03-08');
+  });
+
   it('적합도 등급·공식근거 표기 금지(키워드 일치 후보일 뿐)', () => {
     for (const f of Object.keys(index.fields)) {
       for (const c of roadmapCandidates({ roadmapField: f, texts: PDM })) {

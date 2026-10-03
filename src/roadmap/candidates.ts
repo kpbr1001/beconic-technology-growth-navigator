@@ -50,6 +50,8 @@ export interface RoadmapCandidate {
 export interface CandidateInput {
   roadmapField: string;
   texts: string[];
+  /** 기업이 직접 밝힌 기술(세부 업종·기술분야, 핵심기술명). 이 단어는 2배 가중 — 제품 설명의 넓은 맥락어보다 우선 */
+  coreTexts?: string[];
 }
 
 type AppItem = {
@@ -95,11 +97,11 @@ function idf(field: AppField, q: string): number {
   return Math.log((n + 1) / df);
 }
 
-function matchItem(field: AppField, item: AppItem, qs: string[]) {
+function matchItem(field: AppField, item: AppItem, qs: string[], core: Set<string>) {
   const name = item.name.toLowerCase();
   const matched = qs.filter((q) => idf(field, q) > 0 && itemText(item).includes(q));
-  // 품목명 일치는 핵심기술명 일치보다 1.5배 가중
-  const score = matched.reduce((s, q) => s + idf(field, q) * (name.includes(q) ? 1.5 : 1), 0);
+  // 품목명 일치 1.5배, 기업이 밝힌 핵심어 2배
+  const score = matched.reduce((s, q) => s + idf(field, q) * (name.includes(q) ? 1.5 : 1) * (core.has(q) ? 2 : 1), 0);
   const techHits = item.techs
     .map((t) => ({ t, n: matched.filter((q) => t[0].toLowerCase().includes(q)).length }))
     .filter((x) => x.n > 0);
@@ -126,10 +128,10 @@ function fallback(f: string, field: AppField | undefined): RoadmapCandidate[] {
   });
 }
 
-export function roadmapCandidates({ roadmapField: f, texts }: CandidateInput): RoadmapCandidate[] {
+export function roadmapCandidates({ roadmapField: f, texts, coreTexts = [] }: CandidateInput): RoadmapCandidate[] {
   const field = INDEX?.fields[f];
   if (!field) return fallback(f, undefined);
-  const ranked = rank(field, terms(texts.join(' ')));
+  const ranked = rank(field, terms([...texts, ...coreTexts].join(' ')), new Set(terms(coreTexts.join(' '))));
   if (!ranked.length) return fallback(f, field);
   return ranked.map((x) => toCandidate(field, x));
 }
@@ -139,14 +141,15 @@ export interface OtherFieldCandidate extends RoadmapCandidate {
 }
 
 /** 선택 분야보다 확실히 더 잘 맞는 품목이 다른 분야에 있으면 제시(분야 선택 재검토용). 없으면 빈 배열 */
-export function otherFieldCandidates({ roadmapField: f, texts }: CandidateInput, limit = 2): OtherFieldCandidate[] {
+export function otherFieldCandidates({ roadmapField: f, texts, coreTexts = [] }: CandidateInput, limit = 2): OtherFieldCandidate[] {
   if (!INDEX) return [];
-  const qs = terms(texts.join(' '));
-  const own = INDEX.fields[f] ? rank(INDEX.fields[f], qs)[0]?.score ?? 0 : 0;
+  const qs = terms([...texts, ...coreTexts].join(' '));
+  const core = new Set(terms(coreTexts.join(' ')));
+  const own = INDEX.fields[f] ? rank(INDEX.fields[f], qs, core)[0]?.score ?? 0 : 0;
   const out: OtherFieldCandidate[] = [];
   for (const [name, field] of Object.entries(INDEX.fields)) {
     if (name === f || field.collection === '2025-2027_general') continue; // 이전 판(대조용)은 추천하지 않는다
-    const top = rank(field, qs)[0];
+    const top = rank(field, qs, core)[0];
     if (top && top.hits >= 2 && top.score > Math.max(own * 1.5, 2)) out.push({ field: name, ...toCandidate(field, top) });
   }
   return out.sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, limit);
@@ -154,9 +157,9 @@ export function otherFieldCandidates({ roadmapField: f, texts }: CandidateInput,
 
 type Ranked = { item: AppItem; order: number } & ReturnType<typeof matchItem>;
 
-function rank(field: AppField, qs: string[]): Ranked[] {
+function rank(field: AppField, qs: string[], core: Set<string> = new Set()): Ranked[] {
   return field.items
-    .map((item, order) => ({ item, order, ...matchItem(field, item, qs) }))
+    .map((item, order) => ({ item, order, ...matchItem(field, item, qs, core) }))
     .filter((x) => x.hits > 0)
     .sort((a, b) => b.score - a.score || a.order - b.order)
     .slice(0, 3);
