@@ -7,6 +7,6 @@ export const VERSIONS: Versions = {
   question: 'core12-v0.9',
   /** rule-v0.9 대비: 무응답 차원 null 처리(D2), TRL 평균 폐지(D3) */
   scoring: 'rule-v1.0',
-  /** 공식 로드맵 원문 KB 미연결(정적 세부분야 목록) */
-  roadmapKb: 'static-v0.9',
+  /** 공식 로드맵 원문 색인(전략품목·핵심기술명·원문 쪽) + 원문 근거 검색(설정 시) */
+  roadmapKb: 'index-kb-v2',
 };

@@ -8,6 +8,8 @@ export interface SearchFilters {
   roadmapType?: string[];
   strategicField?: string[];
   activeOnly?: boolean;
+  /** 특정 전략품목 범위로 한정(로드맵 후보별 원문 근거) */
+  itemUids?: string[];
 }
 
 /** 검색 후보 1건. 출처(문서·버전·페이지)는 원문 근거 추적을 위해 반드시 보존한다. */

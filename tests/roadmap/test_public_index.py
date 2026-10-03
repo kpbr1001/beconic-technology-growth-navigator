@@ -93,5 +93,16 @@ class TestPublicIndex(unittest.TestCase):
             self.assertFalse(re.search(r"\.pdf\"\s*:", p.read_text(encoding="utf-8")))
 
 
+class TestAppIndexInSync(unittest.TestCase):
+    def test_app_index_matches_public_index(self):
+        # 앱 로드맵 후보가 쓰는 src/roadmap/kb-app-index.json·static-taxonomy.json이 공개 색인에서 다시 만든 값과 같아야 한다
+        import subprocess
+        import sys
+        root = INDEX_DIR.parents[2]
+        r = subprocess.run([sys.executable, str(root / "scripts/roadmap/build_app_index.py"), "--check"],
+                           capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

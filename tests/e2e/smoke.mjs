@@ -43,8 +43,11 @@ for (const [w, h] of VIEWPORTS) {
   const hscroll = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   check(!hscroll, `${w}px: 가로 스크롤 발생`);
   check(errors.length === 0, `${w}px: 콘솔 에러 ${JSON.stringify(errors)}`);
+  await page.waitForFunction(() => /원문 색인/.test(document.querySelector('#roadmapfit')?.textContent || ''));
   const txt = await page.textContent('#roadmapfit');
   check(!/POC 적합성|높음|중간/.test(txt), `${w}px: 로드맵 후보에 검증 전 적합도 등급 노출`);
+  // D4: 원문 색인 품목·쪽 번호 (샘플기업 = 스마트제조 예지보전)
+  check(/SMESTR-2025-B-03-08/.test(txt) && /p\.271/.test(txt), `${w}px: 원문 색인 후보(품목코드·쪽) 미표시`);
   if (w === 375 || w === 1440) await page.screenshot({ path: `${OUT}/result-${w}.png`, fullPage: false });
   await page.close();
 }
@@ -91,6 +94,8 @@ for (const [w, h] of VIEWPORTS) {
   check(pages === 13, `PDF 섹션 수 ${pages} (기대 13)`);
   const pr = await page.textContent('#printReport');
   check(/Scoring rule-v1\.0/.test(pr), 'PDF에 Scoring 버전 누락');
+  check(/AI 설비 예지보전 솔루션/.test(pr) && /원문 p\.271/.test(pr), 'PDF 로드맵 정렬에 원문 색인 후보 누락');
+  check(/Roadmap KB index-kb-v2/.test(pr), 'PDF에 Roadmap KB 버전 누락');
   check(/App v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트/.test(pr), 'PDF에 앱 버전·업데이트 일자 누락');
   check(/그로스벤처스/.test(pr) && /제2025-684호/.test(pr), 'PDF에 발행사·인증번호 누락');
   const logoOk = await page.$eval('#printReport .cover-logo', (i) => i.complete && i.naturalWidth > 0);

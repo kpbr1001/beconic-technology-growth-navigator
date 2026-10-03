@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { evaluate, activeQuestions, nextTrlGate } from '../../src/diagnosis';
 import { strategicOptions, riskItems } from '../../src/diagnosis/strategy';
-import { roadmapCandidates } from '../../src/roadmap/candidates';
+import { loadRoadmapIndex, roadmapCandidates, setRoadmapIndex } from '../../src/roadmap/candidates';
 import type { AssessmentInput } from '../../src/diagnosis';
 import { NAMED, randomInputs } from '../fixtures/assessments';
 import { runV09 } from './v09-oracle';
@@ -42,10 +42,8 @@ describe.each(cases)('v0.9 parity · %s', (_name, input) => {
     }
   });
 
-  it('리스크 신호·로드맵 후보 순서·TRL Gate 동일', () => {
+  it('리스크 신호·TRL Gate 동일 (로드맵 후보는 D4로 원문 색인 기준 변경 — 아래 의도된 차이 참조)', () => {
     expect(riskItems(input.answers)).toEqual(old.risks);
-    const cand = roadmapCandidates({ roadmapField: input.company.roadmapField, texts: candidateTexts(input) });
-    expect(cand.map((c) => c.name)).toEqual(old.candidates.map((c) => c.name));
     const crit = input.inventory.filter((t) => t.critical).map((t) => ({ id: t.id, ...nextTrlGate(t.trl) }));
     expect(crit).toEqual(old.crit.map(({ id, target, gate }) => ({ id, target, gate })));
   });
@@ -76,6 +74,20 @@ describe('의도된 차이 고정 (승인된 P0 수정)', () => {
     expect(trl.items.map((x) => x.trl)).toEqual([6, 6, 7]);
     expect(trl.distribution).toBe('6~7');
     expect(runV09(NAMED.sample).results.trl).toBe(6); // v0.9는 (6+6+7)/3 반올림 = 6
+  });
+
+  it('D4: 로드맵 후보가 세부분야명 → 원문 색인의 전략품목(문서·쪽 포함)으로 바뀜', async () => {
+    await loadRoadmapIndex();
+    const input = NAMED.sample;
+    const now = roadmapCandidates({ roadmapField: input.company.roadmapField, texts: candidateTexts(input) });
+    const old = runV09(input).candidates.map((c) => c.name);
+    expect(now.map((c) => c.name)).not.toEqual(old);
+    for (const c of now) {
+      expect(c.evidenceGrade).toBe('retrieved');
+      expect(c.page).toBeGreaterThan(0);
+      expect(`${c.label} ${c.reason} ${c.source}`).not.toMatch(/높음|중간|공식근거/);
+    }
+    setRoadmapIndex(null);
   });
 
   it('D1: 로드맵 후보에 적합도 등급·공식근거 표기가 없음', () => {
