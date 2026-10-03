@@ -1,0 +1,8810 @@
+{
+ "version": "crosswalk-v1",
+ "label": "자동 대조 후보 · 전문가 검토 전 (공식 대응표 아님)",
+ "method": "품목명·핵심기술명 공통 핵심어(새 판 기준 희소어 가중 코사인 0.75) + 품목명 글자 2-gram 유사도(0.25) + 분야 대응 가산 0.15; 후보 최소 0.3, '이어짐 가능성 높음' ≥ 0.6 & 공통 핵심어 2개 이상",
+ "from": "2025-2027_general",
+ "to": [
+  "2026-2028_general",
+  "2026-2028_specialized"
+ ],
+ "summary": {
+  "from_items": 218,
+  "to_items": 360,
+  "strong": 19,
+  "related": 134,
+  "no_match": 65,
+  "to_items_without_predecessor": 226
+ },
+ "rows": [
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-01",
+    "no": "01",
+    "name": "정지궤도 위성용 전력 제어 장치",
+    "page": 37,
+    "pdf": 43
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.435,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-06@p109",
+     "code": "SMESTR-2025-A-13-06",
+     "name": "위성용 통합 자세제어 모듈",
+     "page": 99,
+     "pdf": 109
+    },
+    {
+     "score": 0.406,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-07@p111",
+     "code": "SMESTR-2025-A-13-07",
+     "name": "초소형 위성용 애비오닉스",
+     "page": 101,
+     "pdf": 111
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-02",
+    "no": "02",
+    "name": "위성용 대형 광학계",
+    "page": 38,
+    "pdf": 44
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.326,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-06@p109",
+     "code": "SMESTR-2025-A-13-06",
+     "name": "위성용 통합 자세제어 모듈",
+     "page": 99,
+     "pdf": 109
+    },
+    {
+     "score": 0.318,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-07@p111",
+     "code": "SMESTR-2025-A-13-07",
+     "name": "초소형 위성용 애비오닉스",
+     "page": 101,
+     "pdf": 111
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-03",
+    "no": "03",
+    "name": "고성능 위성 중계기",
+    "page": 39,
+    "pdf": 45
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-04",
+    "no": "04",
+    "name": "위성용 레이저 통신 모듈",
+    "page": 40,
+    "pdf": 46
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.342,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-06@p109",
+     "code": "SMESTR-2025-A-13-06",
+     "name": "위성용 통합 자세제어 모듈",
+     "page": 99,
+     "pdf": 109
+    },
+    {
+     "score": 0.316,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-07@p111",
+     "code": "SMESTR-2025-A-13-07",
+     "name": "초소형 위성용 애비오닉스",
+     "page": 101,
+     "pdf": 111
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-05",
+    "no": "05",
+    "name": "위성용 고성능 데이터 통신 모듈",
+    "page": 41,
+    "pdf": 47
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.36,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-06@p109",
+     "code": "SMESTR-2025-A-13-06",
+     "name": "위성용 통합 자세제어 모듈",
+     "page": 99,
+     "pdf": 109
+    },
+    {
+     "score": 0.335,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-07@p111",
+     "code": "SMESTR-2025-A-13-07",
+     "name": "초소형 위성용 애비오닉스",
+     "page": 101,
+     "pdf": 111
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-06",
+    "no": "06",
+    "name": "위성용 온보드 프로세서",
+    "page": 42,
+    "pdf": 48
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.475,
+     "common_terms": [
+      "온보드",
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-07@p111",
+     "code": "SMESTR-2025-A-13-07",
+     "name": "초소형 위성용 애비오닉스",
+     "page": 101,
+     "pdf": 111
+    },
+    {
+     "score": 0.368,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-06@p109",
+     "code": "SMESTR-2025-A-13-06",
+     "name": "위성용 통합 자세제어 모듈",
+     "page": 99,
+     "pdf": 109
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-07",
+    "no": "07",
+    "name": "위성용 고성능 온보드 컴퓨터",
+    "page": 43,
+    "pdf": 49
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.401,
+     "common_terms": [
+      "온보드",
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-07@p111",
+     "code": "SMESTR-2025-A-13-07",
+     "name": "초소형 위성용 애비오닉스",
+     "page": 101,
+     "pdf": 111
+    },
+    {
+     "score": 0.319,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-06@p109",
+     "code": "SMESTR-2025-A-13-06",
+     "name": "위성용 통합 자세제어 모듈",
+     "page": 99,
+     "pdf": 109
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-08",
+    "no": "08",
+    "name": "고정밀 관성 측정 장비",
+    "page": 44,
+    "pdf": 50
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-09",
+    "no": "09",
+    "name": "위성용 배터리",
+    "page": 45,
+    "pdf": 51
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.466,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-06@p109",
+     "code": "SMESTR-2025-A-13-06",
+     "name": "위성용 통합 자세제어 모듈",
+     "page": 99,
+     "pdf": 109
+    },
+    {
+     "score": 0.449,
+     "common_terms": [
+      "위성용"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-07@p111",
+     "code": "SMESTR-2025-A-13-07",
+     "name": "초소형 위성용 애비오닉스",
+     "page": 101,
+     "pdf": 111
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-10",
+    "no": "10",
+    "name": "우주발사체용 연료 저장 탱크",
+    "page": 49,
+    "pdf": 55
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.483,
+     "common_terms": [
+      "탱크",
+      "저장",
+      "복합재"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-04@p105",
+     "code": "SMESTR-2025-A-13-04",
+     "name": "추진제 저장 시스템 부품 및 구성품",
+     "page": 95,
+     "pdf": 105
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-11",
+    "no": "11",
+    "name": "우주발사체용 비접촉 실",
+    "page": 50,
+    "pdf": 56
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.301,
+     "common_terms": [
+      "도료",
+      "코팅"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-05@p107",
+     "code": "SMESTR-2025-A-13-05",
+     "name": "우주 시스템 제작 소재 및 공정",
+     "page": 97,
+     "pdf": 107
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-12",
+    "no": "12",
+    "name": "우주발사체용 터보펌프 베어링",
+    "page": 51,
+    "pdf": 57
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-13",
+    "no": "13",
+    "name": "우주발사체용 밸브",
+    "page": 52,
+    "pdf": 58
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.304,
+     "common_terms": [
+      "밸브"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-03@p103",
+     "code": "SMESTR-2025-A-13-03",
+     "name": "추진제 공급 시스템 부품 및 구성품",
+     "page": 93,
+     "pdf": 103
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "우주(위성체·발사체)",
+    "uid": "R2025-01-14",
+    "no": "14",
+    "name": "우주발사체용 배관",
+    "page": 53,
+    "pdf": 59
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.386,
+     "common_terms": [
+      "배관",
+      "복합재"
+     ],
+     "same_field_prior": true,
+     "field": "우주",
+     "subfield": "우주 시스템",
+     "uid": "SMESTR-2025-A-13-03@p103",
+     "code": "SMESTR-2025-A-13-03",
+     "name": "추진제 공급 시스템 부품 및 구성품",
+     "page": 93,
+     "pdf": 103
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "첨단항공",
+    "uid": "R2025-02-01",
+    "no": "01",
+    "name": "AAM용 장비·부품",
+    "page": 42,
+    "pdf": 50
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.714,
+     "common_terms": [
+      "aam용",
+      "기본",
+      "구성품"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "항공 모빌리티",
+     "uid": "SMESTR-2025-A-08-20@p230",
+     "code": "SMESTR-2025-A-08-20",
+     "name": "AAM용 장비·부품 패키지",
+     "page": 220,
+     "pdf": 230
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "첨단항공",
+    "uid": "R2025-02-02",
+    "no": "02",
+    "name": "항공전자 시스템",
+    "page": 43,
+    "pdf": 51
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.659,
+     "common_terms": [
+      "항공전자",
+      "이착륙",
+      "자동"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "항공 모빌리티",
+     "uid": "SMESTR-2025-A-08-21@p232",
+     "code": "SMESTR-2025-A-08-21",
+     "name": "차세대 항공전자 시스템",
+     "page": 222,
+     "pdf": 232
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "첨단항공",
+    "uid": "R2025-02-03",
+    "no": "03",
+    "name": "전기동력 추진시스템",
+    "page": 44,
+    "pdf": 52
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.543,
+     "common_terms": [
+      "추진시스템",
+      "프로펠러"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "해상 모빌리티",
+     "uid": "SMESTR-2025-A-08-16@p178",
+     "code": "SMESTR-2025-A-08-16",
+     "name": "전기추진선박 추진시스템",
+     "page": 168,
+     "pdf": 178
+    },
+    {
+     "score": 0.347,
+     "common_terms": [
+      "프로펠러",
+      "모터",
+      "배터리"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "항공 모빌리티",
+     "uid": "SMESTR-2025-A-08-22@p234",
+     "code": "SMESTR-2025-A-08-22",
+     "name": "친환경 항공 추진체계",
+     "page": 224,
+     "pdf": 234
+    },
+    {
+     "score": 0.312,
+     "common_terms": [
+      "충전",
+      "배터리"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-08@p111",
+     "code": "SMESTR-2025-A-08-08",
+     "name": "차세대 배터리 시스템",
+     "page": 101,
+     "pdf": 111
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "첨단항공",
+    "uid": "R2025-02-04",
+    "no": "04",
+    "name": "무인비행체 통합관제 시스템",
+    "page": 45,
+    "pdf": 53
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.619,
+     "common_terms": [
+      "무인비행체"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "항공 모빌리티",
+     "uid": "SMESTR-2025-A-08-23@p236",
+     "code": "SMESTR-2025-A-08-23",
+     "name": "무인비행체 통합관제시스템",
+     "page": 226,
+     "pdf": 236
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "첨단항공",
+    "uid": "R2025-02-05",
+    "no": "05",
+    "name": "항공기용 친환경 소모성 부품",
+    "page": 46,
+    "pdf": 54
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.393,
+     "common_terms": [
+      "항공기용",
+      "친환경"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "항공 모빌리티",
+     "uid": "SMESTR-2025-A-08-22@p234",
+     "code": "SMESTR-2025-A-08-22",
+     "name": "친환경 항공 추진체계",
+     "page": 224,
+     "pdf": 234
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "AI",
+    "uid": "R2025-03-01",
+    "no": "01",
+    "name": "Edge-Device 기반 실시간 지능 플랫폼",
+    "page": 45,
+    "pdf": 53
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "AI",
+    "uid": "R2025-03-02",
+    "no": "02",
+    "name": "데이터 관리 플랫폼",
+    "page": 46,
+    "pdf": 54
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.341,
+     "common_terms": [
+      "품질",
+      "지원"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-20@p240",
+     "code": "SMESTR-2025-A-01-20",
+     "name": "품질향상 지원 에이전트 AI",
+     "page": 230,
+     "pdf": 240
+    },
+    {
+     "score": 0.334,
+     "common_terms": [
+      "품질"
+     ],
+     "same_field_prior": false,
+     "field": "스마트제조",
+     "subfield": "생산관리시스템",
+     "uid": "SMESTR-2025-B-03-01@p261",
+     "code": "SMESTR-2025-B-03-01",
+     "name": "AI 기반 공정·품질 최적화 플랫폼",
+     "page": 253,
+     "pdf": 261
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "AI",
+    "uid": "R2025-03-03",
+    "no": "03",
+    "name": "초거대 복합 AI 실용화 솔루션",
+    "page": 47,
+    "pdf": 55
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "AI",
+    "uid": "R2025-03-04",
+    "no": "04",
+    "name": "휴먼 AI 협업 솔루션",
+    "page": 49,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.337,
+     "common_terms": [
+      "휴먼",
+      "상호작용"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-12@p172",
+     "code": "SMESTR-2025-A-01-12",
+     "name": "디지털 휴먼·아바타 AI",
+     "page": 162,
+     "pdf": 172
+    },
+    {
+     "score": 0.324,
+     "common_terms": [
+      "ui",
+      "ux",
+      "처리",
+      "멀티모달"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-23@p246",
+     "code": "SMESTR-2025-A-01-23",
+     "name": "디지털 취약계층 AI 에이전트",
+     "page": 236,
+     "pdf": 246
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "바이오",
+    "uid": "R2025-04-01",
+    "no": "01",
+    "name": "유전자·세포 치료제",
+    "page": 46,
+    "pdf": 54
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.717,
+     "common_terms": [
+      "유전자",
+      "치료제",
+      "세포",
+      "편집"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "제약바이오",
+     "uid": "SMESTR-2025-A-02-05@p126",
+     "code": "SMESTR-2025-A-02-05",
+     "name": "세포·유전자 치료제",
+     "page": 116,
+     "pdf": 126
+    },
+    {
+     "score": 0.328,
+     "common_terms": [
+      "치료제"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "제약바이오",
+     "uid": "SMESTR-2025-A-02-02@p117",
+     "code": "SMESTR-2025-A-02-02",
+     "name": "항체 기반 치료제",
+     "page": 107,
+     "pdf": 117
+    },
+    {
+     "score": 0.321,
+     "common_terms": [
+      "세포",
+      "오가노이드"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "제약바이오",
+     "uid": "SMESTR-2025-A-02-04@p123",
+     "code": "SMESTR-2025-A-02-04",
+     "name": "오가노이드치료제",
+     "page": 113,
+     "pdf": 123
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "바이오",
+    "uid": "R2025-04-02",
+    "no": "02",
+    "name": "디지털 헬스 데이터 분석·활용 솔루션",
+    "page": 47,
+    "pdf": 55
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.345,
+     "common_terms": [
+      "전자약"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-25@p272",
+     "code": "SMESTR-2025-A-02-25",
+     "name": "전자약",
+     "page": 262,
+     "pdf": 272
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "바이오",
+    "uid": "R2025-04-03",
+    "no": "03",
+    "name": "감염병 백신·치료제",
+    "page": 48,
+    "pdf": 56
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.92,
+     "common_terms": [
+      "감염병",
+      "백신",
+      "치료제"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "제약바이오",
+     "uid": "SMESTR-2025-A-02-03@p120",
+     "code": "SMESTR-2025-A-02-03",
+     "name": "감염병 백신 치료제",
+     "page": 110,
+     "pdf": 120
+    },
+    {
+     "score": 0.349,
+     "common_terms": [
+      "치료제"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "제약바이오",
+     "uid": "SMESTR-2025-A-02-02@p117",
+     "code": "SMESTR-2025-A-02-02",
+     "name": "항체 기반 치료제",
+     "page": 107,
+     "pdf": 117
+    },
+    {
+     "score": 0.318,
+     "common_terms": [
+      "치료제"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "제약바이오",
+     "uid": "SMESTR-2025-A-02-05@p126",
+     "code": "SMESTR-2025-A-02-05",
+     "name": "세포·유전자 치료제",
+     "page": 116,
+     "pdf": 126
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "바이오",
+    "uid": "R2025-04-04",
+    "no": "04",
+    "name": "합성생물 제조 시스템",
+    "page": 49,
+    "pdf": 57
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "바이오",
+    "uid": "R2025-04-05",
+    "no": "05",
+    "name": "바이오 융·복합 치료기기",
+    "page": 51,
+    "pdf": 59
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.388,
+     "common_terms": [
+      "치료기기"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-19@p260",
+     "code": "SMESTR-2025-A-02-19",
+     "name": "디지털 치료기기(불면,우울,근골격 등 DTx 솔루션)",
+     "page": 250,
+     "pdf": 260
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "시스템반도체",
+    "uid": "R2025-05-01",
+    "no": "01",
+    "name": "차량용 반도체",
+    "page": 42,
+    "pdf": 52
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.386,
+     "common_terms": [
+      "차량용",
+      "차량"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-02@p111",
+     "code": "SMESTR-2025-A-03-02",
+     "name": "차량용 온디바이스 AI SoC",
+     "page": 101,
+     "pdf": 111
+    },
+    {
+     "score": 0.308,
+     "common_terms": [
+      "반도체",
+      "보안",
+      "센서"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-06@p119",
+     "code": "SMESTR-2025-A-03-06",
+     "name": "온센서 AI 반도체 및 모듈",
+     "page": 109,
+     "pdf": 119
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "시스템반도체",
+    "uid": "R2025-05-02",
+    "no": "02",
+    "name": "바이오·헬스케어용 반도체",
+    "page": 44,
+    "pdf": 54
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "시스템반도체",
+    "uid": "R2025-05-03",
+    "no": "03",
+    "name": "전력반도체",
+    "page": 46,
+    "pdf": 56
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "시스템반도체",
+    "uid": "R2025-05-04",
+    "no": "04",
+    "name": "아날로그·디지털제어 반도체",
+    "page": 47,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.318,
+     "common_terms": [
+      "아날로그",
+      "adc"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-05@p117",
+     "code": "SMESTR-2025-A-03-05",
+     "name": "센서 처리용 ROIC",
+     "page": 107,
+     "pdf": 117
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "시스템반도체",
+    "uid": "R2025-05-05",
+    "no": "05",
+    "name": "시스템반도체 설계 IP",
+    "page": 49,
+    "pdf": 59
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.396,
+     "common_terms": [
+      "ip",
+      "인터페이스"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-04@p115",
+     "code": "SMESTR-2025-A-03-04",
+     "name": "고속 메모리용 IP",
+     "page": 105,
+     "pdf": 115
+    },
+    {
+     "score": 0.306,
+     "common_terms": [
+      "soc",
+      "반도체",
+      "인터페이스"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-06@p119",
+     "code": "SMESTR-2025-A-03-06",
+     "name": "온센서 AI 반도체 및 모듈",
+     "page": 109,
+     "pdf": 119
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "시스템반도체",
+    "uid": "R2025-05-06",
+    "no": "06",
+    "name": "보안용 인공지능 반도체",
+    "page": 51,
+    "pdf": 61
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.316,
+     "common_terms": [
+      "반도체",
+      "인터페이스",
+      "보안"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-06@p119",
+     "code": "SMESTR-2025-A-03-06",
+     "name": "온센서 AI 반도체 및 모듈",
+     "page": 109,
+     "pdf": 119
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "차세대이동통신",
+    "uid": "R2025-06-01",
+    "no": "01",
+    "name": "5G 오픈랜 액세스 장비",
+    "page": 55,
+    "pdf": 65
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.304,
+     "common_terms": [
+      "5g"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "유·무선 통신 장비",
+     "uid": "SMESTR-2025-A-04-08@p113",
+     "code": "SMESTR-2025-A-04-08",
+     "name": "산업용 IoT 지원 5G 특화망-TSN 연동 장치",
+     "page": 103,
+     "pdf": 113
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "차세대이동통신",
+    "uid": "R2025-06-02",
+    "no": "02",
+    "name": "5G 통신 모듈",
+    "page": 56,
+    "pdf": 66
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.383,
+     "common_terms": [
+      "빔포밍",
+      "안테나"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "통신 부품",
+     "uid": "SMESTR-2025-A-04-13@p171",
+     "code": "SMESTR-2025-A-04-13",
+     "name": "빔포밍 안테나 모듈",
+     "page": 161,
+     "pdf": 171
+    },
+    {
+     "score": 0.352,
+     "common_terms": [
+      "커버리지",
+      "빔포밍",
+      "안테나"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "유·무선 통신 장비",
+     "uid": "SMESTR-2025-A-04-03@p103",
+     "code": "SMESTR-2025-A-04-03",
+     "name": "차세대 네트워크 중계기",
+     "page": 93,
+     "pdf": 103
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "차세대이동통신",
+    "uid": "R2025-06-03",
+    "no": "03",
+    "name": "위성통신 부품 및 모듈",
+    "page": 57,
+    "pdf": 67
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.416,
+     "common_terms": [
+      "송수신",
+      "안테나"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "통신 부품",
+     "uid": "SMESTR-2025-A-04-13@p171",
+     "code": "SMESTR-2025-A-04-13",
+     "name": "빔포밍 안테나 모듈",
+     "page": 161,
+     "pdf": 171
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "차세대이동통신",
+    "uid": "R2025-06-04",
+    "no": "04",
+    "name": "5G 프론트홀 및 백홀",
+    "page": 58,
+    "pdf": 68
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.446,
+     "common_terms": [
+      "백홀",
+      "xhaul",
+      "슬라이싱",
+      "모바일",
+      "지원"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "유·무선 통신 장비",
+     "uid": "SMESTR-2025-A-04-01@p99",
+     "code": "SMESTR-2025-A-04-01",
+     "name": "광액세스 OLT, ONU",
+     "page": 89,
+     "pdf": 99
+    },
+    {
+     "score": 0.33,
+     "common_terms": [
+      "5g",
+      "지원"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "유·무선 통신 장비",
+     "uid": "SMESTR-2025-A-04-08@p113",
+     "code": "SMESTR-2025-A-04-08",
+     "name": "산업용 IoT 지원 5G 특화망-TSN 연동 장치",
+     "page": 103,
+     "pdf": 113
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "차세대이동통신",
+    "uid": "R2025-06-05",
+    "no": "05",
+    "name": "5G/6G 중계기",
+    "page": 59,
+    "pdf": 69
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.43,
+     "common_terms": [
+      "중계기",
+      "네트워크"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "유·무선 통신 장비",
+     "uid": "SMESTR-2025-A-04-03@p103",
+     "code": "SMESTR-2025-A-04-03",
+     "name": "차세대 네트워크 중계기",
+     "page": 93,
+     "pdf": 103
+    },
+    {
+     "score": 0.301,
+     "common_terms": [
+      "5g"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "유·무선 통신 장비",
+     "uid": "SMESTR-2025-A-04-08@p113",
+     "code": "SMESTR-2025-A-04-08",
+     "name": "산업용 IoT 지원 5G 특화망-TSN 연동 장치",
+     "page": 103,
+     "pdf": 113
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "차세대이동통신",
+    "uid": "R2025-06-06",
+    "no": "06",
+    "name": "데이터센터 네트워크 장비",
+    "page": 60,
+    "pdf": 70
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.475,
+     "common_terms": [
+      "데이터센터",
+      "이더넷",
+      "고속"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "유·무선 통신 장비",
+     "uid": "SMESTR-2025-A-04-02@p101",
+     "code": "SMESTR-2025-A-04-02",
+     "name": "이더넷 기반 데이터센터 서버 NIC",
+     "page": 91,
+     "pdf": 101
+    },
+    {
+     "score": 0.363,
+     "common_terms": [
+      "네트워크",
+      "고속"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "유·무선 통신 장비",
+     "uid": "SMESTR-2025-A-04-07@p111",
+     "code": "SMESTR-2025-A-04-07",
+     "name": "지능형 암호통신 네트워크 장비",
+     "page": 101,
+     "pdf": 111
+    },
+    {
+     "score": 0.303,
+     "common_terms": [
+      "네트워크",
+      "프로토콜"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "유·무선 통신 장비",
+     "uid": "SMESTR-2025-A-04-03@p103",
+     "code": "SMESTR-2025-A-04-03",
+     "name": "차세대 네트워크 중계기",
+     "page": 93,
+     "pdf": 103
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자율주행차",
+    "uid": "R2025-07-01",
+    "no": "01",
+    "name": "자율주행 알고리즘",
+    "page": 37,
+    "pdf": 47
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.478,
+     "common_terms": [
+      "자율주행",
+      "판단",
+      "인지"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-01@p97",
+     "code": "SMESTR-2025-A-08-01",
+     "name": "지능형 자율주행 시스템",
+     "page": 87,
+     "pdf": 97
+    },
+    {
+     "score": 0.316,
+     "common_terms": [
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-05@p105",
+     "code": "SMESTR-2025-A-08-05",
+     "name": "자율주행 검증·시뮬레이션 플랫폼",
+     "page": 95,
+     "pdf": 105
+    },
+    {
+     "score": 0.308,
+     "common_terms": [
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-02@p99",
+     "code": "SMESTR-2025-A-08-02",
+     "name": "차세대 자율주행 센서 플랫폼",
+     "page": 89,
+     "pdf": 99
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자율주행차",
+    "uid": "R2025-07-02",
+    "no": "02",
+    "name": "차세대 자율주행 인지 센서",
+    "page": 38,
+    "pdf": 48
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.406,
+     "common_terms": [
+      "자율주행",
+      "센서"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-02@p99",
+     "code": "SMESTR-2025-A-08-02",
+     "name": "차세대 자율주행 센서 플랫폼",
+     "page": 89,
+     "pdf": 99
+    },
+    {
+     "score": 0.383,
+     "common_terms": [
+      "인지",
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-01@p97",
+     "code": "SMESTR-2025-A-08-01",
+     "name": "지능형 자율주행 시스템",
+     "page": 87,
+     "pdf": 97
+    },
+    {
+     "score": 0.356,
+     "common_terms": [
+      "자율주행",
+      "센서",
+      "3d"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-05@p105",
+     "code": "SMESTR-2025-A-08-05",
+     "name": "자율주행 검증·시뮬레이션 플랫폼",
+     "page": 95,
+     "pdf": 105
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자율주행차",
+    "uid": "R2025-07-03",
+    "no": "03",
+    "name": "자율 협력 주행 솔루션",
+    "page": 39,
+    "pdf": 49
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.783,
+     "common_terms": [
+      "협력",
+      "주행",
+      "자율",
+      "인프라"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-03@p101",
+     "code": "SMESTR-2025-A-08-03",
+     "name": "자율 협력 주행 솔루션",
+     "page": 91,
+     "pdf": 101
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자율주행차",
+    "uid": "R2025-07-04",
+    "no": "04",
+    "name": "자율주행 데이터처리 솔루션",
+    "page": 41,
+    "pdf": 51
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.333,
+     "common_terms": [
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-01@p97",
+     "code": "SMESTR-2025-A-08-01",
+     "name": "지능형 자율주행 시스템",
+     "page": 87,
+     "pdf": 97
+    },
+    {
+     "score": 0.327,
+     "common_terms": [
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-05@p105",
+     "code": "SMESTR-2025-A-08-05",
+     "name": "자율주행 검증·시뮬레이션 플랫폼",
+     "page": 95,
+     "pdf": 105
+    },
+    {
+     "score": 0.315,
+     "common_terms": [
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-02@p99",
+     "code": "SMESTR-2025-A-08-02",
+     "name": "차세대 자율주행 센서 플랫폼",
+     "page": 89,
+     "pdf": 99
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자율주행차",
+    "uid": "R2025-07-05",
+    "no": "05",
+    "name": "자율주행 개발장비",
+    "page": 43,
+    "pdf": 53
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.555,
+     "common_terms": [
+      "자율주행",
+      "hw",
+      "sw",
+      "시뮬레이션"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-05@p105",
+     "code": "SMESTR-2025-A-08-05",
+     "name": "자율주행 검증·시뮬레이션 플랫폼",
+     "page": 95,
+     "pdf": 105
+    },
+    {
+     "score": 0.38,
+     "common_terms": [
+      "자율주행",
+      "sw"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-01@p97",
+     "code": "SMESTR-2025-A-08-01",
+     "name": "지능형 자율주행 시스템",
+     "page": 87,
+     "pdf": 97
+    },
+    {
+     "score": 0.317,
+     "common_terms": [
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-02@p99",
+     "code": "SMESTR-2025-A-08-02",
+     "name": "차세대 자율주행 센서 플랫폼",
+     "page": 89,
+     "pdf": 99
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자율주행차",
+    "uid": "R2025-07-06",
+    "no": "06",
+    "name": "자율주행 보안·안전 시스템",
+    "page": 44,
+    "pdf": 54
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.381,
+     "common_terms": [
+      "자율주행",
+      "상황",
+      "예측"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-01@p97",
+     "code": "SMESTR-2025-A-08-01",
+     "name": "지능형 자율주행 시스템",
+     "page": 87,
+     "pdf": 97
+    },
+    {
+     "score": 0.316,
+     "common_terms": [
+      "자율주행",
+      "안전"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-05@p105",
+     "code": "SMESTR-2025-A-08-05",
+     "name": "자율주행 검증·시뮬레이션 플랫폼",
+     "page": 95,
+     "pdf": 105
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자율주행차",
+    "uid": "R2025-07-07",
+    "no": "07",
+    "name": "자율주행차 연계서비스",
+    "page": 45,
+    "pdf": 55
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.409,
+     "common_terms": [
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-01@p97",
+     "code": "SMESTR-2025-A-08-01",
+     "name": "지능형 자율주행 시스템",
+     "page": 87,
+     "pdf": 97
+    },
+    {
+     "score": 0.402,
+     "common_terms": [
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-05@p105",
+     "code": "SMESTR-2025-A-08-05",
+     "name": "자율주행 검증·시뮬레이션 플랫폼",
+     "page": 95,
+     "pdf": 105
+    },
+    {
+     "score": 0.383,
+     "common_terms": [
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-02@p99",
+     "code": "SMESTR-2025-A-08-02",
+     "name": "차세대 자율주행 센서 플랫폼",
+     "page": 89,
+     "pdf": 99
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "지능형로봇",
+    "uid": "R2025-08-01",
+    "no": "01",
+    "name": "고난도 조작 구현 로봇핸드",
+    "page": 45,
+    "pdf": 55
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.381,
+     "common_terms": [
+      "엑추에이터",
+      "소형"
+     ],
+     "same_field_prior": true,
+     "field": "로봇",
+     "subfield": "로봇 부품·소프트웨어",
+     "uid": "SMESTR-2025-A-07-02@p100",
+     "code": "SMESTR-2025-A-07-02",
+     "name": "소형·경량·고정밀 엑추에이터 모듈",
+     "page": 89,
+     "pdf": 100
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "지능형로봇",
+    "uid": "R2025-08-02",
+    "no": "02",
+    "name": "로봇 시험평가 시스템",
+    "page": 46,
+    "pdf": 56
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.413,
+     "common_terms": [
+      "인간",
+      "로봇",
+      "안전"
+     ],
+     "same_field_prior": true,
+     "field": "로봇",
+     "subfield": "서비스용 로봇",
+     "uid": "SMESTR-2025-A-07-14@p217",
+     "code": "SMESTR-2025-A-07-14",
+     "name": "의료·헬스케어 로봇 시스템",
+     "page": 206,
+     "pdf": 217
+    },
+    {
+     "score": 0.332,
+     "common_terms": [
+      "로봇"
+     ],
+     "same_field_prior": true,
+     "field": "로봇",
+     "subfield": "서비스용 로봇",
+     "uid": "SMESTR-2025-A-07-16@p222",
+     "code": "SMESTR-2025-A-07-16",
+     "name": "F&B 로봇 시스템",
+     "page": 211,
+     "pdf": 222
+    },
+    {
+     "score": 0.314,
+     "common_terms": [
+      "로봇",
+      "센서"
+     ],
+     "same_field_prior": true,
+     "field": "로봇",
+     "subfield": "서비스용 로봇",
+     "uid": "SMESTR-2025-A-07-17@p224",
+     "code": "SMESTR-2025-A-07-17",
+     "name": "건설·재난 로봇 시스템",
+     "page": 213,
+     "pdf": 224
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "지능형로봇",
+    "uid": "R2025-08-03",
+    "no": "03",
+    "name": "지능형 물류·배송 로봇",
+    "page": 47,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.569,
+     "common_terms": [
+      "배송",
+      "물류",
+      "물체",
+      "로봇",
+      "자율주행"
+     ],
+     "same_field_prior": true,
+     "field": "로봇",
+     "subfield": "서비스용 로봇",
+     "uid": "SMESTR-2025-A-07-13@p214",
+     "code": "SMESTR-2025-A-07-13",
+     "name": "스마트 물류·배송 로봇 시스템",
+     "page": 203,
+     "pdf": 214
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "지능형로봇",
+    "uid": "R2025-08-04",
+    "no": "04",
+    "name": "농업 자동화 로봇",
+    "page": 48,
+    "pdf": 58
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.369,
+     "common_terms": [
+      "농작업",
+      "로봇"
+     ],
+     "same_field_prior": true,
+     "field": "로봇",
+     "subfield": "서비스용 로봇",
+     "uid": "SMESTR-2025-A-07-15@p219",
+     "code": "SMESTR-2025-A-07-15",
+     "name": "농업용 로봇 시스템",
+     "page": 208,
+     "pdf": 219
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "지능형로봇",
+    "uid": "R2025-08-05",
+    "no": "05",
+    "name": "행동보조용 웨어러블 로봇",
+    "page": 49,
+    "pdf": 59
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "지능형로봇",
+    "uid": "R2025-08-06",
+    "no": "06",
+    "name": "재활로봇",
+    "page": 50,
+    "pdf": 60
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "미래형선박",
+    "uid": "R2025-09-01",
+    "no": "01",
+    "name": "저탄소 연료 선박용 기자재",
+    "page": 43,
+    "pdf": 51
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "미래형선박",
+    "uid": "R2025-09-02",
+    "no": "02",
+    "name": "무탄소 연료 선박용 기자재",
+    "page": 44,
+    "pdf": 52
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.369,
+     "common_terms": [
+      "무탄소",
+      "연료",
+      "연소"
+     ],
+     "same_field_prior": false,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-07@p155",
+     "code": "SMESTR-2025-A-09-07",
+     "name": "무탄소 연료 산업용 보일러",
+     "page": 145,
+     "pdf": 155
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "미래형선박",
+    "uid": "R2025-09-03",
+    "no": "03",
+    "name": "선박 자율운항 지원 서비스 및 플랫폼",
+    "page": 45,
+    "pdf": 53
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.39,
+     "common_terms": [
+      "선박",
+      "항해"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "해상 모빌리티",
+     "uid": "SMESTR-2025-A-08-11@p165",
+     "code": "SMESTR-2025-A-08-11",
+     "name": "자율운항선박 항해·기관·원격운영 통합 플랫폼",
+     "page": 155,
+     "pdf": 165
+    },
+    {
+     "score": 0.352,
+     "common_terms": [
+      "선박",
+      "원격"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "해상 모빌리티",
+     "uid": "SMESTR-2025-A-08-18@p182",
+     "code": "SMESTR-2025-A-08-18",
+     "name": "차세대 해상통신 및 위성 기반 통합 통신 및 선박·해양·어업 서비스",
+     "page": 172,
+     "pdf": 182
+    },
+    {
+     "score": 0.307,
+     "common_terms": [
+      "선박"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "해상 모빌리티",
+     "uid": "SMESTR-2025-A-08-19@p184",
+     "code": "SMESTR-2025-A-08-19",
+     "name": "고강도·경량 선박 소재 부품",
+     "page": 174,
+     "pdf": 184
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "미래형선박",
+    "uid": "R2025-09-04",
+    "no": "04",
+    "name": "선박용 스마트 관리시스템",
+    "page": 46,
+    "pdf": 54
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.353,
+     "common_terms": [
+      "선박용",
+      "친환경"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "해상 모빌리티",
+     "uid": "SMESTR-2025-A-08-14@p174",
+     "code": "SMESTR-2025-A-08-14",
+     "name": "친환경 추진선박 동력발생 보조 시스템",
+     "page": 164,
+     "pdf": 174
+    },
+    {
+     "score": 0.308,
+     "common_terms": [
+      "화물",
+      "지원"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "해상 모빌리티",
+     "uid": "SMESTR-2025-A-08-17@p180",
+     "code": "SMESTR-2025-A-08-17",
+     "name": "지능형 항해안전 센서·인식장치 및 경제운항 지원 시스템",
+     "page": 170,
+     "pdf": 180
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "청정연료",
+    "uid": "R2025-10-01",
+    "no": "01",
+    "name": "수소 연료 기반 다이캐스팅용 무탄소 용해로",
+    "page": 35,
+    "pdf": 47
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.484,
+     "common_terms": [
+      "무탄소",
+      "연료",
+      "공급"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-07@p155",
+     "code": "SMESTR-2025-A-09-07",
+     "name": "무탄소 연료 산업용 보일러",
+     "page": 145,
+     "pdf": 155
+    },
+    {
+     "score": 0.334,
+     "common_terms": [
+      "연료",
+      "수소",
+      "버너"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-08@p157",
+     "code": "SMESTR-2025-A-09-08",
+     "name": "친환경 제조공정 에너지 제어 시스템",
+     "page": 147,
+     "pdf": 157
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "청정연료",
+    "uid": "R2025-10-02",
+    "no": "02",
+    "name": "수소 사용 바이오연료 생산 공정",
+    "page": 36,
+    "pdf": 48
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.409,
+     "common_terms": [
+      "수소"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "무탄소 에너지 전환",
+     "uid": "SMESTR-2025-A-09-06@p108",
+     "code": "SMESTR-2025-A-09-06",
+     "name": "차세대 수소 생산·저장 시스템",
+     "page": 98,
+     "pdf": 108
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "청정연료",
+    "uid": "R2025-10-03",
+    "no": "03",
+    "name": "암모니아 제거 및 수소 생산 전기분해 시스템",
+    "page": 37,
+    "pdf": 49
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.434,
+     "common_terms": [
+      "수소",
+      "촉매"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "무탄소 에너지 전환",
+     "uid": "SMESTR-2025-A-09-06@p108",
+     "code": "SMESTR-2025-A-09-06",
+     "name": "차세대 수소 생산·저장 시스템",
+     "page": 98,
+     "pdf": 108
+    },
+    {
+     "score": 0.391,
+     "common_terms": [
+      "암모니아",
+      "수소",
+      "에너지",
+      "친환경"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-08@p157",
+     "code": "SMESTR-2025-A-09-08",
+     "name": "친환경 제조공정 에너지 제어 시스템",
+     "page": 147,
+     "pdf": 157
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "청정연료",
+    "uid": "R2025-10-04",
+    "no": "04",
+    "name": "그린 암모니아(e-NH3) 저압 생산·활용 시스템",
+    "page": 38,
+    "pdf": 50
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.452,
+     "common_terms": [
+      "암모니아",
+      "버너",
+      "혼소"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-08@p157",
+     "code": "SMESTR-2025-A-09-08",
+     "name": "친환경 제조공정 에너지 제어 시스템",
+     "page": 147,
+     "pdf": 157
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "청정연료",
+    "uid": "R2025-10-05",
+    "no": "05",
+    "name": "고효율 수소 생산 시스템",
+    "page": 39,
+    "pdf": 51
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.672,
+     "common_terms": [
+      "수소",
+      "수전해",
+      "촉매"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "무탄소 에너지 전환",
+     "uid": "SMESTR-2025-A-09-06@p108",
+     "code": "SMESTR-2025-A-09-06",
+     "name": "차세대 수소 생산·저장 시스템",
+     "page": 98,
+     "pdf": 108
+    },
+    {
+     "score": 0.307,
+     "common_terms": [
+      "재생에너지",
+      "연계"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "무탄소 에너지 전환",
+     "uid": "SMESTR-2025-A-09-01@p98",
+     "code": "SMESTR-2025-A-09-01",
+     "name": "AI 기반 계통 안정화 제어 시스템",
+     "page": 88,
+     "pdf": 98
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "청정연료",
+    "uid": "R2025-10-06",
+    "no": "06",
+    "name": "E-Fuel 생산 시스템",
+    "page": 40,
+    "pdf": 52
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.371,
+     "common_terms": [
+      "co2",
+      "에너지"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-15@p171",
+     "code": "SMESTR-2025-A-09-15",
+     "name": "고성능 CO2 포집 시스템",
+     "page": 161,
+     "pdf": 171
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "청정연료",
+    "uid": "R2025-10-07",
+    "no": "07",
+    "name": "고발열량 합성천연가스 생산 시스템",
+    "page": 41,
+    "pdf": 53
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.359,
+     "common_terms": [
+      "온실가스"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-13@p167",
+     "code": "SMESTR-2025-A-09-13",
+     "name": "고GWP 온실가스 처리 시스템",
+     "page": 157,
+     "pdf": 167
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "청정연료",
+    "uid": "R2025-10-08",
+    "no": "08",
+    "name": "수전해 및 CO2 메탄화 하이브리드 공정 개발",
+    "page": 42,
+    "pdf": 54
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.366,
+     "common_terms": [
+      "co2"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-15@p171",
+     "code": "SMESTR-2025-A-09-15",
+     "name": "고성능 CO2 포집 시스템",
+     "page": 161,
+     "pdf": 171
+    },
+    {
+     "score": 0.355,
+     "common_terms": [
+      "수전해"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "무탄소 에너지 전환",
+     "uid": "SMESTR-2025-A-09-06@p108",
+     "code": "SMESTR-2025-A-09-06",
+     "name": "차세대 수소 생산·저장 시스템",
+     "page": 98,
+     "pdf": 108
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "신재생에너지",
+    "uid": "R2025-11-01",
+    "no": "01",
+    "name": "분산전원 연계 태양광 운영 시스템",
+    "page": 47,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.311,
+     "common_terms": [
+      "재생에너지",
+      "연계"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "무탄소 에너지 전환",
+     "uid": "SMESTR-2025-A-09-01@p98",
+     "code": "SMESTR-2025-A-09-01",
+     "name": "AI 기반 계통 안정화 제어 시스템",
+     "page": 88,
+     "pdf": 98
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "신재생에너지",
+    "uid": "R2025-11-02",
+    "no": "02",
+    "name": "고효율 태양광 모듈 및 장치",
+    "page": 48,
+    "pdf": 58
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "신재생에너지",
+    "uid": "R2025-11-03",
+    "no": "03",
+    "name": "건물일체형 태양광 발전 시스템",
+    "page": 49,
+    "pdf": 59
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.334,
+     "common_terms": [
+      "발전"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-08@p157",
+     "code": "SMESTR-2025-A-09-08",
+     "name": "친환경 제조공정 에너지 제어 시스템",
+     "page": 147,
+     "pdf": 157
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "신재생에너지",
+    "uid": "R2025-11-04",
+    "no": "04",
+    "name": "수소 연료 전지 시스템",
+    "page": 50,
+    "pdf": 60
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.339,
+     "common_terms": [
+      "수소"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "무탄소 에너지 전환",
+     "uid": "SMESTR-2025-A-09-06@p108",
+     "code": "SMESTR-2025-A-09-06",
+     "name": "차세대 수소 생산·저장 시스템",
+     "page": 98,
+     "pdf": 108
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "신재생에너지",
+    "uid": "R2025-11-05",
+    "no": "05",
+    "name": "100 kW급 이하 소형 수소혼소식 가스엔진 발전기",
+    "page": 51,
+    "pdf": 61
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "신재생에너지",
+    "uid": "R2025-11-06",
+    "no": "06",
+    "name": "초소형 보조발전용 8kW급 수소엔진",
+    "page": 52,
+    "pdf": 62
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "신재생에너지",
+    "uid": "R2025-11-07",
+    "no": "07",
+    "name": "고효율 소형 풍력발전 시스템",
+    "page": 53,
+    "pdf": 63
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "이차전지",
+    "uid": "R2025-12-01",
+    "no": "01",
+    "name": "실리콘 복합 음극재",
+    "page": 37,
+    "pdf": 49
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.31,
+     "common_terms": [
+      "실리콘"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-02@p98",
+     "code": "SMESTR-2025-A-10-02",
+     "name": "저팽창 실리콘계 음극·전극",
+     "page": 88,
+     "pdf": 98
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "이차전지",
+    "uid": "R2025-12-02",
+    "no": "02",
+    "name": "리튬인산철 양극재",
+    "page": 38,
+    "pdf": 50
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.407,
+     "common_terms": [
+      "양극재",
+      "고전압",
+      "양극"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-05@p104",
+     "code": "SMESTR-2025-A-10-05",
+     "name": "경제성 강화 양극재",
+     "page": 94,
+     "pdf": 104
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "이차전지",
+    "uid": "R2025-12-03",
+    "no": "03",
+    "name": "고안전성·친환경 바인더",
+    "page": 39,
+    "pdf": 51
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "이차전지",
+    "uid": "R2025-12-04",
+    "no": "04",
+    "name": "고안전성 이차전지 전해질 첨가제",
+    "page": 40,
+    "pdf": 52
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.499,
+     "common_terms": [
+      "첨가제",
+      "전해질",
+      "난연성"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-03@p100",
+     "code": "SMESTR-2025-A-10-03",
+     "name": "고전압용 전해질 안정화 첨가제",
+     "page": 90,
+     "pdf": 100
+    },
+    {
+     "score": 0.376,
+     "common_terms": [
+      "이차전지",
+      "전해질"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-06@p106",
+     "code": "SMESTR-2025-A-10-06",
+     "name": "차세대 이차전지",
+     "page": 96,
+     "pdf": 106
+    },
+    {
+     "score": 0.308,
+     "common_terms": [
+      "이차전지"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-08@p110",
+     "code": "SMESTR-2025-A-10-08",
+     "name": "이차전지 제조 시스템",
+     "page": 100,
+     "pdf": 110
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "이차전지",
+    "uid": "R2025-12-05",
+    "no": "05",
+    "name": "이차전지 제조 시스템",
+    "page": 41,
+    "pdf": 53
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.555,
+     "common_terms": [
+      "이차전지"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-08@p110",
+     "code": "SMESTR-2025-A-10-08",
+     "name": "이차전지 제조 시스템",
+     "page": 100,
+     "pdf": 110
+    },
+    {
+     "score": 0.37,
+     "common_terms": [
+      "이차전지"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-06@p106",
+     "code": "SMESTR-2025-A-10-06",
+     "name": "차세대 이차전지",
+     "page": 96,
+     "pdf": 106
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "이차전지",
+    "uid": "R2025-12-06",
+    "no": "06",
+    "name": "차세대 이차전지",
+    "page": 42,
+    "pdf": 54
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.598,
+     "common_terms": [
+      "이차전지"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-06@p106",
+     "code": "SMESTR-2025-A-10-06",
+     "name": "차세대 이차전지",
+     "page": 96,
+     "pdf": 106
+    },
+    {
+     "score": 0.42,
+     "common_terms": [
+      "이차전지"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-08@p110",
+     "code": "SMESTR-2025-A-10-08",
+     "name": "이차전지 제조 시스템",
+     "page": 100,
+     "pdf": 110
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "이차전지",
+    "uid": "R2025-12-07",
+    "no": "07",
+    "name": "사용후 배터리 재사용 시스템",
+    "page": 43,
+    "pdf": 55
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.516,
+     "common_terms": [
+      "사용후",
+      "재사용",
+      "배터리",
+      "분리"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "배터리 재사용·재활용 시스템",
+     "uid": "SMESTR-2025-A-10-13@p165",
+     "code": "SMESTR-2025-A-10-13",
+     "name": "배터리 재사용·재활용 해체 자동화 시스템",
+     "page": 155,
+     "pdf": 165
+    },
+    {
+     "score": 0.472,
+     "common_terms": [
+      "사용후",
+      "재사용",
+      "배터리",
+      "회수"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "배터리 재사용·재활용 시스템",
+     "uid": "SMESTR-2025-A-10-12@p163",
+     "code": "SMESTR-2025-A-10-12",
+     "name": "배터리 업사이클링 공정 패키지",
+     "page": 153,
+     "pdf": 163
+    },
+    {
+     "score": 0.404,
+     "common_terms": [
+      "사용후",
+      "배터리"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "배터리 재사용·재활용 시스템",
+     "uid": "SMESTR-2025-A-10-11@p161",
+     "code": "SMESTR-2025-A-10-11",
+     "name": "사용후 배터리 통합 운영·관리 플랫폼",
+     "page": 151,
+     "pdf": 161
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "이차전지",
+    "uid": "R2025-12-08",
+    "no": "08",
+    "name": "폐배터리 재활용 시스템",
+    "page": 44,
+    "pdf": 56
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.453,
+     "common_terms": [
+      "폐배터리",
+      "재활용",
+      "회수",
+      "진단",
+      "모니터링"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "배터리 재사용·재활용 시스템",
+     "uid": "SMESTR-2025-A-10-10@p159",
+     "code": "SMESTR-2025-A-10-10",
+     "name": "고품질 블랙매스 회수 전처리 시스템",
+     "page": 149,
+     "pdf": 159
+    },
+    {
+     "score": 0.452,
+     "common_terms": [
+      "재활용",
+      "해체",
+      "재사용"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "배터리 재사용·재활용 시스템",
+     "uid": "SMESTR-2025-A-10-13@p165",
+     "code": "SMESTR-2025-A-10-13",
+     "name": "배터리 재사용·재활용 해체 자동화 시스템",
+     "page": 155,
+     "pdf": 165
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경자동차",
+    "uid": "R2025-13-01",
+    "no": "01",
+    "name": "열관리 시스템",
+    "page": 42,
+    "pdf": 50
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.865,
+     "common_terms": [
+      "전력부품",
+      "열관리",
+      "히트펌프",
+      "연료전지",
+      "배터리"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-07@p109",
+     "code": "SMESTR-2025-A-08-07",
+     "name": "통합 열관리 시스템",
+     "page": 99,
+     "pdf": 109
+    },
+    {
+     "score": 0.402,
+     "common_terms": [
+      "열관리",
+      "배터리"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-09@p112",
+     "code": "SMESTR-2025-A-10-09",
+     "name": "배터리 열관리 시스템",
+     "page": 102,
+     "pdf": 112
+    },
+    {
+     "score": 0.356,
+     "common_terms": [
+      "열관리",
+      "제어기술",
+      "연료전지"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-09@p114",
+     "code": "SMESTR-2025-A-08-09",
+     "name": "차세대 수소연료전지 시스템",
+     "page": 104,
+     "pdf": 114
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경자동차",
+    "uid": "R2025-13-02",
+    "no": "02",
+    "name": "전력변환 시스템",
+    "page": 43,
+    "pdf": 51
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.617,
+     "common_terms": [
+      "hdc",
+      "ldc",
+      "obc",
+      "양방향",
+      "인버터"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-06@p107",
+     "code": "SMESTR-2025-A-08-06",
+     "name": "차세대 전기구동 파워트레인 시스템",
+     "page": 97,
+     "pdf": 107
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경자동차",
+    "uid": "R2025-13-03",
+    "no": "03",
+    "name": "배터리 시스템",
+    "page": 44,
+    "pdf": 52
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.84,
+     "common_terms": [
+      "분류장치",
+      "요소기술",
+      "배터리",
+      "bms",
+      "폐배터리"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-08@p111",
+     "code": "SMESTR-2025-A-08-08",
+     "name": "차세대 배터리 시스템",
+     "page": 101,
+     "pdf": 111
+    },
+    {
+     "score": 0.411,
+     "common_terms": [
+      "배터리",
+      "열관리"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "이차전지 소재·엔지니어링",
+     "uid": "SMESTR-2025-A-10-09@p112",
+     "code": "SMESTR-2025-A-10-09",
+     "name": "배터리 열관리 시스템",
+     "page": 102,
+     "pdf": 112
+    },
+    {
+     "score": 0.408,
+     "common_terms": [
+      "배터리",
+      "열관리"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-07@p109",
+     "code": "SMESTR-2025-A-08-07",
+     "name": "통합 열관리 시스템",
+     "page": 99,
+     "pdf": 109
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경자동차",
+    "uid": "R2025-13-04",
+    "no": "04",
+    "name": "전기자동차 충전시스템",
+    "page": 45,
+    "pdf": 53
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.408,
+     "common_terms": [
+      "hpc",
+      "충전",
+      "관제",
+      "초고속"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-08@p111",
+     "code": "SMESTR-2025-A-08-08",
+     "name": "차세대 배터리 시스템",
+     "page": 101,
+     "pdf": 111
+    },
+    {
+     "score": 0.354,
+     "common_terms": [
+      "충전시스템",
+      "충전"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-09@p114",
+     "code": "SMESTR-2025-A-08-09",
+     "name": "차세대 수소연료전지 시스템",
+     "page": 104,
+     "pdf": 114
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경자동차",
+    "uid": "R2025-13-05",
+    "no": "05",
+    "name": "수소자동차 충전시스템",
+    "page": 46,
+    "pdf": 54
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.648,
+     "common_terms": [
+      "충전시스템",
+      "저장장치",
+      "제어기술",
+      "압축",
+      "충전"
+     ],
+     "same_field_prior": true,
+     "field": "첨단모빌리티",
+     "subfield": "육상 모빌리티",
+     "uid": "SMESTR-2025-A-08-09@p114",
+     "code": "SMESTR-2025-A-08-09",
+     "name": "차세대 수소연료전지 시스템",
+     "page": 104,
+     "pdf": 114
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경 공정전환",
+    "uid": "R2025-14-01",
+    "no": "01",
+    "name": "온실가스 저감형 마찰교반 용접시스템",
+    "page": 41,
+    "pdf": 53
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.368,
+     "common_terms": [
+      "온실가스"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-13@p167",
+     "code": "SMESTR-2025-A-09-13",
+     "name": "고GWP 온실가스 처리 시스템",
+     "page": 157,
+     "pdf": 167
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경 공정전환",
+    "uid": "R2025-14-02",
+    "no": "02",
+    "name": "화학동도금 폐수 TOC 유발 물질 로셀염, HCHO 처리 시스템",
+    "page": 42,
+    "pdf": 54
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "친환경 공정전환",
+    "uid": "R2025-14-03",
+    "no": "03",
+    "name": "전기도금용 프로톤 전도성 막-전극 모듈 및 최적화 솔루션",
+    "page": 43,
+    "pdf": 55
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "친환경 공정전환",
+    "uid": "R2025-14-04",
+    "no": "04",
+    "name": "배출가스 분리형 소성로",
+    "page": 44,
+    "pdf": 56
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.339,
+     "common_terms": [
+      "순환"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "자원순환",
+     "uid": "SMESTR-2025-A-09-16@p219",
+     "code": "SMESTR-2025-A-09-16",
+     "name": "의류·섬유 자원 순환 시스템",
+     "page": 209,
+     "pdf": 219
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경 공정전환",
+    "uid": "R2025-14-05",
+    "no": "05",
+    "name": "촉매 및 흡착제 기반 반도체 CF4, Cl2 저온분해 IHS 시스템",
+    "page": 45,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.308,
+     "common_terms": [
+      "촉매"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "무탄소 에너지 전환",
+     "uid": "SMESTR-2025-A-09-06@p108",
+     "code": "SMESTR-2025-A-09-06",
+     "name": "차세대 수소 생산·저장 시스템",
+     "page": 98,
+     "pdf": 108
+    },
+    {
+     "score": 0.304,
+     "common_terms": [
+      "흡착제"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-15@p171",
+     "code": "SMESTR-2025-A-09-15",
+     "name": "고성능 CO2 포집 시스템",
+     "page": 161,
+     "pdf": 171
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경 공정전환",
+    "uid": "R2025-14-06",
+    "no": "06",
+    "name": "전기 유도 용해로",
+    "page": 46,
+    "pdf": 58
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "친환경 공정전환",
+    "uid": "R2025-14-07",
+    "no": "07",
+    "name": "반도체 및 디스플레이 탄소 배출 저감 모니터링 및 스크러버 시스템",
+    "page": 47,
+    "pdf": 59
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.363,
+     "common_terms": [
+      "디스플레",
+      "반도체"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-12@p165",
+     "code": "SMESTR-2025-A-09-12",
+     "name": "반도체·디스플레이 냉각시스템",
+     "page": 155,
+     "pdf": 165
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "친환경 공정전환",
+    "uid": "R2025-14-08",
+    "no": "08",
+    "name": "탄소감축량 인증 시스템",
+    "page": 48,
+    "pdf": 60
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.329,
+     "common_terms": [
+      "온실가스",
+      "모니터링"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-13@p167",
+     "code": "SMESTR-2025-A-09-13",
+     "name": "고GWP 온실가스 처리 시스템",
+     "page": 157,
+     "pdf": 167
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자원재활용",
+    "uid": "R2025-15-01",
+    "no": "01",
+    "name": "수송/산업기계 부품 재제조 시스템",
+    "page": 38,
+    "pdf": 44
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.436,
+     "common_terms": [
+      "재제조",
+      "성능",
+      "처리"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "자원순환",
+     "uid": "SMESTR-2025-A-09-21@p229",
+     "code": "SMESTR-2025-A-09-21",
+     "name": "재제조 공정 솔루션",
+     "page": 219,
+     "pdf": 229
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자원재활용",
+    "uid": "R2025-15-02",
+    "no": "02",
+    "name": "희소 및 핵심금속 회수 시스템",
+    "page": 39,
+    "pdf": 45
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.312,
+     "common_terms": [
+      "회수"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "배터리 재사용·재활용 시스템",
+     "uid": "SMESTR-2025-A-10-10@p159",
+     "code": "SMESTR-2025-A-10-10",
+     "name": "고품질 블랙매스 회수 전처리 시스템",
+     "page": 149,
+     "pdf": 159
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "자원재활용",
+    "uid": "R2025-15-03",
+    "no": "03",
+    "name": "태양광 모듈 재활용 시스템",
+    "page": 40,
+    "pdf": 46
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.319,
+     "common_terms": [
+      "재제조"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "자원순환",
+     "uid": "SMESTR-2025-A-09-21@p229",
+     "code": "SMESTR-2025-A-09-21",
+     "name": "재제조 공정 솔루션",
+     "page": 219,
+     "pdf": 229
+    },
+    {
+     "score": 0.309,
+     "common_terms": [
+      "재활용"
+     ],
+     "same_field_prior": true,
+     "field": "이차전지",
+     "subfield": "배터리 재사용·재활용 시스템",
+     "uid": "SMESTR-2025-A-10-13@p165",
+     "code": "SMESTR-2025-A-10-13",
+     "name": "배터리 재사용·재활용 해체 자동화 시스템",
+     "page": 155,
+     "pdf": 165
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "에너지재활용",
+    "uid": "R2025-16-01",
+    "no": "01",
+    "name": "공장 폐열에너지 재활용 시스템",
+    "page": 34,
+    "pdf": 40
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.41,
+     "common_terms": [
+      "열교환기",
+      "히트펌프",
+      "폐열"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-10@p161",
+     "code": "SMESTR-2025-A-09-10",
+     "name": "고온 공정 적용 히트펌프",
+     "page": 151,
+     "pdf": 161
+    },
+    {
+     "score": 0.355,
+     "common_terms": [
+      "재활용",
+      "폐열",
+      "회수"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-11@p163",
+     "code": "SMESTR-2025-A-09-11",
+     "name": "전기가열로 핵심부품",
+     "page": 153,
+     "pdf": 163
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "에너지재활용",
+    "uid": "R2025-16-02",
+    "no": "02",
+    "name": "고품질 바이오연료 생산 시스템",
+    "page": 35,
+    "pdf": 41
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.312,
+     "common_terms": [
+      "고품질",
+      "전처리"
+     ],
+     "same_field_prior": false,
+     "field": "이차전지",
+     "subfield": "배터리 재사용·재활용 시스템",
+     "uid": "SMESTR-2025-A-10-10@p159",
+     "code": "SMESTR-2025-A-10-10",
+     "name": "고품질 블랙매스 회수 전처리 시스템",
+     "page": 149,
+     "pdf": 159
+    },
+    {
+     "score": 0.311,
+     "common_terms": [
+      "부산물",
+      "전처리"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "자원순환",
+     "uid": "SMESTR-2025-A-09-17@p221",
+     "code": "SMESTR-2025-A-09-17",
+     "name": "무기성 산업 부산물 재순환 시스템",
+     "page": 211,
+     "pdf": 221
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "에너지재활용",
+    "uid": "R2025-16-03",
+    "no": "03",
+    "name": "PVC 폐플라스틱 활용 오일 생산 시스템",
+    "page": 36,
+    "pdf": 42
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "CCUS",
+    "uid": "R2025-17-01",
+    "no": "01",
+    "name": "중소형 CO2 포집 시스템",
+    "page": 43,
+    "pdf": 51
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.631,
+     "common_terms": [
+      "co2",
+      "포집",
+      "극대화"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-15@p171",
+     "code": "SMESTR-2025-A-09-15",
+     "name": "고성능 CO2 포집 시스템",
+     "page": 161,
+     "pdf": 171
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "CCUS",
+    "uid": "R2025-17-02",
+    "no": "02",
+    "name": "CO2 화학 전환 시스템",
+    "page": 44,
+    "pdf": 52
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.358,
+     "common_terms": [
+      "co2",
+      "에너지"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-15@p171",
+     "code": "SMESTR-2025-A-09-15",
+     "name": "고성능 CO2 포집 시스템",
+     "page": 161,
+     "pdf": 171
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "CCUS",
+    "uid": "R2025-17-03",
+    "no": "03",
+    "name": "CO2 광물 탄산화 시스템",
+    "page": 45,
+    "pdf": 53
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.466,
+     "common_terms": [
+      "co2"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-15@p171",
+     "code": "SMESTR-2025-A-09-15",
+     "name": "고성능 CO2 포집 시스템",
+     "page": 161,
+     "pdf": 171
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "CCUS",
+    "uid": "R2025-17-04",
+    "no": "04",
+    "name": "CCU 활용 친환경 SAF 제조 시스템",
+    "page": 46,
+    "pdf": 54
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "CCUS",
+    "uid": "R2025-17-05",
+    "no": "05",
+    "name": "DAC 연료생산공정 최적화 시스템",
+    "page": 47,
+    "pdf": 55
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.492,
+     "common_terms": [
+      "co2",
+      "포집"
+     ],
+     "same_field_prior": true,
+     "field": "기후·에너지",
+     "subfield": "산업 탈탄소화",
+     "uid": "SMESTR-2025-A-09-15@p171",
+     "code": "SMESTR-2025-A-09-15",
+     "name": "고성능 CO2 포집 시스템",
+     "page": 161,
+     "pdf": 171
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "반도체장비",
+    "uid": "R2025-18-01",
+    "no": "01",
+    "name": "리소용 부품·소재",
+    "page": 38,
+    "pdf": 50
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.398,
+     "common_terms": [
+      "포토레지스트"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-11@p130",
+     "code": "SMESTR-2025-A-03-11",
+     "name": "EUV 공정·부품용 소재",
+     "page": 120,
+     "pdf": 130
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "반도체장비",
+    "uid": "R2025-18-02",
+    "no": "02",
+    "name": "플라즈마 (PVD, Dry etching, Ashing) 장비·부품",
+    "page": 40,
+    "pdf": 52
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "반도체장비",
+    "uid": "R2025-18-03",
+    "no": "03",
+    "name": "CVD·ALD 장비·부품",
+    "page": 42,
+    "pdf": 54
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "반도체장비",
+    "uid": "R2025-18-04",
+    "no": "04",
+    "name": "CMP 공정 소재",
+    "page": 44,
+    "pdf": 56
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "반도체장비",
+    "uid": "R2025-18-05",
+    "no": "05",
+    "name": "반도체 세정 장비·부품·소재",
+    "page": 45,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.361,
+     "common_terms": [
+      "반도체",
+      "공정용"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-08@p123",
+     "code": "SMESTR-2025-A-03-08",
+     "name": "반도체 증착 공정용 절연막 증착 장비",
+     "page": 113,
+     "pdf": 123
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "반도체장비",
+    "uid": "R2025-18-06",
+    "no": "06",
+    "name": "진공용 부품",
+    "page": 46,
+    "pdf": 58
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "반도체장비",
+    "uid": "R2025-18-07",
+    "no": "07",
+    "name": "첨단 패키징 전기도금용 장비·부품·소재",
+    "page": 47,
+    "pdf": 59
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.613,
+     "common_terms": [
+      "도금",
+      "도금장비",
+      "대면적"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-14@p136",
+     "code": "SMESTR-2025-A-03-14",
+     "name": "글라스 기판 대응 대면적 도금장비",
+     "page": 126,
+     "pdf": 136
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "반도체장비",
+    "uid": "R2025-18-08",
+    "no": "08",
+    "name": "반도체 테스트 장비·부품",
+    "page": 48,
+    "pdf": 60
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "반도체장비",
+    "uid": "R2025-18-09",
+    "no": "09",
+    "name": "첨단 패키징 장비·부품·소재",
+    "page": 49,
+    "pdf": 61
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.492,
+     "common_terms": [
+      "본딩",
+      "본딩용",
+      "하이브리드"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "반도체",
+     "uid": "SMESTR-2025-A-03-13@p134",
+     "code": "SMESTR-2025-A-03-13",
+     "name": "나노급 하이브리드 본딩 장비",
+     "page": 124,
+     "pdf": 134
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "디스플레이장비",
+    "uid": "R2025-19-01",
+    "no": "01",
+    "name": "VR·XR 디스플레이 제조 및 검사장비",
+    "page": 47,
+    "pdf": 55
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.59,
+     "common_terms": [
+      "xr",
+      "vr",
+      "디스플레",
+      "검사"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "디스플레이",
+     "uid": "SMESTR-2025-A-03-23@p201",
+     "code": "SMESTR-2025-A-03-23",
+     "name": "AR·VR·XR 디스플레이 모듈",
+     "page": 191,
+     "pdf": 201
+    },
+    {
+     "score": 0.378,
+     "common_terms": [
+      "디스플레",
+      "검사"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "디스플레이",
+     "uid": "SMESTR-2025-A-03-22@p199",
+     "code": "SMESTR-2025-A-03-22",
+     "name": "고해상도 디스플레이 계측·검사 장비",
+     "page": 189,
+     "pdf": 199
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "디스플레이장비",
+    "uid": "R2025-19-02",
+    "no": "02",
+    "name": "Inkjet 공정 및 검사장비",
+    "page": 48,
+    "pdf": 56
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.44,
+     "common_terms": [
+      "박막",
+      "검사",
+      "고속"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "디스플레이",
+     "uid": "SMESTR-2025-A-03-18@p191",
+     "code": "SMESTR-2025-A-03-18",
+     "name": "비파괴 검사 장비",
+     "page": 181,
+     "pdf": 191
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "디스플레이장비",
+    "uid": "R2025-19-03",
+    "no": "03",
+    "name": "마이크로LED 칩 대량 전사 장비",
+    "page": 49,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.422,
+     "common_terms": [
+      "마이크로led",
+      "전사"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "디스플레이",
+     "uid": "SMESTR-2025-A-03-25@p205",
+     "code": "SMESTR-2025-A-03-25",
+     "name": "무기발광 화소형성 솔루션",
+     "page": 195,
+     "pdf": 205
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "디스플레이장비",
+    "uid": "R2025-19-04",
+    "no": "04",
+    "name": "마이크로LED 검사·리페어 장비",
+    "page": 50,
+    "pdf": 58
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.433,
+     "common_terms": [
+      "리페어",
+      "마이크로led"
+     ],
+     "same_field_prior": true,
+     "field": "반도체·디스플레이",
+     "subfield": "디스플레이",
+     "uid": "SMESTR-2025-A-03-25@p205",
+     "code": "SMESTR-2025-A-03-25",
+     "name": "무기발광 화소형성 솔루션",
+     "page": 195,
+     "pdf": 205
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "전기전자부품",
+    "uid": "R2025-20-01",
+    "no": "01",
+    "name": "디지털 전력변환 부품",
+    "page": 40,
+    "pdf": 50
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "전기전자부품",
+    "uid": "R2025-20-02",
+    "no": "02",
+    "name": "전기구동 부품",
+    "page": 41,
+    "pdf": 51
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "전기전자부품",
+    "uid": "R2025-20-03",
+    "no": "03",
+    "name": "고기능 전자회로기판",
+    "page": 42,
+    "pdf": 52
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "전기전자부품",
+    "uid": "R2025-20-04",
+    "no": "04",
+    "name": "고효율 방열부품",
+    "page": 43,
+    "pdf": 53
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "전기전자부품",
+    "uid": "R2025-20-05",
+    "no": "05",
+    "name": "산업용 레이저 부품",
+    "page": 44,
+    "pdf": 54
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "전기전자부품",
+    "uid": "R2025-20-06",
+    "no": "06",
+    "name": "광전자·통신 부품",
+    "page": 45,
+    "pdf": 55
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.443,
+     "common_terms": [
+      "광트랜시버",
+      "초고속"
+     ],
+     "same_field_prior": true,
+     "field": "차세대통신",
+     "subfield": "통신 부품",
+     "uid": "SMESTR-2025-A-04-14@p173",
+     "code": "SMESTR-2025-A-04-14",
+     "name": "초고속 지능형 광트랜시버",
+     "page": 163,
+     "pdf": 173
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "산업용기계",
+    "uid": "R2025-21-01",
+    "no": "01",
+    "name": "산업용 히트 펌프",
+    "page": 34,
+    "pdf": 42
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.312,
+     "common_terms": [
+      "산업용"
+     ],
+     "same_field_prior": true,
+     "field": "첨단제조",
+     "subfield": "첨단제조 소프트웨어",
+     "uid": "SMESTR-2025-A-06-03@p102",
+     "code": "SMESTR-2025-A-06-03",
+     "name": "산업용 온디바이스 엣지 AI",
+     "page": 92,
+     "pdf": 102
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "산업용기계",
+    "uid": "R2025-21-02",
+    "no": "02",
+    "name": "지능형 정밀가공 시스템",
+    "page": 36,
+    "pdf": 44
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.328,
+     "common_terms": [
+      "정밀"
+     ],
+     "same_field_prior": true,
+     "field": "첨단제조",
+     "subfield": "첨단제조 인프라",
+     "uid": "SMESTR-2025-A-06-14@p170",
+     "code": "SMESTR-2025-A-06-14",
+     "name": "고신뢰성 지능형 정밀 센서 시스템",
+     "page": 160,
+     "pdf": 170
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "산업용기계",
+    "uid": "R2025-21-03",
+    "no": "03",
+    "name": "고성능 산업기계용 밸브 시스템",
+    "page": 37,
+    "pdf": 45
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "산업용기계",
+    "uid": "R2025-21-04",
+    "no": "04",
+    "name": "딥러닝 기반 산업기계용 제어 시스템",
+    "page": 38,
+    "pdf": 46
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.323,
+     "common_terms": [
+      "작업",
+      "트윈",
+      "디지털"
+     ],
+     "same_field_prior": true,
+     "field": "첨단제조",
+     "subfield": "첨단제조 소프트웨어",
+     "uid": "SMESTR-2025-A-06-09@p114",
+     "code": "SMESTR-2025-A-06-09",
+     "name": "디지털 트윈 계획·관제 시스템",
+     "page": 104,
+     "pdf": 114
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "금속소재 및 성형가공",
+    "uid": "R2025-22-01",
+    "no": "01",
+    "name": "친환경 금속소재",
+    "page": 50,
+    "pdf": 58
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.494,
+     "common_terms": [
+      "금속소재",
+      "저감형",
+      "친환경",
+      "대체"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-01@p104",
+     "code": "SMESTR-2025-A-05-01",
+     "name": "친환경 금속소재 및 공정 솔루션",
+     "page": 92,
+     "pdf": 104
+    },
+    {
+     "score": 0.367,
+     "common_terms": [
+      "금속소재",
+      "폐기물"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-05@p117",
+     "code": "SMESTR-2025-A-05-05",
+     "name": "특수 목적성 금속소재",
+     "page": 105,
+     "pdf": 117
+    },
+    {
+     "score": 0.34,
+     "common_terms": [
+      "금속소재"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-03@p109",
+     "code": "SMESTR-2025-A-05-03",
+     "name": "고성능 금속소재",
+     "page": 97,
+     "pdf": 109
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "금속소재 및 성형가공",
+    "uid": "R2025-22-02",
+    "no": "02",
+    "name": "경량·고강도 금속소재",
+    "page": 51,
+    "pdf": 59
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.458,
+     "common_terms": [
+      "고강",
+      "금속소재",
+      "고성형성",
+      "경량"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-04@p113",
+     "code": "SMESTR-2025-A-05-04",
+     "name": "모빌리티용 금속소재",
+     "page": 101,
+     "pdf": 113
+    },
+    {
+     "score": 0.405,
+     "common_terms": [
+      "고강",
+      "금속소재",
+      "경량"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-03@p109",
+     "code": "SMESTR-2025-A-05-03",
+     "name": "고성능 금속소재",
+     "page": 97,
+     "pdf": 109
+    },
+    {
+     "score": 0.336,
+     "common_terms": [
+      "금속소재",
+      "이종재료",
+      "접합"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-02@p107",
+     "code": "SMESTR-2025-A-05-02",
+     "name": "첨단 뿌리기술 솔루션",
+     "page": 95,
+     "pdf": 107
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "금속소재 및 성형가공",
+    "uid": "R2025-22-03",
+    "no": "03",
+    "name": "고기능성 금속소재",
+    "page": 53,
+    "pdf": 61
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.847,
+     "common_terms": [
+      "금속소재",
+      "고방열성",
+      "고전기전도",
+      "금속분말",
+      "저열팽창"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-03@p109",
+     "code": "SMESTR-2025-A-05-03",
+     "name": "고성능 금속소재",
+     "page": 97,
+     "pdf": 109
+    },
+    {
+     "score": 0.313,
+     "common_terms": [
+      "고기능성"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-25@p284",
+     "code": "SMESTR-2025-A-05-25",
+     "name": "고기능성 유리 소재",
+     "page": 272,
+     "pdf": 284
+    },
+    {
+     "score": 0.305,
+     "common_terms": [
+      "금속소재"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-05@p117",
+     "code": "SMESTR-2025-A-05-05",
+     "name": "특수 목적성 금속소재",
+     "page": 105,
+     "pdf": 117
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "금속소재 및 성형가공",
+    "uid": "R2025-22-04",
+    "no": "04",
+    "name": "전문분야용 금속소재",
+    "page": 55,
+    "pdf": 63
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.591,
+     "common_terms": [
+      "금속소재",
+      "금속적층",
+      "부착형",
+      "부품소재",
+      "폐기물"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-05@p117",
+     "code": "SMESTR-2025-A-05-05",
+     "name": "특수 목적성 금속소재",
+     "page": 105,
+     "pdf": 117
+    },
+    {
+     "score": 0.313,
+     "common_terms": [
+      "금속소재"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-04@p113",
+     "code": "SMESTR-2025-A-05-04",
+     "name": "모빌리티용 금속소재",
+     "page": 101,
+     "pdf": 113
+    },
+    {
+     "score": 0.302,
+     "common_terms": [
+      "금속소재"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-03@p109",
+     "code": "SMESTR-2025-A-05-03",
+     "name": "고성능 금속소재",
+     "page": 97,
+     "pdf": 109
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "금속소재 및 성형가공",
+    "uid": "R2025-22-05",
+    "no": "05",
+    "name": "소재 공정 개발 솔루션",
+    "page": 57,
+    "pdf": 65
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.417,
+     "common_terms": [
+      "적층제조",
+      "금속",
+      "금속소재"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-02@p107",
+     "code": "SMESTR-2025-A-05-02",
+     "name": "첨단 뿌리기술 솔루션",
+     "page": 95,
+     "pdf": 107
+    },
+    {
+     "score": 0.301,
+     "common_terms": [
+      "금속부품",
+      "금속소재"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-05@p117",
+     "code": "SMESTR-2025-A-05-05",
+     "name": "특수 목적성 금속소재",
+     "page": 105,
+     "pdf": 117
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "의료기기",
+    "uid": "R2025-23-01",
+    "no": "01",
+    "name": "인공지능 의료 플랫폼",
+    "page": 35,
+    "pdf": 43
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.308,
+     "common_terms": [
+      "인공지능",
+      "생체신호"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-18@p258",
+     "code": "SMESTR-2025-A-02-18",
+     "name": "생체 신호 수집 및 건강 관리 모바일 및 웨어러블 기기",
+     "page": 248,
+     "pdf": 258
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "의료기기",
+    "uid": "R2025-23-02",
+    "no": "02",
+    "name": "치료용 소프트웨어",
+    "page": 36,
+    "pdf": 44
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "의료기기",
+    "uid": "R2025-23-03",
+    "no": "03",
+    "name": "전자약",
+    "page": 37,
+    "pdf": 45
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.659,
+     "common_terms": [
+      "전자약"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-25@p272",
+     "code": "SMESTR-2025-A-02-25",
+     "name": "전자약",
+     "page": 262,
+     "pdf": 272
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "의료기기",
+    "uid": "R2025-23-04",
+    "no": "04",
+    "name": "고령자 재활⦁안전시스템",
+    "page": 38,
+    "pdf": 46
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.377,
+     "common_terms": [
+      "고령자"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-21@p264",
+     "code": "SMESTR-2025-A-02-21",
+     "name": "AI 기반 환자‧고령자 맞춤형 돌봄 플랫폼",
+     "page": 254,
+     "pdf": 264
+    },
+    {
+     "score": 0.346,
+     "common_terms": [
+      "재활",
+      "웨어러블"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-27@p276",
+     "code": "SMESTR-2025-A-02-27",
+     "name": "재활 및 운동 보조 웨어러블 헬스케어 디바이스",
+     "page": 266,
+     "pdf": 276
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "의료기기",
+    "uid": "R2025-23-05",
+    "no": "05",
+    "name": "유전자 진단 시스템",
+    "page": 39,
+    "pdf": 47
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.422,
+     "common_terms": [
+      "유전자"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "제약바이오",
+     "uid": "SMESTR-2025-A-02-05@p126",
+     "code": "SMESTR-2025-A-02-05",
+     "name": "세포·유전자 치료제",
+     "page": 116,
+     "pdf": 126
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "섬유",
+    "uid": "R2025-24-01",
+    "no": "01",
+    "name": "보호용 섬유",
+    "page": 47,
+    "pdf": 55
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.322,
+     "common_terms": [
+      "섬유",
+      "고강"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-16@p224",
+     "code": "SMESTR-2025-A-05-16",
+     "name": "고기능 산업용 섬유",
+     "page": 212,
+     "pdf": 224
+    },
+    {
+     "score": 0.32,
+     "common_terms": [
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-13@p218",
+     "code": "SMESTR-2025-A-05-13",
+     "name": "의료용 섬유",
+     "page": 206,
+     "pdf": 218
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "섬유",
+    "uid": "R2025-24-02",
+    "no": "02",
+    "name": "의료 및 위생용 섬유",
+    "page": 48,
+    "pdf": 56
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.377,
+     "common_terms": [
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-13@p218",
+     "code": "SMESTR-2025-A-05-13",
+     "name": "의료용 섬유",
+     "page": 206,
+     "pdf": 218
+    },
+    {
+     "score": 0.337,
+     "common_terms": [
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-12@p216",
+     "code": "SMESTR-2025-A-05-12",
+     "name": "스마트 섬유",
+     "page": 204,
+     "pdf": 216
+    },
+    {
+     "score": 0.302,
+     "common_terms": [
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-16@p224",
+     "code": "SMESTR-2025-A-05-16",
+     "name": "고기능 산업용 섬유",
+     "page": 212,
+     "pdf": 224
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "섬유",
+    "uid": "R2025-24-03",
+    "no": "03",
+    "name": "기능성 섬유",
+    "page": 49,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.364,
+     "common_terms": [
+      "나노섬유",
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-13@p218",
+     "code": "SMESTR-2025-A-05-13",
+     "name": "의료용 섬유",
+     "page": 206,
+     "pdf": 218
+    },
+    {
+     "score": 0.342,
+     "common_terms": [
+      "섬유",
+      "기능성"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-12@p216",
+     "code": "SMESTR-2025-A-05-12",
+     "name": "스마트 섬유",
+     "page": 204,
+     "pdf": 216
+    },
+    {
+     "score": 0.309,
+     "common_terms": [
+      "통기성",
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-15@p222",
+     "code": "SMESTR-2025-A-05-15",
+     "name": "의류생활용 섬유",
+     "page": 210,
+     "pdf": 222
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "섬유",
+    "uid": "R2025-24-04",
+    "no": "04",
+    "name": "스마트 섬유",
+    "page": 50,
+    "pdf": 58
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.573,
+     "common_terms": [
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-12@p216",
+     "code": "SMESTR-2025-A-05-12",
+     "name": "스마트 섬유",
+     "page": 204,
+     "pdf": 216
+    },
+    {
+     "score": 0.328,
+     "common_terms": [
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-13@p218",
+     "code": "SMESTR-2025-A-05-13",
+     "name": "의료용 섬유",
+     "page": 206,
+     "pdf": 218
+    },
+    {
+     "score": 0.308,
+     "common_terms": [
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-14@p220",
+     "code": "SMESTR-2025-A-05-14",
+     "name": "자원순환형 섬유",
+     "page": 208,
+     "pdf": 220
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "섬유",
+    "uid": "R2025-24-05",
+    "no": "05",
+    "name": "친환경 섬유",
+    "page": 51,
+    "pdf": 59
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.458,
+     "common_terms": [
+      "섬유",
+      "자원순환형",
+      "친환경"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-14@p220",
+     "code": "SMESTR-2025-A-05-14",
+     "name": "자원순환형 섬유",
+     "page": 208,
+     "pdf": 220
+    },
+    {
+     "score": 0.365,
+     "common_terms": [
+      "섬유",
+      "생분해성"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-13@p218",
+     "code": "SMESTR-2025-A-05-13",
+     "name": "의료용 섬유",
+     "page": 206,
+     "pdf": 218
+    },
+    {
+     "score": 0.326,
+     "common_terms": [
+      "섬유"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "섬유 소재",
+     "uid": "SMESTR-2025-A-05-12@p216",
+     "code": "SMESTR-2025-A-05-12",
+     "name": "스마트 섬유",
+     "page": 204,
+     "pdf": 216
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "유기/복합소재",
+    "uid": "R2025-25-01",
+    "no": "01",
+    "name": "특수 필름·코팅 소재",
+    "page": 54,
+    "pdf": 62
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.372,
+     "common_terms": [
+      "특수"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-05@p117",
+     "code": "SMESTR-2025-A-05-05",
+     "name": "특수 목적성 금속소재",
+     "page": 105,
+     "pdf": 117
+    },
+    {
+     "score": 0.347,
+     "common_terms": [
+      "코팅",
+      "고기능성"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "화학 소재",
+     "uid": "SMESTR-2025-A-05-07@p163",
+     "code": "SMESTR-2025-A-05-07",
+     "name": "고기능성 코팅 소재",
+     "page": 151,
+     "pdf": 163
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "유기/복합소재",
+    "uid": "R2025-25-02",
+    "no": "02",
+    "name": "특수 점·접착 소재",
+    "page": 55,
+    "pdf": 63
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.333,
+     "common_terms": [
+      "특수"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "금속 소재",
+     "uid": "SMESTR-2025-A-05-05@p117",
+     "code": "SMESTR-2025-A-05-05",
+     "name": "특수 목적성 금속소재",
+     "page": 105,
+     "pdf": 117
+    },
+    {
+     "score": 0.306,
+     "common_terms": [
+      "접착",
+      "투명"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "화학 소재",
+     "uid": "SMESTR-2025-A-05-09@p167",
+     "code": "SMESTR-2025-A-05-09",
+     "name": "친환경/고기능성 점·접착제 솔루션",
+     "page": 155,
+     "pdf": 167
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "유기/복합소재",
+    "uid": "R2025-25-03",
+    "no": "03",
+    "name": "환경정화 친환경 소재",
+    "page": 56,
+    "pdf": 64
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "유기/복합소재",
+    "uid": "R2025-25-04",
+    "no": "04",
+    "name": "차세대 반도체 패키징 고방열/패턴형성 소재",
+    "page": 57,
+    "pdf": 65
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.302,
+     "common_terms": [
+      "고방열"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-22@p278",
+     "code": "SMESTR-2025-A-05-22",
+     "name": "고순도 분말 및 세라믹 섬유 소재",
+     "page": 266,
+     "pdf": 278
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "유기/복합소재",
+    "uid": "R2025-25-05",
+    "no": "05",
+    "name": "차세대 저온 유연신축 전도성 접착소재",
+    "page": 58,
+    "pdf": 66
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "기능성식품",
+    "uid": "R2025-26-01",
+    "no": "01",
+    "name": "개인 맞춤형 식품 솔루션",
+    "page": 50,
+    "pdf": 60
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.357,
+     "common_terms": [
+      "식품"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "첨단 GW 바이오",
+     "uid": "SMESTR-2025-A-02-15@p202",
+     "code": "SMESTR-2025-A-02-15",
+     "name": "기능성 소재·식품",
+     "page": 192,
+     "pdf": 202
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "기능성식품",
+    "uid": "R2025-26-02",
+    "no": "02",
+    "name": "케어푸드",
+    "page": 51,
+    "pdf": 61
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "기능성식품",
+    "uid": "R2025-26-03",
+    "no": "03",
+    "name": "건강기능식품",
+    "page": 52,
+    "pdf": 62
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "기능성식품",
+    "uid": "R2025-26-04",
+    "no": "04",
+    "name": "대체식품",
+    "page": 53,
+    "pdf": 63
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "기능성식품",
+    "uid": "R2025-26-05",
+    "no": "05",
+    "name": "가정 간편식 제품(HMR)",
+    "page": 54,
+    "pdf": 64
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "기능성식품",
+    "uid": "R2025-26-06",
+    "no": "06",
+    "name": "친환경 식품 포장",
+    "page": 55,
+    "pdf": 65
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.341,
+     "common_terms": [
+      "식품"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "첨단 GW 바이오",
+     "uid": "SMESTR-2025-A-02-15@p202",
+     "code": "SMESTR-2025-A-02-15",
+     "name": "기능성 소재·식품",
+     "page": 192,
+     "pdf": 202
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "세라믹",
+    "uid": "R2025-27-01",
+    "no": "01",
+    "name": "전자부품패키지용 세라믹",
+    "page": 47,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.43,
+     "common_terms": [
+      "세라믹",
+      "저유전",
+      "반도체"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-23@p280",
+     "code": "SMESTR-2025-A-05-23",
+     "name": "반도체·전자 세라믹 소재",
+     "page": 268,
+     "pdf": 280
+    },
+    {
+     "score": 0.345,
+     "common_terms": [
+      "세라믹",
+      "저유전"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-22@p278",
+     "code": "SMESTR-2025-A-05-22",
+     "name": "고순도 분말 및 세라믹 섬유 소재",
+     "page": 266,
+     "pdf": 278
+    },
+    {
+     "score": 0.331,
+     "common_terms": [
+      "세라믹",
+      "반도체"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-24@p282",
+     "code": "SMESTR-2025-A-05-24",
+     "name": "정밀가공용 세라믹 소재",
+     "page": 270,
+     "pdf": 282
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "세라믹",
+    "uid": "R2025-27-02",
+    "no": "02",
+    "name": "센싱용 세라믹",
+    "page": 48,
+    "pdf": 58
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.311,
+     "common_terms": [
+      "세라믹"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-17@p268",
+     "code": "SMESTR-2025-A-05-17",
+     "name": "에너지용 세라믹 소재",
+     "page": 256,
+     "pdf": 268
+    },
+    {
+     "score": 0.307,
+     "common_terms": [
+      "세라믹"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-18@p270",
+     "code": "SMESTR-2025-A-05-18",
+     "name": "극한환경 세라믹 소재",
+     "page": 258,
+     "pdf": 270
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "세라믹",
+    "uid": "R2025-27-03",
+    "no": "03",
+    "name": "에너지용 세라믹",
+    "page": 49,
+    "pdf": 59
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.602,
+     "common_terms": [
+      "에너지용",
+      "세라믹"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-17@p268",
+     "code": "SMESTR-2025-A-05-17",
+     "name": "에너지용 세라믹 소재",
+     "page": 256,
+     "pdf": 268
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "세라믹",
+    "uid": "R2025-27-04",
+    "no": "04",
+    "name": "극한환경 세라믹",
+    "page": 50,
+    "pdf": 60
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.785,
+     "common_terms": [
+      "극한환경",
+      "내플라즈마",
+      "세라믹",
+      "코팅"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-18@p270",
+     "code": "SMESTR-2025-A-05-18",
+     "name": "극한환경 세라믹 소재",
+     "page": 258,
+     "pdf": 270
+    },
+    {
+     "score": 0.334,
+     "common_terms": [
+      "세라믹"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-21@p276",
+     "code": "SMESTR-2025-A-05-21",
+     "name": "생활∙환경 세라믹 소재",
+     "page": 264,
+     "pdf": 276
+    },
+    {
+     "score": 0.31,
+     "common_terms": [
+      "세라믹",
+      "코팅"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-20@p274",
+     "code": "SMESTR-2025-A-05-20",
+     "name": "기능성 세라믹 코팅 소재",
+     "page": 262,
+     "pdf": 274
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "세라믹",
+    "uid": "R2025-27-05",
+    "no": "05",
+    "name": "정밀가공용 세라믹",
+    "page": 51,
+    "pdf": 61
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.887,
+     "common_terms": [
+      "정밀가공용",
+      "cmp용",
+      "가공용",
+      "다이아몬드",
+      "초경세라믹"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-24@p282",
+     "code": "SMESTR-2025-A-05-24",
+     "name": "정밀가공용 세라믹 소재",
+     "page": 270,
+     "pdf": 282
+    },
+    {
+     "score": 0.366,
+     "common_terms": [
+      "세라믹",
+      "복합체",
+      "나노"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-18@p270",
+     "code": "SMESTR-2025-A-05-18",
+     "name": "극한환경 세라믹 소재",
+     "page": 258,
+     "pdf": 270
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "세라믹",
+    "uid": "R2025-27-06",
+    "no": "06",
+    "name": "고기능성 유리",
+    "page": 52,
+    "pdf": 62
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.666,
+     "common_terms": [
+      "유리",
+      "고기능성"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "세라믹 소재",
+     "uid": "SMESTR-2025-A-05-25@p284",
+     "code": "SMESTR-2025-A-05-25",
+     "name": "고기능성 유리 소재",
+     "page": 272,
+     "pdf": 284
+    },
+    {
+     "score": 0.36,
+     "common_terms": [
+      "고기능성",
+      "코팅"
+     ],
+     "same_field_prior": true,
+     "field": "첨단소재",
+     "subfield": "화학 소재",
+     "uid": "SMESTR-2025-A-05-07@p163",
+     "code": "SMESTR-2025-A-05-07",
+     "name": "고기능성 코팅 소재",
+     "page": 151,
+     "pdf": 163
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "재난안전",
+    "uid": "R2025-28-01",
+    "no": "01",
+    "name": "건설현장 안전관리 시스템",
+    "page": 46,
+    "pdf": 54
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "재난안전",
+    "uid": "R2025-28-02",
+    "no": "02",
+    "name": "산업보건 안전관리 시스템",
+    "page": 48,
+    "pdf": 56
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.324,
+     "common_terms": [
+      "안전관리"
+     ],
+     "same_field_prior": false,
+     "field": "스마트제조",
+     "subfield": "생산관리시스템",
+     "uid": "SMESTR-2025-B-03-09@p282",
+     "code": "SMESTR-2025-B-03-09",
+     "name": "생산공정 안전관리 시스템",
+     "page": 274,
+     "pdf": 282
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "재난안전",
+    "uid": "R2025-28-03",
+    "no": "03",
+    "name": "배터리 화재대응 전주기 스마트 관리 시스템",
+    "page": 50,
+    "pdf": 58
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "재난안전",
+    "uid": "R2025-28-04",
+    "no": "04",
+    "name": "취약시설 스마트 수해관리 시스템",
+    "page": 52,
+    "pdf": 60
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.315,
+     "common_terms": [
+      "모니터링",
+      "대응"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "IT·OT 보안",
+     "uid": "SMESTR-2025-A-11-04@p103",
+     "code": "SMESTR-2025-A-11-04",
+     "name": "원격운영 보안 관리 시스템",
+     "page": 93,
+     "pdf": 103
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "재난안전",
+    "uid": "R2025-28-05",
+    "no": "05",
+    "name": "사회취약계층을 위한 관리 및 교육플랫폼 구축",
+    "page": 53,
+    "pdf": 61
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.396,
+     "common_terms": [
+      "콘텐츠"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-11@p170",
+     "code": "SMESTR-2025-A-01-11",
+     "name": "피지컬 AI 기반 디지털 콘텐츠 생성 솔루션",
+     "page": 160,
+     "pdf": 170
+    },
+    {
+     "score": 0.319,
+     "common_terms": [
+      "콘텐츠"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-16@p181",
+     "code": "SMESTR-2025-A-01-16",
+     "name": "디지털 취약계층 맞춤형 솔루션",
+     "page": 171,
+     "pdf": 181
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "스마트홈",
+    "uid": "R2025-34-01",
+    "no": "01",
+    "name": "스마트홈 헬스케어 시스템",
+    "page": 42,
+    "pdf": 52
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "스마트홈",
+    "uid": "R2025-34-02",
+    "no": "02",
+    "name": "스마트 멘탈케어 시스템",
+    "page": 43,
+    "pdf": 53
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.305,
+     "common_terms": [
+      "기기"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-14@p177",
+     "code": "SMESTR-2025-A-01-14",
+     "name": "차세대 인터랙션 디바이스용 핵심 부품·기기",
+     "page": 167,
+     "pdf": 177
+    },
+    {
+     "score": 0.3,
+     "common_terms": [
+      "영상"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-10@p168",
+     "code": "SMESTR-2025-A-01-10",
+     "name": "영상 컨텐츠 생성형 AI",
+     "page": 158,
+     "pdf": 168
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "스마트홈",
+    "uid": "R2025-34-03",
+    "no": "03",
+    "name": "반려동물 케어 홈 IoT 시스템",
+    "page": 44,
+    "pdf": 54
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "스마트홈",
+    "uid": "R2025-34-04",
+    "no": "04",
+    "name": "스마트홈 위험상황 대응 시스템",
+    "page": 45,
+    "pdf": 55
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "스마트홈",
+    "uid": "R2025-34-05",
+    "no": "05",
+    "name": "스마트홈 에너지관리 시스템",
+    "page": 46,
+    "pdf": 56
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "스마트홈",
+    "uid": "R2025-34-06",
+    "no": "06",
+    "name": "인공지능 가전",
+    "page": 47,
+    "pdf": 57
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "스마트제조",
+    "uid": "R2025-35-01",
+    "no": "01",
+    "name": "AI 기반 품질 관리·분석 솔루션",
+    "page": 58,
+    "pdf": 66
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.541,
+     "common_terms": [
+      "품질",
+      "자동"
+     ],
+     "same_field_prior": true,
+     "field": "스마트제조",
+     "subfield": "생산관리시스템",
+     "uid": "SMESTR-2025-B-03-01@p261",
+     "code": "SMESTR-2025-B-03-01",
+     "name": "AI 기반 공정·품질 최적화 플랫폼",
+     "page": 253,
+     "pdf": 261
+    },
+    {
+     "score": 0.32,
+     "common_terms": [
+      "품질",
+      "학습",
+      "자동"
+     ],
+     "same_field_prior": true,
+     "field": "스마트제조",
+     "subfield": "제조AI·빅데이터",
+     "uid": "SMESTR-2025-B-01-07@p171",
+     "code": "SMESTR-2025-B-01-07",
+     "name": "제조데이터 수집 및 라벨링 플랫폼",
+     "page": 163,
+     "pdf": 171
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "스마트제조",
+    "uid": "R2025-35-02",
+    "no": "02",
+    "name": "스마트 제조용 제어 관리 시스템",
+    "page": 60,
+    "pdf": 68
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "스마트제조",
+    "uid": "R2025-35-03",
+    "no": "03",
+    "name": "스마트제조 인간·기계 협업 패키지",
+    "page": 62,
+    "pdf": 70
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "스마트제조",
+    "uid": "R2025-35-04",
+    "no": "04",
+    "name": "스마트제조용 디지털 트윈 시스템",
+    "page": 63,
+    "pdf": 71
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.447,
+     "common_terms": [
+      "트윈",
+      "디지털",
+      "시뮬레이션"
+     ],
+     "same_field_prior": true,
+     "field": "첨단제조",
+     "subfield": "첨단제조 소프트웨어",
+     "uid": "SMESTR-2025-A-06-09@p114",
+     "code": "SMESTR-2025-A-06-09",
+     "name": "디지털 트윈 계획·관제 시스템",
+     "page": 104,
+     "pdf": 114
+    },
+    {
+     "score": 0.328,
+     "common_terms": [
+      "설비",
+      "환경",
+      "예측"
+     ],
+     "same_field_prior": true,
+     "field": "스마트제조",
+     "subfield": "CPS·디지털트윈",
+     "uid": "SMESTR-2025-B-02-02@p218",
+     "code": "SMESTR-2025-B-02-02",
+     "name": "AI 실시간 디지털트윈 의사결정 시스템",
+     "page": 210,
+     "pdf": 218
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "스마트시티",
+    "uid": "R2025-36-01",
+    "no": "01",
+    "name": "스마트 빌딩 에너지 관리 시스템",
+    "page": 50,
+    "pdf": 58
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.321,
+     "common_terms": [
+      "mrv",
+      "에너지",
+      "검증"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-30@p260",
+     "code": "SMESTR-2025-A-01-30",
+     "name": "기후테크 AI 에이전트",
+     "page": 250,
+     "pdf": 260
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "스마트시티",
+    "uid": "R2025-36-02",
+    "no": "02",
+    "name": "스마트 조명 제어 시스템",
+    "page": 51,
+    "pdf": 59
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.327,
+     "common_terms": [
+      "api",
+      "표준"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-26@p252",
+     "code": "SMESTR-2025-A-01-26",
+     "name": "레거시 시스템-AI 연동 솔루션",
+     "page": 242,
+     "pdf": 252
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "스마트시티",
+    "uid": "R2025-36-03",
+    "no": "03",
+    "name": "도시 화재 관리 시스템",
+    "page": 52,
+    "pdf": 60
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "스마트시티",
+    "uid": "R2025-36-04",
+    "no": "04",
+    "name": "스마트시티 디바이스 인증보안 시스템",
+    "page": 53,
+    "pdf": 61
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.352,
+     "common_terms": [
+      "테스트",
+      "디바이스"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-13@p175",
+     "code": "SMESTR-2025-A-01-13",
+     "name": "크로스 디바이스 랜더링·전력 최적화 SDK",
+     "page": 165,
+     "pdf": 175
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "스마트시티",
+    "uid": "R2025-36-05",
+    "no": "05",
+    "name": "스마트시티 디지털 트윈 시스템",
+    "page": 55,
+    "pdf": 63
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.369,
+     "common_terms": [
+      "트윈",
+      "디지털",
+      "모델링",
+      "시뮬레이션"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-29@p258",
+     "code": "SMESTR-2025-A-01-29",
+     "name": "극한환경용 소·부·장 제조 AI 에이전트",
+     "page": 248,
+     "pdf": 258
+    },
+    {
+     "score": 0.326,
+     "common_terms": [
+      "트윈",
+      "디지털",
+      "모델링",
+      "시뮬레이션"
+     ],
+     "same_field_prior": false,
+     "field": "첨단제조",
+     "subfield": "첨단제조 소프트웨어",
+     "uid": "SMESTR-2025-A-06-09@p114",
+     "code": "SMESTR-2025-A-06-09",
+     "name": "디지털 트윈 계획·관제 시스템",
+     "page": 104,
+     "pdf": 114
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "디지털콘텐츠",
+    "uid": "R2025-37-01",
+    "no": "01",
+    "name": "디지털약자 디지털 접근성 개선 플랫폼",
+    "page": 57,
+    "pdf": 65
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.449,
+     "common_terms": [
+      "접근성",
+      "콘텐츠",
+      "디지털"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-16@p181",
+     "code": "SMESTR-2025-A-01-16",
+     "name": "디지털 취약계층 맞춤형 솔루션",
+     "page": 171,
+     "pdf": 181
+    },
+    {
+     "score": 0.374,
+     "common_terms": [
+      "콘텐츠",
+      "디지털"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-11@p170",
+     "code": "SMESTR-2025-A-01-11",
+     "name": "피지컬 AI 기반 디지털 콘텐츠 생성 솔루션",
+     "page": 160,
+     "pdf": 170
+    },
+    {
+     "score": 0.356,
+     "common_terms": [
+      "접근성",
+      "디지털"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-23@p246",
+     "code": "SMESTR-2025-A-01-23",
+     "name": "디지털 취약계층 AI 에이전트",
+     "page": 236,
+     "pdf": 246
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "디지털콘텐츠",
+    "uid": "R2025-37-02",
+    "no": "02",
+    "name": "AI 기반 사물․상황 인지 모듈",
+    "page": 59,
+    "pdf": 67
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.317,
+     "common_terms": [
+      "콘텐츠",
+      "디지털"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-11@p170",
+     "code": "SMESTR-2025-A-01-11",
+     "name": "피지컬 AI 기반 디지털 콘텐츠 생성 솔루션",
+     "page": 160,
+     "pdf": 170
+    },
+    {
+     "score": 0.3,
+     "common_terms": [
+      "휴먼",
+      "3d",
+      "디지털"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-12@p172",
+     "code": "SMESTR-2025-A-01-12",
+     "name": "디지털 휴먼·아바타 AI",
+     "page": 162,
+     "pdf": 172
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "디지털콘텐츠",
+    "uid": "R2025-37-03",
+    "no": "03",
+    "name": "AI 기반 콘텐츠 생성 및 최적화 모델",
+    "page": 61,
+    "pdf": 69
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.516,
+     "common_terms": [
+      "콘텐츠",
+      "생성",
+      "모델"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-11@p170",
+     "code": "SMESTR-2025-A-01-11",
+     "name": "피지컬 AI 기반 디지털 콘텐츠 생성 솔루션",
+     "page": 160,
+     "pdf": 170
+    },
+    {
+     "score": 0.331,
+     "common_terms": [
+      "모델",
+      "도메인",
+      "특화"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-09@p166",
+     "code": "SMESTR-2025-A-01-09",
+     "name": "도메인 특화 생성형 AI 베이스 모델",
+     "page": 156,
+     "pdf": 166
+    },
+    {
+     "score": 0.312,
+     "common_terms": [
+      "언어",
+      "모델"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-10@p168",
+     "code": "SMESTR-2025-A-01-10",
+     "name": "영상 컨텐츠 생성형 AI",
+     "page": 158,
+     "pdf": 168
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "디지털콘텐츠",
+    "uid": "R2025-37-04",
+    "no": "04",
+    "name": "상호작용 향상 공간컴퓨팅 시스템",
+    "page": 62,
+    "pdf": 70
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "사이버보안",
+    "uid": "R2025-38-01",
+    "no": "01",
+    "name": "클라우드 보안 시스템",
+    "page": 46,
+    "pdf": 56
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.42,
+     "common_terms": [
+      "클라우드",
+      "보안",
+      "보호"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "신기술 보안",
+     "uid": "SMESTR-2025-A-11-12@p166",
+     "code": "SMESTR-2025-A-11-12",
+     "name": "클라우드 네이티브 통합 보안(CNAPP)",
+     "page": 156,
+     "pdf": 166
+    },
+    {
+     "score": 0.352,
+     "common_terms": [
+      "보안",
+      "보호"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "IT·OT 보안",
+     "uid": "SMESTR-2025-A-11-05@p107",
+     "code": "SMESTR-2025-A-11-05",
+     "name": "통합 백업·복구 보안 시스템",
+     "page": 97,
+     "pdf": 107
+    },
+    {
+     "score": 0.336,
+     "common_terms": [
+      "보안",
+      "인증"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "IT·OT 보안",
+     "uid": "SMESTR-2025-A-11-04@p103",
+     "code": "SMESTR-2025-A-11-04",
+     "name": "원격운영 보안 관리 시스템",
+     "page": 93,
+     "pdf": 103
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "사이버보안",
+    "uid": "R2025-38-02",
+    "no": "02",
+    "name": "지능형 사이버보안 시스템",
+    "page": 47,
+    "pdf": 57
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.304,
+     "common_terms": [
+      "공격",
+      "사이버",
+      "예측"
+     ],
+     "same_field_prior": false,
+     "field": "첨단제조",
+     "subfield": "첨단제조 인프라",
+     "uid": "SMESTR-2025-A-06-17@p176",
+     "code": "SMESTR-2025-A-06-17",
+     "name": "사이버 물리보안 시스템",
+     "page": 166,
+     "pdf": 176
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "사이버보안",
+    "uid": "R2025-38-03",
+    "no": "03",
+    "name": "데이터 보호 시스템",
+    "page": 48,
+    "pdf": 58
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.305,
+     "common_terms": [
+      "신원"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "신기술 보안",
+     "uid": "SMESTR-2025-A-11-09@p158",
+     "code": "SMESTR-2025-A-11-09",
+     "name": "제로 트러스트 기반 신원·접근 시스템",
+     "page": 148,
+     "pdf": 158
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "사이버보안",
+    "uid": "R2025-38-04",
+    "no": "04",
+    "name": "영상보안 시스템",
+    "page": 49,
+    "pdf": 59
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "사이버보안",
+    "uid": "R2025-38-05",
+    "no": "05",
+    "name": "OT 보안 시스템",
+    "page": 50,
+    "pdf": 60
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.457,
+     "common_terms": [
+      "ot",
+      "ics",
+      "국제표준",
+      "보안",
+      "인증"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "IT·OT 보안",
+     "uid": "SMESTR-2025-A-11-03@p99",
+     "code": "SMESTR-2025-A-11-03",
+     "name": "IT·OT 융합 환경 보안 플랫폼",
+     "page": 89,
+     "pdf": 99
+    },
+    {
+     "score": 0.419,
+     "common_terms": [
+      "ot",
+      "복구",
+      "보안",
+      "탐지"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "IT·OT 보안",
+     "uid": "SMESTR-2025-A-11-05@p107",
+     "code": "SMESTR-2025-A-11-05",
+     "name": "통합 백업·복구 보안 시스템",
+     "page": 97,
+     "pdf": 107
+    },
+    {
+     "score": 0.345,
+     "common_terms": [
+      "ot",
+      "보안",
+      "인증",
+      "대응",
+      "탐지"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "IT·OT 보안",
+     "uid": "SMESTR-2025-A-11-04@p103",
+     "code": "SMESTR-2025-A-11-04",
+     "name": "원격운영 보안 관리 시스템",
+     "page": 93,
+     "pdf": 103
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "사이버보안",
+    "uid": "R2025-38-06",
+    "no": "06",
+    "name": "공급망 보안 시스템",
+    "page": 51,
+    "pdf": 61
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.546,
+     "common_terms": [
+      "공급망",
+      "sbom",
+      "보안",
+      "자동화"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "신기술 보안",
+     "uid": "SMESTR-2025-A-11-08@p156",
+     "code": "SMESTR-2025-A-11-08",
+     "name": "공급망 보안 관리 플랫폼",
+     "page": 146,
+     "pdf": 156
+    },
+    {
+     "score": 0.466,
+     "common_terms": [
+      "공급망",
+      "취약점",
+      "보안"
+     ],
+     "same_field_prior": true,
+     "field": "사이버보안",
+     "subfield": "IT·OT 보안",
+     "uid": "SMESTR-2025-A-11-07@p111",
+     "code": "SMESTR-2025-A-11-07",
+     "name": "보안 패치·취약점 관리 시스템",
+     "page": 101,
+     "pdf": 111
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스플랫폼",
+    "uid": "R2025-39-01",
+    "no": "01",
+    "name": "핀테크 서비스플랫폼",
+    "page": 49,
+    "pdf": 59
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.55,
+     "common_terms": [
+      "핀테크",
+      "금융",
+      "인증"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-24@p248",
+     "code": "SMESTR-2025-A-01-24",
+     "name": "금융 핀테크 에이전트",
+     "page": 238,
+     "pdf": 248
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스플랫폼",
+    "uid": "R2025-39-02",
+    "no": "02",
+    "name": "공급망 디지털서비스플랫폼",
+    "page": 51,
+    "pdf": 61
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스플랫폼",
+    "uid": "R2025-39-03",
+    "no": "03",
+    "name": "sLLM 기반 AI콜센터 플랫폼",
+    "page": 53,
+    "pdf": 63
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.333,
+     "common_terms": [
+      "sllm"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-17@p231",
+     "code": "SMESTR-2025-A-01-17",
+     "name": "LLM 기반 문서 자동화 에이전트",
+     "page": 221,
+     "pdf": 231
+    },
+    {
+     "score": 0.326,
+     "common_terms": [
+      "sllm",
+      "인식"
+     ],
+     "same_field_prior": false,
+     "field": "스마트제조",
+     "subfield": "제조AI·빅데이터",
+     "uid": "SMESTR-2025-B-01-03@p159",
+     "code": "SMESTR-2025-B-01-03",
+     "name": "sLLM 기반 비전식별 AI Agent",
+     "page": 151,
+     "pdf": 159
+    },
+    {
+     "score": 0.322,
+     "common_terms": [
+      "sllm"
+     ],
+     "same_field_prior": false,
+     "field": "스마트제조",
+     "subfield": "CPS·디지털트윈",
+     "uid": "SMESTR-2025-B-02-05@p224",
+     "code": "SMESTR-2025-B-02-05",
+     "name": "sLLM 기반 상호작용 시스템",
+     "page": 216,
+     "pdf": 224
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스플랫폼",
+    "uid": "R2025-39-04",
+    "no": "04",
+    "name": "AI 채용 및 노무관리 플랫폼",
+    "page": 55,
+    "pdf": 65
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.309,
+     "common_terms": [
+      "자연어",
+      "처리"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-28@p256",
+     "code": "SMESTR-2025-A-01-28",
+     "name": "RPA AI 에이전트",
+     "page": 246,
+     "pdf": 256
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스플랫폼",
+    "uid": "R2025-39-05",
+    "no": "05",
+    "name": "AI 마케팅 플랫폼",
+    "page": 56,
+    "pdf": 66
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.308,
+     "common_terms": [
+      "자연어",
+      "처리"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-28@p256",
+     "code": "SMESTR-2025-A-01-28",
+     "name": "RPA AI 에이전트",
+     "page": 246,
+     "pdf": 256
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스플랫폼",
+    "uid": "R2025-39-06",
+    "no": "06",
+    "name": "파인튜닝용 데이터 생성 플랫폼",
+    "page": 57,
+    "pdf": 67
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스플랫폼",
+    "uid": "R2025-39-07",
+    "no": "07",
+    "name": "AI 기반 문서 전처리 및 가공 플랫폼",
+    "page": 59,
+    "pdf": 69
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S1-01",
+    "no": "01",
+    "name": "AI·클라우드 플랫폼 기반 층간소음·진동 개선 서비스",
+    "page": 105,
+    "pdf": 113
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S1-02",
+    "no": "02",
+    "name": "AI·클라우드 플랫폼 기반 주거안전 취약계층 돌봄 서비스",
+    "page": 106,
+    "pdf": 114
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.381,
+     "common_terms": [
+      "돌봄"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-21@p264",
+     "code": "SMESTR-2025-A-02-21",
+     "name": "AI 기반 환자‧고령자 맞춤형 돌봄 플랫폼",
+     "page": 254,
+     "pdf": 264
+    },
+    {
+     "score": 0.378,
+     "common_terms": [
+      "취약계층"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-16@p181",
+     "code": "SMESTR-2025-A-01-16",
+     "name": "디지털 취약계층 맞춤형 솔루션",
+     "page": 171,
+     "pdf": 181
+    },
+    {
+     "score": 0.372,
+     "common_terms": [
+      "취약계층"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-23@p246",
+     "code": "SMESTR-2025-A-01-23",
+     "name": "디지털 취약계층 AI 에이전트",
+     "page": 236,
+     "pdf": 246
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S1-03",
+    "no": "03",
+    "name": "소상공인 무인점포 지원 솔루션",
+    "page": 107,
+    "pdf": 115
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S1-04",
+    "no": "04",
+    "name": "가상자산 연계 기반 서비스 생성 플랫폼",
+    "page": 108,
+    "pdf": 116
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.342,
+     "common_terms": [
+      "연계",
+      "시뮬레이션"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-29@p258",
+     "code": "SMESTR-2025-A-01-29",
+     "name": "극한환경용 소·부·장 제조 AI 에이전트",
+     "page": 248,
+     "pdf": 258
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S1-05",
+    "no": "05",
+    "name": "교통 인프라 연계형 교통 약자 안전 솔루션",
+    "page": 109,
+    "pdf": 117
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S2-01",
+    "no": "01",
+    "name": "데이터 분석 기반 건강관리 서비스",
+    "page": 112,
+    "pdf": 120
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.309,
+     "common_terms": [
+      "건강",
+      "예측"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-18@p258",
+     "code": "SMESTR-2025-A-02-18",
+     "name": "생체 신호 수집 및 건강 관리 모바일 및 웨어러블 기기",
+     "page": 248,
+     "pdf": 258
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S2-02",
+    "no": "02",
+    "name": "모바일 및 웨어러블 기기 활용 운동 지원 서비스",
+    "page": 113,
+    "pdf": 121
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.572,
+     "common_terms": [
+      "기기",
+      "모바일",
+      "웨어러블",
+      "생체신호",
+      "생체"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-18@p258",
+     "code": "SMESTR-2025-A-02-18",
+     "name": "생체 신호 수집 및 건강 관리 모바일 및 웨어러블 기기",
+     "page": 248,
+     "pdf": 258
+    },
+    {
+     "score": 0.434,
+     "common_terms": [
+      "운동",
+      "웨어러블",
+      "생체신호",
+      "디바이스"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-27@p276",
+     "code": "SMESTR-2025-A-02-27",
+     "name": "재활 및 운동 보조 웨어러블 헬스케어 디바이스",
+     "page": 266,
+     "pdf": 276
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S2-03",
+    "no": "03",
+    "name": "원격 모니터링 활용 임상 및 환자 관리 서비스",
+    "page": 114,
+    "pdf": 122
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.695,
+     "common_terms": [
+      "환자",
+      "원격",
+      "임상",
+      "의료",
+      "모니터링"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-24@p270",
+     "code": "SMESTR-2025-A-02-24",
+     "name": "원격 모니터링 활용 환자 및 임상 관리 플랫폼",
+     "page": 260,
+     "pdf": 270
+    },
+    {
+     "score": 0.321,
+     "common_terms": [
+      "기기",
+      "웨어러블",
+      "수집"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-18@p258",
+     "code": "SMESTR-2025-A-02-18",
+     "name": "생체 신호 수집 및 건강 관리 모바일 및 웨어러블 기기",
+     "page": 248,
+     "pdf": 258
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S2-04",
+    "no": "04",
+    "name": "AI 맞춤형 환자·고령자·장기요양보험 수급자 돌봄 플랫폼",
+    "page": 115,
+    "pdf": 123
+   },
+   "relation": "이어짐 가능성 높음",
+   "candidates": [
+    {
+     "score": 0.909,
+     "common_terms": [
+      "고령자",
+      "돌봄",
+      "환자",
+      "간병인",
+      "맞춤형"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-21@p264",
+     "code": "SMESTR-2025-A-02-21",
+     "name": "AI 기반 환자‧고령자 맞춤형 돌봄 플랫폼",
+     "page": 254,
+     "pdf": 264
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S2-05",
+    "no": "05",
+    "name": "3D 신체형상 시뮬레이션 서비스",
+    "page": 116,
+    "pdf": 124
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.31,
+     "common_terms": [
+      "변화",
+      "표현",
+      "시뮬레이션"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "AI 에이전트",
+     "uid": "SMESTR-2025-A-01-30@p260",
+     "code": "SMESTR-2025-A-01-30",
+     "name": "기후테크 AI 에이전트",
+     "page": 250,
+     "pdf": 260
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S3-01",
+    "no": "01",
+    "name": "지능형 유통·물류 로보틱스 시스템",
+    "page": 119,
+    "pdf": 127
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S3-02",
+    "no": "02",
+    "name": "미들마일 물류 최적화 시스템",
+    "page": 121,
+    "pdf": 129
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.342,
+     "common_terms": [
+      "물류",
+      "배송",
+      "적재"
+     ],
+     "same_field_prior": false,
+     "field": "로봇",
+     "subfield": "서비스용 로봇",
+     "uid": "SMESTR-2025-A-07-13@p214",
+     "code": "SMESTR-2025-A-07-13",
+     "name": "스마트 물류·배송 로봇 시스템",
+     "page": 203,
+     "pdf": 214
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S3-03",
+    "no": "03",
+    "name": "제조기업용 유통·물류 시스템",
+    "page": 123,
+    "pdf": 131
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S4-01",
+    "no": "01",
+    "name": "메타버스 기반 학습 소외계층 게이미피케이션 교육 서비스",
+    "page": 127,
+    "pdf": 135
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.376,
+     "common_terms": [
+      "콘텐츠",
+      "생성"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-11@p170",
+     "code": "SMESTR-2025-A-01-11",
+     "name": "피지컬 AI 기반 디지털 콘텐츠 생성 솔루션",
+     "page": 160,
+     "pdf": 170
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S4-02",
+    "no": "02",
+    "name": "XR 가상 훈련 시뮬레이터",
+    "page": 128,
+    "pdf": 136
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S4-03",
+    "no": "03",
+    "name": "AI·IoT 기반 스마트호텔 운영 관리 플랫폼",
+    "page": 129,
+    "pdf": 137
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S4-04",
+    "no": "04",
+    "name": "멀티모달 AI 기반 관광상품·서비스 추천 플랫폼",
+    "page": 131,
+    "pdf": 139
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S5-01",
+    "no": "01",
+    "name": "산업재직자 역량 강화플랫폼",
+    "page": 134,
+    "pdf": 142
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S5-02",
+    "no": "02",
+    "name": "은퇴자·고령자 런케이션 서비스",
+    "page": 136,
+    "pdf": 144
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.423,
+     "common_terms": [
+      "고령자"
+     ],
+     "same_field_prior": true,
+     "field": "바이오·의료",
+     "subfield": "의료기기·헬스케어",
+     "uid": "SMESTR-2025-A-02-21@p264",
+     "code": "SMESTR-2025-A-02-21",
+     "name": "AI 기반 환자‧고령자 맞춤형 돌봄 플랫폼",
+     "page": 254,
+     "pdf": 264
+    },
+    {
+     "score": 0.336,
+     "common_terms": [
+      "공간",
+      "인터랙션",
+      "학습"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-15@p179",
+     "code": "SMESTR-2025-A-01-15",
+     "name": "차세대 인터랙션 디바이스용 핵심 소프트웨어",
+     "page": 169,
+     "pdf": 179
+    }
+   ]
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S5-03",
+    "no": "03",
+    "name": "휴먼팩터 연계 지식전이 서비스",
+    "page": 137,
+    "pdf": 145
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S5-04",
+    "no": "04",
+    "name": "xAI 기반 개별 학습자 맞춤형 교육 플랫폼",
+    "page": 138,
+    "pdf": 146
+   },
+   "relation": "대응 품목 없음(자동 대조 기준)",
+   "candidates": []
+  },
+  {
+   "from": {
+    "field": "서비스R&D",
+    "uid": "R2025-29-33-S5-05",
+    "no": "05",
+    "name": "생성형 AI기반 대화형 자율학습 서비스",
+    "page": 140,
+    "pdf": 148
+   },
+   "relation": "관련 후보",
+   "candidates": [
+    {
+     "score": 0.351,
+     "common_terms": [
+      "생성형",
+      "모델"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-10@p168",
+     "code": "SMESTR-2025-A-01-10",
+     "name": "영상 컨텐츠 생성형 AI",
+     "page": 158,
+     "pdf": 168
+    },
+    {
+     "score": 0.319,
+     "common_terms": [
+      "생성형",
+      "모델"
+     ],
+     "same_field_prior": true,
+     "field": "AI",
+     "subfield": "컨텐츠 제네레이션 AI",
+     "uid": "SMESTR-2025-A-01-09@p166",
+     "code": "SMESTR-2025-A-01-09",
+     "name": "도메인 특화 생성형 AI 베이스 모델",
+     "page": 156,
+     "pdf": 166
+    }
+   ]
+  }
+ ],
+ "to_items_without_predecessor": [
+  {
+   "field": "AI",
+   "subfield": "멀티모달 데이터 운영·관리",
+   "uid": "SMESTR-2025-A-01-01@p105",
+   "code": "SMESTR-2025-A-01-01",
+   "name": "엣지 기반 멀티모달 분석 시스템",
+   "page": 95,
+   "pdf": 105
+  },
+  {
+   "field": "AI",
+   "subfield": "멀티모달 데이터 운영·관리",
+   "uid": "SMESTR-2025-A-01-02@p107",
+   "code": "SMESTR-2025-A-01-02",
+   "name": "멀티모달 데이터 탐색·분석 플랫폼",
+   "page": 97,
+   "pdf": 107
+  },
+  {
+   "field": "AI",
+   "subfield": "멀티모달 데이터 운영·관리",
+   "uid": "SMESTR-2025-A-01-03@p109",
+   "code": "SMESTR-2025-A-01-03",
+   "name": "산업 안전용 멀티모달 데이터 관리 솔루션",
+   "page": 99,
+   "pdf": 109
+  },
+  {
+   "field": "AI",
+   "subfield": "멀티모달 데이터 운영·관리",
+   "uid": "SMESTR-2025-A-01-04@p111",
+   "code": "SMESTR-2025-A-01-04",
+   "name": "개인정보 보호용 멀티모달 데이터 관리 AI",
+   "page": 101,
+   "pdf": 111
+  },
+  {
+   "field": "AI",
+   "subfield": "멀티모달 데이터 운영·관리",
+   "uid": "SMESTR-2025-A-01-05@p113",
+   "code": "SMESTR-2025-A-01-05",
+   "name": "LLM 학습용 데이터 솔루션",
+   "page": 103,
+   "pdf": 113
+  },
+  {
+   "field": "AI",
+   "subfield": "멀티모달 데이터 운영·관리",
+   "uid": "SMESTR-2025-A-01-06@p115",
+   "code": "SMESTR-2025-A-01-06",
+   "name": "기후테크 멀티모달 데이터 솔루션",
+   "page": 105,
+   "pdf": 115
+  },
+  {
+   "field": "AI",
+   "subfield": "멀티모달 데이터 운영·관리",
+   "uid": "SMESTR-2025-A-01-07@p117",
+   "code": "SMESTR-2025-A-01-07",
+   "name": "극한환경용 소·부·장 제조 멀티모달 데이터 솔루션",
+   "page": 107,
+   "pdf": 117
+  },
+  {
+   "field": "AI",
+   "subfield": "컨텐츠 제네레이션 AI",
+   "uid": "SMESTR-2025-A-01-08@p164",
+   "code": "SMESTR-2025-A-01-08",
+   "name": "생성물 신뢰성 자기 검증 AI",
+   "page": 154,
+   "pdf": 164
+  },
+  {
+   "field": "AI",
+   "subfield": "AI 에이전트",
+   "uid": "SMESTR-2025-A-01-18@p234",
+   "code": "SMESTR-2025-A-01-18",
+   "name": "고객관리 AI 에이전트",
+   "page": 224,
+   "pdf": 234
+  },
+  {
+   "field": "AI",
+   "subfield": "AI 에이전트",
+   "uid": "SMESTR-2025-A-01-19@p237",
+   "code": "SMESTR-2025-A-01-19",
+   "name": "SaaS형 AI 에이전트 플랫폼",
+   "page": 227,
+   "pdf": 237
+  },
+  {
+   "field": "AI",
+   "subfield": "AI 에이전트",
+   "uid": "SMESTR-2025-A-01-21@p242",
+   "code": "SMESTR-2025-A-01-21",
+   "name": "산업안전 지원 에이전트 AI",
+   "page": 232,
+   "pdf": 242
+  },
+  {
+   "field": "AI",
+   "subfield": "AI 에이전트",
+   "uid": "SMESTR-2025-A-01-22@p244",
+   "code": "SMESTR-2025-A-01-22",
+   "name": "푸드테크 에이전트 AI",
+   "page": 234,
+   "pdf": 244
+  },
+  {
+   "field": "AI",
+   "subfield": "AI 에이전트",
+   "uid": "SMESTR-2025-A-01-25@p250",
+   "code": "SMESTR-2025-A-01-25",
+   "name": "AI 에이전트용 LAM",
+   "page": 240,
+   "pdf": 250
+  },
+  {
+   "field": "AI",
+   "subfield": "AI 에이전트",
+   "uid": "SMESTR-2025-A-01-27@p254",
+   "code": "SMESTR-2025-A-01-27",
+   "name": "물리 AI 에이전트",
+   "page": 244,
+   "pdf": 254
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "제약바이오",
+   "uid": "SMESTR-2025-A-02-01@p114",
+   "code": "SMESTR-2025-A-02-01",
+   "name": "AI 기반 신약 개발 플랫폼",
+   "page": 104,
+   "pdf": 114
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "제약바이오",
+   "uid": "SMESTR-2025-A-02-06@p129",
+   "code": "SMESTR-2025-A-02-06",
+   "name": "연속 바이오프로세스·디지털 QMS",
+   "page": 119,
+   "pdf": 129
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "제약바이오",
+   "uid": "SMESTR-2025-A-02-07@p131",
+   "code": "SMESTR-2025-A-02-07",
+   "name": "비임상·임상 대체 플랫폼",
+   "page": 121,
+   "pdf": 131
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "제약바이오",
+   "uid": "SMESTR-2025-A-02-08@p134",
+   "code": "SMESTR-2025-A-02-08",
+   "name": "차세대 약물전달 시스템",
+   "page": 124,
+   "pdf": 134
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "제약바이오",
+   "uid": "SMESTR-2025-A-02-09@p137",
+   "code": "SMESTR-2025-A-02-09",
+   "name": "CDMO 적용가능 소재 장비 및 소규모 고집약 공정",
+   "page": 127,
+   "pdf": 137
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "첨단 GW 바이오",
+   "uid": "SMESTR-2025-A-02-10@p190",
+   "code": "SMESTR-2025-A-02-10",
+   "name": "차세대 육류",
+   "page": 180,
+   "pdf": 190
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "첨단 GW 바이오",
+   "uid": "SMESTR-2025-A-02-11@p192",
+   "code": "SMESTR-2025-A-02-11",
+   "name": "그린백신",
+   "page": 182,
+   "pdf": 192
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "첨단 GW 바이오",
+   "uid": "SMESTR-2025-A-02-12@p195",
+   "code": "SMESTR-2025-A-02-12",
+   "name": "탄소저감 그린비료 및 작물보호제",
+   "page": 185,
+   "pdf": 195
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "첨단 GW 바이오",
+   "uid": "SMESTR-2025-A-02-13@p198",
+   "code": "SMESTR-2025-A-02-13",
+   "name": "바이오 연료",
+   "page": 188,
+   "pdf": 198
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "첨단 GW 바이오",
+   "uid": "SMESTR-2025-A-02-14@p200",
+   "code": "SMESTR-2025-A-02-14",
+   "name": "바이오 플라스틱",
+   "page": 190,
+   "pdf": 200
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "첨단 GW 바이오",
+   "uid": "SMESTR-2025-A-02-16@p204",
+   "code": "SMESTR-2025-A-02-16",
+   "name": "합성생물학 정밀·자동화 모듈",
+   "page": 194,
+   "pdf": 204
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "첨단 GW 바이오",
+   "uid": "SMESTR-2025-A-02-17@p206",
+   "code": "SMESTR-2025-A-02-17",
+   "name": "바이오촉매",
+   "page": 196,
+   "pdf": 206
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "의료기기·헬스케어",
+   "uid": "SMESTR-2025-A-02-20@p262",
+   "code": "SMESTR-2025-A-02-20",
+   "name": "AI 판독 SW(X-Ray, 마모그램, CT, MRI, 병리영상 등)",
+   "page": 252,
+   "pdf": 262
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "의료기기·헬스케어",
+   "uid": "SMESTR-2025-A-02-22@p266",
+   "code": "SMESTR-2025-A-02-22",
+   "name": "AI 기반 이종 데이터 구축 및 분석 플랫폼",
+   "page": 256,
+   "pdf": 266
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "의료기기·헬스케어",
+   "uid": "SMESTR-2025-A-02-23@p268",
+   "code": "SMESTR-2025-A-02-23",
+   "name": "AI 기반 뷰티 소재 발굴 플랫폼 및 기능성 화장품 개발",
+   "page": 258,
+   "pdf": 268
+  },
+  {
+   "field": "바이오·의료",
+   "subfield": "의료기기·헬스케어",
+   "uid": "SMESTR-2025-A-02-26@p274",
+   "code": "SMESTR-2025-A-02-26",
+   "name": "디지털 기반 임플란트 교정, 의치 제작 및 관리 플랫폼",
+   "page": 264,
+   "pdf": 274
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "반도체",
+   "uid": "SMESTR-2025-A-03-01@p109",
+   "code": "SMESTR-2025-A-03-01",
+   "name": "저전력·경량 AI 칩 설계",
+   "page": 99,
+   "pdf": 109
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "반도체",
+   "uid": "SMESTR-2025-A-03-03@p113",
+   "code": "SMESTR-2025-A-03-03",
+   "name": "오픈 ISA 기반 맞춤형 프로세서·NPU IP군",
+   "page": 103,
+   "pdf": 113
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "반도체",
+   "uid": "SMESTR-2025-A-03-07@p121",
+   "code": "SMESTR-2025-A-03-07",
+   "name": "AI 기반 결함 검사 장비",
+   "page": 111,
+   "pdf": 121
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "반도체",
+   "uid": "SMESTR-2025-A-03-09@p125",
+   "code": "SMESTR-2025-A-03-09",
+   "name": "AI 기반 소재·공정 최적화 시스템",
+   "page": 115,
+   "pdf": 125
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "반도체",
+   "uid": "SMESTR-2025-A-03-10@p128",
+   "code": "SMESTR-2025-A-03-10",
+   "name": "차세대 고성능 웨이퍼·기판",
+   "page": 118,
+   "pdf": 128
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "반도체",
+   "uid": "SMESTR-2025-A-03-12@p132",
+   "code": "SMESTR-2025-A-03-12",
+   "name": "3D 반도체용 첨단 세정장비",
+   "page": 122,
+   "pdf": 132
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "반도체",
+   "uid": "SMESTR-2025-A-03-15@p138",
+   "code": "SMESTR-2025-A-03-15",
+   "name": "첨단 패키징용 소재",
+   "page": 128,
+   "pdf": 138
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "디스플레이",
+   "uid": "SMESTR-2025-A-03-16@p187",
+   "code": "SMESTR-2025-A-03-16",
+   "name": "디스플레이의 특성 개선을 위한 기능성 코팅재료",
+   "page": 177,
+   "pdf": 187
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "디스플레이",
+   "uid": "SMESTR-2025-A-03-17@p189",
+   "code": "SMESTR-2025-A-03-17",
+   "name": "과불소화 화합물을 포함하지 않는 친환경 고내열 소재",
+   "page": 179,
+   "pdf": 189
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "디스플레이",
+   "uid": "SMESTR-2025-A-03-19@p193",
+   "code": "SMESTR-2025-A-03-19",
+   "name": "정밀 스테이지",
+   "page": 183,
+   "pdf": 193
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "디스플레이",
+   "uid": "SMESTR-2025-A-03-20@p195",
+   "code": "SMESTR-2025-A-03-20",
+   "name": "대용량 드라이 펌프",
+   "page": 185,
+   "pdf": 195
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "디스플레이",
+   "uid": "SMESTR-2025-A-03-21@p197",
+   "code": "SMESTR-2025-A-03-21",
+   "name": "DC 파워 서플라이",
+   "page": 187,
+   "pdf": 197
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "디스플레이",
+   "uid": "SMESTR-2025-A-03-24@p203",
+   "code": "SMESTR-2025-A-03-24",
+   "name": "모빌리티 디스플레이 모듈",
+   "page": 193,
+   "pdf": 203
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "디스플레이",
+   "uid": "SMESTR-2025-A-03-26@p207",
+   "code": "SMESTR-2025-A-03-26",
+   "name": "인터랙티브 디스플레이 패널",
+   "page": 197,
+   "pdf": 207
+  },
+  {
+   "field": "반도체·디스플레이",
+   "subfield": "디스플레이",
+   "uid": "SMESTR-2025-A-03-27@p209",
+   "code": "SMESTR-2025-A-03-27",
+   "name": "첨단 모듈러 디스플레이",
+   "page": 199,
+   "pdf": 209
+  },
+  {
+   "field": "차세대통신",
+   "subfield": "유·무선 통신 장비",
+   "uid": "SMESTR-2025-A-04-04@p105",
+   "code": "SMESTR-2025-A-04-04",
+   "name": "지능형 기지국 제어기",
+   "page": 95,
+   "pdf": 105
+  },
+  {
+   "field": "차세대통신",
+   "subfield": "유·무선 통신 장비",
+   "uid": "SMESTR-2025-A-04-05@p107",
+   "code": "SMESTR-2025-A-04-05",
+   "name": "개방형 지능화 vRAN 분산장치 통합 플랫폼 (RU·DU·CU)",
+   "page": 97,
+   "pdf": 107
+  },
+  {
+   "field": "차세대통신",
+   "subfield": "유·무선 통신 장비",
+   "uid": "SMESTR-2025-A-04-06@p109",
+   "code": "SMESTR-2025-A-04-06",
+   "name": "프라이빗5G 로컬 코어-MEC 패키지",
+   "page": 99,
+   "pdf": 109
+  },
+  {
+   "field": "차세대통신",
+   "subfield": "유·무선 통신 장비",
+   "uid": "SMESTR-2025-A-04-09@p116",
+   "code": "SMESTR-2025-A-04-09",
+   "name": "OTN 통합 백홀 전송 장비",
+   "page": 106,
+   "pdf": 116
+  },
+  {
+   "field": "차세대통신",
+   "subfield": "통신 부품",
+   "uid": "SMESTR-2025-A-04-10@p164",
+   "code": "SMESTR-2025-A-04-10",
+   "name": "고효율 전력증폭 모듈 PAM",
+   "page": 154,
+   "pdf": 164
+  },
+  {
+   "field": "차세대통신",
+   "subfield": "통신 부품",
+   "uid": "SMESTR-2025-A-04-11@p166",
+   "code": "SMESTR-2025-A-04-11",
+   "name": "저손실 필터·듀플렉서",
+   "page": 156,
+   "pdf": 166
+  },
+  {
+   "field": "차세대통신",
+   "subfield": "통신 부품",
+   "uid": "SMESTR-2025-A-04-12@p169",
+   "code": "SMESTR-2025-A-04-12",
+   "name": "RF 프런트엔드 모듈",
+   "page": 159,
+   "pdf": 169
+  },
+  {
+   "field": "차세대통신",
+   "subfield": "통신 부품",
+   "uid": "SMESTR-2025-A-04-15@p175",
+   "code": "SMESTR-2025-A-04-15",
+   "name": "고속 광송수신 모듈",
+   "page": 165,
+   "pdf": 175
+  },
+  {
+   "field": "첨단소재",
+   "subfield": "화학 소재",
+   "uid": "SMESTR-2025-A-05-06@p161",
+   "code": "SMESTR-2025-A-05-06",
+   "name": "유기 발광 소재(OLED)",
+   "page": 149,
+   "pdf": 161
+  },
+  {
+   "field": "첨단소재",
+   "subfield": "화학 소재",
+   "uid": "SMESTR-2025-A-05-08@p165",
+   "code": "SMESTR-2025-A-05-08",
+   "name": "반도체용 정밀 화학소재",
+   "page": 153,
+   "pdf": 165
+  },
+  {
+   "field": "첨단소재",
+   "subfield": "화학 소재",
+   "uid": "SMESTR-2025-A-05-10@p169",
+   "code": "SMESTR-2025-A-05-10",
+   "name": "친환경 고분자 포장재 소재",
+   "page": 157,
+   "pdf": 169
+  },
+  {
+   "field": "첨단소재",
+   "subfield": "섬유 소재",
+   "uid": "SMESTR-2025-A-05-11@p214",
+   "code": "SMESTR-2025-A-05-11",
+   "name": "유뮤기 복합재료",
+   "page": 202,
+   "pdf": 214
+  },
+  {
+   "field": "첨단소재",
+   "subfield": "세라믹 소재",
+   "uid": "SMESTR-2025-A-05-19@p272",
+   "code": "SMESTR-2025-A-05-19",
+   "name": "바이오 세라믹 소재",
+   "page": 260,
+   "pdf": 272
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 소프트웨어",
+   "uid": "SMESTR-2025-A-06-01@p98",
+   "code": "SMESTR-2025-A-06-01",
+   "name": "생성형 AI-레거시 소프트웨어 통합 시스템",
+   "page": 88,
+   "pdf": 98
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 소프트웨어",
+   "uid": "SMESTR-2025-A-06-02@p100",
+   "code": "SMESTR-2025-A-06-02",
+   "name": "지능형 산업안전 관리 시스템",
+   "page": 90,
+   "pdf": 100
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 소프트웨어",
+   "uid": "SMESTR-2025-A-06-04@p104",
+   "code": "SMESTR-2025-A-06-04",
+   "name": "멀티모달 제조데이터 수집 플랫폼",
+   "page": 94,
+   "pdf": 104
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 소프트웨어",
+   "uid": "SMESTR-2025-A-06-05@p106",
+   "code": "SMESTR-2025-A-06-05",
+   "name": "지능형 예지보전·자산관리 시스템",
+   "page": 96,
+   "pdf": 106
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 소프트웨어",
+   "uid": "SMESTR-2025-A-06-06@p108",
+   "code": "SMESTR-2025-A-06-06",
+   "name": "사용자 친화 제조 Agent AI",
+   "page": 98,
+   "pdf": 108
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 소프트웨어",
+   "uid": "SMESTR-2025-A-06-07@p110",
+   "code": "SMESTR-2025-A-06-07",
+   "name": "AI 기반 APS·APC 통합 플랫폼",
+   "page": 100,
+   "pdf": 110
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 소프트웨어",
+   "uid": "SMESTR-2025-A-06-08@p112",
+   "code": "SMESTR-2025-A-06-08",
+   "name": "다품종 소량생산 경량 AI 시스템",
+   "page": 102,
+   "pdf": 112
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 소프트웨어",
+   "uid": "SMESTR-2025-A-06-10@p116",
+   "code": "SMESTR-2025-A-06-10",
+   "name": "지능형 FEMS",
+   "page": 106,
+   "pdf": 116
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 인프라",
+   "uid": "SMESTR-2025-A-06-11@p164",
+   "code": "SMESTR-2025-A-06-11",
+   "name": "중소기업 맞춤형 제조로봇",
+   "page": 154,
+   "pdf": 164
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 인프라",
+   "uid": "SMESTR-2025-A-06-12@p166",
+   "code": "SMESTR-2025-A-06-12",
+   "name": "AI 머신 비전",
+   "page": 156,
+   "pdf": 166
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 인프라",
+   "uid": "SMESTR-2025-A-06-13@p168",
+   "code": "SMESTR-2025-A-06-13",
+   "name": "로봇 친화형 제조환경 구축 시스템",
+   "page": 158,
+   "pdf": 168
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 인프라",
+   "uid": "SMESTR-2025-A-06-15@p172",
+   "code": "SMESTR-2025-A-06-15",
+   "name": "AX 제조 장비(AI eXperience Manufacturing Equipment)",
+   "page": 162,
+   "pdf": 172
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 인프라",
+   "uid": "SMESTR-2025-A-06-16@p174",
+   "code": "SMESTR-2025-A-06-16",
+   "name": "산업용 웨어러블-인터랙션 디바이스",
+   "page": 164,
+   "pdf": 174
+  },
+  {
+   "field": "첨단제조",
+   "subfield": "첨단제조 인프라",
+   "uid": "SMESTR-2025-A-06-18@p178",
+   "code": "SMESTR-2025-A-06-18",
+   "name": "산업용 고속 통신 네트워크 시스템",
+   "page": 168,
+   "pdf": 178
+  },
+  {
+   "field": "로봇",
+   "subfield": "로봇 부품·소프트웨어",
+   "uid": "SMESTR-2025-A-07-01@p98",
+   "code": "SMESTR-2025-A-07-01",
+   "name": "고정밀 고성능 센서",
+   "page": 87,
+   "pdf": 98
+  },
+  {
+   "field": "로봇",
+   "subfield": "로봇 부품·소프트웨어",
+   "uid": "SMESTR-2025-A-07-04@p102",
+   "code": "SMESTR-2025-A-07-04",
+   "name": "지능형 로봇 툴링 모듈화 플랫폼",
+   "page": 91,
+   "pdf": 102
+  },
+  {
+   "field": "로봇",
+   "subfield": "로봇 부품·소프트웨어",
+   "uid": "SMESTR-2025-A-07-04@p104",
+   "code": "SMESTR-2025-A-07-04",
+   "name": "고효율 구동·엔드이펙터 통합 모듈",
+   "page": 93,
+   "pdf": 104
+  },
+  {
+   "field": "로봇",
+   "subfield": "로봇 부품·소프트웨어",
+   "uid": "SMESTR-2025-A-07-05@p106",
+   "code": "SMESTR-2025-A-07-05",
+   "name": "비정형 환경인지 자율조작 SW",
+   "page": 95,
+   "pdf": 106
+  },
+  {
+   "field": "로봇",
+   "subfield": "로봇 부품·소프트웨어",
+   "uid": "SMESTR-2025-A-07-06@p108",
+   "code": "SMESTR-2025-A-07-06",
+   "name": "비정형 환경인지 자율주행 SW",
+   "page": 97,
+   "pdf": 108
+  },
+  {
+   "field": "로봇",
+   "subfield": "로봇 부품·소프트웨어",
+   "uid": "SMESTR-2025-A-07-07@p110",
+   "code": "SMESTR-2025-A-07-07",
+   "name": "AI 기반 HRI 솔루션",
+   "page": 99,
+   "pdf": 110
+  },
+  {
+   "field": "로봇",
+   "subfield": "로봇 부품·소프트웨어",
+   "uid": "SMESTR-2025-A-07-08@p112",
+   "code": "SMESTR-2025-A-07-08",
+   "name": "다수 로봇 통합 제어 솔루션",
+   "page": 101,
+   "pdf": 112
+  },
+  {
+   "field": "로봇",
+   "subfield": "로봇 부품·소프트웨어",
+   "uid": "SMESTR-2025-A-07-09@p115",
+   "code": "SMESTR-2025-A-07-09",
+   "name": "서비스 로봇 시스템 통합 플랫폼",
+   "page": 104,
+   "pdf": 115
+  },
+  {
+   "field": "로봇",
+   "subfield": "제조용 로봇",
+   "uid": "SMESTR-2025-A-07-10@p160",
+   "code": "SMESTR-2025-A-07-10",
+   "name": "고정밀 조립 생산 자동화 셀",
+   "page": 149,
+   "pdf": 160
+  },
+  {
+   "field": "로봇",
+   "subfield": "제조용 로봇",
+   "uid": "SMESTR-2025-A-07-11@p162",
+   "code": "SMESTR-2025-A-07-11",
+   "name": "로봇-스마트공장 통합 플랫폼",
+   "page": 151,
+   "pdf": 162
+  },
+  {
+   "field": "로봇",
+   "subfield": "제조용 로봇",
+   "uid": "SMESTR-2025-A-07-12@p164",
+   "code": "SMESTR-2025-A-07-12",
+   "name": "공장시설 점검 및 유지보수 로봇 시스템",
+   "page": 153,
+   "pdf": 164
+  },
+  {
+   "field": "로봇",
+   "subfield": "서비스용 로봇",
+   "uid": "SMESTR-2025-A-07-18@p226",
+   "code": "SMESTR-2025-A-07-18",
+   "name": "휴머노이드 로봇 시스템",
+   "page": 215,
+   "pdf": 226
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "육상 모빌리티",
+   "uid": "SMESTR-2025-A-08-04@p103",
+   "code": "SMESTR-2025-A-08-04",
+   "name": "소프트웨어 정의 차량(SDV) 플랫폼",
+   "page": 93,
+   "pdf": 103
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "육상 모빌리티",
+   "uid": "SMESTR-2025-A-08-10@p117",
+   "code": "SMESTR-2025-A-08-10",
+   "name": "친환경 경량 소재, 부품",
+   "page": 107,
+   "pdf": 117
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "해상 모빌리티",
+   "uid": "SMESTR-2025-A-08-12@p167",
+   "code": "SMESTR-2025-A-08-12",
+   "name": "디지털 트윈 기반 선박 관리 및 항만·물류연계 플랫폼",
+   "page": 157,
+   "pdf": 167
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "해상 모빌리티",
+   "uid": "SMESTR-2025-A-08-13@p170",
+   "code": "SMESTR-2025-A-08-13",
+   "name": "선박 배출 오염물질 감축 시스템",
+   "page": 160,
+   "pdf": 170
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "해상 모빌리티",
+   "uid": "SMESTR-2025-A-08-15@p176",
+   "code": "SMESTR-2025-A-08-15",
+   "name": "하이브리드 전기추진 전력망",
+   "page": 166,
+   "pdf": 176
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "항공 모빌리티",
+   "uid": "SMESTR-2025-A-08-24@p238",
+   "code": "SMESTR-2025-A-08-24",
+   "name": "UAM 통합 운항·관제 시스템",
+   "page": 228,
+   "pdf": 238
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "항공 모빌리티",
+   "uid": "SMESTR-2025-A-08-25@p240",
+   "code": "SMESTR-2025-A-08-25",
+   "name": "디지털 트윈 항공 운영 플랫폼",
+   "page": 230,
+   "pdf": 240
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "항공 모빌리티",
+   "uid": "SMESTR-2025-A-08-26@p242",
+   "code": "SMESTR-2025-A-08-26",
+   "name": "배터리·에너지 저장 모듈",
+   "page": 232,
+   "pdf": 242
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "항공 모빌리티",
+   "uid": "SMESTR-2025-A-08-27@p244",
+   "code": "SMESTR-2025-A-08-27",
+   "name": "정밀·항법 측위 시스템",
+   "page": 234,
+   "pdf": 244
+  },
+  {
+   "field": "첨단모빌리티",
+   "subfield": "항공 모빌리티",
+   "uid": "SMESTR-2025-A-08-28@p246",
+   "code": "SMESTR-2025-A-08-28",
+   "name": "예지정비·건전성 관리 체계(SHM/PHM)",
+   "page": 236,
+   "pdf": 246
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "무탄소 에너지 전환",
+   "uid": "SMESTR-2025-A-09-02@p100",
+   "code": "SMESTR-2025-A-09-02",
+   "name": "고경량x저손실 전선x케이블 시스템",
+   "page": 90,
+   "pdf": 100
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "무탄소 에너지 전환",
+   "uid": "SMESTR-2025-A-09-03@p102",
+   "code": "SMESTR-2025-A-09-03",
+   "name": "데이터센터 에너지 효율성 향상 시스템",
+   "page": 92,
+   "pdf": 102
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "무탄소 에너지 전환",
+   "uid": "SMESTR-2025-A-09-04@p104",
+   "code": "SMESTR-2025-A-09-04",
+   "name": "ESS 안정성 향상 및 운영 시스템",
+   "page": 94,
+   "pdf": 104
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "무탄소 에너지 전환",
+   "uid": "SMESTR-2025-A-09-05@p106",
+   "code": "SMESTR-2025-A-09-05",
+   "name": "해상풍력용 핵심 부품",
+   "page": 96,
+   "pdf": 106
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "산업 탈탄소화",
+   "uid": "SMESTR-2025-A-09-09@p159",
+   "code": "SMESTR-2025-A-09-09",
+   "name": "고효율 친환경 전동기·유체기기",
+   "page": 149,
+   "pdf": 159
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "산업 탈탄소화",
+   "uid": "SMESTR-2025-A-09-14@p169",
+   "code": "SMESTR-2025-A-09-14",
+   "name": "AI 기반 산업용 배기가스 감소 시스템",
+   "page": 159,
+   "pdf": 169
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "자원순환",
+   "uid": "SMESTR-2025-A-09-18@p223",
+   "code": "SMESTR-2025-A-09-18",
+   "name": "AI 활용 순환자원 고도 선별 시스템",
+   "page": 213,
+   "pdf": 223
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "자원순환",
+   "uid": "SMESTR-2025-A-09-19@p225",
+   "code": "SMESTR-2025-A-09-19",
+   "name": "플라스틱 순환자원 활용 시스템",
+   "page": 215,
+   "pdf": 225
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "자원순환",
+   "uid": "SMESTR-2025-A-09-20@p227",
+   "code": "SMESTR-2025-A-09-20",
+   "name": "저농도 금속함유자원 회수 솔루션",
+   "page": 217,
+   "pdf": 227
+  },
+  {
+   "field": "기후·에너지",
+   "subfield": "자원순환",
+   "uid": "SMESTR-2025-A-09-22@p231",
+   "code": "SMESTR-2025-A-09-22",
+   "name": "재생 흑연 제조 시스템",
+   "page": 221,
+   "pdf": 231
+  },
+  {
+   "field": "이차전지",
+   "subfield": "이차전지 소재·엔지니어링",
+   "uid": "SMESTR-2025-A-10-01@p96",
+   "code": "SMESTR-2025-A-10-01",
+   "name": "건식전극용 제조장비",
+   "page": 86,
+   "pdf": 96
+  },
+  {
+   "field": "이차전지",
+   "subfield": "이차전지 소재·엔지니어링",
+   "uid": "SMESTR-2025-A-10-04@p102",
+   "code": "SMESTR-2025-A-10-04",
+   "name": "전구체·표면개질 기술 적용 개량형 LFP 양극",
+   "page": 92,
+   "pdf": 102
+  },
+  {
+   "field": "이차전지",
+   "subfield": "이차전지 소재·엔지니어링",
+   "uid": "SMESTR-2025-A-10-07@p108",
+   "code": "SMESTR-2025-A-10-07",
+   "name": "고정밀 BMS 진단 알고리즘·보드 세트",
+   "page": 98,
+   "pdf": 108
+  },
+  {
+   "field": "이차전지",
+   "subfield": "배터리 재사용·재활용 시스템",
+   "uid": "SMESTR-2025-A-10-14@p167",
+   "code": "SMESTR-2025-A-10-14",
+   "name": "자원순환형 환경부하 저감 시스템",
+   "page": 157,
+   "pdf": 167
+  },
+  {
+   "field": "이차전지",
+   "subfield": "배터리 재사용·재활용 시스템",
+   "uid": "SMESTR-2025-A-10-15@p169",
+   "code": "SMESTR-2025-A-10-15",
+   "name": "재사용배터리 기반 고안전·고효율 ESS 시스템",
+   "page": 159,
+   "pdf": 169
+  },
+  {
+   "field": "이차전지",
+   "subfield": "배터리 재사용·재활용 시스템",
+   "uid": "SMESTR-2025-A-10-16@p171",
+   "code": "SMESTR-2025-A-10-16",
+   "name": "현장형 사용후 배터리 고속 진단 시스템 및 배터리 열화 정밀진단 시스템",
+   "page": 161,
+   "pdf": 171
+  },
+  {
+   "field": "사이버보안",
+   "subfield": "IT·OT 보안",
+   "uid": "SMESTR-2025-A-11-01@p94",
+   "code": "SMESTR-2025-A-11-01",
+   "name": "통합 보안관제 (XDR/SIEM/SOAR) 플랫폼",
+   "page": 84,
+   "pdf": 94
+  },
+  {
+   "field": "사이버보안",
+   "subfield": "IT·OT 보안",
+   "uid": "SMESTR-2025-A-11-02@p97",
+   "code": "SMESTR-2025-A-11-02",
+   "name": "엔드포인트 보안 및 대응(EPP/EDR)시스템",
+   "page": 87,
+   "pdf": 97
+  },
+  {
+   "field": "사이버보안",
+   "subfield": "IT·OT 보안",
+   "uid": "SMESTR-2025-A-11-06@p109",
+   "code": "SMESTR-2025-A-11-06",
+   "name": "데이터 암호화·무결성 검증 시스템",
+   "page": 99,
+   "pdf": 109
+  },
+  {
+   "field": "사이버보안",
+   "subfield": "신기술 보안",
+   "uid": "SMESTR-2025-A-11-10@p162",
+   "code": "SMESTR-2025-A-11-10",
+   "name": "생성형·멀티모달 AI 보안 시스템",
+   "page": 152,
+   "pdf": 162
+  },
+  {
+   "field": "사이버보안",
+   "subfield": "신기술 보안",
+   "uid": "SMESTR-2025-A-11-11@p164",
+   "code": "SMESTR-2025-A-11-11",
+   "name": "개인정보 보호 비식별화 플랫폼",
+   "page": 154,
+   "pdf": 164
+  },
+  {
+   "field": "사이버보안",
+   "subfield": "신기술 보안",
+   "uid": "SMESTR-2025-A-11-13@p168",
+   "code": "SMESTR-2025-A-11-13",
+   "name": "AI 에이전트·피지컬 AI 보안 플랫폼",
+   "page": 158,
+   "pdf": 168
+  },
+  {
+   "field": "사이버보안",
+   "subfield": "신기술 보안",
+   "uid": "SMESTR-2025-A-11-14@p171",
+   "code": "SMESTR-2025-A-11-14",
+   "name": "블록체인·스마트계약 보안 시스템",
+   "page": 161,
+   "pdf": 171
+  },
+  {
+   "field": "사이버보안",
+   "subfield": "신기술 보안",
+   "uid": "SMESTR-2025-A-11-15@p173",
+   "code": "SMESTR-2025-A-11-15",
+   "name": "양자내성암호 시스템",
+   "page": 163,
+   "pdf": 173
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 컴퓨팅",
+   "uid": "SMESTR-2025-A-12-01@p110",
+   "code": "SMESTR-2025-A-12-01",
+   "name": "양자 시뮬레이터",
+   "page": 100,
+   "pdf": 110
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 컴퓨팅",
+   "uid": "SMESTR-2025-A-12-02@p112",
+   "code": "SMESTR-2025-A-12-02",
+   "name": "양자 최적화 알고리즘",
+   "page": 102,
+   "pdf": 112
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 컴퓨팅",
+   "uid": "SMESTR-2025-A-12-03@p114",
+   "code": "SMESTR-2025-A-12-03",
+   "name": "양자 금융/신약바이오 알고리즘",
+   "page": 104,
+   "pdf": 114
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 컴퓨팅",
+   "uid": "SMESTR-2025-A-12-04@p116",
+   "code": "SMESTR-2025-A-12-04",
+   "name": "양자 ML/개발도구",
+   "page": 106,
+   "pdf": 116
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 컴퓨팅",
+   "uid": "SMESTR-2025-A-12-05@p118",
+   "code": "SMESTR-2025-A-12-05",
+   "name": "양자 컴퓨팅용 냉각기",
+   "page": 108,
+   "pdf": 118
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 컴퓨팅",
+   "uid": "SMESTR-2025-A-12-06@p120",
+   "code": "SMESTR-2025-A-12-06",
+   "name": "하이브리드 양자 컴퓨터",
+   "page": 110,
+   "pdf": 120
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 통신",
+   "uid": "SMESTR-2025-A-12-07@p165",
+   "code": "SMESTR-2025-A-12-07",
+   "name": "양자암호 키분배 송수신 핵심소자 및 모듈",
+   "page": 155,
+   "pdf": 165
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 통신",
+   "uid": "SMESTR-2025-A-12-08@p167",
+   "code": "SMESTR-2025-A-12-08",
+   "name": "QRNG(Quantum Random Number Generator) 칩 및 모듈",
+   "page": 157,
+   "pdf": 167
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 통신",
+   "uid": "SMESTR-2025-A-12-09@p169",
+   "code": "SMESTR-2025-A-12-09",
+   "name": "양자통신용 단일광자검출기",
+   "page": 159,
+   "pdf": 169
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 통신",
+   "uid": "SMESTR-2025-A-12-10@p171",
+   "code": "SMESTR-2025-A-12-10",
+   "name": "광지연 간섭계 칩 및 모듈",
+   "page": 161,
+   "pdf": 171
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 통신",
+   "uid": "SMESTR-2025-A-12-11@p173",
+   "code": "SMESTR-2025-A-12-11",
+   "name": "고속 양자통신용 광원 모듈",
+   "page": 163,
+   "pdf": 173
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 통신",
+   "uid": "SMESTR-2025-A-12-12@p175",
+   "code": "SMESTR-2025-A-12-12",
+   "name": "유선(광섬유) QKD 장치",
+   "page": 165,
+   "pdf": 175
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 통신",
+   "uid": "SMESTR-2025-A-12-13@p177",
+   "code": "SMESTR-2025-A-12-13",
+   "name": "하이브리드 QKD 통신용 PQC",
+   "page": 167,
+   "pdf": 177
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 센싱",
+   "uid": "SMESTR-2025-A-12-14@p223",
+   "code": "SMESTR-2025-A-12-14",
+   "name": "자기장 센싱 및 이미징 디바이스",
+   "page": 213,
+   "pdf": 223
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 센싱",
+   "uid": "SMESTR-2025-A-12-15@p226",
+   "code": "SMESTR-2025-A-12-15",
+   "name": "생체 자기 계측",
+   "page": 216,
+   "pdf": 226
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 센싱",
+   "uid": "SMESTR-2025-A-12-16@p228",
+   "code": "SMESTR-2025-A-12-16",
+   "name": "단일광자 검출 배열 핵심소자",
+   "page": 218,
+   "pdf": 228
+  },
+  {
+   "field": "양자",
+   "subfield": "양자 센싱",
+   "uid": "SMESTR-2025-A-12-17@p230",
+   "code": "SMESTR-2025-A-12-17",
+   "name": "원자 기반 관성센서",
+   "page": 220,
+   "pdf": 230
+  },
+  {
+   "field": "우주",
+   "subfield": "우주 시스템",
+   "uid": "SMESTR-2025-A-13-01@p99",
+   "code": "SMESTR-2025-A-13-01",
+   "name": "전기추진 시스템 부품 및 구성",
+   "page": 89,
+   "pdf": 99
+  },
+  {
+   "field": "우주",
+   "subfield": "우주 시스템",
+   "uid": "SMESTR-2025-A-13-02@p101",
+   "code": "SMESTR-2025-A-13-02",
+   "name": "고신뢰 소형발사체 항법장비",
+   "page": 91,
+   "pdf": 101
+  },
+  {
+   "field": "우주",
+   "subfield": "우주 시스템",
+   "uid": "SMESTR-2025-A-13-08@p113",
+   "code": "SMESTR-2025-A-13-08",
+   "name": "항법유도제어 시뮬레이터",
+   "page": 103,
+   "pdf": 113
+  },
+  {
+   "field": "우주",
+   "subfield": "우주 활용",
+   "uid": "SMESTR-2025-A-13-09@p162",
+   "code": "SMESTR-2025-A-13-09",
+   "name": "고신뢰·초정밀 항법 솔루션",
+   "page": 152,
+   "pdf": 162
+  },
+  {
+   "field": "우주",
+   "subfield": "우주 활용",
+   "uid": "SMESTR-2025-A-13-10@p164",
+   "code": "SMESTR-2025-A-13-10",
+   "name": "궤도상 우주 시험/제조 활용 솔루션",
+   "page": 154,
+   "pdf": 164
+  },
+  {
+   "field": "우주",
+   "subfield": "우주 활용",
+   "uid": "SMESTR-2025-A-13-11@p166",
+   "code": "SMESTR-2025-A-13-11",
+   "name": "AI 기반 지상국 운영자동화 솔루션",
+   "page": 156,
+   "pdf": 166
+  },
+  {
+   "field": "우주",
+   "subfield": "우주 활용",
+   "uid": "SMESTR-2025-A-13-12@p168",
+   "code": "SMESTR-2025-A-13-12",
+   "name": "우주 탐사 지원 서비스 플랫폼",
+   "page": 158,
+   "pdf": 168
+  },
+  {
+   "field": "우주",
+   "subfield": "우주 활용",
+   "uid": "SMESTR-2025-A-13-13@p170",
+   "code": "SMESTR-2025-A-13-13",
+   "name": "다중센서 기반 위성데이터 융합·활용 서비스",
+   "page": 160,
+   "pdf": 170
+  },
+  {
+   "field": "우주",
+   "subfield": "우주 활용",
+   "uid": "SMESTR-2025-A-13-14@p172",
+   "code": "SMESTR-2025-A-13-14",
+   "name": "SSA/SDA 데이터 융합 활용 서비스",
+   "page": 162,
+   "pdf": 172
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제조AI·빅데이터",
+   "uid": "SMESTR-2025-B-01-01@p154",
+   "code": "SMESTR-2025-B-01-01",
+   "name": "멀티에이전트 자율제조 오케스트레이션 솔루션",
+   "page": 146,
+   "pdf": 154
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제조AI·빅데이터",
+   "uid": "SMESTR-2025-B-01-02@p157",
+   "code": "SMESTR-2025-B-01-02",
+   "name": "파운데이션·MLOps 제조 AI 운영 플랫폼",
+   "page": 149,
+   "pdf": 157
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제조AI·빅데이터",
+   "uid": "SMESTR-2025-B-01-04@p162",
+   "code": "SMESTR-2025-B-01-04",
+   "name": "제조로봇 제어 AI",
+   "page": 154,
+   "pdf": 162
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제조AI·빅데이터",
+   "uid": "SMESTR-2025-B-01-05@p165",
+   "code": "SMESTR-2025-B-01-05",
+   "name": "제품설계용 생성형 AI",
+   "page": 157,
+   "pdf": 165
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제조AI·빅데이터",
+   "uid": "SMESTR-2025-B-01-06@p168",
+   "code": "SMESTR-2025-B-01-06",
+   "name": "스마트공장 데이터보안 내재 학습 플랫폼",
+   "page": 160,
+   "pdf": 168
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제조AI·빅데이터",
+   "uid": "SMESTR-2025-B-01-08@p174",
+   "code": "SMESTR-2025-B-01-08",
+   "name": "멀티모달 작업자·설비 지능인식 시스템",
+   "page": 166,
+   "pdf": 174
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제조AI·빅데이터",
+   "uid": "SMESTR-2025-B-01-09@p177",
+   "code": "SMESTR-2025-B-01-09",
+   "name": "제조 RAG 모델",
+   "page": 169,
+   "pdf": 177
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제조AI·빅데이터",
+   "uid": "SMESTR-2025-B-01-10@p179",
+   "code": "SMESTR-2025-B-01-10",
+   "name": "실시간 제조산업 지식관리 플랫폼",
+   "page": 171,
+   "pdf": 179
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "CPS·디지털트윈",
+   "uid": "SMESTR-2025-B-02-01@p216",
+   "code": "SMESTR-2025-B-02-01",
+   "name": "시뮬레이션·모델링 CPS",
+   "page": 208,
+   "pdf": 216
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "CPS·디지털트윈",
+   "uid": "SMESTR-2025-B-02-03@p220",
+   "code": "SMESTR-2025-B-02-03",
+   "name": "협동로봇 및 휴머노이드 트레이닝 CPS",
+   "page": 212,
+   "pdf": 220
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "CPS·디지털트윈",
+   "uid": "SMESTR-2025-B-02-04@p222",
+   "code": "SMESTR-2025-B-02-04",
+   "name": "예지·운영 관리 CPS",
+   "page": 214,
+   "pdf": 222
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "CPS·디지털트윈",
+   "uid": "SMESTR-2025-B-02-06@p226",
+   "code": "SMESTR-2025-B-02-06",
+   "name": "안전관리 디지털트윈·CPS",
+   "page": 218,
+   "pdf": 226
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "생산관리시스템",
+   "uid": "SMESTR-2025-B-03-02@p264",
+   "code": "SMESTR-2025-B-03-02",
+   "name": "실시간 생산제어관리 시스템",
+   "page": 256,
+   "pdf": 264
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "생산관리시스템",
+   "uid": "SMESTR-2025-B-03-03@p267",
+   "code": "SMESTR-2025-B-03-03",
+   "name": "에너지·탄소 통합관리 플랫폼",
+   "page": 259,
+   "pdf": 267
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "생산관리시스템",
+   "uid": "SMESTR-2025-B-03-04@p270",
+   "code": "SMESTR-2025-B-03-04",
+   "name": "MES 모듈형 솔루션",
+   "page": 262,
+   "pdf": 270
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "생산관리시스템",
+   "uid": "SMESTR-2025-B-03-05@p273",
+   "code": "SMESTR-2025-B-03-05",
+   "name": "MES·ERP 통합 플랫폼",
+   "page": 265,
+   "pdf": 273
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "생산관리시스템",
+   "uid": "SMESTR-2025-B-03-06@p275",
+   "code": "SMESTR-2025-B-03-06",
+   "name": "스마트 SCM·인벤토리 관리 솔루션",
+   "page": 267,
+   "pdf": 275
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "생산관리시스템",
+   "uid": "SMESTR-2025-B-03-07@p277",
+   "code": "SMESTR-2025-B-03-07",
+   "name": "다품종 소량생산 최적화 시스템",
+   "page": 269,
+   "pdf": 277
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "생산관리시스템",
+   "uid": "SMESTR-2025-B-03-08@p279",
+   "code": "SMESTR-2025-B-03-08",
+   "name": "AI 설비 예지보전 솔루션",
+   "page": 271,
+   "pdf": 279
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "물류관리시스템",
+   "uid": "SMESTR-2025-B-04-01@p318",
+   "code": "SMESTR-2025-B-04-01",
+   "name": "AI 물류 시뮬레이션 의사결정 지원 플랫폼",
+   "page": 310,
+   "pdf": 318
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "물류관리시스템",
+   "uid": "SMESTR-2025-B-04-02@p321",
+   "code": "SMESTR-2025-B-04-02",
+   "name": "AI 물류실행 최적화 시스템",
+   "page": 313,
+   "pdf": 321
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "물류관리시스템",
+   "uid": "SMESTR-2025-B-04-03@p324",
+   "code": "SMESTR-2025-B-04-03",
+   "name": "이기종·다기종 물류 로보틱스 시스템",
+   "page": 316,
+   "pdf": 324
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "물류관리시스템",
+   "uid": "SMESTR-2025-B-04-04@p326",
+   "code": "SMESTR-2025-B-04-04",
+   "name": "자동화 창고 구축 물류 인프라 시스템",
+   "page": 318,
+   "pdf": 326
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "물류관리시스템",
+   "uid": "SMESTR-2025-B-04-05@p329",
+   "code": "SMESTR-2025-B-04-05",
+   "name": "탄소계수 기반 지속가능 물류관리 플랫폼",
+   "page": 321,
+   "pdf": 329
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "물류관리시스템",
+   "uid": "SMESTR-2025-B-04-06@p332",
+   "code": "SMESTR-2025-B-04-06",
+   "name": "글로벌 공급망 보안관리 시스템",
+   "page": 324,
+   "pdf": 332
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "식별시스템·머신비전",
+   "uid": "SMESTR-2025-B-05-01@p366",
+   "code": "SMESTR-2025-B-05-01",
+   "name": "AI 3D 비전검사 시스템",
+   "page": 358,
+   "pdf": 366
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "식별시스템·머신비전",
+   "uid": "SMESTR-2025-B-05-02@p369",
+   "code": "SMESTR-2025-B-05-02",
+   "name": "다중소스 비전검사 시스템",
+   "page": 361,
+   "pdf": 369
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "식별시스템·머신비전",
+   "uid": "SMESTR-2025-B-05-03@p373",
+   "code": "SMESTR-2025-B-05-03",
+   "name": "멀티모달 스마트 식별시스템",
+   "page": 365,
+   "pdf": 373
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "식별시스템·머신비전",
+   "uid": "SMESTR-2025-B-05-04@p377",
+   "code": "SMESTR-2025-B-05-04",
+   "name": "산업맞춤형 AI 비전인식 시스템",
+   "page": 369,
+   "pdf": 377
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "식별시스템·머신비전",
+   "uid": "SMESTR-2025-B-05-05@p380",
+   "code": "SMESTR-2025-B-05-05",
+   "name": "고정밀 제조로봇용 AI 머신비전 시스템",
+   "page": 372,
+   "pdf": 380
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "식별시스템·머신비전",
+   "uid": "SMESTR-2025-B-05-06@p383",
+   "code": "SMESTR-2025-B-05-06",
+   "name": "위험요소 식별시스템",
+   "page": 375,
+   "pdf": 383
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제어시스템·컨트롤러",
+   "uid": "SMESTR-2025-B-06-01@p418",
+   "code": "SMESTR-2025-B-06-01",
+   "name": "AI 온디바이스 제어칩·모듈",
+   "page": 410,
+   "pdf": 418
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제어시스템·컨트롤러",
+   "uid": "SMESTR-2025-B-06-02@p420",
+   "code": "SMESTR-2025-B-06-02",
+   "name": "로봇 제어 모션 컨트롤러",
+   "page": 412,
+   "pdf": 420
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제어시스템·컨트롤러",
+   "uid": "SMESTR-2025-B-06-03@p423",
+   "code": "SMESTR-2025-B-06-03",
+   "name": "AI 비전·센서 제어 모듈",
+   "page": 415,
+   "pdf": 423
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제어시스템·컨트롤러",
+   "uid": "SMESTR-2025-B-06-04@p426",
+   "code": "SMESTR-2025-B-06-04",
+   "name": "엣지 기반 분산 자율제어 시스템",
+   "page": 418,
+   "pdf": 426
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제어시스템·컨트롤러",
+   "uid": "SMESTR-2025-B-06-05@p428",
+   "code": "SMESTR-2025-B-06-05",
+   "name": "전력모니터링 스마트 컨트롤러",
+   "page": 420,
+   "pdf": 428
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "제어시스템·컨트롤러",
+   "uid": "SMESTR-2025-B-06-06@p431",
+   "code": "SMESTR-2025-B-06-06",
+   "name": "사용자 보조 AI 디바이스",
+   "page": 423,
+   "pdf": 431
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "통신네트워크장비",
+   "uid": "SMESTR-2025-B-07-01@p466",
+   "code": "SMESTR-2025-B-07-01",
+   "name": "차세대 네트워크 운영·관리 AI 센트럴 유닛",
+   "page": 458,
+   "pdf": 466
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "통신네트워크장비",
+   "uid": "SMESTR-2025-B-07-02@p468",
+   "code": "SMESTR-2025-B-07-02",
+   "name": "엣지 AI 네트워크 시스템",
+   "page": 460,
+   "pdf": 468
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "통신네트워크장비",
+   "uid": "SMESTR-2025-B-07-03@p471",
+   "code": "SMESTR-2025-B-07-03",
+   "name": "초저지연·초고속 산업 IoT 통신 시스템",
+   "page": 463,
+   "pdf": 471
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "통신네트워크장비",
+   "uid": "SMESTR-2025-B-07-04@p473",
+   "code": "SMESTR-2025-B-07-04",
+   "name": "표준 네트워크 경량화 시스템",
+   "page": 465,
+   "pdf": 473
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "통신네트워크장비",
+   "uid": "SMESTR-2025-B-07-05@p475",
+   "code": "SMESTR-2025-B-07-05",
+   "name": "제조 데이터스페이스 커넥터 디바이스",
+   "page": 467,
+   "pdf": 475
+  },
+  {
+   "field": "스마트제조",
+   "subfield": "통신네트워크장비",
+   "uid": "SMESTR-2025-B-07-06@p478",
+   "code": "SMESTR-2025-B-07-06",
+   "name": "지능형 무선랜 구축용 장비",
+   "page": 470,
+   "pdf": 478
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-01@p100",
+   "code": "SMESTR-2025-C-01-01",
+   "name": "색소생성 경로 기반 미백·톤개선 활성소재",
+   "page": 92,
+   "pdf": 100
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-02@p102",
+   "code": "SMESTR-2025-C-01-02",
+   "name": "멜라닌 분해·배출 복합 활성소재",
+   "page": 94,
+   "pdf": 102
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-03@p104",
+   "code": "SMESTR-2025-C-01-03",
+   "name": "ECM 네트워크 항상성 기반 주름·탄력 개선 활성소재",
+   "page": 96,
+   "pdf": 104
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-04@p106",
+   "code": "SMESTR-2025-C-01-04",
+   "name": "신경과학 기반 고기능성 뉴로코스메틱 소재",
+   "page": 98,
+   "pdf": 106
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-05@p109",
+   "code": "SMESTR-2025-C-01-05",
+   "name": "표피 재생·턴오버 조절 기반 차세대 안티에이징 활성소재",
+   "page": 101,
+   "pdf": 109
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-06@p111",
+   "code": "SMESTR-2025-C-01-06",
+   "name": "피부장벽 기능·진정 조절 기반 피부 균형 회복 소재",
+   "page": 103,
+   "pdf": 111
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-07@p114",
+   "code": "SMESTR-2025-C-01-07",
+   "name": "고보습 수분충전 기반 하이드레이션 소재",
+   "page": 106,
+   "pdf": 114
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-08@p116",
+   "code": "SMESTR-2025-C-01-08",
+   "name": "환경스트레스 대응 보호 활성소재",
+   "page": 108,
+   "pdf": 116
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-09@p119",
+   "code": "SMESTR-2025-C-01-09",
+   "name": "피부 마이크로바이옴 기반 장벽·활성 개선 소재",
+   "page": 111,
+   "pdf": 119
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-10@p121",
+   "code": "SMESTR-2025-C-01-10",
+   "name": "피지조절·염증완화 여드름 케어 소재",
+   "page": 113,
+   "pdf": 121
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-11@p123",
+   "code": "SMESTR-2025-C-01-11",
+   "name": "탈모방지 및 모근 활성화 소재",
+   "page": 115,
+   "pdf": 123
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-12@p125",
+   "code": "SMESTR-2025-C-01-12",
+   "name": "두피 환경 개선 소재",
+   "page": 117,
+   "pdf": 125
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-13@p127",
+   "code": "SMESTR-2025-C-01-13",
+   "name": "모발 건강 증진 소재",
+   "page": 119,
+   "pdf": 127
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-14@p129",
+   "code": "SMESTR-2025-C-01-14",
+   "name": "저자극, 고정착 천연기반 모발 염색 소재",
+   "page": 121,
+   "pdf": 129
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-15@p131",
+   "code": "SMESTR-2025-C-01-15",
+   "name": "항산화·산화스트레스 대응 활성소재",
+   "page": 123,
+   "pdf": 131
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-16@p133",
+   "code": "SMESTR-2025-C-01-16",
+   "name": "엑소좀 기반 피부재생 소재",
+   "page": 125,
+   "pdf": 133
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-17@p136",
+   "code": "SMESTR-2025-C-01-17",
+   "name": "부산물 업사이클링 기능성 바이오액티브 소재",
+   "page": 128,
+   "pdf": 136
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-18@p139",
+   "code": "SMESTR-2025-C-01-18",
+   "name": "UV 차단 강화 소재",
+   "page": 131,
+   "pdf": 139
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-19@p142",
+   "code": "SMESTR-2025-C-01-19",
+   "name": "하이브리드 UV 차단 활성 성분 복합체",
+   "page": 134,
+   "pdf": 142
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-20@p145",
+   "code": "SMESTR-2025-C-01-20",
+   "name": "UV 필터 캡슐화 안정 시스템",
+   "page": 137,
+   "pdf": 145
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-21@p148",
+   "code": "SMESTR-2025-C-01-21",
+   "name": "고흡수형 전달체 소재",
+   "page": 140,
+   "pdf": 148
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-22@p150",
+   "code": "SMESTR-2025-C-01-22",
+   "name": "장기 지속형 전달체 소재",
+   "page": 142,
+   "pdf": 150
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-23@p152",
+   "code": "SMESTR-2025-C-01-23",
+   "name": "고보습 수상농축 및 수화 기반 하이드레이션 플랫폼",
+   "page": 144,
+   "pdf": 152
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-24@p155",
+   "code": "SMESTR-2025-C-01-24",
+   "name": "분산·결정 억제 기반 제형 안정화 플랫폼",
+   "page": 147,
+   "pdf": 155
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-25@p157",
+   "code": "SMESTR-2025-C-01-25",
+   "name": "광·열·계면·온도 스마트 안정화 시스템",
+   "page": 149,
+   "pdf": 157
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-26@p159",
+   "code": "SMESTR-2025-C-01-26",
+   "name": "고점탄성·다중감각 텍스처 엔지니어링 시스템",
+   "page": 151,
+   "pdf": 159
+  },
+  {
+   "field": "화장품",
+   "subfield": "기능성 원료",
+   "uid": "SMESTR-2025-C-01-27@p161",
+   "code": "SMESTR-2025-C-01-27",
+   "name": "AI 기반 기능성 원료 커스터마이징 솔루션",
+   "page": 153,
+   "pdf": 161
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-01@p217",
+   "code": "SMESTR-2025-C-02-01",
+   "name": "AI 기반 개인 맞춤형 뷰티 디바이스",
+   "page": 209,
+   "pdf": 217
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-02@p219",
+   "code": "SMESTR-2025-C-02-02",
+   "name": "안티에이징 웨어러블 뷰티 디바이스",
+   "page": 211,
+   "pdf": 219
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-03@p221",
+   "code": "SMESTR-2025-C-02-03",
+   "name": "멀티 기술 기반 하이브리드 뷰티 디바이스",
+   "page": 213,
+   "pdf": 221
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-04@p223",
+   "code": "SMESTR-2025-C-02-04",
+   "name": "OLED 기반 광(光) 테라피 솔루션",
+   "page": 215,
+   "pdf": 223
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-05@p225",
+   "code": "SMESTR-2025-C-02-05",
+   "name": "두피 탈모 디바이스",
+   "page": 217,
+   "pdf": 225
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-06@p227",
+   "code": "SMESTR-2025-C-02-06",
+   "name": "피부 관리 디바이스",
+   "page": 219,
+   "pdf": 227
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-07@p229",
+   "code": "SMESTR-2025-C-02-07",
+   "name": "단일소재 부자재 제조 시스템",
+   "page": 221,
+   "pdf": 229
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-08@p232",
+   "code": "SMESTR-2025-C-02-08",
+   "name": "AI 기반 규제 대응 플랫폼",
+   "page": 224,
+   "pdf": 232
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-09@p235",
+   "code": "SMESTR-2025-C-02-09",
+   "name": "고성능 애플리케이터",
+   "page": 227,
+   "pdf": 235
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-10@p238",
+   "code": "SMESTR-2025-C-02-10",
+   "name": "생분해성 부자재 제조 시스템",
+   "page": 230,
+   "pdf": 238
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-11@p240",
+   "code": "SMESTR-2025-C-02-11",
+   "name": "재사용성 강화 패키지",
+   "page": 232,
+   "pdf": 240
+  },
+  {
+   "field": "화장품",
+   "subfield": "부자재 및 디바이스",
+   "uid": "SMESTR-2025-C-02-12@p242",
+   "code": "SMESTR-2025-C-02-12",
+   "name": "고기능성 부자재",
+   "page": 234,
+   "pdf": 242
+  }
+ ]
+}
