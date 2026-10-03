@@ -212,3 +212,13 @@ v0.9와 **달라지지 않는 것**(회귀 테스트로 고정): 문항·가중�
 - 표기: '자동 대조 후보 · 전문가 검토 전 (공식 대응표 아님)', 후보마다 공통 핵심어·점수·분야 대응 여부를 근거로 남김
 - 테스트 4건: 색인 동기화(실행 환경과 무관하게 같은 결과), 218개 전부 1회·후보는 색인에 있는 품목만, 공식 대응표 표기 금지, 대표 사례 회귀
 - 한계: 이름 기반이라 분야가 다른 동음 품목(예: 항공 추진 ↔ 선박 추진)이 후보에 섞일 수 있음 → Phase 3 원문 정의 비교(의미 검색)로 고도화 예정
+
+## v0.9.6 — Phase 5-1: Claude 진단 해석(interpret_assessment) (2026-10-03)
+- `src/ai/schema.ts`(구조화 출력 스키마·요청 검증, zod), `src/ai/prompt.ts`(시스템 프롬프트 `interpret-v1`), `src/ai/guardrail.ts`(사후검증), `src/ai/interpret.ts`(Rule Engine 재계산 → 원문 근거 → Claude → 가드레일)
+- 서버 함수 `POST /api/ai-interpret`: `ANTHROPIC_API_KEY` 없으면 `not_configured`, 거절·형식 오류·API 오류는 `fallback`(규칙 기반 유지). 사이트 출처만 허용, 본문 60KB 제한, 오류 로그에 키·본문 미기록
+- 모델 `ANTHROPIC_MODEL`(기본 `claude-opus-5-5`), effort `AI_INTERPRET_EFFORT`(기본 low), 거절 시 서버측 대체 모델(`fallbacks: "default"`)
+- 가드레일: 입력에 없는 점수·TRL·품목코드·쪽 번호 문장 제거, 로드맵 노트의 적합도 등급·근거 없는 품목 제거, `verified_fact` → `self_report`(POC 입력은 모두 자가응답), 목록 밖 근거유형 → 검증 가설, 항목 수·220자 제한
+- 화면: `VITE_AI_INTERPRET=on`일 때 결과 맨 위 'AI 해석 · Claude' 패널(헤드라인·강점·제약·가설·확인질문·로드맵 연결, 근거유형 배지). 기업명은 전송하지 않음
+- PDF: 5쪽 근본원인 가설·확인 질문을 AI 해석으로 대체(있을 때), 부록에 프롬프트 버전·모델 기록. 인쇄 시 AI 해석 진행 중이면 최대 45초 대기(버튼 '반영 중…')
+- 검증: 단위 11건(가짜 클라이언트 — 가드레일·입력 구성·fallback·출처·키 비노출), 모의 응답 E2E(데스크톱·모바일 가로 스크롤 없음, 인쇄 대기, PDF 13쪽 이슈 0), 함수 esbuild 번들 확인. **실제 Claude 호출은 운영 키 등록 후 확인 필요**
+- 켜는 법: `docs/phase5-ai-setup.md`
