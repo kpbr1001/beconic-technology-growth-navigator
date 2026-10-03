@@ -3,7 +3,7 @@
 작성일: 2026-09-28 · 기준선: `reference/BECONIC_Technology_Growth_Navigator_v0.9.html` (배포본 `public/index.html` = v0.9.1, 브랜딩만 변경)
 근거 문서: `BECONIC_ClaudeCode_Implementation_Master_Prompt_v1.0.md`, `BECONIC_RAG_Upload_Manifest_v1.0.md`
 
-> 진행 현황은 `docs/progress.md` 참고 (Phase 0·1 완료).
+> 진행 현황은 `docs/progress.md` 참고 (Phase 0·1·2 완료 — 로드맵 52건 전체 수령·파싱).
 >
 > 이 문서의 모든 "현황" 서술은 v0.9 소스를 직접 읽고 확인한 사실만 적었습니다. 확인하지 못한 항목은 **[미확인]** 으로 표시합니다.
 
@@ -207,7 +207,7 @@ Rule 결과 + RAG citations + Claude narrative
 |---|---|---|
 | **0 Baseline** ✅ | 배포 구성, 브랜딩, 이 문서, manifest 초안 | 완료 |
 | **1 모듈화** ✅ | Vite+TS, `src/diagnosis/{questions,scoring,confidence,consistency,priority,versions}.ts`, `src/reports/report-model.ts`, v0.9 회귀 스냅샷 테스트 | 동일 입력 → v0.9와 **수치 동일**(D2·D3 수정분 제외, 변경 내역 문서화). D1 라벨 강등 |
-| **2 Ingestion** | scripts 5종, manifest 확정(checksum), parsed JSON | 13+4 문서 파싱, 페이지 보존율 100%, parse_confidence 기록 |
+| **2 Ingestion** ✅ 52/52 | scripts 5종, manifest 확정(checksum), parsed JSON | 13+4 문서 파싱, 페이지 보존율 100%, parse_confidence 기록 |
 | **3 Hybrid RAG** | Supabase migration, hybrid-search 함수, retrieval log | FTS+벡터+메타필터+RRF+rerank 동작, source/page 100% |
 | **4 평가** | Gold Set ≥50, evaluate 스크립트, 결과 리포트 | 목표치 합의 후 통과 시 UI 라벨 복원 |
 | **5 Claude** | 5개 task, schema, guardrail, fallback | 스키마 준수 100%, 점수 변경 0건, 날조 인용 0건(자동검사) |

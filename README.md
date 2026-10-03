@@ -18,10 +18,13 @@ public/assets/              # 로고·OG 이미지·파비콘 (빌드 시 그대
 tests/
 ├─ regression/              # v0.9 원본과 판정 비교 (오라클)
 ├─ unit/                    # Rule Engine 원칙 테스트
+├─ roadmap/                 # 로드맵 파서·공개 색인 테스트 (Python)
 └─ e2e/                     # Chromium 뷰포트·PDF 스모크
 reference/                  # 기준선 원본 v0.9 (수정 금지)
 docs/progress.md            # Phase별 진행 기록
 IMPLEMENTATION_PLAN.md      # 전체 설계·Phase 계획
+scripts/roadmap/            # 로드맵 PDF 파서(형식 4종 자동 판별)·KB 빌더 (원본 PDF는 비공개 저장소)
+data/roadmaps/              # manifest·공개 색인(이름·코드·TRL·쪽)
 ```
 
 ## 개발
@@ -30,11 +33,23 @@ IMPLEMENTATION_PLAN.md      # 전체 설계·Phase 계획
 npm install
 npm run dev          # 로컬 개발 서버 http://localhost:8787
 npm test             # 회귀 + 단위 테스트
+npm run test:roadmap # 로드맵 파서·색인 테스트 (python3)
 npm run build        # 타입체크 + 빌드(dist) + 번들 비밀키 검사
 npm run lint         # ESLint
 npm run test:e2e     # 빌드본 E2E + v0.9 대비 사용자 플로우 (build 후 실행)
 npm run test:pdf     # A4 PDF 7종 생성·페이지별 검수 (pymupdf 필요)
 npm run ci           # CI와 동일한 전체 검사
+```
+
+## 로드맵 KB 갱신
+
+원본 PDF·원문 문장은 비공개 저장소 `kpbr1001/beconic-roadmap-kb`에만 둡니다(`pip install pymupdf`).
+
+```bash
+python3 scripts/roadmap/parse_roadmap.py ../beconic-roadmap-kb/*.pdf --out ../beconic-roadmap-kb/parsed
+python3 scripts/roadmap/build_kb.py ../beconic-roadmap-kb/parsed \
+  --chunks ../beconic-roadmap-kb/kb/chunks.jsonl --index-dir data/roadmaps/index
+npm run test:roadmap
 ```
 
 ## CI (GitHub Actions)
@@ -45,7 +60,7 @@ PR·main push마다 `.github/workflows/ci.yml`이 4개 검사를 실행합니다
 |---|---|
 | Lint · 저장소 위생 | .env·비밀키·PDF 원본·2MB 초과 파일 차단, ESLint |
 | Build | 타입체크, Vite 빌드, 번들 비밀키 검사 |
-| Unit · v0.9 Regression | Rule Engine 원칙 테스트 + v0.9 원본 대비 308 시나리오 |
+| Unit · v0.9 Regression | Rule Engine 원칙 테스트 + v0.9 원본 대비 308 시나리오 + 로드맵 파서·색인 |
 | E2E · 사용자 플로우 · PDF QA | 6개 화면 크기, v0.9 대비 실제 클릭 플로우, A4 PDF 7종 페이지별 검수 |
 
 main 보호: Settings → Rules → Rulesets → main 대상 **Require status checks to pass**에 위 4개 Check 등록.

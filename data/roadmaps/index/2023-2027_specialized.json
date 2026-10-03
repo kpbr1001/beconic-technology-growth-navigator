@@ -1,0 +1,2100 @@
+{
+ "kb_version": "kb-v2",
+ "collection": "2023-2027_specialized",
+ "roadmap_version": "2023-2027",
+ "roadmap_type": "specialized",
+ "fields": [
+  {
+   "field_no": "NUC",
+   "field": "원전",
+   "source_file": "원전 중소기업 특화 기술로드맵(2023-2027).pdf",
+   "sha256": "fd8932fb0984e5294d0e95757558d67e814df7eb5800cca6e5514904135d871e",
+   "subfields": [
+    {
+     "name": "원전 설계",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-1-01",
+       "item_no": "01",
+       "name": "차세대 원전 선행 기반 기술",
+       "item_type": null,
+       "pdf_page_start": 25,
+       "printed_page_start": 18,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "차세대원전 노심 설계 전용 전산 코드 메인 알고리즘",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 54,
+         "printed_page": 45
+        },
+        {
+         "no": 2,
+         "name": "차세대원전 다수모듈 중앙제어용 I&C 검증 기반 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 54,
+         "printed_page": 45
+        },
+        {
+         "no": 3,
+         "name": "차세대원전 예측진단 감시모델의 불확도 정량화와 표준화 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 54,
+         "printed_page": 45
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-1-02",
+       "item_no": "02",
+       "name": "내지진성 향상 시스템",
+       "item_type": null,
+       "pdf_page_start": 25,
+       "printed_page_start": 18,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "설계기준 초과지진 대응용 제어계측 캐비닛 3차원 면진장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 54,
+         "printed_page": 45
+        },
+        {
+         "no": 2,
+         "name": "원전 내진 성능 향상용 면진 캐비닛 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 54,
+         "printed_page": 45
+        },
+        {
+         "no": 3,
+         "name": "원전 인근 미소지진 관측용 시추형 지진계의 물리적 정향 및 수평 조절장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 54,
+         "printed_page": 45
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-1-03",
+       "item_no": "03",
+       "name": "원전 패키지 공급자 설계 표준화용 DB 기반 설계 플랫폼",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 25,
+       "printed_page_start": 18,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "설계 표준화 및 범용 CAD 특화 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 25,
+         "printed_page": 18
+        },
+        {
+         "no": 2,
+         "name": "DB 기반 P&ID 설계 프로그램",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 25,
+         "printed_page": 18
+        },
+        {
+         "no": 3,
+         "name": "DB 기반 전기/계장분야 설계 프로그램",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 25,
+         "printed_page": 18
+        },
+        {
+         "no": 4,
+         "name": "Pilot 프로젝트 적용 및 프로그램 최적화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 25,
+         "printed_page": 18
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-1-04",
+       "item_no": "04",
+       "name": "원전 공조/소방 최적 설계용 IoT/AI 기반 시뮬레이션 가능 디지털트윈",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 25,
+       "printed_page_start": 18,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "실시간 AI기반 공조 시뮬레이션 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 25,
+         "printed_page": 18
+        },
+        {
+         "no": 2,
+         "name": "화재 및 화재진압 시뮬레이션 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 25,
+         "printed_page": 18
+        },
+        {
+         "no": 3,
+         "name": "공조와 소방 해석 지원 통합 플랫폼 및 시뮬레이션 디지털트윈",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 25,
+         "printed_page": 18
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "원전 제작·건설",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-2-01",
+       "item_no": "01",
+       "name": "차세대원전 선행실증 기계부품",
+       "item_type": null,
+       "pdf_page_start": 27,
+       "printed_page_start": 20,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "차세대원전용 CRDM External Assembly 주요 부품",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 55,
+         "printed_page": 46
+        },
+        {
+         "no": 2,
+         "name": "차세대원전 소구경 튜브 및 배관 제조 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 55,
+         "printed_page": 46
+        },
+        {
+         "no": 3,
+         "name": "차세대원전 압력용기 제작용 국부진공 전자빔용접 기반 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 55,
+         "printed_page": 46
+        },
+        {
+         "no": 4,
+         "name": "차세대원전 Helical Tube 진공열처리 기반 기술 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 55,
+         "printed_page": 46
+        },
+        {
+         "no": 5,
+         "name": "차세대원전 FHE System",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 55,
+         "printed_page": 46
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-2-02",
+       "item_no": "02",
+       "name": "강도 향상 다기능 콘크리트",
+       "item_type": null,
+       "pdf_page_start": 27,
+       "printed_page_start": 20,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 전자파 차폐용 콘크리트",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 55,
+         "printed_page": 46
+        },
+        {
+         "no": 2,
+         "name": "철강슬래그 섬유화 재활용 방사선 차폐와 내충격 성능 향상 섬유강화 시멘트",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 55,
+         "printed_page": 46
+        },
+        {
+         "no": 3,
+         "name": "초고강도 레진 모르타르제",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 56,
+         "printed_page": 47
+        },
+        {
+         "no": 4,
+         "name": "콘크리트 관통부 구조건전성 확보용 보강체 설계/설치 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 56,
+         "printed_page": 47
+        },
+        {
+         "no": 5,
+         "name": "방사선 노출 및 균열 억제용 자기치유 콘크리트",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 56,
+         "printed_page": 47
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-2-03",
+       "item_no": "03",
+       "name": "기능 향상 기계용 소재/부품/장비",
+       "item_type": null,
+       "pdf_page_start": 27,
+       "printed_page_start": 20,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "RCP Seal용 SiC 소재",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 56,
+         "printed_page": 47
+        },
+        {
+         "no": 2,
+         "name": "소형 설계기준 사고 성능검증 시험장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 56,
+         "printed_page": 47
+        },
+        {
+         "no": 3,
+         "name": "크리프 파단 수명 고신뢰도 확보 크리프-고장력 체결 기계요소",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 56,
+         "printed_page": 47
+        },
+        {
+         "no": 4,
+         "name": "원전용 고성능 액체 가스켓 실란트",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 56,
+         "printed_page": 47
+        },
+        {
+         "no": 5,
+         "name": "심공 가공용 드릴",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 56,
+         "printed_page": 47
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-2-04",
+       "item_no": "04",
+       "name": "기능 향상 밸브 및 보조장치",
+       "item_type": null,
+       "pdf_page_start": 27,
+       "printed_page_start": 20,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 안전등급 콘트롤 밸브제어용 공압 포지쇼너",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 57,
+         "printed_page": 48
+        },
+        {
+         "no": 2,
+         "name": "고차압 제어밸브 특수 트림",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 57,
+         "printed_page": 48
+        },
+        {
+         "no": 3,
+         "name": "한울 1,2호기 터빈건물 환기계통 보조증기 공급라인 감압 및 조절밸브 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 57,
+         "printed_page": 48
+        },
+        {
+         "no": 4,
+         "name": "한울 3,4호기 ROTORK MOV Limit Switch 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 57,
+         "printed_page": 48
+        },
+        {
+         "no": 5,
+         "name": "발전소용 주터빈 Servo Valve 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 57,
+         "printed_page": 48
+        },
+        {
+         "no": 6,
+         "name": "주발전기 밀봉유 계통 차압조절 밸브 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 57,
+         "printed_page": 48
+        },
+        {
+         "no": 7,
+         "name": "3D 프린팅 기반 원전 정밀 밸브 주조품 제작 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 57,
+         "printed_page": 48
+        },
+        {
+         "no": 8,
+         "name": "고리 3,4호기 터빈 스러스트웨어 공급압력 조절밸브 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 57,
+         "printed_page": 48
+        },
+        {
+         "no": 9,
+         "name": "증기발생기 주급수펌프 재순환 유량 제어밸브",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 57,
+         "printed_page": 48
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-2-05",
+       "item_no": "05",
+       "name": "기능 향상 특수배관 자재",
+       "item_type": null,
+       "pdf_page_start": 27,
+       "printed_page_start": 20,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "HDPE 난연 파이프 연결용 아답타 및 전자소켓",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 58,
+         "printed_page": 49
+        },
+        {
+         "no": 2,
+         "name": "원전용 내진 강화형 소재 및 액체 수송용 파이프",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 58,
+         "printed_page": 49
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-2-06",
+       "item_no": "06",
+       "name": "원전기기 협소공간 특수용접 로봇 및 자동화 기술",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 27,
+       "printed_page_start": 20,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "협소공간 용접부 관찰용 초소형 내열 카메라 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 27,
+         "printed_page": 20
+        },
+        {
+         "no": 2,
+         "name": "원전 기기 소구경 노즐 내면 Cladding & Buttering 장비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 27,
+         "printed_page": 20
+        },
+        {
+         "no": 3,
+         "name": "원전 기기 노즐 용접부 곡면 자동 측정 및 사상 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 27,
+         "printed_page": 20
+        },
+        {
+         "no": 4,
+         "name": "원자로 헤드 CEDM Nozzle J-Groove Robot 용접 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 27,
+         "printed_page": 20
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "원전 운영·유지보수",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-01",
+       "item_no": "01",
+       "name": "성능 향상 전기 부품",
+       "item_type": null,
+       "pdf_page_start": 29,
+       "printed_page_start": 22,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전용 고신뢰 하이브리드 커패시터 성능평가 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 58,
+         "printed_page": 49
+        },
+        {
+         "no": 2,
+         "name": "침수시 누설전류 없는 전력커넥터",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 58,
+         "printed_page": 49
+        },
+        {
+         "no": 3,
+         "name": "원전용 고성능 하이브리드 커패시터",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 58,
+         "printed_page": 49
+        },
+        {
+         "no": 4,
+         "name": "가압기 Heater Terminal 및 전원 Cable 신속 탈부착 소켓",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 58,
+         "printed_page": 49
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-02",
+       "item_no": "02",
+       "name": "신뢰성 향상 측정 설비",
+       "item_type": null,
+       "pdf_page_start": 29,
+       "printed_page_start": 22,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "격납건물내 주기기와 배관 3차원 변위 측정 장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 59,
+         "printed_page": 50
+        },
+        {
+         "no": 2,
+         "name": "원자로 스터드 홀 나사산 검사 장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 59,
+         "printed_page": 50
+        },
+        {
+         "no": 3,
+         "name": "원전 구조물의 변위와 진동 감시용 대면적 멀티셀 진동센서 관리시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 59,
+         "printed_page": 50
+        },
+        {
+         "no": 4,
+         "name": "주파수 스위핑 와전류기법 기반 핵연료 피복관 산화피막 측정 장비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 59,
+         "printed_page": 50
+        },
+        {
+         "no": 5,
+         "name": "노외 중성자속 감시계통 신호처리함 고도화 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 59,
+         "printed_page": 50
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-03",
+       "item_no": "03",
+       "name": "효율 향상 제어⸱통신 장비",
+       "item_type": null,
+       "pdf_page_start": 29,
+       "printed_page_start": 22,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 발전소제어계통(PCS) 전자회로기판",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 59,
+         "printed_page": 50
+        },
+        {
+         "no": 2,
+         "name": "원전 안전 관련 공정과 제어계통의 데이터 연계용 무선억세스포인트(WAP)",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 59,
+         "printed_page": 50
+        },
+        {
+         "no": 3,
+         "name": "발전소 제어용 전산기 비디오 프린터 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 60,
+         "printed_page": 51
+        },
+        {
+         "no": 4,
+         "name": "한울 3,4호기 비상디젤발전기 DMDS 통신모듈 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 60,
+         "printed_page": 51
+        },
+        {
+         "no": 5,
+         "name": "원전 현장기기 IoT Edge Controller",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 60,
+         "printed_page": 51
+        },
+        {
+         "no": 6,
+         "name": "발전소 경보용 전산기 MDMC16 모듈 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 60,
+         "printed_page": 51
+        },
+        {
+         "no": 7,
+         "name": "원전 HVAC Heater 다단제어용 반도체 소자형 제어기",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 60,
+         "printed_page": 51
+        },
+        {
+         "no": 8,
+         "name": "원전 CPS용 PLC 장비의 Smart IoT Gateway 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 60,
+         "printed_page": 51
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-04",
+       "item_no": "04",
+       "name": "ICT 기반 성능 향상 방사선 모니터링 시스템",
+       "item_type": null,
+       "pdf_page_start": 29,
+       "printed_page_start": 22,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "레이저 기반 실시간 방사능성분분석과 제염 융합시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 60,
+         "printed_page": 51
+        },
+        {
+         "no": 2,
+         "name": "이동형 작업현장 방사선 유해물질 실시간 모니터링 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 60,
+         "printed_page": 51
+        },
+        {
+         "no": 3,
+         "name": "선박 장착형 전자동 삼중수소 온라인 감시장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 60,
+         "printed_page": 51
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-05",
+       "item_no": "05",
+       "name": "스마트한 방사능 탐지 장치",
+       "item_type": null,
+       "pdf_page_start": 29,
+       "printed_page_start": 22,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "스마트 검출기 기반 방사능 탐지 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 61,
+         "printed_page": 52
+        },
+        {
+         "no": 2,
+         "name": "AI 기반 3차원 공간 선원누설과 이동경로 예측 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 61,
+         "printed_page": 52
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-06",
+       "item_no": "06",
+       "name": "휴대용 삼중수소 계측장비",
+       "item_type": null,
+       "pdf_page_start": 29,
+       "printed_page_start": 22,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "현장측정용 휴대형 삼중수소 분석장비(액체섬광계측기)",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 61,
+         "printed_page": 52
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-07",
+       "item_no": "07",
+       "name": "설계효율 향상 스마트 엔지니어링",
+       "item_type": null,
+       "pdf_page_start": 29,
+       "printed_page_start": 22,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 설계용 반자동 배관과 지지대 모델링 및 자재물량 산출 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 61,
+         "printed_page": 52
+        },
+        {
+         "no": 2,
+         "name": "가동원전 안정성등급 기기 유지보수용 CGID 방법론 고도화 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 61,
+         "printed_page": 52
+        },
+        {
+         "no": 3,
+         "name": "IoT 기반 실시간 측정용 복합(감마선, 중성자, 온도) 센서",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 62,
+         "printed_page": 53
+        },
+        {
+         "no": 4,
+         "name": "디지털 기기/부품 대상 CGID 정량평가방법론 및 지원 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 62,
+         "printed_page": 53
+        },
+        {
+         "no": 5,
+         "name": "원전 기자재 대상 Smart SCSQM(공급망안전품질관리)플랫폼",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 62,
+         "printed_page": 53
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-08",
+       "item_no": "08",
+       "name": "편의성 제고 스마트 설비관리 시스템",
+       "item_type": null,
+       "pdf_page_start": 29,
+       "printed_page_start": 22,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "레이다와 RF스캐너 기반 원전 보안용 안티드론 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 62,
+         "printed_page": 53
+        },
+        {
+         "no": 2,
+         "name": "월성 2호기 예비디젤발전기 PLC 시험용 시뮬레이터",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 62,
+         "printed_page": 53
+        },
+        {
+         "no": 3,
+         "name": "월성 2호기 제2정지계통 정지용 전산기 첨단 진단장비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 62,
+         "printed_page": 53
+        },
+        {
+         "no": 4,
+         "name": "밀폐 공간 감시용 로봇",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 62,
+         "printed_page": 53
+        },
+        {
+         "no": 5,
+         "name": "배관지지물 정비이력 관리시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 63,
+         "printed_page": 54
+        },
+        {
+         "no": 6,
+         "name": "원전 DT용 데이터 관리모듈과 MRC 기반 기술데이터 연계 의사결정 지원 솔루션",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 63,
+         "printed_page": 54
+        },
+        {
+         "no": 7,
+         "name": "원전 구조물 지능형 관리시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 63,
+         "printed_page": 54
+        },
+        {
+         "no": 8,
+         "name": "디지털트윈 기반 원전 매설/지하배관 분석·평가 및 관리 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 63,
+         "printed_page": 54
+        },
+        {
+         "no": 9,
+         "name": "EHC-HPU 고장 예지 진단 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 63,
+         "printed_page": 54
+        },
+        {
+         "no": 10,
+         "name": "원전 제어부품 디지털 데이터베이스 기반 수명관리 플랫폼",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 63,
+         "printed_page": 54
+        },
+        {
+         "no": 11,
+         "name": "CCTV와 드론 기반 원전 실시간 3차원 관제시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 63,
+         "printed_page": 54
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-09",
+       "item_no": "09",
+       "name": "스마트한 작업자 안전 향상 장치",
+       "item_type": null,
+       "pdf_page_start": 30,
+       "printed_page_start": 23,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "무선 쌍방향 마스크폰",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 64,
+         "printed_page": 55
+        },
+        {
+         "no": 2,
+         "name": "리튬배터리 적용 원전 비상전원공급장치의 화재안전관리시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 64,
+         "printed_page": 55
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-10",
+       "item_no": "10",
+       "name": "안전성 향상 원자로 요소 기술",
+       "item_type": null,
+       "pdf_page_start": 30,
+       "printed_page_start": 23,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "3D프린팅 기반 핵연료 지지격자의 결함 보수 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 64,
+         "printed_page": 55
+        },
+        {
+         "no": 2,
+         "name": "원자로헤드 분해체결 고도화 스터드 텐셔너",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 64,
+         "printed_page": 55
+        },
+        {
+         "no": 3,
+         "name": "원전 현장용 노내핵계측계통 진단 설비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 64,
+         "printed_page": 55
+        },
+        {
+         "no": 4,
+         "name": "OPR1000 원전 노심보호연산기 운전원 훈련시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 64,
+         "printed_page": 55
+        },
+        {
+         "no": 5,
+         "name": "인공지능 기반 원전 안전성 진단시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 64,
+         "printed_page": 55
+        },
+        {
+         "no": 6,
+         "name": "사면검사용 사용후핵연료 손상 자동검출 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 64,
+         "printed_page": 55
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-11",
+       "item_no": "11",
+       "name": "성능 향상 액체 방사성폐기물 처리기술",
+       "item_type": null,
+       "pdf_page_start": 30,
+       "printed_page_start": 23,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "RI 액체폐기물 정화용 응집재 및 처리기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 65,
+         "printed_page": 56
+        },
+        {
+         "no": 2,
+         "name": "소형 모듈 이동형 방사성 세탁폐액 처리 설비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 65,
+         "printed_page": 56
+        },
+        {
+         "no": 3,
+         "name": "원전 액체폐기물 세슘 감용 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 65,
+         "printed_page": 56
+        },
+        {
+         "no": 4,
+         "name": "방사성폐수 처리용 기능성 흡착소재",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 65,
+         "printed_page": 56
+        },
+        {
+         "no": 5,
+         "name": "액체폐기물 내 방사성 물질의 분리 및 처리 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 65,
+         "printed_page": 56
+        },
+        {
+         "no": 6,
+         "name": "플라즈마 공정기술 기반 방사능 함유 형광 폐액 처리시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 65,
+         "printed_page": 56
+        },
+        {
+         "no": 7,
+         "name": "원전 오염수(유해물질) 처리 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 65,
+         "printed_page": 56
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-12",
+       "item_no": "12",
+       "name": "용접/비파괴검사 성능향상 기술",
+       "item_type": null,
+       "pdf_page_start": 30,
+       "printed_page_start": 23,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 오스트나이트계 배관 용접부 Far Side 초음파 신호평가 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 66,
+         "printed_page": 57
+        },
+        {
+         "no": 2,
+         "name": "원전 경년열화 배관 유도초음파 검사 신뢰성 향상 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 66,
+         "printed_page": 57
+        },
+        {
+         "no": 3,
+         "name": "원전 구조재 열화 손상 평가용 비선형 초음파 검사장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 66,
+         "printed_page": 57
+        },
+        {
+         "no": 4,
+         "name": "비파괴검사 시뮬레이션 모델링 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 66,
+         "printed_page": 57
+        },
+        {
+         "no": 5,
+         "name": "In-process 용접결함 탐지 기반 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 66,
+         "printed_page": 57
+        },
+        {
+         "no": 6,
+         "name": "원자로 제어봉 집합체 피복관 균열/마모 검사 탐촉자",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 66,
+         "printed_page": 57
+        },
+        {
+         "no": 7,
+         "name": "원전 터빈 동익 미세균열 결함 AI NDE 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 66,
+         "printed_page": 57
+        },
+        {
+         "no": 8,
+         "name": "원전 접근제한 배관 내부 검사용 맞춤형 비파괴검사 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 66,
+         "printed_page": 57
+        },
+        {
+         "no": 9,
+         "name": "3D 프린팅의 원전 적용을 위한 비파괴검사 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 67,
+         "printed_page": 58
+        },
+        {
+         "no": 10,
+         "name": "원전 매설배관과 해수 배관용 스파크 탐촉자 기반 원격제어 건전성 검사 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 67,
+         "printed_page": 58
+        },
+        {
+         "no": 11,
+         "name": "초음파 기반 이동형 해수배관 내부 피막 건전성 검사 장비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 67,
+         "printed_page": 58
+        },
+        {
+         "no": 12,
+         "name": "원자력 수전해 설비의 수소취성 균열 온라인 감시 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 67,
+         "printed_page": 58
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-13",
+       "item_no": "13",
+       "name": "편의성 제고 운영보수용 기계설비",
+       "item_type": null,
+       "pdf_page_start": 30,
+       "printed_page_start": 23,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "가동 원전 고소 지역 검사·정비·보수용 고소 작업대",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 67,
+         "printed_page": 58
+        },
+        {
+         "no": 2,
+         "name": "대형 수동조작 밸브의 이동형 전동 조작장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 67,
+         "printed_page": 58
+        },
+        {
+         "no": 3,
+         "name": "원전 철판 관통부 밀폐장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 67,
+         "printed_page": 58
+        },
+        {
+         "no": 4,
+         "name": "원전용 복수기 튜브 자동 세정 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 67,
+         "printed_page": 58
+        },
+        {
+         "no": 5,
+         "name": "증기발생기 반출입 주요 부품(견인, 리깅, 윈치 등)",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 68,
+         "printed_page": 59
+        },
+        {
+         "no": 6,
+         "name": "한울 3,4호기 CW Travelling Screen 감속기 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 68,
+         "printed_page": 59
+        },
+        {
+         "no": 7,
+         "name": "펌프용 베어링 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 68,
+         "printed_page": 59
+        },
+        {
+         "no": 8,
+         "name": "인공지능 기반 원전 주요 설비 자율점검 로봇",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 68,
+         "printed_page": 59
+        },
+        {
+         "no": 9,
+         "name": "원전 증기발생기 정비 로봇",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 68,
+         "printed_page": 59
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-14",
+       "item_no": "14",
+       "name": "성능 향상 원전 공기정화 필터",
+       "item_type": null,
+       "pdf_page_start": 30,
+       "printed_page_start": 23,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 공기정화용 고성능 막 복합필터 및 이동식 융합형 장치 상용화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 68,
+         "printed_page": 59
+        },
+        {
+         "no": 2,
+         "name": "원전 공기조화 및 공기정화용 금속헤파필터",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 68,
+         "printed_page": 59
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-15",
+       "item_no": "15",
+       "name": "운용성 향상 원전 사고 대응 지원 시스템",
+       "item_type": null,
+       "pdf_page_start": 30,
+       "printed_page_start": 23,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 재난시 기상 모니터링용 방사능 탐지 드론",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 69,
+         "printed_page": 60
+        },
+        {
+         "no": 2,
+         "name": "원전 지하용 음성 통화 및 재난 대응 통신망",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 69,
+         "printed_page": 60
+        },
+        {
+         "no": 3,
+         "name": "재난용 객체 검출과 추적, 공간좌표화 기술 기반 객체간 충돌 방지 AI 솔루션과 시작품 로봇",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 69,
+         "printed_page": 60
+        },
+        {
+         "no": 4,
+         "name": "원전 자연재난 정보 통합관제 플랫폼",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 69,
+         "printed_page": 60
+        },
+        {
+         "no": 5,
+         "name": "원전 재난사고 대응용 이재민 통합지원시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 69,
+         "printed_page": 60
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-16",
+       "item_no": "16",
+       "name": "원전 증기발생기 전열관 영구관막음 및 스테빌라이징기술",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 31,
+       "printed_page_start": 24,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "증기발생기 전열관 영구 관마개 설치 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 2,
+         "name": "증기발생기 전열관 임시 관마개 제거 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 3,
+         "name": "증기발생기 전열관 스테빌라이저 설치 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 4,
+         "name": "영구 관마개 및 스테빌라이저 설계 및 검증 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-17",
+       "item_no": "17",
+       "name": "AI 기반 원전 정비 용접 고도화 및 훈련 플랫폼",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 31,
+       "printed_page_start": 24,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 기기 품질 향상 AI 기반 기계 GTAW 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 2,
+         "name": "가동 원전 일차측 기기 용접 결함 분석 기반 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 3,
+         "name": "현장 인식용 엣지 디바이스 기반 가동 원전 작업자 훈련 플랫폼",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-18",
+       "item_no": "18",
+       "name": "가압기 내부 전열기 원격 교체 공정기술 및 장비",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 31,
+       "printed_page_start": 24,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "가압기 내부 전열기 관찰용 내방사선(감마)고성능 카메라 모듈",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 2,
+         "name": "가압기 손상 전열기 추출용 Jig/Fix",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 3,
+         "name": "발전소 교체작업 작업자 훈련용 시뮬레이터",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 4,
+         "name": "가압기 손상 전열기 제거 원격 플랫폼",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-19",
+       "item_no": "19",
+       "name": "DT기반 발전소 보호계통 유지보수 시험반 PC노드박스 국산화",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 31,
+       "printed_page_start": 24,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "발전소보호계통 유지보수 시험반(MTP) PC Nodebox",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 2,
+         "name": "발전소보호계통 MTP PC Nodebox 소프트웨어 V&V",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 3,
+         "name": "발전소보호계통 MTP PC Nodebox 기기검증",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 4,
+         "name": "발전소보호계통 MTP PC Nodebox 실증 설비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-20",
+       "item_no": "20",
+       "name": "설비 신뢰도와 정비 효율성 제고를 위한 계측 기술",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 31,
+       "printed_page_start": 24,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 고정밀 디지털 기록계 국산화",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 2,
+         "name": "원전 Data Validation & Reconciliation 소프트웨어",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 3,
+         "name": "원전 고정밀 주급수 유량계",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-3-21",
+       "item_no": "21",
+       "name": "방사선/능 및 유해물질 감시용 하이브리드형 디지털트윈 관제시스템",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 31,
+       "printed_page_start": 24,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "IoT 기반 이동형 유해물질 누출 감지 센서",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 2,
+         "name": "3차원 방사선/능 정보 획득용 컴프턴 카메라와 라이다 센서 융합형 측정 장비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 3,
+         "name": "이동형 방사선/능 및 유해물질 정보 통합형 안전분석 플랫폼",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        },
+        {
+         "no": 4,
+         "name": "방사선/능 유해물질 감시용 디지털트윈 관제시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 31,
+         "printed_page": 24
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "원전 해체",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-4-01",
+       "item_no": "01",
+       "name": "성능 향상 방사능 제염 로봇",
+       "item_type": null,
+       "pdf_page_start": 36,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 제염용 3차원 공간정보 기반 다족 로봇",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 69,
+         "printed_page": 60
+        },
+        {
+         "no": 2,
+         "name": "원전 시설관리용 제염 로봇",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 69,
+         "printed_page": 60
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-4-02",
+       "item_no": "02",
+       "name": "성능 향상 방사선 저감/차폐재",
+       "item_type": null,
+       "pdf_page_start": 36,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "한국형 SF 건식 저장 시스템 중성자 차폐재",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 70,
+         "printed_page": 61
+        },
+        {
+         "no": 2,
+         "name": "내열 내방사선 에폭시 수지",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 70,
+         "printed_page": 61
+        },
+        {
+         "no": 3,
+         "name": "사용후 핵연료 저장 및 수송용기용 C-타입 가스켓",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 70,
+         "printed_page": 61
+        },
+        {
+         "no": 4,
+         "name": "친환경 이동형 경량 방사선 차폐체",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 70,
+         "printed_page": 61
+        },
+        {
+         "no": 5,
+         "name": "가볍고 강성 있는 방사선 차폐용 복합소재",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 70,
+         "printed_page": 61
+        },
+        {
+         "no": 6,
+         "name": "원전 계통 방사성 준위 저감용 부식산화막 장기용출 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 70,
+         "printed_page": 61
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-4-03",
+       "item_no": "03",
+       "name": "효율 향상 방폐물 처리/감용 기술",
+       "item_type": null,
+       "pdf_page_start": 36,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "아임계 수열반응 기반 비금속 방사성 폐기물 처리시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 71,
+         "printed_page": 62
+        },
+        {
+         "no": 2,
+         "name": "중저준위 방사성 고체 폐기물 자동 압축 설비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 71,
+         "printed_page": 62
+        },
+        {
+         "no": 3,
+         "name": "고체 방사성폐기물 열분해 처리 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 71,
+         "printed_page": 62
+        },
+        {
+         "no": 4,
+         "name": "원전 폐기물 탄화붕소 합성기",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 71,
+         "printed_page": 62
+        },
+        {
+         "no": 5,
+         "name": "해체 원전 발생 폐기물 활용 기체/액체 방사성폐기물 처리용 무기 다공성 필터",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 71,
+         "printed_page": 62
+        },
+        {
+         "no": 6,
+         "name": "생활 방사능 및 원전부지 토양/지하수 생물학적 환경 복원 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 71,
+         "printed_page": 62
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-4-04",
+       "item_no": "04",
+       "name": "성능향상 코팅/도장기술",
+       "item_type": null,
+       "pdf_page_start": 36,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "원전 구조물용 내열성 부식 방지 기능성 세라믹 코팅제",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 72,
+         "printed_page": 63
+        },
+        {
+         "no": 2,
+         "name": "고준위 방사성폐기물 운반 용기의 내구성과 중성자 차폐 향상용 다기능 코팅제",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 72,
+         "printed_page": 63
+        },
+        {
+         "no": 3,
+         "name": "원자로건물 내부 방호도장 표면처리 및 보수도장 장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 72,
+         "printed_page": 63
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-4-05",
+       "item_no": "05",
+       "name": "해체용 용접/비파괴검사 실증기술",
+       "item_type": null,
+       "pdf_page_start": 36,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "사용후 핵연료 저장조 구조체 경년열화 진단 비파괴검사 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 72,
+         "printed_page": 63
+        },
+        {
+         "no": 2,
+         "name": "다단 성형 및 고에너지 레이저용접 적용 고준위 사용후핵연료 금속저장용기",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 72,
+         "printed_page": 63
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-4-06",
+       "item_no": "06",
+       "name": "캐스크용 중성자 차폐재 재료성능평가",
+       "item_type": null,
+       "pdf_page_start": 36,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "CASK용 중성자 차폐재 장기 물성 내구성 평가 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 72,
+         "printed_page": 63
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-4-07",
+       "item_no": "07",
+       "name": "성능 향상 특수용도 제염",
+       "item_type": null,
+       "pdf_page_start": 36,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "APR1400 RCP 임펠러 내장품 화학제염 설비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 73,
+         "printed_page": 64
+        },
+        {
+         "no": 2,
+         "name": "원격 표면 방사선 측정/제염 병행 장비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 73,
+         "printed_page": 64
+        },
+        {
+         "no": 3,
+         "name": "대용량 방사성 오염토양 제염 상용화 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 73,
+         "printed_page": 64
+        },
+        {
+         "no": 4,
+         "name": "3D 스캐닝과 감마선 영상 기반 복합 입체표면 고착 방사성 물질 제거 장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 73,
+         "printed_page": 64
+        },
+        {
+         "no": 5,
+         "name": "APR1400 RCP 내장품 화학적-초음파 제염 설비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 73,
+         "printed_page": 64
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-4-08",
+       "item_no": "08",
+       "name": "해체 선행 실증기술",
+       "item_type": null,
+       "pdf_page_start": 36,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "방사성 폐기물 드럼 자동 식별 및 추적 관리시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 73,
+         "printed_page": 64
+        },
+        {
+         "no": 2,
+         "name": "로봇 작업 동반 원전 해체 공정용 힘-토크 햅틱 기반 고충실도 교육훈련 시스템",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 74,
+         "printed_page": 65
+        },
+        {
+         "no": 3,
+         "name": "해체공정 액체폐기물 처리기술 실증 및 평가 기술",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 74,
+         "printed_page": 65
+        },
+        {
+         "no": 4,
+         "name": "라이다/방사선 센서 활용 시스템과 자율비행 드론 기반 원전 해체현장 안전점검 솔루션",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 74,
+         "printed_page": 65
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "NUCLEAR-2023-4-09",
+       "item_no": "09",
+       "name": "방사선 작업환경 관리용 엣지 디바이스 기반 표준 플랫폼",
+       "item_type": "플래그십 프로젝트",
+       "pdf_page_start": 36,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "하이브리드형 UWB 기반 광대역 실시간 위치정보 센싱 S/W 및 장치",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 36,
+         "printed_page": 29
+        },
+        {
+         "no": 2,
+         "name": "발전소 운영 안전성 강화용 무선통신 장비",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 36,
+         "printed_page": 29
+        },
+        {
+         "no": 3,
+         "name": "방사선 환경데이터 통합형 AI기반 임베디드 ADR",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 36,
+         "printed_page": 29
+        },
+        {
+         "no": 4,
+         "name": "방사선 데이터 최적화 분석 알고리즘 기반 선량 데이터 표준 관리플랫폼",
+         "trl_raw": null,
+         "trl_min": null,
+         "trl_max": null,
+         "pdf_page": 36,
+         "printed_page": 29
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
