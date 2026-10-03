@@ -1,6 +1,6 @@
 // Phase 3 원문 근거: Supabase 검색기·근거 발췌·서버 함수·적재 변환. 실제 Supabase/Voyage 없이(가짜 fetch) 실행.
 import { describe, expect, it, vi } from 'vitest';
-import { handle } from '../../netlify/functions/roadmap-evidence';
+import { handle, urlHint } from '../../netlify/functions/roadmap-evidence';
 import { embedInput, toRow, type Chunk } from '../../scripts/rag/load_kb';
 import { createEmbeddingProvider, type EmbeddingProvider } from '../../src/rag/embedding';
 import { bestQuote, findEvidence } from '../../src/rag/evidence';
@@ -27,6 +27,8 @@ describe('Supabase 설정', () => {
     expect(supabaseConfigFromEnv({})).toBeNull();
     expect(supabaseConfigFromEnv({ SUPABASE_URL: 'https://x.supabase.co' })).toBeNull();
     expect(supabaseConfigFromEnv({ SUPABASE_URL: 'https://x.supabase.co/', SUPABASE_SERVICE_ROLE_KEY: 'k' })?.url).toBe('https://x.supabase.co');
+    const c = supabaseConfigFromEnv({ SUPABASE_URL: ' "https://x.supabase.co/rest/v1/" ', SUPABASE_SERVICE_ROLE_KEY: ' k\n' });
+    expect([c?.url, c?.serviceKey]).toEqual(['https://x.supabase.co', 'k']);
   });
 });
 
@@ -120,6 +122,13 @@ describe('서버 함수 /api/roadmap-evidence', () => {
     expect((await handle(req(null, 'GET'), {})).status).toBe(405);
     expect((await handle(req({ query: '', itemUids: ['U1x'] }), {})).status).toBe(400);
     expect((await handle(req({ query: '예지보전', itemUids: ['<script>'] }), {})).status).toBe(400);
+  });
+  it('SUPABASE_URL 형식 진단(주소는 로그에 남기지 않음)', () => {
+    expect(urlHint('https://abcd1234.supabase.co')).toBe('[SUPABASE_URL 형식 정상]');
+    expect(urlHint('postgresql://postgres:pw@db.abcd1234.supabase.co:5432/postgres')).toMatch(/postgresql: 주소/);
+    expect(urlHint('abcd1234.supabase.co')).toMatch(/형식 오류/);
+    expect(urlHint('https://supabase.com/dashboard/project/abcd1234')).toMatch(/확인 필요/);
+    expect(urlHint('https://abcd1234.supabase.co')).not.toContain('abcd1234');
   });
   it('환경변수 없으면 200 not_configured', async () => {
     const res = await handle(req({ query: '예지보전', itemUids: ['SMESTR-2025-B-03-08@p279'] }), {});
