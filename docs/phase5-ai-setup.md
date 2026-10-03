@@ -42,6 +42,8 @@ Claude 응답(30초~1분)이 Netlify 일반 함수 제한 시간을 넘어 504�
 
 ## 문제가 생기면
 
+먼저 결과 화면 맨 위 **'연동 상태'** 신호등을 확인하세요. 빨간 항목에 원인(키 오류·권한·사용 한도·모델 이름 등)이 표시됩니다. 서버 점검만 보려면 `/api/health`를 열면 됩니다(키 값은 표시되지 않음).
+
 Netlify → Logs → Functions → `ai-interpret`(접수·조회), `ai-interpret-background`(Claude 처리 — `ai-interpret ok {ms, usage}`는 여기)
 
 | 로그 | 의미 | 조치 |
