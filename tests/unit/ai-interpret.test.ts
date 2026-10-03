@@ -71,6 +71,15 @@ describe('가드레일', () => {
     const { output } = applyGuardrail({ ...good, strengths: [{ text: '강점', claim_type: 'fact', basis: 'x' }] }, ctx);
     expect(output.strengths[0].claim_type).toBe('hypothesis');
   });
+  it('로드맵 노트의 수치는 원문 발췌에 있는 숫자만(원문에 없는 10ms 등은 제거)', () => {
+    const notes = [
+      { item_uid: UID, text: '원문 p.272의 고장 예측 목표와 이어집니다.' },
+      { item_uid: UID, text: '응답 10ms 이내 목표와 연결됩니다.' },
+    ];
+    const { output, violations } = applyGuardrail({ ...good, roadmap_notes: notes }, ctx);
+    expect(output.roadmap_notes.map((n) => n.text)).toEqual([notes[0].text]);
+    expect(violations.map((v) => v.kind)).toContain('number_not_in_source');
+  });
   it('항목 수·문장 길이 제한', () => {
     const many = Array.from({ length: 6 }, (_, i) => ({ text: `강점 ${i} ${'가'.repeat(300)}`, claim_type: 'self_report' as const, basis: 'x' }));
     const { output } = applyGuardrail({ ...good, strengths: many }, ctx);

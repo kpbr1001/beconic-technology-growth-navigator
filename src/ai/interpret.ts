@@ -49,6 +49,7 @@ export function guardContext(r: AssessmentResult, input: AssessmentInput, eviden
     scores: [...new Set(scores)],
     trls: [...trls],
     evidenceUids: Object.keys(evidence).filter((k) => evidence[k].length),
+    evidenceText: Object.fromEntries(Object.entries(evidence).map(([k, qs]) => [k, qs.map((q) => `${q.label} ${q.technologyName ?? ''} ${q.trl ?? ''} ${q.quote} ${q.citation}`).join(' ')])),
     codes: [...new Set(quotes.flatMap((q) => q.citation.match(/\b[A-Z]{2,}(?:-[A-Z0-9]+)*-\d{2}-\d{2}\b/g) ?? []))],
     pages: [...new Set(quotes.flatMap((q) => [q.printedPage, q.pdfPage]).filter((x): x is number => x !== null))],
     // 이 POC의 입력은 모두 자가응답이다. 외부검증 Evidence(4단계)가 확인되기 전에는 '확인된 사실' 표기 금지

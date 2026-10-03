@@ -9,6 +9,8 @@ export interface GuardContext {
   trls: number[];
   /** 원문 근거가 있는 로드맵 품목 고유키 */
   evidenceUids: string[];
+  /** 품목별 원문 근거 텍스트(발췌·라벨·기술명·출처). 로드맵 노트의 수치(10ms, 95% 등)가 원문에 있는지 대조 */
+  evidenceText?: Record<string, string>;
   /** 원문 근거에 있는 공식 품목코드 */
   codes: string[];
   /** 원문 근거의 인쇄 쪽·PDF 쪽 */
@@ -17,7 +19,7 @@ export interface GuardContext {
   allowVerifiedFact: boolean;
 }
 
-export type ViolationKind = 'score_mismatch' | 'trl_mismatch' | 'unknown_item' | 'unknown_page' | 'fit_grade' | 'claim_downgraded' | 'trimmed';
+export type ViolationKind = 'number_not_in_source' | 'score_mismatch' | 'trl_mismatch' | 'unknown_item' | 'unknown_page' | 'fit_grade' | 'claim_downgraded' | 'trimmed';
 export interface Violation {
   kind: ViolationKind;
   field: string;
@@ -32,6 +34,10 @@ const TRL_RE = /TRL\s*:?\s*(\d)(?:\s*[~\-–→]\s*(\d))?/gi;
 const CODE_RE = /\b[A-Z]{2,}(?:-[A-Z0-9]+)*-\d{2}-\d{2}\b/g;
 const PAGE_RE = /p\.\s*(\d{1,4})/gi;
 const FIT_RE = /적합도|적합성\s*(?:높|중|낮)|(?:높음|중간|낮음)/;
+
+/** 문장 속 숫자(쪽 번호·TRL 표기는 제외 — 별도 규칙으로 대조) */
+export const numbersIn = (t: string) =>
+  [...t.replace(PAGE_RE, ' ').replace(TRL_RE, ' ').matchAll(/\d+(?:\.\d+)?/g)].map((m) => m[0]);
 
 const clip = (s: string) => (s.length > MAX_TEXT ? `${s.slice(0, MAX_TEXT - 1)}…` : s);
 
@@ -90,9 +96,18 @@ export function applyGuardrail(raw: Interpretation, ctx: GuardContext): { output
       roadmap_notes: keep(
         'roadmap_notes',
         raw.roadmap_notes.filter((n) => {
-          if (ctx.evidenceUids.includes(n.item_uid)) return true;
-          violations.push({ kind: 'unknown_item', field: 'roadmap_notes', text: n.item_uid.slice(0, 80) });
-          return false;
+          if (!ctx.evidenceUids.includes(n.item_uid)) {
+            violations.push({ kind: 'unknown_item', field: 'roadmap_notes', text: n.item_uid.slice(0, 80) });
+            return false;
+          }
+          // 원문 노트의 숫자는 그 품목 원문 근거에 실제로 있는 숫자만(입력 점수·TRL·쪽은 위 규칙으로 따로 대조)
+          const src = ctx.evidenceText?.[n.item_uid];
+          const stray = src === undefined ? undefined : numbersIn(n.text).find((x) => !numbersIn(src).includes(x) && !ctx.scores.includes(Number(x)));
+          if (stray) {
+            violations.push({ kind: 'number_not_in_source', field: 'roadmap_notes', text: n.text.slice(0, 120) });
+            return false;
+          }
+          return true;
         }),
         (n) => [n.text],
         { roadmap: true },
