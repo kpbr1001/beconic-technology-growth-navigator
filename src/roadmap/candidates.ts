@@ -1,13 +1,22 @@
-// 로드맵 세부분야 '참고 후보' (D1 수정).
-// 원문 KB(Hybrid RAG)가 연결되기 전까지는 단어 일치 기반 후보일 뿐이므로
-// '높음/중간' 같은 적합도 등급과 '공식근거' 표기를 하지 않는다(마스터 프롬프트 금지사항 2·3, 17장).
+// 로드맵 '참고 후보' (D1 → D4).
+// 원문 색인(전략품목·핵심기술 이름, 원문 쪽 번호)에서 입력 내용과 단어가 겹치는 전략품목을 찾는다.
+// 키워드 일치일 뿐 내용 적합성 판정이 아니므로 '높음/중간' 같은 적합도 등급과 '공식근거' 표기를 하지 않는다
+// (마스터 프롬프트 금지사항 2·3, 17장). 원문 문장 검색·근거 인용은 Phase 3 Hybrid RAG에서 붙는다.
 import taxonomy from './static-taxonomy.json';
 
 export const ROADMAP_GROUPS: Record<string, string[]> = taxonomy.ROADMAP_GROUPS;
-/** 세부분야 목록: 원문 대조 전(Phase 2에서 검증) */
+/** 세부분야 목록(원문 색인 기준으로 동기화: scripts/roadmap/build_app_index.py) */
 export const ROADMAP_DETAIL: Record<string, string[]> = taxonomy.ROADMAP_DETAIL;
 
+/** unverified: 세부분야명만 / retrieved: 원문 색인에서 찾은 품목(문서·쪽 있음, 내용 적합성은 미검증) */
 export type EvidenceGrade = 'unverified' | 'retrieved' | 'verified';
+
+export interface MatchedTech {
+  name: string;
+  /** 원문 TRL 표기 그대로. 2025~2027 판은 연차별 목표 TRL('2 → 3 → 4') */
+  trl: string | null;
+  page: number | null;
+}
 
 export interface RoadmapCandidate {
   name: string;
@@ -17,8 +26,20 @@ export interface RoadmapCandidate {
   reason: string;
   source: string;
   evidenceGrade: EvidenceGrade;
-  /** 원문 페이지. RAG 연결 전에는 항상 null */
+  /** 원문 인쇄 쪽 번호(없으면 null) */
   page: number | null;
+  pdfPage?: number | null;
+  /** 공식 품목코드(2026~2028 판) 또는 null */
+  code?: string | null;
+  itemNo?: string | null;
+  subfield?: string | null;
+  matchedTerms?: string[];
+  matchedTechs?: MatchedTech[];
+  trlNote?: string | null;
+  /** 일치 단어가 1개뿐인 약한 후보 */
+  weak?: boolean;
+  /** 정렬 점수(희소 단어 가중). 표시용 등급이 아니다 */
+  score?: number;
 }
 
 export interface CandidateInput {
@@ -26,28 +47,153 @@ export interface CandidateInput {
   texts: string[];
 }
 
+type AppItem = {
+  uid: string; code: string | null; no: string | null; name: string; sub: string | null;
+  pp: number | null; pdf: number; techs: [string, string | null, number | null, number | null, string?][];
+};
+type AppField = {
+  collection: string; edition: string; doc: string; source_file: string; trl_note: string | null;
+  subfields: string[]; items: AppItem[];
+};
+export type AppIndex = { kb_version: string; fields: Record<string, AppField> };
+
 export const UNVERIFIED_LABEL = '참고 후보 · 원문 검증 전';
+export const RETRIEVED_LABEL = '원문 색인 후보 · 키워드 일치';
+
+let INDEX: AppIndex | null = null;
+let loading: Promise<AppIndex | null> | null = null;
+
+/** 원문 색인(약 64KB gzip)을 별도 파일로 비동기 로드. 실패해도 세부분야 목록으로 계속 동작한다. */
+export function loadRoadmapIndex(): Promise<AppIndex | null> {
+  loading ??= import('./kb-app-index.json')
+    .then((m) => (INDEX = (m.default ?? m) as unknown as AppIndex))
+    .catch(() => null);
+  return loading;
+}
+export const roadmapIndexReady = () => INDEX !== null;
+/** 테스트용 */
+export function setRoadmapIndex(ix: AppIndex | null) {
+  INDEX = ix;
+}
+
+// 매칭에서 제외할 일반어(어느 품목에나 붙는 말)
+const STOP = new Set(['기술', '개발', '기반', '위한', '통한', '관련', '제품', '서비스', '고객', '기업', '중소', '사용', '활용',
+  '적용', '제공', '있는', '하는', '합니다', '입니다', '시스템', '솔루션', '플랫폼', '주요', '분야', '현장', '담당자', '등의', '및']);
+const JOSA = /(으로|에서|에게|까지|부터|처럼|이며|이고|하고|과|와|을|를|이|가|은|는|의|에|로|도|만)$/;
+
+export function terms(text: string): string[] {
+  const out = new Set<string>();
+  for (let w of text.toLowerCase().split(/[^0-9a-z가-힣]+/)) {
+    if (/[가-힣]/.test(w) && w.length > 2) w = w.replace(JOSA, '');
+    if (w.length >= 2 && !STOP.has(w) && !/^\d+$/.test(w)) out.add(w);
+  }
+  return [...out];
+}
+
+const itemText = (i: AppItem) => `${i.name} ${i.techs.map((t) => t[0]).join(' ')}`.toLowerCase();
+const DF = new WeakMap<AppField, Map<string, number>>();
+
+/** 분야 안에서 단어의 희소성(IDF). 그 분야 품목 대부분에 들어가는 말('ai', '데이터')은 거의 0 */
+function idf(field: AppField, q: string): number {
+  let m = DF.get(field);
+  if (!m) DF.set(field, (m = new Map()));
+  let df = m.get(q);
+  if (df === undefined) m.set(q, (df = field.items.filter((i) => itemText(i).includes(q)).length));
+  const n = field.items.length;
+  if (!df || df / n > 0.35) return 0;
+  return Math.log((n + 1) / df);
+}
+
+function matchItem(field: AppField, item: AppItem, qs: string[]) {
+  const name = item.name.toLowerCase();
+  const matched = qs.filter((q) => idf(field, q) > 0 && itemText(item).includes(q));
+  // 품목명 일치는 핵심기술명 일치보다 1.5배 가중
+  const score = matched.reduce((s, q) => s + idf(field, q) * (name.includes(q) ? 1.5 : 1), 0);
+  const techHits = item.techs
+    .map((t) => ({ t, n: matched.filter((q) => t[0].toLowerCase().includes(q)).length }))
+    .filter((x) => x.n > 0);
+  return { score, hits: matched.length, matched, techHits };
+}
+
+function fallback(f: string, field: AppField | undefined): RoadmapCandidate[] {
+  const subs = field?.subfields.length ? field.subfields : ROADMAP_DETAIL[f] || ['추가 분류 필요'];
+  return subs.slice(0, 3).map((s) => {
+    const first = field?.items.find((i) => i.sub === s);
+    return {
+      name: s,
+      hits: 0,
+      label: field ? RETRIEVED_LABEL : UNVERIFIED_LABEL,
+      reason: field
+        ? `입력 내용과 일치하는 전략품목이 없어 '${f}' 세부분야를 표시 — 기업 기술을 더 구체적으로 입력하면 품목 단위로 찾습니다`
+        : `선택한 '${f}' 분야의 세부분야 목록 중 하나 (원문 대조 전)`,
+      source: field ? `${field.doc}${first?.pp ? ` · 인쇄 p.${first.pp}~` : ''}` : `${f} 세부분야명 · 원문 페이지 미확인`,
+      evidenceGrade: field ? ('retrieved' as const) : ('unverified' as const),
+      page: field && first ? first.pp : null,
+      pdfPage: field && first ? first.pdf : null,
+      subfield: s,
+    };
+  });
+}
 
 export function roadmapCandidates({ roadmapField: f, texts }: CandidateInput): RoadmapCandidate[] {
-  const subs = ROADMAP_DETAIL[f] || ['추가 분류 필요'];
-  const txt = texts.join(' ').toLowerCase();
-  return subs
-    .map((s) => {
-      const words = s.toLowerCase().split(/[·/\s]+/).filter((x) => x.length > 1);
-      const hits = words.filter((w) => txt.includes(w)).length;
-      return {
-        name: s,
-        hits,
-        label: UNVERIFIED_LABEL,
-        reason: hits
-          ? `입력 내용과 세부분야명 단어 ${hits}개 일치 (원문 대조 전)`
-          : `선택한 '${f}' 분야의 세부분야 목록 중 하나 (원문 대조 전)`,
-        source: `${f} 세부분야명 · 원문 페이지 미확인`,
-        evidenceGrade: 'unverified' as const,
-        page: null,
-      };
-    })
-    // v0.9와 같은 순위: 일치 2개 이상 > 1개 > 0개, 동률은 원래 순서 유지
-    .sort((a, b) => Math.min(b.hits, 2) - Math.min(a.hits, 2))
+  const field = INDEX?.fields[f];
+  if (!field) return fallback(f, undefined);
+  const ranked = rank(field, terms(texts.join(' ')));
+  if (!ranked.length) return fallback(f, field);
+  return ranked.map((x) => toCandidate(field, x));
+}
+
+export interface OtherFieldCandidate extends RoadmapCandidate {
+  field: string;
+}
+
+/** 선택 분야보다 확실히 더 잘 맞는 품목이 다른 분야에 있으면 제시(분야 선택 재검토용). 없으면 빈 배열 */
+export function otherFieldCandidates({ roadmapField: f, texts }: CandidateInput, limit = 2): OtherFieldCandidate[] {
+  if (!INDEX) return [];
+  const qs = terms(texts.join(' '));
+  const own = INDEX.fields[f] ? rank(INDEX.fields[f], qs)[0]?.score ?? 0 : 0;
+  const out: OtherFieldCandidate[] = [];
+  for (const [name, field] of Object.entries(INDEX.fields)) {
+    if (name === f || field.collection === '2025-2027_general') continue; // 이전 판(대조용)은 추천하지 않는다
+    const top = rank(field, qs)[0];
+    if (top && top.hits >= 2 && top.score > Math.max(own * 1.5, 2)) out.push({ field: name, ...toCandidate(field, top) });
+  }
+  return out.sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, limit);
+}
+
+type Ranked = { item: AppItem; order: number } & ReturnType<typeof matchItem>;
+
+function rank(field: AppField, qs: string[]): Ranked[] {
+  return field.items
+    .map((item, order) => ({ item, order, ...matchItem(field, item, qs) }))
+    .filter((x) => x.hits > 0)
+    .sort((a, b) => b.score - a.score || a.order - b.order)
     .slice(0, 3);
+}
+
+function toCandidate(field: AppField, { item, hits, matched, techHits, score }: Ranked): RoadmapCandidate {
+  const techs = techHits.sort((a, b) => b.n - a.n).slice(0, 2).map(({ t }) => ({
+    name: t[0],
+    trl: t[1] ? (t[4] === 'stage_targets' ? `연차별 목표 ${t[1]}` : t[1]) : null,
+    page: t[2],
+  }));
+  const id = item.code ?? (item.no ? `원문 순번 ${item.no}` : '');
+  return {
+    name: item.name,
+    hits,
+    label: RETRIEVED_LABEL,
+    reason: `입력어 ${matched.slice(0, 4).map((m) => `'${m}'`).join('·')} 일치 (전략품목·핵심기술명 기준, 내용 적합성 검증 전)`,
+    source: `${field.doc}${item.sub ? ` › ${item.sub}` : ''} › ${id} · ${item.pp ? `인쇄 p.${item.pp}` : '인쇄 쪽 미확인'} (PDF p.${item.pdf})`,
+    evidenceGrade: 'retrieved' as const,
+    page: item.pp,
+    pdfPage: item.pdf,
+    code: item.code,
+    itemNo: item.no,
+    subfield: item.sub,
+    matchedTerms: matched,
+    matchedTechs: techs,
+    trlNote: field.trl_note,
+    weak: hits < 2,
+    score: Math.round(score * 100) / 100,
+  };
 }
