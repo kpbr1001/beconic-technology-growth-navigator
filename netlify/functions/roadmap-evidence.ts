@@ -12,6 +12,21 @@ const json = (body: unknown, status = 200) =>
     headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
   });
 
+/** SUPABASE_URL 형식 진단(로그용). 프로젝트 주소 자체는 남기지 않는다 */
+export function urlHint(raw: string | undefined): string {
+  if (!raw) return '[SUPABASE_URL 없음]';
+  const v = raw.trim().replace(/^["']|["']$/g, '');
+  let u: URL;
+  try {
+    u = new URL(v);
+  } catch {
+    return '[SUPABASE_URL 형식 오류: https://<프로젝트ID>.supabase.co 형태가 아님]';
+  }
+  if (u.protocol !== 'https:') return `[SUPABASE_URL 형식 오류: ${u.protocol} 주소 — DB 연결문자열이 아니라 Project URL(https://…supabase.co)이 필요]`;
+  if (!/^[a-z0-9]+\.supabase\.co$/.test(u.hostname)) return '[SUPABASE_URL 확인 필요: 호스트가 <프로젝트ID>.supabase.co 형태가 아님]';
+  return '[SUPABASE_URL 형식 정상]';
+}
+
 const UID = /^[A-Za-z0-9가-힣@&\-_.]{3,80}$/;
 
 export async function handle(req: Request, env: Record<string, string | undefined>): Promise<Response> {
@@ -37,7 +52,8 @@ export async function handle(req: Request, env: Record<string, string | undefine
     return json(res);
   } catch (e) {
     // 내부 오류 상세(키·URL)는 응답에 넣지 않는다
-    console.error('roadmap-evidence 실패', e instanceof Error ? e.message : e);
+    const cause = e instanceof Error && e.cause instanceof Error ? ` (원인: ${(e.cause as Error & { code?: string }).code ?? e.cause.message})` : '';
+    console.error('roadmap-evidence 실패', e instanceof Error ? e.message : e, cause, urlHint(env.SUPABASE_URL));
     return json({ status: 'error', items: {} }, 502);
   }
 }
