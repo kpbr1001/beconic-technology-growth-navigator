@@ -27,6 +27,8 @@ describe('Supabase 설정', () => {
     expect(supabaseConfigFromEnv({})).toBeNull();
     expect(supabaseConfigFromEnv({ SUPABASE_URL: 'https://x.supabase.co' })).toBeNull();
     expect(supabaseConfigFromEnv({ SUPABASE_URL: 'https://x.supabase.co/', SUPABASE_SERVICE_ROLE_KEY: 'k' })?.url).toBe('https://x.supabase.co');
+    const c = supabaseConfigFromEnv({ SUPABASE_URL: ' "https://x.supabase.co/rest/v1/" ', SUPABASE_SERVICE_ROLE_KEY: ' k\n' });
+    expect([c?.url, c?.serviceKey]).toEqual(['https://x.supabase.co', 'k']);
   });
 });
 

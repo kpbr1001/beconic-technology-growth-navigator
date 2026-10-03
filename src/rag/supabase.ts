@@ -18,7 +18,10 @@ export type SupabaseEnv = Partial<Record<'SUPABASE_URL' | 'SUPABASE_SERVICE_ROLE
 /** 환경변수가 없으면 null(앱은 원문 색인 후보로 계속 동작) */
 export function supabaseConfigFromEnv(env: SupabaseEnv): SupabaseConfig | null {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return null;
-  return { url: env.SUPABASE_URL.replace(/\/+$/, ''), serviceKey: env.SUPABASE_SERVICE_ROLE_KEY, restUrl: env.SUPABASE_REST_URL };
+  // 붙여넣을 때 흔한 실수(앞뒤 공백·따옴표, 끝의 /rest/v1)를 정리한다
+  const clean = (v: string) => v.trim().replace(/^["']|["']$/g, '');
+  const url = clean(env.SUPABASE_URL).replace(/\/+$/, '').replace(/\/rest\/v1$/, '');
+  return { url, serviceKey: clean(env.SUPABASE_SERVICE_ROLE_KEY), restUrl: env.SUPABASE_REST_URL };
 }
 
 /** 검색 결과 행 + 원문 근거 추적용 메타 */
