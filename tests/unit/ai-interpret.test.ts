@@ -1,7 +1,8 @@
 // Phase 5 Task 2: Claude 진단 해석 — 가드레일·입력 구성·서버 함수. 실제 API 없이(가짜 클라이언트) 실행.
 import Anthropic from '@anthropic-ai/sdk';
 import { describe, expect, it, vi } from 'vitest';
-import { handle, originAllowed } from '../../netlify/functions/ai-interpret';
+import { handle, originAllowed, type Deps } from '../../netlify/functions/ai-interpret';
+import { JOB_STALE_MS, jobView, processJob, type Job, type JobStore } from '../../src/ai/jobs';
 import { applyGuardrail, checkText, type GuardContext } from '../../src/ai/guardrail';
 import { buildUserContent, guardContext, interpretAssessment } from '../../src/ai/interpret';
 import { InterpretRequest, type Interpretation } from '../../src/ai/schema';
@@ -70,6 +71,15 @@ describe('가드레일', () => {
     const { output } = applyGuardrail({ ...good, strengths: [{ text: '강점', claim_type: 'fact', basis: 'x' }] }, ctx);
     expect(output.strengths[0].claim_type).toBe('hypothesis');
   });
+  it('로드맵 노트의 수치는 원문 발췌에 있는 숫자만(원문에 없는 10ms 등은 제거)', () => {
+    const notes = [
+      { item_uid: UID, text: '원문 p.272의 고장 예측 목표와 이어집니다.' },
+      { item_uid: UID, text: '응답 10ms 이내 목표와 연결됩니다.' },
+    ];
+    const { output, violations } = applyGuardrail({ ...good, roadmap_notes: notes }, ctx);
+    expect(output.roadmap_notes.map((n) => n.text)).toEqual([notes[0].text]);
+    expect(violations.map((v) => v.kind)).toContain('number_not_in_source');
+  });
   it('항목 수·문장 길이 제한', () => {
     const many = Array.from({ length: 6 }, (_, i) => ({ text: `강점 ${i} ${'가'.repeat(300)}`, claim_type: 'self_report' as const, basis: 'x' }));
     const { output } = applyGuardrail({ ...good, strengths: many }, ctx);
@@ -82,6 +92,7 @@ describe('Claude 입력 구성', () => {
   it('점수는 Rule Engine 값, 원문은 발췌 그대로, 근거 없는 품목은 노트 금지 표시', () => {
     const text = buildUserContent(input, r, { ...req, roadmap: [...req.roadmap, { uid: 'X-1@p2', name: '근거없음', code: null }] }, evidence);
     expect(text).toContain(`리스크대응: ${risk}/100`);
+    expect(text).toContain(`진단 신뢰도: ${Math.round(r.confidence)}/100 `); // 소수점 없이(화면 표기와 동일)
     expect(text).toContain('"고장 예측 정확도 확보 … 예지보전 알림 자동화"');
     expect(text).toContain('이상패턴 탐지 모델 · 자체 가능 · TRL 5');
     expect(text).toContain('원문 근거 없음(이 품목은 roadmap_notes에 쓰지 말 것)');
@@ -121,39 +132,107 @@ describe('interpretAssessment', () => {
   });
 });
 
-describe('서버 함수 /api/ai-interpret', () => {
-  const env = { URL: 'https://beconic-diagnosis-tech.netlify.app', ANTHROPIC_API_KEY: 'sk-test-only' };
-  const call = (body: unknown, origin = 'https://beconic-diagnosis-tech.netlify.app', method = 'POST') =>
-    new Request('https://x/api/ai-interpret', { method, headers: { origin }, body: method === 'POST' ? JSON.stringify(body) : undefined });
+describe('작업 처리(백그라운드)', () => {
+  const memStore = () => {
+    const m = new Map<string, Job>();
+    return { m, store: { get: async (id: string) => m.get(id) ?? null, set: async (id: string, j: Job) => void m.set(id, j) } as JobStore };
+  };
+  const ID = '123e4567-e89b-42d3-a456-426614174000';
+  const env = { ANTHROPIC_API_KEY: 'sk-test-only' };
 
-  it('출처 확인: 운영·배포 미리보기만 허용', () => {
-    expect(originAllowed('https://beconic-diagnosis-tech.netlify.app', env)).toBe(true);
-    expect(originAllowed('https://deploy-preview-6--beconic-diagnosis-tech.netlify.app', env)).toBe(true);
-    expect(originAllowed('https://evil.example', env)).toBe(false);
-    expect(originAllowed('https://beconic-diagnosis-tech.netlify.app.evil.example', env)).toBe(false);
-    expect(originAllowed(null, env)).toBe(false);
-  });
-  it('POST만, 외부 출처 403, 입력 형식 오류 400, 키 없으면 not_configured', async () => {
-    expect((await handle(call(null, undefined, 'GET'), env)).status).toBe(405);
-    expect((await handle(call(req, 'https://evil.example'), env)).status).toBe(403);
-    expect((await handle(call({ input: {} }), env)).status).toBe(400);
-    const res = await handle(call(req), { URL: env.URL });
-    expect(await res.json()).toEqual({ status: 'not_configured' });
-  });
-  it('정상 응답에는 키·사용량을 싣지 않고, API 오류는 fallback(키 비노출)', async () => {
+  it('대기 중인 작업만 처리하고, 끝나면 입력 원문을 지운다', async () => {
+    const { m, store } = memStore();
+    m.set(ID, { status: 'queued', createdAt: Date.now(), request: req });
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
-      const ok = await handle(call(req), env, () => fakeClient({}).client);
-      const body = await ok.json();
-      expect(body.status).toBe('ok');
-      expect(body.usage).toBeUndefined();
-      expect(JSON.stringify(body)).not.toContain('sk-test-only');
-      const boom = { beta: { messages: { parse: async () => { throw new Anthropic.APIConnectionError({ message: 'boom' }); } } } } as never;
-      const fb = await handle(call(req), env, () => boom);
-      expect(await fb.json()).toEqual({ status: 'fallback', reason: 'api_error' });
+      expect(await processJob(ID, store, env, () => fakeClient({}).client)).toBe(true);
+      const done = m.get(ID)!;
+      expect(done.status).toBe('done');
+      expect(done.request).toBeUndefined();
+      expect(done.result?.status).toBe('ok');
+      expect(JSON.stringify(done.result)).not.toMatch(/usage|sk-test-only/);
+      // 이미 끝난 작업·없는 작업·형식 오류는 무시(외부에서 백그라운드 함수를 직접 불러도 비용 없음)
+      expect(await processJob(ID, store, env)).toBe(false);
+      expect(await processJob('123e4567-e89b-42d3-a456-426614174999', store, env)).toBe(false);
+      expect(await processJob('../etc', store, env)).toBe(false);
     } finally {
       log.mockRestore();
+    }
+  });
+  it('API 오류는 fallback으로 저장', async () => {
+    const { m, store } = memStore();
+    m.set(ID, { status: 'queued', createdAt: Date.now(), request: req });
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const boom = { beta: { messages: { parse: async () => { throw new Anthropic.APIConnectionError({ message: 'boom' }); } } } } as never;
+    try {
+      await processJob(ID, store, env, () => boom);
+      expect(m.get(ID)?.result).toEqual({ status: 'fallback', reason: 'api_error' });
+    } finally {
+      err.mockRestore();
+    }
+  });
+  it('조회: 진행 중이면 상태만, 5분 넘은 미완료는 시간 초과', () => {
+    const t = Date.now();
+    expect(jobView(null)).toEqual({ status: 'not_found' });
+    expect(jobView({ status: 'running', createdAt: t, request: req }, t + 1000)).toEqual({ status: 'running' });
+    expect(jobView({ status: 'running', createdAt: t }, t + JOB_STALE_MS + 1)).toEqual({ status: 'fallback', reason: 'timeout' });
+  });
+});
+
+describe('서버 함수 /api/ai-interpret', () => {
+  const env = { URL: 'https://beconic-diagnosis-tech.netlify.app', ANTHROPIC_API_KEY: 'sk-test-only' };
+  const SITE = 'https://beconic-diagnosis-tech.netlify.app';
+  const call = (body: unknown, origin = SITE, method = 'POST', url = `${SITE}/api/ai-interpret`) =>
+    new Request(url, { method, headers: origin ? { origin } : {}, body: method === 'POST' ? JSON.stringify(body) : undefined });
+  const deps = (over: Partial<Deps> = {}) => {
+    const m = new Map<string, Job>();
+    const triggered: string[] = [];
+    const d: Deps = {
+      store: () => ({ get: async (id) => m.get(id) ?? null, set: async (id, j) => void m.set(id, j) }),
+      trigger: async (_u, id) => (triggered.push(id), true),
+      newId: () => '123e4567-e89b-42d3-a456-426614174000',
+      ...over,
+    };
+    return { d, m, triggered };
+  };
+
+  it('출처 확인: 운영·배포 미리보기·같은 사이트만 허용', () => {
+    expect(originAllowed(SITE, env)).toBe(true);
+    expect(originAllowed('https://deploy-preview-6--beconic-diagnosis-tech.netlify.app', env)).toBe(true);
+    expect(originAllowed('https://custom.example', {}, 'https://custom.example/api/ai-interpret')).toBe(true); // 사이트 주소 변수가 없어도 같은 호스트면 허용
+    expect(originAllowed('https://evil.example', env, `${SITE}/api/ai-interpret`)).toBe(false);
+    expect(originAllowed(`${SITE}.evil.example`, env)).toBe(false);
+    expect(originAllowed(null, env)).toBe(false);
+  });
+  it('외부 출처 403, 입력 형식 오류 400, 키 없으면 not_configured(접수 안 함)', async () => {
+    const { d, m } = deps();
+    expect((await handle(call(null, undefined, 'DELETE'), env, d)).status).toBe(405);
+    expect((await handle(call(req, 'https://evil.example'), env, d)).status).toBe(403);
+    expect((await handle(call({ input: {} }), env, d)).status).toBe(400);
+    expect(await (await handle(call(req), { URL: env.URL }, d)).json()).toEqual({ status: 'not_configured' });
+    expect(m.size).toBe(0);
+  });
+  it('접수 → 202 queued, 백그라운드 함수 호출, 조회는 상태·결과만', async () => {
+    const { d, m, triggered } = deps();
+    const res = await handle(call(req), env, d);
+    expect(res.status).toBe(202);
+    const { job } = await res.json();
+    expect(triggered).toEqual([job]);
+    expect(m.get(job)?.status).toBe('queued');
+    const get = (id: string) => handle(new Request(`${SITE}/api/ai-interpret?job=${id}`), env, d);
+    expect(await (await get(job)).json()).toEqual({ status: 'queued' });
+    expect((await get('nope')).status).toBe(400);
+    m.set(job, { status: 'done', createdAt: Date.now(), result: { status: 'fallback', reason: 'refusal' } });
+    expect(await (await get(job)).json()).toEqual({ status: 'fallback', reason: 'refusal' });
+  });
+  it('백그라운드 호출 실패 → fallback(키 비노출)', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const { d } = deps({ trigger: async () => false });
+      const body = await (await handle(call(req), env, d)).text();
+      expect(JSON.parse(body)).toEqual({ status: 'fallback', reason: 'api_error' });
+      expect(body).not.toContain('sk-test-only');
+    } finally {
       err.mockRestore();
     }
   });

@@ -6,10 +6,14 @@
 ## 구성
 
 ```text
-브라우저(결과 화면) ──POST /api/ai-interpret──▶ Netlify Function ──▶ Claude API (구조화 출력)
-  VITE_AI_INTERPRET=on 일 때만 호출              ANTHROPIC_API_KEY        └▶ (선택) Supabase 원문 근거
-  기업명은 보내지 않음                           Rule Engine 재계산 → 가드레일 → 응답
+브라우저 ──POST /api/ai-interpret──▶ 접수 함수 ──(작업 저장: Netlify Blobs)──▶ 202 {job}
+   │                                     └─▶ ai-interpret-background (백그라운드, 최대 15분)
+   │                                          Rule Engine 재계산 → (선택) Supabase 원문 근거 → Claude → 가드레일 → 결과 저장
+   └─ 3초마다 GET /api/ai-interpret?job=… ──▶ queued / running / 결과(ok·fallback)
+  VITE_AI_INTERPRET=on 일 때만 호출, 기업명은 보내지 않음, 처리 후 입력 원문은 저장소에서 삭제
 ```
+
+Claude 응답(30초~1분)이 Netlify 일반 함수 제한 시간을 넘어 504가 나서(v0.9.6 운영 확인), 백그라운드 함수로 처리합니다. 추가 설정은 없습니다(Netlify Blobs는 자동 연결).
 
 | 단계 | 하는 일 |
 |---|---|
@@ -34,18 +38,19 @@
    | `AI_INTERPRET_EFFORT` | 비우면 `low`. `medium`·`high`는 더 깊지만 느림 | 서버 전용(선택) |
 
 3. **재배포** — Deploys → Trigger deploy → Deploy site
-4. **확인** — 샘플기업 → 결과 화면 맨 위 'AI 해석 · Claude' 패널(보통 20~40초 뒤 표시) → PDF 인쇄 5쪽
+4. **확인** — 샘플기업 → 결과 화면 맨 위 'AI 해석 · Claude' 패널(보통 30초~1분 뒤 표시) → PDF 인쇄 5쪽
 
 ## 문제가 생기면
 
-Netlify → Logs → Functions → `ai-interpret`
+Netlify → Logs → Functions → `ai-interpret`(접수·조회), `ai-interpret-background`(Claude 처리 — `ai-interpret ok {ms, usage}`는 여기)
 
 | 로그 | 의미 | 조치 |
 |---|---|---|
 | `ai-interpret ok {model, ms, usage, removed}` | 정상. `ms`가 응답 시간 | — |
 | `ai-interpret 실패 auth` | 키 오류 | 키 재발급 후 등록·재배포 |
 | `ai-interpret 실패 rate_limit` | 사용 한도·속도 제한 | Console 한도 확인 |
-| `ai-interpret 실패 timeout` / 화면이 계속 '해석 중' | 응답 지연 | `AI_INTERPRET_EFFORT`를 `low`로 유지. 계속되면 백그라운드 처리로 전환 예정 |
+| `ai-interpret-background` 로그에 `ai-interpret 실패 timeout` / 화면이 3분 넘게 '해석 중' | Claude 응답 지연 | `AI_INTERPRET_EFFORT`를 `low`로 유지, Anthropic 상태 확인 |
+| `ai-interpret 접수 실패` | 작업 저장·백그라운드 호출 실패 | 재배포 후 재시도, 계속되면 로그 캡처 |
 | `ai-interpret fallback {reason}` | 거절·형식 오류 | 화면은 규칙 기반 해석으로 정상 표시 |
 
 ## 원칙

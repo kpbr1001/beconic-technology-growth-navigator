@@ -1,6 +1,6 @@
 {
   "name": "beconic-technology-growth-navigator",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "private": true,
   "type": "module",
   "scripts": {
@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
+    "@netlify/blobs": "^11.1.3",
     "zod": "^4.6.5"
   }
 }
