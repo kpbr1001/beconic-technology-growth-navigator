@@ -16,9 +16,8 @@ import re
 import sys
 from pathlib import Path
 
-PARSER_VERSION = "roadmap-parser-0.1"
+PARSER_VERSION = "roadmap-parser-0.2"
 CODE_RE = re.compile(r"SMESTR-\d{4}-[A-Z]-\d{2}-\d{2}")
-ITEM_TYPES = ["신시장 창출형", "핵심기술 선도형", "제조혁신·전환형", "공급망·안보 대응형"]
 
 
 # ---------------------------------------------------------------- 텍스트 정규화
@@ -33,17 +32,19 @@ HANGUL = re.compile(r"[가-힣]")
 FULLWIDTH_DIGITS = str.maketrans("０１２３４５６７８９", "0123456789")
 
 
-def repaired_page_text(page, gap: float = 8.0) -> str:
+def repaired_page_text(page, gap: float = 8.0, clip=None) -> str:
     """텍스트 층이 손상된 PDF(일부 분야 보고서) 복원.
 
     같은 기준선(baseline)에서 수평 간격이 gap 이하인 줄 조각들을 하나의 줄로 합치고 x 좌표 순으로
     글자를 정렬한다. 쉼표·가운뎃점·영문 단어가 별도 조각으로 떨어져 나온 문제를 바로잡는다.
-    숫자만 있는 조각(표의 번호 칸)은 합치지 않는다. 출력 줄 순서는 원래 읽기 순서를 따른다.
+    숫자만 있는 조각(표의 번호 칸)은 맞닿거나 겹칠 때만 합친다. 출력 줄 순서는 원래 읽기 순서를 따른다.
     """
     segs = []
-    for b in page.get_text("rawdict")["blocks"]:
+    for b in page.get_text("rawdict", clip=clip)["blocks"]:
         for ln in b.get("lines", []):
             chars = [c for s in ln["spans"] for c in s["chars"]]
+            if clip is not None:  # 칸 경계에 걸친 글자는 중심점이 칸 안에 있을 때만
+                chars = [c for c in chars if clip.contains(((c["bbox"][0] + c["bbox"][2]) / 2, (c["bbox"][1] + c["bbox"][3]) / 2))]
             if not chars or not "".join(c["c"] for c in chars).strip():
                 continue
             base = sum(c["origin"][1] for c in chars) / len(chars)
@@ -72,9 +73,9 @@ def repaired_page_text(page, gap: float = 8.0) -> str:
         for sg in sorted(row, key=lambda s: s["x0"]):
             txt = "".join(c["c"] for c in sg["chars"]).lstrip()
             limit = 4.0 if (sg["hangul"] and grp_hangul) else gap
-            joinable = (grp is not None and not sg["digit"] and not grp["digit"]
-                        and not txt.startswith("•")          # 글머리표는 왼쪽 칸(라벨)에 붙이지 않는다
-                        and sg["x0"] - right <= limit)
+            touching = grp is not None and sg["x0"] - right <= 1.0  # 맞닿거나 겹침: 문장 속 숫자('3대', '2030년')
+            joinable = (grp is not None and not txt.startswith("•")  # 글머리표는 왼쪽 칸(라벨)에 붙이지 않는다
+                        and ((not sg["digit"] and not grp["digit"] and sg["x0"] - right <= limit) or touching))
             if joinable:
                 parent[find(sg["i"])] = find(grp["i"])
                 right = max(right, sg["x1"])
@@ -91,7 +92,7 @@ def repaired_page_text(page, gap: float = 8.0) -> str:
     return "\n".join(t for _, t in sorted(lines)) + "\n"
 
 
-HEADER_LINE = re.compile(r"^(｜?\s*중소기업 전략기술\s*로드맵.*|수립|\(2026 ?~ ?2028\)|2026-2028)$")
+HEADER_LINE = re.compile(r"^(｜?\s*[^\n｜]{0,12}전략기술\s*로드맵.*|수립|\(2026 ?~ ?2028\)|2026-2028)$")
 FIELD_NAME_LINE = re.compile(r"^[^\n]{1,20}$")
 BODY_LABEL = re.compile(r"^(품목명|품목 ?코드|구분|명칭|개요|유형|정의|핵심 요소기술|세부 전략분야.*)$")
 
@@ -109,6 +110,8 @@ def _header_split(text: str) -> tuple[int | None, int]:
         if re.fullmatch(r"\d{1,4}", l):
             if i >= 1 and _is_header(lines[:i]):
                 return int(l), i + 1
+            if i == 0 and len(lines) > 1 and HEADER_LINE.match(lines[1]):  # '93 / ｜화장품 전략기술로드맵…' 순서
+                return int(l), 2
             return None, 0
     return None, 0
 
@@ -148,7 +151,7 @@ def parse_trl(raw: str | None) -> dict:
         return {"trl_raw": r or None, "trl_min": None, "trl_max": None, "trl_confidence": "missing"}
     if re.fullmatch(r"\d(\s*수준)?", r):
         return {"trl_raw": r, "trl_min": nums[0], "trl_max": nums[0], "trl_confidence": "high"}
-    if re.fullmatch(r"\d\s*[-~]\s*\d", r):
+    if re.fullmatch(r"\d\s*[-~–—]\s*\d", r):
         return {"trl_raw": r, "trl_min": min(nums), "trl_max": max(nums), "trl_confidence": "high"}
     # '5→7' 등: 현재→목표인지 범위인지 원문만으로 확정 불가
     return {"trl_raw": r, "trl_min": min(nums), "trl_max": max(nums), "trl_confidence": "low"}
@@ -162,6 +165,40 @@ def parse_subfields(pages: list[str]) -> list[dict]:
             subs.append({"no": int(m.group(1)), "name": m.group(2).strip(), "printed_page_start": int(m.group(3))})
     uniq = {s["no"]: s for s in subs}
     return [uniq[k] for k in sorted(uniq)]
+
+
+def parse_specialized_subfields(plain: list[str], pages: list[str]) -> dict[int, str]:
+    """특화 로드맵의 전략분야 번호→이름. 목차 '전략분야 #k 이름 ···· 쪽'(화장품형) 또는
+    본문 제목 '<이름>(의) 기술혁신형 전략품목·기술정의서'(스마트제조형, 등장 순서 = 번호)"""
+    subs: dict[int, str] = {}
+    for t in plain[:12]:
+        for m in re.finditer(r"(?<!세부 )전략분야\s*#\s*(\d+)\s*(.+?)\s*·{3,}\s*\d+", t):
+            subs[int(m.group(1))] = m.group(2).strip()
+    if subs:
+        return subs
+    names: list[str] = []
+    for t in pages:
+        for m in re.finditer(r"(?m)^(.+?)(?:의)?\s*기술혁신형\s*전략품목\s*·?\s*기술\s*정의서$", t):
+            if m.group(1).strip() not in names:
+                names.append(m.group(1).strip())
+    return {k: n for k, n in enumerate(names, 1)}
+
+
+def parse_specialized_counts(plain: list[str], subs: dict[int, str]) -> dict[str, int]:
+    """'…전략품목 N개 선정'(전문위원회 확정) 문구를 전략분야 순서대로 대응. 개수가 맞지 않으면 빈 값(검증 불가)."""
+    found = [int(m.group(1)) for t in plain for m in re.finditer(r"최종 검토·조정을 통한 전략품목\s*(\d+)\s*개\s*선정", t)]
+    if not subs or len(found) != len(subs):
+        return {}
+    return {subs[k]: n for k, n in zip(sorted(subs), found)}
+
+
+def code_sequence_complete(codes: list[str]) -> bool:
+    """분야·세부분야별 품목 순번이 01부터 빠짐없이 이어지는지 (원문 누락·파싱 누락 탐지)"""
+    groups: dict[str, list[int]] = {}
+    for c in codes:
+        head, _, n = c.rpartition("-")
+        groups.setdefault(head, []).append(int(n))
+    return all(sorted(v) == list(range(1, len(v) + 1)) for v in groups.values())
 
 
 def parse_summary_counts(pages: list[str], field_name: str) -> dict[str, int]:
@@ -235,7 +272,7 @@ LABELS = [
     ("dev_goals", r"\n개발 목표\n"),
     ("effects", r"\n기대 효과\n"),
     ("issues", r"\n핵심 이슈\n"),
-    ("target_markets", r"\n타겟시장\n\(주요 활용처\)\n"),
+    ("target_markets", r"\n타겟시장\n\(주요\s*활용처\)\n"),
     ("policies", r"\n연계 ?정책\n"),
     ("national_platform", r"\n국가 ?플랫폼\n"),
 ]
@@ -278,8 +315,13 @@ def parse_item_definition(t: str) -> tuple[dict, list[str]]:
             warnings.append("주요 기업 칸 줄 수가 2가 아님(국외/국내 구분 불확실)")
     tm = re.search(r"유형\n(.*?)\n정의", t, re.S)
     if tm:
-        checked = [ty for ty in ITEM_TYPES if re.search(r"■\s*" + re.escape(ty), tm.group(1))]
+        checked = []
+        for x in re.findall(r"■\s*([^□■]+)", tm.group(1)):
+            x = re.sub(r"^\(Type\s*[①②③④]\)\s*", "", re.sub(r"\s+", " ", x)).strip()
+            known = [k for k in KNOWN_TYPES if k in x]
+            checked.append(known[0] if known and x.startswith(known[0]) else x)  # 원문 □ 누락으로 다음 유형이 붙은 경우 첫 유형만
         out["item_type"] = checked[0] if len(checked) == 1 else None
+        out["item_types_checked"] = checked
         if len(checked) != 1:
             warnings.append(f"유형 체크 {len(checked)}개")
     else:
@@ -289,7 +331,9 @@ def parse_item_definition(t: str) -> tuple[dict, list[str]]:
 
 
 # ---------------------------------------------------------------- 핵심 요소기술
-TECH_SPLIT = re.compile(r"(?:^|\n)(\d{1,2})\n구분\n내용\n개발 필요 기간\n")
+KNOWN_TYPES = ["신시장 창출형", "핵심기술 선도형", "제조혁신·전환형", "공급망·안보 대응형", "기술혁신형", "수요기업 활용형"]
+TECH_SPLIT = re.compile(r"(?:^|\n)(\d{1,2})\n구분\n(?:작성 )?내용\n개발 필요 기간\n")
+RESUME = "\n§품목명재개§\n"  # 기술 상세 시트 뒤에서 정의서가 다시 시작되는 지점
 
 
 def parse_technologies(text: str, offset_to_page: list[tuple[int, int]]) -> tuple[list[dict], list[str]]:
@@ -302,7 +346,8 @@ def parse_technologies(text: str, offset_to_page: list[tuple[int, int]]) -> tupl
         block = re.split(r"\n핵심키워드\n", block)[0]
         # '기술개발목표' 라벨: 기술/개발/목표, 기술개/발/목표, 기술·/개발/목표 등. 손상 문서는 라벨 줄에 본문 조각이
         # 붙기도 해서(예: '기술• 다양한…', '개발SLAM) 모델…') 라벨 줄의 나머지 글자를 목표 본문 앞에 되살린다.
-        gm = re.search(r"\n기술(?P<a>[^\n]*)\n(?P<b>(?:개\s*)?발[^\n]*)\n\s*목\s*표(?P<c>[^\n]*)(?:\n|$)", block)
+        gm = (re.search(r"\n기술(?P<a>[^\n]*)\n(?P<b>(?:개\s*)?발[^\n]*)\n\s*목\s*표(?P<c>[^\n]*)(?:\n|$)", block)
+              or re.search(r"\n기술\s*개발(?P<a>)(?P<b>)\n\s*목\s*표(?P<c>[^\n]*)(?:\n|$)", block))
         head = re.search(r"명칭\n", block)
         page = next((p for off, p in reversed(offset_to_page) if off <= m.start()), None)
         if not gm or not head or head.end() > gm.start():
@@ -326,6 +371,10 @@ def parse_technologies(text: str, offset_to_page: list[tuple[int, int]]) -> tupl
         gc = re.sub(r"^(?:[\s·,./]|-(?!\d))+", "", gm.group("c"))
         gb = re.sub(r"^(?:[\s·,./]|-(?!\d))+", "", gb)
         goal_part = "\n".join(x for x in (ga, gb, gc, block[gm.end():]) if x and x.strip())
+        # 스마트제조형: 목표 뒤 '단기 (3Y)' / '중장기 (5Y)' 계획
+        plan = re.search(r"\n단기\n\(3Y\)\n(?P<s>.*?)(?:\n중장기\n\(5Y\)\n?(?P<m>.*))?$", "\n" + goal_part, re.S)
+        if plan:
+            goal_part = ("\n" + goal_part)[: plan.start()]
         nm = (name_part, summary_part, goal_part)
         name_raw = re.sub(r"\s*\n\s*", " ", nm[0]).replace("▮", "").strip()
         name_raw = re.sub(r"(\))\s*[/,.·]+\s*$", r"\1", name_raw)  # 'TRL : 4) /' 처럼 떨어진 기호 제거
@@ -346,9 +395,47 @@ def parse_technologies(text: str, offset_to_page: list[tuple[int, int]]) -> tupl
             "summary": oneline(nm[1]),
             "goal": oneline(nm[2]),
             "dev_period": None,  # 표의 연도 칸 음영(그래픽)은 텍스트로 추출 불가 → 미기재
+            **({"plan_short_3y": oneline(plan.group("s")), "plan_mid_5y": oneline(plan.group("m"))} if plan else {}),
             "page": page,
             "parse_confidence": conf,
         })
+    return techs, warnings
+
+
+TECH_TABLE_RE = re.compile(r"\n핵심기술\s*\nNo\n기술명\nTRL\n(?P<rows>.*?)\[\s*핵심기술\s*리스트\s*\]", re.S)
+
+
+def _key(x: str | None) -> str:
+    return re.sub(r"[\s·ㆍ,./()\-–]", "", x or "")
+
+
+def pair_by_name(techs: list[dict], listed: list[dict]) -> list[dict]:
+    """상세 시트 순서에 맞춰 목록표 행을 기술명 유사도로 짝짓는다(목록표 행 배치가 뒤섞인 문서 대응)."""
+    from difflib import SequenceMatcher
+    rest, out = list(listed), []
+    for t in techs:
+        best = max(rest, key=lambda lt: SequenceMatcher(None, _key(t.get("name")), _key(lt["name"])).ratio())
+        rest.remove(best)
+        out.append(best)
+    return out
+
+
+def parse_tech_table(rows: str, page: int | None) -> tuple[list[dict], list[str]]:
+    """스마트제조형 '핵심기술 No/기술명/TRL' 목록표. 행 = [번호] 기술명(여러 줄) '단계' TRL.
+    원문 배치상 번호가 누락·이동되는 경우가 있어 번호는 순서대로 매기고 원문 번호는 no_raw로 남긴다."""
+    warnings: list[str] = []
+    techs: list[dict] = []
+    rows = re.sub(r"(?m)^(\d(?:\s*[~→-]\s*\d)?)\s*단계$", r"단계\n\1", rows)  # 'N단계'(한 줄) 표기도 '단계 / N'으로
+    for k, m in enumerate(re.finditer(r"(?P<body>.*?)\n?단계\n(?P<trl>\d(?:\s*[~→-]\s*\d)?)(?:\n|$)", rows, re.S), 1):
+        lines = [x.strip() for x in m.group("body").strip("\n").split("\n") if x.strip()]
+        no_raw = int(lines.pop(0)) if lines and re.fullmatch(r"\d{1,2}", lines[0]) else None
+        if no_raw != k:
+            warnings.append(f"핵심기술 목록표 {k}행: 원문 번호 {no_raw}")
+        name = " ".join(lines)
+        trl = parse_trl(m.group("trl"))
+        techs.append({"no": k, "no_raw": no_raw, "name": name or None, **trl, "summary": None, "goal": None,
+                      "dev_period": None, "page": page,
+                      "parse_confidence": "high" if name and trl["trl_confidence"] == "high" else "low"})
     return techs, warnings
 
 
@@ -357,12 +444,16 @@ def parse_pages(pages_raw: list[str], meta: dict, plain_raw: list[str] | None = 
     pages = [normalize(t) for t in pages_raw]
     plain = [normalize(t) for t in plain_raw] if plain_raw else pages
     printed = [printed_page_no(t) for t in pages]
-    title = re.search(r"「\s*(.+?)\s*」", pages[0], re.S) or re.search(r"2026\s*~\s*2028\n(.+?)\n「", pages[0])
+    title = (re.search(r"「\s*(.+?)\s*」", pages[0], re.S) or re.search(r"2026\s*~\s*2028\n(.+?)\n「", pages[0])
+             or re.search(r"^\s*(\S[^\n]*?)\s*전략기술\s*로드맵", pages[0]))
     field_name = title.group(1).strip() if title else meta.get("field_name")
     published = re.search(r"\n(20\d\d\.\d{1,2})\s*$", pages[0].strip())
     subfields = parse_subfields(plain)
+    specialized_subs = parse_specialized_subfields(plain, pages)
 
-    def subfield_for(pp: int | None):
+    def subfield_for(pp: int | None, code: str | None = None):
+        if specialized_subs and code:  # 특화 로드맵: 품목코드 가운데 번호 = 전략분야 번호
+            return specialized_subs.get(int(code.split("-")[3]))
         if pp is None:
             return None
         cur = None
@@ -383,23 +474,70 @@ def parse_pages(pages_raw: list[str], meta: dict, plain_raw: list[str] | None = 
         # 이어지는 페이지: 머리글 다음이 '품목명 <같은 품목명>'으로 시작
         name_re = r"\s*".join(re.escape(tok) for tok in (name or "").split()) if name else None
         cont_re = re.compile(r"^\s*품목명\n" + (name_re + r"\s*\n" if name_re else r".*?\n"), re.S)
+        mid_re = re.compile(r"\n품목명\n" + (name_re + r"\s*\n" if name_re else r"[^\n]*\n"))
         j = si + 1
-        while j < stop and cont_re.match(strip_page_header(pages[j])):
+        while j < stop and (cont_re.match(strip_page_header(pages[j]))
+                            or TECH_SPLIT.match(strip_page_header(pages[j]).lstrip("\n"))):
             j += 1
         page_idx = list(range(si, j))
         full, offs = "", []
         for pi in page_idx:
             chunk = strip_page_header(pages[pi])
             if pi != si:
-                chunk = cont_re.sub("\n", chunk, count=1)
+                chunk = cont_re.sub("\n", chunk, count=1) if cont_re.match(chunk) else mid_re.sub(RESUME, "\n" + chunk, count=1)
             offs.append((len(full), pi + 1))
             full += "\n" + chunk
         cut = full.find("핵심 요소기술")
-        body = full[:cut] if cut >= 0 else full
-        tech_text = full[cut + len("핵심 요소기술"):] if cut >= 0 else ""
-        tech_offs = [(max(0, off - cut - len("핵심 요소기술")), pg) for off, pg in offs] if cut >= 0 else []
+        table = TECH_TABLE_RE.search(full) if cut < 0 else None
+        if table:  # 스마트제조형: 정의서 안 핵심기술 목록표 + 뒤따르는 기술 상세 시트
+            tpage = next((pg for off, pg in reversed(offs) if off <= table.start()), None)
+            listed, w2 = parse_tech_table(table.group("rows"), tpage)
+            # 상세 시트 블록: 각 'N 구분 작성 내용 …'부터 다음 시트 또는 정의서 재개 지점까지. 나머지는 정의서 본문.
+            starts_ = [m.start() for m in TECH_SPLIT.finditer(full, table.end())]
+            body = full[: table.start()] + "\n"
+            cursor, techs = table.end(), []
+            for k2, st in enumerate(starts_):
+                nxt = starts_[k2 + 1] if k2 + 1 < len(starts_) else len(full)
+                rs = full.find(RESUME, st, nxt)
+                en = rs if rs >= 0 else nxt
+                body += full[cursor:st] + "\n"
+                t_, w3 = parse_technologies(full[st:en], [(max(0, off - st), pg) for off, pg in offs])
+                techs += t_
+                w2 += w3
+                cursor = en
+            body += full[cursor:]
+            if techs and len(techs) == len(listed):
+                for n_, t in enumerate(techs, 1):  # 순번은 시트 순서대로, 원문 시트 번호는 따로 보존
+                    t["sheet_no_raw"] = t["no"]
+                    if t["no"] != n_:
+                        w2.append(f"요소기술 {n_}: 원문 상세 시트 번호 {t['no']}(중복·불연속) — 순서대로 {n_}번으로 정리")
+                    t["no"] = n_
+                for t, lt in zip(techs, pair_by_name(techs, listed)):
+                    t["listed_name"], t["listed_trl_raw"] = lt["name"], lt["trl_raw"]
+                    if t.get("trl_min") != lt["trl_min"]:
+                        w2.append(f"요소기술 {t['no']}: 원문 불일치 — 목록표 TRL {lt['trl_raw']} ≠ 상세 시트 TRL {t.get('trl_raw')} (상세 시트 값 사용)")
+                tech_format = "table+detail"
+            else:
+                # 원문에 상세 시트가 일부만 있는 경우: 목록표를 기준으로 하고 같은 번호의 시트 내용만 덧붙인다
+                if techs:
+                    w2.append(f"원문 상세 시트 {len(techs)}건 / 목록표 {len(listed)}건 → 목록표 기준")
+                by_no = {t["no"]: t for t in techs}
+                for lt in listed:
+                    dt = by_no.get(lt["no"])
+                    if dt and dt.get("name"):
+                        lt.update({k: dt.get(k) for k in ("summary", "goal", "plan_short_3y", "plan_mid_5y") if dt.get(k)})
+                        lt["detail_name"], lt["detail_page"] = dt["name"], dt.get("page")
+                techs, tech_format = listed, "table" if not techs else "table+partial_detail"
+            body = body.replace(RESUME, "\n").split("\n핵심키워드")[0]
+            tech_text = full
+        else:
+            body = full[:cut] if cut >= 0 else full
+            tech_text = full[cut + len("핵심 요소기술"):] if cut >= 0 else ""
+            tech_offs = [(max(0, off - cut - len("핵심 요소기술")), pg) for off, pg in offs] if cut >= 0 else []
+            techs, w2 = parse_technologies(tech_text, tech_offs)
+            tech_format = "detail"
+            body = body.replace(RESUME, "\n")
         defn, w1 = parse_item_definition(body)
-        techs, w2 = parse_technologies(tech_text, tech_offs)
         kw = re.findall(r"#([^,#\n]+)", tech_text.split("핵심키워드")[-1]) if "핵심키워드" in tech_text else []
         warnings = w1 + w2
         if not techs:
@@ -408,10 +546,11 @@ def parse_pages(pages_raw: list[str], meta: dict, plain_raw: list[str] | None = 
         items.append({
             "code": code,
             "name": name,
-            "subfield": subfield_for(printed[si]),
+            "subfield": subfield_for(printed[si], code),
             **defn,
             "keywords": [k.strip() for k in kw],
             "technologies": techs,
+            "tech_format": tech_format,
             "page_start": si + 1,
             "page_end": page_idx[-1] + 1,
             "printed_page_start": printed[si],
@@ -421,20 +560,25 @@ def parse_pages(pages_raw: list[str], meta: dict, plain_raw: list[str] | None = 
         })
 
     expected = parse_summary_counts(plain, field_name) if field_name else {}
+    lm = re.search(r"-([A-Z])-(\d{2})-", items[0]["code"]) if items else None
+    general = not lm or lm.group(1) == "A"
+    if not general:
+        expected = parse_specialized_counts(plain, specialized_subs)
     canon = {re.sub(r"\s", "", s["name"]): s["name"] for s in subfields}
     expected = {canon.get(re.sub(r"\s", "", k), k): v for k, v in expected.items()}
     actual: dict[str, int] = {}
     for it in items:
         actual[it["subfield"] or "(미상)"] = actual.get(it["subfield"] or "(미상)", 0) + 1
-    fno = re.search(r"-A-(\d{2})-", items[0]["code"]).group(1) if items else None
+    fno = (lm.group(2) if general else lm.group(1)) if lm else None
     return {
         "parser_version": PARSER_VERSION,
         "document": {**meta, "field_name": field_name, "field_no": fno, "published": published.group(1) if published else None,
-                     "version": "2026-2028", "roadmap_type": "general", "pages": len(pages),
+                     "version": "2026-2028", "roadmap_type": "general" if general else "specialized", "pages": len(pages),
                      "printed_page_by_pdf_page": {str(i + 1): n for i, n in enumerate(printed) if n is not None}},
         "subfields": subfields,
         "validation": {"expected_items_by_subfield": expected, "parsed_items_by_subfield": actual,
                        "summary_match": bool(expected) and expected == actual,
+                       "code_sequence_complete": code_sequence_complete([it["code"] for it in items]),
                        "items": len(items), "technologies": sum(len(i["technologies"]) for i in items)},
         "items": items,
         "_global_summary": parse_global_summary(plain),
@@ -449,17 +593,42 @@ def parse_pdf(path: Path) -> dict:
     doc = pymupdf.open(stream=data, filetype="pdf")
     meta = {"source_file": path.name, "sha256": hashlib.sha256(data).hexdigest()}
     plain = [p.get_text() for p in doc]
+    kind = detect_kind(path.name, plain[0] if plain else "")
     # 문장부호만 있는 떨어진 줄이 많으면 '텍스트 층 손상' 문서로 보고 좌표 기반 복원을 적용
-    orphan = sum(len(re.findall(r"(?m)^\s*[,·.]\s*$", t)) for t in plain)
-    degraded = orphan > 50
-    pages = [repaired_page_text(p) for p in doc] if degraded else plain
+    orphan = sum(len(re.findall(r"(?m)^\s*[,·.]\s*$", normalize(t))) for t in plain)
+    degraded = orphan > 50 or kind == "sobujang"
     meta["text_layer"] = "repaired" if degraded else "plain"
+    if kind == "sobujang":
+        from parse_sobujang import parse_sobujang
+        return parse_sobujang(doc, meta)
+    pages = [repaired_page_text(p) for p in doc] if degraded else plain
+    if kind == "2025-2027":
+        from parse_2025 import parse_2025
+        fm = re.match(r"^(\d+(?:\s*-\s*\d+)?)\.", path.name)
+        meta["field_no"] = re.sub(r"\s", "", fm.group(1)) if fm else "00"
+        return parse_2025([normalize(t) for t in pages], meta, [normalize(t) for t in plain])
+    if kind == "nuclear":
+        from parse_nuclear import parse_nuclear
+        return parse_nuclear(doc, [normalize(t) for t in pages], meta)
     return parse_pages(pages, meta, plain)
+
+
+def detect_kind(filename: str, first_page: str) -> str:
+    """문서 형식: 2026~2028 일반·특화(기본) / 소부장 정의서 / 2025~2027 대조본 / 원전 특화(2023~2027)"""
+    t = normalize(first_page)
+    if ("소재·부품·장비" in t and "정의서" in t) or ("소부장" in filename and "정의서" in filename):
+        return "sobujang"
+    if re.search(r"2025\s*~\s*2027", t) or re.search(r"_\d{6}\.pdf$", filename):
+        return "2025-2027"
+    if "원전" in filename and "2023" in filename:
+        return "nuclear"
+    return "2026-2028"
 
 
 def mark_duplicate_codes(items: list[dict]) -> None:
     """원문 품목코드 중복(오기)은 고치지 않고 표시만 한다. item_uid는 코드+PDF 시작쪽으로 항상 유일."""
     counts: dict[str, int] = {}
+    items = [it for it in items if it.get("code")]  # 공식 코드가 없는 형식(소부장·2025~2027)은 파서가 고유키를 부여
     for it in items:
         counts[it["code"]] = counts.get(it["code"], 0) + 1
     for it in items:
@@ -478,8 +647,12 @@ def main(argv: list[str]) -> int:
     seen: dict[str, str] = {}
     results = []
     # 같은 파일이 '… (1).pdf' 사본으로 중복 수령된 경우 원래 이름을 대표로 남긴다
-    for p in sorted(a.pdfs, key=lambda x: (bool(re.search(r" \(\d+\)$", x.stem)), x.name)):
-        res = parse_pdf(p)
+    ordered = sorted(a.pdfs, key=lambda x: (bool(re.search(r" \(\d+\)$", x.stem)), x.name))
+    # PDF마다 별도 프로세스(대량 처리 시 PDF 라이브러리 메모리 누적 방지)
+    from multiprocessing import get_context
+    with get_context("spawn").Pool(processes=2, maxtasksperchild=1) as pool:
+        parsed = pool.map(parse_pdf, ordered, chunksize=1)
+    for p, res in zip(ordered, parsed):
         sha = res["document"]["sha256"]
         if sha in seen:
             print(f"중복(건너뜀): {p.name} = {seen[sha]}")
@@ -488,10 +661,11 @@ def main(argv: list[str]) -> int:
         results.append(res)
     # 정상 텍스트 문서의 '로드맵 구성' 표(13개 분야 전체)를 기준표로 사용
     glob_summary = next((r["_global_summary"] for r in results
-                         if r["document"].get("text_layer") == "plain" and len(r["_global_summary"]) >= 13), {})
+                         if r["document"].get("text_layer") == "plain" and len(r.get("_global_summary", {})) >= 13), {})
     for res in results:
         key = re.sub(r"\s", "", res["document"]["field_name"] or "")
-        if not res["subfields"] and key in glob_summary:
+        if res["document"].get("version") == "2026-2028" and res["document"].get("roadmap_type") == "general" \
+                and not res["subfields"] and key in glob_summary:
             starts = res.pop("_subfield_starts")
             names = glob_summary[key]
             if len(starts) == len(names):
@@ -503,10 +677,12 @@ def main(argv: list[str]) -> int:
         res.pop("_global_summary", None)
     for res in results:
         mark_duplicate_codes(res["items"])
-        v = res["validation"]
-        out = a.out / f"{res['document']['field_no']}_{res['document']['field_name']}.json"
+        v, doc = res["validation"], res["document"]
+        sub = a.out / f"{doc['version']}_{doc['roadmap_type']}"
+        sub.mkdir(parents=True, exist_ok=True)
+        out = sub / (re.sub(r"[/\\\s]+", "_", f"{doc['field_no']}_{doc['field_name']}") + ".json")
         out.write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
-        print(f"{res['document']['field_name']}: 품목 {v['items']} · 요소기술 {v['technologies']} → {out.name}")
+        print(f"{doc['version']} {doc['field_name']}: 품목 {v['items']} · 요소기술 {v['technologies']} → {sub.name}/{out.name}")
     return 0
 
 

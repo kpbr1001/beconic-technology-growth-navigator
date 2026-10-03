@@ -23,7 +23,7 @@ tests/
 reference/                  # 기준선 원본 v0.9 (수정 금지)
 docs/progress.md            # Phase별 진행 기록
 IMPLEMENTATION_PLAN.md      # 전체 설계·Phase 계획
-scripts/roadmap/            # 로드맵 PDF 파서·KB 빌더 (원본 PDF는 비공개 저장소)
+scripts/roadmap/            # 로드맵 PDF 파서(형식 4종 자동 판별)·KB 빌더 (원본 PDF는 비공개 저장소)
 data/roadmaps/              # manifest·공개 색인(이름·코드·TRL·쪽)
 ```
 
@@ -48,7 +48,7 @@ npm run ci           # CI와 동일한 전체 검사
 ```bash
 python3 scripts/roadmap/parse_roadmap.py ../beconic-roadmap-kb/*.pdf --out ../beconic-roadmap-kb/parsed
 python3 scripts/roadmap/build_kb.py ../beconic-roadmap-kb/parsed \
-  --chunks ../beconic-roadmap-kb/kb/chunks.jsonl --index data/roadmaps/index/2026-2028_general.json
+  --chunks ../beconic-roadmap-kb/kb/chunks.jsonl --index-dir data/roadmaps/index
 npm run test:roadmap
 ```
 

@@ -1,0 +1,5997 @@
+{
+ "kb_version": "kb-v2",
+ "collection": "2026_sobujang_definition",
+ "roadmap_version": "2026",
+ "roadmap_type": "sobujang_definition",
+ "fields": [
+  {
+   "field_no": "SBJ",
+   "field": "소재·부품·장비",
+   "source_file": "260306_소부장로드맵 전략품목 정의서_최종.pdf",
+   "sha256": "0548e209fc6d9afd62e3d7fb8b7ea9d594c2f85ef453b2d63968b3abba50721d",
+   "subfields": [
+    {
+     "name": "기계금속",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-01@p4",
+       "item_no": "01",
+       "name": "발전용 핵심 장치",
+       "item_type": null,
+       "pdf_page_start": 4,
+       "printed_page_start": 3,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고효율 대용량 축류 압축기 설계 기술",
+         "trl_raw": "7-8",
+         "trl_min": 7,
+         "trl_max": 8,
+         "pdf_page": 4,
+         "printed_page": 3,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 2,
+         "name": "저공해/수소 혼소·전소 연소기 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 4,
+         "printed_page": 3,
+         "dev_period": "5-7년"
+        },
+        {
+         "no": 3,
+         "name": "초내열 합금 소재 및 냉각·코팅 기술",
+         "trl_raw": "6-8",
+         "trl_min": 6,
+         "trl_max": 8,
+         "pdf_page": 4,
+         "printed_page": 3,
+         "dev_period": "5-9년"
+        },
+        {
+         "no": 4,
+         "name": "시스템 통합 제어 및 상태 감시(O&M)",
+         "trl_raw": "7-9",
+         "trl_min": 7,
+         "trl_max": 9,
+         "pdf_page": 4,
+         "printed_page": 3,
+         "dev_period": "3-5년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-02@p6",
+       "item_no": "02",
+       "name": "감속기",
+       "item_type": null,
+       "pdf_page_start": 6,
+       "printed_page_start": 5,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "최적 치형 설계 기술",
+         "trl_raw": "7-9",
+         "trl_min": 7,
+         "trl_max": 9,
+         "pdf_page": 6,
+         "printed_page": 5,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 2,
+         "name": "특수 합금 소재 및 열처리 기술",
+         "trl_raw": "6-8",
+         "trl_min": 6,
+         "trl_max": 8,
+         "pdf_page": 6,
+         "printed_page": 5,
+         "dev_period": "5-7년"
+        },
+        {
+         "no": 3,
+         "name": "마이크로미터급 정밀 가공 및 조립",
+         "trl_raw": "7-9",
+         "trl_min": 7,
+         "trl_max": 9,
+         "pdf_page": 6,
+         "printed_page": 5,
+         "dev_period": "7-9년"
+        },
+        {
+         "no": 4,
+         "name": "성능 평가 및 수명 예측(신뢰성) 기술",
+         "trl_raw": "7-9",
+         "trl_min": 7,
+         "trl_max": 9,
+         "pdf_page": 6,
+         "printed_page": 5,
+         "dev_period": "7-9년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-03@p8",
+       "item_no": "03",
+       "name": "정밀생산기계부품",
+       "item_type": null,
+       "pdf_page_start": 8,
+       "printed_page_start": 7,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고정밀 볼스크류 궤도 가공 및 예압 설계 기술",
+         "trl_raw": "7-9",
+         "trl_min": 7,
+         "trl_max": 9,
+         "pdf_page": 8,
+         "printed_page": 7,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 2,
+         "name": "초정밀 궤도면 가공 및 무한 순환 구조 설계",
+         "trl_raw": "7-9",
+         "trl_min": 7,
+         "trl_max": 9,
+         "pdf_page": 8,
+         "printed_page": 7,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 3,
+         "name": "고탄소 베어링강 특수 열처리 및 표면 처리 기술",
+         "trl_raw": "6-8",
+         "trl_min": 6,
+         "trl_max": 8,
+         "pdf_page": 8,
+         "printed_page": 7,
+         "dev_period": "5-7년"
+        },
+        {
+         "no": 4,
+         "name": "동정격 하중 및 가혹 환경 수명 평가 기술",
+         "trl_raw": "7-9",
+         "trl_min": 7,
+         "trl_max": 9,
+         "pdf_page": 8,
+         "printed_page": 7,
+         "dev_period": "2-4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-04@p10",
+       "item_no": "04",
+       "name": "로봇용 서보모터",
+       "item_type": null,
+       "pdf_page_start": 10,
+       "printed_page_start": 9,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "코깅토크 저감 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 10,
+         "printed_page": 9,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "자기저항 변화 최소화",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 10,
+         "printed_page": 9,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고속 FET 제작 및 응용",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 10,
+         "printed_page": 9,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-05@p11",
+       "item_no": "05",
+       "name": "고성능 압연부품",
+       "item_type": null,
+       "pdf_page_start": 11,
+       "printed_page_start": 10,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고내마모 표면 강화 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 11,
+         "printed_page": 10,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "내열·내피로 소재 합금설계 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 11,
+         "printed_page": 10,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고정밀 형상 제어 및 가공 기술",
+         "trl_raw": "7-8",
+         "trl_min": 7,
+         "trl_max": 8,
+         "pdf_page": 11,
+         "printed_page": 10,
+         "dev_period": "1-2 년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-06@p12",
+       "item_no": "06",
+       "name": "금속 기반 이종접합·복합 소재",
+       "item_type": null,
+       "pdf_page_start": 12,
+       "printed_page_start": 11,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "이종소재 접합 공정 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 12,
+         "printed_page": 11,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "계면 제어 및 접합 신뢰성 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 12,
+         "printed_page": 11,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "복합 구조 설계 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 12,
+         "printed_page": 11,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-07@p13",
+       "item_no": "07",
+       "name": "AI 기반 사출 성형기",
+       "item_type": null,
+       "pdf_page_start": 13,
+       "printed_page_start": 12,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고정밀 금형 내압/온도 센싱 및 엣지 수집 기술",
+         "trl_raw": "7-8",
+         "trl_min": 7,
+         "trl_max": 8,
+         "pdf_page": 13,
+         "printed_page": 12,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 2,
+         "name": "머신러닝 기반 사출 공정 데이터 분석 알고리즘",
+         "trl_raw": "6-8",
+         "trl_min": 6,
+         "trl_max": 8,
+         "pdf_page": 13,
+         "printed_page": 12,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 3,
+         "name": "AI 모델 기반 실시간 피드백 제어 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 13,
+         "printed_page": 12,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 4,
+         "name": "디지털 트윈 기반 사출 공정 모니터링 플랫폼",
+         "trl_raw": "6-8",
+         "trl_min": 6,
+         "trl_max": 8,
+         "pdf_page": 13,
+         "printed_page": 12,
+         "dev_period": "3-4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-08@p15",
+       "item_no": "08",
+       "name": "3D 프린팅 금속분말",
+       "item_type": null,
+       "pdf_page_start": 15,
+       "printed_page_start": 14,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "구형화 분말 제조 기술",
+         "trl_raw": "7-8",
+         "trl_min": 7,
+         "trl_max": 8,
+         "pdf_page": 15,
+         "printed_page": 14,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "입도 분포 및 분말 특성 제어 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 15,
+         "printed_page": 14,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "적층공정 맞춤형 합금 분말 설계 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 15,
+         "printed_page": 14,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-09@p16",
+       "item_no": "09",
+       "name": "고효율 연자성 소재",
+       "item_type": null,
+       "pdf_page_start": 16,
+       "printed_page_start": 15,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "저손실 연자성 합금 설계 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 16,
+         "printed_page": 15,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "분말 기반 연자성 코어 제조 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 16,
+         "printed_page": 15,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "고주파 특성 및 계면 제어 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 16,
+         "printed_page": 15,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-10@p17",
+       "item_no": "10",
+       "name": "협동 로봇용 액추에이터",
+       "item_type": null,
+       "pdf_page_start": 17,
+       "printed_page_start": 16,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "속도/토크 제어시스템",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 17,
+         "printed_page": 16,
+         "dev_period": "1.5년"
+        },
+        {
+         "no": 2,
+         "name": "고속 FET를 활용한 속응성",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 17,
+         "printed_page": 16,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-11@p18",
+       "item_no": "11",
+       "name": "항공우주용 내열 합금",
+       "item_type": null,
+       "pdf_page_start": 18,
+       "printed_page_start": 17,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초내열합금 성분 설계 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 18,
+         "printed_page": 17,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 2,
+         "name": "일방향 응고 및 단결정 주조 기술",
+         "trl_raw": "6-8",
+         "trl_min": 6,
+         "trl_max": 8,
+         "pdf_page": 18,
+         "printed_page": 17,
+         "dev_period": "5-7년"
+        },
+        {
+         "no": 3,
+         "name": "열차폐 코팅(TBC) 및 내환경 코팅 기술",
+         "trl_raw": "6-8",
+         "trl_min": 6,
+         "trl_max": 8,
+         "pdf_page": 18,
+         "printed_page": 17,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 4,
+         "name": "적층제조(3D 프린팅) 및 등온 단조 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 18,
+         "printed_page": 17,
+         "dev_period": "4-6년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-12@p20",
+       "item_no": "12",
+       "name": "자율주행 AMR 구동부",
+       "item_type": null,
+       "pdf_page_start": 20,
+       "printed_page_start": 19,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "센서기반 환경인식 기능",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 20,
+         "printed_page": 19,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "SLAM기반 자율 주행 기능",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 20,
+         "printed_page": 19,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-13@p21",
+       "item_no": "13",
+       "name": "굴삭기용 고기능 작업 어태치먼트",
+       "item_type": null,
+       "pdf_page_start": 21,
+       "printed_page_start": 20,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "비례 제어 밸브 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 21,
+         "printed_page": 20,
+         "dev_period": "1.5년"
+        },
+        {
+         "no": 2,
+         "name": "윤활 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 21,
+         "printed_page": 20,
+         "dev_period": "1년"
+        },
+        {
+         "no": 3,
+         "name": "이상진단기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 21,
+         "printed_page": 20,
+         "dev_period": "1년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-14@p22",
+       "item_no": "14",
+       "name": "특수목적차량용 에너지회수장치",
+       "item_type": null,
+       "pdf_page_start": 22,
+       "printed_page_start": 21,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "축압기 상태진단",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 22,
+         "printed_page": 21,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "이상진단",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 22,
+         "printed_page": 21,
+         "dev_period": "1년"
+        },
+        {
+         "no": 3,
+         "name": "유압에너지 회생",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 22,
+         "printed_page": 21,
+         "dev_period": "1년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-01-15@p23",
+       "item_no": "15",
+       "name": "표면처리용 핵심 소재 및 장비",
+       "item_type": null,
+       "pdf_page_start": 23,
+       "printed_page_start": 22,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고기능 표면코팅 소재 제조기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 23,
+         "printed_page": 22,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "정밀 표면처리 공정 기술",
+         "trl_raw": "6-8",
+         "trl_min": 6,
+         "trl_max": 8,
+         "pdf_page": 23,
+         "printed_page": 22,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "친환경 표면처리 장비 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 23,
+         "printed_page": 22,
+         "dev_period": "2-3년"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "미래소재",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-01@p26",
+       "item_no": "01",
+       "name": "극한성능 유·무기섬유",
+       "item_type": null,
+       "pdf_page_start": 26,
+       "printed_page_start": 25,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "유·무기 섬유 구조/조성 설계",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 26,
+         "printed_page": 25,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "개질/가공 기반 내산화·내화학 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 26,
+         "printed_page": 25,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "방사, 패브리케이션 및 복합화 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 26,
+         "printed_page": 25,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-02@p27",
+       "item_no": "02",
+       "name": "미래모빌리티용 초경량 초강도 탄소소재",
+       "item_type": null,
+       "pdf_page_start": 27,
+       "printed_page_start": 26,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고강도, 고탄성 탄소섬유 소재 적층기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 27,
+         "printed_page": 26,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 2,
+         "name": "배터리 열폭주 대응구조 복합화 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 27,
+         "printed_page": 26,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고속성형 공정 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 27,
+         "printed_page": 26,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-03@p28",
+       "item_no": "03",
+       "name": "우주항공 및 방산용 초내열 코팅 소재",
+       "item_type": null,
+       "pdf_page_start": 28,
+       "printed_page_start": 27,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초고온 세라믹 기반 열차단 코팅기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 28,
+         "printed_page": 27,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 2,
+         "name": "고내산화 내식 방호 코팅 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 28,
+         "printed_page": 27,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고경도 세라믹 복합코팅 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 28,
+         "printed_page": 27,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-04@p29",
+       "item_no": "04",
+       "name": "고전압 배터리용 난연 분리막 소재",
+       "item_type": null,
+       "pdf_page_start": 29,
+       "printed_page_start": 28,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "난연 복합분리막 조성 및 세라믹 코팅 다층 설계 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 29,
+         "printed_page": 28,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "고이온전도 다공구조 제어 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 29,
+         "printed_page": 28,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고전압 전해액 안정 계면 설계 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 29,
+         "printed_page": 28,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-05@p30",
+       "item_no": "05",
+       "name": "EMI 차폐·방열 겸용 탄소나노 복합 시트 소재",
+       "item_type": null,
+       "pdf_page_start": 30,
+       "printed_page_start": 29,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "CNT, 그래핀 기반 전도 네트워크 형성 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 30,
+         "printed_page": 29,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "고열전도 탄소나노 복합 시트 설계",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 30,
+         "printed_page": 29,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고유연, 경량 복합시트 구조 설계",
+         "trl_raw": "3-6",
+         "trl_min": 3,
+         "trl_max": 6,
+         "pdf_page": 30,
+         "printed_page": 29,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-06@p31",
+       "item_no": "06",
+       "name": "고기능성 점접착제",
+       "item_type": null,
+       "pdf_page_start": 31,
+       "printed_page_start": 30,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "나노 필러 분산형 전도성 수지 설계 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 31,
+         "printed_page": 30,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "이종소재 접합 계면 제어 및 고신뢰성 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 31,
+         "printed_page": 30,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "초미세 피치 대응 전도 제어 및 경화 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 31,
+         "printed_page": 30,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-07@p32",
+       "item_no": "07",
+       "name": "코팅용 에폭시 수지",
+       "item_type": null,
+       "pdf_page_start": 32,
+       "printed_page_start": 31,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "불소기 함유 고내열 에폭시 합성 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 32,
+         "printed_page": 31,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고순도 정제 및 금속 이온 제어",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 32,
+         "printed_page": 31,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "저온 경화형 하이브리드 코팅 배합 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 32,
+         "printed_page": 31,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-08@p33",
+       "item_no": "08",
+       "name": "친환경 분해성 소재",
+       "item_type": null,
+       "pdf_page_start": 33,
+       "printed_page_start": 32,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고내열/고차단성 바이오매스 수지 합성 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 33,
+         "printed_page": 32,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "생분해 속도 제어 및 기능성 복합화",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 33,
+         "printed_page": 32,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 3,
+         "name": "친환경 박막 코팅 및 정밀 성형 공정 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 33,
+         "printed_page": 32,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-09@p34",
+       "item_no": "09",
+       "name": "휴머노이드 로봇용 고기능성 소재",
+       "item_type": null,
+       "pdf_page_start": 34,
+       "printed_page_start": 33,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "탄소복합재 기반 고강성 골격 설계 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 34,
+         "printed_page": 33,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "촉각 감지형 유연 고무(Soft Skin) 소재 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 34,
+         "printed_page": 33,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 3,
+         "name": "고감쇠·내마모성 관절구동부 부품 소재",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 34,
+         "printed_page": 33,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-10@p35",
+       "item_no": "10",
+       "name": "폐자원 기반 고순도 희토류 회수용 전구체 소재",
+       "item_type": null,
+       "pdf_page_start": 35,
+       "printed_page_start": 34,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "희토류 원소 선택적 용매 추출 전구체 설계 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 35,
+         "printed_page": 34,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "다단계 불순물 제거 및 초고순도 정제 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 35,
+         "printed_page": 34,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 3,
+         "name": "회수 희토류 기반 고성능 산화물/염화물 제조 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 35,
+         "printed_page": 34,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-11@p36",
+       "item_no": "11",
+       "name": "정밀광학기기 및 극한환경용 렌즈",
+       "item_type": null,
+       "pdf_page_start": 36,
+       "printed_page_start": 35,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초저열팽창 및 내방사선 ·내플라즈마 렌즈",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 36,
+         "printed_page": 35,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "가시광·근적외선 ·중적외선 렌즈",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 36,
+         "printed_page": 35,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "고정밀 비구면 가공 및 코팅",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 36,
+         "printed_page": 35,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-12@p37",
+       "item_no": "12",
+       "name": "AI·전력반도체용 세라믹 패키지 소재",
+       "item_type": null,
+       "pdf_page_start": 37,
+       "printed_page_start": 36,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고평탄·저유전 유리 기판 소재",
+         "trl_raw": "2-5",
+         "trl_min": 2,
+         "trl_max": 5,
+         "pdf_page": 37,
+         "printed_page": 36,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고열전도·저유전 세라믹 기판 소재",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 37,
+         "printed_page": 36,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "고신뢰성 hole 가공 및 metalization기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 37,
+         "printed_page": 36,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-13@p38",
+       "item_no": "13",
+       "name": "우주항공 및 방산용 초내열 세라믹 소재",
+       "item_type": null,
+       "pdf_page_start": 38,
+       "printed_page_start": 37,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초고온 세라믹 조성 설계 기술",
+         "trl_raw": "2-5",
+         "trl_min": 2,
+         "trl_max": 5,
+         "pdf_page": 38,
+         "printed_page": 37,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "내산화·내열충격 코팅 및 복합재 기술",
+         "trl_raw": "2-5",
+         "trl_min": 2,
+         "trl_max": 5,
+         "pdf_page": 38,
+         "printed_page": 37,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "대형·복잡 형상 세라믹 부품 제조기술",
+         "trl_raw": "3-6",
+         "trl_min": 3,
+         "trl_max": 6,
+         "pdf_page": 38,
+         "printed_page": 37,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-14@p39",
+       "item_no": "14",
+       "name": "저희토류·무희토류 고성능 자석 소재",
+       "item_type": null,
+       "pdf_page_start": 39,
+       "printed_page_start": 38,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "저희토류 고보자력 미세조직 제어 기술",
+         "trl_raw": "2-5",
+         "trl_min": 2,
+         "trl_max": 5,
+         "pdf_page": 39,
+         "printed_page": 38,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "무희토류 자석 신조성 설계 기술",
+         "trl_raw": "2-5",
+         "trl_min": 2,
+         "trl_max": 5,
+         "pdf_page": 39,
+         "printed_page": 38,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "고온 안정성 및 내식성 향상 기술",
+         "trl_raw": "2-5",
+         "trl_min": 2,
+         "trl_max": 5,
+         "pdf_page": 39,
+         "printed_page": 38,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-02-15@p40",
+       "item_no": "15",
+       "name": "전고체전지용 고체전해질 소재",
+       "item_type": null,
+       "pdf_page_start": 40,
+       "printed_page_start": 39,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고이온전도 황화물계 조성 설계 기술",
+         "trl_raw": "2-5",
+         "trl_min": 2,
+         "trl_max": 5,
+         "pdf_page": 40,
+         "printed_page": 39,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "산화물계 고전도 전해질 기술",
+         "trl_raw": "2-5",
+         "trl_min": 2,
+         "trl_max": 5,
+         "pdf_page": 40,
+         "printed_page": 39,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "전극-전해질 계면 저항 제어 기술",
+         "trl_raw": "2-5",
+         "trl_min": 2,
+         "trl_max": 5,
+         "pdf_page": 40,
+         "printed_page": 39,
+         "dev_period": "3년"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "디스플레이",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-01@p43",
+       "item_no": "01",
+       "name": "고이동도 광·전자기 세라믹 소재",
+       "item_type": null,
+       "pdf_page_start": 43,
+       "printed_page_start": 42,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고순도 나노 분말 합성 및 조성 설계 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 43,
+         "printed_page": 42,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "고밀도 세라믹 타게 제조 및 소결 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 43,
+         "printed_page": 42,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고정밀 박막 증착 및 계면 제어 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 43,
+         "printed_page": 42,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-02@p44",
+       "item_no": "02",
+       "name": "고연신 코팅 및 기판 소재",
+       "item_type": null,
+       "pdf_page_start": 44,
+       "printed_page_start": 43,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "신규 탄성체 폴리머 중합기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 44,
+         "printed_page": 43,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "고연신 재료들의 박막화 코팅 공정기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 44,
+         "printed_page": 43,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "고연신 기판의 특성 측정기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 44,
+         "printed_page": 43,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-03@p45",
+       "item_no": "03",
+       "name": "고성능 광학제어 소재",
+       "item_type": null,
+       "pdf_page_start": 45,
+       "printed_page_start": 44,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "굴절률 조절이 가능한 신소재 합성기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 45,
+         "printed_page": 44,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "파장범위를 제한할 수 있는 광대역 제어소재",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 45,
+         "printed_page": 44,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "주파수변환, 레이저제어기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 45,
+         "printed_page": 44,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-04@p46",
+       "item_no": "04",
+       "name": "초고차단 박막봉지 소재",
+       "item_type": null,
+       "pdf_page_start": 46,
+       "printed_page_start": 45,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "신규고차단 소재개발",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 46,
+         "printed_page": 45,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고차단 소개 성막기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 46,
+         "printed_page": 45,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "수분/산소/수소 투과도분석",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 46,
+         "printed_page": 45,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-05@p47",
+       "item_no": "05",
+       "name": "그린 리사이클 공정 소재 및 장비",
+       "item_type": null,
+       "pdf_page_start": 47,
+       "printed_page_start": 46,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "친환경 용매 추출법 개발",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 47,
+         "printed_page": 46,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "이온성 액체기반 hybrid 정제기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 47,
+         "printed_page": 46,
+         "dev_period": "5년"
+        },
+        {
+         "no": 3,
+         "name": "인력의존도를 낮춘 자동화공정",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 47,
+         "printed_page": 46,
+         "dev_period": "5년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-06@p48",
+       "item_no": "06",
+       "name": "친환경 ESG 소재",
+       "item_type": null,
+       "pdf_page_start": 48,
+       "printed_page_start": 47,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "PFAS free 신규 구조 design/중합",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 48,
+         "printed_page": 47,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "정밀 공정기술 확보",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 48,
+         "printed_page": 47,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "신규경화공정기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 48,
+         "printed_page": 47,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-07@p49",
+       "item_no": "07",
+       "name": "고유연 탄성 배선 부품",
+       "item_type": null,
+       "pdf_page_start": 49,
+       "printed_page_start": 48,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "전도성 복합소재 합성 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 49,
+         "printed_page": 48,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "기하학적 구조 설계 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 49,
+         "printed_page": 48,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "고신뢰성 계면 및 패키징 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 49,
+         "printed_page": 48,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-08@p50",
+       "item_no": "08",
+       "name": "공정 장비용 핵심 부품",
+       "item_type": null,
+       "pdf_page_start": 50,
+       "printed_page_start": 49,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고정밀 복합 감지 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 50,
+         "printed_page": 49,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "데이터 처리 및 경량화 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 50,
+         "printed_page": 49,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "산업용 통신 및 통합 인터페이스",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 50,
+         "printed_page": 49,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-09@p51",
+       "item_no": "09",
+       "name": "마이크로LED 고속 전사·접합 소재 및 장비",
+       "item_type": null,
+       "pdf_page_start": 51,
+       "printed_page_start": 50,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "전사용 인터미디어트 및 접합 소재",
+         "trl_raw": "4~6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 51,
+         "printed_page": 50,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "전사.접합 장비",
+         "trl_raw": "4~6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 51,
+         "printed_page": 50,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "검사/리페어 기술",
+         "trl_raw": "4~6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 51,
+         "printed_page": 50,
+         "dev_period": "4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-10@p52",
+       "item_no": "10",
+       "name": "디스플레이 공정 자동화 장비",
+       "item_type": null,
+       "pdf_page_start": 52,
+       "printed_page_start": 51,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "지능형 비전 및 가변형 검사 알고리즘",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 52,
+         "printed_page": 51,
+         "dev_period": "5년"
+        },
+        {
+         "no": 2,
+         "name": "범용성 핸들링 기술",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 52,
+         "printed_page": 51,
+         "dev_period": "5년"
+        },
+        {
+         "no": 3,
+         "name": "모듈형 공정 아키텍쳐",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 52,
+         "printed_page": 51,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-11@p53",
+       "item_no": "11",
+       "name": "나노 임프린트 리소그래피용 소재 및 장비",
+       "item_type": null,
+       "pdf_page_start": 53,
+       "printed_page_start": 52,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고굴절율 임프린트 레진 소재",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 53,
+         "printed_page": 52,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고종횡비 나노 스탬프 제작 및 이탈 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 53,
+         "printed_page": 52,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "멀티 스케일 및 복합 구조 전사",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 53,
+         "printed_page": 52,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-12@p54",
+       "item_no": "12",
+       "name": "프리폼 디스플레이용 검사 장비",
+       "item_type": null,
+       "pdf_page_start": 54,
+       "printed_page_start": 53,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "프리폼 3D 형상 측정·보정 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 54,
+         "printed_page": 53,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "곡면·비구면 표면 결함·광학 특성 검사 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 54,
+         "printed_page": 53,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "환경 조건 신뢰성 검사",
+         "trl_raw": "4~7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 54,
+         "printed_page": 53,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-13@p55",
+       "item_no": "13",
+       "name": "비파괴 3차원 검사 장비",
+       "item_type": null,
+       "pdf_page_start": 55,
+       "printed_page_start": 54,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "멀티 박막 두께 검사",
+         "trl_raw": "4~6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 55,
+         "printed_page": 54,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고속 X-ray/ 광학 복합 3D 영상화 기술",
+         "trl_raw": "3~5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 55,
+         "printed_page": 54,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "양산장비 Insuit 3차원 검사 장비",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 55,
+         "printed_page": 54,
+         "dev_period": "5년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-14@p56",
+       "item_no": "14",
+       "name": "마이크로LED 광학·전기 검사 장비",
+       "item_type": null,
+       "pdf_page_start": 56,
+       "printed_page_start": 55,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고해상도 PL/EL 기반 칩·패널 검사 기술",
+         "trl_raw": "4~6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 56,
+         "printed_page": 55,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "비접촉 EL 검사 기술",
+         "trl_raw": "2~4",
+         "trl_min": 2,
+         "trl_max": 4,
+         "pdf_page": 56,
+         "printed_page": 55,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "AI 기반 Binning·매칭· 불량 패턴 분석 SW",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 56,
+         "printed_page": 55,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-03-15@p57",
+       "item_no": "15",
+       "name": "대면적 글라스 기판 TGV 형성 및 검사 장비",
+       "item_type": null,
+       "pdf_page_start": 57,
+       "printed_page_start": 56,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "대면적 글라스 TGV 레이저 가공/에칭 기술",
+         "trl_raw": "5~7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 57,
+         "printed_page": 56,
+         "dev_period": "3"
+        },
+        {
+         "no": 2,
+         "name": "TGV 전수 2D/3D 광학 검사 기술",
+         "trl_raw": "4~6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 57,
+         "printed_page": 56,
+         "dev_period": "4"
+        },
+        {
+         "no": 3,
+         "name": "TGV 내벽 품질·Cu 충전 공정 최적화 기술",
+         "trl_raw": "3~5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 57,
+         "printed_page": 56,
+         "dev_period": "4"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "반도체",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-01@p60",
+       "item_no": "01",
+       "name": "차세대 고정밀 노광장비용 핵심부품",
+       "item_type": null,
+       "pdf_page_start": 60,
+       "printed_page_start": 59,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초저결함 팰리클 소재 및 프레임",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 60,
+         "printed_page": 59,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "나노급 스테이지 및 진동 저감 모듈",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 60,
+         "printed_page": 59,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "고정밀 스피너 및 코팅 제어 기술",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 60,
+         "printed_page": 59,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-02@p61",
+       "item_no": "02",
+       "name": "반도체 생산용 첨단 가스소재",
+       "item_type": null,
+       "pdf_page_start": 61,
+       "printed_page_start": 60,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초고순도 정제/초미량 통합 플랫폼",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 61,
+         "printed_page": 60,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고종횡비 구조용 식각/패시베이션 가스 조성 설계 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 61,
+         "printed_page": 60,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-03@p62",
+       "item_no": "03",
+       "name": "반도체 첨단 패키징용 측정·분석·검사 장비",
+       "item_type": null,
+       "pdf_page_start": 62,
+       "printed_page_start": 61,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "패키징 전용 대면적/초미세 동시 대응 검사 장비 개발",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 62,
+         "printed_page": 61,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "TGV내 Cu 충진률 비파괴 정량화 검사 장비",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 62,
+         "printed_page": 61,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-04@p63",
+       "item_no": "04",
+       "name": "반도체용 차세대 진공 증착 장비·부품",
+       "item_type": null,
+       "pdf_page_start": 63,
+       "printed_page_start": 62,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고응답 질량유량 제어 모듈",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 63,
+         "printed_page": 62,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고주파 RF 전원·매칭 네트워크",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 63,
+         "printed_page": 62,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "플라즈마 전처리 기술 및 모듈",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 63,
+         "printed_page": 62,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-05@p64",
+       "item_no": "05",
+       "name": "반도체용 차세대 습식 증착 장비·부품",
+       "item_type": null,
+       "pdf_page_start": 64,
+       "printed_page_start": 63,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초고종횡비 TGV용 양면 구리도금 장비 개발",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 64,
+         "printed_page": 63,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "미세 피치 및 고종횡비용 무전해 시드층 도금 장비 개발",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 64,
+         "printed_page": 63,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-06@p65",
+       "item_no": "06",
+       "name": "초정밀 가공용 CMP 부품·소재",
+       "item_type": null,
+       "pdf_page_start": 65,
+       "printed_page_start": 64,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "루테늄 및 몰리브덴 전용 슬러리 개발",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 65,
+         "printed_page": 64,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "하이브리드 본딩용 초평탄화 패드 및 제어 장비",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 65,
+         "printed_page": 64,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-07@p66",
+       "item_no": "07",
+       "name": "반도체 세정 장비·부품",
+       "item_type": null,
+       "pdf_page_start": 66,
+       "printed_page_start": 65,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "물리적 손상 최소화 세정 기술",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 66,
+         "printed_page": 65,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "3D 입체 구조 대응 건식 세정",
+         "trl_raw": "3-7",
+         "trl_min": 3,
+         "trl_max": 7,
+         "pdf_page": 66,
+         "printed_page": 65,
+         "dev_period": "5년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-08@p67",
+       "item_no": "08",
+       "name": "지능형 반도체용 기능성 소재",
+       "item_type": null,
+       "pdf_page_start": 67,
+       "printed_page_start": 66,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고열전도성 TIM 소재 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 67,
+         "printed_page": 66,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "광대역 EMI 차폐 소재 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 67,
+         "printed_page": 66,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "저CTE충진재, 보강필름 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 67,
+         "printed_page": 66,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-09@p68",
+       "item_no": "09",
+       "name": "반도체용 차세대 식각 부품·소재",
+       "item_type": null,
+       "pdf_page_start": 68,
+       "printed_page_start": 67,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고선택비 식각 가스 합성·정제 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 68,
+         "printed_page": 67,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "저 GWP 차세대 식각 가스 개발 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 68,
+         "printed_page": 67,
+         "dev_period": "3-4년"
+        },
+        {
+         "no": 3,
+         "name": "고종횡비 이온 에너지 제어 모듈",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 68,
+         "printed_page": 67,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-10@p69",
+       "item_no": "10",
+       "name": "차세대 이송장비",
+       "item_type": null,
+       "pdf_page_start": 69,
+       "printed_page_start": 68,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "나노급 밀폐 이송 모듈 및 부품",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 69,
+         "printed_page": 68,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "초저응력 진공 척 제어",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 69,
+         "printed_page": 68,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "저습·질소 퍼지 시스템",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 69,
+         "printed_page": 68,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-11@p70",
+       "item_no": "11",
+       "name": "첨단 패키지용 본더 장비·부품",
+       "item_type": null,
+       "pdf_page_start": 70,
+       "printed_page_start": 69,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "AI 기반 비전 정렬 시스템",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 70,
+         "printed_page": 69,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "열압착 공정 통합 제어 모듈",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 70,
+         "printed_page": 69,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "Cu-Cu 직접 접합 공정 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 70,
+         "printed_page": 69,
+         "dev_period": "3-4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-12@p71",
+       "item_no": "12",
+       "name": "박형 웨이퍼·다이 핸들링 장비·부품",
+       "item_type": null,
+       "pdf_page_start": 71,
+       "printed_page_start": 70,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "진공 척 기반 박형 웨이퍼 이송 제어 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 71,
+         "printed_page": 70,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "하이브리드 다이싱 모듈",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 71,
+         "printed_page": 70,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "AI 기반 정밀 픽업 콜릿·이젝터 시스템",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 71,
+         "printed_page": 70,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-13@p72",
+       "item_no": "13",
+       "name": "전력반도체용 핵심 소재",
+       "item_type": null,
+       "pdf_page_start": 72,
+       "printed_page_start": 71,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "SiC·GaN 고품질 에피택셜 성장 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 72,
+         "printed_page": 71,
+         "dev_period": "3-4년"
+        },
+        {
+         "no": 2,
+         "name": "고내열 DBC 기판 및 접합 소재 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 72,
+         "printed_page": 71,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "고방열 모듈 패키지 소재 설계 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 72,
+         "printed_page": 71,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-14@p73",
+       "item_no": "14",
+       "name": "지능형 반도체용 기판 장비·소재",
+       "item_type": null,
+       "pdf_page_start": 73,
+       "printed_page_start": 72,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "글래스세라믹 소재 기술",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 73,
+         "printed_page": 72,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "초정밀 TGV 레이저 가공 기술",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 73,
+         "printed_page": 72,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "초미세 RDL 공정 기술",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 73,
+         "printed_page": 72,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-04-15@p74",
+       "item_no": "15",
+       "name": "차세대 테스트 장비·부품",
+       "item_type": null,
+       "pdf_page_start": 74,
+       "printed_page_start": 73,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초미세 피치 프로브 카드",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 74,
+         "printed_page": 73,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "전력반도체 스트레스 테스트 시스템",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 74,
+         "printed_page": 73,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "AI 기반 수율 예측 알고리즘",
+         "trl_raw": "5~6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 74,
+         "printed_page": 73,
+         "dev_period": "3년"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "자동차",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-01@p77",
+       "item_no": "01",
+       "name": "차세대 전장 및 제어 시스템",
+       "item_type": null,
+       "pdf_page_start": 77,
+       "printed_page_start": 76,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "전력반도체 모듈 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 77,
+         "printed_page": 76,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "양방향 OBC 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 77,
+         "printed_page": 76,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "고출력 인버터 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 77,
+         "printed_page": 76,
+         "dev_period": "4년"
+        },
+        {
+         "no": 4,
+         "name": "고효율 HDC 기술",
+         "trl_raw": "3",
+         "trl_min": 3,
+         "trl_max": 3,
+         "pdf_page": 77,
+         "printed_page": 76,
+         "dev_period": "4년"
+        },
+        {
+         "no": 5,
+         "name": "고효율 LDC 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 77,
+         "printed_page": 76,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-02@p79",
+       "item_no": "02",
+       "name": "차세대 섀시 부품",
+       "item_type": null,
+       "pdf_page_start": 79,
+       "printed_page_start": 78,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고기능 동력전달 시스템 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 79,
+         "printed_page": 78,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "친환경 자동차의 주행환경을 고려한 고효율 저마모 타이어 개발",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 79,
+         "printed_page": 78,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "전기구동자동차 플랫폼용 경량 고인성 복합소재 적용 조향 및 서스펜션 부품 개발",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 79,
+         "printed_page": 78,
+         "dev_period": "4년"
+        },
+        {
+         "no": 4,
+         "name": "저탄소 친환경 소재 및 주조성형 공정을 통한 섀시 부품기술 개발",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 79,
+         "printed_page": 78,
+         "dev_period": "4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-03@p81",
+       "item_no": "03",
+       "name": "친환경 파워트레인 모듈",
+       "item_type": null,
+       "pdf_page_start": 81,
+       "printed_page_start": 80,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고출력·고속 전동화 파워트레인 구동제어 안전성 향상 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 81,
+         "printed_page": 80,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "비출력 향상 위한 xEV용 다층 축방향 플럭스형 고성능 전기구동시스템",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 81,
+         "printed_page": 80,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "xEV용 다극 고비출력 전기구동시스템 및 고안전/고정밀 위치센서 개발",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 81,
+         "printed_page": 80,
+         "dev_period": "3년"
+        },
+        {
+         "no": 4,
+         "name": "소재/설계 최적화 기반 고출력 전기구동시스템 가격저감 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 81,
+         "printed_page": 80,
+         "dev_period": "4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-04@p84",
+       "item_no": "04",
+       "name": "자동차용 초경량 복합소재",
+       "item_type": null,
+       "pdf_page_start": 84,
+       "printed_page_start": 83,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고강도고탄성 섬유 강화 복합소재 설계 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 84,
+         "printed_page": 83,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "복합소재 구조 해석 및 경량화 설계 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 84,
+         "printed_page": 83,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "내구·충동 안전성 평가 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 84,
+         "printed_page": 83,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-05@p85",
+       "item_no": "05",
+       "name": "차량용 지능형 반도체",
+       "item_type": null,
+       "pdf_page_start": 85,
+       "printed_page_start": 84,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "차량용 AI SoC· NPU 설계 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 85,
+         "printed_page": 84,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "차량용 MCU·특화 AI 가속기·센서 인터페이스 반도체 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 85,
+         "printed_page": 84,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "차량용 전력관리 반도체·기능안전 지원 반도체·차량 보안 반도체 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 85,
+         "printed_page": 84,
+         "dev_period": "3년"
+        },
+        {
+         "no": 4,
+         "name": "차량용 고신뢰 패키지·기판·방 열·전원/신호 연결부품 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 85,
+         "printed_page": 84,
+         "dev_period": "4년"
+        },
+        {
+         "no": 5,
+         "name": "차량용 반도체 신뢰성·열설계· 기능안전 평가·검증 장비 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 85,
+         "printed_page": 84,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-06@p87",
+       "item_no": "06",
+       "name": "차량용 배터리 시스템",
+       "item_type": null,
+       "pdf_page_start": 87,
+       "printed_page_start": 86,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "배터리 열관리 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 87,
+         "printed_page": 86,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "공용 BMS 플랫폼 기술",
+         "trl_raw": "3",
+         "trl_min": 3,
+         "trl_max": 3,
+         "pdf_page": 87,
+         "printed_page": 86,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "폐배터리 분류장치 및 공정기술",
+         "trl_raw": "3",
+         "trl_min": 3,
+         "trl_max": 3,
+         "pdf_page": 87,
+         "printed_page": 86,
+         "dev_period": "4년"
+        },
+        {
+         "no": 4,
+         "name": "BMS 고도화 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 87,
+         "printed_page": 86,
+         "dev_period": "4년"
+        },
+        {
+         "no": 5,
+         "name": "배터리 패키징 요소기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 87,
+         "printed_page": 86,
+         "dev_period": "4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-07@p89",
+       "item_no": "07",
+       "name": "자율주행용 인지 모듈",
+       "item_type": null,
+       "pdf_page_start": 89,
+       "printed_page_start": 88,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "차량용 센서 소자·광학·RF 핵심부품 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 89,
+         "printed_page": 88,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "이종 센서 일체형 통합 하우징·패키징 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 89,
+         "printed_page": 88,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "MCU·NPU 내장형 스마트 센서 모듈 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 89,
+         "printed_page": 88,
+         "dev_period": "3년"
+        },
+        {
+         "no": 4,
+         "name": "오염 감지·자동 세정·상태진단 하우징 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 89,
+         "printed_page": 88,
+         "dev_period": "3년"
+        },
+        {
+         "no": 5,
+         "name": "표준 인터페이스· 자가진단·업데이트 연계형 인지 모듈 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 89,
+         "printed_page": 88,
+         "dev_period": "3년"
+        },
+        {
+         "no": 6,
+         "name": "캘리브레이션·광축 정렬·성능 검사 장비 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 89,
+         "printed_page": 88,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-08@p91",
+       "item_no": "08",
+       "name": "SDV용 통합 제어 시스템",
+       "item_type": null,
+       "pdf_page_start": 91,
+       "printed_page_start": 90,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "차량용 HPC 통합 제어기 하드웨어 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 91,
+         "printed_page": 90,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "차량용 Zonal 제어기·전원/입출력 통합 게이트웨이 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 91,
+         "printed_page": 90,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "차량용 통합 제어 소프트웨어· 도메인 기능 통합 연산 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 91,
+         "printed_page": 90,
+         "dev_period": "3년"
+        },
+        {
+         "no": 4,
+         "name": "AUTOSAR Adaptive·ROS2 연계형 차량용 미들웨어·런타임 플랫폼 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 91,
+         "printed_page": 90,
+         "dev_period": "3년"
+        },
+        {
+         "no": 5,
+         "name": "차량용 OTA 업데이트·사이버 보안·진단·로깅 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 91,
+         "printed_page": 90,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-09@p93",
+       "item_no": "09",
+       "name": "차량용 수소 공급 시스템 핵심 소재 및 부품",
+       "item_type": null,
+       "pdf_page_start": 93,
+       "printed_page_start": 92,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "수소 충전시스템 압축 기술",
+         "trl_raw": "3",
+         "trl_min": 3,
+         "trl_max": 3,
+         "pdf_page": 93,
+         "printed_page": 92,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "액화수소 충전 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 93,
+         "printed_page": 92,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "수소 충전용 냉각 기술",
+         "trl_raw": "3",
+         "trl_min": 3,
+         "trl_max": 3,
+         "pdf_page": 93,
+         "printed_page": 92,
+         "dev_period": "4년"
+        },
+        {
+         "no": 4,
+         "name": "수소 충전 제어 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 93,
+         "printed_page": 92,
+         "dev_period": "4년"
+        },
+        {
+         "no": 5,
+         "name": "수소 저장 기술",
+         "trl_raw": "3",
+         "trl_min": 3,
+         "trl_max": 3,
+         "pdf_page": 93,
+         "printed_page": 92,
+         "dev_period": "5년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-10@p95",
+       "item_no": "10",
+       "name": "차세대 인포테인먼트 시스템",
+       "item_type": null,
+       "pdf_page_start": 95,
+       "printed_page_start": 94,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "차량용 초대형·분산형 디스플레이 모듈 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 95,
+         "printed_page": 94,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "차량용 AR-HUD 광학 모듈 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 95,
+         "printed_page": 94,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "차량용 멀티모달 HMI 센서·입력부 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 95,
+         "printed_page": 94,
+         "dev_period": "3년"
+        },
+        {
+         "no": 4,
+         "name": "차량용 개인화 UI/UX·상태 연계 인터페이스 소프트웨어 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 95,
+         "printed_page": 94,
+         "dev_period": "3년"
+        },
+        {
+         "no": 5,
+         "name": "차량용 앱 서비스 연동·콘텐츠 인터페이스 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 95,
+         "printed_page": 94,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-11@p97",
+       "item_no": "11",
+       "name": "협력주행용 핵심 부품",
+       "item_type": null,
+       "pdf_page_start": 97,
+       "printed_page_start": 96,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "이기종 V2X 통신 프로토콜 통합 및 보안 모듈 기술",
+         "trl_raw": "5",
+         "trl_min": 5,
+         "trl_max": 5,
+         "pdf_page": 97,
+         "printed_page": 96,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "차량-인프라 데이터 기반 협력주행 의사결정 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 97,
+         "printed_page": 96,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "초저지연 기반 V2X 안전교통 정보 수신·활용 기술",
+         "trl_raw": "5",
+         "trl_min": 5,
+         "trl_max": 5,
+         "pdf_page": 97,
+         "printed_page": 96,
+         "dev_period": "3년"
+        },
+        {
+         "no": 4,
+         "name": "차량 군집주행 및 합류·분기 협력 제어 기술",
+         "trl_raw": "5",
+         "trl_min": 5,
+         "trl_max": 5,
+         "pdf_page": 97,
+         "printed_page": 96,
+         "dev_period": "4년"
+        },
+        {
+         "no": 5,
+         "name": "차량용 고정밀 측위 모듈 및 위치 보정기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 97,
+         "printed_page": 96,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-12@p99",
+       "item_no": "12",
+       "name": "차량용 금속 가공 공정 장비",
+       "item_type": null,
+       "pdf_page_start": 99,
+       "printed_page_start": 98,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "기가캐스팅 주조 공정 장비",
+         "trl_raw": "3",
+         "trl_min": 3,
+         "trl_max": 3,
+         "pdf_page": 99,
+         "printed_page": 98,
+         "dev_period": "4년"
+        },
+        {
+         "no": 2,
+         "name": "원가 절감형 금형 및 후처리 공정",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 99,
+         "printed_page": 98,
+         "dev_period": "4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-13@p102",
+       "item_no": "13",
+       "name": "자율주행 SW검증 플랫폼",
+       "item_type": null,
+       "pdf_page_start": 102,
+       "printed_page_start": 101,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고정밀 3D 디지털트윈 맵 구축 및 연동 기술",
+         "trl_raw": "5",
+         "trl_min": 5,
+         "trl_max": 5,
+         "pdf_page": 102,
+         "printed_page": 101,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "시나리오 생성·관리·자동 실행 및 KPI 기반 평가 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 102,
+         "printed_page": 101,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "기능안전(ISO 26262)·SOTIF 검증 자동화 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 102,
+         "printed_page": 101,
+         "dev_period": "3년"
+        },
+        {
+         "no": 4,
+         "name": "HW/SW SIL/HIL 통합 연동을 위한 시스템 통합 기술",
+         "trl_raw": "6",
+         "trl_min": 6,
+         "trl_max": 6,
+         "pdf_page": 102,
+         "printed_page": 101,
+         "dev_period": "3년"
+        },
+        {
+         "no": 5,
+         "name": "VIL 연동 및 센서 신호 정밀 모사 인터페이스 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 102,
+         "printed_page": 101,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-14@p104",
+       "item_no": "14",
+       "name": "친환경 고급형 내장 소재",
+       "item_type": null,
+       "pdf_page_start": 104,
+       "printed_page_start": 103,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "바이오·재활용 기반 고급 내장소재 조성 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 104,
+         "printed_page": 103,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "고급 질감·디자인 표면 가공 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 104,
+         "printed_page": 103,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "저VOC·저취·유해 물질 저감 기술",
+         "trl_raw": "4",
+         "trl_min": 4,
+         "trl_max": 4,
+         "pdf_page": 104,
+         "printed_page": 103,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-15@p105",
+       "item_no": "15",
+       "name": "차세대 정밀 공정용 로봇",
+       "item_type": null,
+       "pdf_page_start": 105,
+       "printed_page_start": 104,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고속·고정밀 로봇 제어 알고리즘",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 105,
+         "printed_page": 104,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "센서 융합 기반 공정 인식 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 105,
+         "printed_page": 104,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "공정용 로봇 신뢰성·안전 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 105,
+         "printed_page": 104,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-16@p106",
+       "item_no": "16",
+       "name": "인간-로봇 협업형 휴머노이드",
+       "item_type": null,
+       "pdf_page_start": 106,
+       "printed_page_start": 105,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "인간 유사 관절·구동 메커니즘",
+         "trl_raw": "2~3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 106,
+         "printed_page": 105,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "환경 인식 및 작업 이해 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 106,
+         "printed_page": 105,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "안전 협업 제어 알고리즘",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 106,
+         "printed_page": 105,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-05-17@p107",
+       "item_no": "17",
+       "name": "친환경 자동차 통합 열관리 시스템",
+       "item_type": null,
+       "pdf_page_start": 107,
+       "printed_page_start": 106,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "차량 통합 열관리 시스템 아키텍처 설계",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 107,
+         "printed_page": 106,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "전력부품·배터리 열관리 기술",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 107,
+         "printed_page": 106,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "통합 열관리 제어 알고리즘",
+         "trl_raw": "4~5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 107,
+         "printed_page": 106,
+         "dev_period": "3년"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "전기·전자",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-01@p110",
+       "item_no": "01",
+       "name": "MLCC 및 MLCC용 핵심소재",
+       "item_type": null,
+       "pdf_page_start": 110,
+       "printed_page_start": 109,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고유전율 세라믹 소재 합성 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 110,
+         "printed_page": 109,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "미립 금속 분말 제조 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 110,
+         "printed_page": 109,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "무결함 적층 동시 소결 공정 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 110,
+         "printed_page": 109,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-02@p111",
+       "item_no": "02",
+       "name": "이차전지용 외장재",
+       "item_type": null,
+       "pdf_page_start": 111,
+       "printed_page_start": 110,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고내식성 라미네이팅",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 111,
+         "printed_page": 110,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "국방용 고강도 외장 설계",
+         "trl_raw": "3-7",
+         "trl_min": 3,
+         "trl_max": 7,
+         "pdf_page": 111,
+         "printed_page": 110,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-03@p112",
+       "item_no": "03",
+       "name": "이차전지 전극/전해액 첨가 소재",
+       "item_type": null,
+       "pdf_page_start": 112,
+       "printed_page_start": 111,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "실리콘 음극용 고탄성 바인더",
+         "trl_raw": "4-8",
+         "trl_min": 4,
+         "trl_max": 8,
+         "pdf_page": 112,
+         "printed_page": 111,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "고전압용 SEI 형성 첨가제",
+         "trl_raw": "5-8",
+         "trl_min": 5,
+         "trl_max": 8,
+         "pdf_page": 112,
+         "printed_page": 111,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-04@p113",
+       "item_no": "04",
+       "name": "이차전지 분리막",
+       "item_type": null,
+       "pdf_page_start": 113,
+       "printed_page_start": 112,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고내열성 세라믹 코팅",
+         "trl_raw": "5-8",
+         "trl_min": 5,
+         "trl_max": 8,
+         "pdf_page": 113,
+         "printed_page": 112,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "균일 기공 제어 연신",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 113,
+         "printed_page": 112,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-05@p114",
+       "item_no": "05",
+       "name": "광학부품 및 기기",
+       "item_type": null,
+       "pdf_page_start": 114,
+       "printed_page_start": 113,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "세라믹 광흡수 소재",
+         "trl_raw": "2-3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 114,
+         "printed_page": 113,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "선택적 파장 흡수 디바이스 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 114,
+         "printed_page": 113,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고신뢰성 패키징 모듈",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 114,
+         "printed_page": 113,
+         "dev_period": "1~2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-06@p115",
+       "item_no": "06",
+       "name": "황화리튬 소재",
+       "item_type": null,
+       "pdf_page_start": 115,
+       "printed_page_start": 114,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "저가형 고순도 Li2S 합성",
+         "trl_raw": "3-6",
+         "trl_min": 3,
+         "trl_max": 6,
+         "pdf_page": 115,
+         "printed_page": 114,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "대기 안정성 표면 개질",
+         "trl_raw": "3-6",
+         "trl_min": 3,
+         "trl_max": 6,
+         "pdf_page": 115,
+         "printed_page": 114,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-07@p116",
+       "item_no": "07",
+       "name": "차세대 전동모듈",
+       "item_type": null,
+       "pdf_page_start": 116,
+       "printed_page_start": 115,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "SiC/GaN 구동 인버터 및 보호 제어",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 116,
+         "printed_page": 115,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "고출력밀도 모터 설계 및 손실 저감",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 116,
+         "printed_page": 115,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "절연/열 통합 패키징 및 냉각 구조",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 116,
+         "printed_page": 115,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-08@p117",
+       "item_no": "08",
+       "name": "극한환경용 센서",
+       "item_type": null,
+       "pdf_page_start": 117,
+       "printed_page_start": 116,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "내열·내방사선 소재 및 설계기술",
+         "trl_raw": "2-3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 117,
+         "printed_page": 116,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "고신뢰성 패키징 및 보호 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 117,
+         "printed_page": 116,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 3,
+         "name": "신호 안정화 및 실시간 상태 모니터링 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 117,
+         "printed_page": 116,
+         "dev_period": "1-2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-09@p118",
+       "item_no": "09",
+       "name": "저유전·저손실 고주파 기판용 복합 소재",
+       "item_type": null,
+       "pdf_page_start": 118,
+       "printed_page_start": 117,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "저손실 수지 소재 설계 및 합성 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 118,
+         "printed_page": 117,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "저유전 필러 복합화 및 분산 제어 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 118,
+         "printed_page": 117,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "계면 접착 및 공정 제어 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 118,
+         "printed_page": 117,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-10@p119",
+       "item_no": "10",
+       "name": "AI·통신용 초고다층 신호·전원 통합 PCB",
+       "item_type": null,
+       "pdf_page_start": 119,
+       "printed_page_start": 118,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초고속 신호층 및 저손실 스택 설계 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 119,
+         "printed_page": 118,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "신호/전원 통합 PDN 설계 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 119,
+         "printed_page": 118,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고집적 다층 적층 공정 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 119,
+         "printed_page": 118,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-11@p120",
+       "item_no": "11",
+       "name": "전장 및 데이터 센터용 고신뢰 전력변환 통합 모듈",
+       "item_type": null,
+       "pdf_page_start": 120,
+       "printed_page_start": 119,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "WBG 기반 고효율 전력단 설계 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 120,
+         "printed_page": 119,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "절연/열 통합 패키징 및 접합 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 120,
+         "printed_page": 119,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고주파 수동소자·EMI 필터 통합 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 120,
+         "printed_page": 119,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-12@p121",
+       "item_no": "12",
+       "name": "고주파 대응 유연 PCB 기반 인터커넥트",
+       "item_type": null,
+       "pdf_page_start": 121,
+       "printed_page_start": 120,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "전장·가전 환경 대응 소재 및 공정 기술",
+         "trl_raw": "2-3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 121,
+         "printed_page": 120,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "고신뢰성 연성 구조 및 내구 설계 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 121,
+         "printed_page": 120,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 3,
+         "name": "고주파 신호 무결성(SI) 설계 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 121,
+         "printed_page": 120,
+         "dev_period": "1-2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-13@p122",
+       "item_no": "13",
+       "name": "초미세 비아 대응 고정밀 레이저 가공 장비",
+       "item_type": null,
+       "pdf_page_start": 122,
+       "printed_page_start": 121,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "레이저 빔 제어 및 고정밀 드릴링",
+         "trl_raw": "2-3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 122,
+         "printed_page": 121,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "열영향 최소화 및 고품질 가공 공정",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 122,
+         "printed_page": 121,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고속·고정밀 위치 제어 및 자동 정렬",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 122,
+         "printed_page": 121,
+         "dev_period": "1-2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-14@p123",
+       "item_no": "14",
+       "name": "AI 기반 전자조립 품질 자동분류 검사 장비",
+       "item_type": null,
+       "pdf_page_start": 123,
+       "printed_page_start": 122,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "딥러닝 기반 비전 검사 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 123,
+         "printed_page": 122,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "공정 데이터 융합 및 불량 예측 분석 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 123,
+         "printed_page": 122,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "실시간 처리 및 스마트 피드백 제어 기술",
+         "trl_raw": "2-3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 123,
+         "printed_page": 122,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-15@p124",
+       "item_no": "15",
+       "name": "전력기기 고전압·열복합 신뢰성 시험 장비",
+       "item_type": null,
+       "pdf_page_start": 124,
+       "printed_page_start": 123,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고전압 정밀 인가 및 절연계측 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 124,
+         "printed_page": 123,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 2,
+         "name": "고온·열사이클 정밀 제어 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 124,
+         "printed_page": 123,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 3,
+         "name": "전기·열 복합 스트레스 통합 제어 및 데이터 분석 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 124,
+         "printed_page": 123,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-06-16@p125",
+       "item_no": "16",
+       "name": "극한환경용 드론",
+       "item_type": null,
+       "pdf_page_start": 125,
+       "printed_page_start": 124,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "내환경 특수 소재 및 구조 설계 기술",
+         "trl_raw": "2-3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 125,
+         "printed_page": 124,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "고신뢰성 비행·전력·통신 이중화 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 125,
+         "printed_page": 124,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "AI 기반 자율 임무 수행 및 특수 센서 융합 기술",
+         "trl_raw": "2-3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 125,
+         "printed_page": 124,
+         "dev_period": "2년"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "바이오",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-01@p128",
+       "item_no": "01",
+       "name": "바이오의약품 생산 다운스트림 공정 소재",
+       "item_type": null,
+       "pdf_page_start": 128,
+       "printed_page_start": 127,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고선택성 크로마토그래피 레진 설계 및 제조 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 128,
+         "printed_page": 127,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고유량 및 고안전성 바이러스 제거 필터 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 128,
+         "printed_page": 127,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "재활용성 및 내화학성 향상 정제용 멤브레인 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 128,
+         "printed_page": 127,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-02@p129",
+       "item_no": "02",
+       "name": "바이오의약품 생산 업스트림 공정 소재",
+       "item_type": null,
+       "pdf_page_start": 129,
+       "printed_page_start": 128,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "무혈청·무동물성 맞춤형 세포배양 배지 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 129,
+         "printed_page": 128,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고재현성 및 기능성 배양 보조제 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 129,
+         "printed_page": 128,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "대량 생산을 위한 건조 분말 배지 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 129,
+         "printed_page": 128,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-03@p130",
+       "item_no": "03",
+       "name": "고성능 약물 전달 및 제형화 소재",
+       "item_type": null,
+       "pdf_page_start": 130,
+       "printed_page_start": 129,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "표적 지향성 리간드 접합 나노 입자 설계 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 130,
+         "printed_page": 129,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "다중층 코팅 및 서방출 조절 고분자 마이크로/나노 입자 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 130,
+         "printed_page": 129,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "생체 적합성 지질 나노 입자(LNP) 및 유전자 전달 소재 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 130,
+         "printed_page": 129,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-04@p131",
+       "item_no": "04",
+       "name": "기능성 바이오 소재",
+       "item_type": null,
+       "pdf_page_start": 131,
+       "printed_page_start": 130,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고효율·고순도 생물자원 유효성분 추출 및 분리 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 131,
+         "printed_page": 130,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "기능성 바이오 소재 표준화 및 지표 물질 분석 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 131,
+         "printed_page": 130,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "생체 이용률 및 안정성 향상을 위한 마이크로/나노 캡슐화 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 131,
+         "printed_page": 130,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-05@p132",
+       "item_no": "05",
+       "name": "AI 기반 신약개발 스크리닝 장비",
+       "item_type": null,
+       "pdf_page_start": 132,
+       "printed_page_start": 131,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "AI 기반 약물-표적 상호작용 및 활성 예측 모델 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 132,
+         "printed_page": 131,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "초고속 자동화 로봇 기반 스크리닝 시스템 통합 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 132,
+         "printed_page": 131,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "실시간 데이터 수집 및 분석, 시각화 인터페이스 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 132,
+         "printed_page": 131,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-06@p133",
+       "item_no": "06",
+       "name": "바이오의약품 통합 품질 관리용 핵심부품",
+       "item_type": null,
+       "pdf_page_start": 133,
+       "printed_page_start": 132,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "현장용 데이터 무결성 엔진",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 133,
+         "printed_page": 132,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "워크플로우 오케스트레이션",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 133,
+         "printed_page": 132,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "품질 분석(QI)",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 133,
+         "printed_page": 132,
+         "dev_period": "1년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-07@p134",
+       "item_no": "07",
+       "name": "바이오의약품 생산 배양 공정 관리 시스템 및 부품",
+       "item_type": null,
+       "pdf_page_start": 134,
+       "printed_page_start": 133,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "다중 설비 프로토콜 연계 커넥터 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 134,
+         "printed_page": 133,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "공정 단계 모델링/경보",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 134,
+         "printed_page": 133,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "전자기록/ 무결성 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 134,
+         "printed_page": 133,
+         "dev_period": "1년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-08@p135",
+       "item_no": "08",
+       "name": "헬스케어 핵심 전자 부품",
+       "item_type": null,
+       "pdf_page_start": 135,
+       "printed_page_start": 134,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "헬스케어 생체 신호처리 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 135,
+         "printed_page": 134,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "데이터 송수신 및 보안 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 135,
+         "printed_page": 134,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "전자 부품, 모듈화, 소형화",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 135,
+         "printed_page": 134,
+         "dev_period": "1년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-09@p136",
+       "item_no": "09",
+       "name": "바이오 자율랩",
+       "item_type": null,
+       "pdf_page_start": 136,
+       "printed_page_start": 135,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "AI 기반 워크플로우 오케스트레이션 엔진 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 136,
+         "printed_page": 135,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "장비 연동 커넥터 및 자율 최적화 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 136,
+         "printed_page": 135,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "재현성과 운영 안정성 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 136,
+         "printed_page": 135,
+         "dev_period": "1년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-10@p137",
+       "item_no": "10",
+       "name": "헬스케어 로봇",
+       "item_type": null,
+       "pdf_page_start": 137,
+       "printed_page_start": 136,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "의료/돌봄 환경 특화 자율주행",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 137,
+         "printed_page": 136,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "다양한 헬스케어 로봇 통합 운영",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 137,
+         "printed_page": 136,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "보안 및 개인정보 보호",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 137,
+         "printed_page": 136,
+         "dev_period": "1년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-11@p138",
+       "item_no": "11",
+       "name": "AI 기반 스마트 자율 공정 제어 시스템",
+       "item_type": null,
+       "pdf_page_start": 138,
+       "printed_page_start": 137,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "공정 기술과 관련 요소의 표준화",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 138,
+         "printed_page": 137,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 2,
+         "name": "AI 기반 공정 최적화",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 138,
+         "printed_page": 137,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "AI 기반 공정 제어",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 138,
+         "printed_page": 137,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-12@p139",
+       "item_no": "12",
+       "name": "고정밀 체외진단 장비",
+       "item_type": null,
+       "pdf_page_start": 139,
+       "printed_page_start": 138,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "디지털 진단 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 139,
+         "printed_page": 138,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 2,
+         "name": "비침습적 시료를 이용한 검사 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 139,
+         "printed_page": 138,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 3,
+         "name": "POCT (Point-of-Care Testing) 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 139,
+         "printed_page": 138,
+         "dev_period": "1-2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-13@p140",
+       "item_no": "13",
+       "name": "AI 기반 의료 영상 분석·진단 시스템",
+       "item_type": null,
+       "pdf_page_start": 140,
+       "printed_page_start": 139,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "데이터 확보 및 정제",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 140,
+         "printed_page": 139,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 2,
+         "name": "영상 전처리 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 140,
+         "printed_page": 139,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 3,
+         "name": "분석 정확도 개선",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 140,
+         "printed_page": 139,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-14@p141",
+       "item_no": "14",
+       "name": "다양한 바이오 DB를 활용한 질병 관리 시스템",
+       "item_type": null,
+       "pdf_page_start": 141,
+       "printed_page_start": 140,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "DB 표준화 및 분석",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 141,
+         "printed_page": 140,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 2,
+         "name": "임상 적용 모델",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 141,
+         "printed_page": 140,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 3,
+         "name": "인증 획득",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 141,
+         "printed_page": 140,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-07-15@p142",
+       "item_no": "15",
+       "name": "원격의료·원격모니터링 시스템",
+       "item_type": null,
+       "pdf_page_start": 142,
+       "printed_page_start": 141,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "생체 신호 수집 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 142,
+         "printed_page": 141,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 2,
+         "name": "진료 프로세스 접목",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 142,
+         "printed_page": 141,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 3,
+         "name": "의료 데이터 분석",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 142,
+         "printed_page": 141,
+         "dev_period": "1-2년"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "그린에너지",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-01@p145",
+       "item_no": "01",
+       "name": "차세대 태양전지",
+       "item_type": null,
+       "pdf_page_start": 145,
+       "printed_page_start": 144,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "태양광 신소재",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 145,
+         "printed_page": 144,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "탠덤 적층 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 145,
+         "printed_page": 144,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "박막·유연 패널",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 145,
+         "printed_page": 144,
+         "dev_period": "2년"
+        },
+        {
+         "no": 4,
+         "name": "저단가 양산 시스템",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 145,
+         "printed_page": 144,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-02@p146",
+       "item_no": "02",
+       "name": "수전해 스택 및 BOP",
+       "item_type": null,
+       "pdf_page_start": 146,
+       "printed_page_start": 145,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고성능 MEA 및 저가형 촉매",
+         "trl_raw": "3-7",
+         "trl_min": 3,
+         "trl_max": 7,
+         "pdf_page": 146,
+         "printed_page": 145,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고내구 분리막 및 이오노머 기술",
+         "trl_raw": "3-7",
+         "trl_min": 3,
+         "trl_max": 7,
+         "pdf_page": 146,
+         "printed_page": 145,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "분리판·유로 설계 및 표면코팅",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 146,
+         "printed_page": 145,
+         "dev_period": "2년"
+        },
+        {
+         "no": 4,
+         "name": "BOP 통합제어 및 부하추종",
+         "trl_raw": "4-8",
+         "trl_min": 4,
+         "trl_max": 8,
+         "pdf_page": 146,
+         "printed_page": 145,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-03@p147",
+       "item_no": "03",
+       "name": "수소 저장 장비",
+       "item_type": null,
+       "pdf_page_start": 147,
+       "printed_page_start": 146,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "단열기술",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 147,
+         "printed_page": 146,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "수소취성 대응 금속·용접기술",
+         "trl_raw": "3-6",
+         "trl_min": 3,
+         "trl_max": 6,
+         "pdf_page": 147,
+         "printed_page": 146,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "복합재 용기 성형기술",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 147,
+         "printed_page": 146,
+         "dev_period": "3년"
+        },
+        {
+         "no": 4,
+         "name": "밸브·씰링 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 147,
+         "printed_page": 146,
+         "dev_period": "2년"
+        },
+        {
+         "no": 5,
+         "name": "누설 감지 및 안전계장 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 147,
+         "printed_page": 146,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-04@p148",
+       "item_no": "04",
+       "name": "연료전지 스택 및 BOP",
+       "item_type": null,
+       "pdf_page_start": 148,
+       "printed_page_start": 147,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "저가 고내구 MEA기술",
+         "trl_raw": "3-7",
+         "trl_min": 3,
+         "trl_max": 7,
+         "pdf_page": 148,
+         "printed_page": 147,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "분리판 소재·성형·코팅",
+         "trl_raw": "3-7",
+         "trl_min": 3,
+         "trl_max": 7,
+         "pdf_page": 148,
+         "printed_page": 147,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "공기공급 및 수분관리",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 148,
+         "printed_page": 147,
+         "dev_period": "2년"
+        },
+        {
+         "no": 4,
+         "name": "열관리 및 시스템 패키징",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 148,
+         "printed_page": 147,
+         "dev_period": "2년"
+        },
+        {
+         "no": 5,
+         "name": "통합제어·진단 및 안전계장",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 148,
+         "printed_page": 147,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-05@p149",
+       "item_no": "05",
+       "name": "이차전지용 고에너지 밀도 소재",
+       "item_type": null,
+       "pdf_page_start": 149,
+       "printed_page_start": 148,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고저압·고용량 양극소재 설계 및 안정화 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 149,
+         "printed_page": 148,
+         "dev_period": "3-4년"
+        },
+        {
+         "no": 2,
+         "name": "차세대 고용량 음극 복합소재 및 구조 안정화 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 149,
+         "printed_page": 148,
+         "dev_period": "3-4년"
+        },
+        {
+         "no": 3,
+         "name": "전극-전해질 계면제어 및 고안정성 전해질 적합화 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 149,
+         "printed_page": 148,
+         "dev_period": "3-4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-06@p150",
+       "item_no": "06",
+       "name": "지능형 ESS 관리 시스템",
+       "item_type": null,
+       "pdf_page_start": 150,
+       "printed_page_start": 149,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "AI 기반 ESS 이상감지 예측 통합 안전관리 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 150,
+         "printed_page": 149,
+         "dev_period": "2-4년"
+        },
+        {
+         "no": 2,
+         "name": "지능형 SOH/SOC 추정 및 수명 예측 기반 운영 최적화 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 150,
+         "printed_page": 149,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 3,
+         "name": "재생에너지 연계 AI 기반 ESS 통합 에너지 운영관리 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 150,
+         "printed_page": 149,
+         "dev_period": "2-4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-07@p151",
+       "item_no": "07",
+       "name": "탄소 포집 및 자원화 설비",
+       "item_type": null,
+       "pdf_page_start": 151,
+       "printed_page_start": 150,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "저에너지 재생형 흡수제·흡착제",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 151,
+         "printed_page": 150,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고성능 막분리·모듈",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 151,
+         "printed_page": 150,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "CO₂ 압축·건조·액화 및 저장·이송",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 151,
+         "printed_page": 150,
+         "dev_period": "2년"
+        },
+        {
+         "no": 4,
+         "name": "포집-전환 반응 공정기술",
+         "trl_raw": "3-7",
+         "trl_min": 3,
+         "trl_max": 7,
+         "pdf_page": 151,
+         "printed_page": 150,
+         "dev_period": "3년"
+        },
+        {
+         "no": 5,
+         "name": "MRV (측정·보고·검증) SW",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 151,
+         "printed_page": 150,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-08@p152",
+       "item_no": "08",
+       "name": "차세대 원전용 핵심 기기",
+       "item_type": null,
+       "pdf_page_start": 152,
+       "printed_page_start": 151,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "구조재",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 152,
+         "printed_page": 151,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "냉각제 및 감속제",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 152,
+         "printed_page": 151,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "일체형 원자로 구조 설계 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 152,
+         "printed_page": 151,
+         "dev_period": "4년"
+        },
+        {
+         "no": 4,
+         "name": "모듈형 제작 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 152,
+         "printed_page": 151,
+         "dev_period": "3년"
+        },
+        {
+         "no": 5,
+         "name": "디지털 티윈 및 자동 제어 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 152,
+         "printed_page": 151,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-09@p153",
+       "item_no": "09",
+       "name": "대형 해상풍력 핵심 부품",
+       "item_type": null,
+       "pdf_page_start": 153,
+       "printed_page_start": 152,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초대형 터빈용 고내구 구동계 및 발전기 핵심 부품 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 153,
+         "printed_page": 152,
+         "dev_period": "2-4년"
+        },
+        {
+         "no": 2,
+         "name": "초대형 블레이드 경량·고강성 복합소재 구조 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 153,
+         "printed_page": 152,
+         "dev_period": "3-5년"
+        },
+        {
+         "no": 3,
+         "name": "해상풍력용 고전압 전력변환 및 계통 연계 핵심 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 153,
+         "printed_page": 152,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-10@p154",
+       "item_no": "10",
+       "name": "희토류 저감형 자성 소재",
+       "item_type": null,
+       "pdf_page_start": 154,
+       "printed_page_start": 153,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "저희토류/대체 조성 고보자력 자성 합금 설계기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 154,
+         "printed_page": 153,
+         "dev_period": "3-4년"
+        },
+        {
+         "no": 2,
+         "name": "미세조직 제어/결정립 정렬 공정 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 154,
+         "printed_page": 153,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 3,
+         "name": "극한 구동 환경용 자성 열화 억제 및 코팅기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 154,
+         "printed_page": 153,
+         "dev_period": "2-3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-11@p155",
+       "item_no": "11",
+       "name": "재생에너지 연동형 스마트 인버터",
+       "item_type": null,
+       "pdf_page_start": 155,
+       "printed_page_start": 154,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "전력망 지원 및 안정화 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 155,
+         "printed_page": 154,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "출력 제한 완화 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 155,
+         "printed_page": 154,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "라이드 스루 기술",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 155,
+         "printed_page": 154,
+         "dev_period": "2년"
+        },
+        {
+         "no": 4,
+         "name": "자가 진단 및 원격 제어 기술",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 155,
+         "printed_page": 154,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-12@p156",
+       "item_no": "12",
+       "name": "차세대 송전 부품",
+       "item_type": null,
+       "pdf_page_start": 156,
+       "printed_page_start": 155,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "HVDC 핵심 부품",
+         "trl_raw": "5-7",
+         "trl_min": 5,
+         "trl_max": 7,
+         "pdf_page": 156,
+         "printed_page": 155,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "초전도 송전 부품",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 156,
+         "printed_page": 155,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "지능형/고효율 송전 철탑 및 소재",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 156,
+         "printed_page": 155,
+         "dev_period": "2년"
+        },
+        {
+         "no": 4,
+         "name": "전력 계통 고도화 장치",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 156,
+         "printed_page": 155,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-13@p157",
+       "item_no": "13",
+       "name": "AI 기반 폐배터리 자원 재활용 시스템",
+       "item_type": null,
+       "pdf_page_start": 157,
+       "printed_page_start": 156,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "AI 기반 폐배터리 자동 진단·분류 및 안전 예측기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 157,
+         "printed_page": 156,
+         "dev_period": "2-4년"
+        },
+        {
+         "no": 2,
+         "name": "AI 기반 지능형 전처리·해체 자동 제어 기술",
+         "trl_raw": "2-3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 157,
+         "printed_page": 156,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "AI 기반 제련 공정 최적화 및 전지급 소재 고순도화 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 157,
+         "printed_page": 156,
+         "dev_period": "4년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-08-14@p158",
+       "item_no": "14",
+       "name": "수소생산 촉매",
+       "item_type": null,
+       "pdf_page_start": 158,
+       "printed_page_start": 157,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "수전해 촉매 및 전극 코팅",
+         "trl_raw": "3-7",
+         "trl_min": 3,
+         "trl_max": 7,
+         "pdf_page": 158,
+         "printed_page": 157,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "개질촉매 내황·내코킹 및 재생기술",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 158,
+         "printed_page": 157,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "열분해 촉매 및 탄소생성·침적 제어",
+         "trl_raw": "3-7",
+         "trl_min": 3,
+         "trl_max": 7,
+         "pdf_page": 158,
+         "printed_page": 157,
+         "dev_period": "3년"
+        },
+        {
+         "no": 4,
+         "name": "암모니아 크래킹 촉매 고활성· 저비용화",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 158,
+         "printed_page": 157,
+         "dev_period": "3년"
+        },
+        {
+         "no": 5,
+         "name": "촉매성능평가· 품질관리",
+         "trl_raw": "4-7",
+         "trl_min": 4,
+         "trl_max": 7,
+         "pdf_page": 158,
+         "printed_page": 157,
+         "dev_period": "2년"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "통신·네트워크",
+     "printed_page_start": null,
+     "items": [
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-01@p161",
+       "item_no": "01",
+       "name": "통신용 전력 증폭기 핵심 소자 및 부품",
+       "item_type": null,
+       "pdf_page_start": 161,
+       "printed_page_start": 160,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "미세 게이트 공정 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 161,
+         "printed_page": 160,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "고효율 증폭기 구조",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 161,
+         "printed_page": 160,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고방열 패키징",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 161,
+         "printed_page": 160,
+         "dev_period": "5년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-02@p162",
+       "item_no": "02",
+       "name": "저손실 통신기판 소재",
+       "item_type": null,
+       "pdf_page_start": 162,
+       "printed_page_start": 161,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "유리 기판 및 TGV 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 162,
+         "printed_page": 161,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "나노 다공성 하이브리드 레진",
+         "trl_raw": "3-5",
+         "trl_min": 3,
+         "trl_max": 5,
+         "pdf_page": 162,
+         "printed_page": 161,
+         "dev_period": "5년"
+        },
+        {
+         "no": 3,
+         "name": "Low-profile 동박 적층",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 162,
+         "printed_page": 161,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-03@p163",
+       "item_no": "03",
+       "name": "위성 위상배열 안테나",
+       "item_type": null,
+       "pdf_page_start": 163,
+       "printed_page_start": 162,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "하이브리드 빔포밍",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 163,
+         "printed_page": 162,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "다중빔 호핑",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 163,
+         "printed_page": 162,
+         "dev_period": "4년"
+        },
+        {
+         "no": 3,
+         "name": "AI 기반 빔 조향 및 예측 알고리즘",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 163,
+         "printed_page": 162,
+         "dev_period": "5년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-04@p164",
+       "item_no": "04",
+       "name": "RF 부품 및 모듈",
+       "item_type": null,
+       "pdf_page_start": 164,
+       "printed_page_start": 163,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고선택도 BAW 필터 기술",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 164,
+         "printed_page": 163,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "PAMiD (증폭기-필터 통합) 패키징",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 164,
+         "printed_page": 163,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "고속 RF 스위치",
+         "trl_raw": "6-7",
+         "trl_min": 6,
+         "trl_max": 7,
+         "pdf_page": 164,
+         "printed_page": 163,
+         "dev_period": "3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-05@p165",
+       "item_no": "05",
+       "name": "저손실 전자기 차폐 소재",
+       "item_type": null,
+       "pdf_page_start": 165,
+       "printed_page_start": 164,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "나노 복합재 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 165,
+         "printed_page": 164,
+         "dev_period": "5년"
+        },
+        {
+         "no": 2,
+         "name": "Spray-on/Shie ld-in-package",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 165,
+         "printed_page": 164,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "자원순환형 친환경 소재 기술",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 165,
+         "printed_page": 164,
+         "dev_period": "5년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-06@p166",
+       "item_no": "06",
+       "name": "NCR 네트워크 제어 중계기",
+       "item_type": null,
+       "pdf_page_start": 166,
+       "printed_page_start": 165,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "능동 빔포밍 기술",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 166,
+         "printed_page": 165,
+         "dev_period": "3년"
+        },
+        {
+         "no": 2,
+         "name": "RIS 위상 변이 제어 기술",
+         "trl_raw": "4-6",
+         "trl_min": 4,
+         "trl_max": 6,
+         "pdf_page": 166,
+         "printed_page": 165,
+         "dev_period": "3년"
+        },
+        {
+         "no": 3,
+         "name": "채널 추정 및 빔 최적화 알고리즘",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 166,
+         "printed_page": 165,
+         "dev_period": "5년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-07@p167",
+       "item_no": "07",
+       "name": "대용량·초고속 광송신 및 수신부품(LD, PD)",
+       "item_type": null,
+       "pdf_page_start": 167,
+       "printed_page_start": 166,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "초고속 LD 설계 및 제작 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 167,
+         "printed_page": 166,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "광대역 PD 설계 및 제작 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 167,
+         "printed_page": 166,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "고주파 광소자 패키징 및 집적 기술",
+         "trl_raw": "3~4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 167,
+         "printed_page": 166,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-08@p168",
+       "item_no": "08",
+       "name": "초고속 광트랜시버",
+       "item_type": null,
+       "pdf_page_start": 168,
+       "printed_page_start": 167,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고속 레이저/광수신 설계",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 168,
+         "printed_page": 167,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "광·전기 인터페이스 회로 기술",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 168,
+         "printed_page": 167,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "광트랜시버 패키징 기술",
+         "trl_raw": "2 –3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 168,
+         "printed_page": 167,
+         "dev_period": "2 –3년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-09@p169",
+       "item_no": "09",
+       "name": "AI 네트워크 제어 시스템",
+       "item_type": null,
+       "pdf_page_start": 169,
+       "printed_page_start": 168,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "AI 기반 트래픽 예측 기술",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 169,
+         "printed_page": 168,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "실시간 장애·이상 탐지 기술",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 169,
+         "printed_page": 168,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "자율 자원 최적화 알고리즘",
+         "trl_raw": "2 –3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 169,
+         "printed_page": 168,
+         "dev_period": "2 –3년"
+        },
+        {
+         "no": 4,
+         "name": "SDN/NFV 연계 오케스트레이션",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 169,
+         "printed_page": 168,
+         "dev_period": "1 –2년"
+        },
+        {
+         "no": 5,
+         "name": "자율운용 네트워크 단계화 기술",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 169,
+         "printed_page": 168,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-10@p170",
+       "item_no": "10",
+       "name": "초고속 인터커넥트 부품",
+       "item_type": null,
+       "pdf_page_start": 170,
+       "printed_page_start": 169,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고속 신호 무결성 설계 기술",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 170,
+         "printed_page": 169,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "고밀도 커넥터·케이블 설계 기술",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 170,
+         "printed_page": 169,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "인터포저·고속 PCB 연계 기술",
+         "trl_raw": "2 –3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 170,
+         "printed_page": 169,
+         "dev_period": "2 –3년"
+        },
+        {
+         "no": 4,
+         "name": "EMI/열·신뢰성 최적화 기술",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 170,
+         "printed_page": 169,
+         "dev_period": "1 –2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-11@p171",
+       "item_no": "11",
+       "name": "광선로 인프라 상태 감시 장비",
+       "item_type": null,
+       "pdf_page_start": 171,
+       "printed_page_start": 170,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "고정밀 측정 기술",
+         "trl_raw": "4 –5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 171,
+         "printed_page": 170,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "광선로 이벤트 분석 및 장애 판별 기술",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 171,
+         "printed_page": 170,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "다채널 광선로 원격 감시 기술",
+         "trl_raw": "3 –4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 171,
+         "printed_page": 170,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-12@p172",
+       "item_no": "12",
+       "name": "O-RAN 기지국 장비",
+       "item_type": null,
+       "pdf_page_start": 172,
+       "printed_page_start": 171,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "O-RAN 소형 O-RU",
+         "trl_raw": "5-6",
+         "trl_min": 5,
+         "trl_max": 6,
+         "pdf_page": 172,
+         "printed_page": 171,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 2,
+         "name": "AI 기반 RIC xApp·rApp",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 172,
+         "printed_page": 171,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 3,
+         "name": "Private 5G 경량 기지국 장비",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 172,
+         "printed_page": 171,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-13@p173",
+       "item_no": "13",
+       "name": "산업 인더넷 싱글페어 통신 모듈",
+       "item_type": null,
+       "pdf_page_start": 173,
+       "printed_page_start": 172,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "IEEE 802.3cg 통신모듈",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 173,
+         "printed_page": 172,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "PoDL 기술",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 173,
+         "printed_page": 172,
+         "dev_period": "1-2년"
+        },
+        {
+         "no": 3,
+         "name": "산업용 인터넷 미들웨어",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 173,
+         "printed_page": 172,
+         "dev_period": "2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-14@p174",
+       "item_no": "14",
+       "name": "TSN 기반 산업용 멀티프로토콜 변환 모듈",
+       "item_type": null,
+       "pdf_page_start": 174,
+       "printed_page_start": 173,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "IEEE 802.1AS TSN 동기화",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 174,
+         "printed_page": 173,
+         "dev_period": "2년"
+        },
+        {
+         "no": 2,
+         "name": "멀티프로토콜 변환 엔진",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 174,
+         "printed_page": 173,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 3,
+         "name": "TSN 트래픽 스케줄링",
+         "trl_raw": "4-5",
+         "trl_min": 4,
+         "trl_max": 5,
+         "pdf_page": 174,
+         "printed_page": 173,
+         "dev_period": "1-2년"
+        }
+       ]
+      },
+      {
+       "code": null,
+       "item_uid": "SOBUJANG-2026-09-15@p175",
+       "item_no": "15",
+       "name": "TSN wireless 확장 모듈",
+       "item_type": null,
+       "pdf_page_start": 175,
+       "printed_page_start": 174,
+       "technologies": [
+        {
+         "no": 1,
+         "name": "WTSN 브릿지",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 175,
+         "printed_page": 174,
+         "dev_period": "2-3년"
+        },
+        {
+         "no": 2,
+         "name": "무선 IEEE 802.1AS",
+         "trl_raw": "3-4",
+         "trl_min": 3,
+         "trl_max": 4,
+         "pdf_page": 175,
+         "printed_page": 174,
+         "dev_period": "2년"
+        },
+        {
+         "no": 3,
+         "name": "무선 TSN 트래픽 스케줄링",
+         "trl_raw": "2-3",
+         "trl_min": 2,
+         "trl_max": 3,
+         "pdf_page": 175,
+         "printed_page": 174,
+         "dev_period": "2-3년"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

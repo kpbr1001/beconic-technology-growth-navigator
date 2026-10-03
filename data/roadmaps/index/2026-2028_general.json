@@ -1,5 +1,8 @@
 {
- "kb_version": "kb-2026-2028-general-v1",
+ "kb_version": "kb-v2",
+ "collection": "2026-2028_general",
+ "roadmap_version": "2026-2028",
+ "roadmap_type": "general",
  "fields": [
   {
    "field_no": "01",
@@ -3181,7 +3184,7 @@
         },
         {
          "no": 2,
-         "name": "인치급 HPSI-SiC 단결정 잉곳 기술",
+         "name": "6인치급 HPSI-SiC 단결정 잉곳 기술",
          "trl_raw": "4",
          "trl_min": 4,
          "trl_max": 4,
@@ -3199,7 +3202,7 @@
         },
         {
          "no": 4,
-         "name": "인치급 HPSI-SiC 단결정 기판기술",
+         "name": "6인치급 HPSI-SiC 단결정 기판기술",
          "trl_raw": "5",
          "trl_min": 5,
          "trl_max": 5,
@@ -3704,7 +3707,7 @@
         },
         {
          "no": 3,
-         "name": "인치 내외의 크기를 갖는 메타렌즈의 2 대량 생산 기술 개발",
+         "name": "2인치 내외의 크기를 갖는 메타렌즈의 대량 생산 기술 개발",
          "trl_raw": "5",
          "trl_min": 5,
          "trl_max": 5,
@@ -6892,7 +6895,7 @@
        "technologies": [
         {
          "no": 1,
-         "name": "AI 기반 차원 비정형 환경 모델링 및 상황 인지 기술 3",
+         "name": "AI 기반 3차원 비정형 환경 모델링 및 상황 인지 기술",
          "trl_raw": "5",
          "trl_min": 5,
          "trl_max": 5,
