@@ -97,6 +97,13 @@ main{min-width:0}
  body{background:#fff}header,aside,.no-print,.hero-box{display:none!important}.shell{display:block;max-width:none;padding:0}.hero{background:#fff!important;color:#000;padding:0;box-shadow:none}.hero p{color:#444}.section{display:none!important}#s5{display:block!important}.panel{box-shadow:none;border:0;padding:0;margin:0 0 7mm}.print-only{display:block}.kpis{grid-template-columns:repeat(4,1fr)}.vizgrid{grid-template-columns:1fr 1fr}.roadmap{grid-template-columns:repeat(2,1fr)}.kpi,.viz,.phase,.summarybox,.mini{break-inside:avoid}.tablewrap{overflow:visible}table{min-width:0}th,td{font-size:9px;padding:6px}.footer{display:none}
 }
 
+/* 연동 상태 신호등 */
+.sig-panel{padding:14px 16px}.sig-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.sig-head b{font-size:13px}.sig-head .subtle{font-size:11px;color:var(--muted)}.sig-refresh{margin-left:auto;font-size:11px;padding:5px 9px}
+.sig-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.sig{display:grid;grid-template-columns:12px auto 1fr;column-gap:7px;row-gap:2px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+.sig b{font-size:12px}.sig span{font-size:11px;font-weight:800;color:#475467;justify-self:end}.sig small{grid-column:2/4;font-size:10.5px;color:var(--muted);line-height:1.4}
+.sig-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#d0d5dd;box-shadow:0 0 0 3px #f2f4f7}.sig-dot.green{background:#12b76a;box-shadow:0 0 0 3px #d1fadf}.sig-dot.yellow{background:#f79009;box-shadow:0 0 0 3px #fef0c7}.sig-dot.red{background:#f04438;box-shadow:0 0 0 3px #fee4e2}.sig-dot.wait{background:#f79009;box-shadow:0 0 0 3px #fef0c7;animation:sigblink 1.2s ease-in-out infinite}
+@keyframes sigblink{50%{opacity:.35}}@media(prefers-reduced-motion:reduce){.sig-dot.wait{animation:none}}
+@media(max-width:720px){.sig-grid{grid-template-columns:1fr}}
 /* Claude 진단 해석(Phase 5) */
 .ai-headline{border-left:4px solid var(--primary2,#3f5bb5);background:#f5f7ff;border-radius:10px;padding:12px 14px;font-weight:800;font-size:14px;color:#1d2939;margin:4px 0 12px}
 .ai-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ai-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.ai-card h4{margin:0 0 8px;font-size:13px}.ai-roadmap{margin-top:12px}

@@ -44,6 +44,12 @@ jobs:
         with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
       - run: npm ci
       - run: npm run build
+      # 운영과 같은 화면 스위치(원문 근거·AI 해석 on)로도 빌드해 번들 비밀키 검사 — 스위치 off 빌드에서는 해당 코드가 빠져 검사를 통과할 수 있음
+      - name: Build (화면 스위치 on)
+        run: npm run build
+        env:
+          VITE_ROADMAP_EVIDENCE: 'on'
+          VITE_AI_INTERPRET: 'on'
 
   test:
     name: Unit · v0.9 Regression
