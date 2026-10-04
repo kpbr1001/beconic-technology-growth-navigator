@@ -210,8 +210,8 @@ Rule 결과 + RAG citations + Claude narrative
 | **2 Ingestion** ✅ 52/52 | scripts 5종, manifest 확정(checksum), parsed JSON | 13+4 문서 파싱, 페이지 보존율 100%, parse_confidence 기록 |
 | **3 Hybrid RAG** | Supabase migration, hybrid-search 함수, retrieval log | FTS+벡터+메타필터+RRF+rerank 동작, source/page 100% |
 | **4 평가** | Gold Set ≥50, evaluate 스크립트, 결과 리포트 | 목표치 합의 후 통과 시 UI 라벨 복원 |
-| **5 Claude** 🟡 Task 2(해석) 구현 | 5개 task, schema, guardrail, fallback | 스키마 준수 100%, 점수 변경 0건, 날조 인용 0건(자동검사) |
-| **6 PDF** | ReportViewModel, Paged.js 렌더러, PDF QA 체크리스트 | 마스터 13.4 항목 전수 통과 |
+| **5 Claude** 🟡 Task 2(해석)·3·4(축약: 전략 메모·맞춤 90일 과제) 구현 | 5개 task, schema, guardrail, fallback | 스키마 준수 100%, 점수 변경 0건, 날조 인용 0건(자동검사) |
+| **6 PDF** 🟡 시각화 보강(v0.9.9: 포지셔닝·레이더·간트·KPI 기준선) | ReportViewModel, Paged.js 렌더러, PDF QA 체크리스트 | 마스터 13.4 항목 전수 통과 |
 | **7 재진단** | reassessments, delta 뷰, expert_feedback | 90일 후 재진단 비교 보고서 |
 
 ## 10. 테스트·QA 계획
