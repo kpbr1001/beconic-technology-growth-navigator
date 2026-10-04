@@ -104,6 +104,24 @@ for (const [w, h] of VIEWPORTS) {
   await page.close();
 }
 
+// 4-b) 기술 후보: 2단계 답변에서 찾은 후보(근거 구절 표시), 다시 찾기·삭제 동작
+{
+  const { page, errors } = await openPage(1440, 900);
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: 'networkidle' });
+  for (const b of await page.locator('section.active .example-use').all()) await b.click();
+  await page.locator('section.active').getByRole('button', { name: '기술 발견 시작' }).click();
+  for (const b of await page.locator('section.active .example-use').all()) await b.click();
+  await page.locator('section.active').getByRole('button', { name: '기술 후보 생성' }).click();
+  const names = await page.$$eval('section.active .tech-row b', (bs) => bs.map((b) => b.textContent));
+  check(names.length >= 3 && names.some((n) => /알고리즘·모델/.test(n)), `기술 후보: 답변 기반 후보 미생성 ${JSON.stringify(names)}`);
+  check((await page.locator('section.active .tech-basis').count()) === names.length, '기술 후보: 근거 구절 미표시');
+  await page.locator('section.active .tech-row').last().getByRole('button', { name: '삭제' }).click();
+  check((await page.locator('section.active .tech-row').count()) === names.length - 1, '기술 후보: 삭제 동작 안 함');
+  check(errors.length === 0, `기술 후보: 콘솔 에러 ${JSON.stringify(errors)}`);
+  await page.close();
+}
+
 // 5) 재진단(Phase 7): 기록 저장 → 파일 내보내기 → 재진단 시작 → 응답 변경 → 비교 섹션·PDF 비교 쪽 → 다른 브라우저에서 파일 불러오기
 {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true });
@@ -158,4 +176,4 @@ if (failures.length) {
   console.error('❌ E2E 실패\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log(`✅ E2E 통과 (뷰포트 ${VIEWPORTS.length}개, 전부 모름, CSS, PDF, 재진단)`);
+console.log(`✅ E2E 통과 (뷰포트 ${VIEWPORTS.length}개, 전부 모름, CSS, PDF, 기술 후보, 재진단)`);
