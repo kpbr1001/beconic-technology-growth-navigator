@@ -40,11 +40,21 @@ export function positionMatrixSVG(capability: number | null, confidence: number)
     `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="${fill}" ${q?.key === k ? 'stroke="#2457f5" stroke-width="1.5"' : ''}/>` +
     // 위쪽 사분면은 위에, 아래쪽 사분면은 아래에 이름을 둬 현재 위치 표시와 겹치지 않게
     `<text x="${(x0 + x1) / 2}" y="${y0 === T ? y0 + 14 : y1 - 7}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${q?.key === k ? '#173fb5' : '#667085'}">${QUADRANTS[k].label}</text>`;
+  // 현재 위치 라벨은 점이 있는 사분면 안에 두어 기준선·사분면 이름과 겹치지 않게 한다
+  const px = x(confidence), py = capability === null ? 0 : y(capability);
+  const LBL = 74; // '현재 (78, 52)' 라벨 폭(대략)
+  const [qL, qR] = Math.round(confidence) < MATRIX_CUT.confidence ? [L, cx] : [cx, L + PW];
+  const below = capability !== null && (capability > 88 || (py > cy && py - cy < 16));
+  // 오른쪽 → 왼쪽 → 점 위·아래 가운데 순으로, 점이 있는 사분면 안에 들어가는 자리
+  const [lx, anchor, dy] =
+    px + 10 + LBL <= qR ? [px + 10, 'start', below ? 17 : -9]
+      : px - 10 - LBL >= qL ? [px - 10, 'end', below ? 17 : -9]
+        : [Math.min(Math.max(px, qL + LBL / 2 + 2), qR - LBL / 2 - 2), 'middle', below ? 20 : -12];
   const dot =
     capability === null
       ? `<text x="${L + PW / 2}" y="${T + PH / 2}" text-anchor="middle" font-size="10" fill="#b54708">기술역량 판단 보류 — 위치 미표시</text>`
-      : `<circle cx="${x(confidence)}" cy="${y(capability)}" r="6.5" fill="#2457f5" stroke="#fff" stroke-width="2"/>` +
-        `<text x="${x(confidence) + (confidence > 80 ? -10 : 10)}" y="${y(capability) + (capability > 88 ? 14 : -8)}" text-anchor="${confidence > 80 ? 'end' : 'start'}" font-size="9.5" font-weight="800" fill="#1d2939">현재 (${Math.round(confidence)}, ${Math.round(capability)})</text>`;
+      : `<circle cx="${px}" cy="${py}" r="6.5" fill="#2457f5" stroke="#fff" stroke-width="2"/>` +
+        `<text class="matrix-here" x="${lx}" y="${py + dy}" text-anchor="${anchor}" font-size="9.5" font-weight="800" fill="#1d2939">현재 (${Math.round(confidence)}, ${Math.round(capability)})</text>`;
   return `<svg class="matrix-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="기술역량·진단 신뢰도 포지셔닝">` +
     zone('evidence', L, T, cx, cy, '#fff7ed') + zone('scale', cx, T, L + PW, cy, '#ecfdf3') +
     zone('recheck', L, cy, cx, T + PH, '#fef3f2') + zone('focus', cx, cy, L + PW, T + PH, '#f5f7ff') +

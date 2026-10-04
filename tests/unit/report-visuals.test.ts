@@ -15,6 +15,24 @@ describe('포지셔닝 매트릭스', () => {
     expect(positionMatrixSVG(52, 78)).toContain('현재 (78, 52)');
     expect(positionMatrixSVG(null, 30)).toContain('판단 보류');
   });
+  it('현재 위치 라벨은 점이 있는 사분면 안에(기준선·바깥으로 넘지 않음)', () => {
+    const label = (svg: string) => {
+      const m = /class="matrix-here" x="([\d.]+)" y="[\d.]+" text-anchor="(\w+)"/.exec(svg)!;
+      const x = Number(m[1]), w = 74;
+      return m[2] === 'start' ? [x, x + w] : m[2] === 'end' ? [x - w, x] : [x - w / 2, x + w / 2];
+    };
+    const cut = 34 + 0.6 * 252, right = 34 + 252;
+    for (const conf of [5, 30, 53, 59]) {
+      const [a, b] = label(positionMatrixSVG(52, conf));
+      expect(a).toBeGreaterThanOrEqual(34);
+      expect(b).toBeLessThanOrEqual(cut);
+    }
+    for (const conf of [60, 62, 78, 95, 100]) {
+      const [a, b] = label(positionMatrixSVG(52, conf));
+      expect(a).toBeGreaterThanOrEqual(cut);
+      expect(b).toBeLessThanOrEqual(right);
+    }
+  });
 });
 
 describe('90일 간트', () => {
