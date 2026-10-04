@@ -15,6 +15,8 @@ export interface GuardContext {
   codes: string[];
   /** 원문 근거의 인쇄 쪽·PDF 쪽 */
   pages: number[];
+  /** Rule Engine 우선순위 영역(순서 그대로). 맞춤 실행과제는 이 영역만 허용 */
+  gapAreas?: string[];
   /** 외부검증 근거가 없으면 '확인된 사실' 표기를 자가응답으로 낮춘다 */
   allowVerifiedFact: boolean;
 }
@@ -26,7 +28,8 @@ export interface Violation {
   text: string;
 }
 
-const LIMITS = { strengths: 3, constraints: 3, root_cause_hypotheses: 4, confirmation_needed: 4, roadmap_notes: 3 } as const;
+const LIMITS = { strengths: 3, constraints: 3, root_cause_hypotheses: 4, confirmation_needed: 4, roadmap_notes: 3, option_notes: 3, action_plan: 5 } as const;
+const OPTIONS = ['A', 'B', 'C'] as const;
 const MAX_TEXT = 220;
 
 const SCORE_RE = /(\d{1,3}(?:\.\d+)?)\s*(?:\/\s*100|점)/g;
@@ -38,6 +41,9 @@ const FIT_RE = /적합도|적합성\s*(?:높|중|낮)|(?:높음|중간|낮음)/;
 /** 문장 속 숫자(쪽 번호·TRL 표기는 제외 — 별도 규칙으로 대조) */
 export const numbersIn = (t: string) =>
   [...t.replace(PAGE_RE, ' ').replace(TRL_RE, ' ').matchAll(/\d+(?:\.\d+)?/g)].map((m) => m[0]);
+
+/** 같은 키는 첫 항목만(전략안·영역별 1개) */
+const uniqueBy = <T>(xs: T[], key: (x: T) => string) => xs.filter((x, i) => xs.findIndex((y) => key(y) === key(x)) === i);
 
 const clip = (s: string) => (s.length > MAX_TEXT ? `${s.slice(0, MAX_TEXT - 1)}…` : s);
 
@@ -112,6 +118,34 @@ export function applyGuardrail(raw: Interpretation, ctx: GuardContext): { output
         (n) => [n.text],
         { roadmap: true },
       ).map((n) => ({ ...n, text: clip(n.text) })),
+      option_notes: keep(
+        'option_notes',
+        uniqueBy(
+          (raw.option_notes ?? []).flatMap((o) => {
+            // "B", "B.", "B안", "B. 제품화…" → B. 기호를 알 수 없으면 제외
+            const k = o.option.trim().toUpperCase().charAt(0);
+            if (!(OPTIONS as readonly string[]).includes(k)) {
+              violations.push({ kind: 'unknown_item', field: 'option_notes', text: o.option.slice(0, 40) });
+              return [];
+            }
+            return [{ ...o, option: k }];
+          }),
+          (o) => o.option,
+        ).sort((a, b) => a.option.localeCompare(b.option)),
+        (o) => [o.text, o.prerequisite],
+      ).map((o) => ({ option: o.option, text: clip(o.text), prerequisite: clip(o.prerequisite) })),
+      action_plan: keep(
+        'action_plan',
+        uniqueBy(
+          (raw.action_plan ?? []).filter((a) => {
+            const ok = (ctx.gapAreas ?? []).includes(a.area.trim());
+            if (!ok) violations.push({ kind: 'unknown_item', field: 'action_plan', text: a.area.slice(0, 40) });
+            return ok;
+          }),
+          (a) => a.area.trim(),
+        ).sort((a, b) => (ctx.gapAreas ?? []).indexOf(a.area.trim()) - (ctx.gapAreas ?? []).indexOf(b.area.trim())),
+        (a) => [a.action, a.kpi, a.evidence],
+      ).map((a) => ({ area: a.area.trim(), action: clip(a.action), kpi: clip(a.kpi), evidence: clip(a.evidence) })),
     },
   };
 }

@@ -3,6 +3,7 @@
 // Claude는 점수·TRL·우선순위를 바꾸지 못하고, 실패하면 화면은 규칙 기반 해석을 그대로 쓴다.
 import Anthropic from '@anthropic-ai/sdk';
 import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod';
+import { strategicOptions } from '../diagnosis/strategy';
 import { evaluate, type AssessmentInput, type AssessmentResult, type Dimension } from '../diagnosis';
 import type { EvidenceQuote } from '../rag/evidence';
 import { applyGuardrail, type GuardContext, type Violation } from './guardrail';
@@ -40,7 +41,7 @@ export type InterpretResponse =
 
 /** 원문 근거·Rule 결과에서 허용 값 목록을 만든다(가드레일 대조용) */
 export function guardContext(r: AssessmentResult, input: AssessmentInput, evidence: Record<string, EvidenceQuote[]>): GuardContext {
-  const scores = [...Object.values(r.m), r.capability, r.confidence].filter((x): x is number => x !== null).map((x) => Math.round(x));
+  const scores = [...Object.values(r.m), r.capability, r.confidence, ...strategicOptions(r).map((o) => o.score)].filter((x): x is number => x !== null).map((x) => Math.round(x));
   const trls = new Set<number>();
   for (const t of input.inventory) if (t.trl > 0) [t.trl, Math.min(9, t.trl + 1)].forEach((x) => trls.add(x));
   const quotes = Object.values(evidence).flat();
@@ -52,6 +53,7 @@ export function guardContext(r: AssessmentResult, input: AssessmentInput, eviden
     evidenceText: Object.fromEntries(Object.entries(evidence).map(([k, qs]) => [k, qs.map((q) => `${q.label} ${q.technologyName ?? ''} ${q.trl ?? ''} ${q.quote} ${q.citation}`).join(' ')])),
     codes: [...new Set(quotes.flatMap((q) => q.citation.match(/\b[A-Z]{2,}(?:-[A-Z0-9]+)*-\d{2}-\d{2}\b/g) ?? []))],
     pages: [...new Set(quotes.flatMap((q) => [q.printedPage, q.pdfPage]).filter((x): x is number => x !== null))],
+    gapAreas: r.gaps.slice(0, 5).map((g) => g.area),
     // 이 POC의 입력은 모두 자가응답이다. 외부검증 Evidence(4단계)가 확인되기 전에는 '확인된 사실' 표기 금지
     allowVerifiedFact: false,
   };
@@ -72,6 +74,7 @@ export function buildUserContent(input: AssessmentInput, r: AssessmentResult, re
       : '  · 원문 근거 없음(이 품목은 roadmap_notes에 쓰지 말 것)';
     return `- item_uid=${it.uid} · ${it.name}${it.code ? ` (${it.code})` : ''}\n${body}`;
   });
+  const opts = strategicOptions(r).map((o) => `- ${o.name}${o.recommended ? ' ← Rule 추천안' : ''} · 규칙 점수 ${o.score === null ? '산정 불가' : `${o.score}/100`} · 적합 상황: ${o.when} · Focus: ${o.focus}`);
   const disc = input.discovery;
   return [
     '## 기업 입력(자가응답)',
@@ -91,6 +94,8 @@ export function buildUserContent(input: AssessmentInput, r: AssessmentResult, re
     ...dims,
     '- 우선순위(Rule Engine 산정 순서 그대로):',
     ...gaps,
+    '- 전략 대안(추천안 변경 금지):',
+    ...opts,
     ...(r.alerts.length ? ['- 일관성 경고:', ...r.alerts.map((a) => `  · ${a}`)] : []),
     '',
     '## 로드맵 참고 후보와 원문 근거(발췌 그대로)',
@@ -107,7 +112,7 @@ export async function interpretAssessment(req: InterpretRequest, deps: Interpret
 
   const call = deps.client.beta.messages.parse({
     model,
-    max_tokens: 6000,
+    max_tokens: 8000,
     betas: ['server-side-fallback-2026-07-01'],
     // 안전 분류기가 거절하면 서버에서 대체 모델로 자동 재시도(거절 유형별 권장 모델)
     fallbacks: 'default',

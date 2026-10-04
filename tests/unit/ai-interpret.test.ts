@@ -42,7 +42,10 @@ const good: Interpretation = {
   root_cause_hypotheses: [{ text: 'CTO 1인에게 지식이 집중됐을 가능성', verify_by: '인터뷰' }],
   confirmation_needed: ['대체 API 경로를 시험했습니까?'],
   roadmap_notes: [{ item_uid: UID, text: '원문 p.272의 고장 예측 목표와 기업의 이상패턴 탐지 모델이 맞닿습니다.' }],
+  option_notes: [{ option: 'B', text: '고객사 PoC를 반복 현장으로 넓히는 경로입니다.', prerequisite: 'PoC 성공기준 문서화' }],
+  action_plan: [{ area: r.gaps[0].area, action: '클라우드 API 중단 시 대체 경로를 시험합니다.', kpi: '대체 경로 시험 1회 완료', evidence: '시험 기록' }],
 };
+const AREA0 = r.gaps[0].area;
 
 describe('가드레일', () => {
   it('입력에 없는 점수·TRL·품목코드·쪽 번호가 들어간 문장은 제거', () => {
@@ -80,6 +83,36 @@ describe('가드레일', () => {
     expect(output.roadmap_notes.map((n) => n.text)).toEqual([notes[0].text]);
     expect(violations.map((v) => v.kind)).toContain('number_not_in_source');
   });
+  it('전략 메모: 기호 정규화(B안→B)·중복·모르는 기호 제거, A→C 순서', () => {
+    const { output, violations } = applyGuardrail({
+      ...good,
+      option_notes: [
+        { option: 'C. 차별기술', text: 'IP 확보 후 검토', prerequisite: '특허 조사' },
+        { option: 'B안', text: '현장 확대', prerequisite: 'PoC 기준' },
+        { option: 'b', text: '중복', prerequisite: 'x' },
+        { option: 'D', text: '없는 안', prerequisite: 'x' },
+        { option: 'A', text: '리스크대응 99/100이라 안정화', prerequisite: 'x' },
+      ],
+    }, ctx);
+    expect(output.option_notes.map((o) => o.option)).toEqual(['B', 'C']);
+    expect(violations.filter((v) => v.field !== 'constraints').map((v) => v.kind).sort()).toEqual(['score_mismatch', 'unknown_item']);
+  });
+  it('맞춤 실행과제: Rule 우선순위 영역만·영역당 1개·Rule 순서, 점수 위조 제거', () => {
+    const areas = ctx.gapAreas as string[];
+    expect(areas).toEqual(r.gaps.slice(0, 5).map((g) => g.area));
+    const act = (area: string, action = `${area} 과제`) => ({ area, action, kpi: '완료 1건', evidence: '기록' });
+    const { output, violations } = applyGuardrail({
+      ...good,
+      action_plan: [act(areas[1]), act(` ${AREA0} `), act(AREA0, '중복'), act('마케팅'), act(areas[2], `${areas[2]} 99/100 개선`)],
+    }, ctx);
+    expect(output.action_plan.map((a) => a.area)).toEqual([AREA0, areas[1]]);
+    expect(violations.filter((v) => v.field !== 'constraints').map((v) => v.kind).sort()).toEqual(['score_mismatch', 'unknown_item']);
+  });
+  it('v1 결과(전략 메모·실행과제 없음)도 그대로 통과', () => {
+    const { output } = applyGuardrail({ ...good, option_notes: undefined, action_plan: undefined } as unknown as Interpretation, ctx);
+    expect(output.option_notes).toEqual([]);
+    expect(output.action_plan).toEqual([]);
+  });
   it('항목 수·문장 길이 제한', () => {
     const many = Array.from({ length: 6 }, (_, i) => ({ text: `강점 ${i} ${'가'.repeat(300)}`, claim_type: 'self_report' as const, basis: 'x' }));
     const { output } = applyGuardrail({ ...good, strengths: many }, ctx);
@@ -97,6 +130,7 @@ describe('Claude 입력 구성', () => {
     expect(text).toContain('이상패턴 탐지 모델 · 자체 가능 · TRL 5');
     expect(text).toContain('원문 근거 없음(이 품목은 roadmap_notes에 쓰지 말 것)');
     expect(text).not.toMatch(/직원|업력/);
+    expect(text).toMatch(/← Rule 추천안 · 규칙 점수 \d+\/100/);
   });
 });
 

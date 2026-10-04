@@ -32,6 +32,23 @@ export const Interpretation = z.object({
   roadmap_notes: z
     .array(z.object({ item_uid: z.string(), text: z.string() }))
     .describe('제공된 원문 근거가 있는 로드맵 품목에 대해서만, 기업 기술과의 연결 지점 최대 3개'),
+  // Task 3 strategic_options(축약): 추천안은 Rule Engine 값 그대로, Claude는 이 기업 맥락의 의미·전제만 쓴다
+  option_notes: z
+    .array(z.object({
+      option: z.string().describe('A, B, C 중 하나(전략 대안 기호)'),
+      text: z.string().describe('이 기업의 제품·기술 맥락에서 이 안이 뜻하는 것, 언제 이 안으로 전환할지'),
+      prerequisite: z.string().describe('이 안을 실행하기 전에 갖춰야 할 전제 1개'),
+    }))
+    .describe('전략 대안 A·B·C 각각에 대한 메모 최대 3개'),
+  // Task 4 action_plan(축약): 영역·우선순위는 Rule Engine 목록 그대로, Claude는 이 기업에 맞춘 과제 문장만 쓴다
+  action_plan: z
+    .array(z.object({
+      area: z.string().describe('Rule Engine 우선순위 목록의 영역명 그대로(예: 리스크대응)'),
+      action: z.string().describe('이 기업의 핵심기술·제품·의존요소를 짚은 90일 내 실행과제 1문장'),
+      kpi: z.string().describe('완료기준·KPI 1개(목표 수치는 제안값으로, 현재 값처럼 쓰지 않음)'),
+      evidence: z.string().describe('완료 시 남길 증빙자료'),
+    }))
+    .describe('우선순위 영역별 맞춤 90일 실행과제 최대 5개(우선순위 순서)'),
 });
 export type Interpretation = z.infer<typeof Interpretation>;
 
