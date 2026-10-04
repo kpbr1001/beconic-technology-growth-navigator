@@ -246,3 +246,8 @@ v0.9와 **달라지지 않는 것**(회귀 테스트로 고정): 문항·가중�
 - 이번 진단의 실제 결과(원문 발췌 건수·AI 해석 완료/대체/오류)가 서버 점검보다 우선
 - 검증: 단위 4건(꺼짐·정상·오류·캐시), 모의 E2E(데스크톱·모바일, 로딩→정상, 가로 스크롤 없음, PDF 미포함)
 
+## 의미 검색(Voyage) 적재 버튼 (2026-10-04)
+- `scripts/rag/load_kb.ts`: `--probe`(키·모델·DB 연결만 확인, 쓰기 없음), 임베딩 실패 시 20초·40초… 최대 6회 재시도(429 대비), DB 저장 3회 재시도, `--pause-ms`, batch 1~128 검증
+- 비공개 KB 저장소 `.github/workflows/load-embeddings.yml`: 수동 실행(시험/전체 적재), `kb/`만 sparse checkout(원문 PDF 제외), 공개 앱 저장소 main의 적재 스크립트 사용, 키는 저장소 Secrets에서만
+- 켜는 순서: KB 저장소 Secrets 3개 → 시험 → 전체 적재 → Netlify `EMBEDDING_PROVIDER=voyage`·`VOYAGE_API_KEY`(Secret·Functions) → 재배포 → 신호등 '의미 검색' 초록
+
