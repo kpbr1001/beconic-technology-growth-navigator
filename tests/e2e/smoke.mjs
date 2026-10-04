@@ -91,7 +91,7 @@ for (const [w, h] of VIEWPORTS) {
   await page.emulateMedia({ media: 'print' });
   await page.pdf({ path: `${OUT}/report-sample.pdf`, format: 'A4', printBackground: true });
   const pages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(pages === 13, `PDF 섹션 수 ${pages} (기대 13)`);
+  check(pages === 14, `PDF 섹션 수 ${pages} (기대 14)`);
   const pr = await page.textContent('#printReport');
   check(/Scoring rule-v1\.0/.test(pr), 'PDF에 Scoring 버전 누락');
   check(/AI 설비 예지보전 솔루션/.test(pr) && /원문 p\.271/.test(pr), 'PDF 로드맵 정렬에 원문 색인 후보 누락');

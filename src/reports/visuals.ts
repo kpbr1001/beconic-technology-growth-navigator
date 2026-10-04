@@ -119,3 +119,29 @@ export function dateAfter(days: number, from = new Date()): string {
   const d = new Date(from.getTime() + days * 86_400_000);
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 }
+
+/** 리스크 히트맵 SVG: 가로=가능성(낮음·중간·높음·확인 필요), 세로=영향(위가 높음). 칸 안에 리스크 ID */
+export function riskHeatmapSVG(risks: { id: string; likelihood: 1 | 2 | 3 | null; impact: 1 | 2 | 3 }[]): string {
+  const LW = 44, TH = 22, CW = 74, CH = 46, W = LW + CW * 4 + 4, H = TH + CH * 3 + 24;
+  const fill = (s: number | null) => (s === null ? '#f2f4f7' : s >= 6 ? '#fee4e2' : s >= 3 ? '#fef0c7' : '#ecfdf3');
+  const cols = ['낮음', '중간', '높음', '확인 필요'];
+  let out = cols.map((c, i) => `<text x="${LW + i * CW + CW / 2}" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#475467">${c}</text>`).join('');
+  for (let imp = 3; imp >= 1; imp--) {
+    const y0 = TH + (3 - imp) * CH;
+    out += `<text x="${LW - 6}" y="${y0 + CH / 2 + 3}" text-anchor="end" font-size="9" font-weight="700" fill="#475467">${['', '낮음', '중간', '높음'][imp]}</text>`;
+    for (let c = 0; c < 4; c++) {
+      const lk = c < 3 ? c + 1 : null;
+      const x0 = LW + c * CW;
+      out += `<rect x="${x0 + 1}" y="${y0 + 1}" width="${CW - 2}" height="${CH - 2}" rx="4" fill="${fill(lk === null ? null : lk * imp)}" stroke="#fff"/>`;
+      const here = risks.filter((r) => r.impact === imp && r.likelihood === lk);
+      here.forEach((r, k) => {
+        const cx = x0 + 14 + (k % 3) * 23, cy = y0 + 12 + Math.floor(k / 3) * 14;
+        out += `<circle cx="${cx}" cy="${cy}" r="7" fill="${lk === null ? '#667085' : lk * imp >= 6 ? '#d92d20' : lk * imp >= 3 ? '#dc6803' : '#039855'}"/>` +
+          `<text x="${cx}" y="${cy + 3}" text-anchor="middle" font-size="6.6" font-weight="800" fill="#fff">${esc(r.id)}</text>`;
+      });
+    }
+  }
+  out += `<text x="${LW + (CW * 3) / 2}" y="${H - 6}" text-anchor="middle" font-size="9" fill="#475467">발생 가능성 →</text>` +
+    `<text x="${LW - 6}" y="14" text-anchor="end" font-size="8.5" font-weight="700" fill="#667085">영향 ↓</text>`;
+  return `<svg class="heatmap-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="리스크 히트맵">${out}</svg>`;
+}

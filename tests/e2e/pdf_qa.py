@@ -2,9 +2,9 @@
 
 사용: python3 tests/e2e/pdf_qa.py [pdf ...]   (기본: tests/e2e/out/pdf/*.pdf, 필요: pip install pymupdf)
 검사 항목
-  - 물리 페이지 수 vs 보고서 섹션 수(13) → 넘침으로 생긴 추가 페이지
+  - 물리 페이지 수 vs 보고서 섹션 수(바닥글 'n / 총쪽수'의 총쪽수: v0.9 원본 13, v0.9.11부터 14) → 넘침으로 생긴 추가 페이지
   - 빈 페이지
-  - 머리글(BECONIC TECHNOLOGY GROWTH REPORT)·바닥글(Confidential · n / 13) 존재
+  - 머리글(BECONIC TECHNOLOGY GROWTH REPORT)·바닥글(Confidential · n / 총쪽수) 존재
   - 바닥글 쪽번호가 실제 물리 페이지 번호와 일치하는지
   - 본문이 바닥글 영역을 침범하거나 A4 하단 여백 밖으로 나가는지
   - 한글이 한 글자씩 세로로 쪼개진 줄(1글자 줄 연속) / 숫자·TRL·점수 단독 조각 줄
@@ -37,9 +37,10 @@ def analyze(path):
     for i, page in enumerate(doc):
         ls = lines_of(page)
         text = " ".join(t for t, _ in ls)
-        footer = [(t, bb) for t, bb in ls if re.search(r"\d+ / 13$", t)]
+        footer = [(t, bb) for t, bb in ls if re.search(r"\d+ / \d+$", t)]
         footer_y = min((bb[1] for _, bb in footer), default=None)
-        foot_no = int(re.search(r"(\d+) / 13$", footer[0][0]).group(1)) if footer else None
+        fm = re.search(r"(\d+) / (\d+)$", footer[0][0]) if footer else None
+        foot_no = int(fm.group(1)) if fm else None
         body = [(t, bb) for t, bb in ls if (t, bb) not in footer and "Confidential" not in t]
         intrude = [t for t, bb in body if footer_y is not None and bb[3] > footer_y - 1]
         off_page = [t for t, bb in ls if bb[3] > A4_H - 5]
@@ -51,6 +52,7 @@ def analyze(path):
             "header": "BECONIC TECHNOLOGY GROWTH REPORT" in text,
             "cover": i == 0 and "Technology Growth Diagnostic Report".upper() in text.upper(),
             "footer_no": foot_no,
+            "footer_total": int(fm.group(2)) if fm else None,
             "footer_intrusion": intrude[:3],
             "off_page": off_page[:3],
             "single_hangul_lines": len(singles),
@@ -62,8 +64,12 @@ def analyze(path):
 def summarize(path, pages):
     issues = []
     n = len(pages)
-    if n != 13:
-        issues.append(f"물리 {n}쪽 ≠ 섹션 13 (넘침 페이지 {n - 13:+d})")
+    totals = [p["footer_total"] for p in pages if p.get("footer_total")]
+    expect = max(set(totals), key=totals.count) if totals else None
+    if expect is None:
+        issues.append("바닥글 총쪽수를 찾지 못함")
+    elif n != expect:
+        issues.append(f"물리 {n}쪽 ≠ 섹션 {expect} (넘침 페이지 {n - expect:+d})")
     for p in pages:
         tag = f"p{p['page']}"
         if p["chars"] < 30:
