@@ -104,10 +104,50 @@ for (const [w, h] of VIEWPORTS) {
   await page.close();
 }
 
+// 5) 재진단(Phase 7): 기록 저장 → 파일 내보내기 → 재진단 시작 → 응답 변경 → 비교 섹션·PDF 비교 쪽 → 다른 브라우저에서 파일 불러오기
+{
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true });
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('dialog', (d) => d.accept());
+  await page.goto(URL, { waitUntil: 'networkidle' });
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: '샘플기업' }).click();
+  await page.evaluate(() => window.navTo(5));
+  check(!(await page.$('#delta')), '재진단: 기준 없이 비교 섹션 표시');
+  await page.locator('#history').getByRole('button', { name: '이번 진단 기록 저장' }).click();
+  check((await page.locator('#history tbody tr').count()) === 1, '재진단: 기록 저장 실패');
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.locator('#history').getByRole('button', { name: '내보내기' }).first().click()]);
+  const file = `${OUT}/record.json`;
+  await dl.saveAs(file);
+  check(JSON.parse(readFileSync(file, 'utf8')).kind === 'beconic-diagnosis', '재진단: 내보낸 파일 형식');
+  await page.locator('#history').getByRole('button', { name: '재진단 시작' }).first().click();
+  check((await page.evaluate(() => document.querySelector('.section.active')?.id)) === 's2', '재진단: 핵심기술 단계로 이동 안 됨');
+  await page.evaluate(() => { window.ans('q9', 4); window.ans('q10', 4); window.navTo(5); });
+  const head = await page.textContent('#delta .decision p');
+  check(/기술역량 \d+→\d+/.test(head ?? ''), `재진단: 변화 요약 ${head}`);
+  const prPages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
+  check(prPages === 15, `재진단: PDF 섹션 수 ${prPages} (기대 15)`);
+  check(/Re-diagnosis Delta/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
+  await page.emulateMedia({ media: 'print' });
+  mkdirSync(`${OUT}/pdf`, { recursive: true });
+  await page.pdf({ path: `${OUT}/pdf/new-rediag.pdf`, format: 'A4', printBackground: true }); // test:pdf 검수 대상에 포함
+  await page.evaluate(() => localStorage.removeItem('beconic_history_v1'));
+  await page.emulateMedia({ media: 'screen' });
+  await page.evaluate(() => window.navTo(5));
+  await page.locator('#history input[type=file]').setInputFiles(file);
+  await page.waitForTimeout(300);
+  check((await page.locator('#history tbody tr').count()) === 1, '재진단: 기록 파일 불러오기 실패');
+  check(errors.length === 0, `재진단: 콘솔 에러 ${JSON.stringify(errors)}`);
+  await ctx.close();
+}
+
 await browser.close();
 server.close();
 if (failures.length) {
   console.error('❌ E2E 실패\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log(`✅ E2E 통과 (뷰포트 ${VIEWPORTS.length}개, 전부 모름, CSS, PDF)`);
+console.log(`✅ E2E 통과 (뷰포트 ${VIEWPORTS.length}개, 전부 모름, CSS, PDF, 재진단)`);

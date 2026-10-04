@@ -212,7 +212,7 @@ Rule 결과 + RAG citations + Claude narrative
 | **4 평가** | Gold Set ≥50, evaluate 스크립트, 결과 리포트 | 목표치 합의 후 통과 시 UI 라벨 복원 |
 | **5 Claude** 🟡 Task 2(해석)·3·4(축약: 전략 메모·맞춤 90일 과제) 구현 | 5개 task, schema, guardrail, fallback | 스키마 준수 100%, 점수 변경 0건, 날조 인용 0건(자동검사) |
 | **6 PDF** 🟡 시각화 보강(v0.9.9: 포지셔닝·레이더·간트·KPI 기준선) | ReportViewModel, Paged.js 렌더러, PDF QA 체크리스트 | 마스터 13.4 항목 전수 통과 |
-| **7 재진단** | reassessments, delta 뷰, expert_feedback | 90일 후 재진단 비교 보고서 |
+| **7 재진단** 🟡 비교 구현(v0.9.12: 브라우저·파일 기록, delta 화면·PDF) | reassessments, delta 뷰, expert_feedback | 90일 후 재진단 비교 보고서 |
 
 ## 10. 테스트·QA 계획
 

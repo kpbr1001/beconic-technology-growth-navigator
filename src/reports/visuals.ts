@@ -145,3 +145,26 @@ export function riskHeatmapSVG(risks: { id: string; likelihood: 1 | 2 | 3 | null
     `<text x="${LW - 6}" y="14" text-anchor="end" font-size="8.5" font-weight="700" fill="#667085">영향 ↓</text>`;
   return `<svg class="heatmap-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="리스크 히트맵">${out}</svg>`;
 }
+
+/** 재진단 변화(덤벨) SVG: 영역별 기준(회색) → 이번(파랑·빨강) 점수. 판단 보류는 표시만 */
+export function deltaDumbbellSVG(rows: { label: string; prev: number | null; cur: number | null; verdict: string }[]): string {
+  const LW = 84, RW = 70, PW = 330, RH = 24, T = 18, W = LW + PW + RW, H = T + rows.length * RH + 8;
+  const x = (v: number) => LW + (Math.max(0, Math.min(100, v)) / 100) * PW;
+  const grid = [0, 25, 50, 75, 100].map((g) =>
+    `<line x1="${x(g)}" y1="${T - 6}" x2="${x(g)}" y2="${T + rows.length * RH}" stroke="#eaecf0"/><text x="${x(g)}" y="10" text-anchor="middle" font-size="8" fill="#98a2b3">${g}</text>`).join('');
+  const body = rows.map((r, i) => {
+    const y = T + i * RH + RH / 2;
+    const col = r.verdict === '개선' ? '#2457f5' : r.verdict === '악화' ? '#d92d20' : '#667085';
+    const label = `<text x="${LW - 8}" y="${y + 3}" text-anchor="end" font-size="9.5" font-weight="700" fill="#1d2939">${esc(r.label)}</text>`;
+    const tag = `<text x="${LW + PW + 8}" y="${y + 3}" font-size="9" font-weight="700" fill="${col}">${esc(r.verdict)}</text>`;
+    if (r.prev === null || r.cur === null) {
+      const v = r.cur ?? r.prev;
+      return label + tag + (v === null ? '' : `<circle cx="${x(v)}" cy="${y}" r="5" fill="${r.cur === null ? '#d0d5dd' : col}"/>`);
+    }
+    return label + tag +
+      `<line x1="${x(r.prev)}" y1="${y}" x2="${x(r.cur)}" y2="${y}" stroke="${col}" stroke-width="3" opacity=".35"/>` +
+      `<circle cx="${x(r.prev)}" cy="${y}" r="5" fill="#d0d5dd"/><circle cx="${x(r.cur)}" cy="${y}" r="5.5" fill="${col}"/>` +
+      `<text x="${x(r.cur)}" y="${y - 8}" text-anchor="middle" font-size="8.5" font-weight="800" fill="${col}">${r.cur}</text>`;
+  }).join('');
+  return `<svg class="delta-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="재진단 영역별 변화">${grid}${body}</svg>`;
+}
