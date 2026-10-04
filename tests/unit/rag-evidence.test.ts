@@ -152,6 +152,21 @@ describe('서버 함수 /api/roadmap-evidence', () => {
     expect(urlHint('https://supabase.com/dashboard/project/abcd1234')).toMatch(/확인 필요/);
     expect(urlHint('https://abcd1234.supabase.co')).not.toContain('abcd1234');
   });
+  it('외부 처리 동의 전(external≠true)에는 임베딩 호출 없이 키워드만', async () => {
+    const env = { SUPABASE_URL: 'https://x.supabase.co', SUPABASE_SERVICE_ROLE_KEY: SERVICE_JWT, EMBEDDING_PROVIDER: 'voyage', VOYAGE_API_KEY: 'pa-test' };
+    const orig = globalThis.fetch;
+    const f = vi.fn(async (u: string) => new Response(JSON.stringify(String(u).includes('voyage') ? { data: [{ embedding: [0.1], index: 0 }] } : [row()]), { status: 200 }));
+    globalThis.fetch = f as unknown as typeof fetch;
+    try {
+      const r1 = await (await handle(req({ query: '예지보전', itemUids: ['SMESTR-2025-B-03-08@p279'] }), env)).json();
+      expect(r1.mode).toBe('keyword_only');
+      expect(f.mock.calls.some((c) => String(c[0]).includes('voyage'))).toBe(false);
+      await handle(req({ query: '예지보전', itemUids: ['SMESTR-2025-B-03-08@p279'], external: true }), env);
+      expect(f.mock.calls.some((c) => String(c[0]).includes('voyage'))).toBe(true);
+    } finally {
+      globalThis.fetch = orig;
+    }
+  });
   it('환경변수 없으면 200 not_configured', async () => {
     const res = await handle(req({ query: '예지보전', itemUids: ['SMESTR-2025-B-03-08@p279'] }), {});
     expect([res.status, (await res.json()).status]).toEqual([200, 'not_configured']);
