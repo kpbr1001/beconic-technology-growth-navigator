@@ -53,7 +53,8 @@ const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object
 export function parseSnapshot(x: unknown): Snapshot | null {
   if (!isObj(x) || x.kind !== SNAPSHOT_KIND || x.schema !== SNAPSHOT_SCHEMA) return null;
   const i = x.input, s = x.summary;
-  if (typeof x.id !== 'string' || typeof x.savedAt !== 'string' || Number.isNaN(Date.parse(x.savedAt))) return null;
+  // id는 화면 버튼 동작에 쓰이므로 영문·숫자·하이픈만 허용(조작된 파일의 스크립트 주입 차단)
+  if (typeof x.id !== 'string' || !/^[a-z0-9-]{1,40}$/.test(x.id) || typeof x.savedAt !== 'string' || Number.isNaN(Date.parse(x.savedAt))) return null;
   if (!isObj(i) || !isObj(s) || !isObj(i.company) || !isObj(i.discovery) || !isObj(i.answers) || !Array.isArray(i.inventory)) return null;
   if (i.mode !== 'quick' && i.mode !== 'deep') return null;
   const answers: Record<string, number | null> = {};
@@ -74,7 +75,7 @@ export function parseSnapshot(x: unknown): Snapshot | null {
   }));
   const versions = isObj(s.versions) ? s.versions : {};
   return {
-    kind: SNAPSHOT_KIND, schema: SNAPSHOT_SCHEMA, id: x.id.slice(0, 40), savedAt: x.savedAt, appVersion: str(x.appVersion, 40) || undefined,
+    kind: SNAPSHOT_KIND, schema: SNAPSHOT_SCHEMA, id: x.id, savedAt: new Date(Date.parse(x.savedAt)).toISOString(), appVersion: str(x.appVersion, 40) || undefined,
     input: {
       mode: i.mode,
       company: {

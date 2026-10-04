@@ -27,6 +27,8 @@ describe('스냅샷', () => {
   it('형식이 다르거나 값이 범위를 벗어나면 거부·정리', () => {
     expect(parseSnapshot({ kind: 'other' })).toBeNull();
     expect(parseSnapshot({ ...snap, savedAt: 'x' })).toBeNull();
+    // 화면 버튼에 쓰이는 id에 스크립트를 넣은 조작 파일은 거부
+    expect(parseSnapshot({ ...snap, id: "x');alert(1);('" })).toBeNull();
     const dirty = JSON.parse(JSON.stringify(snap));
     dirty.input.answers = { q1: 9, q2: 3, '__proto__x': 1, q3: null };
     dirty.input.inventory[0].trl = 42;
