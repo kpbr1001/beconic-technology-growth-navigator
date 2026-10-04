@@ -22,13 +22,10 @@
 1. **Supabase 프로젝트 생성** — supabase.com → New project (리전: Seoul 권장)
 2. **테이블·검색 함수 만들기** — Supabase 대시보드 → SQL Editor → `supabase/migrations/20261003000000_roadmap_kb.sql` 내용 붙여넣고 Run
 3. **키 확인** — Project Settings → API: `Project URL`, `service_role`(또는 secret) 키
-4. **원문 적재(1회, 로컬 PC에서)** — 비공개 KB 저장소를 옆에 두고:
-   ```bash
-   SUPABASE_URL=https://xxxx.supabase.co SUPABASE_SERVICE_ROLE_KEY=<키> \
-     npx vite-node scripts/rag/load_kb.ts --chunks ../beconic-roadmap-kb/kb/chunks.jsonl
-   # 의미 검색까지: 앞에 EMBEDDING_PROVIDER=voyage VOYAGE_API_KEY=<키> 추가 (EMBEDDING_DIMENSIONS=1024)
-   ```
-   키는 명령 실행 시에만 입력하고 파일에 저장하지 않습니다. 적재는 재실행해도 안전합니다(같은 문단은 갱신, 다른 KB 버전은 비활성).
+4. **원문 적재(1회)**
+   - 키워드 검색만: Supabase 표 가져오기(CSV) 또는 로컬 `npx vite-node scripts/rag/load_kb.ts --chunks …`
+   - **의미 검색(Voyage)까지: 비공개 KB 저장소의 GitHub Actions 버튼** — `beconic-roadmap-kb` → Settings → Secrets에 `SUPABASE_URL`·`SUPABASE_SERVICE_ROLE_KEY`·`VOYAGE_API_KEY` 등록 → Actions → "로드맵 원문 임베딩 적재" → `시험`(쓰기 없음) → `전체 적재`
+   - 적재는 재실행해도 안전합니다(같은 문단은 갱신, 다른 KB 버전은 비활성). Voyage 사용 한도(429)는 20초·40초… 간격으로 자동 재시도합니다.
 5. **Netlify 환경변수 등록** — Site configuration → Environment variables
 
    | 이름 | 값 | 공개 여부 |

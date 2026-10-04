@@ -1,7 +1,7 @@
 // Phase 3 원문 근거: Supabase 검색기·근거 발췌·서버 함수·적재 변환. 실제 Supabase/Voyage 없이(가짜 fetch) 실행.
 import { describe, expect, it, vi } from 'vitest';
 import { handle, urlHint } from '../../netlify/functions/roadmap-evidence';
-import { embedInput, toRow, type Chunk } from '../../scripts/rag/load_kb';
+import { embedInput, toRow, withRetry, type Chunk } from '../../scripts/rag/load_kb';
 import { createEmbeddingProvider, type EmbeddingProvider } from '../../src/rag/embedding';
 import { bestQuote, findEvidence } from '../../src/rag/evidence';
 import {
@@ -158,6 +158,18 @@ describe('적재 변환', () => {
     const r = toRow(c);
     expect(r).not.toHaveProperty('trl_by_year');
     expect([r.technology_no, r.content, r.is_active, r.roadmap_role]).toEqual([null, '', true, 'primary']);
+  });
+  it('적재 재시도: 실패하면 대기 후 다시, 한도 넘으면 오류', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const waits: number[] = [];
+      let n = 0;
+      const ok = await withRetry(async () => { if (++n < 3) throw new Error('HTTP 429'); return 'done'; }, { baseMs: 10, wait: async (ms) => void waits.push(ms) });
+      expect([ok, waits]).toEqual(['done', [10, 20]]);
+      await expect(withRetry(async () => { throw new Error('HTTP 401'); }, { tries: 2, baseMs: 1, wait: async () => {} })).rejects.toThrow('401');
+    } finally {
+      warn.mockRestore();
+    }
   });
   it('임베딩 입력 = 문맥 머리말 + 내용', () => {
     expect(embedInput({ ...c, content: '본문' })).toBe('[문서] X\n본문');
