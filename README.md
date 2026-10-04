@@ -60,6 +60,10 @@ Supabase·Voyage 설정 방법은 [docs/phase3-rag-setup.md](docs/phase3-rag-set
 
 Anthropic API 키 설정 방법은 [docs/phase5-ai-setup.md](docs/phase5-ai-setup.md). 설정 전에도 앱은 규칙 기반 해석으로 정상 동작합니다.
 
+## 재진단 비교(Phase 7)
+
+결과 화면 '진단 기록 · 재진단'에서 이번 진단을 기록으로 저장하거나 파일(JSON)로 내보낸 뒤, 90일 후 '재진단 시작'으로 같은 입력을 불러와 바뀐 항목만 수정하면 기준 진단 대비 변화(영역·신뢰도·TRL·P0 이행·리스크)를 화면과 PDF(비교 쪽 1개 추가)로 보여 줍니다. 기록은 브라우저와 내려받은 파일에만 저장되며 서버로 보내지 않습니다. 비교 로직: `src/diagnosis/delta.ts`.
+
 ## CI (GitHub Actions)
 
 PR·main push마다 `.github/workflows/ci.yml`이 4개 검사를 실행합니다.
