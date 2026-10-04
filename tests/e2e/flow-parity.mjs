@@ -136,7 +136,8 @@ for (const width of [390, 1440]) {
     `${tag} 단계 구성 불일치 (기술 ${old.nRows}/${now.nRows}, 문항 ${old.qCount}/${now.qCount}, 근거 ${old.nCards}/${now.nCards})`);
   for (const [k, v] of Object.entries(now.steps)) check(v.overflowPx <= 1, `${tag} ${k}: 가로 넘침 ${v.overflowPx}px`);
   check(now.printed === 1, `${tag} PDF 인쇄 버튼이 인쇄를 호출하지 않음`);
-  check(now.prPages === old.prPages, `${tag} PDF 섹션 수 ${old.prPages} → ${now.prPages}`);
+  // v0.9.11: 리스크 레드팀 쪽 1개 추가(의도된 변경)
+  check(now.prPages === old.prPages + 1, `${tag} PDF 섹션 수 ${old.prPages} → ${now.prPages} (기대 ${old.prPages + 1})`);
   check(now.restored.summaryVisible && now.restored.name && now.restored.printName, `${tag} 저장 후 새로고침 복원 실패`);
   check(now.afterReset.step0 && now.afterReset.name === '', `${tag} 초기화 실패`);
   for (const id of Object.keys(old.sections)) check(now.sections[id] !== null, `${tag} 결과 섹션 누락: ${id}`);

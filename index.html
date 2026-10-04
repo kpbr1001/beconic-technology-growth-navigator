@@ -124,6 +124,11 @@ main{min-width:0}
 .opt-score{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:0 0 10px}.opt-score .bartrack{height:8px;background:#edf0f5;border-radius:999px;overflow:hidden}.opt-score .bartrack i{display:block;height:100%;background:#5a75c4;border-radius:999px}.opt-score span{font-size:11px;font-weight:800;color:#344054}
 .ai-inline{margin-top:8px;border-left:3px solid #a5b4fc;background:#f8f9ff;border-radius:8px;padding:8px 10px;font-size:12px;color:#344054;line-height:1.5}.ai-inline small{display:block;color:var(--muted);font-size:10.5px;margin-top:3px}.ai-more{margin-top:12px}
 @media(max-width:720px){.position-grid,.option-grid{grid-template-columns:1fr}}
+/* 리스크 레드팀(v0.9.11) */
+.rt-top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:13px}.heatmap-svg{max-width:440px;display:block;margin:0 auto}
+.rt-counts{display:flex;gap:6px;flex-wrap:wrap}.rt-table{min-width:980px}.rt-table td{font-size:11.5px;line-height:1.5;vertical-align:top}.rt-table td.subtle{font-size:10.5px}
+.rt-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+@media(max-width:720px){.rt-top,.rt-grid2{grid-template-columns:1fr}}
 .report-nav{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 14px}.report-nav a{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:800;color:#475467;text-decoration:none}.report-nav a:hover{background:var(--soft);color:var(--primary2)}
 .narrative-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.narrative{border:1px solid var(--line);border-radius:15px;padding:15px;background:#fff}.narrative h3{margin:0 0 8px;font-size:15px}.narrative p{margin:0;color:#475467;font-size:12px}.narrative ul{margin:8px 0 0;padding-left:18px}.narrative li{font-size:12px;margin:5px 0;color:#475467}
 .qa-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.qa-card{border:1px solid var(--line);border-radius:13px;padding:12px}.qa-card small{display:block;color:var(--muted)}.qa-card b{display:block;margin-top:4px}.qa-card .dotstatus{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px}.dotstatus.ok{background:var(--ok)}.dotstatus.warn{background:#f79009}.dotstatus.bad{background:var(--bad)}
@@ -175,6 +180,7 @@ main{min-width:0}
     .pr-position{margin-top:3mm}.pr-position .matrix-svg{max-height:58mm;width:100%}.pr-asks{margin:1mm 0 0;padding-left:4.5mm}.pr-asks li{font-size:8.1pt;margin:.8mm 0;color:#344054}
   .pr-ai-line{margin-top:1.8mm!important;border-left:2px solid #a5b4fc;padding-left:2mm;font-size:7.9pt!important;color:#344054!important}
   .pr-optbar{display:grid;grid-template-columns:1fr auto;gap:2mm;align-items:center;margin:0 0 2mm}.pr-optbar span{font-size:7.6pt;font-weight:800;color:#344054}
+  .pr-rt-top{margin-bottom:2.5mm}.pr-rt-top .heatmap-svg{max-height:46mm;width:100%}.pr-rt-top li{font-size:7.7pt;margin:.6mm 0}.pr-table.pr-rt td{font-size:7.1pt;line-height:1.3;padding:1.1mm 1.4mm}.pr-table.pr-rt th{font-size:7.1pt;padding:1.2mm 1.4mm}
   .pr-radar svg{max-height:68mm;display:block;margin:0 auto}.pr-gantt svg{display:block;margin:1mm 0 1.5mm}.pr-table .pr-subrow td{background:#f8f9ff;font-size:7.6pt;color:#344054;padding-top:1mm;padding-bottom:1.2mm;border-top:0}.pr-gantt .pr-source{line-height:1.5}
   .pr-option .opt-head{display:flex;justify-content:space-between;gap:2mm;align-items:center;margin-bottom:1.5mm}.pr-option .opt-head b{font-size:9.2pt}.pr-option .opt-score{font-size:7pt;font-weight:800;color:#173fb5}
 }

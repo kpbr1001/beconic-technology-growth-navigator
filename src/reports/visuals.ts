@@ -40,11 +40,21 @@ export function positionMatrixSVG(capability: number | null, confidence: number)
     `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="${fill}" ${q?.key === k ? 'stroke="#2457f5" stroke-width="1.5"' : ''}/>` +
     // 위쪽 사분면은 위에, 아래쪽 사분면은 아래에 이름을 둬 현재 위치 표시와 겹치지 않게
     `<text x="${(x0 + x1) / 2}" y="${y0 === T ? y0 + 14 : y1 - 7}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${q?.key === k ? '#173fb5' : '#667085'}">${QUADRANTS[k].label}</text>`;
+  // 현재 위치 라벨은 점이 있는 사분면 안에 두어 기준선·사분면 이름과 겹치지 않게 한다
+  const px = x(confidence), py = capability === null ? 0 : y(capability);
+  const LBL = 74; // '현재 (78, 52)' 라벨 폭(대략)
+  const [qL, qR] = Math.round(confidence) < MATRIX_CUT.confidence ? [L, cx] : [cx, L + PW];
+  const below = capability !== null && (capability > 88 || (py > cy && py - cy < 16));
+  // 오른쪽 → 왼쪽 → 점 위·아래 가운데 순으로, 점이 있는 사분면 안에 들어가는 자리
+  const [lx, anchor, dy] =
+    px + 10 + LBL <= qR ? [px + 10, 'start', below ? 17 : -9]
+      : px - 10 - LBL >= qL ? [px - 10, 'end', below ? 17 : -9]
+        : [Math.min(Math.max(px, qL + LBL / 2 + 2), qR - LBL / 2 - 2), 'middle', below ? 20 : -12];
   const dot =
     capability === null
       ? `<text x="${L + PW / 2}" y="${T + PH / 2}" text-anchor="middle" font-size="10" fill="#b54708">기술역량 판단 보류 — 위치 미표시</text>`
-      : `<circle cx="${x(confidence)}" cy="${y(capability)}" r="6.5" fill="#2457f5" stroke="#fff" stroke-width="2"/>` +
-        `<text x="${x(confidence) + (confidence > 80 ? -10 : 10)}" y="${y(capability) + (capability > 88 ? 14 : -8)}" text-anchor="${confidence > 80 ? 'end' : 'start'}" font-size="9.5" font-weight="800" fill="#1d2939">현재 (${Math.round(confidence)}, ${Math.round(capability)})</text>`;
+      : `<circle cx="${px}" cy="${py}" r="6.5" fill="#2457f5" stroke="#fff" stroke-width="2"/>` +
+        `<text class="matrix-here" x="${lx}" y="${py + dy}" text-anchor="${anchor}" font-size="9.5" font-weight="800" fill="#1d2939">현재 (${Math.round(confidence)}, ${Math.round(capability)})</text>`;
   return `<svg class="matrix-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="기술역량·진단 신뢰도 포지셔닝">` +
     zone('evidence', L, T, cx, cy, '#fff7ed') + zone('scale', cx, T, L + PW, cy, '#ecfdf3') +
     zone('recheck', L, cy, cx, T + PH, '#fef3f2') + zone('focus', cx, cy, L + PW, T + PH, '#f5f7ff') +
@@ -108,4 +118,30 @@ export function ganttSVG(rows: GanttRow[]): string {
 export function dateAfter(days: number, from = new Date()): string {
   const d = new Date(from.getTime() + days * 86_400_000);
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** 리스크 히트맵 SVG: 가로=가능성(낮음·중간·높음·확인 필요), 세로=영향(위가 높음). 칸 안에 리스크 ID */
+export function riskHeatmapSVG(risks: { id: string; likelihood: 1 | 2 | 3 | null; impact: 1 | 2 | 3 }[]): string {
+  const LW = 44, TH = 22, CW = 74, CH = 46, W = LW + CW * 4 + 4, H = TH + CH * 3 + 24;
+  const fill = (s: number | null) => (s === null ? '#f2f4f7' : s >= 6 ? '#fee4e2' : s >= 3 ? '#fef0c7' : '#ecfdf3');
+  const cols = ['낮음', '중간', '높음', '확인 필요'];
+  let out = cols.map((c, i) => `<text x="${LW + i * CW + CW / 2}" y="14" text-anchor="middle" font-size="9" font-weight="700" fill="#475467">${c}</text>`).join('');
+  for (let imp = 3; imp >= 1; imp--) {
+    const y0 = TH + (3 - imp) * CH;
+    out += `<text x="${LW - 6}" y="${y0 + CH / 2 + 3}" text-anchor="end" font-size="9" font-weight="700" fill="#475467">${['', '낮음', '중간', '높음'][imp]}</text>`;
+    for (let c = 0; c < 4; c++) {
+      const lk = c < 3 ? c + 1 : null;
+      const x0 = LW + c * CW;
+      out += `<rect x="${x0 + 1}" y="${y0 + 1}" width="${CW - 2}" height="${CH - 2}" rx="4" fill="${fill(lk === null ? null : lk * imp)}" stroke="#fff"/>`;
+      const here = risks.filter((r) => r.impact === imp && r.likelihood === lk);
+      here.forEach((r, k) => {
+        const cx = x0 + 14 + (k % 3) * 23, cy = y0 + 12 + Math.floor(k / 3) * 14;
+        out += `<circle cx="${cx}" cy="${cy}" r="7" fill="${lk === null ? '#667085' : lk * imp >= 6 ? '#d92d20' : lk * imp >= 3 ? '#dc6803' : '#039855'}"/>` +
+          `<text x="${cx}" y="${cy + 3}" text-anchor="middle" font-size="6.6" font-weight="800" fill="#fff">${esc(r.id)}</text>`;
+      });
+    }
+  }
+  out += `<text x="${LW + (CW * 3) / 2}" y="${H - 6}" text-anchor="middle" font-size="9" fill="#475467">발생 가능성 →</text>` +
+    `<text x="${LW - 6}" y="14" text-anchor="end" font-size="8.5" font-weight="700" fill="#667085">영향 ↓</text>`;
+  return `<svg class="heatmap-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="리스크 히트맵">${out}</svg>`;
 }
