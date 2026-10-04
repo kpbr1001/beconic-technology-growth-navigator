@@ -72,6 +72,7 @@ export function parseSnapshot(x: unknown): Snapshot | null {
     id: Number.isFinite(t.id) ? Number(t.id) : n + 1, name: str(t.name, 120), type: str(t.type, 40), ownership: str(t.ownership, 40),
     status: str(t.status, 40), critical: t.critical === true, trl: Number.isInteger(t.trl) ? Math.max(0, Math.min(9, t.trl as number)) : 0,
     confirmed: t.confirmed === true,
+    ...(typeof t.src === 'string' && /^[a-zA-Z]{1,20}$/.test(t.src) ? { src: t.src } : {}),
   }));
   const versions = isObj(s.versions) ? s.versions : {};
   return {

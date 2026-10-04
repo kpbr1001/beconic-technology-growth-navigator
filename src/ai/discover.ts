@@ -6,7 +6,7 @@ import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod';
 import { z } from 'zod/v4';
 import type { Effort } from './interpret';
 
-export const DISCOVER_PROMPT_VERSION = 'discover-v1';
+export const DISCOVER_PROMPT_VERSION = 'discover-v2';
 export const DISCOVER_FIELDS = ['product', 'sectorDetail', 'hardPart', 'automated', 'data', 'external', 'validation'] as const;
 export type DiscoverField = (typeof DISCOVER_FIELDS)[number];
 const FIELD_LABEL: Record<DiscoverField, string> = {
@@ -61,6 +61,7 @@ export const DISCOVER_SYSTEM = `당신은 그로스벤처스의 기술사업화 
 - 답변에 근거가 있는 기술만 씁니다. 답변에 없는 기술을 추측하거나, 앞으로 개발하면 좋을 기술을 제안하지 않습니다.
 - 각 후보의 quote에는 근거가 된 답변 구절을 한 글자도 바꾸지 않고 그대로 복사합니다. 요약·의역하지 않습니다. source_field에는 그 구절이 있는 답변 칸 이름을 적습니다.
 - TRL·점수·등급·시장성 평가는 쓰지 않습니다.
+- 실증·납품·PoC 경험, 고객 실적, 인증 이력처럼 '기술을 검증한 기록'은 기술이 아니라 근거자료이므로 후보로 쓰지 않습니다. 그 경험에서 실제로 쓰인 기술(예: 모델·정규화 방법)이 답변에 있으면 그 기술을 씁니다.
 - 기술 이름은 쉬운 우리말로, 무엇을 하는 기술인지 드러나게 씁니다(예: "설비 센서 데이터 정규화", "고장 직전 이상 패턴 탐지 모델"). 영어 약어는 꼭 필요할 때만 씁니다.
 - 외부 서비스·외주·공급사에 의존하는 기술은 ownership을 '외부' 또는 '혼합'으로 적습니다. 판단할 근거가 없으면 '확인필요'로 둡니다.
 - 이미 목록에 있는 기술과 같은 것은 다시 쓰지 않습니다. 같은 기술을 이름만 바꿔 여러 개 쓰지 않습니다.
@@ -84,7 +85,10 @@ export function buildDiscoverContent(req: DiscoverRequest): string {
 const squash = (s: string) => s.replace(/\s+/g, '').replace(/[“”"']/g, '');
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
-export type DiscoverViolation = 'quote_not_in_answer' | 'unknown_field' | 'duplicate' | 'empty' | 'trl_or_score';
+export type DiscoverViolation = 'quote_not_in_answer' | 'unknown_field' | 'duplicate' | 'empty' | 'trl_or_score' | 'not_technology';
+
+/** 경험·실적·이력은 기술이 아니라 근거자료(결과의 TRL 근거로 씀) */
+const NOT_TECH = /(경험|실적|이력|사례|레퍼런스)$/;
 
 /** 인용 대조·중복·형식 정리. 원문에 없는 인용은 제거(없는 기술을 만들어 내지 못하게) */
 export function guardDiscover(raw: DiscoverOutput, req: DiscoverRequest): { candidates: DiscoverCandidate[]; removed: DiscoverViolation[] } {
@@ -100,6 +104,7 @@ export function guardDiscover(raw: DiscoverOutput, req: DiscoverRequest): { cand
     if (!(DISCOVER_FIELDS as readonly string[]).includes(field)) { removed.push('unknown_field'); continue; }
     if (!squash(fields[field] ?? '').includes(squash(x.quote))) { removed.push('quote_not_in_answer'); continue; }
     if (/TRL\s*\d|\d+\s*점|적합도|등급/.test(`${name} ${x.why_core}`)) { removed.push('trl_or_score'); continue; }
+    if (NOT_TECH.test(name.replace(/[\s)]+$/, ''))) { removed.push('not_technology'); continue; }
     if (seen.has(squash(name))) { removed.push('duplicate'); continue; }
     seen.add(squash(name));
     out.push({

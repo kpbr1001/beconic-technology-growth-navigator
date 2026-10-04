@@ -51,6 +51,8 @@ export interface TechItem {
   /** 0 = 확인필요 */
   trl: number;
   confirmed: boolean;
+  /** 후보를 찾은 기술 발견 답변 칸(예: hardPart) — 핵심기술 우선순위 판단에 씀 */
+  src?: string;
 }
 
 /** 1~5 척도, null = 모름·확인필요, undefined = 미응답 */

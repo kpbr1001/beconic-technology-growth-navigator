@@ -48,6 +48,10 @@ for (const [w, h] of VIEWPORTS) {
   check(!/POC 적합성|높음|중간/.test(txt), `${w}px: 로드맵 후보에 검증 전 적합도 등급 노출`);
   // D4: 원문 색인 품목·쪽 번호 (샘플기업 = 스마트제조 예지보전)
   check(/SMESTR-2025-B-03-08/.test(txt) && /p\.271/.test(txt), `${w}px: 원문 색인 후보(품목코드·쪽) 미표시`);
+  // 결과 연관성: 요약은 P0 과제, 핵심기술 우선순위(확인 항목)와 R&D 과제 연결
+  check(/90일 최우선 과제\(P[0-2]\)/.test(await page.textContent('#summary')), `${w}px: 요약에 P0 기준 최우선 과제 누락`);
+  const tech = await page.textContent('#tech');
+  check(/확인 항목/.test(tech) && /\d\/5/.test(tech) && /R&D-1/.test(tech), `${w}px: 핵심기술 우선순위·결과 연결 누락`);
   if (w === 375 || w === 1440) await page.screenshot({ path: `${OUT}/result-${w}.png`, fullPage: false });
   await page.close();
 }
@@ -96,6 +100,11 @@ for (const [w, h] of VIEWPORTS) {
   check(/Scoring rule-v1\.1/.test(pr), 'PDF에 Scoring 버전 누락');
   check(/AI 설비 예지보전 솔루션/.test(pr) && /원문 p\.271/.test(pr), 'PDF 로드맵 정렬에 원문 색인 후보 누락');
   check(/Roadmap KB index-kb-v2/.test(pr), 'PDF에 Roadmap KB 버전 누락');
+  check(/순위 기준/.test(pr) && /R&D-1/.test(pr), 'PDF 핵심기술 우선순위·결과 연결 누락');
+  check(/권하는 이유/.test(pr), 'PDF 전략 대안에 우선 검토 이유 누락');
+  const radar = await page.textContent('#printReport .pr-radar');
+  check((radar.match(/\b\d{1,3}\b/g) || []).length >= 7, `PDF 레이더 점수 표기 누락 ${radar}`);
+  check(!/검증 검증|운영 운영|점수 점수|관문를|점를/.test(pr), 'PDF 용어 변환 중복·조사 오류');
   check(/App v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트/.test(pr), 'PDF에 앱 버전·업데이트 일자 누락');
   check(/그로스벤처스/.test(pr) && /제2025-684호/.test(pr), 'PDF에 발행사·인증번호 누락');
   const logoOk = await page.$eval('#printReport .cover-logo', (i) => i.complete && i.naturalWidth > 0);
@@ -116,6 +125,11 @@ for (const [w, h] of VIEWPORTS) {
   const names = await page.$$eval('section.active .tech-row b', (bs) => bs.map((b) => b.textContent));
   check(names.length >= 3 && names.some((n) => /알고리즘·모델/.test(n)), `기술 후보: 답변 기반 후보 미생성 ${JSON.stringify(names)}`);
   check((await page.locator('section.active .tech-basis').count()) === names.length, '기술 후보: 근거 구절 미표시');
+  // 결과 반영 안내: 핵심기술 체크 수와 행별 '결과 반영/목록만'
+  const note = await page.textContent('section.active .reflect-note');
+  check(/'핵심기술'에 체크한 기술만/.test(note) && /\d+개<\/b>|\d+개 반영/.test(note), `기술 후보: 결과 반영 안내 누락 ${note}`);
+  const rowTags = await page.$$eval('section.active .tech-row .check .tag', (ts) => ts.map((t) => t.textContent));
+  check(rowTags.includes('결과 반영') && rowTags.length === names.length, `기술 후보: 결과 반영 표시 누락 ${JSON.stringify(rowTags)}`);
   await page.locator('section.active .tech-row').last().getByRole('button', { name: '삭제' }).click();
   check((await page.locator('section.active .tech-row').count()) === names.length - 1, '기술 후보: 삭제 동작 안 함');
   check(errors.length === 0, `기술 후보: 콘솔 에러 ${JSON.stringify(errors)}`);

@@ -51,3 +51,22 @@ export function riskItems(a: Record<string, Answer>): RiskItem[] {
   if (low(a.q7)) r.push(['확장 리스크', '중간', '현재 규모에서의 성공이 확장 시 유지된다는 근거가 부족합니다.']);
   return r.slice(0, 4);
 }
+
+/** 우선 검토안이 정해진 이유(위 strategicOptions의 규칙을 그대로 문장으로 풀어 씀 — 규칙은 바꾸지 않음) */
+export function recommendReason(r: Pick<AssessmentResult, 'm' | 'confidence'>): string {
+  const { m, confidence } = r;
+  const v = (x: number | null) => (x === null ? '판단 보류' : String(Math.round(x)));
+  const rec = strategicOptions(r).findIndex((o) => o.recommended);
+  if (rec === 0) {
+    const why: string[] = [];
+    if (confidence < 62) why.push(`진단 신뢰도 ${Math.round(confidence)}(기준 62 미만)`);
+    if (m.evidence === null || m.evidence < 45) why.push(`기술기록 ${v(m.evidence)}(기준 45 미만)`);
+    if (m.exec === null || m.exec < 45) why.push(`실행준비 ${v(m.exec)}(기준 45 미만)`);
+    if (m.tech === null) why.push('기술성숙 판단 보류');
+    return `A를 먼저 권하는 이유: ${why.join(', ')}. 근거가 약한 상태에서 B·C에 투자하면 성과를 입증하기 어려워, 기준 점수가 더 높아도 근거 확보를 먼저 둡니다.`;
+  }
+  if (rec === 1 && m.tech !== null && m.tech >= 60 && m.scale !== null && m.scale < 65)
+    return `B를 권하는 이유: 기술성숙이 ${v(m.tech)}점(60 이상)으로 기능은 갖춰졌지만, 확장준비가 ${v(m.scale)}점(65 미만)으로 성장의 병목입니다.`;
+  if (rec === 2) return `C를 권하는 이유: 기술성숙 ${v(m.tech)}·R&D 역량 ${v(m.rd)}·전략정렬 ${v(m.strategy)}이 모두 기준(65·60·55) 이상이라 차별기술 투자 여력이 있습니다.`;
+  return 'B를 권하는 이유: A(근거 보강)나 C(차별기술) 조건에 해당하지 않아 제품화·확장을 기본안으로 둡니다.';
+}

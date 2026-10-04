@@ -85,12 +85,36 @@ export const TERMS: Term[] = [
   [/(?<![A-Za-z0-9_(])Hit@K·NDCG(?!\))/g, '검색 정확도 지표(Hit@K·NDCG)'],
 ];
 
+/** 받침 유무로 조사 고르기(을/를·이/가·은/는·과/와·으로/로). 한글이 아니면 받침 없음으로 본다 */
+export function josa(word: string, withFinal: string, withoutFinal: string): string {
+  const code = word.trim().charCodeAt(word.trim().length - 1) - 0xac00;
+  const fin = code >= 0 && code < 11172 ? code % 28 : 0;
+  // '으로/로'는 ㄹ 받침(8)도 '로'
+  const has = withFinal === '으로' ? fin !== 0 && fin !== 8 : fin !== 0;
+  return `${word}${has ? withFinal : withoutFinal}`;
+}
+
+const PAIRS: Record<string, [string, string]> = {
+  을: ['을', '를'], 를: ['을', '를'], 이: ['이', '가'], 가: ['이', '가'], 은: ['은', '는'], 는: ['은', '는'],
+  과: ['과', '와'], 와: ['과', '와'], 으로: ['으로', '로'], 로: ['으로', '로'],
+};
+const MARK = '\uE000';
+/** 바꾼 말 바로 뒤 조사를 새 말의 받침에 맞춤(예: Gate를 → 검증 관문을) */
+const fixJosa = (s: string) =>
+  s.replace(/([가-힣])\uE000(으로|을|를|이|가|은|는|과|와|로)(?![가-힣])/g, (_m, last: string, p: string) => {
+    const [a, b] = PAIRS[p];
+    return josa(last, a, b);
+  }).replace(/\uE000/g, '');
+/** 번역 뒤 같은 말이 겹치는 경우 정리(예: '운영 운영 체계', '의존요소 목록(의존요소 목록)') */
+const dedupe = (s: string) => s.replace(/(?<![가-힣])([가-힣]{2,4}) \1(?![가-힣])/g, '$1').replace(/([가-힣·][가-힣· ]{1,14})\(\1\)/g, '$1');
+
 /** 문자열 하나 변환(멱등) */
 export function plainKo(text: string): string {
   if (!/[A-Za-z]/.test(text)) return text;
   let out = text;
-  for (const [re, to] of TERMS) out = out.replace(re, to);
-  return out;
+  for (const [re, to] of TERMS) out = out.replace(re, (...a) => `${to.replace(/\$(\d)/g, (_m, n: string) => String(a[Number(n)] ?? ''))}${MARK}`);
+  if (out.indexOf(MARK) < 0) return text;
+  return dedupe(fixJosa(out));
 }
 
 const SKIP = new Set(['TEXTAREA', 'INPUT', 'SCRIPT', 'STYLE', 'CODE', 'OPTION']);

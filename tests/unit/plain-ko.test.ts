@@ -1,6 +1,6 @@
 // 쉬운 용어 변환: 영어 컨설팅 용어 → 우리말, 꼭 필요한 영어는 한국어 병행표기, 여러 번 적용해도 같음
 import { describe, expect, it } from 'vitest';
-import { plainKo, TERMS } from '../../src/app/plain-ko';
+import { josa, plainKo, TERMS } from '../../src/app/plain-ko';
 
 describe('쉬운 용어 변환', () => {
   it('컨설팅 용어를 우리말로', () => {
@@ -20,5 +20,21 @@ describe('쉬운 용어 변환', () => {
     const s = 'PoC Evidence Gold Set CVI/CVR Gap Governance Pilot Calibration';
     expect(plainKo(plainKo(s))).toBe(plainKo(s));
     for (const [, to] of TERMS) expect(plainKo(to)).toBe(to);
+  });
+  it('바꾼 말 뒤 조사를 받침에 맞추고, 번역으로 겹친 말을 정리', () => {
+    expect(plainKo('핵심기술별 현재 상태와 다음 검증 Gate를 관리합니다.')).toBe('핵심기술별 현재 상태와 다음 검증 관문을 관리합니다.');
+    expect(plainKo('실행 전제와 Trade-off를 함께')).toBe('실행 전제와 감수할 점을 함께');
+    expect(plainKo('KPI·운영 Governance')).toBe('성과지표·운영 체계');
+    expect(plainKo('의존요소 목록(Dependency Map)과 상위 5')).toBe('의존요소 목록과 상위 5');
+    expect(plainKo('점수 Calibration')).toBe('점수 보정');
+    expect(plainKo('Evidence가 부족 · Gate로 이동 · KPI와 Owner')).toBe('근거자료가 부족 · 검증 관문으로 이동 · 성과지표와 담당자');
+    expect(plainKo('Gate이며')).toBe('검증 관문이며');
+    for (const s of ['다음 검증 Gate를', 'KPI·운영 Governance', 'Top 3와 핵심기술 Crosswalk']) expect(plainKo(plainKo(s))).toBe(plainKo(s));
+  });
+  it('조사 고르기', () => {
+    expect(josa('정의서 작성', '이', '가')).toBe('정의서 작성이');
+    expect(josa('대조표', '이', '가')).toBe('대조표가');
+    expect(josa('규칙', '으로', '로')).toBe('규칙으로');
+    expect(josa('파일', '으로', '로')).toBe('파일로');
   });
 });
