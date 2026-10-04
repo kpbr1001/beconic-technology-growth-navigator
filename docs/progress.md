@@ -250,4 +250,9 @@ v0.9와 **달라지지 않는 것**(회귀 테스트로 고정): 문항·가중�
 - `scripts/rag/load_kb.ts`: `--probe`(키·모델·DB 연결만 확인, 쓰기 없음), 임베딩 실패 시 20초·40초… 최대 6회 재시도(429 대비), DB 저장 3회 재시도, `--pause-ms`, batch 1~128 검증
 - 비공개 KB 저장소 `.github/workflows/load-embeddings.yml`: 수동 실행(시험/전체 적재), `kb/`만 sparse checkout(원문 PDF 제외), 공개 앱 저장소 main의 적재 스크립트 사용, 키는 저장소 Secrets에서만
 - 켜는 순서: KB 저장소 Secrets 3개 → 시험 → 전체 적재 → Netlify `EMBEDDING_PROVIDER=voyage`·`VOYAGE_API_KEY`(Secret·Functions) → 재배포 → 신호등 '의미 검색' 초록
+- 운영 보완(첫 전체 적재가 10분 만에 실패 — Voyage 무료 한도로 추정, 결제수단 등록 후 재실행):
+  - `--resume` 이어서 적재: 같은 KB 버전·모델로 이미 임베딩된 문단은 건너뜀(`listEmbeddedChunkIds`, 1,000개씩 조회)
+  - 실패 시 GitHub Actions 요약(Annotations)에 `적재 실패 — 이유` 표시, 완료 시 저장 건수 표시
+  - 원문 근거 조회에서 질의 임베딩을 1회만 호출(`memoizeEmbedder`) — 진단당 Voyage 호출 품목 수(최대 3) → 1, 실패도 1회로 끝나고 키워드로 계속
+  - KB 워크플로: `전체 적재`=이어서, `처음부터 다시` 추가
 
