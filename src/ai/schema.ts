@@ -66,6 +66,8 @@ export const InterpretRequest = z.object({
     answers: z.record(str(20), Answer),
     evidence: z.record(str(20), z.number().int().min(0).max(4).optional()),
   }),
+  /** 사용자가 AI·외부 처리(국외 이전) 고지를 보고 동의함. 동의 없는 요청은 서버가 거부한다 */
+  consent: z.literal(true),
   /** 화면에 표시된 로드맵 후보(원문 근거 조회용). 최대 3개 */
   roadmap: z
     .array(z.object({ uid: z.string().regex(/^[A-Za-z0-9가-힣@&\-_.]{3,80}$/), name: str(120), code: str(40).nullable().optional() }))

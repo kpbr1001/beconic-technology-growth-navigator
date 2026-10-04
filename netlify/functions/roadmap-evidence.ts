@@ -3,6 +3,7 @@
 //  - Supabase 미설정 → 200 {status:'not_configured'} (화면은 원문 색인 후보만 표시)
 //  - Voyage 키 없음 → 키워드 검색만(mode:'keyword_only')
 import { createEmbeddingProvider } from '../../src/rag/embedding';
+import { disabledEmbeddingProvider } from '../../src/rag/embedding/disabled';
 import { findEvidence } from '../../src/rag/evidence';
 import { supabaseConfigFromEnv } from '../../src/rag/supabase';
 
@@ -31,7 +32,7 @@ const UID = /^[A-Za-z0-9가-힣@&\-_.]{3,80}$/;
 
 export async function handle(req: Request, env: Record<string, string | undefined>): Promise<Response> {
   if (req.method !== 'POST') return json({ error: 'POST만 지원' }, 405);
-  let body: { query?: unknown; itemUids?: unknown };
+  let body: { query?: unknown; itemUids?: unknown; external?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -43,7 +44,8 @@ export async function handle(req: Request, env: Record<string, string | undefine
   try {
     const res = await findEvidence({ query, itemUids }, {
       supabase: supabaseConfigFromEnv(env),
-      embedder: createEmbeddingProvider(env),
+      // 의미 검색(질의 문장을 해외 임베딩 서비스로 전송)은 사용자가 외부 처리에 동의한 경우에만. 동의 전에는 키워드 검색만
+      embedder: body.external === true ? createEmbeddingProvider(env) : disabledEmbeddingProvider('외부 처리 동의 전 — 키워드 검색만 사용'),
     }, {
       rrfK: Number(env.RAG_RRF_K) || undefined,
       keywordWeight: Number(env.RAG_KEYWORD_WEIGHT) || undefined,

@@ -31,7 +31,7 @@ const quote: EvidenceQuote = {
   printedPage: 272, pdfPage: 280, matchedTerms: ['예지보전'],
 };
 const evidence = { [UID]: [quote] };
-const req: InterpretRequest = { input: input as InterpretRequest['input'], roadmap: [{ uid: UID, name: 'AI 설비 예지보전 솔루션', code: 'SMESTR-2025-B-03-08' }] };
+const req: InterpretRequest = { consent: true, input: input as InterpretRequest['input'], roadmap: [{ uid: UID, name: 'AI 설비 예지보전 솔루션', code: 'SMESTR-2025-B-03-08' }] };
 const ctx: GuardContext = guardContext(r, input, evidence);
 const risk = Math.round(r.m.risk as number);
 
@@ -209,6 +209,9 @@ describe('서버 함수 /api/ai-interpret', () => {
     expect((await handle(call(null, undefined, 'DELETE'), env, d)).status).toBe(405);
     expect((await handle(call(req, 'https://evil.example'), env, d)).status).toBe(403);
     expect((await handle(call({ input: {} }), env, d)).status).toBe(400);
+    // 동의 표시가 없으면(국외 이전 고지 미확인) 접수하지 않음
+    expect((await handle(call({ ...req, consent: undefined }), env, d)).status).toBe(400);
+    expect((await handle(call({ ...req, consent: false }), env, d)).status).toBe(400);
     expect(await (await handle(call(req), { URL: env.URL }, d)).json()).toEqual({ status: 'not_configured' });
     expect(m.size).toBe(0);
   });
