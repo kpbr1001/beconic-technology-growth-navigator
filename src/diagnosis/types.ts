@@ -108,6 +108,8 @@ export interface AssessmentResult {
   unknown: number;
   gaps: Gap[];
   alerts: string[];
+  /** 공통 핵심 12문항 응답 수가 MIN_CORE_ANSWERS 미만이면 true(전 영역 판단 보류) */
   insufficient: boolean;
+  coreAnswered: number;
   range: [number, number] | null;
 }

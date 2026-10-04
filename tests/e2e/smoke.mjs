@@ -93,7 +93,7 @@ for (const [w, h] of VIEWPORTS) {
   const pages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
   check(pages === 14, `PDF 섹션 수 ${pages} (기대 14)`);
   const pr = await page.textContent('#printReport');
-  check(/Scoring rule-v1\.0/.test(pr), 'PDF에 Scoring 버전 누락');
+  check(/Scoring rule-v1\.1/.test(pr), 'PDF에 Scoring 버전 누락');
   check(/AI 설비 예지보전 솔루션/.test(pr) && /원문 p\.271/.test(pr), 'PDF 로드맵 정렬에 원문 색인 후보 누락');
   check(/Roadmap KB index-kb-v2/.test(pr), 'PDF에 Roadmap KB 버전 누락');
   check(/App v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트/.test(pr), 'PDF에 앱 버전·업데이트 일자 누락');
@@ -130,7 +130,7 @@ for (const [w, h] of VIEWPORTS) {
   check(/기술역량 \d+→\d+/.test(head ?? ''), `재진단: 변화 요약 ${head}`);
   const prPages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
   check(prPages === 15, `재진단: PDF 섹션 수 ${prPages} (기대 15)`);
-  check(/Re-diagnosis Delta/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
+  check(/재진단 비교 · 기준 진단 대비 변화/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
   await page.emulateMedia({ media: 'print' });
   mkdirSync(`${OUT}/pdf`, { recursive: true });
   await page.pdf({ path: `${OUT}/pdf/new-rediag.pdf`, format: 'A4', printBackground: true }); // test:pdf 검수 대상에 포함

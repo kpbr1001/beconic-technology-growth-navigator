@@ -6,7 +6,8 @@ import { makeInput, NAMED } from '../fixtures/assessments';
 
 describe('모름·확인필요 처리', () => {
   it('모름은 0점(1점 응답)과 다르게 처리된다 — 결측으로 제외', () => {
-    const base = { q1: 5, q2: 5, q12: 5 };
+    // 최소 응답 기준(공통 핵심 8문항) 이상이 되도록 다른 영역도 응답
+    const base = { q1: 5, q2: 5, q12: 5, q3: 3, q4: 3, q5: 3, q6: 3, q7: 3, q8: 3 };
     const unknown = evaluate(makeInput({ answers: { ...base, q1: null } }));
     const lowest = evaluate(makeInput({ answers: { ...base, q1: 1 } }));
     expect(unknown.m.tech).toBeCloseTo(100, 10);
@@ -61,9 +62,18 @@ describe('종합 역량점수', () => {
   });
 
   it('일부 차원만 응답하면 응답 차원끼리 재정규화된다', () => {
-    const r = evaluate(makeInput({ answers: { q1: 5, q2: 5, q12: 5 } })); // tech만 응답
-    expect(r.capability).toBe(100);
-    expect(r.pendingDimensions).toEqual(['rd', 'exec', 'evidence', 'scale', 'strategy', 'risk']);
+    // 전략정렬·리스크대응 무응답(8문항 응답)
+    const r = evaluate(makeInput({ answers: { q1: 5, q2: 5, q12: 5, q3: 5, q4: 5, q5: 5, q6: 5, q7: 5 } }));
+    expect(r.capability).toBeCloseTo(100, 10);
+    expect(r.pendingDimensions).toEqual(['strategy', 'risk']);
+  });
+
+  it('최소 응답 기준: 공통 핵심 8문항 미만이면 응답한 영역도 점수를 내지 않음(판단 보류)', () => {
+    const r = evaluate(makeInput({ answers: { q1: 5, q2: 5, q12: 5 } }));
+    expect(r.coreAnswered).toBe(3);
+    expect(r.insufficient).toBe(true);
+    expect(r.capability).toBeNull();
+    expect(r.m.tech).toBeNull();
   });
 
   it('band 경계값', () => {
@@ -106,7 +116,7 @@ describe('전략대안', () => {
 describe('재현성', () => {
   it('결과에 버전 태그가 포함된다', () => {
     expect(evaluate(NAMED.sample).versions).toEqual(VERSIONS);
-    expect(VERSIONS.scoring).toBe('rule-v1.0');
+    expect(VERSIONS.scoring).toBe('rule-v1.1');
   });
   it('동일 입력 → 동일 결과', () => {
     expect(evaluate(NAMED.sample)).toEqual(evaluate(structuredClone(NAMED.sample)));
