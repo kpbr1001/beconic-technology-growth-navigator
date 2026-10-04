@@ -40,10 +40,11 @@ export type InterpretResponse =
     };
 
 /** 원문 근거·Rule 결과에서 허용 값 목록을 만든다(가드레일 대조용) */
-export function guardContext(r: AssessmentResult, input: AssessmentInput, evidence: Record<string, EvidenceQuote[]>): GuardContext {
+export function guardContext(r: AssessmentResult, input: AssessmentInput, evidence: Record<string, EvidenceQuote[]>, req?: Pick<InterpretRequest, 'rnd'>): GuardContext {
   const scores = [...Object.values(r.m), r.capability, r.confidence, ...strategicOptions(r).map((o) => o.score)].filter((x): x is number => x !== null).map((x) => Math.round(x));
   const trls = new Set<number>();
-  for (const t of input.inventory) if (t.trl > 0) [t.trl, Math.min(9, t.trl + 1)].forEach((x) => trls.add(x));
+  // 입력 TRL, 다음 단계, R&D 과제 목표(+2)까지 허용
+  for (const t of input.inventory) if (t.trl > 0) [t.trl, Math.min(9, t.trl + 1), Math.min(9, t.trl + 2)].forEach((x) => trls.add(x));
   const quotes = Object.values(evidence).flat();
   for (const q of quotes) for (const m of (q.trl ?? '').matchAll(/\d/g)) trls.add(Number(m[0]));
   return {
@@ -54,6 +55,7 @@ export function guardContext(r: AssessmentResult, input: AssessmentInput, eviden
     codes: [...new Set(quotes.flatMap((q) => q.citation.match(/\b[A-Z]{2,}(?:-[A-Z0-9]+)*-\d{2}-\d{2}\b/g) ?? []))],
     pages: [...new Set(quotes.flatMap((q) => [q.printedPage, q.pdfPage]).filter((x): x is number => x !== null))],
     gapAreas: r.gaps.slice(0, 5).map((g) => g.area),
+    rndIds: (req?.rnd ?? []).map((x) => x.id),
     // 이 POC의 입력은 모두 자가응답이다. 외부검증 Evidence(4단계)가 확인되기 전에는 '확인된 사실' 표기 금지
     allowVerifiedFact: false,
   };
@@ -98,6 +100,9 @@ export function buildUserContent(input: AssessmentInput, r: AssessmentResult, re
     ...opts,
     ...(r.alerts.length ? ['- 일관성 경고:', ...r.alerts.map((a) => `  · ${a}`)] : []),
     '',
+    '## R&D 과제 제안(규칙 기반 초안 — 번호·유형·목표 TRL 변경 금지)',
+    ...(req.rnd.length ? req.rnd.map((x) => `- ${x.id} · ${x.track} · ${x.title} · 연계 기술: ${x.techName} · 목표: ${x.trlTarget}`) : ['- 없음']),
+    '',
     '## 로드맵 참고 후보와 원문 근거(발췌 그대로)',
     ...(rm.length ? rm : ['- 후보 없음']),
   ].join('\n');
@@ -134,7 +139,7 @@ export async function interpretAssessment(req: InterpretRequest, deps: Interpret
   const parsed = msg.parsed_output;
   if (!parsed) return { status: 'fallback', reason: 'invalid_output' };
 
-  const { output, violations } = applyGuardrail(parsed, guardContext(r, input, evidence));
+  const { output, violations } = applyGuardrail(parsed, guardContext(r, input, evidence, req));
   const removed = violations.filter((v) => v.kind !== 'claim_downgraded' && v.kind !== 'trimmed').length;
   if (!output.headline && !output.strengths.length && !output.constraints.length) return { status: 'fallback', reason: 'empty' };
   return { status: 'ok', interpretation: output, model: msg.model, promptVersion: PROMPT_VERSION, ruleVersions: r.versions, removed, violations,

@@ -91,7 +91,7 @@ for (const [w, h] of VIEWPORTS) {
   await page.emulateMedia({ media: 'print' });
   await page.pdf({ path: `${OUT}/report-sample.pdf`, format: 'A4', printBackground: true });
   const pages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(pages === 14, `PDF 섹션 수 ${pages} (기대 14)`);
+  check(pages === 15, `PDF 섹션 수 ${pages} (기대 15)`);
   const pr = await page.textContent('#printReport');
   check(/Scoring rule-v1\.1/.test(pr), 'PDF에 Scoring 버전 누락');
   check(/AI 설비 예지보전 솔루션/.test(pr) && /원문 p\.271/.test(pr), 'PDF 로드맵 정렬에 원문 색인 후보 누락');
@@ -147,7 +147,7 @@ for (const [w, h] of VIEWPORTS) {
   const head = await page.textContent('#delta .decision p');
   check(/기술역량 \d+→\d+/.test(head ?? ''), `재진단: 변화 요약 ${head}`);
   const prPages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(prPages === 15, `재진단: PDF 섹션 수 ${prPages} (기대 15)`);
+  check(prPages === 16, `재진단: PDF 섹션 수 ${prPages} (기대 16)`);
   check(/재진단 비교 · 기준 진단 대비 변화/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
   await page.emulateMedia({ media: 'print' });
   mkdirSync(`${OUT}/pdf`, { recursive: true });

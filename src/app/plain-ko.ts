@@ -29,6 +29,7 @@ export const TERMS: Term[] = [
   [W('Risk & Governance'), '리스크·운영 체계'],
   [W('Appendix & Limitations'), '부록·한계'],
   [W('Re-diagnosis Delta'), '재진단 비교'],
+  [W('R&D Proposals'), 'R&D 과제 제안'],
   [W('Appendix'), '부록'],
   // 진단 흐름·개념
   [W('Evidence Confidence'), '근거 신뢰도'],
