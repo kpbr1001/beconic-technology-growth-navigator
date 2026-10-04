@@ -51,4 +51,23 @@ describe('R&D 과제 제안', () => {
   it('핵심기술·로드맵이 없으면 제안 없음', () => {
     expect(rndProposals(mk({ techs: [], roadmap: [] }))).toEqual([]);
   });
+  it('과제마다 다른 핵심기술: 고도화=우선순위 1위, 초격차=그 로드맵 품목과 연결된 기술, 확장=남은 기술', () => {
+    const ts = [
+      { name: '데이터 수집·정규화 기술', trl: 2, critical: true, ownership: '확인필요' },
+      { name: '이상징후 탐지 알고리즘·모델', trl: 2, critical: true, ownership: '확인필요' },
+      { name: '고장 가능성 예측 모델', trl: 2, critical: true, ownership: '확인필요' },
+      { name: '설비 이벤트 로그 연계 분석', trl: 3, critical: true, ownership: '자체' },
+    ];
+    const links: Record<string, (typeof roadmap)[number]> = { '고장 가능성 예측 모델': roadmap[0] };
+    const p = rndProposals(mk({ techs: ts, hardPart: '설비별 센서데이터 정규화와 이상패턴 탐지', linkOf: (n) => links[n] ?? roadmap[1] }));
+    expect(p.map((x) => [x.track, x.techName, x.techRank])).toEqual([
+      ['upgrade', '데이터 수집·정규화 기술', 1],
+      ['frontier', '고장 가능성 예측 모델', 4],
+      ['convergence', '이상징후 탐지 알고리즘·모델', 2],
+    ]);
+    expect(p[0].why).toContain('우선순위 1위');
+    // 기업 확인 전 기술은 '신청 준비됨'이 될 수 없고 확인을 준비사항으로
+    expect(p.every((x) => x.readiness !== '신청 준비됨')).toBe(true);
+    expect(p[0].prep[0]).toContain('기업 확인');
+  });
 });

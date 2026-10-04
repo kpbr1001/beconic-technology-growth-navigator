@@ -122,3 +122,13 @@ describe('재현성', () => {
     expect(evaluate(NAMED.sample)).toEqual(evaluate(structuredClone(NAMED.sample)));
   });
 });
+
+import { recommendReason } from '../../src/diagnosis/strategy';
+describe('우선 검토안 이유', () => {
+  it('A안: 기준 미달 항목을 숫자로 밝힘', () => {
+    const m = { tech: 63, rd: 75, exec: 75, evidence: 50, scale: 37, strategy: 37, risk: 50 };
+    expect(recommendReason({ m, confidence: 54 })).toMatch(/^A를 먼저 권하는 이유: 진단 신뢰도 54\(기준 62 미만\)/);
+    expect(recommendReason({ m, confidence: 70 })).toMatch(/^B를 권하는 이유: 기술성숙이 63점\(60 이상\).*확장준비가 37점/);
+    expect(recommendReason({ m: { ...m, tech: 70, scale: 70, strategy: 60 }, confidence: 70 })).toMatch(/^C를 권하는 이유/);
+  });
+});

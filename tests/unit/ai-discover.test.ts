@@ -26,10 +26,11 @@ describe('AI 기술 후보 가드레일', () => {
       cand({ name: '예지보전 플랫폼', source_field: 'product', quote: '예지보전 SaaS' }), // 기존 목록과 중복
       cand({ name: 'TRL 7 실증 기술', source_field: 'validation', quote: '2개 공장 PoC' }),
       cand({ name: '클라우드 연계', type: '없는유형', source_field: 'external', quote: 'AWS 클라우드', ownership: '모름' }),
+      cand({ name: '제조현장 실증 적용 경험', type: '실증기술', source_field: 'validation', quote: '2개 공장 PoC' }), // 경험은 근거자료
     ] }, req);
     expect(candidates.map((c) => c.name)).toEqual(['설비 센서 데이터 표준화', '이상 탐지 모델', '클라우드 연계']);
     expect(candidates[2]).toMatchObject({ type: '핵심기술', ownership: '확인필요', fieldLabel: '외부에 의존하는 부분' });
-    expect(removed.sort()).toEqual(['duplicate', 'quote_not_in_answer', 'trl_or_score', 'unknown_field']);
+    expect(removed.sort()).toEqual(['duplicate', 'not_technology', 'quote_not_in_answer', 'trl_or_score', 'unknown_field']);
   });
   it('입력 구성: 칸 이름과 내용, 기존 목록 포함', () => {
     const t = buildDiscoverContent(req);

@@ -2,6 +2,7 @@
 // 과제 유형별(초격차·기존 기술 고도화·실증·사업화·융합 확장) 기획 초안을 만든다.
 // 원칙: 선정 가능성·적합도 등급을 말하지 않는다. 로드맵 품목·쪽은 원문 색인에 있는 것만 쓴다.
 // 목표 TRL은 2~3년 과제 기준 '현재 +1~2단계' 제안값이며, 정량 목표는 기업이 확정한다. 특정 사업명은 쓰지 않는다.
+import { CHECK_KEYS, CHECK_LABEL, rankTechs, type RankTechInput, type TechRankRow } from './techrank';
 import { TRL_LEVELS } from './trl';
 import type { AssessmentResult, Answer } from './types';
 
@@ -20,12 +21,7 @@ export const TRACK_PROGRAM: Record<RndTrack, string> = {
   convergence: '융합·신시장 기술개발 과제 — 보유 기술의 새 분야 적용',
 };
 
-export interface RndTech {
-  name: string;
-  trl: number;
-  critical: boolean;
-  ownership?: string;
-}
+export type RndTech = RankTechInput;
 
 export interface RndRoadmapLink {
   name: string;
@@ -53,6 +49,8 @@ export interface RndProposal {
   contents: string[];
   readiness: Readiness;
   prep: string[];
+  /** 연계 기술의 핵심기술 우선순위(1부터) */
+  techRank: number | null;
 }
 
 export interface RndInput {
@@ -64,6 +62,8 @@ export interface RndInput {
   linkOf: (techName: string) => RndRoadmapLink | null;
   answers: Record<string, Answer>;
   externalDependency: boolean;
+  /** 차별 요소 답변(핵심기술 우선순위 판단용) */
+  hardPart?: string;
 }
 
 const lvl = (t: number) => `TRL ${t}(${TRL_LEVELS[t]})`;
@@ -108,23 +108,34 @@ function readinessOf(i: RndInput, need: { tech?: number; extra?: (keyof Assessme
 export function rndProposals(i: RndInput): RndProposal[] {
   const out: RndProposal[] = [];
   const prep0 = commonPrep(i);
-  const crit = i.techs.filter((t) => t.critical && t.name.trim());
-  const rank = (t: RndTech) => (i.linkOf(t.name) ? 10 : 0) + (t.ownership === '외부' ? -5 : 0) + t.trl;
-  const sorted = [...crit].sort((a, b) => rank(b) - rank(a));
+  // 결과 화면·PDF와 같은 핵심기술 우선순위(확인 항목 수 → 차별 요소 → TRL)
+  const ranked = rankTechs(i.techs, { hardPart: i.hardPart ?? '', linkOf: i.linkOf });
+  const used = new Set<string>();
+  const rankOf = (t?: RndTech) => (t ? ranked.find((x) => x.tech === t)?.rank ?? null : null);
+  const why1 = (row: TechRankRow<RndTech>) => {
+    const ok = CHECK_KEYS.filter((k) => row.checks[k] === true).map((k) => CHECK_LABEL[k]);
+    return `'${row.tech.name}'은(는) 핵심기술 우선순위 ${row.rank}위(확인 항목 ${row.met}/5${row.met === 5 ? ' 모두 충족' : ok.length ? `: ${ok.join('·')}` : ''})`;
+  };
+  /** 기업 확인 전 기술은 '신청 준비됨'으로 두지 않는다 */
+  const capConfirmed = (r: Readiness, t?: RndTech): Readiness => (t && !t.confirmed && r === '신청 준비됨' ? '보완 후 신청' : r);
+  const confirmPrep = (t?: RndTech) => (t && !t.confirmed ? [`'${t.name}' TRL·보유형태 기업 확인(3단계 '내용 확인')`] : []);
 
   // 1) 기존 기술 고도화: 대표 핵심기술의 다음 단계
-  const main = sorted.find((t) => t.trl > 0) ?? sorted[0];
+  const mainRow = ranked.find((x) => x.tech.trl > 0) ?? ranked[0];
+  const main = mainRow?.tech;
   if (main) {
-    const link = i.linkOf(main.name);
+    used.add(main.name);
+    const link = mainRow.link;
     const trl = main.trl || 0;
     out.push({
       id: 'R&D-1', track: 'upgrade', trackLabel: TRACK_LABEL.upgrade, program: TRACK_PROGRAM.upgrade,
       title: `${main.name} 성능·신뢰성 고도화`,
       techName: main.name, trlNow: trl || null, trlTarget: targetTrl(trl), roadmap: link,
-      why: trl ? `핵심기술 '${main.name}'이(가) ${lvl(trl)} 단계로, 다음 검증 단계를 과제로 묶기 좋습니다.` : `핵심기술 '${main.name}'의 TRL이 확인되지 않아 목표를 정하기 전에 현재 수준 확인이 먼저입니다.`,
+      why: trl ? `${why1(mainRow)}이며 ${lvl(trl)} 단계로, 다음 검증 단계를 과제로 묶기 좋습니다.` : `핵심기술 '${main.name}'의 TRL이 확인되지 않아 목표를 정하기 전에 현재 수준 확인이 먼저입니다.`,
       contents: trl ? upgradeContents(trl) : ['현재 TRL과 근거자료 확인', '성능 목표(정량 지표) 정의', '시험·검증 계획 수립'],
-      readiness: trl ? readinessOf(i, {}) : '선행 조건 필요',
-      prep: [...(trl ? [] : ['핵심기술 TRL 확인(3단계)']), ...prep0].slice(0, 4),
+      readiness: trl ? capConfirmed(readinessOf(i, {}), main) : '선행 조건 필요',
+      prep: [...(trl ? confirmPrep(main) : ['핵심기술 TRL 확인(3단계)']), ...prep0].slice(0, 4),
+      techRank: mainRow.rank,
     });
   }
 
@@ -133,47 +144,59 @@ export function rndProposals(i: RndInput): RndProposal[] {
   if (top) {
     const mt = top.matchedTechs![0];
     const diff = known(i.answers.q12) && i.answers.q12 >= 4;
-    const readiness: Readiness = !at(i.r.m.tech, 50) ? '선행 조건 필요' : at(i.r.m.tech, 65) && diff ? readinessOf(i, { extra: ['strategy'] }) : '보완 후 신청';
+    // 이 로드맵 품목과 연결된 핵심기술을 우선(같은 품목 코드·이름) → 없으면 아직 쓰지 않은 상위 기술 → 대표 기술
+    const sameItem = (row: TechRankRow<RndTech>) => !!row.link && (top.code ? row.link.code === top.code : row.link.name === top.name);
+    const fRow = ranked.find((x) => sameItem(x) && !used.has(x.tech.name)) ?? ranked.find((x) => !used.has(x.tech.name)) ?? mainRow;
+    const ft = fRow?.tech;
+    if (ft) used.add(ft.name);
+    const readiness: Readiness = capConfirmed(!at(i.r.m.tech, 50) ? '선행 조건 필요' : at(i.r.m.tech, 65) && diff ? readinessOf(i, { extra: ['strategy'] }) : '보완 후 신청', ft);
     out.push({
       id: 'R&D-2', track: 'frontier', trackLabel: TRACK_LABEL.frontier, program: TRACK_PROGRAM.frontier,
       title: `${mt.name} 차세대 기술 개발`,
-      techName: main?.name ?? mt.name, trlNow: main?.trl || null,
+      techName: ft?.name ?? mt.name, trlNow: ft?.trl || null,
       // 원문 TRL 표기는 품목 기준값(연차 목표일 수도 있음)이라 자사 목표가 아니라 대조 기준으로만 쓴다
       trlTarget: mt.trl ? `차세대 성능 목표 설정(로드맵 원문 TRL ${mt.trl} 기준 대조)` : '로드맵 원문 목표 확인 후 설정',
       roadmap: { name: top.name, code: top.code, page: mt.page ?? top.page, source: top.source, techName: mt.name, techTrl: mt.trl },
-      why: `공식 로드맵 '${top.name}'의 핵심기술 '${mt.name}'과(와) 자사 기술이 맞닿아 있어, 정책 방향과 연결된 선도 과제로 설명할 수 있습니다(원문 확인 필요).`,
+      why: `공식 로드맵 '${top.name}'의 핵심기술 '${mt.name}'과(와) 자사 '${ft?.name ?? '핵심기술'}'이(가) 맞닿아 있어, 정책 방향과 연결된 선도 과제로 설명할 수 있습니다(원문 확인 필요).`,
       contents: ['로드맵 개발목표 대비 자사 기술 격차 분석과 목표 성능 설정', '독자 핵심기술(알고리즘·공정·소재) 개발과 지식재산(특허) 확보', '국내외 선도 기술과의 성능 비교 검증'],
       readiness,
-      prep: [...(diff ? [] : ['차별 기술·노하우의 지식재산 보호 방안(특허 선행조사)']), `로드맵 원문${(mt.page ?? top.page) ? ` p.${mt.page ?? top.page}` : ''}의 개발목표와 대조`, ...prep0].slice(0, 4),
+      prep: [...(diff ? [] : ['차별 기술·노하우의 지식재산 보호 방안(특허 선행조사)']), `로드맵 원문${(mt.page ?? top.page) ? ` p.${mt.page ?? top.page}` : ''}의 개발목표와 대조`, ...confirmPrep(ft), ...prep0].slice(0, 4),
+      techRank: rankOf(ft),
     });
   }
 
   // 3) 실증·사업화: TRL 6 이상 핵심기술
   // 고도화 과제와 겹치지 않게 다른 핵심기술로
-  const ready = sorted.find((t) => t.trl >= 6 && t !== main);
+  const ready = ranked.map((x) => x.tech).find((t) => t.trl >= 6 && !used.has(t.name));
   if (ready) {
+    used.add(ready.name);
     out.push({
       id: 'R&D-3', track: 'validation', trackLabel: TRACK_LABEL.validation, program: TRACK_PROGRAM.validation,
       title: `${ready.name} 수요처 실증·사업화`,
       techName: ready.name, trlNow: ready.trl, trlTarget: targetTrl(ready.trl), roadmap: i.linkOf(ready.name),
       why: `'${ready.name}'이(가) ${lvl(ready.trl)} 단계로, 실제 수요처 실증과 인증을 거쳐 매출로 연결할 시점입니다.`,
       contents: ['수요처(고객사) 현장 실증과 성과 지표 측정', '필수 인증·표준·안전 요건 대응', '양산·운영 체계와 원가 구조 확정'],
-      readiness: readinessOf(i, { extra: ['scale'] }),
-      prep: [...(!(known(i.answers.q10) && i.answers.q10 >= 3) ? ['목표 시장 필수 인증·보안 요건 목록 확인'] : []), '실증 수요처 확보 의향서', ...prep0].slice(0, 4),
+      readiness: capConfirmed(readinessOf(i, { extra: ['scale'] }), ready),
+      prep: [...(!(known(i.answers.q10) && i.answers.q10 >= 3) ? ['목표 시장 필수 인증·보안 요건 목록 확인'] : []), '실증 수요처 확보 의향서', ...confirmPrep(ready), ...prep0].slice(0, 4),
+      techRank: rankOf(ready),
     });
   }
 
   // 4) 융합·확장: 두 번째 로드맵 후보(다른 품목)로 적용 분야 확대 — 앞의 제안이 3개 미만일 때만
   const second = i.roadmap.find((c) => c !== top && c.name !== top?.name);
-  if (out.length < 3 && second && main) {
+  // 적용 확장은 아직 과제에 쓰지 않은 기술을 우선(같은 기술로 3건을 채우지 않음)
+  const cRow = second ? ranked.find((x) => !used.has(x.tech.name)) ?? mainRow : undefined;
+  const ct = cRow?.tech;
+  if (out.length < 3 && second && ct) {
     out.push({
       id: 'R&D-4', track: 'convergence', trackLabel: TRACK_LABEL.convergence, program: TRACK_PROGRAM.convergence,
-      title: `${main.name} 기반 ${second.name} 적용 확장`,
-      techName: main.name, trlNow: main.trl || null, trlTarget: main.trl ? targetTrl(Math.max(1, main.trl - 1)) : 'TRL 확인 후 설정', roadmap: second,
-      why: `보유 기술 '${main.name}'을(를) 로드맵 품목 '${second.name}' 분야에 적용하면 새 시장을 겨냥한 과제로 기획할 수 있습니다(원문 확인 필요).`,
+      title: `${ct.name} 기반 ${second.name} 적용 확장`,
+      techName: ct.name, trlNow: ct.trl || null, trlTarget: ct.trl ? targetTrl(Math.max(1, ct.trl - 1)) : 'TRL 확인 후 설정', roadmap: second,
+      why: `보유 기술 '${ct.name}'을(를) 로드맵 품목 '${second.name}' 분야에 적용하면 새 시장을 겨냥한 과제로 기획할 수 있습니다(원문 확인 필요).`,
       contents: ['새 적용 분야의 요구 성능·데이터 조건 분석', '보유 기술의 적용 모듈 개발·연계', '새 분야 수요처 시범 적용'],
-      readiness: readinessOf(i, { extra: ['strategy'] }),
-      prep: ['새 분야 수요처·협력기관 확보', ...prep0].slice(0, 4),
+      readiness: capConfirmed(readinessOf(i, { extra: ['strategy'] }), ct),
+      prep: ['새 분야 수요처·협력기관 확보', ...confirmPrep(ct), ...prep0].slice(0, 4),
+      techRank: rankOf(ct),
     });
   }
   return out.slice(0, 3);
