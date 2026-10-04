@@ -1,7 +1,7 @@
 // E2E 스모크: dist 빌드본을 실제 Chromium으로 열어 흐름·콘솔 에러·레이아웃·PDF를 검사한다.
 // 사용: npm run build && npm run test:e2e   (결과 이미지·PDF: tests/e2e/out/)
 import { createServer } from 'node:http';
-import { readFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { extname, join } from 'node:path';
 import { chromium } from 'playwright';
 
@@ -140,6 +140,14 @@ for (const [w, h] of VIEWPORTS) {
   await page.locator('#history input[type=file]').setInputFiles(file);
   await page.waitForTimeout(300);
   check((await page.locator('#history tbody tr').count()) === 1, '재진단: 기록 파일 불러오기 실패');
+  // 레드팀: id에 스크립트를 넣은 조작 기록 파일은 거부(목록에 추가되지 않고 실행되지 않음)
+  const evil = { ...JSON.parse(readFileSync(file, 'utf8')), id: "x');window.__pwned=1;('" };
+  writeFileSync(`${OUT}/record-evil.json`, JSON.stringify(evil));
+  await page.locator('#history input[type=file]').setInputFiles(`${OUT}/record-evil.json`);
+  await page.waitForTimeout(300);
+  await page.locator('#history').getByRole('button', { name: '현재 결과와 비교' }).first().click();
+  check((await page.locator('#history tbody tr').count()) === 1, '레드팀: 조작된 기록 파일이 목록에 추가됨');
+  check(!(await page.evaluate(() => window.__pwned)), '레드팀: 기록 파일 스크립트 주입 실행됨');
   check(errors.length === 0, `재진단: 콘솔 에러 ${JSON.stringify(errors)}`);
   await ctx.close();
 }

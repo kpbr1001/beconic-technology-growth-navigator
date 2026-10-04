@@ -65,6 +65,14 @@ describe('진단 검토(이 진단이 틀릴 수 있는 지점)', () => {
     expect(run().diagnostic.find((d) => d.title === '근거 없는 높은 응답')!.detail).toContain('Q1');
     expect(titles.at(-1)).toBe('단일 응답자 관점');
   });
+  it("근거 확인 단계에서 묻지 않은 문항은 '말로만 설명'으로 보지 않음", () => {
+    const rt = run({ answers: { ...base.answers, q12: 5 }, evidence: { q5: 2 } });
+    expect(byId(rt, 'R10')).toMatchObject({ likelihood: 1 });
+    expect(byId(rt, 'R10')!.basis).toContain('근거 미확인');
+    const d = rt.diagnostic.find((x) => x.title === '근거 미확인 높은 응답');
+    expect(d?.detail).toContain('Q12');
+    expect(rt.diagnostic.find((x) => x.title === '근거 없는 높은 응답')).toBeUndefined();
+  });
 });
 
 describe('히트맵', () => {

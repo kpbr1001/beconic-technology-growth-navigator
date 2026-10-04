@@ -205,8 +205,6 @@ main{min-width:0}
 .brand-logo{width:38px;height:auto;flex:0 0 auto;display:block}
 .brand-text b{display:block;font-size:15px;letter-spacing:-.01em}.brand-text b em{font-style:normal;color:var(--primary)}
 .brand-text small{display:block;color:var(--muted);font-size:11.5px}
-.cert-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #d5defc;background:#f5f8ff;color:#1b2c55;border-radius:999px;padding:5px 10px 5px 6px;font-size:11px;font-weight:800;white-space:nowrap}
-.cert-chip img{width:16px;height:auto}
 .header-right{display:flex;gap:12px;align-items:center}
 .site-footer{max-width:none;margin:0;padding:0;background:#1b2c55;color:#c9d3ec;font-size:12.5px;line-height:1.65}
 .site-footer a{color:#fff;text-decoration:none}.site-footer a:hover{text-decoration:underline}
@@ -223,13 +221,13 @@ main{min-width:0}
 .sf-bottom{max-width:1480px;margin:auto;padding:14px 22px 26px;border-top:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:11px;color:#8e9cc2}
 .sf-bottom p{margin:0;max-width:880px;word-break:keep-all}
 .sf-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right}.sf-version{display:inline-block;padding:2px 8px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:#c9d3ec;font-weight:700;white-space:nowrap}
-@media(max-width:1100px){.cert-chip{display:none}.sf-inner{grid-template-columns:1fr 1fr}.sf-cert-wrap{grid-column:1/-1}}
+@media(max-width:1100px){.sf-inner{grid-template-columns:1fr 1fr}.sf-cert-wrap{grid-column:1/-1}}
 @media(max-width:720px){.brand-logo{width:32px}.brand-text b{font-size:13.5px}.brand-text small{display:none}.header-inner{flex-wrap:wrap;gap:10px}.sf-inner{grid-template-columns:1fr;padding:28px 16px 18px;gap:20px}.sf-bottom{padding:12px 16px 24px}.sf-meta{align-items:flex-start;text-align:left}.sf-logo{height:38px}}
 @media print{.site-footer{display:none!important}.pr-footer{gap:4mm}.pr-footer span{white-space:nowrap}.pr-table tr:last-child td{border-bottom:1px solid #e1e6ee}.pr-footer span:first-child{overflow:hidden;text-overflow:ellipsis;min-width:0}.pr-cover .cover-logo{height:13mm;width:auto;display:block;margin-bottom:6mm}.pr-cover .cover-issuer{margin-top:3mm;font-size:8pt;color:#dbe4ff}.pr-cover .cover-issuer b{color:#fff}}
 </style>
 </head>
 <body>
-<header><div class="header-inner"><a class="brand" href="./" aria-label="BECONIC 기업 기술진단 홈" style="text-decoration:none"><img class="brand-logo" src="assets/gv-shield.svg" alt="그로스벤처스 방패 로고" width="38" height="40"><div class="brand-text"><b>BECONIC <em>기업 기술진단</em></b><small>by 그로스벤처스(주) · 기술발견 · 근거기반 진단 · 로드맵 정렬 · 실행우선순위</small></div></a><div class="header-right"><span class="cert-chip" title="중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호"><img src="assets/gv-shield.svg" alt="" width="16" height="17">중기부 인증 중소기업상담회사 제2025-684호</span><div class="top-actions"><button class="btn soft" onclick="loadSample()">샘플기업</button><button class="btn" onclick="saveState()">저장</button><button class="btn" onclick="resetState()">초기화</button><button class="btn primary" onclick="printReport()">PDF 인쇄</button></div></div></div></header>
+<header><div class="header-inner"><a class="brand" href="./" aria-label="BECONIC 기업 기술진단 홈" style="text-decoration:none"><img class="brand-logo" src="assets/gv-shield.svg" alt="그로스벤처스 방패 로고" width="38" height="40"><div class="brand-text"><b>BECONIC <em>기업 기술진단</em></b><small>by 그로스벤처스(주) · 기술발견 · 근거기반 진단 · 로드맵 정렬 · 실행우선순위</small></div></a><div class="header-right"><div class="top-actions"><button class="btn soft" onclick="loadSample()">샘플기업</button><button class="btn" onclick="saveState()">저장</button><button class="btn" onclick="resetState()">초기화</button><button class="btn primary" onclick="printReport()">PDF 인쇄</button></div></div></div></header>
 <div class="shell">
 <aside><div class="progress-label"><span>진단 진행률</span><b id="progTxt">0%</b></div><div class="progress"><i id="progBar"></i></div><div id="nav"></div></aside>
 <main>
