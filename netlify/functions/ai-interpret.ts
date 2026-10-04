@@ -7,6 +7,7 @@
 import { blobJobStore } from '../../src/ai/blob-store';
 import { JOB_ID, jobView, type JobStore } from '../../src/ai/jobs';
 import { InterpretRequest } from '../../src/ai/schema';
+import type { DiscoverRequest } from '../../src/ai/discover';
 
 type Env = Record<string, string | undefined>;
 const MAX_BODY = 60_000;
@@ -57,7 +58,10 @@ const defaultDeps: Deps = {
   newId: () => crypto.randomUUID(),
 };
 
-export async function handle(req: Request, env: Env, deps: Deps = defaultDeps): Promise<Response> {
+/** 요청 형식(해석·기술 후보 찾기)만 다르고 접수·조회 절차는 같다 */
+type RequestSchema = { safeParse: (x: unknown) => { success: true; data: InterpretRequest | DiscoverRequest } | { success: false } };
+
+export async function handle(req: Request, env: Env, deps: Deps = defaultDeps, schema: RequestSchema = InterpretRequest as unknown as RequestSchema): Promise<Response> {
   if (req.method === 'GET') {
     const id = new URL(req.url).searchParams.get('job') ?? '';
     if (!JOB_ID.test(id)) return json({ error: '작업 번호 형식 오류' }, 400);
@@ -78,7 +82,7 @@ export async function handle(req: Request, env: Env, deps: Deps = defaultDeps): 
   } catch {
     return json({ error: 'JSON 본문 필요' }, 400);
   }
-  const parsed = InterpretRequest.safeParse(body);
+  const parsed = schema.safeParse(body);
   if (!parsed.success) return json({ error: '입력 형식 오류' }, 400);
   if (!env.ANTHROPIC_API_KEY?.trim()) return json({ status: 'not_configured' });
 

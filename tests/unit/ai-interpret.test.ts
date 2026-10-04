@@ -31,8 +31,8 @@ const quote: EvidenceQuote = {
   printedPage: 272, pdfPage: 280, matchedTerms: ['예지보전'],
 };
 const evidence = { [UID]: [quote] };
-const req: InterpretRequest = { consent: true, input: input as InterpretRequest['input'], roadmap: [{ uid: UID, name: 'AI 설비 예지보전 솔루션', code: 'SMESTR-2025-B-03-08' }] };
-const ctx: GuardContext = guardContext(r, input, evidence);
+const req: InterpretRequest = { consent: true, input: input as InterpretRequest['input'], roadmap: [{ uid: UID, name: 'AI 설비 예지보전 솔루션', code: 'SMESTR-2025-B-03-08' }], rnd: [{ id: 'R&D-1', track: 'upgrade', title: '이상패턴 탐지 모델 성능·신뢰성 고도화', techName: '이상패턴 탐지 모델', trlTarget: 'TRL 7(실제환경 시제품 실증)' }] };
+const ctx: GuardContext = guardContext(r, input, evidence, req);
 const risk = Math.round(r.m.risk as number);
 
 const good: Interpretation = {
@@ -44,6 +44,7 @@ const good: Interpretation = {
   roadmap_notes: [{ item_uid: UID, text: '원문 p.272의 고장 예측 목표와 기업의 이상패턴 탐지 모델이 맞닿습니다.' }],
   option_notes: [{ option: 'B', text: '고객사 PoC를 반복 현장으로 넓히는 경로입니다.', prerequisite: 'PoC 성공기준 문서화' }],
   action_plan: [{ area: r.gaps[0].area, action: '클라우드 API 중단 시 대체 경로를 시험합니다.', kpi: '대체 경로 시험 1회 완료', evidence: '시험 기록' }],
+  rnd_notes: [{ id: 'R&D-1', title: '설비 이상패턴 탐지 모델 현장 실증 고도화', summary: '고객사 현장에서 TRL 7 실증을 목표로 합니다.' }],
 };
 const AREA0 = r.gaps[0].area;
 
@@ -108,8 +109,24 @@ describe('가드레일', () => {
     expect(output.action_plan.map((a) => a.area)).toEqual([AREA0, areas[1]]);
     expect(violations.filter((v) => v.field !== 'constraints').map((v) => v.kind).sort()).toEqual(['score_mismatch', 'unknown_item']);
   });
+  it('R&D 과제 메모: 제안 번호만·선정 가능성 표현 제거, 목표 TRL(+2)은 허용', () => {
+    const c2 = ctx;
+    const { output, violations } = applyGuardrail({
+      ...good,
+      rnd_notes: [
+        { id: 'R&D-1', title: '이상패턴 탐지 고도화', summary: 'TRL 7 실증을 목표로 합니다.' },
+        { id: 'R&D-9', title: '없는 과제', summary: 'x' },
+        { id: 'R&D-1', title: '중복', summary: 'x' },
+      ],
+    }, c2);
+    expect(output.rnd_notes.map((n) => n.title)).toEqual(['이상패턴 탐지 고도화']);
+    expect(violations.filter((v) => v.field === 'rnd_notes').map((v) => v.kind)).toEqual(['unknown_item']);
+    const sel = applyGuardrail({ ...good, rnd_notes: [{ id: 'R&D-1', title: '선정 가능성이 높은 과제', summary: 'x' }] }, c2);
+    expect(sel.output.rnd_notes).toEqual([]);
+    expect(sel.violations.some((v) => v.kind === 'fit_grade')).toBe(true);
+  });
   it('v1 결과(전략 메모·실행과제 없음)도 그대로 통과', () => {
-    const { output } = applyGuardrail({ ...good, option_notes: undefined, action_plan: undefined } as unknown as Interpretation, ctx);
+    const { output } = applyGuardrail({ ...good, option_notes: undefined, action_plan: undefined, rnd_notes: undefined } as unknown as Interpretation, ctx);
     expect(output.option_notes).toEqual([]);
     expect(output.action_plan).toEqual([]);
   });
@@ -131,6 +148,7 @@ describe('Claude 입력 구성', () => {
     expect(text).toContain('원문 근거 없음(이 품목은 roadmap_notes에 쓰지 말 것)');
     expect(text).not.toMatch(/직원|업력/);
     expect(text).toMatch(/← Rule 추천안 · 규칙 점수 \d+\/100/);
+    expect(text).toContain('- R&D-1 · upgrade · 이상패턴 탐지 모델 성능·신뢰성 고도화');
   });
 });
 

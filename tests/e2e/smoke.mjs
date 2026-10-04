@@ -91,9 +91,9 @@ for (const [w, h] of VIEWPORTS) {
   await page.emulateMedia({ media: 'print' });
   await page.pdf({ path: `${OUT}/report-sample.pdf`, format: 'A4', printBackground: true });
   const pages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(pages === 14, `PDF 섹션 수 ${pages} (기대 14)`);
+  check(pages === 15, `PDF 섹션 수 ${pages} (기대 15)`);
   const pr = await page.textContent('#printReport');
-  check(/Scoring rule-v1\.0/.test(pr), 'PDF에 Scoring 버전 누락');
+  check(/Scoring rule-v1\.1/.test(pr), 'PDF에 Scoring 버전 누락');
   check(/AI 설비 예지보전 솔루션/.test(pr) && /원문 p\.271/.test(pr), 'PDF 로드맵 정렬에 원문 색인 후보 누락');
   check(/Roadmap KB index-kb-v2/.test(pr), 'PDF에 Roadmap KB 버전 누락');
   check(/App v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트/.test(pr), 'PDF에 앱 버전·업데이트 일자 누락');
@@ -101,6 +101,24 @@ for (const [w, h] of VIEWPORTS) {
   const logoOk = await page.$eval('#printReport .cover-logo', (i) => i.complete && i.naturalWidth > 0);
   check(logoOk, 'PDF 표지 로고 로드 실패');
   check(errors.length === 0, `PDF: 콘솔 에러 ${JSON.stringify(errors)}`);
+  await page.close();
+}
+
+// 4-b) 기술 후보: 2단계 답변에서 찾은 후보(근거 구절 표시), 다시 찾기·삭제 동작
+{
+  const { page, errors } = await openPage(1440, 900);
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: 'networkidle' });
+  for (const b of await page.locator('section.active .example-use').all()) await b.click();
+  await page.locator('section.active').getByRole('button', { name: '기술 발견 시작' }).click();
+  for (const b of await page.locator('section.active .example-use').all()) await b.click();
+  await page.locator('section.active').getByRole('button', { name: '기술 후보 생성' }).click();
+  const names = await page.$$eval('section.active .tech-row b', (bs) => bs.map((b) => b.textContent));
+  check(names.length >= 3 && names.some((n) => /알고리즘·모델/.test(n)), `기술 후보: 답변 기반 후보 미생성 ${JSON.stringify(names)}`);
+  check((await page.locator('section.active .tech-basis').count()) === names.length, '기술 후보: 근거 구절 미표시');
+  await page.locator('section.active .tech-row').last().getByRole('button', { name: '삭제' }).click();
+  check((await page.locator('section.active .tech-row').count()) === names.length - 1, '기술 후보: 삭제 동작 안 함');
+  check(errors.length === 0, `기술 후보: 콘솔 에러 ${JSON.stringify(errors)}`);
   await page.close();
 }
 
@@ -129,8 +147,8 @@ for (const [w, h] of VIEWPORTS) {
   const head = await page.textContent('#delta .decision p');
   check(/기술역량 \d+→\d+/.test(head ?? ''), `재진단: 변화 요약 ${head}`);
   const prPages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(prPages === 15, `재진단: PDF 섹션 수 ${prPages} (기대 15)`);
-  check(/Re-diagnosis Delta/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
+  check(prPages === 16, `재진단: PDF 섹션 수 ${prPages} (기대 16)`);
+  check(/재진단 비교 · 기준 진단 대비 변화/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
   await page.emulateMedia({ media: 'print' });
   mkdirSync(`${OUT}/pdf`, { recursive: true });
   await page.pdf({ path: `${OUT}/pdf/new-rediag.pdf`, format: 'A4', printBackground: true }); // test:pdf 검수 대상에 포함
@@ -158,4 +176,4 @@ if (failures.length) {
   console.error('❌ E2E 실패\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log(`✅ E2E 통과 (뷰포트 ${VIEWPORTS.length}개, 전부 모름, CSS, PDF, 재진단)`);
+console.log(`✅ E2E 통과 (뷰포트 ${VIEWPORTS.length}개, 전부 모름, CSS, PDF, 기술 후보, 재진단)`);

@@ -62,7 +62,7 @@ async function runFlow(label, url, width) {
     await selects.nth(0).selectOption(i % 2 ? '외부' : '자체');
     await selects.nth(2).selectOption(trls[i % trls.length]);
   }
-  await rows.nth(0).getByRole('button').click(); // 내용 확인
+  await rows.nth(0).getByRole('button', { name: '내용 확인' }).click();
   await rows.nth(nRows - 1).locator('input[type=checkbox]').setChecked(false);
   await hscroll('3-inventory');
   await clickText('핵심진단');
@@ -132,12 +132,13 @@ for (const width of [390, 1440]) {
   report.push({ old, now });
   const tag = `${width}px`;
   check(now.errors.length === 0, `${tag} 신규: 콘솔 에러 ${JSON.stringify(now.errors)}`);
-  check(now.nRows === old.nRows && now.qCount === old.qCount && now.nCards === old.nCards,
+  // v0.9.16: 기술 후보는 업종 고정 4개 대신 2단계 답변에서 찾음(의도된 차이) — 개수는 2개 이상만 확인
+  check(now.nRows >= 2 && now.qCount === old.qCount && now.nCards === old.nCards,
     `${tag} 단계 구성 불일치 (기술 ${old.nRows}/${now.nRows}, 문항 ${old.qCount}/${now.qCount}, 근거 ${old.nCards}/${now.nCards})`);
   for (const [k, v] of Object.entries(now.steps)) check(v.overflowPx <= 1, `${tag} ${k}: 가로 넘침 ${v.overflowPx}px`);
   check(now.printed === 1, `${tag} PDF 인쇄 버튼이 인쇄를 호출하지 않음`);
-  // v0.9.11: 리스크 레드팀 쪽 1개 추가(의도된 변경)
-  check(now.prPages === old.prPages + 1, `${tag} PDF 섹션 수 ${old.prPages} → ${now.prPages} (기대 ${old.prPages + 1})`);
+  // v0.9.11 리스크 레드팀·v0.9.17 R&D 과제 제안 쪽 추가(의도된 변경)
+  check(now.prPages === old.prPages + 2, `${tag} PDF 섹션 수 ${old.prPages} → ${now.prPages} (기대 ${old.prPages + 2})`);
   check(now.restored.summaryVisible && now.restored.name && now.restored.printName, `${tag} 저장 후 새로고침 복원 실패`);
   check(now.afterReset.step0 && now.afterReset.name === '', `${tag} 초기화 실패`);
   for (const id of Object.keys(old.sections)) check(now.sections[id] !== null, `${tag} 결과 섹션 누락: ${id}`);

@@ -17,6 +17,8 @@ export interface GuardContext {
   pages: number[];
   /** Rule Engine 우선순위 영역(순서 그대로). 맞춤 실행과제는 이 영역만 허용 */
   gapAreas?: string[];
+  /** 화면의 R&D 과제 제안 번호. 과제 메모는 이 번호만 허용 */
+  rndIds?: string[];
   /** 외부검증 근거가 없으면 '확인된 사실' 표기를 자가응답으로 낮춘다 */
   allowVerifiedFact: boolean;
 }
@@ -28,7 +30,9 @@ export interface Violation {
   text: string;
 }
 
-const LIMITS = { strengths: 3, constraints: 3, root_cause_hypotheses: 4, confirmation_needed: 4, roadmap_notes: 3, option_notes: 3, action_plan: 5 } as const;
+const LIMITS = { strengths: 3, constraints: 3, root_cause_hypotheses: 4, confirmation_needed: 4, roadmap_notes: 3, option_notes: 3, action_plan: 5, rnd_notes: 3 } as const;
+/** 과제 메모에 쓰면 안 되는 표현(선정 가능성·적합도) */
+const SELECTION_RE = /선정|합격|채택\s?가능|가능성\s?(?:이\s?)?(?:높|크)|적합도/;
 const OPTIONS = ['A', 'B', 'C'] as const;
 const MAX_TEXT = 220;
 
@@ -146,6 +150,22 @@ export function applyGuardrail(raw: Interpretation, ctx: GuardContext): { output
         ).sort((a, b) => (ctx.gapAreas ?? []).indexOf(a.area.trim()) - (ctx.gapAreas ?? []).indexOf(b.area.trim())),
         (a) => [a.action, a.kpi, a.evidence],
       ).map((a) => ({ area: a.area.trim(), action: clip(a.action), kpi: clip(a.kpi), evidence: clip(a.evidence) })),
+      rnd_notes: keep(
+        'rnd_notes',
+        uniqueBy(
+          (raw.rnd_notes ?? []).filter((n) => {
+            const ok = (ctx.rndIds ?? []).includes(n.id.trim());
+            if (!ok) violations.push({ kind: 'unknown_item', field: 'rnd_notes', text: n.id.slice(0, 20) });
+            else if (SELECTION_RE.test(`${n.title} ${n.summary}`)) {
+              violations.push({ kind: 'fit_grade', field: 'rnd_notes', text: n.title.slice(0, 80) });
+              return false;
+            }
+            return ok;
+          }),
+          (n) => n.id.trim(),
+        ),
+        (n) => [n.title, n.summary],
+      ).map((n) => ({ id: n.id.trim(), title: n.title.length > 60 ? `${n.title.slice(0, 59)}…` : n.title, summary: clip(n.summary) })),
     },
   };
 }

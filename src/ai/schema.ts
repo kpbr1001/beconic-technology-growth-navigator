@@ -49,6 +49,14 @@ export const Interpretation = z.object({
       evidence: z.string().describe('완료 시 남길 증빙자료'),
     }))
     .describe('우선순위 영역별 맞춤 90일 실행과제 최대 5개(우선순위 순서)'),
+  // R&D 과제(지원사업) 제안: 유형·목표 TRL은 규칙 초안 그대로, Claude는 기업 맞춤 과제명·요약만
+  rnd_notes: z
+    .array(z.object({
+      id: z.string().describe('R&D 과제 제안 번호 그대로(예: R&D-1)'),
+      title: z.string().describe('이 기업의 기술·제품을 드러내는 과제명(40자 이내, 사업명·선정 가능성 표현 금지)'),
+      summary: z.string().describe('무엇을 개발해 어떤 성과(제안값)를 낼지 1~2문장'),
+    }))
+    .describe('R&D 과제 제안별 과제명·요약 최대 3개'),
 });
 export type Interpretation = z.infer<typeof Interpretation>;
 
@@ -88,6 +96,14 @@ export const InterpretRequest = z.object({
   /** 화면에 표시된 로드맵 후보(원문 근거 조회용). 최대 3개 */
   roadmap: z
     .array(z.object({ uid: z.string().regex(/^[A-Za-z0-9가-힣@&\-_.]{3,80}$/), name: str(120), code: str(40).nullable().optional() }))
+    .max(3)
+    .default([]),
+  /** 화면의 R&D 과제 제안(규칙 초안) — Claude가 과제명·요약을 다듬을 대상. 최대 3개 */
+  rnd: z
+    .array(z.object({
+      id: z.string().regex(/^R&D-[1-4]$/), track: z.enum(['upgrade', 'frontier', 'validation', 'convergence']),
+      title: str(120), techName: str(120), trlTarget: str(100),
+    }))
     .max(3)
     .default([]),
 });
