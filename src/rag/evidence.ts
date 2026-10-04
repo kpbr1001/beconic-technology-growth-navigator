@@ -77,6 +77,21 @@ function citation(c: RoadmapRankedChunk): string {
   return `${doc} › ${r.item_name}${id ? ` (${id})` : ''} · ${page}${r.page_start ? ` (PDF p.${r.page_start})` : ''}`;
 }
 
+/** 질의 임베딩 메모: 같은 텍스트·용도면 첫 호출의 결과(또는 실패)를 그대로 돌려준다 */
+export function memoizeEmbedder(e: EmbeddingProvider): EmbeddingProvider {
+  if (!e.enabled) return e;
+  const memo = new Map<string, Promise<number[]>>();
+  return {
+    ...e,
+    embedText(text, options) {
+      const k = `${options.inputType}\u0000${text}`;
+      if (!memo.has(k)) memo.set(k, e.embedText(text, options));
+      return memo.get(k)!;
+    },
+    embedBatch: (texts, options) => e.embedBatch(texts, options),
+  };
+}
+
 export async function findEvidence(
   req: EvidenceRequest,
   deps: { supabase: SupabaseConfig | null; embedder: EmbeddingProvider },
@@ -88,11 +103,13 @@ export async function findEvidence(
   const keyword = supabaseKeywordRetriever(deps.supabase);
   const vector = supabaseVectorRetriever(deps.supabase);
   const qTerms = terms(query);
+  // 같은 질의를 후보 품목마다 다시 임베딩하지 않도록 1회 결과(실패 포함)를 재사용 — 임베딩 호출 수를 품목 수 → 1회로
+  const embedder = memoizeEmbedder(deps.embedder);
   const items: Record<string, EvidenceQuote[]> = {};
   let mode: EvidenceResponse['mode'] = 'hybrid';
   let reason: string | undefined;
   for (const uid of uids) {
-    const r = await hybridSearch(query, { keyword, vector, embedder: deps.embedder }, {
+    const r = await hybridSearch(query, { keyword, vector, embedder }, {
       ...opts,
       matchCount: opts.matchCount ?? 10,
       finalCount: opts.finalCount ?? 2,

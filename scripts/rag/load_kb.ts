@@ -1,12 +1,13 @@
 // 비공개 KB의 문단(chunks.jsonl) → Supabase roadmap_chunks 적재 (+ 임베딩 공급자가 켜져 있으면 벡터도)
-// 사용: npx vite-node scripts/rag/load_kb.ts -- --chunks ../beconic-roadmap-kb/kb/chunks.jsonl [--dry-run|--probe] [--batch 64] [--pause-ms 0]
+// 사용: npx vite-node scripts/rag/load_kb.ts -- --chunks ../beconic-roadmap-kb/kb/chunks.jsonl [--dry-run|--probe] [--resume] [--batch 64] [--pause-ms 0]
+//  --resume: 같은 KB 버전·임베딩 모델로 이미 저장된 문단은 건너뜀(중간 실패 후 이어서 적재)
 //  --probe: 키·모델·DB 연결만 확인(문단 1개 임베딩 + DB 검색 1회, 쓰기 없음)
 //  임베딩 호출이 실패(429 사용 한도 등)하면 20초·40초·… 간격으로 최대 6회 재시도
 // 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, (선택) EMBEDDING_PROVIDER=voyage, VOYAGE_API_KEY
 // ⚠️ 키는 셸 환경변수로만 전달하고 파일·커밋에 남기지 않는다.
 import { readFileSync } from 'node:fs';
 import { createEmbeddingProvider } from '../../src/rag/embedding';
-import { deactivateOtherVersions, supabaseConfigFromEnv, supabaseKeywordRetriever, upsertChunks } from '../../src/rag/supabase';
+import { deactivateOtherVersions, listEmbeddedChunkIds, supabaseConfigFromEnv, supabaseKeywordRetriever, upsertChunks } from '../../src/rag/supabase';
 
 const COLUMNS = ['chunk_id', 'chunk_type', 'kb_version', 'source_file', 'sha256', 'roadmap_version', 'roadmap_type',
   'roadmap_role', 'strategic_field', 'field_no', 'subfield', 'item_uid', 'item_code', 'item_no', 'item_name',
@@ -80,8 +81,14 @@ async function main() {
     console.log(`임베딩 확인 — ${embedder.model} ${v.length}차원. 시험 통과(쓰기 없음). 전체 적재를 실행하세요.`);
     return;
   }
-  for (let i = 0; i < chunks.length; i += batch) {
-    const part = chunks.slice(i, i + batch);
+  let todo = chunks;
+  if (process.argv.includes('--resume') && embedder.enabled && embedder.model) {
+    const done = await listEmbeddedChunkIds(cfg, versions[0], embedder.model);
+    todo = chunks.filter((c) => !done.has(c.chunk_id));
+    console.log(`이어서 적재: 이미 저장 ${done.size}개 건너뜀 → 남은 ${todo.length}개`);
+  }
+  for (let i = 0; i < todo.length; i += batch) {
+    const part = todo.slice(i, i + batch);
     const rows = part.map(toRow);
     if (embedder.enabled) {
       const vecs = await withRetry(() => embedder.embedBatch(part.map(embedInput), { inputType: 'document' }), { label: `임베딩 ${i + 1}~` });
@@ -91,17 +98,21 @@ async function main() {
       });
     }
     await withRetry(() => upsertChunks(cfg, rows), { tries: 3, baseMs: 5_000, label: `DB 저장 ${i + 1}~` });
-    process.stdout.write(`\r적재 ${Math.min(i + batch, chunks.length)}/${chunks.length}`);
+    process.stdout.write(`\r적재 ${Math.min(i + batch, todo.length)}/${todo.length}`);
     if (pauseMs > 0) await new Promise((r) => setTimeout(r, pauseMs));
   }
   await deactivateOtherVersions(cfg, versions[0]);
   console.log(`\n완료 — 다른 KB 버전 행은 비활성 처리`);
+  if (process.env.GITHUB_ACTIONS) console.log(`::notice::적재 완료 — 이번 실행 ${todo.length}개 저장(전체 ${chunks.length}개)`);
 }
 
 // 테스트(vitest)에서 import할 때는 실행하지 않는다
 if (!process.env.VITEST) {
   main().catch((e) => {
-    console.error(`적재 실패: ${e instanceof Error ? e.message : e}`);
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(`적재 실패: ${msg}`);
+    // GitHub Actions 요약 화면에 실패 이유를 바로 표시(로그를 열지 않아도 보이게)
+    if (process.env.GITHUB_ACTIONS) console.log(`::error::적재 실패 — ${msg.replace(/\r?\n/g, ' ').slice(0, 300)}`);
     process.exit(1);
   });
 }

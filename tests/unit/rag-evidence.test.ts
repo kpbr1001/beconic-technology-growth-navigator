@@ -5,7 +5,7 @@ import { embedInput, toRow, withRetry, type Chunk } from '../../scripts/rag/load
 import { createEmbeddingProvider, type EmbeddingProvider } from '../../src/rag/embedding';
 import { bestQuote, findEvidence } from '../../src/rag/evidence';
 import {
-  supabaseConfigFromEnv, supabaseKeywordRetriever, supabaseVectorRetriever, upsertChunks, type RoadmapChunkRow,
+  listEmbeddedChunkIds, supabaseConfigFromEnv, supabaseKeywordRetriever, supabaseVectorRetriever, upsertChunks, type RoadmapChunkRow,
 } from '../../src/rag/supabase';
 
 const SERVICE_JWT = 'aaa.bbb.ccc-test-only';
@@ -67,6 +67,17 @@ describe('Supabase 검색기 (가짜 fetch)', () => {
     expect(String(err.message)).toMatch(/HTTP 401/);
     expect(String(err.message)).not.toContain(SERVICE_JWT);
   });
+  it('이어서 적재: 임베딩된 문단 id를 1,000개씩 나눠 조회', async () => {
+    const page = (n: number, from: number) => Array.from({ length: n }, (_, i) => ({ chunk_id: `c${from + i}` }));
+    const f = vi.fn(async (_u: string, init: RequestInit) => {
+      const from = Number(String((init.headers as Record<string, string>).range).split('-')[0]);
+      return new Response(JSON.stringify(from === 0 ? page(1000, 0) : page(5, 1000)), { status: 200 });
+    });
+    const ids = await listEmbeddedChunkIds(cfg(f), 'kb-v2', 'voyage-4');
+    expect(ids.size).toBe(1005);
+    expect(f).toHaveBeenCalledTimes(2);
+    expect(String((f.mock.calls[0] as unknown as [string])[0])).toContain('embedding=not.is.null');
+  });
   it('적재 upsert: 중복 시 갱신 헤더', async () => {
     const f = vi.fn(async () => new Response('', { status: 201 }));
     await upsertChunks(cfg(f), [{ chunk_id: 'a' }]);
@@ -108,6 +119,17 @@ describe('findEvidence', () => {
     expect(r.mode).toBe('hybrid');
     expect(embedText).toHaveBeenCalledWith('예지보전 고장', { inputType: 'query' });
     expect(r.items.U1.map((q) => q.chunkId)).toEqual(expect.arrayContaining([row().chunk_id, 'X#tech1']));
+  });
+  it('질의 임베딩은 품목 수와 관계없이 1회(실패도 1회로 끝나고 키워드로 계속)', async () => {
+    const f = vi.fn(async () => new Response(JSON.stringify([row()]), { status: 200 }));
+    const embedText = vi.fn(async () => [0.5, 0.5]);
+    const embedder = { id: 'fake', model: 'm', dimensions: 2, enabled: true, embedText, embedBatch: vi.fn() } as unknown as EmbeddingProvider;
+    await findEvidence({ query: '예지보전 고장', itemUids: ['a1x', 'b2x', 'c3x'] }, { supabase: cfg(f), embedder });
+    expect(embedText).toHaveBeenCalledTimes(1);
+    const failing = vi.fn(async () => { throw new Error('HTTP 429'); });
+    const bad = { ...embedder, embedText: failing } as unknown as EmbeddingProvider;
+    const r = await findEvidence({ query: '예지보전 고장', itemUids: ['a1x', 'b2x'] }, { supabase: cfg(f), embedder: bad });
+    expect([failing.mock.calls.length, r.mode, r.status]).toEqual([1, 'keyword_only', 'ok']);
   });
   it('품목은 최대 3개, 질의는 600자로 제한', async () => {
     const f = okFetch([]);

@@ -150,3 +150,20 @@ export async function deactivateOtherVersions(cfg: SupabaseConfig, kbVersion: st
   });
   if (!res.ok) throw new SupabaseRequestError(`Supabase 비활성화 실패 (HTTP ${res.status})`, res.status);
 }
+
+/** 이미 임베딩이 저장된 문단 id(이어서 적재용). 1,000개씩 나눠 조회 */
+export async function listEmbeddedChunkIds(cfg: SupabaseConfig, kbVersion: string, model: string): Promise<Set<string>> {
+  const base = cfg.restUrl?.replace(/\/+$/, '') ?? `${cfg.url}/rest/v1`;
+  const out = new Set<string>();
+  for (let from = 0; ; from += 1000) {
+    const q = `select=chunk_id&kb_version=eq.${encodeURIComponent(kbVersion)}&embedding_model=eq.${encodeURIComponent(model)}&embedding=not.is.null&order=chunk_id`;
+    const res = await (cfg.fetchImpl ?? fetch)(`${base}/roadmap_chunks?${q}`, {
+      headers: { ...headers(cfg), range: `${from}-${from + 999}`, 'range-unit': 'items' },
+    });
+    if (!res.ok) throw new SupabaseRequestError(`Supabase 임베딩 현황 조회 실패 (HTTP ${res.status})`, res.status);
+    const rows = (await res.json()) as { chunk_id: string }[];
+    rows.forEach((r) => out.add(r.chunk_id));
+    if (rows.length < 1000) return out;
+  }
+}
+
