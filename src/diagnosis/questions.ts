@@ -65,11 +65,11 @@ export const DIMENSIONS: Dimension[] = ['tech', 'rd', 'exec', 'evidence', 'scale
 /** 문항 화면용 차원명 */
 export const DIMENSION_NAME: Record<Dimension, string> = {
   tech: '기술성숙', rd: 'R&D 역량', exec: '실행준비', evidence: '기술기록',
-  scale: '확장준비', strategy: '전략정렬', risk: '리스크 대응',
+  scale: '확장준비', strategy: '전략정렬', risk: '리스크대응',
 };
 
-/** 결과·보고서용 영역명 (v0.9에서 '리스크대응'은 붙여 쓴다) */
-export const AREA_NAME: Record<Dimension, string> = { ...DIMENSION_NAME, risk: '리스크대응' };
+/** 결과·보고서용 영역명(문항 화면과 같은 표기) */
+export const AREA_NAME: Record<Dimension, string> = { ...DIMENSION_NAME };
 
 export function profile(bizType: string): Profile {
   const t = bizType;

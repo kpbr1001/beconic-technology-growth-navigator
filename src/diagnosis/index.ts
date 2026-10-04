@@ -38,7 +38,10 @@ export function evaluate(input: AssessmentInput): AssessmentResult {
     answered,
     unknown,
     gaps: priorityGaps(m, confidence),
-    alerts: consistencyAlerts(questions, input.answers, Boolean(input.discovery.external), pendingDimensions),
+    alerts: consistencyAlerts(
+      questions, input.answers, Boolean(input.discovery.external), pendingDimensions,
+      input.inventory.filter((t) => t.critical && t.trl > 0).map((t) => t.trl),
+    ),
     insufficient: answered < 8,
     range,
   };

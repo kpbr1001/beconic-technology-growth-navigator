@@ -2,7 +2,8 @@
 import type { Versions } from './types';
 
 export const VERSIONS: Versions = {
-  assessment: '0.9.2',
+  /** 0.9.3: TRL 대조 경고 추가(점수·우선순위 불변) */
+  assessment: '0.9.3',
   /** 문항 문구·가중치는 v0.9와 동일 */
   question: 'core12-v0.9',
   /** rule-v0.9 대비: 무응답 차원 null 처리(D2), TRL 평균 폐지(D3) */

@@ -7,6 +7,10 @@ import { loadRoadmapIndex, roadmapCandidates, setRoadmapIndex } from '../../src/
 import type { AssessmentInput } from '../../src/diagnosis';
 import { NAMED, randomInputs } from '../fixtures/assessments';
 import { runV09 } from './v09-oracle';
+import { TRL_ALERT } from '../../src/diagnosis/consistency';
+
+/** v0.9.3에서 추가된 TRL 대조 경고는 v0.9 원본에 없으므로 비교에서 뺀다(아래 '의도된 차이'에서 따로 고정) */
+const v09Alerts = (a: string[]) => a.filter((x) => !x.startsWith(TRL_ALERT));
 
 const cases: [string, AssessmentInput][] = [
   ...Object.entries(NAMED),
@@ -52,7 +56,7 @@ describe.each(cases)('v0.9 parity · %s', (_name, input) => {
     expect(now.capability).toBe(old.results.capability);
     expect(now.range).toEqual(old.results.range);
     expect(now.gaps).toEqual(old.results.gaps);
-    expect(now.alerts).toEqual(old.results.alerts);
+    expect(v09Alerts(now.alerts)).toEqual(old.results.alerts);
     expect(strategicOptions(now).map((o) => [o.name, o.score, o.recommended])).toEqual(
       old.options.map((o) => [o.name, o.score, o.recommended]),
     );
@@ -61,13 +65,24 @@ describe.each(cases)('v0.9 parity · %s', (_name, input) => {
   it.runIf(!complete)('무응답 차원 존재 시: Gap에서 제외되고 판단 보류 경고가 추가됨', () => {
     const areas = now.gaps.map((g) => g.area);
     expect(now.alerts.at(-1)).toMatch(/판단 보류/);
-    expect(now.alerts.slice(0, -1)).toEqual(old.results.alerts);
+    expect(v09Alerts(now.alerts.slice(0, -1))).toEqual(old.results.alerts);
     for (const g of now.gaps) if (g.score !== null) expect(areas).toContain(g.area);
     expect(now.gaps.every((g) => g.score === null || g.area !== '근거확보')).toBe(true);
   });
 });
 
 describe('의도된 차이 고정 (승인된 P0 수정)', () => {
+  it('v0.9.3: 핵심기술 TRL과 구현·실증 응답이 어긋나면 TRL 대조 경고(점수·우선순위 불변)', () => {
+    const base = NAMED.sample;
+    const hi = { ...base, inventory: base.inventory.map((t) => (t.critical ? { ...t, trl: 9 } : t)), answers: { ...base.answers, q1: 1 } };
+    const r = evaluate(hi);
+    expect(r.alerts.some((x) => x.startsWith(TRL_ALERT) && x.includes('TRL 7 이상'))).toBe(true);
+    const plain = evaluate({ ...hi, inventory: hi.inventory.map((t) => ({ ...t, critical: false })) });
+    expect(r.capability).toBe(plain.capability);
+    expect(r.gaps).toEqual(plain.gaps);
+    const lo = { ...base, inventory: base.inventory.map((t) => (t.critical ? { ...t, trl: 3 } : t)), answers: { ...base.answers, q2: 5 } };
+    expect(evaluate(lo).alerts.some((x) => x.startsWith(TRL_ALERT) && x.includes('4 이하'))).toBe(true);
+  });
   it('D3: TRL 평균 필드가 없고 핵심기술별 값과 분포만 제공', () => {
     const { trl } = evaluate(NAMED.sample);
     expect(trl).not.toHaveProperty('avg');
