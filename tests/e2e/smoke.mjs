@@ -105,6 +105,10 @@ for (const [w, h] of VIEWPORTS) {
   const radar = await page.textContent('#printReport .pr-radar');
   check((radar.match(/\b\d{1,3}\b/g) || []).length >= 7, `PDF 레이더 점수 표기 누락 ${radar}`);
   check(!/검증 검증|운영 운영|점수 점수|관문를|점를/.test(pr), 'PDF 용어 변환 중복·조사 오류');
+  // 하드코딩 제거: 영역 근거 문항·개인화 로드맵(핵심기술 이름)·쪽번호 토큰 치환
+  check(/응답 근거/.test(pr), 'PDF 영역 근거 문항 누락');
+  check(/'이상징후 탐지 모델' TRL \d→\d/.test(pr), 'PDF 로드맵에 핵심기술 TRL 단계 누락');
+  check(!/\{\{(TOTAL|P:)/.test(pr), 'PDF 쪽번호 토큰 미치환');
   check(/App v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트/.test(pr), 'PDF에 앱 버전·업데이트 일자 누락');
   check(/그로스벤처스/.test(pr) && /제2025-684호/.test(pr), 'PDF에 발행사·인증번호 누락');
   const logoOk = await page.$eval('#printReport .cover-logo', (i) => i.complete && i.naturalWidth > 0);
@@ -113,6 +117,20 @@ for (const [w, h] of VIEWPORTS) {
   await page.close();
 }
 
+// 4-a) 업종별 작성 예시: 운영유형을 바꾸면 1단계 예시가 바뀌고 2단계 예시도 그 유형
+{
+  const { page, errors } = await openPage(1440, 900);
+  await page.evaluate(() => localStorage.clear());
+  await page.reload({ waitUntil: 'networkidle' });
+  const before = await page.textContent('[data-ex="product"]');
+  await page.selectOption('#bizType', '제조 중심');
+  const after = await page.textContent('[data-ex="product"]');
+  check(before !== after && /사출/.test(after), `업종별 예시: 1단계 예시가 바뀌지 않음 ${after}`);
+  await page.locator('section.active').getByRole('button', { name: '기술 발견 시작' }).click();
+  check(/금형/.test(await page.textContent('section.active')), '업종별 예시: 2단계 예시가 운영유형과 다름');
+  check(errors.length === 0, `업종별 예시: 콘솔 에러 ${JSON.stringify(errors)}`);
+  await page.close();
+}
 // 4-b) 기술 후보: 2단계 답변에서 찾은 후보(근거 구절 표시), 다시 찾기·삭제 동작
 {
   const { page, errors } = await openPage(1440, 900);
