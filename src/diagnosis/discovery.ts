@@ -50,8 +50,9 @@ const RULES: Rule[] = [
   { kws: ['컨설팅', '교육 서비스', '서비스 프로세스', '운영\\s?방식', '매뉴얼'], type: '서비스기술', name: () => '서비스 운영 노하우' },
 ];
 
-/** 답변을 읽는 순서: 차별 요소 → 자동화 → 데이터 → 제품 → 업종 → 검증 → 외부 의존 */
-const ORDER: DiscoveryField[] = ['hardPart', 'automated', 'data', 'product', 'sectorDetail', 'validation', 'external'];
+/** 답변을 읽는 순서: 차별 요소 → 자동화 → 데이터 → 제품 → 업종 → 외부 의존.
+ *  '외부에서 확인된 경험'은 고객사 이름(예: B부품)이 섞여 오탐이 많아 규칙에서는 읽지 않는다(AI 찾기에서만 사용) */
+const ORDER: DiscoveryField[] = ['hardPart', 'automated', 'data', 'product', 'sectorDetail', 'external'];
 
 /** 일치한 곳이 들어 있는 구절(문장·쉼표 단위, 최대 70자) */
 function clauseAround(text: string, index: number): string {
