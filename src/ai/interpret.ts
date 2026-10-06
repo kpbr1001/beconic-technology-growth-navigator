@@ -9,6 +9,9 @@ import type { EvidenceQuote } from '../rag/evidence';
 import { applyGuardrail, type GuardContext, type Violation } from './guardrail';
 import { Interpretation, type InterpretRequest } from './schema';
 import { SYSTEM_PROMPT, PROMPT_VERSION } from './prompt';
+import { CHECK_KEYS, CHECK_LABEL, rankTechs, type TechRankRow } from '../diagnosis/techrank';
+import { roadmapCandidates, roadmapInputOf, techRoadmapLink } from '../roadmap/candidates';
+import { gapAnswerText, gapCards, gapTechNames, type GapCard } from '../roadmap/gaps';
 
 export const DEFAULT_MODEL = 'claude-opus-5-5';
 export type Effort = 'low' | 'medium' | 'high';
@@ -39,22 +42,50 @@ export type InterpretResponse =
       usage: { input: number; output: number };
     };
 
+const PRI = { P0: 0, P1: 1, P2: 2 } as const;
+/** 화면과 같은 우선순위 순서(P0→P1→P2, 같은 등급은 점수 낮은 순) */
+export const byPriority = (r: AssessmentResult) => [...r.gaps].sort((a, b) => PRI[a.priority] - PRI[b.priority]);
+
+/** 화면과 같은 규칙으로 서버에서 다시 계산: 핵심기술 우선순위·보완 필요 기술·데이터(원문 색인이 없으면 로드맵 연결 없음) */
+export function techContext(input: AssessmentInput, r: AssessmentResult): { ranked: TechRankRow[]; cards: GapCard[] } {
+  const f = input.company.roadmapField;
+  const ranked = rankTechs(input.inventory, {
+    hardPart: input.discovery.hardPart ?? '',
+    linkOf: (n) => {
+      const c = techRoadmapLink(f, n);
+      return c ? { name: c.name, code: c.code ?? null, page: c.page, source: c.source } : null;
+    },
+  });
+  const cards = gapCards({
+    candidates: roadmapCandidates(roadmapInputOf(input)),
+    techs: input.inventory,
+    answerText: gapAnswerText(input),
+    dataText: input.discovery.data ?? '',
+    rdScore: r.m.rd,
+  });
+  return { ranked, cards };
+}
+
 /** 원문 근거·Rule 결과에서 허용 값 목록을 만든다(가드레일 대조용) */
-export function guardContext(r: AssessmentResult, input: AssessmentInput, evidence: Record<string, EvidenceQuote[]>, req?: Pick<InterpretRequest, 'rnd'>): GuardContext {
+export function guardContext(r: AssessmentResult, input: AssessmentInput, evidence: Record<string, EvidenceQuote[]>, req?: Pick<InterpretRequest, 'rnd'>, cards: GapCard[] = []): GuardContext {
   const scores = [...Object.values(r.m), r.capability, r.confidence, ...strategicOptions(r).map((o) => o.score)].filter((x): x is number => x !== null).map((x) => Math.round(x));
   const trls = new Set<number>();
   // 입력 TRL, 다음 단계, R&D 과제 목표(+2)까지 허용
   for (const t of input.inventory) if (t.trl > 0) [t.trl, Math.min(9, t.trl + 1), Math.min(9, t.trl + 2)].forEach((x) => trls.add(x));
   const quotes = Object.values(evidence).flat();
   for (const q of quotes) for (const m of (q.trl ?? '').matchAll(/\d/g)) trls.add(Number(m[0]));
+  // 보완 필요 대조표의 원문 TRL 표기·쪽·품목코드도 인용 가능
+  const gapRows = cards.flatMap((c) => c.rows);
+  for (const g of gapRows) for (const m of (g.trlRef ?? '').matchAll(/\d/g)) trls.add(Number(m[0]));
   return {
     scores: [...new Set(scores)],
     trls: [...trls],
     evidenceUids: Object.keys(evidence).filter((k) => evidence[k].length),
     evidenceText: Object.fromEntries(Object.entries(evidence).map(([k, qs]) => [k, qs.map((q) => `${q.label} ${q.technologyName ?? ''} ${q.trl ?? ''} ${q.quote} ${q.citation}`).join(' ')])),
-    codes: [...new Set(quotes.flatMap((q) => q.citation.match(/\b[A-Z]{2,}(?:-[A-Z0-9]+)*-\d{2}-\d{2}\b/g) ?? []))],
-    pages: [...new Set(quotes.flatMap((q) => [q.printedPage, q.pdfPage]).filter((x): x is number => x !== null))],
-    gapAreas: r.gaps.slice(0, 5).map((g) => g.area),
+    codes: [...new Set([...quotes.flatMap((q) => q.citation.match(/\b[A-Z]{2,}(?:-[A-Z0-9]+)*-\d{2}-\d{2}\b/g) ?? []), ...cards.map((c) => c.item.code).filter((x): x is string => !!x)])],
+    pages: [...new Set([...quotes.flatMap((q) => [q.printedPage, q.pdfPage]), ...cards.map((c) => c.item.page), ...gapRows.map((g) => g.page)].filter((x): x is number => x !== null))],
+    gapAreas: byPriority(r).slice(0, 5).map((g) => g.area),
+    gapTechs: gapTechNames(cards),
     rndIds: (req?.rnd ?? []).map((x) => x.id),
     // 이 POC의 입력은 모두 자가응답이다. 외부검증 Evidence(4단계)가 확인되기 전에는 '확인된 사실' 표기 금지
     allowVerifiedFact: false,
@@ -62,13 +93,13 @@ export function guardContext(r: AssessmentResult, input: AssessmentInput, eviden
 }
 
 /** Claude에게 넘길 입력: 계산은 끝난 값만, 원문은 발췌 그대로 */
-export function buildUserContent(input: AssessmentInput, r: AssessmentResult, req: InterpretRequest, evidence: Record<string, EvidenceQuote[]>): string {
+export function buildUserContent(input: AssessmentInput, r: AssessmentResult, req: InterpretRequest, evidence: Record<string, EvidenceQuote[]>, tc: { ranked: TechRankRow[]; cards: GapCard[] } = { ranked: [], cards: [] }): string {
   const c = input.company;
   const dims = (Object.keys(DIM_LABEL) as Dimension[]).map((d) => `- ${DIM_LABEL[d]}: ${r.m[d] === null ? '판단 보류(응답 없음)' : `${Math.round(r.m[d] as number)}/100`}`);
   const techs = input.inventory
     .filter((t) => t.critical)
     .map((t) => `- ${t.name} · ${t.ownership} · ${t.trl > 0 ? `TRL ${t.trl}` : 'TRL 확인 필요'}${t.confirmed ? ' (담당자 확인)' : ' (미확인)'}`);
-  const gaps = r.gaps.slice(0, 5).map((g) => `- ${g.priority} ${g.area}: ${g.score === null ? '점수 산정 불가(근거확보 과제)' : `${Math.round(g.score)}/100`}`);
+  const gaps = byPriority(r).slice(0, 5).map((g) => `- ${g.priority} ${g.area}: ${g.score === null ? '점수 산정 불가(근거확보 과제)' : `${Math.round(g.score)}/100`}`);
   const rm = req.roadmap.map((it) => {
     const qs = evidence[it.uid] ?? [];
     const body = qs.length
@@ -78,6 +109,18 @@ export function buildUserContent(input: AssessmentInput, r: AssessmentResult, re
   });
   const opts = strategicOptions(r).map((o) => `- ${o.name}${o.recommended ? ' ← Rule 추천안' : ''} · 규칙 점수 ${o.score === null ? '산정 불가' : `${o.score}/100`} · 적합 상황: ${o.when} · Focus: ${o.focus}`);
   const disc = input.discovery;
+  const rankLines = tc.ranked.map((x) => {
+    const ok = CHECK_KEYS.filter((k) => x.checks[k] === true).map((k) => CHECK_LABEL[k]);
+    const rnd = req.rnd.filter((p) => p.techName === x.tech.name).map((p) => p.id);
+    return `- ${x.rank}위 ${x.tech.name} · 확인 항목 ${x.met}/5${ok.length ? `(${ok.join('·')})` : ''}${rnd.length ? ` · 연결 과제 ${rnd.join('·')}` : ''}`;
+  });
+  const gapLines = tc.cards.flatMap((c) => [
+    `- 로드맵 품목 ${c.item.name}${c.item.code ? ` (${c.item.code})` : ''}${c.item.page ? ` p.${c.item.page}` : ''}`,
+    ...c.rows.map((g) => g.status === 'held'
+      ? `  · 보유 대조: 원문 '${g.roadmapTech}'${g.trlRef ? `(원문 TRL ${g.trlRef})` : ''} ↔ 자사 '${g.company?.name}'(${g.company?.trl ? `TRL ${g.company.trl}` : 'TRL 확인 필요'})`
+      : `  · 보완 필요 후보: '${g.roadmapTech}'${g.trlRef ? `(원문 TRL ${g.trlRef})` : ''}${g.page ? ` p.${g.page}` : ''} — ${g.status === 'mentioned' ? '답변에 관련 표현 있음(목록 추가 검토)' : `경로: ${g.route}`}`),
+    ...c.dataGaps.map((d) => `  · 데이터 보완 후보: ${d.term} 데이터(원문 '${d.roadmapTech}'${d.page ? ` p.${d.page}` : ''}, 데이터 답변에 없음)`),
+  ]);
   return [
     '## 기업 입력(자가응답)',
     `- 업종·운영유형: ${c.bizType} / 세부: ${c.sectorDetail || '미입력'}`,
@@ -100,6 +143,12 @@ export function buildUserContent(input: AssessmentInput, r: AssessmentResult, re
     ...opts,
     ...(r.alerts.length ? ['- 일관성 경고:', ...r.alerts.map((a) => `  · ${a}`)] : []),
     '',
+    '## 핵심기술 우선순위(규칙 기반 — 순서 변경 금지, 가치 평가 아님)',
+    ...(rankLines.length ? rankLines : ['- 핵심기술 미지정']),
+    '',
+    '## 보완 필요 기술·데이터 후보(로드맵 원문 핵심기술 대조 — 목록 밖 기술 금지)',
+    ...(gapLines.length ? gapLines : ['- 대조할 로드맵 품목 없음(gap_notes 쓰지 말 것)']),
+    '',
     '## R&D 과제 제안(규칙 기반 초안 — 번호·유형·목표 TRL 변경 금지)',
     ...(req.rnd.length ? req.rnd.map((x) => `- ${x.id} · ${x.track} · ${x.title} · 연계 기술: ${x.techName} · 목표: ${x.trlTarget}`) : ['- 없음']),
     '',
@@ -114,6 +163,7 @@ export async function interpretAssessment(req: InterpretRequest, deps: Interpret
   const r = evaluate(input);
   const evidence = deps.evidence ?? {};
   const model = deps.model || DEFAULT_MODEL;
+  const tc = techContext(input, r);
 
   const call = deps.client.beta.messages.parse({
     model,
@@ -123,7 +173,7 @@ export async function interpretAssessment(req: InterpretRequest, deps: Interpret
     fallbacks: 'default',
     system: SYSTEM_PROMPT,
     output_config: { effort: deps.effort ?? 'low', format: betaZodOutputFormat(Interpretation) },
-    messages: [{ role: 'user', content: buildUserContent(input, r, req, evidence) }],
+    messages: [{ role: 'user', content: buildUserContent(input, r, req, evidence, tc) }],
   });
   let msg: Awaited<typeof call>;
   try {
@@ -139,7 +189,7 @@ export async function interpretAssessment(req: InterpretRequest, deps: Interpret
   const parsed = msg.parsed_output;
   if (!parsed) return { status: 'fallback', reason: 'invalid_output' };
 
-  const { output, violations } = applyGuardrail(parsed, guardContext(r, input, evidence, req));
+  const { output, violations } = applyGuardrail(parsed, guardContext(r, input, evidence, req, tc.cards));
   const removed = violations.filter((v) => v.kind !== 'claim_downgraded' && v.kind !== 'trimmed').length;
   if (!output.headline && !output.strengths.length && !output.constraints.length) return { status: 'fallback', reason: 'empty' };
   return { status: 'ok', interpretation: output, model: msg.model, promptVersion: PROMPT_VERSION, ruleVersions: r.versions, removed, violations,
