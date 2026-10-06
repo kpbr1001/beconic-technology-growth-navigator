@@ -19,6 +19,8 @@ export interface GuardContext {
   gapAreas?: string[];
   /** 화면의 R&D 과제 제안 번호. 과제 메모는 이 번호만 허용 */
   rndIds?: string[];
+  /** 보완 필요 후보 원문 핵심기술명. 보완 메모는 이 기술만 허용 */
+  gapTechs?: string[];
   /** 외부검증 근거가 없으면 '확인된 사실' 표기를 자가응답으로 낮춘다 */
   allowVerifiedFact: boolean;
 }
@@ -30,7 +32,7 @@ export interface Violation {
   text: string;
 }
 
-const LIMITS = { strengths: 3, constraints: 3, root_cause_hypotheses: 4, confirmation_needed: 4, roadmap_notes: 3, option_notes: 3, action_plan: 5, rnd_notes: 3 } as const;
+const LIMITS = { strengths: 3, constraints: 3, root_cause_hypotheses: 4, confirmation_needed: 4, roadmap_notes: 3, option_notes: 3, action_plan: 5, rnd_notes: 3, gap_notes: 3 } as const;
 /** 과제 메모에 쓰면 안 되는 표현(선정 가능성·적합도) */
 const SELECTION_RE = /선정|합격|채택\s?가능|가능성\s?(?:이\s?)?(?:높|크)|적합도/;
 const OPTIONS = ['A', 'B', 'C'] as const;
@@ -166,6 +168,26 @@ export function applyGuardrail(raw: Interpretation, ctx: GuardContext): { output
         ),
         (n) => [n.title, n.summary],
       ).map((n) => ({ id: n.id.trim(), title: n.title.length > 60 ? `${n.title.slice(0, 59)}…` : n.title, summary: clip(n.summary) })),
+      gap_notes: keep(
+        'gap_notes',
+        uniqueBy(
+          (raw.gap_notes ?? []).flatMap((n) => {
+            const sq = (x: string) => x.replace(/\s+/g, '');
+            const tech = (ctx.gapTechs ?? []).find((t) => sq(t) === sq(n.tech));
+            if (!tech) {
+              violations.push({ kind: 'unknown_item', field: 'gap_notes', text: n.tech.slice(0, 60) });
+              return [];
+            }
+            if (SELECTION_RE.test(`${n.why} ${n.first_step}`)) {
+              violations.push({ kind: 'fit_grade', field: 'gap_notes', text: n.why.slice(0, 80) });
+              return [];
+            }
+            return [{ ...n, tech }];
+          }),
+          (n) => n.tech,
+        ),
+        (n) => [n.why, n.first_step],
+      ).map((n) => ({ tech: n.tech, why: clip(n.why), first_step: clip(n.first_step) })),
     },
   };
 }

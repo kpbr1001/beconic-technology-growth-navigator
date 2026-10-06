@@ -52,6 +52,7 @@ for (const [w, h] of VIEWPORTS) {
   check(/90일 최우선 과제\(P[0-2]\)/.test(await page.textContent('#summary')), `${w}px: 요약에 P0 기준 최우선 과제 누락`);
   const tech = await page.textContent('#tech');
   check(/확인 항목/.test(tech) && /\d\/5/.test(tech) && /R&D-1/.test(tech), `${w}px: 핵심기술 우선순위·결과 연결 누락`);
+  check(/원문 핵심기술/.test(await page.textContent('#gaps')), `${w}px: 보완 필요 기술·데이터 누락`);
   if (w === 375 || w === 1440) await page.screenshot({ path: `${OUT}/result-${w}.png`, fullPage: false });
   await page.close();
 }
@@ -95,7 +96,7 @@ for (const [w, h] of VIEWPORTS) {
   await page.emulateMedia({ media: 'print' });
   await page.pdf({ path: `${OUT}/report-sample.pdf`, format: 'A4', printBackground: true });
   const pages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(pages === 15, `PDF 섹션 수 ${pages} (기대 15)`);
+  check(pages === 16, `PDF 섹션 수 ${pages} (기대 16)`);
   const pr = await page.textContent('#printReport');
   check(/Scoring rule-v1\.1/.test(pr), 'PDF에 Scoring 버전 누락');
   check(/AI 설비 예지보전 솔루션/.test(pr) && /원문 p\.271/.test(pr), 'PDF 로드맵 정렬에 원문 색인 후보 누락');
@@ -107,6 +108,8 @@ for (const [w, h] of VIEWPORTS) {
   check(!/검증 검증|운영 운영|점수 점수|관문를|점를/.test(pr), 'PDF 용어 변환 중복·조사 오류');
   // 하드코딩 제거: 영역 근거 문항·개인화 로드맵(핵심기술 이름)·쪽번호 토큰 치환
   check(/응답 근거/.test(pr), 'PDF 영역 근거 문항 누락');
+  // 보완 필요 기술·데이터: 원문 핵심기술 대조(보유·보완 후보)
+  check(/보완 필요 기술·데이터/.test(pr) && /보유 기술과 대조/.test(pr) && /보완 필요 후보/.test(pr), 'PDF 보완 필요 기술·데이터 누락');
   check(/'이상징후 탐지 모델' TRL \d→\d/.test(pr), 'PDF 로드맵에 핵심기술 TRL 단계 누락');
   check(!/\{\{(TOTAL|P:)/.test(pr), 'PDF 쪽번호 토큰 미치환');
   check(/App v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트/.test(pr), 'PDF에 앱 버전·업데이트 일자 누락');
@@ -179,7 +182,7 @@ for (const [w, h] of VIEWPORTS) {
   const head = await page.textContent('#delta .decision p');
   check(/기술역량 \d+→\d+/.test(head ?? ''), `재진단: 변화 요약 ${head}`);
   const prPages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(prPages === 16, `재진단: PDF 섹션 수 ${prPages} (기대 16)`);
+  check(prPages === 17, `재진단: PDF 섹션 수 ${prPages} (기대 17)`);
   check(/재진단 비교 · 기준 진단 대비 변화/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
   await page.emulateMedia({ media: 'print' });
   mkdirSync(`${OUT}/pdf`, { recursive: true });

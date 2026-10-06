@@ -1,10 +1,13 @@
 // Phase 5 Task 2: Claude 진단 해석 — 가드레일·입력 구성·서버 함수. 실제 API 없이(가짜 클라이언트) 실행.
 import Anthropic from '@anthropic-ai/sdk';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { handle, originAllowed, type Deps } from '../../netlify/functions/ai-interpret';
 import { JOB_STALE_MS, jobView, processJob, type Job, type JobStore } from '../../src/ai/jobs';
 import { applyGuardrail, checkText, type GuardContext } from '../../src/ai/guardrail';
-import { buildUserContent, guardContext, interpretAssessment } from '../../src/ai/interpret';
+import { buildUserContent, byPriority, guardContext, interpretAssessment, techContext } from '../../src/ai/interpret';
+import { setRoadmapIndex, type AppIndex } from '../../src/roadmap/candidates';
+import { gapCards } from '../../src/roadmap/gaps';
+import kbIndex from '../../src/roadmap/kb-app-index.json';
 import { InterpretRequest, type Interpretation } from '../../src/ai/schema';
 import { evaluate, type AssessmentInput } from '../../src/diagnosis';
 import type { EvidenceQuote } from '../../src/rag/evidence';
@@ -24,6 +27,7 @@ const input: AssessmentInput = {
   evidence: { q1: 2 },
 };
 const r = evaluate(input);
+const PG = byPriority(r);
 const UID = 'SMESTR-2025-B-03-08@p279';
 const quote: EvidenceQuote = {
   chunkId: `${UID}#tech2`, quote: '고장 예측 정확도 확보 … 예지보전 알림 자동화', label: '기술개발 목표', technologyName: 'AI 기반 설비 이상 탐지',
@@ -43,10 +47,11 @@ const good: Interpretation = {
   confirmation_needed: ['대체 API 경로를 시험했습니까?'],
   roadmap_notes: [{ item_uid: UID, text: '원문 p.272의 고장 예측 목표와 기업의 이상패턴 탐지 모델이 맞닿습니다.' }],
   option_notes: [{ option: 'B', text: '고객사 PoC를 반복 현장으로 넓히는 경로입니다.', prerequisite: 'PoC 성공기준 문서화' }],
-  action_plan: [{ area: r.gaps[0].area, action: '클라우드 API 중단 시 대체 경로를 시험합니다.', kpi: '대체 경로 시험 1회 완료', evidence: '시험 기록' }],
+  action_plan: [{ area: PG[0].area, action: '클라우드 API 중단 시 대체 경로를 시험합니다.', kpi: '대체 경로 시험 1회 완료', evidence: '시험 기록' }],
   rnd_notes: [{ id: 'R&D-1', title: '설비 이상패턴 탐지 모델 현장 실증 고도화', summary: '고객사 현장에서 TRL 7 실증을 목표로 합니다.' }],
+  gap_notes: [],
 };
-const AREA0 = r.gaps[0].area;
+const AREA0 = PG[0].area;
 
 describe('가드레일', () => {
   it('입력에 없는 점수·TRL·품목코드·쪽 번호가 들어간 문장은 제거', () => {
@@ -100,7 +105,8 @@ describe('가드레일', () => {
   });
   it('맞춤 실행과제: Rule 우선순위 영역만·영역당 1개·Rule 순서, 점수 위조 제거', () => {
     const areas = ctx.gapAreas as string[];
-    expect(areas).toEqual(r.gaps.slice(0, 5).map((g) => g.area));
+    // 화면과 같은 우선순위 순서(P0→P1→P2)
+    expect(areas).toEqual(PG.slice(0, 5).map((g) => g.area));
     const act = (area: string, action = `${area} 과제`) => ({ area, action, kpi: '완료 1건', evidence: '기록' });
     const { output, violations } = applyGuardrail({
       ...good,
@@ -292,3 +298,49 @@ describe('서버 함수 /api/ai-interpret', () => {
     }
   });
 });
+
+describe('핵심기술 우선순위·보완 필요 기술(서버 재계산)', () => {
+  const cand = {
+    name: 'AI 설비 예지보전 솔루션', hits: 3, label: '', reason: '', source: '스마트제조', evidenceGrade: 'retrieved' as const, page: 271, code: 'SMESTR-2025-B-03-08',
+    allTechs: [
+      { name: 'AI 기반 설비 이상 탐지 및 고장 예측 알고리즘 기술', trl: '5', page: 272 },
+      { name: '설비 유지보수 최적화 및 자동 의사결정 기술', trl: '6', page: 272 },
+    ],
+  };
+  const cards = gapCards({ candidates: [cand], techs: input.inventory, answerText: '', dataText: input.discovery.data, rdScore: r.m.rd });
+  const c3 = guardContext(r, input, evidence, req, cards);
+  it('보완 메모: 후보 목록의 원문 기술만(띄어쓰기 차이 허용), 보유 대조 기술·목록 밖 기술·선정 표현 제거', () => {
+    expect(c3.gapTechs).toEqual(['설비 유지보수 최적화 및 자동 의사결정 기술']);
+    const { output, violations } = applyGuardrail({
+      ...good,
+      gap_notes: [
+        { tech: '설비 유지보수 최적화 및 자동의사결정 기술', why: '고장 예측 결과를 정비 계획으로 잇는 기술입니다(원문 p.272).', first_step: '외부 협력처 2곳을 조사합니다.' },
+        { tech: 'AI 기반 설비 이상 탐지 및 고장 예측 알고리즘 기술', why: '이미 보유', first_step: 'x' },
+        { tech: '양자 컴퓨팅', why: 'x', first_step: 'x' },
+      ],
+    }, c3);
+    expect(output.gap_notes.map((n) => n.tech)).toEqual(['설비 유지보수 최적화 및 자동 의사결정 기술']);
+    expect(violations.filter((v) => v.field === 'gap_notes').map((v) => v.kind)).toEqual(['unknown_item', 'unknown_item']);
+    const sel = applyGuardrail({ ...good, gap_notes: [{ tech: '설비 유지보수 최적화 및 자동 의사결정 기술', why: '선정 가능성이 높습니다', first_step: 'x' }] }, c3);
+    expect(sel.output.gap_notes).toEqual([]);
+  });
+  it('v2.3 결과(보완 메모 없음)도 통과', () => {
+    expect(applyGuardrail({ ...good, gap_notes: undefined } as unknown as Interpretation, c3).output.gap_notes).toEqual([]);
+  });
+  describe('원문 색인 사용', () => {
+    beforeAll(() => setRoadmapIndex(kbIndex as unknown as AppIndex));
+    afterAll(() => setRoadmapIndex(null));
+    it('입력에 우선순위·보완 후보·P0 순서를 넣고, 순위는 화면과 같은 규칙', () => {
+      const tc = techContext(input, r);
+      expect(tc.ranked.map((x) => x.tech.name)).toEqual(['이상패턴 탐지 모델', '제품 설계·사양']);
+      expect(tc.cards.length).toBeGreaterThan(0);
+      const text = buildUserContent(input, r, req, evidence, tc);
+      expect(text).toMatch(/## 핵심기술 우선순위[^\n]*\n- 1위 이상패턴 탐지 모델 · 확인 항목 \d\/5.*연결 과제 R&D-1/);
+      expect(text).toContain('## 보완 필요 기술·데이터 후보');
+      expect(text).toMatch(/보완 필요 후보: '.+'/);
+      const pri = [...text.matchAll(/^- (P[012]) /gm)].map((m) => m[1]);
+      expect(pri).toEqual([...pri].sort());
+    });
+  });
+});
+

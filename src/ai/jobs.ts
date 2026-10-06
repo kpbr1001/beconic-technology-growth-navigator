@@ -6,6 +6,7 @@ import { findEvidence, type EvidenceQuote } from '../rag/evidence';
 import { supabaseConfigFromEnv } from '../rag/supabase';
 import { DEFAULT_MODEL, interpretAssessment, type Effort, type InterpretResponse } from './interpret';
 import type { InterpretRequest } from './schema';
+import { loadRoadmapIndex } from '../roadmap/candidates';
 import { discoverTechnologies, type DiscoverRequest, type DiscoverResponse } from './discover';
 
 type Env = Record<string, string | undefined>;
@@ -61,6 +62,8 @@ export async function runInterpretation(
       console.error('ai-interpret 원문 근거 조회 실패', e instanceof Error ? e.message : e);
     }
   }
+  // 핵심기술 우선순위·보완 필요 기술을 화면과 같은 원문 색인으로 계산(실패해도 진행 — 로드맵 연결만 빠짐)
+  await loadRoadmapIndex().catch(() => null);
   try {
     const effort = EFFORTS.includes(env.AI_INTERPRET_EFFORT as Effort) ? (env.AI_INTERPRET_EFFORT as Effort) : 'low';
     const res = await interpretAssessment(req, {

@@ -57,6 +57,14 @@ export const Interpretation = z.object({
       summary: z.string().describe('무엇을 개발해 어떤 성과(제안값)를 낼지 1~2문장'),
     }))
     .describe('R&D 과제 제안별 과제명·요약 최대 3개'),
+  // 보완 필요 기술: 대상 기술·경로는 규칙(로드맵 원문 핵심기술 대조) 그대로, Claude는 이 기업에 필요한 이유·첫 단계만
+  gap_notes: z
+    .array(z.object({
+      tech: z.string().describe('제공된 보완 필요 후보의 원문 핵심기술명 그대로'),
+      why: z.string().describe('이 기업의 제품·데이터·핵심기술 맥락에서 왜 필요한지 1문장'),
+      first_step: z.string().describe('90일 안에 할 첫 단계 1문장(주어진 경로 — 자체 개발 또는 외부 협력 — 를 따름)'),
+    }))
+    .describe('보완 필요 기술 후보 최대 3개'),
 });
 export type Interpretation = z.infer<typeof Interpretation>;
 

@@ -40,6 +40,8 @@ export interface RoadmapCandidate {
   subfield?: string | null;
   matchedTerms?: string[];
   matchedTechs?: MatchedTech[];
+  /** 품목의 원문 핵심기술 전체(보완 필요 기술 대조용) */
+  allTechs?: MatchedTech[];
   trlNote?: string | null;
   /** 일치 단어가 1개뿐인 약한 후보 */
   weak?: boolean;
@@ -187,8 +189,28 @@ function toCandidate(field: AppField, { item, hits, matched, techHits, score }: 
     subfield: item.sub,
     matchedTerms: matched,
     matchedTechs: techs,
+    allTechs: item.techs.map((t) => ({ name: t[0], trl: t[1] ? (t[4] === 'stage_targets' ? `연차별 목표 ${t[1]}` : t[1]) : null, page: t[2] })),
     trlNote: field.trl_note,
     weak: hits < 2,
     score: Math.round(score * 100) / 100,
   };
+}
+
+/** 진단 입력 → 로드맵 후보 검색 입력(화면·서버 공용). 기업이 밝힌 세부 업종·핵심기술명은 핵심어 */
+export function roadmapInputOf(i: {
+  company: { roadmapField: string; product?: string; sectorDetail?: string };
+  discovery: { hardPart?: string; automated?: string; data?: string };
+  inventory: { name: string; critical: boolean }[];
+}): CandidateInput {
+  return {
+    roadmapField: i.company.roadmapField,
+    texts: [i.company.product ?? '', i.discovery.hardPart ?? '', i.discovery.automated ?? '', i.discovery.data ?? ''],
+    coreTexts: [i.company.sectorDetail ?? '', ...i.inventory.filter((x) => x.critical).map((x) => x.name)],
+  };
+}
+
+/** 핵심기술 1건과 이름이 겹치는 로드맵 품목(없으면 null) — 화면·서버 공용 */
+export function techRoadmapLink(roadmapField: string, techName: string): RoadmapCandidate | null {
+  const c = roadmapCandidates({ roadmapField, texts: [], coreTexts: [techName] })[0];
+  return c && c.hits > 0 ? c : null;
 }
