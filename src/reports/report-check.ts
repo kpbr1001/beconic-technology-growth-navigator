@@ -134,6 +134,25 @@ export function checkReport(root: ParentNode): CheckResult[] {
     const bad = rows(root, 'voucher').map((r) => r.dataset.risk).filter((id) => id && !ids.has(id));
     add('voucher-risk', '바우처 근거 리스크 = 레드팀 표', !bad.length, bad.join(', '));
   }
+  // 17·18. 신청 준비도 세부 항목: 레이더 점수 = 표 점수, 관점 판정·점수 = 항목 판정 규칙
+  const items = rows(root, 'item');
+  if (items.length) {
+    const radarItems = Array.from(root.querySelectorAll<SVGTextElement>('[data-ckitem]'));
+    const fromTable = items.map((r) => `${r.dataset.label}:${r.dataset.score || '확인 필요'}`).join(' ');
+    const fromRadar = radarItems.map((t) => `${t.getAttribute('data-ckitem')}:${t.textContent?.trim()}`).join(' ');
+    add('item-radar', '세부 항목 레이더 점수 = 표 점수', fromTable === fromRadar, fromTable === fromRadar ? '' : `${fromRadar}  ≠  ${fromTable}`);
+    const bad: string[] = [];
+    for (const axis of rows(root, 'axis').filter((a) => items.some((r) => r.dataset.axis === a.dataset.label))) {
+      const its = items.filter((r) => r.dataset.axis === axis.dataset.label);
+      const sc = its.map((r) => (r.dataset.score ? Number(r.dataset.score) : null)).filter((x): x is number => x !== null);
+      const avg = sc.length ? Math.round(sc.reduce((a, b) => a + b, 0) / sc.length) : null;
+      const st = (r: HTMLElement) => r.dataset.status;
+      const gate = its.some((r) => r.dataset.gate && (st(r) === '미흡' || (r.dataset.gatenull && st(r) === '확인 필요')));
+      const expected = gate ? '미흡' : sc.length < 3 ? '확인 필요' : avg !== null && avg < 45 ? '미흡' : avg !== null && avg >= 70 && !its.some((r) => st(r) === '보완' || st(r) === '미흡') ? '충족' : '보완';
+      if (axis.dataset.status !== expected || String(avg ?? '') !== (axis.dataset.score ?? '')) bad.push(`${axis.dataset.label} 표시 ${axis.dataset.status}·${axis.dataset.score} ≠ 규칙 ${expected}·${avg}`);
+    }
+    add('item-axis', '관점 판정·점수 = 세부 항목 판정 규칙', !bad.length, bad.join(' / '));
+  }
   // 14. 깨진 값·미치환 표식
   const all = txt(root as Element);
   const broken = all.match(/\{\{[^}]*\}\}|undefined|NaN|\[object Object\]/g);

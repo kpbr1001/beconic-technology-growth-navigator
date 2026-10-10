@@ -97,7 +97,7 @@ for (const [w, h] of VIEWPORTS) {
   await page.emulateMedia({ media: 'print' });
   await page.pdf({ path: `${OUT}/report-sample.pdf`, format: 'A4', printBackground: true });
   const pages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(pages === 17, `PDF 섹션 수 ${pages} (기대 17)`);
+  check(pages === 18, `PDF 섹션 수 ${pages} (기대 18)`);
   const pr = await page.textContent('#printReport');
   check(/Scoring rule-v1\.1/.test(pr), 'PDF에 Scoring 버전 누락');
   check(/AI 설비 예지보전 솔루션/.test(pr) && /원문 p\.271/.test(pr), 'PDF 로드맵 정렬에 원문 색인 후보 누락');
@@ -112,6 +112,7 @@ for (const [w, h] of VIEWPORTS) {
   // 보완 필요 기술·데이터: 원문 핵심기술 대조(보유·보완 후보)
   check(/보완 필요 기술·데이터/.test(pr) && /보유 기술과 대조/.test(pr) && /보완 필요 후보/.test(pr), 'PDF 보완 필요 기술·데이터 누락');
   check(/지원사업 신청 준비도/.test(pr) && /기술바우처 활용 후보/.test(pr) && /공통 자격 확인/.test(pr), 'PDF 신청 준비도 누락');
+  check(/기술성·수행 역량 세부 진단/.test(pr) && (await page.locator('#printReport [data-ckrow="item"]').count()) === 10 && (await page.locator('#printReport [data-ckitem]').count()) === 10, 'PDF 신청 준비도 세부 항목(10)·레이더 누락');
   check(/'이상징후 탐지 모델' TRL \d→\d/.test(pr), 'PDF 로드맵에 핵심기술 TRL 단계 누락');
   check(!/\{\{(TOTAL|P:)/.test(pr), 'PDF 쪽번호 토큰 미치환');
   check(/App v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트/.test(pr), 'PDF에 앱 버전·업데이트 일자 누락');
@@ -184,7 +185,7 @@ for (const [w, h] of VIEWPORTS) {
   const head = await page.textContent('#delta .decision p');
   check(/기술역량 \d+→\d+/.test(head ?? ''), `재진단: 변화 요약 ${head}`);
   const prPages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(prPages === 18, `재진단: PDF 섹션 수 ${prPages} (기대 18)`);
+  check(prPages === 19, `재진단: PDF 섹션 수 ${prPages} (기대 19)`);
   const rdBad = await page.evaluate(() => (window.__reportChecks || []).filter((c) => c.ok === false).map((c) => `${c.label} (${c.detail})`));
   check(!rdBad.length, `재진단: 보고서 정합성 ${rdBad.join(' / ')}`);
   check(/재진단 비교 · 기준 진단 대비 변화/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
@@ -220,6 +221,8 @@ for (const [w, h] of VIEWPORTS) {
   await page.evaluate(() => window.navTo(5));
   const ready = await page.textContent('#ready');
   check(/종합 · 선행 조건 필요/.test(ready) && /결격 가능성/.test(ready), `자격 확인: 체납 있음이 준비도에 반영 안 됨`);
+  check((await page.locator('#ready svg').count()) >= 3 && /세부 5개 항목/.test(ready), '신청 준비도: 화면 레이더·막대 누락');
+  check(/연구 조직·인력/.test(ready) && !/연구전담조직 미입력/.test(ready), '자격 확인: 연구전담조직 입력이 세부 항목에 미반영');
   check(/기업부설연구소 보유/.test(ready), '자격 확인: 연구소 입력 미반영');
   await page.reload({ waitUntil: 'networkidle' });
   check(await page.evaluate(() => JSON.parse(localStorage.getItem('beconic_tgn_v09')).company.elig.tax === '있음'), '자격 확인: 저장 안 됨');

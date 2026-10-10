@@ -168,3 +168,40 @@ export function deltaDumbbellSVG(rows: { label: string; prev: number | null; cur
   }).join('');
   return `<svg class="delta-svg" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="재진단 영역별 변화">${grid}${body}</svg>`;
 }
+
+/** 신청 준비도 세부 항목 레이더(5각형 등): 점수·충족 기준선(점선)·항목명. '확인 필요'(null)는 중심에 회색으로 두고 '확인 필요'라 적는다(0점 아님) */
+export function itemRadarSVG(items: { label: string; score: number | null }[], opts: { title: string; pass?: number } = { title: '' }): string {
+  const n = items.length;
+  if (n < 3) return '';
+  const pass = opts.pass ?? 70;
+  const cx = 150, cy = 140, R = 92;
+  const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
+  const pt = (i: number, r: number) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r] as const;
+  const ring = (r: number) => items.map((_, i) => pt(i, r).map((v) => v.toFixed(1)).join(',')).join(' ');
+  const val = (s: number | null) => (s === null ? 0 : Math.max(0, Math.min(100, s)) / 100);
+  const poly = items.map((x, i) => pt(i, val(x.score)).map((v) => v.toFixed(1)).join(',')).join(' ');
+  const color = (s: number | null) => (s === null ? '#98a2b3' : s >= pass ? '#067647' : s >= 45 ? '#b54708' : '#b42318');
+  const labels = items.map((x, i) => {
+    const [lx, ly] = pt(i, 1.28);
+    const c = Math.cos(ang(i));
+    const anchor = Math.abs(c) < 0.2 ? 'middle' : c > 0 ? 'start' : 'end';
+    const dy = Math.sin(ang(i)) < -0.5 ? -8 : 0;
+    return `<text x="${lx.toFixed(1)}" y="${(ly + dy).toFixed(1)}" text-anchor="${anchor}" font-size="10.5" fill="#475467">${esc(clip(x.label, 10))}</text><text data-ckitem="${esc(x.label)}" x="${lx.toFixed(1)}" y="${(ly + dy + 13).toFixed(1)}" text-anchor="${anchor}" font-size="12.5" font-weight="700" fill="${color(x.score)}">${x.score === null ? '확인 필요' : x.score}</text>`;
+  }).join('');
+  const axes = items.map((_, i) => { const [x, y] = pt(i, 1); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#e4e7ec"/>`; }).join('');
+  const dots = items.map((x, i) => { const [px, py] = pt(i, val(x.score)); return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.2" fill="${color(x.score)}"${x.score === null ? ' fill-opacity=".5"' : ''}/>`; }).join('');
+  return `<svg viewBox="-34 -6 368 300" width="100%" role="img" aria-label="${esc(opts.title)} 세부 항목 점수"><polygon points="${ring(1)}" fill="none" stroke="#d0d5dd"/><polygon points="${ring(0.45)}" fill="none" stroke="#f2f4f7"/><polygon points="${ring(pass / 100)}" fill="none" stroke="#067647" stroke-dasharray="4 3" stroke-width="1.2"/>${axes}<polygon points="${poly}" fill="rgba(79,102,176,.16)" stroke="#4f66b0" stroke-width="2"/>${dots}${labels}<text x="${cx + 3}" y="${(cy - R * pass / 100 - 3).toFixed(1)}" font-size="8.5" fill="#067647">충족 기준 ${pass}</text></svg>`;
+}
+
+/** 관점별 점수 막대(가로) — 4개 관점 한눈에: 점수 있는 관점은 막대, 없으면 상태만 */
+export function axisBarsSVG(rows: { label: string; score: number | null; status: string }[], pass = 70): string {
+  const W = 520, rowH = 30, top = 8, left = 96, bw = 300;
+  const col = (s: string) => (s === '충족' ? '#067647' : s === '보완' ? '#b54708' : s === '미흡' ? '#b42318' : '#98a2b3');
+  const px = left + (bw * pass) / 100;
+  const body = rows.map((r, i) => {
+    const y = top + i * rowH;
+    const w = r.score === null ? 0 : (bw * Math.max(0, Math.min(100, r.score))) / 100;
+    return `<text x="${left - 8}" y="${y + 16}" text-anchor="end" font-size="11.5" fill="#344054">${esc(r.label)}</text><rect x="${left}" y="${y + 6}" width="${bw}" height="13" rx="6" fill="#f2f4f7"/>${w ? `<rect x="${left}" y="${y + 6}" width="${w.toFixed(1)}" height="13" rx="6" fill="${col(r.status)}" fill-opacity=".85"/>` : ''}<text x="${left + bw + 10}" y="${y + 16}" font-size="11.5" font-weight="700" fill="${col(r.status)}">${r.score === null ? '' : `${r.score} · `}${esc(r.status)}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${top + rows.length * rowH + 14}" width="100%" role="img" aria-label="신청 준비도 관점별 판정">${body}<line x1="${px}" y1="${top}" x2="${px}" y2="${top + rows.length * rowH}" stroke="#067647" stroke-dasharray="4 3"/><text x="${px}" y="${top + rows.length * rowH + 11}" text-anchor="middle" font-size="9" fill="#067647">충족 기준 ${pass}</text></svg>`;
+}

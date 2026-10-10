@@ -35,6 +35,7 @@ function render(): string {
     out.push(`- 핵심기술 순위: ${c.ranked.map((x) => `${x.rank}. ${x.tech.name} [${CHECK_KEYS.map((k) => (x.checks[k] === true ? CK[k] : x.checks[k] === null ? '?' : '·')).join('')}]`).join(' / ') || '없음'}`);
     out.push(`- 로드맵 후보: ${c.matches.slice(0, 3).map((m) => `${m.name}${m.code ? ` (${m.code})` : ''}${m.weak ? ' 약함' : ''}`).join(' / ') || '없음'}`);
     for (const card of c.cards) out.push(`- 보완 대조 · ${card.item.name}: ${card.rows.map((r) => `${({ held: '보유', partial: '일부', mentioned: '언급', gap: '보완' } as const)[r.status]}(${r.roadmapTech}${r.company ? `←${r.company.name}` : r.route ? `·${r.route}` : ''})`).join(' / ')}${card.dataGaps.length ? ` · 데이터: ${card.dataGaps.map((d) => d.term).join('·')}` : ''}`);
+    for (const a of c.ready.axes.filter((x) => x.items)) out.push(`- ${a.label} ${a.score ?? '—'}점(${a.status}): ${a.items!.map((x) => `${x.label} ${x.score ?? '확인 필요'}`).join(' · ')}`);
     out.push(`- 신청 준비도: ${c.ready.overall} — ${c.ready.reason} · 바우처 후보: ${c.ready.vouchers.map((v) => v.type).join('·') || '없음'}`);
     out.push(`- 경고: ${c.r.alerts.length ? c.r.alerts.map((a) => a.slice(0, 60)).join(' / ') : '없음'}`);
   }

@@ -1,7 +1,7 @@
 // 지원사업 신청 준비도(규칙 기반) — R&D 과제 4관점 판정·기술바우처 활용 후보·공통 자격 체크리스트.
 // 원칙: '선정 가능성'이 아니라 '신청 전에 보완할 점'을 말한다. 특정 사업명은 쓰지 않는다(연도별 변동).
 // 관점·기준은 일반적인 R&D 평가 관행으로 만든 시범 기준이며 전문가 검증 대상이다.
-import { evidenceLevel, profile } from '../diagnosis/questions';
+import { activeQuestions, evidenceLevel, profile } from '../diagnosis/questions';
 import type { AssessmentInput, Eligibility } from '../diagnosis/types';
 import type { Readiness } from '../diagnosis/rnd';
 import type { ReportCore } from './core';
@@ -10,10 +10,31 @@ export type AxisStatus = '충족' | '보완' | '미흡' | '확인 필요';
 export type AxisKey = 'tech' | 'capacity' | 'market' | 'policy';
 export const AXIS_LABEL: Record<AxisKey, string> = { tech: '기술성', capacity: '수행 역량', market: '사업화·검증', policy: '정책 연계' };
 
+/** 관점 세부 항목(기술성·수행 역량은 5개씩) — 0~100점, null은 '확인 필요'(0점이 아님) */
+export interface AxisItem {
+  key: string;
+  label: string;
+  score: number | null;
+  status: AxisStatus;
+  /** 점수 근거(문항·TRL·리스크·입력값) */
+  basis: string;
+  /** 보완사항(충족이면 빈 문자열) */
+  fix: string;
+  /** 이 항목이 '미흡'이면 관점 전체가 '미흡'(필수 항목) */
+  gate?: boolean;
+}
+
+/** 항목 점수 → 상태: 70 이상 충족 · 45 이상 보완 · 미만 미흡 · 없음 확인 필요 */
+export const itemStatus = (score: number | null): AxisStatus => (score === null ? '확인 필요' : score >= 70 ? '충족' : score >= 45 ? '보완' : '미흡');
+export const ITEM_PASS = 70;
+
 export interface Axis {
   key: AxisKey;
   label: string;
   status: AxisStatus;
+  /** 세부 항목 평균(기술성·수행 역량만) */
+  score?: number | null;
+  items?: AxisItem[];
   /** 판정에 쓴 진단 근거(문항·점수·기술·로드맵) */
   evidence: string[];
   /** 보완 코멘트(무엇이 부족한지) */
@@ -57,30 +78,11 @@ const fmt = (v: number | null) => (v === null ? '판단 보류' : `${Math.round(
 
 function axes(i: AssessmentInput, c: ReportCore): Axis[] {
   const { m } = c.r;
-  const top = c.ranked[0];
   const crit = c.ranked.length;
   const lab = i.company.elig?.lab ?? '';
 
-  // 기술성: 핵심기술 TRL·차별 요소(q12)와 그 근거
-  const q12 = q(i, 'q12'), e12 = ev(i, 'q12');
-  const tEv = [top ? `핵심기술 1위 '${top.tech.name}' ${top.tech.trl ? `TRL ${top.tech.trl}` : 'TRL 확인 필요'}` : '핵심기술 미지정', `Q12 차별 요소 ${q12 === null ? "'모름'·미응답" : `${q12}/5 · 근거 '${e12.name}'`}`, `기술성숙 ${fmt(m.tech)}`];
-  const tIssues: string[] = [], tAct: string[] = [];
-  if (!top) { tIssues.push('과제의 중심이 될 핵심기술이 지정되지 않았습니다'); tAct.push('3단계에서 핵심기술 지정·TRL 입력'); }
-  else if (!top.tech.trl) { tIssues.push(`'${top.tech.name}'의 현재 TRL이 확인되지 않아 개발 목표(TRL)를 정할 수 없습니다`); tAct.push('핵심기술 TRL과 근거(시험기록) 확인'); }
-  else if (top.tech.trl >= 8) tIssues.push(`TRL ${top.tech.trl}은 기술개발보다 실증·사업화 과제에 가깝습니다`);
-  if (q12 === null || q12 <= 2) { tIssues.push('경쟁 기술 대비 차별성이 약하거나 확인되지 않았습니다'); tAct.push('경쟁·선행기술 조사와 성능 비교표 작성'); }
-  else if (e12.k <= 1) { tIssues.push(`차별 요소를 높게 답했지만 근거가 '${e12.name}' 수준입니다`); tAct.push('특허 선행조사·성능 비교 데이터로 차별성 입증'); }
-  const tStatus: AxisStatus = !top || !top.tech.trl || q12 === null || q12 <= 2 ? '미흡' : top.tech.trl >= 3 && top.tech.trl <= 7 && q12 >= 4 && e12.k >= 2 ? '충족' : '보완';
-
-  // 수행 역량: R&D 역량·기술기록·연구전담조직·핵심 인력 의존
-  const r3 = c.redteam.risks.find((x) => x.id === 'R3');
-  const cEv = [`R&D 역량 ${fmt(m.rd)}`, `기술기록 ${fmt(m.evidence)}`, `연구전담조직 ${lab || '미입력'}`, ...(r3 ? [`핵심 인력 의존 리스크 ${r3.grade}`] : [])];
-  const cIssues: string[] = [], cAct: string[] = [];
-  if (m.rd !== null && m.rd < 60) { cIssues.push('연구 자원·개발 반복 체계가 과제 수행 계획으로 설명되기에 부족합니다'); cAct.push('연구 인력·장비·예산 계획표와 개발-시험-개선 절차 문서화'); }
-  if (m.evidence !== null && m.evidence < 55) { cIssues.push('연구노트·시험기록이 정비되지 않아 기술 실체를 증빙하기 어렵습니다'); cAct.push('연구노트·시험기록·버전 이력 정비'); }
-  if (lab === '없음') { cIssues.push('연구전담조직이 없으면 신청이 제한되는 R&D 사업이 많습니다'); cAct.push('연구개발전담부서 또는 기업부설연구소 설립 검토'); }
-  if (r3?.grade === '높음') { cIssues.push('핵심 노하우가 특정 인력에 몰려 있어 수행 안정성을 설명하기 어렵습니다'); cAct.push('참여 연구원 구성·백업 담당 지정'); }
-  const cStatus: AxisStatus = m.rd === null || m.evidence === null ? '확인 필요' : m.rd < 45 || m.evidence < 40 || lab === '없음' ? '미흡' : m.rd >= 60 && m.evidence >= 55 && r3?.grade !== '높음' ? '충족' : '보완';
+  const techItems = techAxisItems(i, c);
+  const capItems = capacityAxisItems(i, c, lab);
 
   // 사업화·검증: 실제환경 검증(q2)·검증 경험·확장준비
   const q2 = q(i, 'q2');
@@ -109,7 +111,91 @@ function axes(i: AssessmentInput, c: ReportCore): Axis[] {
     comment: issues.length ? `${issues.join('. ')}.` : st === '충족' ? '진단 근거상 큰 보완 사항이 없습니다. 공고별 평가 기준에 맞춰 근거자료를 정리하세요.' : '추가 확인이 필요합니다.',
     actions: actions.slice(0, 3),
   });
-  return [mk('tech', tStatus, tEv, tIssues, tAct), mk('capacity', cStatus, cEv, cIssues, cAct), mk('market', mStatus, mEv, mIssues, mAct), mk('policy', pStatus, pEv, pIssues, pAct)];
+  return [itemAxis('tech', techItems), itemAxis('capacity', capItems), mk('market', mStatus, mEv, mIssues, mAct), mk('policy', pStatus, pEv, pIssues, pAct)];
+}
+
+const ans = (v: number | null) => (v === null ? null : Math.round(((v - 1) / 4) * 100));
+const avg = (xs: (number | null)[]) => {
+  const v = xs.filter((x): x is number => x !== null);
+  return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
+};
+const item = (key: string, label: string, score: number | null, basis: string, fix: string, gate = false): AxisItem => {
+  const st = itemStatus(score);
+  return { key, label, score, status: st, basis, fix: st === '충족' ? '' : fix, gate };
+};
+const GRADE_SCORE: Record<string, number | null> = { 낮음: 85, 중간: 55, 높음: 30, '확인 필요': null };
+
+/** 기술성 5개 항목: 성숙도·차별성·핵심 기능 구현·로드맵 대비 보유·지식재산 보호 */
+export function techAxisItems(i: AssessmentInput, c: ReportCore): AxisItem[] {
+  const top = c.ranked[0];
+  const trl = top?.tech.trl ?? 0;
+  const trlScore = !top || !trl ? 0 : trl <= 2 ? 30 : trl <= 4 ? 70 : trl <= 7 ? 90 : 60;
+  const q12 = q(i, 'q12'), e12 = ev(i, 'q12');
+  const diff = q12 === null ? null : Math.min(ans(q12)!, e12.k <= 1 ? 60 : 100);
+  const techQs = activeQuestions(i.mode, i.company.bizType).filter((x) => x.cat === 'tech' && x.id !== 'q2' && x.id !== 'q12');
+  const impl = avg(techQs.map((x) => ans(q(i, x.id))));
+  const card = c.cards[0];
+  // 평가에서 보는 것은 '보유 비율'이 아니라 '자사 기술이 로드맵 핵심기술과 맞닿아 있는가' — 보유 1개 70점(+10/개), 일부 겹침 50, 답변 언급 35, 없음 20
+  const cnt = (st: string) => (card ? card.rows.filter((r) => r.status === st).length : 0);
+  const own = !card || !card.rows.length ? null : cnt('held') ? Math.min(100, 60 + 10 * cnt('held')) : cnt('partial') ? 50 : cnt('mentioned') ? 35 : 20;
+  const r5 = c.redteam.risks.find((x) => x.id === 'R5');
+  return [
+    item('trl', '기술 성숙도', trlScore,
+      !top ? '핵심기술 미지정' : trl ? `'${top.tech.name}' TRL ${trl}` : `'${top.tech.name}' TRL 확인 필요`,
+      !top ? '3단계에서 핵심기술 지정·TRL 입력' : !trl ? '핵심기술 TRL과 근거(시험기록) 확인' : trl <= 2 ? '개념 실험(TRL 3)으로 원리 검증 후 과제화' : '기술개발보다 실증·사업화 과제로 설계', true),
+    item('diff', '차별성', diff,
+      q12 === null ? "Q12 '모름'·미응답" : `Q12 ${q12}/5 · 근거 '${e12.name}'${e12.k <= 1 ? '(근거 약해 60점 상한)' : ''}`,
+      q12 === null || q12 <= 2 ? '경쟁·선행기술 조사와 성능 비교표 작성' : '특허 선행조사·성능 비교 데이터로 차별성 입증', true),
+    item('impl', '핵심 기능 구현', impl,
+      techQs.map((x) => `${x.id.toUpperCase()} ${q(i, x.id) ?? '모름'}`).join(' · '),
+      '핵심 기능 시연 영상·시험 결과 정리(구현 수준 증빙)'),
+    item('roadmap', '로드맵 핵심기술 연계', own,
+      card ? `'${card.item.name}' 원문 핵심기술 ${card.rows.length}개 중 보유 ${card.rows.filter((r) => r.status === 'held').length}·일부 ${card.rows.filter((r) => r.status === 'partial').length}` : '대조할 로드맵 품목 없음',
+      own !== null && own < 50 ? '로드맵 원문 핵심기술과 자사 기술의 대조표 작성(연결 근거 확보)' : '보완 필요 기술의 확보 방안(자체 개발·외부 협력) 정리'),
+    item('ip', '지식재산 보호', r5 ? GRADE_SCORE[r5.grade] : null,
+      r5 ? `증빙·지식재산 리스크(R5) ${r5.grade}` : '판단 근거 없음',
+      '핵심기술 특허 출원·영업비밀 관리 방안 수립'),
+  ];
+}
+
+/** 수행 역량 5개 항목: 연구 자원·개발·검증 반복·과제 관리·기술 기록·연구 조직·인력 */
+export function capacityAxisItems(i: AssessmentInput, c: ReportCore, lab: string): AxisItem[] {
+  const { m } = c.r;
+  const qs = activeQuestions(i.mode, i.company.bizType);
+  const rdLoop = avg(qs.filter((x) => x.cat === 'rd' && x.id !== 'q3').map((x) => ans(q(i, x.id))));
+  const r3 = c.redteam.risks.find((x) => x.id === 'R3');
+  const res = i.company.elig?.researchers ?? '';
+  const labBase = lab === '연구소' ? 90 : lab === '전담부서' ? 75 : lab === '없음' ? 20 : null;
+  const org = labBase === null ? null : Math.max(0, Math.min(100, labBase + (({ '0명': -20, '1~2명': -5, '3~5명': 0, '6명 이상': 5 } as Record<string, number>)[res] ?? 0) + (r3?.grade === '높음' ? -15 : r3?.grade === '중간' ? -5 : 0)));
+  return [
+    item('res', '연구 자원', ans(q(i, 'q3')), `Q3 연구 인력·예산·장비 ${q(i, 'q3') ?? '모름'}/5`, '연구 인력·장비·예산 계획표 작성'),
+    item('loop', '개발·검증 반복', rdLoop, qs.filter((x) => x.cat === 'rd' && x.id !== 'q3').map((x) => `${x.id.toUpperCase()} ${q(i, x.id) ?? '모름'}`).join(' · '), '개발→시험→개선 절차와 실험 기록 양식 문서화'),
+    item('mgmt', '과제 관리', m.exec === null ? null : Math.round(m.exec), `실행준비 ${fmt(m.exec)}(Q5 담당·일정·완료기준)`, '과제별 담당·기한·완료기준(중간 목표) 계획'),
+    item('record', '기술 기록', m.evidence === null ? null : Math.round(m.evidence), `기술기록 ${fmt(m.evidence)}(Q6 개발 기록)`, '연구노트·시험기록·버전 이력 정비'),
+    item('org', '연구 조직·인력', org,
+      labBase === null ? '연구전담조직 미입력(1단계 자격 확인)' : `연구전담조직 ${lab}${res ? ` · 연구 인력 ${res}` : ''}${r3 ? ` · 핵심 인력 의존 ${r3.grade}` : ''}`,
+      lab === '없음' ? '연구개발전담부서 또는 기업부설연구소 설립 검토' : labBase === null ? "1단계 '지원사업 자격 확인'에서 연구전담조직 입력" : '참여 연구원 구성·백업 담당 지정', true),
+  ];
+}
+
+/** 항목으로 관점 판정: 필수 항목 미흡 → 미흡 / 확인 가능한 항목 3개 미만 → 확인 필요 / 평균 45 미만 → 미흡 /
+ *  평균 70 이상이고 보완·미흡 항목 없음 → 충족 / 그 외 보완. 기술성은 차별성 '모름'도 미흡(설명 불가) */
+export function itemAxis(key: AxisKey, items: AxisItem[]): Axis {
+  const score = avg(items.map((x) => x.score));
+  const known = items.filter((x) => x.score !== null);
+  const gateFail = items.some((x) => x.gate && (x.status === '미흡' || (key === 'tech' && x.key === 'diff' && x.status === '확인 필요')));
+  // 필수 항목 미흡(예: 연구전담조직 없음)은 정보가 부족해도 확정된 사실이라 먼저 판정한다
+  const status: AxisStatus = gateFail ? '미흡' : known.length < 3 ? '확인 필요' : score !== null && score < 45 ? '미흡'
+    : score !== null && score >= ITEM_PASS && !items.some((x) => x.status === '보완' || x.status === '미흡') ? '충족' : '보완';
+  const weak = items.filter((x) => x.status === '미흡' || x.status === '보완' || (x.gate && x.status === '확인 필요')).sort((a, b) => (a.score ?? -1) - (b.score ?? -1));
+  return {
+    key, label: AXIS_LABEL[key], status, score, items,
+    evidence: items.map((x) => `${x.label} ${x.score === null ? '확인 필요' : `${x.score}점`}`),
+    comment: status === '충족' ? '진단 근거상 큰 보완 사항이 없습니다. 공고별 평가 기준에 맞춰 근거자료를 정리하세요.'
+      : status === '확인 필요' ? '판단할 항목이 부족합니다. 1단계 자격 확인과 핵심 문항 응답을 보완하세요.'
+      : `${weak.map((x) => `${x.label}(${x.score === null ? '확인 필요' : `${x.score}점`})`).join('·')}이(가) 기준(70점)에 못 미칩니다.`,
+    actions: weak.map((x) => x.fix).filter(Boolean).slice(0, 3),
+  };
 }
 
 function vouchers(i: AssessmentInput, c: ReportCore): VoucherFit[] {
