@@ -331,7 +331,7 @@ describe('핵심기술 우선순위·보완 필요 기술(서버 재계산)', ()
     beforeAll(() => setRoadmapIndex(kbIndex as unknown as AppIndex));
     afterAll(() => setRoadmapIndex(null));
     it('입력에 우선순위·보완 후보·P0 순서를 넣고, 순위는 화면과 같은 규칙', () => {
-      const tc = techContext(input, r);
+      const tc = techContext(input);
       expect(tc.ranked.map((x) => x.tech.name)).toEqual(['이상패턴 탐지 모델', '제품 설계·사양']);
       expect(tc.cards.length).toBeGreaterThan(0);
       const text = buildUserContent(input, r, req, evidence, tc);

@@ -21,6 +21,6 @@ export default defineConfig({
   build: { outDir: 'dist', sourcemap: false },
   server: { port: 8787 },
   test: {
-    include: ['tests/unit/**/*.test.ts', 'tests/regression/**/*.test.ts'],
+    include: ['tests/unit/**/*.test.ts', 'tests/regression/**/*.test.ts', 'tests/golden/**/*.test.ts'],
   },
 });

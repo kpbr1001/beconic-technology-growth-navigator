@@ -20,9 +20,11 @@ export interface GapInput {
   rdScore: number | null;
 }
 
-export type GapStatus = 'held' | 'mentioned' | 'gap';
+/** held: 2단어 이상 겹침 · partial: 1단어만 겹침(원문 대조 필요) · mentioned: 답변에만 표현 · gap: 겹침 없음 */
+export type GapStatus = 'held' | 'partial' | 'mentioned' | 'gap';
 export const GAP_STATUS_LABEL: Record<GapStatus, string> = {
   held: '보유 기술과 대조',
+  partial: '일부 겹침 — 원문 대조 필요',
   mentioned: '답변에 관련 표현 — 목록 추가 검토',
   gap: '보완 필요 후보',
 };
@@ -82,7 +84,8 @@ export function gapCards(i: GapInput, maxItems = 2): GapCard[] {
         const ov = rk.filter((w) => t.tk.some((x) => near(w, x)));
         if (ov.length && (!best || ov.length > best.ov.length)) best = { t, ov };
       }
-      if (best) return { roadmapTech: rt.name, trlRef: rt.trl, page: rt.page, status: 'held', company: { name: best.t.name, trl: best.t.trl }, overlap: best.ov };
+      // 한 단어만 겹치면(예: '수명', '탄소') 같은 기술이라 단정하지 않고 '일부 겹침'으로 둔다(표준 사례 검수에서 확인된 오판 방지)
+      if (best) return { roadmapTech: rt.name, trlRef: rt.trl, page: rt.page, status: best.ov.length >= 2 ? 'held' : 'partial', company: { name: best.t.name, trl: best.t.trl }, overlap: best.ov };
       const said = rk.filter((w) => w.length >= 2 && answer.includes(w));
       if (said.length) return { roadmapTech: rt.name, trlRef: rt.trl, page: rt.page, status: 'mentioned', overlap: said };
       const ref = trlNum(rt.trl);
@@ -107,7 +110,7 @@ export function gapCards(i: GapInput, maxItems = 2): GapCard[] {
 }
 
 /** AI·보고서에 넘길 '보완 필요 후보' 기술명 목록(카드 순서, 중복 제거) */
-export const gapTechNames = (cards: GapCard[]) => [...new Set(cards.flatMap((c) => c.rows.filter((r) => r.status !== 'held').map((r) => r.roadmapTech)))];
+export const gapTechNames = (cards: GapCard[]) => [...new Set(cards.flatMap((c) => c.rows.filter((r) => r.status === 'gap' || r.status === 'mentioned').map((r) => r.roadmapTech)))];
 
 /** 보완 필요 대조에 쓰는 기업 답변(화면·서버 공용) */
 export const gapAnswerText = (i: { company: { product?: string; sectorDetail?: string }; discovery: { hardPart?: string; automated?: string; data?: string; external?: string } }) =>
