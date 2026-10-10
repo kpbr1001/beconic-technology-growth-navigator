@@ -153,6 +153,20 @@ export function checkReport(root: ParentNode): CheckResult[] {
     }
     add('item-axis', '관점 판정·점수 = 세부 항목 판정 규칙', !bad.length, bad.join(' / '));
   }
+  // 21. 핵심요약 = 본문(최우선 과제·핵심기술 1위·신청 준비도·'높음' 리스크 수)
+  const key = one(root, 'key');
+  if (key) {
+    const bad: string[] = [];
+    const k = key.dataset;
+    if (sum && k.p0area && (k.p0area !== sum.dataset.p0area || k.p0act !== sum.dataset.p0act)) bad.push(`최우선 과제 '${k.p0area}·${k.p0act}' ≠ 경영진 요약 '${sum.dataset.p0area}·${sum.dataset.p0act}'`);
+    if (acts.length && k.p0area && k.p0act !== acts[0].dataset.act) bad.push(`최우선 과제 '${k.p0act}' ≠ 90일 계획 '${acts[0].dataset.act}'`);
+    if ((k.toptech ?? '') !== (rank[0]?.dataset.tech ?? '')) bad.push(`핵심기술 '${k.toptech}' ≠ 표 1위 '${rank[0]?.dataset.tech ?? ''}'`);
+    if (ready && k.ready !== ready.dataset.overall) bad.push(`신청 준비도 '${k.ready}' ≠ 본문 '${ready.dataset.overall}'`);
+    if (rc && Number(k.high) !== risk.filter((r) => r.dataset.grade === '높음').length) bad.push(`'높음' 리스크 ${k.high} ≠ 표 ${risk.filter((r) => r.dataset.grade === '높음').length}`);
+    const tile = (key2: string) => txt(key.querySelector(`[data-key="${key2}"] b`));
+    if (k.cap && !tile('position').includes(`${k.cap}점`)) bad.push(`위치 카드 '${tile('position')}'에 역량 ${k.cap}점 없음`);
+    add('key-summary', '핵심요약 = 본문(최우선 과제·핵심기술·준비도·리스크)', !bad.length, bad.join(' / '));
+  }
   // 14. 깨진 값·미치환 표식
   const all = txt(root as Element);
   const broken = all.match(/\{\{[^}]*\}\}|undefined|NaN|\[object Object\]/g);

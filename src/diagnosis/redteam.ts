@@ -2,6 +2,7 @@
 // 점수·우선순위는 바꾸지 않는다. 응답·근거수준·입력에서 바로 확인되는 신호만 쓰고, '모름'은 낮은 점수가 아니라 '확인 필요'로 둔다.
 import { activeQuestions, AREA_NAME, evidenceLevel, isUnknown } from './questions';
 import type { Answer, AssessmentInput, AssessmentResult, Dimension } from './types';
+import { qRef, qRefs } from './qref';
 
 /** 1=낮음 2=중간 3=높음 */
 export type Level = 1 | 2 | 3;
@@ -176,7 +177,7 @@ export function redTeam(input: AssessmentInput, r: AssessmentResult): RedTeam {
       // 근거 확인 단계에서 묻지 않은 문항은 '말로만 설명'이 아니라 '근거 미확인'
       const asked = input.evidence[low] !== undefined;
       const ev = evidenceLevel(input.evidence, low);
-      notes.push(`${low.toUpperCase()} ${v}/5 · ${asked ? `근거 '${ev.name}'` : '근거 미확인'}`);
+      notes.push(`${qRef(low)} ${v}/5 · ${asked ? `근거 '${ev.name}'` : '근거 미확인'}`);
       // 높게 응답했지만 근거가 말뿐이라고 확인되면 리스크를 한 단계 높여 본다(과소평가 방지)
       if (v >= 4 && asked && ev.k === 0 && likelihood < 3) {
         likelihood = (likelihood + 1) as Level;
@@ -184,7 +185,7 @@ export function redTeam(input: AssessmentInput, r: AssessmentResult): RedTeam {
       }
     }
     const unknownIds = ids.filter((id) => !known(input.answers[id]));
-    if (unknownIds.length) notes.push(`${unknownIds.map((x) => x.toUpperCase()).join('·')} 모름·미응답`);
+    if (unknownIds.length) notes.push(`${qRefs(unknownIds)} 모름·미응답`);
     const extra = d.input?.(input)?.trim();
     if (extra) notes.push(`입력: "${clip(extra, 40)}"`);
     const severity = likelihood === null ? null : likelihood * d.impact;
@@ -218,13 +219,13 @@ export function diagnosticChecks(input: AssessmentInput, r: AssessmentResult, id
     o.push({
       title: '근거 없는 높은 응답',
       level: '주의',
-      detail: `${weak.map((x) => x.toUpperCase()).join('·')} ${weak.length}개 문항이 4~5점이지만 근거가 '말로만 설명' 또는 '내부 자료'입니다. 해당 영역 점수는 과대평가됐을 수 있습니다.`,
+      detail: `${qRefs(weak)} ${weak.length > 1 ? `${weak.length}개 ` : ''}문항이 4~5점이지만 근거가 '말로만 설명' 또는 '내부 자료'입니다. 해당 영역 점수는 과대평가됐을 수 있습니다.`,
     });
   if (unchecked.length)
     o.push({
       title: '근거 미확인 높은 응답',
       level: '참고',
-      detail: `${unchecked.map((x) => x.toUpperCase()).join('·')} ${unchecked.length}개 문항은 4~5점이지만 근거 확인 단계에서 다루지 않았습니다. 재진단 전 자료로 확인하면 신뢰도가 높아집니다.`,
+      detail: `${qRefs(unchecked)} ${unchecked.length > 1 ? `${unchecked.length}개 ` : ''}문항은 4~5점이지만 근거 확인 단계에서 다루지 않았습니다. 재진단 전 자료로 확인하면 신뢰도가 높아집니다.`,
     });
   if (r.unknown > 0)
     o.push({

@@ -2,6 +2,7 @@
 // 규칙·데이터를 바꿔 결과가 달라지면 이 테스트가 실패하고 차이를 보여 준다. 의도한 변경이면 `npm run golden:update` 후 표를 검수한다.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { reportCore } from '../../src/reports/core';
+import { keySummary } from '../../src/reports/keysummary';
 import { setRoadmapIndex, type AppIndex } from '../../src/roadmap/candidates';
 import { CHECK_KEYS } from '../../src/diagnosis/techrank';
 import { GOLDEN } from '../fixtures/golden';
@@ -29,6 +30,8 @@ function render(): string {
   }
   for (const { id, label, c } of rows) {
     out.push('', `## ${label} (${id})`, '');
+    const ks = keySummary(GOLDEN.find((g) => g.id === id)!.input, c, (a) => [a, '', '', '']);
+    out.push(`- 핵심요약: ${ks.headline} [${ks.tiles.map((t) => `${t.label} ${t.head}`).join(' · ')}]`);
     out.push(`- 영역 점수: ${Object.entries(c.r.m).map(([k, v]) => `${k} ${n(v)}`).join(' · ')}`);
     out.push(`- 우선순위: ${c.priorities.map((g) => `${g.priority} ${g.area}(${n(g.score)})`).join(' → ')}`);
     out.push(`- 전략 기준 점수: ${c.options.map((o) => `${o.name.charAt(0)} ${o.score ?? '산정 불가'}${o.recommended ? '★' : ''}`).join(' · ')}`);

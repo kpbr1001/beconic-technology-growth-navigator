@@ -5,6 +5,7 @@ import { activeQuestions, evidenceLevel, profile } from '../diagnosis/questions'
 import type { AssessmentInput, Eligibility } from '../diagnosis/types';
 import type { Readiness } from '../diagnosis/rnd';
 import type { ReportCore } from './core';
+import { fixParticles, qRef } from './ko';
 
 export type AxisStatus = '충족' | '보완' | '미흡' | '확인 필요';
 export type AxisKey = 'tech' | 'capacity' | 'market' | 'policy';
@@ -87,7 +88,7 @@ function axes(i: AssessmentInput, c: ReportCore): Axis[] {
   // 사업화·검증: 실제환경 검증(q2)·검증 경험·확장준비
   const q2 = q(i, 'q2');
   const val = (i.discovery.validation ?? '').trim();
-  const mEv = [`Q2 실제환경 검증 ${q2 === null ? "'모름'·미응답" : `${q2}/5 · 근거 '${ev(i, 'q2').name}'`}`, `검증 경험 ${val ? `'${val.slice(0, 30)}${val.length > 30 ? '…' : ''}'` : '미입력'}`, `확장준비 ${fmt(m.scale)}`];
+  const mEv = [`'실제환경 검증' 응답 ${q2 === null ? "'모름'·미응답" : `${q2}/5 · 근거 '${ev(i, 'q2').name}'`}`, `검증 경험 ${val ? `'${val.slice(0, 30)}${val.length > 30 ? '…' : ''}'` : '미입력'}`, `확장준비 ${fmt(m.scale)}`];
   const mIssues: string[] = [], mAct: string[] = [];
   if (q2 === null || q2 <= 2) { mIssues.push('실제 고객·현장에서 검증한 근거가 약해 사업화 계획의 설득력이 떨어집니다'); mAct.push('수요처 1곳과 시범 적용(PoC) 또는 수요처 의향서 확보'); }
   if (!val) { mIssues.push('외부에서 확인된 경험(PoC·납품·인증)이 입력되지 않았습니다'); mAct.push('2단계 \'외부에서 확인된 경험\'에 PoC·납품 실적 기록'); }
@@ -99,7 +100,7 @@ function axes(i: AssessmentInput, c: ReportCore): Axis[] {
   // 원문 색인 품목(품목코드 또는 원문 순번이 있는 후보 — 세부분야 대체 후보 제외)
   const strong = c.matches.find((x) => x.uid && !x.weak) ?? c.matches.find((x) => x.uid);
   const sid = strong ? strong.code ?? (strong.itemNo ? `원문 순번 ${strong.itemNo}` : '원문 색인') : '';
-  const pEv = [`로드맵 후보 ${strong ? `'${strong.name}'(${sid}${strong.page ? ` p.${strong.page}` : ''})` : '품목 단위 후보 없음'}`, `핵심기술 로드맵 연결 ${c.ranked.filter((x) => x.link).length}/${crit}개`, `Q11 로드맵 연관성 설명 ${q11 === null ? "'모름'·미응답" : `${q11}/5`}`];
+  const pEv = [`로드맵 후보 ${strong ? `'${strong.name}'(${sid}${strong.page ? ` p.${strong.page}` : ''})` : '품목 단위 후보 없음'}`, `핵심기술 로드맵 연결 ${c.ranked.filter((x) => x.link).length}/${crit}개`, `'로드맵 연관성 설명' 응답 ${q11 === null ? "'모름'·미응답" : `${q11}/5`}`];
   const pIssues: string[] = [], pAct: string[] = [];
   if (!strong) { pIssues.push('공식 기술로드맵 품목과 연결되지 않아 정책 부합성을 설명하기 어렵습니다'); pAct.push('1단계 기술로드맵 분야·핵심기술명을 구체화해 품목 재탐색'); }
   if (q11 === null || q11 <= 2) { pIssues.push('자사 기술과 로드맵의 연관성을 스스로 설명할 준비가 부족합니다'); pAct.push(`로드맵 품목 대조표 작성${strong?.page ? `(원문 p.${strong.page} 개발목표)` : ''}`); }
@@ -144,10 +145,10 @@ export function techAxisItems(i: AssessmentInput, c: ReportCore): AxisItem[] {
       !top ? '핵심기술 미지정' : trl ? `'${top.tech.name}' TRL ${trl}` : `'${top.tech.name}' TRL 확인 필요`,
       !top ? '3단계에서 핵심기술 지정·TRL 입력' : !trl ? '핵심기술 TRL과 근거(시험기록) 확인' : trl <= 2 ? '개념 실험(TRL 3)으로 원리 검증 후 과제화' : '기술개발보다 실증·사업화 과제로 설계', true),
     item('diff', '차별성', diff,
-      q12 === null ? "Q12 '모름'·미응답" : `Q12 ${q12}/5 · 근거 '${e12.name}'${e12.k <= 1 ? '(근거 약해 60점 상한)' : ''}`,
+      q12 === null ? "'모방 어려운 차별 요소' 응답 '모름'·미응답" : `'모방 어려운 차별 요소' 응답 ${q12}/5 · 근거 '${e12.name}'${e12.k <= 1 ? '(근거 약해 60점 상한)' : ''}`,
       q12 === null || q12 <= 2 ? '경쟁·선행기술 조사와 성능 비교표 작성' : '특허 선행조사·성능 비교 데이터로 차별성 입증', true),
     item('impl', '핵심 기능 구현', impl,
-      techQs.map((x) => `${x.id.toUpperCase()} ${q(i, x.id) ?? '모름'}`).join(' · '),
+      techQs.map((x) => `${qRef(x.id)} ${q(i, x.id) ?? '모름'}`).join(' · '),
       '핵심 기능 시연 영상·시험 결과 정리(구현 수준 증빙)'),
     item('roadmap', '로드맵 핵심기술 연계', own,
       card ? `'${card.item.name}' 원문 핵심기술 ${card.rows.length}개 중 보유 ${card.rows.filter((r) => r.status === 'held').length}·일부 ${card.rows.filter((r) => r.status === 'partial').length}` : '대조할 로드맵 품목 없음',
@@ -168,10 +169,10 @@ export function capacityAxisItems(i: AssessmentInput, c: ReportCore, lab: string
   const labBase = lab === '연구소' ? 90 : lab === '전담부서' ? 75 : lab === '없음' ? 20 : null;
   const org = labBase === null ? null : Math.max(0, Math.min(100, labBase + (({ '0명': -20, '1~2명': -5, '3~5명': 0, '6명 이상': 5 } as Record<string, number>)[res] ?? 0) + (r3?.grade === '높음' ? -15 : r3?.grade === '중간' ? -5 : 0)));
   return [
-    item('res', '연구 자원', ans(q(i, 'q3')), `Q3 연구 인력·예산·장비 ${q(i, 'q3') ?? '모름'}/5`, '연구 인력·장비·예산 계획표 작성'),
-    item('loop', '개발·검증 반복', rdLoop, qs.filter((x) => x.cat === 'rd' && x.id !== 'q3').map((x) => `${x.id.toUpperCase()} ${q(i, x.id) ?? '모름'}`).join(' · '), '개발→시험→개선 절차와 실험 기록 양식 문서화'),
-    item('mgmt', '과제 관리', m.exec === null ? null : Math.round(m.exec), `실행준비 ${fmt(m.exec)}(Q5 담당·일정·완료기준)`, '과제별 담당·기한·완료기준(중간 목표) 계획'),
-    item('record', '기술 기록', m.evidence === null ? null : Math.round(m.evidence), `기술기록 ${fmt(m.evidence)}(Q6 개발 기록)`, '연구노트·시험기록·버전 이력 정비'),
+    item('res', '연구 자원', ans(q(i, 'q3')), `'R&D 자원 확보' 응답 ${q(i, 'q3') ?? '모름'}${q(i, 'q3') === null ? '' : '/5'}`, '연구 인력·장비·예산 계획표 작성'),
+    item('loop', '개발·검증 반복', rdLoop, qs.filter((x) => x.cat === 'rd' && x.id !== 'q3').map((x) => `${qRef(x.id)} ${q(i, x.id) ?? '모름'}`).join(' · '), '개발→시험→개선 절차와 실험 기록 양식 문서화'),
+    item('mgmt', '과제 관리', m.exec === null ? null : Math.round(m.exec), `실행준비 ${fmt(m.exec)}('과제 담당·일정·완료기준' 문항 반영)`, '과제별 담당·기한·완료기준(중간 목표) 계획'),
+    item('record', '기술 기록', m.evidence === null ? null : Math.round(m.evidence), `기술기록 ${fmt(m.evidence)}('개발 기록' 문항 반영)`, '연구노트·시험기록·버전 이력 정비'),
     item('org', '연구 조직·인력', org,
       labBase === null ? '연구전담조직 미입력(1단계 자격 확인)' : `연구전담조직 ${lab}${res ? ` · 연구 인력 ${res}` : ''}${r3 ? ` · 핵심 인력 의존 ${r3.grade}` : ''}`,
       lab === '없음' ? '연구개발전담부서 또는 기업부설연구소 설립 검토' : labBase === null ? "1단계 '지원사업 자격 확인'에서 연구전담조직 입력" : '참여 연구원 구성·백업 담당 지정', true),
@@ -193,7 +194,7 @@ export function itemAxis(key: AxisKey, items: AxisItem[]): Axis {
     evidence: items.map((x) => `${x.label} ${x.score === null ? '확인 필요' : `${x.score}점`}`),
     comment: status === '충족' ? '진단 근거상 큰 보완 사항이 없습니다. 공고별 평가 기준에 맞춰 근거자료를 정리하세요.'
       : status === '확인 필요' ? '판단할 항목이 부족합니다. 1단계 자격 확인과 핵심 문항 응답을 보완하세요.'
-      : `${weak.map((x) => `${x.label}(${x.score === null ? '확인 필요' : `${x.score}점`})`).join('·')}이(가) 기준(70점)에 못 미칩니다.`,
+      : fixParticles(`${weak.map((x) => `${x.label}(${x.score === null ? '확인 필요' : `${x.score}점`})`).join(', ')}이(가) 기준(70점)에 못 미칩니다.`),
     actions: weak.map((x) => x.fix).filter(Boolean).slice(0, 3),
   };
 }
@@ -254,11 +255,11 @@ export function readiness(i: AssessmentInput, c: ReportCore): ReadinessResult {
   const weak = ax.filter((a) => a.status === '미흡');
   const overall: Readiness = blocked.length || weak.length ? '선행 조건 필요' : ax.every((a) => a.status === '충족') ? '신청 준비됨' : '보완 후 신청';
   const reason = blocked.length
-    ? `자격 항목 '${blocked.map((b) => b.label).join("', '")}'이(가) 결격 가능성입니다. 해소 전에는 신청이 제한될 수 있습니다.`
+    ? fixParticles(`자격 항목 '${blocked.map((b) => b.label).join("', '")}'이(가) 결격 가능성입니다. 해소 전에는 신청이 제한될 수 있습니다.`)
     : weak.length
-      ? `${weak.map((a) => a.label).join('·')} 관점이 '미흡'입니다. 이 부분을 먼저 보완한 뒤 신청을 검토하세요.`
+      ? `${weak.map((a) => a.label).join(', ')} 관점이 '미흡'입니다. 이 부분을 먼저 보완한 뒤 신청을 검토하세요.`
       : overall === '신청 준비됨'
         ? '4개 관점 모두 진단 근거상 큰 보완 사항이 없습니다. 공고별 자격·평가 기준을 확인해 신청을 검토하세요.'
-        : `${ax.filter((a) => a.status !== '충족').map((a) => a.label).join('·')} 관점을 보완하면 신청 준비가 강화됩니다.`;
+        : `${ax.filter((a) => a.status !== '충족').map((a) => a.label).join(', ')} 관점을 보완하면 신청 준비가 강화됩니다.`;
   return { overall, reason, axes: ax, vouchers: vouchers(i, c), eligibility: elig, eligAnswered };
 }
