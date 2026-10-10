@@ -97,7 +97,7 @@ for (const [w, h] of VIEWPORTS) {
   await page.emulateMedia({ media: 'print' });
   await page.pdf({ path: `${OUT}/report-sample.pdf`, format: 'A4', printBackground: true });
   const pages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(pages === 16, `PDF 섹션 수 ${pages} (기대 16)`);
+  check(pages === 17, `PDF 섹션 수 ${pages} (기대 17)`);
   const pr = await page.textContent('#printReport');
   check(/Scoring rule-v1\.1/.test(pr), 'PDF에 Scoring 버전 누락');
   check(/AI 설비 예지보전 솔루션/.test(pr) && /원문 p\.271/.test(pr), 'PDF 로드맵 정렬에 원문 색인 후보 누락');
@@ -111,6 +111,7 @@ for (const [w, h] of VIEWPORTS) {
   check(/응답 근거/.test(pr), 'PDF 영역 근거 문항 누락');
   // 보완 필요 기술·데이터: 원문 핵심기술 대조(보유·보완 후보)
   check(/보완 필요 기술·데이터/.test(pr) && /보유 기술과 대조/.test(pr) && /보완 필요 후보/.test(pr), 'PDF 보완 필요 기술·데이터 누락');
+  check(/지원사업 신청 준비도/.test(pr) && /기술바우처 활용 후보/.test(pr) && /공통 자격 확인/.test(pr), 'PDF 신청 준비도 누락');
   check(/'이상징후 탐지 모델' TRL \d→\d/.test(pr), 'PDF 로드맵에 핵심기술 TRL 단계 누락');
   check(!/\{\{(TOTAL|P:)/.test(pr), 'PDF 쪽번호 토큰 미치환');
   check(/App v\d+\.\d+\.\d+ · \d{4}\.\d{2}\.\d{2} 업데이트/.test(pr), 'PDF에 앱 버전·업데이트 일자 누락');
@@ -183,7 +184,7 @@ for (const [w, h] of VIEWPORTS) {
   const head = await page.textContent('#delta .decision p');
   check(/기술역량 \d+→\d+/.test(head ?? ''), `재진단: 변화 요약 ${head}`);
   const prPages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
-  check(prPages === 17, `재진단: PDF 섹션 수 ${prPages} (기대 17)`);
+  check(prPages === 18, `재진단: PDF 섹션 수 ${prPages} (기대 18)`);
   const rdBad = await page.evaluate(() => (window.__reportChecks || []).filter((c) => c.ok === false).map((c) => `${c.label} (${c.detail})`));
   check(!rdBad.length, `재진단: 보고서 정합성 ${rdBad.join(' / ')}`);
   check(/재진단 비교 · 기준 진단 대비 변화/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
@@ -206,6 +207,26 @@ for (const [w, h] of VIEWPORTS) {
   check(!(await page.evaluate(() => window.__pwned)), '레드팀: 기록 파일 스크립트 주입 실행됨');
   check(errors.length === 0, `재진단: 콘솔 에러 ${JSON.stringify(errors)}`);
   await ctx.close();
+}
+
+// 4-c) 지원사업 자격 확인: 1단계 입력 → 저장 → 신청 준비도 반영(체납 있음 → 선행 조건 필요), AI 요청에는 자격 정보 없음
+{
+  const { page, errors } = await openPage(1440, 900);
+  await page.getByRole('button', { name: '샘플기업' }).click();
+  await page.evaluate(() => window.navTo(0));
+  await page.locator('.elig-box summary').click();
+  await page.selectOption('#elig_lab', '연구소');
+  await page.selectOption('#elig_tax', '있음');
+  await page.evaluate(() => window.navTo(5));
+  const ready = await page.textContent('#ready');
+  check(/종합 · 선행 조건 필요/.test(ready) && /결격 가능성/.test(ready), `자격 확인: 체납 있음이 준비도에 반영 안 됨`);
+  check(/기업부설연구소 보유/.test(ready), '자격 확인: 연구소 입력 미반영');
+  await page.reload({ waitUntil: 'networkidle' });
+  check(await page.evaluate(() => JSON.parse(localStorage.getItem('beconic_tgn_v09')).company.elig.tax === '있음'), '자격 확인: 저장 안 됨');
+  await page.evaluate(() => window.navTo(0));
+  check((await page.inputValue('#elig_tax')) === '있음', '자격 확인: 다시 열었을 때 입력값 사라짐');
+  check(errors.length === 0, `자격 확인: 콘솔 에러 ${JSON.stringify(errors)}`);
+  await page.close();
 }
 
 // 5) 보고서 정합성 자동 검사: 표준 사례 12개 + 전부 모름은 모두 통과, 일부러 어긋나게 하면 잡아냄

@@ -122,6 +122,18 @@ export function checkReport(root: ParentNode): CheckResult[] {
     }).map((r) => txt(r));
     add('page-ref', '본문의 쪽 참조가 해당 쪽을 가리킴', !badRef.length, badRef.join(' / '));
   }
+  // 15. 신청 준비도 종합 판정 = 관점·자격 판정 규칙(미흡·결격 → 선행 조건 / 모두 충족 → 준비됨 / 그 외 보완 후)
+  const ready = one(root, 'ready');
+  if (ready) {
+    const ax = rows(root, 'axis').map((r) => r.dataset.status);
+    const el = rows(root, 'elig').map((r) => r.dataset.status);
+    const expected = ax.every((x) => x === '확인 필요') || ax.includes('미흡') || el.includes('결격 가능성') ? '선행 조건 필요' : ax.every((x) => x === '충족') ? '신청 준비됨' : '보완 후 신청';
+    const ok = ready.dataset.overall === expected;
+    add('ready-rule', '신청 준비도 종합 판정 = 관점·자격 판정', ok, ok ? '' : `표시 '${ready.dataset.overall}' ≠ 규칙 '${expected}'`);
+    const ids = new Set(risk.map((r) => r.dataset.id));
+    const bad = rows(root, 'voucher').map((r) => r.dataset.risk).filter((id) => id && !ids.has(id));
+    add('voucher-risk', '바우처 근거 리스크 = 레드팀 표', !bad.length, bad.join(', '));
+  }
   // 14. 깨진 값·미치환 표식
   const all = txt(root as Element);
   const broken = all.match(/\{\{[^}]*\}\}|undefined|NaN|\[object Object\]/g);

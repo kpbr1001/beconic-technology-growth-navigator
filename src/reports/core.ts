@@ -7,6 +7,7 @@ import { strategicOptions, type StrategicOption } from '../diagnosis/strategy';
 import { rankTechs, type TechRankRow } from '../diagnosis/techrank';
 import { roadmapCandidates, roadmapInputOf, techRoadmapLink, type RoadmapCandidate } from '../roadmap/candidates';
 import { gapAnswerText, gapCards, type GapCard } from '../roadmap/gaps';
+import { readiness, type ReadinessResult } from './readiness';
 
 const PRI = { P0: 0, P1: 1, P2: 2 } as const;
 /** 화면과 같은 우선순위 순서(P0→P1→P2, 같은 등급은 점수 낮은 순 — 엔진 순서 유지) */
@@ -22,6 +23,8 @@ export interface ReportCore {
   rnd: RndProposal[];
   cards: GapCard[];
   redteam: RedTeam;
+  /** 지원사업 신청 준비도(R&D 4관점·바우처 후보·자격) */
+  ready: ReadinessResult;
 }
 
 const linkOf = (field: string) => (n: string) => {
@@ -47,8 +50,9 @@ export function reportCore(input: AssessmentInput): ReportCore {
   const cards = r.insufficient
     ? []
     : gapCards({ candidates: matches, techs: techs.map((t) => ({ name: t.name, trl: t.trl, critical: !!t.critical })), answerText: gapAnswerText(input), dataText: input.discovery.data ?? '', rdScore: r.m.rd });
-  return {
+  const base = {
     r, priorities: orderByPriority(r.gaps), options, recommended: options.find((o) => o.recommended) ?? options[0],
     ranked, matches, rnd, cards, redteam: redTeam(input, r),
   };
+  return { ...base, ready: readiness(input, { ...base, ready: undefined as never }) };
 }

@@ -3,7 +3,7 @@
 import { evaluate } from './index';
 import { AREA_NAME, DIMENSIONS } from './questions';
 import { redTeam, type RiskEntry } from './redteam';
-import type { AssessmentInput, AssessmentResult, Dimension, Priority } from './types';
+import type { AssessmentInput, AssessmentResult, Dimension, Eligibility, Priority } from './types';
 
 export const SNAPSHOT_KIND = 'beconic-diagnosis';
 export const SNAPSHOT_SCHEMA = 1;
@@ -50,6 +50,15 @@ export function makeSnapshot(input: AssessmentInput, r: AssessmentResult, now = 
 const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
 
 /** 내보낸 기록 파일 검증. 형식이 맞지 않으면 null(받은 내용은 그대로 실행하지 않고 값만 쓴다) */
+/** 자격 확인 입력: 허용된 선택지만 보존(조작된 기록 파일 방어) */
+const ELIG_OPTIONS: Record<keyof Eligibility, readonly string[]> = {
+  lab: ['연구소', '전담부서', '없음'], researchers: ['0명', '1~2명', '3~5명', '6명 이상'], tax: ['없음', '있음'], default: ['없음', '있음'],
+  restriction: ['없음', '있음'], ongoing: ['0건', '1건', '2건', '3건 이상'], cofund: ['가능', '일부 가능', '어려움'], certs: ['없음', '벤처', '이노비즈·메인비즈', '벤처+이노비즈 등 복수'],
+};
+export function eligOf(e: Record<string, unknown>): Eligibility {
+  return Object.fromEntries((Object.keys(ELIG_OPTIONS) as (keyof Eligibility)[]).filter((k) => typeof e[k] === 'string' && ELIG_OPTIONS[k].includes(e[k] as string)).map((k) => [k, e[k]])) as Eligibility;
+}
+
 export function parseSnapshot(x: unknown): Snapshot | null {
   if (!isObj(x) || x.kind !== SNAPSHOT_KIND || x.schema !== SNAPSHOT_SCHEMA) return null;
   const i = x.input, s = x.summary;
@@ -83,6 +92,7 @@ export function parseSnapshot(x: unknown): Snapshot | null {
         name: str(c.name, 80), stage: str(c.stage, 40), roadmapField: str(c.roadmapField, 60), bizType: str(c.bizType, 60),
         sectorDetail: str(c.sectorDetail, 300), size: str(c.size, 40), years: str(c.years, 40), techKnow: str(c.techKnow, 40),
         product: str(c.product), customer: str(c.customer, 300),
+        ...(isObj(c.elig) ? { elig: eligOf(c.elig) } : {}),
       },
       discovery: {
         hardPart: str(d.hardPart), automated: str(d.automated), data: str(d.data), external: str(d.external), people: str(d.people), validation: str(d.validation),

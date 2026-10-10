@@ -184,3 +184,30 @@ describe('논리 검증 — 핵심기술·R&D·보완 필요', () => {
     }
   });
 });
+
+describe('논리 검증 — 지원사업 신청 준비도', () => {
+  beforeAll(() => setRoadmapIndex(raw as unknown as AppIndex));
+  afterAll(() => setRoadmapIndex(null));
+  it("판단 보류·'미흡' 관점·결격 가능성이 있으면 '신청 준비됨'이 될 수 없고, '신청 준비됨'이면 4개 관점 모두 충족", () => {
+    for (const inp of cases.slice(0, 150)) {
+      const { r, ready } = reportCore(inp);
+      if (r.insufficient) expect(ready.overall).toBe('선행 조건 필요');
+      if (ready.axes.some((a) => a.status === '미흡')) expect(ready.overall).toBe('선행 조건 필요');
+      if (ready.overall === '신청 준비됨') expect(ready.axes.every((a) => a.status === '충족')).toBe(true);
+      // 충족 판정에는 보완 코멘트가 붙지 않음(판정·코멘트 일치)
+      for (const a of ready.axes) if (a.status === '충족') expect(a.comment).toMatch(/큰 보완 사항이 없습니다/);
+    }
+  });
+  it('체납·채무불이행·참여제한 중 하나라도 있으면 선행 조건 필요, 자격 입력은 점수·우선순위에 영향 없음', () => {
+    for (const inp of cases.slice(0, 100)) {
+      for (const k of ['tax', 'default', 'restriction'] as const) {
+        const withBad = { ...inp, company: { ...inp.company, elig: { [k]: '있음' } } };
+        const c = reportCore(withBad);
+        expect(c.ready.overall).toBe('선행 조건 필요');
+        const base = reportCore(inp);
+        expect([c.r.m, c.r.capability, c.r.confidence, c.priorities]).toEqual([base.r.m, base.r.capability, base.r.confidence, base.priorities]);
+      }
+    }
+  });
+});
+

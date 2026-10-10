@@ -12,6 +12,7 @@ import { SYSTEM_PROMPT, PROMPT_VERSION } from './prompt';
 import { CHECK_KEYS, CHECK_LABEL, type TechRankRow } from '../diagnosis/techrank';
 import { gapTechNames, type GapCard } from '../roadmap/gaps';
 import { orderByPriority, reportCore } from '../reports/core';
+import { AXIS_LABEL, type Axis } from '../reports/readiness';
 
 export const DEFAULT_MODEL = 'claude-opus-5-5';
 export type Effort = 'low' | 'medium' | 'high';
@@ -46,9 +47,9 @@ export type InterpretResponse =
 export const byPriority = (r: AssessmentResult) => orderByPriority(r.gaps);
 
 /** 화면과 같은 규칙으로 서버에서 다시 계산: 핵심기술 우선순위·보완 필요 기술·데이터(원문 색인이 없으면 로드맵 연결 없음) */
-export function techContext(input: AssessmentInput): { ranked: TechRankRow[]; cards: GapCard[] } {
+export function techContext(input: AssessmentInput): { ranked: TechRankRow[]; cards: GapCard[]; axes?: Axis[] } {
   const core = reportCore(input);
-  return { ranked: core.ranked, cards: core.cards };
+  return { ranked: core.ranked, cards: core.cards, axes: core.ready.axes };
 }
 
 /** 원문 근거·Rule 결과에서 허용 값 목록을 만든다(가드레일 대조용) */
@@ -71,6 +72,7 @@ export function guardContext(r: AssessmentResult, input: AssessmentInput, eviden
     pages: [...new Set([...quotes.flatMap((q) => [q.printedPage, q.pdfPage]), ...cards.map((c) => c.item.page), ...gapRows.map((g) => g.page)].filter((x): x is number => x !== null))],
     gapAreas: byPriority(r).slice(0, 5).map((g) => g.area),
     gapTechs: gapTechNames(cards),
+    planAxes: Object.values(AXIS_LABEL),
     rndIds: (req?.rnd ?? []).map((x) => x.id),
     // 이 POC의 입력은 모두 자가응답이다. 외부검증 Evidence(4단계)가 확인되기 전에는 '확인된 사실' 표기 금지
     allowVerifiedFact: false,
@@ -78,7 +80,7 @@ export function guardContext(r: AssessmentResult, input: AssessmentInput, eviden
 }
 
 /** Claude에게 넘길 입력: 계산은 끝난 값만, 원문은 발췌 그대로 */
-export function buildUserContent(input: AssessmentInput, r: AssessmentResult, req: InterpretRequest, evidence: Record<string, EvidenceQuote[]>, tc: { ranked: TechRankRow[]; cards: GapCard[] } = { ranked: [], cards: [] }): string {
+export function buildUserContent(input: AssessmentInput, r: AssessmentResult, req: InterpretRequest, evidence: Record<string, EvidenceQuote[]>, tc: { ranked: TechRankRow[]; cards: GapCard[]; axes?: Axis[] } = { ranked: [], cards: [] }): string {
   const c = input.company;
   const dims = (Object.keys(DIM_LABEL) as Dimension[]).map((d) => `- ${DIM_LABEL[d]}: ${r.m[d] === null ? '판단 보류(응답 없음)' : `${Math.round(r.m[d] as number)}/100`}`);
   const techs = input.inventory
@@ -133,6 +135,9 @@ export function buildUserContent(input: AssessmentInput, r: AssessmentResult, re
     '',
     '## 보완 필요 기술·데이터 후보(로드맵 원문 핵심기술 대조 — 목록 밖 기술 금지)',
     ...(gapLines.length ? gapLines : ['- 대조할 로드맵 품목 없음(gap_notes 쓰지 말 것)']),
+    '',
+    '## 지원사업 신청 준비도(규칙 기반 — 관점 판정 변경 금지, 자격 정보는 받지 않음)',
+    ...((tc.axes ?? []).length ? (tc.axes ?? []).map((a) => `- ${a.label}: ${a.status} · 근거 ${a.evidence.join(' / ')} · ${a.comment}`) : ['- 판단 보류(plan_notes 쓰지 말 것)']),
     '',
     '## R&D 과제 제안(규칙 기반 초안 — 번호·유형·목표 TRL 변경 금지)',
     ...(req.rnd.length ? req.rnd.map((x) => `- ${x.id} · ${x.track} · ${x.title} · 연계 기술: ${x.techName} · 목표: ${x.trlTarget}`) : ['- 없음']),
