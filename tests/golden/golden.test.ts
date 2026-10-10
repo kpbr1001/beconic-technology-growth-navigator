@@ -18,14 +18,14 @@ function render(): string {
     '> 자동 생성 파일(tests/golden/golden.test.ts). 규칙·데이터 변경으로 결과가 바뀌면 테스트가 실패합니다. 의도한 변경이면 `npm run golden:update` 후 아래 표를 다시 검수하세요.',
     '> 검수 포인트: ① 최우선 과제(P0)가 이 기업에 맞는가 ② 추천 전략안이 납득되는가 ③ 핵심기술 1위가 맞는가 ④ R&D 과제의 기술·유형이 맞는가 ⑤ 보완 필요 후보가 그럴듯한가.',
     '',
-    '| 사례 | 기술역량 | 신뢰도·단계 | 최우선 과제 | 추천안 | 핵심기술 1위 | R&D 과제(유형·기술) | 보완 후보 | 높음 리스크 |',
-    '|---|---|---|---|---|---|---|---|---|',
+    '| 사례 | 기술역량 | 신뢰도·단계 | 최우선 과제 | 추천안 | 핵심기술 1위 | R&D 과제(유형·기술) | 보완 후보 | 높음 리스크 | 신청 준비도 |',
+    '|---|---|---|---|---|---|---|---|---|---|',
   ];
   for (const { id, label, c } of rows) {
     const p0 = c.priorities[0];
     const top = c.ranked[0];
     const gapN = c.cards.flatMap((x) => x.rows).filter((r) => r.status === 'gap').length;
-    out.push(`| ${label} (${id}) | ${n(c.r.capability)} | ${n(c.r.confidence)} · ${c.r.level} | ${p0 ? `${p0.priority} ${p0.area} ${n(p0.score)}` : '-'} | ${c.recommended.name} | ${top ? `${top.tech.name} (${top.met}/5)` : '-'} | ${c.rnd.map((p) => `${p.id} ${p.trackLabel}: ${p.techName} [${p.readiness}]`).join('<br>') || '-'} | ${gapN} | ${c.redteam.risks.filter((x) => x.grade === '높음').map((x) => x.id).join('·') || '-'} |`);
+    out.push(`| ${label} (${id}) | ${n(c.r.capability)} | ${n(c.r.confidence)} · ${c.r.level} | ${p0 ? `${p0.priority} ${p0.area} ${n(p0.score)}` : '-'} | ${c.recommended.name} | ${top ? `${top.tech.name} (${top.met}/5)` : '-'} | ${c.rnd.map((p) => `${p.id} ${p.trackLabel}: ${p.techName} [${p.readiness}]`).join('<br>') || '-'} | ${gapN} | ${c.redteam.risks.filter((x) => x.grade === '높음').map((x) => x.id).join('·') || '-'} | ${c.ready.overall}<br>${c.ready.axes.map((a) => `${a.label} ${a.status}`).join(' · ')} |`);
   }
   for (const { id, label, c } of rows) {
     out.push('', `## ${label} (${id})`, '');
@@ -35,6 +35,7 @@ function render(): string {
     out.push(`- 핵심기술 순위: ${c.ranked.map((x) => `${x.rank}. ${x.tech.name} [${CHECK_KEYS.map((k) => (x.checks[k] === true ? CK[k] : x.checks[k] === null ? '?' : '·')).join('')}]`).join(' / ') || '없음'}`);
     out.push(`- 로드맵 후보: ${c.matches.slice(0, 3).map((m) => `${m.name}${m.code ? ` (${m.code})` : ''}${m.weak ? ' 약함' : ''}`).join(' / ') || '없음'}`);
     for (const card of c.cards) out.push(`- 보완 대조 · ${card.item.name}: ${card.rows.map((r) => `${({ held: '보유', partial: '일부', mentioned: '언급', gap: '보완' } as const)[r.status]}(${r.roadmapTech}${r.company ? `←${r.company.name}` : r.route ? `·${r.route}` : ''})`).join(' / ')}${card.dataGaps.length ? ` · 데이터: ${card.dataGaps.map((d) => d.term).join('·')}` : ''}`);
+    out.push(`- 신청 준비도: ${c.ready.overall} — ${c.ready.reason} · 바우처 후보: ${c.ready.vouchers.map((v) => v.type).join('·') || '없음'}`);
     out.push(`- 경고: ${c.r.alerts.length ? c.r.alerts.map((a) => a.slice(0, 60)).join(' / ') : '없음'}`);
   }
   return `${out.join('\n')}\n`;

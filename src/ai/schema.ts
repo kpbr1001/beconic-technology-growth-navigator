@@ -65,6 +65,13 @@ export const Interpretation = z.object({
       first_step: z.string().describe('90일 안에 할 첫 단계 1문장(주어진 경로 — 자체 개발 또는 외부 협력 — 를 따름)'),
     }))
     .describe('보완 필요 기술 후보 최대 3개'),
+  // 지원사업 신청 준비도: 관점별 판정은 규칙 그대로, Claude는 사업계획서 작성 포인트만
+  plan_notes: z
+    .array(z.object({
+      axis: z.string().describe('관점 이름 그대로: 기술성, 수행 역량, 사업화·검증, 정책 연계 중 하나'),
+      point: z.string().describe('이 기업의 사업계획서에서 이 관점을 어떻게 쓸지(어떤 진단 근거를 어떻게 제시하고 무엇을 먼저 보완할지) 1~2문장'),
+    }))
+    .describe('지원사업 신청 준비도 관점별 작성 포인트 최대 4개'),
 });
 export type Interpretation = z.infer<typeof Interpretation>;
 

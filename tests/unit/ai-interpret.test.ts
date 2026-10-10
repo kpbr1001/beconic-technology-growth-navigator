@@ -50,6 +50,7 @@ const good: Interpretation = {
   action_plan: [{ area: PG[0].area, action: '클라우드 API 중단 시 대체 경로를 시험합니다.', kpi: '대체 경로 시험 1회 완료', evidence: '시험 기록' }],
   rnd_notes: [{ id: 'R&D-1', title: '설비 이상패턴 탐지 모델 현장 실증 고도화', summary: '고객사 현장에서 TRL 7 실증을 목표로 합니다.' }],
   gap_notes: [],
+  plan_notes: [],
 };
 const AREA0 = PG[0].area;
 
@@ -341,6 +342,31 @@ describe('핵심기술 우선순위·보완 필요 기술(서버 재계산)', ()
       const pri = [...text.matchAll(/^- (P[012]) /gm)].map((m) => m[1]);
       expect(pri).toEqual([...pri].sort());
     });
+  });
+});
+
+describe('신청 준비도 작성 포인트(plan_notes)', () => {
+  it('4개 관점 이름만·관점당 1개·관점 순서, 선정 표현·점수 위조 제거', () => {
+    expect(ctx.planAxes).toEqual(['기술성', '수행 역량', '사업화·검증', '정책 연계']);
+    const { output, violations } = applyGuardrail({
+      ...good,
+      plan_notes: [
+        { axis: '정책 연계', point: '로드맵 품목 대조표를 정책 부합성 근거로 제시합니다.' },
+        { axis: '기술성', point: '이상패턴 탐지 모델의 TRL 5 근거를 시험기록으로 제시합니다.' },
+        { axis: '기술성', point: '중복' },
+        { axis: '가점', point: 'x' },
+        { axis: '수행 역량', point: '선정 가능성이 높습니다.' },
+        { axis: '사업화·검증', point: `확장준비 99/100으로 충분합니다.` },
+      ],
+    }, ctx);
+    expect(output.plan_notes.map((n) => n.axis)).toEqual(['기술성', '정책 연계']);
+    expect(violations.filter((v) => v.field === 'plan_notes').map((v) => v.kind).sort()).toEqual(['fit_grade', 'score_mismatch', 'unknown_item']);
+  });
+  it('입력에 관점별 판정·근거가 들어가고 자격 정보는 들어가지 않음', () => {
+    const withElig = { ...input, company: { ...input.company, elig: { tax: '있음' as const } } };
+    const text = buildUserContent(withElig, r, req, evidence, techContext(withElig));
+    expect(text).toMatch(/## 지원사업 신청 준비도[^\n]*\n- 기술성: (충족|보완|미흡)/);
+    expect(text).not.toMatch(/체납/);
   });
 });
 

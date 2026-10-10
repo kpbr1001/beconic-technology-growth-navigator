@@ -19,6 +19,18 @@ export interface EvidenceLevel {
   desc: string;
 }
 
+/** 지원사업 공통 자격 확인(선택 입력). 점수에는 쓰지 않고 신청 준비도·결격 확인에만 쓴다. AI에 보내지 않는다 */
+export interface Eligibility {
+  lab?: '' | '연구소' | '전담부서' | '없음';
+  researchers?: '' | '0명' | '1~2명' | '3~5명' | '6명 이상';
+  tax?: '' | '없음' | '있음';
+  default?: '' | '없음' | '있음';
+  restriction?: '' | '없음' | '있음';
+  ongoing?: '' | '0건' | '1건' | '2건' | '3건 이상';
+  cofund?: '' | '가능' | '일부 가능' | '어려움';
+  certs?: '' | '없음' | '벤처' | '이노비즈·메인비즈' | '벤처+이노비즈 등 복수';
+}
+
 export interface Company {
   name: string;
   stage: string;
@@ -30,6 +42,7 @@ export interface Company {
   techKnow: string;
   product: string;
   customer: string;
+  elig?: Eligibility;
 }
 
 export interface Discovery {
