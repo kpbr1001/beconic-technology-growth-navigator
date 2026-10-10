@@ -9,9 +9,9 @@ import type { EvidenceQuote } from '../rag/evidence';
 import { applyGuardrail, type GuardContext, type Violation } from './guardrail';
 import { Interpretation, type InterpretRequest } from './schema';
 import { SYSTEM_PROMPT, PROMPT_VERSION } from './prompt';
-import { CHECK_KEYS, CHECK_LABEL, rankTechs, type TechRankRow } from '../diagnosis/techrank';
-import { roadmapCandidates, roadmapInputOf, techRoadmapLink } from '../roadmap/candidates';
-import { gapAnswerText, gapCards, gapTechNames, type GapCard } from '../roadmap/gaps';
+import { CHECK_KEYS, CHECK_LABEL, type TechRankRow } from '../diagnosis/techrank';
+import { gapTechNames, type GapCard } from '../roadmap/gaps';
+import { orderByPriority, reportCore } from '../reports/core';
 
 export const DEFAULT_MODEL = 'claude-opus-5-5';
 export type Effort = 'low' | 'medium' | 'high';
@@ -42,28 +42,13 @@ export type InterpretResponse =
       usage: { input: number; output: number };
     };
 
-const PRI = { P0: 0, P1: 1, P2: 2 } as const;
-/** 화면과 같은 우선순위 순서(P0→P1→P2, 같은 등급은 점수 낮은 순) */
-export const byPriority = (r: AssessmentResult) => [...r.gaps].sort((a, b) => PRI[a.priority] - PRI[b.priority]);
+/** 화면과 같은 우선순위 순서(P0→P1→P2) */
+export const byPriority = (r: AssessmentResult) => orderByPriority(r.gaps);
 
 /** 화면과 같은 규칙으로 서버에서 다시 계산: 핵심기술 우선순위·보완 필요 기술·데이터(원문 색인이 없으면 로드맵 연결 없음) */
-export function techContext(input: AssessmentInput, r: AssessmentResult): { ranked: TechRankRow[]; cards: GapCard[] } {
-  const f = input.company.roadmapField;
-  const ranked = rankTechs(input.inventory, {
-    hardPart: input.discovery.hardPart ?? '',
-    linkOf: (n) => {
-      const c = techRoadmapLink(f, n);
-      return c ? { name: c.name, code: c.code ?? null, page: c.page, source: c.source } : null;
-    },
-  });
-  const cards = gapCards({
-    candidates: roadmapCandidates(roadmapInputOf(input)),
-    techs: input.inventory,
-    answerText: gapAnswerText(input),
-    dataText: input.discovery.data ?? '',
-    rdScore: r.m.rd,
-  });
-  return { ranked, cards };
+export function techContext(input: AssessmentInput): { ranked: TechRankRow[]; cards: GapCard[] } {
+  const core = reportCore(input);
+  return { ranked: core.ranked, cards: core.cards };
 }
 
 /** 원문 근거·Rule 결과에서 허용 값 목록을 만든다(가드레일 대조용) */
@@ -116,8 +101,8 @@ export function buildUserContent(input: AssessmentInput, r: AssessmentResult, re
   });
   const gapLines = tc.cards.flatMap((c) => [
     `- 로드맵 품목 ${c.item.name}${c.item.code ? ` (${c.item.code})` : ''}${c.item.page ? ` p.${c.item.page}` : ''}`,
-    ...c.rows.map((g) => g.status === 'held'
-      ? `  · 보유 대조: 원문 '${g.roadmapTech}'${g.trlRef ? `(원문 TRL ${g.trlRef})` : ''} ↔ 자사 '${g.company?.name}'(${g.company?.trl ? `TRL ${g.company.trl}` : 'TRL 확인 필요'})`
+    ...c.rows.map((g) => g.status === 'held' || g.status === 'partial'
+      ? `  · ${g.status === 'held' ? '보유 대조' : '일부 겹침(같은 기술인지 원문 대조 필요)'}: 원문 '${g.roadmapTech}'${g.trlRef ? `(원문 TRL ${g.trlRef})` : ''} ↔ 자사 '${g.company?.name}'(${g.company?.trl ? `TRL ${g.company.trl}` : 'TRL 확인 필요'})`
       : `  · 보완 필요 후보: '${g.roadmapTech}'${g.trlRef ? `(원문 TRL ${g.trlRef})` : ''}${g.page ? ` p.${g.page}` : ''} — ${g.status === 'mentioned' ? '답변에 관련 표현 있음(목록 추가 검토)' : `경로: ${g.route}`}`),
     ...c.dataGaps.map((d) => `  · 데이터 보완 후보: ${d.term} 데이터(원문 '${d.roadmapTech}'${d.page ? ` p.${d.page}` : ''}, 데이터 답변에 없음)`),
   ]);
@@ -163,7 +148,7 @@ export async function interpretAssessment(req: InterpretRequest, deps: Interpret
   const r = evaluate(input);
   const evidence = deps.evidence ?? {};
   const model = deps.model || DEFAULT_MODEL;
-  const tc = techContext(input, r);
+  const tc = techContext(input);
 
   const call = deps.client.beta.messages.parse({
     model,

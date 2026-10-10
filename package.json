@@ -1,6 +1,6 @@
 {
   "name": "beconic-technology-growth-navigator",
-  "version": "0.9.20",
+  "version": "0.9.21",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,8 @@
     "test:e2e": "node tests/e2e/smoke.mjs && node tests/e2e/flow-parity.mjs",
     "test:pdf": "node tests/e2e/pdf-generate.mjs && python3 tests/e2e/pdf_qa.py",
     "lint": "eslint .",
-    "ci": "node scripts/check-repo-hygiene.mjs && npm run lint && npm test && npm run test:roadmap && npm run build && npm run test:e2e && npm run test:pdf"
+    "ci": "node scripts/check-repo-hygiene.mjs && npm run lint && npm test && npm run test:roadmap && npm run build && npm run test:e2e && npm run test:pdf",
+    "golden:update": "vitest run tests/golden -u"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

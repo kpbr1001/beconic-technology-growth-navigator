@@ -2,7 +2,8 @@
 // 사용: npm run build && npm run test:e2e   (결과 이미지·PDF: tests/e2e/out/)
 import { createServer } from 'node:http';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
-import { extname, join } from 'node:path';
+import { extname, join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 
 const OUT = 'tests/e2e/out';
@@ -183,6 +184,8 @@ for (const [w, h] of VIEWPORTS) {
   check(/기술역량 \d+→\d+/.test(head ?? ''), `재진단: 변화 요약 ${head}`);
   const prPages = await page.evaluate(() => document.querySelectorAll('#printReport .pr-page').length);
   check(prPages === 17, `재진단: PDF 섹션 수 ${prPages} (기대 17)`);
+  const rdBad = await page.evaluate(() => (window.__reportChecks || []).filter((c) => c.ok === false).map((c) => `${c.label} (${c.detail})`));
+  check(!rdBad.length, `재진단: 보고서 정합성 ${rdBad.join(' / ')}`);
   check(/재진단 비교 · 기준 진단 대비 변화/.test(await page.textContent('#printReport')), '재진단: PDF 비교 쪽 누락');
   await page.emulateMedia({ media: 'print' });
   mkdirSync(`${OUT}/pdf`, { recursive: true });
@@ -205,10 +208,46 @@ for (const [w, h] of VIEWPORTS) {
   await ctx.close();
 }
 
+// 5) 보고서 정합성 자동 검사: 표준 사례 12개 + 전부 모름은 모두 통과, 일부러 어긋나게 하면 잡아냄
+{
+  const { buildSync } = await import('esbuild');
+  const bundle = `${OUT}/golden-fixture.mjs`;
+  buildSync({ entryPoints: ['tests/fixtures/golden.ts'], bundle: true, format: 'esm', platform: 'node', outfile: bundle, logLevel: 'error' });
+  const { GOLDEN } = await import(pathToFileURL(resolve(bundle)).href);
+  const { page, errors } = await openPage(1440, 900);
+  const unknown = { ...GOLDEN[0].input, answers: Object.fromEntries(Object.keys(GOLDEN[0].input.answers).map((k) => [k, null])) };
+  const cases = [{ id: 'all-unknown', input: unknown }, ...GOLDEN.map((g) => ({ id: g.id, input: g.input }))];
+  for (const c of cases) {
+    await page.evaluate((inp) => { localStorage.clear(); localStorage.setItem('beconic_tgn_v09', JSON.stringify({ step: 5, visited: [0, 1, 2, 3, 4, 5], ...inp })); }, c.input);
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForFunction(() => Array.isArray(window.__reportChecks));
+    const rs = await page.evaluate(() => window.__reportChecks);
+    const bad = rs.filter((r) => r.ok === false);
+    check(!bad.length, `정합성 검사 ${c.id}: ${bad.map((b) => `${b.label} (${b.detail})`).join(' / ')}`);
+    const applied = rs.filter((r) => r.ok === true).length;
+    check(applied >= (c.id === 'all-unknown' ? 5 : 15), `정합성 검사 ${c.id}: 적용된 항목 ${applied}개`);
+  }
+  // 일부러 어긋나게 만들면 잡아내는지(검사기 자체 검증)
+  const caught = await page.evaluate(() => {
+    const pr = document.getElementById('printReport');
+    pr.querySelector('[data-ckrow="act"]').dataset.act = '다른 과제';
+    pr.querySelector('[data-ckrow="rank"]').dataset.tech = '엉뚱한 기술';
+    pr.querySelectorAll('section.pr-page')[3].querySelector('.pr-footer').lastElementChild.textContent = 'X · 9 / 99';
+    pr.querySelector('.pr-asks').insertAdjacentHTML('beforeend', '<li>undefined</li>');
+    pr.querySelector('[data-ckrow="risk"]').remove();
+    window.runReportChecks();
+    return window.__reportChecks.filter((c) => c.ok === false).map((c) => c.id);
+  });
+  for (const id of ['p0-plan', 'top-tech', 'page-no', 'broken', 'risk-count']) check(caught.includes(id), `정합성 검사: 조작 '${id}'를 잡지 못함 (${caught.join(',')})`);
+  check(/정합성 자동 검사 \d+\/\d+ 통과 — 확인 필요/.test(await page.textContent('#qa [data-ck-result]')), '정합성 검사: 실패가 화면 품질점검에 표시되지 않음');
+  check(errors.length === 0, `정합성 검사: 콘솔 에러 ${JSON.stringify(errors)}`);
+  await page.close();
+}
+
 await browser.close();
 server.close();
 if (failures.length) {
   console.error('❌ E2E 실패\n- ' + failures.join('\n- '));
   process.exit(1);
 }
-console.log(`✅ E2E 통과 (뷰포트 ${VIEWPORTS.length}개, 전부 모름, CSS, PDF, 기술 후보, 재진단)`);
+console.log(`✅ E2E 통과 (뷰포트 ${VIEWPORTS.length}개, 전부 모름, CSS, PDF, 기술 후보, 재진단, 보고서 정합성 13사례)`);
