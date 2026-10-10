@@ -198,13 +198,14 @@ export function itemRadarSVG(items: { label: string; score: number | null }[], o
 
 /** 관점별 점수 막대(가로) — 4개 관점 한눈에: 점수 있는 관점은 막대, 없으면 상태만 */
 export function axisBarsSVG(rows: { label: string; score: number | null; status: string }[], pass = ITEM_PASS): string {
-  const W = 520, rowH = 30, top = 8, left = 96, bw = 300;
+  // 화면 최대 폭 480px·모바일 330px에서 글자가 10~14px로 읽히도록 좁은 좌표계(폭 440)를 쓴다
+  const W = 440, rowH = 30, top = 8, left = 84, bw = 230;
   const col = (s: string) => (s === '충족' ? '#067647' : s === '보완' ? '#b54708' : s === '미흡' ? '#b42318' : '#98a2b3');
   const px = left + (bw * pass) / 100;
   const body = rows.map((r, i) => {
     const y = top + i * rowH;
     const w = r.score === null ? 0 : (bw * Math.max(0, Math.min(100, r.score))) / 100;
-    return `<text x="${left - 8}" y="${y + 16}" text-anchor="end" font-size="11.5" fill="#344054">${esc(r.label)}</text><rect x="${left}" y="${y + 6}" width="${bw}" height="13" rx="6" fill="#f2f4f7"/>${w ? `<rect x="${left}" y="${y + 6}" width="${w.toFixed(1)}" height="13" rx="6" fill="${col(r.status)}" fill-opacity=".85"/>` : ''}<text x="${left + bw + 10}" y="${y + 16}" font-size="11.5" font-weight="700" fill="${col(r.status)}">${r.score === null ? '' : `${r.score} · `}${esc(r.status)}</text>`;
+    return `<text x="${left - 8}" y="${y + 17}" text-anchor="end" font-size="13" fill="#344054">${esc(r.label)}</text><rect x="${left}" y="${y + 7}" width="${bw}" height="12" rx="6" fill="#f2f4f7"/>${w ? `<rect x="${left}" y="${y + 7}" width="${w.toFixed(1)}" height="12" rx="6" fill="${col(r.status)}" fill-opacity=".85"/>` : ''}<text x="${left + bw + 10}" y="${y + 17}" font-size="13" font-weight="700" fill="${col(r.status)}">${r.score === null ? '' : `${r.score} · `}${esc(r.status)}${r.score === null && r.status !== '확인 필요' ? ' (판정만)' : ''}</text>`;
   }).join('');
-  return `<svg viewBox="0 0 ${W} ${top + rows.length * rowH + 14}" width="100%" role="img" aria-label="신청 준비도 관점별 판정">${body}<line x1="${px}" y1="${top}" x2="${px}" y2="${top + rows.length * rowH}" stroke="#067647" stroke-dasharray="4 3"/><text x="${px}" y="${top + rows.length * rowH + 11}" text-anchor="middle" font-size="9" fill="#067647">충족 기준 ${pass}</text></svg>`;
+  return `<svg viewBox="0 0 ${W} ${top + rows.length * rowH + 18}" width="100%" role="img" aria-label="신청 준비도 관점별 판정">${body}<line x1="${px}" y1="${top}" x2="${px}" y2="${top + rows.length * rowH}" stroke="#067647" stroke-dasharray="4 3"/><text x="${px}" y="${top + rows.length * rowH + 13}" text-anchor="middle" font-size="10.5" fill="#067647">충족 기준 ${pass}</text></svg>`;
 }
