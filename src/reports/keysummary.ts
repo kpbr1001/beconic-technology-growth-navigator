@@ -1,13 +1,13 @@
 // 6단계 맨 위 '핵심요약'(화면·PDF 공용, 순수 함수): 대표가 1분 안에 읽고 결정할 수 있게 결론 한 줄·카드 6개·90일 할 일을 만든다.
 // 원칙: 새 점수·새 판단을 만들지 않는다. 모든 값은 reportCore(점수·우선순위·핵심기술 순위·신청 준비도·레드팀) 결과를 그대로 옮긴다.
 // 선정 가능성·적합 등급 표현은 쓰지 않는다.
-import { MIN_CORE_ANSWERS } from '../diagnosis';
-import { band } from '../diagnosis/scoring';
+import { CORE, MIN_CORE_ANSWERS } from '../diagnosis';
+import { BAND_CUT, band } from '../diagnosis/scoring';
 import { nextTrlGate } from '../diagnosis/trl';
 import type { AssessmentInput } from '../diagnosis/types';
 import type { ReportCore } from './core';
 import { fixParticles } from './ko';
-import { quadrantOf } from './visuals';
+import { MATRIX_CUT, quadrantOf } from './visuals';
 
 export type KeyTone = 'ok' | 'warn' | 'bad' | 'info';
 export interface KeyTile {
@@ -57,7 +57,7 @@ const QUAD_LINE: Record<string, string> = {
   recheck: '역량과 근거가 모두 불확실해, 담당자 확인과 자료 확보가 먼저인 단계입니다.',
 };
 const READY_TONE: Record<string, KeyTone> = { '신청 준비됨': 'ok', '보완 후 신청': 'warn', '선행 조건 필요': 'bad' };
-const capTone = (v: number | null): KeyTone => (v === null ? 'info' : v >= 65 ? 'ok' : v >= 45 ? 'warn' : 'bad');
+const capTone = (v: number | null): KeyTone => (v === null ? 'info' : v >= BAND_CUT.good ? 'ok' : v >= BAND_CUT.weak ? 'warn' : 'bad');
 
 export function keySummary(i: AssessmentInput, c: ReportCore, actionOf: ActionOf): KeySummary {
   const { r } = c;
@@ -74,7 +74,7 @@ export function keySummary(i: AssessmentInput, c: ReportCore, actionOf: ActionOf
 
   // ① 결론 한 줄
   const headline = held
-    ? `아직 점수를 판단하지 않았습니다. 공통 핵심 12문항 중 ${r.coreAnswered}개만 응답해, ${MIN_CORE_ANSWERS}개 이상 답하면 결과가 확정됩니다.`
+    ? `아직 점수를 판단하지 않았습니다. 공통 핵심 ${CORE.length}문항 중 ${r.coreAnswered}개만 응답해, ${MIN_CORE_ANSWERS}개 이상 답하면 결과가 확정됩니다.`
     : fixParticles(`기술역량은 ${cap}점으로 '${band(cap)}' 구간이고, 가장 먼저 풀 과제는 '${p0?.area}'입니다. ${quad ? QUAD_LINE[quad.key] : ''}`).trim();
 
   // ② 카드 6개
@@ -108,8 +108,8 @@ export function keySummary(i: AssessmentInput, c: ReportCore, actionOf: ActionOf
       : { key: 'risk', label: '주의할 리스크', head: "'높음' 없음", body: '중간 이하 리스크는 90일 계획 안에서 관리', tone: 'ok' });
   tiles.push({
     key: 'trust', label: '결과 신뢰도', head: `${conf}점 · ${r.level}`,
-    body: r.unknown ? `'모름' ${r.unknown}개 — 확인하면 신뢰도가 오릅니다` : conf >= 60 ? '실행계획의 기준선으로 쓸 수 있습니다' : '근거 자료를 보강하면 신뢰도가 오릅니다',
-    tone: conf >= 60 ? 'ok' : 'warn',
+    body: r.unknown ? `'모름' ${r.unknown}개 — 확인하면 신뢰도가 오릅니다` : conf >= MATRIX_CUT.confidence ? '실행계획의 기준선으로 쓸 수 있습니다' : '근거 자료를 보강하면 신뢰도가 오릅니다',
+    tone: conf >= MATRIX_CUT.confidence ? 'ok' : 'warn',
   });
 
   // ③ 90일 할 일(실행 순서)

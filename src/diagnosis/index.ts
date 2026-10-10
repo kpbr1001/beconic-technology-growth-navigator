@@ -49,7 +49,7 @@ export function evaluate(input: AssessmentInput): AssessmentResult {
     unknown,
     gaps: priorityGaps(m, confidence),
     alerts: [
-      ...(held ? [`${HOLD_ALERT}공통 핵심 12문항 중 ${coreAnswered}개만 응답되어 점수를 산정하지 않았습니다. ${MIN_CORE_ANSWERS}개 이상 응답하면 영역별 점수와 기술역량을 계산합니다.`] : []),
+      ...(held ? [`${HOLD_ALERT}공통 핵심 ${CORE.length}문항 중 ${coreAnswered}개만 응답되어 점수를 산정하지 않았습니다. ${MIN_CORE_ANSWERS}개 이상 응답하면 영역별 점수와 기술역량을 계산합니다.`] : []),
       ...consistencyAlerts(
         questions, input.answers, Boolean(input.discovery.external), pendingDimensions,
         input.inventory.filter((t) => t.critical && t.trl > 0).map((t) => t.trl),

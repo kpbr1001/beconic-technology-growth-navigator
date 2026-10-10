@@ -46,7 +46,9 @@ export function capabilityScore(m: DimensionScores): number | null {
   return missing ? raw / wsum : raw;
 }
 
+/** 점수 구간 경계(강점·양호·보완 필요) — 화면 색·문구도 이 값을 쓴다 */
+export const BAND_CUT = { strong: 80, good: 65, weak: 45 } as const;
 export function band(v: number | null): string {
   if (v === null) return '판단 보류';
-  return v >= 80 ? '강점' : v >= 65 ? '양호' : v >= 45 ? '보완 필요' : '우선 개선';
+  return v >= BAND_CUT.strong ? '강점' : v >= BAND_CUT.good ? '양호' : v >= BAND_CUT.weak ? '보완 필요' : '우선 개선';
 }

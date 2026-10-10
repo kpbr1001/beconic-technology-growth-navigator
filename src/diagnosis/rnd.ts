@@ -115,7 +115,7 @@ export function rndProposals(i: RndInput): RndProposal[] {
   const rankOf = (t?: RndTech) => (t ? ranked.find((x) => x.tech === t)?.rank ?? null : null);
   const why1 = (row: TechRankRow<RndTech>) => {
     const ok = CHECK_KEYS.filter((k) => row.checks[k] === true).map((k) => CHECK_LABEL[k]);
-    return fixParticles(`'${row.tech.name}'은(는) 핵심기술 우선순위 ${row.rank}위(판단 기준 5가지 ${row.met === 5 ? '모두 충족' : `중 ${row.met}가지 충족${ok.length ? `: ${ok.join('·')}` : ''}`})`);
+    return fixParticles(`'${row.tech.name}'은(는) 핵심기술 우선순위 ${row.rank}위(판단 기준 ${CHECK_KEYS.length}가지 ${row.met === CHECK_KEYS.length ? '모두 충족' : `중 ${row.met}가지 충족${ok.length ? `: ${ok.join('·')}` : ''}`})`);
   };
   /** 기업 확인 전 기술은 '신청 준비됨'으로 두지 않는다 */
   const capConfirmed = (r: Readiness, t?: RndTech): Readiness => (t && !t.confirmed && r === '신청 준비됨' ? '보완 후 신청' : r);

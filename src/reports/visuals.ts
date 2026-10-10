@@ -1,12 +1,15 @@
 // 보고서 시각화(화면·PDF 공용): 역량×신뢰도 포지셔닝 매트릭스, 90일 실행 간트.
 // 값은 Rule Engine 결과만 쓰고 새 점수를 만들지 않는다. 일정은 '권장 예시'로 표기한다.
 
+import { BAND_CUT } from '../diagnosis/scoring';
+import { ITEM_PASS, ITEM_WARN } from './readiness';
+
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
 /** 기술역량 '양호' 경계(band)·진단 신뢰도 '실행계획 기준선' 경계(경영진 요약 문구와 같은 값) */
-export const MATRIX_CUT = { capability: 65, confidence: 60 } as const;
+export const MATRIX_CUT = { capability: BAND_CUT.good, confidence: 60 } as const;
 
 export interface Quadrant {
   key: 'scale' | 'evidence' | 'focus' | 'recheck';
@@ -173,14 +176,14 @@ export function deltaDumbbellSVG(rows: { label: string; prev: number | null; cur
 export function itemRadarSVG(items: { label: string; score: number | null }[], opts: { title: string; pass?: number } = { title: '' }): string {
   const n = items.length;
   if (n < 3) return '';
-  const pass = opts.pass ?? 70;
+  const pass = opts.pass ?? ITEM_PASS;
   const cx = 150, cy = 140, R = 92;
   const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
   const pt = (i: number, r: number) => [cx + Math.cos(ang(i)) * R * r, cy + Math.sin(ang(i)) * R * r] as const;
   const ring = (r: number) => items.map((_, i) => pt(i, r).map((v) => v.toFixed(1)).join(',')).join(' ');
   const val = (s: number | null) => (s === null ? 0 : Math.max(0, Math.min(100, s)) / 100);
   const poly = items.map((x, i) => pt(i, val(x.score)).map((v) => v.toFixed(1)).join(',')).join(' ');
-  const color = (s: number | null) => (s === null ? '#98a2b3' : s >= pass ? '#067647' : s >= 45 ? '#b54708' : '#b42318');
+  const color = (s: number | null) => (s === null ? '#98a2b3' : s >= pass ? '#067647' : s >= ITEM_WARN ? '#b54708' : '#b42318');
   const labels = items.map((x, i) => {
     const [lx, ly] = pt(i, 1.28);
     const c = Math.cos(ang(i));
@@ -194,7 +197,7 @@ export function itemRadarSVG(items: { label: string; score: number | null }[], o
 }
 
 /** 관점별 점수 막대(가로) — 4개 관점 한눈에: 점수 있는 관점은 막대, 없으면 상태만 */
-export function axisBarsSVG(rows: { label: string; score: number | null; status: string }[], pass = 70): string {
+export function axisBarsSVG(rows: { label: string; score: number | null; status: string }[], pass = ITEM_PASS): string {
   const W = 520, rowH = 30, top = 8, left = 96, bw = 300;
   const col = (s: string) => (s === '충족' ? '#067647' : s === '보완' ? '#b54708' : s === '미흡' ? '#b42318' : '#98a2b3');
   const px = left + (bw * pass) / 100;

@@ -25,9 +25,11 @@ export interface AxisItem {
   gate?: boolean;
 }
 
-/** 항목 점수 → 상태: 70 이상 충족 · 45 이상 보완 · 미만 미흡 · 없음 확인 필요 */
-export const itemStatus = (score: number | null): AxisStatus => (score === null ? '확인 필요' : score >= 70 ? '충족' : score >= 45 ? '보완' : '미흡');
+/** 항목 '충족' 기준점·'보완' 하한(시범 기준 — 화면·PDF 설명과 레이더 기준선이 이 값을 씀) */
 export const ITEM_PASS = 70;
+export const ITEM_WARN = 45;
+/** 항목 점수 → 상태: ITEM_PASS 이상 충족 · ITEM_WARN 이상 보완 · 미만 미흡 · 없음 확인 필요 */
+export const itemStatus = (score: number | null): AxisStatus => (score === null ? '확인 필요' : score >= ITEM_PASS ? '충족' : score >= ITEM_WARN ? '보완' : '미흡');
 
 export interface Axis {
   key: AxisKey;
@@ -186,7 +188,7 @@ export function itemAxis(key: AxisKey, items: AxisItem[]): Axis {
   const known = items.filter((x) => x.score !== null);
   const gateFail = items.some((x) => x.gate && (x.status === '미흡' || (key === 'tech' && x.key === 'diff' && x.status === '확인 필요')));
   // 필수 항목 미흡(예: 연구전담조직 없음)은 정보가 부족해도 확정된 사실이라 먼저 판정한다
-  const status: AxisStatus = gateFail ? '미흡' : known.length < 3 ? '확인 필요' : score !== null && score < 45 ? '미흡'
+  const status: AxisStatus = gateFail ? '미흡' : known.length < 3 ? '확인 필요' : score !== null && score < ITEM_WARN ? '미흡'
     : score !== null && score >= ITEM_PASS && !items.some((x) => x.status === '보완' || x.status === '미흡') ? '충족' : '보완';
   const weak = items.filter((x) => x.status === '미흡' || x.status === '보완' || (x.gate && x.status === '확인 필요')).sort((a, b) => (a.score ?? -1) - (b.score ?? -1));
   return {
@@ -259,7 +261,7 @@ export function readiness(i: AssessmentInput, c: ReportCore): ReadinessResult {
     : weak.length
       ? `${weak.map((a) => a.label).join(', ')} 관점이 '미흡'입니다. 이 부분을 먼저 보완한 뒤 신청을 검토하세요.`
       : overall === '신청 준비됨'
-        ? '4개 관점 모두 진단 근거상 큰 보완 사항이 없습니다. 공고별 자격·평가 기준을 확인해 신청을 검토하세요.'
+        ? `${ax.length}개 관점 모두 진단 근거상 큰 보완 사항이 없습니다. 공고별 자격·평가 기준을 확인해 신청을 검토하세요.`
         : `${ax.filter((a) => a.status !== '충족').map((a) => a.label).join(', ')} 관점을 보완하면 신청 준비가 강화됩니다.`;
   return { overall, reason, axes: ax, vouchers: vouchers(i, c), eligibility: elig, eligAnswered };
 }

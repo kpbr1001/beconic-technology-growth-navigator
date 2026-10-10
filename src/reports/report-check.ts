@@ -2,6 +2,8 @@
 // 화면에 그려진 결과를 그대로 읽으므로, 계산은 맞는데 표시가 어긋나는 경우(예: 요약 최우선 과제 ≠ 90일 계획 P0)도 잡는다.
 // 표식: data-ck(단일 값), data-ckrow(표의 행), section[data-sec](쪽).
 
+import { ITEM_PASS, ITEM_WARN } from './readiness';
+
 export interface CheckResult {
   id: string;
   label: string;
@@ -148,7 +150,7 @@ export function checkReport(root: ParentNode): CheckResult[] {
       const avg = sc.length ? Math.round(sc.reduce((a, b) => a + b, 0) / sc.length) : null;
       const st = (r: HTMLElement) => r.dataset.status;
       const gate = its.some((r) => r.dataset.gate && (st(r) === '미흡' || (r.dataset.gatenull && st(r) === '확인 필요')));
-      const expected = gate ? '미흡' : sc.length < 3 ? '확인 필요' : avg !== null && avg < 45 ? '미흡' : avg !== null && avg >= 70 && !its.some((r) => st(r) === '보완' || st(r) === '미흡') ? '충족' : '보완';
+      const expected = gate ? '미흡' : sc.length < 3 ? '확인 필요' : avg !== null && avg < ITEM_WARN ? '미흡' : avg !== null && avg >= ITEM_PASS && !its.some((r) => st(r) === '보완' || st(r) === '미흡') ? '충족' : '보완';
       if (axis.dataset.status !== expected || String(avg ?? '') !== (axis.dataset.score ?? '')) bad.push(`${axis.dataset.label} 표시 ${axis.dataset.status}·${axis.dataset.score} ≠ 규칙 ${expected}·${avg}`);
     }
     add('item-axis', '관점 판정·점수 = 세부 항목 판정 규칙', !bad.length, bad.join(' / '));
