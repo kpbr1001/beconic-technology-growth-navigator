@@ -5,6 +5,7 @@
 import { CHECK_KEYS, CHECK_LABEL, rankTechs, type RankTechInput, type TechRankRow } from './techrank';
 import { TRL_LEVELS } from './trl';
 import type { AssessmentResult, Answer } from './types';
+import { fixParticles } from '../reports/ko';
 
 export type RndTrack = 'upgrade' | 'frontier' | 'validation' | 'convergence';
 export const TRACK_LABEL: Record<RndTrack, string> = {
@@ -114,7 +115,7 @@ export function rndProposals(i: RndInput): RndProposal[] {
   const rankOf = (t?: RndTech) => (t ? ranked.find((x) => x.tech === t)?.rank ?? null : null);
   const why1 = (row: TechRankRow<RndTech>) => {
     const ok = CHECK_KEYS.filter((k) => row.checks[k] === true).map((k) => CHECK_LABEL[k]);
-    return `'${row.tech.name}'은(는) 핵심기술 우선순위 ${row.rank}위(확인 항목 ${row.met}/5${row.met === 5 ? ' 모두 충족' : ok.length ? `: ${ok.join('·')}` : ''})`;
+    return fixParticles(`'${row.tech.name}'은(는) 핵심기술 우선순위 ${row.rank}위(판단 기준 ${CHECK_KEYS.length}가지 ${row.met === CHECK_KEYS.length ? '모두 충족' : `중 ${row.met}가지 충족${ok.length ? `: ${ok.join('·')}` : ''}`})`);
   };
   /** 기업 확인 전 기술은 '신청 준비됨'으로 두지 않는다 */
   const capConfirmed = (r: Readiness, t?: RndTech): Readiness => (t && !t.confirmed && r === '신청 준비됨' ? '보완 후 신청' : r);
@@ -157,7 +158,7 @@ export function rndProposals(i: RndInput): RndProposal[] {
       // 원문 TRL 표기는 품목 기준값(연차 목표일 수도 있음)이라 자사 목표가 아니라 대조 기준으로만 쓴다
       trlTarget: mt.trl ? `차세대 성능 목표 설정(로드맵 원문 TRL ${mt.trl} 기준 대조)` : '로드맵 원문 목표 확인 후 설정',
       roadmap: { name: top.name, code: top.code, page: mt.page ?? top.page, source: top.source, techName: mt.name, techTrl: mt.trl },
-      why: `공식 로드맵 '${top.name}'의 핵심기술 '${mt.name}'과(와) 자사 '${ft?.name ?? '핵심기술'}'이(가) 맞닿아 있어, 정책 방향과 연결된 선도 과제로 설명할 수 있습니다(원문 확인 필요).`,
+      why: fixParticles(`공식 로드맵 '${top.name}'의 핵심기술 '${mt.name}'과(와) 자사 '${ft?.name ?? '핵심기술'}'이(가) 맞닿아 있어, 정책 방향과 연결된 선도 과제로 설명할 수 있습니다(원문 확인 필요).`),
       contents: ['로드맵 개발목표 대비 자사 기술 격차 분석과 목표 성능 설정', '독자 핵심기술(알고리즘·공정·소재) 개발과 지식재산(특허) 확보', '국내외 선도 기술과의 성능 비교 검증'],
       readiness,
       prep: [...(diff ? [] : ['차별 기술·노하우의 지식재산 보호 방안(특허 선행조사)']), `로드맵 원문${(mt.page ?? top.page) ? ` p.${mt.page ?? top.page}` : ''}의 개발목표와 대조`, ...confirmPrep(ft), ...prep0].slice(0, 4),

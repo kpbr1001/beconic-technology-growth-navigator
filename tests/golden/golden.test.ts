@@ -2,6 +2,7 @@
 // 규칙·데이터를 바꿔 결과가 달라지면 이 테스트가 실패하고 차이를 보여 준다. 의도한 변경이면 `npm run golden:update` 후 표를 검수한다.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { reportCore } from '../../src/reports/core';
+import { keySummary } from '../../src/reports/keysummary';
 import { setRoadmapIndex, type AppIndex } from '../../src/roadmap/candidates';
 import { CHECK_KEYS } from '../../src/diagnosis/techrank';
 import { GOLDEN } from '../fixtures/golden';
@@ -29,12 +30,15 @@ function render(): string {
   }
   for (const { id, label, c } of rows) {
     out.push('', `## ${label} (${id})`, '');
+    const ks = keySummary(GOLDEN.find((g) => g.id === id)!.input, c, (a) => [a, '', '', '']);
+    out.push(`- 핵심요약: ${ks.headline} [${ks.tiles.map((t) => `${t.label} ${t.head}`).join(' · ')}]`);
     out.push(`- 영역 점수: ${Object.entries(c.r.m).map(([k, v]) => `${k} ${n(v)}`).join(' · ')}`);
     out.push(`- 우선순위: ${c.priorities.map((g) => `${g.priority} ${g.area}(${n(g.score)})`).join(' → ')}`);
     out.push(`- 전략 기준 점수: ${c.options.map((o) => `${o.name.charAt(0)} ${o.score ?? '산정 불가'}${o.recommended ? '★' : ''}`).join(' · ')}`);
     out.push(`- 핵심기술 순위: ${c.ranked.map((x) => `${x.rank}. ${x.tech.name} [${CHECK_KEYS.map((k) => (x.checks[k] === true ? CK[k] : x.checks[k] === null ? '?' : '·')).join('')}]`).join(' / ') || '없음'}`);
     out.push(`- 로드맵 후보: ${c.matches.slice(0, 3).map((m) => `${m.name}${m.code ? ` (${m.code})` : ''}${m.weak ? ' 약함' : ''}`).join(' / ') || '없음'}`);
     for (const card of c.cards) out.push(`- 보완 대조 · ${card.item.name}: ${card.rows.map((r) => `${({ held: '보유', partial: '일부', mentioned: '언급', gap: '보완' } as const)[r.status]}(${r.roadmapTech}${r.company ? `←${r.company.name}` : r.route ? `·${r.route}` : ''})`).join(' / ')}${card.dataGaps.length ? ` · 데이터: ${card.dataGaps.map((d) => d.term).join('·')}` : ''}`);
+    for (const a of c.ready.axes.filter((x) => x.items)) out.push(`- ${a.label} ${a.score ?? '—'}점(${a.status}): ${a.items!.map((x) => `${x.label} ${x.score ?? '확인 필요'}`).join(' · ')}`);
     out.push(`- 신청 준비도: ${c.ready.overall} — ${c.ready.reason} · 바우처 후보: ${c.ready.vouchers.map((v) => v.type).join('·') || '없음'}`);
     out.push(`- 경고: ${c.r.alerts.length ? c.r.alerts.map((a) => a.slice(0, 60)).join(' / ') : '없음'}`);
   }

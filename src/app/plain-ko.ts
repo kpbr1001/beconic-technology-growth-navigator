@@ -1,6 +1,7 @@
 // 쉬운 용어 변환(화면·PDF 공용). 컨설팅 영어 용어를 사용자가 이해하기 쉬운 우리말로 바꾸고,
 // 영어로 전해야 하는 말은 한국어를 함께 적는다. 진단 엔진·저장 데이터는 그대로 두고 '보이는 글자'만 바꾼다.
 // 사용자가 입력 중인 칸(textarea·input)과 data-raw 표시 영역은 바꾸지 않는다.
+import { fixParticles, josa } from '../reports/ko';
 
 type Term = [RegExp, string];
 const W = (s: string) => new RegExp(`(?<![A-Za-z0-9_])${s}(?![A-Za-z0-9_])`, 'g');
@@ -85,14 +86,7 @@ export const TERMS: Term[] = [
   [/(?<![A-Za-z0-9_(])Hit@K·NDCG(?!\))/g, '검색 정확도 지표(Hit@K·NDCG)'],
 ];
 
-/** 받침 유무로 조사 고르기(을/를·이/가·은/는·과/와·으로/로). 한글이 아니면 받침 없음으로 본다 */
-export function josa(word: string, withFinal: string, withoutFinal: string): string {
-  const code = word.trim().charCodeAt(word.trim().length - 1) - 0xac00;
-  const fin = code >= 0 && code < 11172 ? code % 28 : 0;
-  // '으로/로'는 ㄹ 받침(8)도 '로'
-  const has = withFinal === '으로' ? fin !== 0 && fin !== 8 : fin !== 0;
-  return `${word}${has ? withFinal : withoutFinal}`;
-}
+export { josa };
 
 const PAIRS: Record<string, [string, string]> = {
   을: ['을', '를'], 를: ['을', '를'], 이: ['이', '가'], 가: ['이', '가'], 은: ['은', '는'], 는: ['은', '는'],
@@ -110,11 +104,11 @@ const dedupe = (s: string) => s.replace(/(?<![가-힣])([가-힣]{2,4}) \1(?![�
 
 /** 문자열 하나 변환(멱등) */
 export function plainKo(text: string): string {
-  if (!/[A-Za-z]/.test(text)) return text;
+  if (!/[A-Za-z]/.test(text)) return fixParticles(text);
   let out = text;
   for (const [re, to] of TERMS) out = out.replace(re, (...a) => `${to.replace(/\$(\d)/g, (_m, n: string) => String(a[Number(n)] ?? ''))}${MARK}`);
-  if (out.indexOf(MARK) < 0) return text;
-  return dedupe(fixJosa(out));
+  if (out.indexOf(MARK) < 0) return fixParticles(text);
+  return fixParticles(dedupe(fixJosa(out)));
 }
 
 const SKIP = new Set(['TEXTAREA', 'INPUT', 'SCRIPT', 'STYLE', 'CODE', 'OPTION']);

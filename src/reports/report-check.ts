@@ -2,6 +2,8 @@
 // 화면에 그려진 결과를 그대로 읽으므로, 계산은 맞는데 표시가 어긋나는 경우(예: 요약 최우선 과제 ≠ 90일 계획 P0)도 잡는다.
 // 표식: data-ck(단일 값), data-ckrow(표의 행), section[data-sec](쪽).
 
+import { ITEM_PASS, ITEM_WARN } from './readiness';
+
 export interface CheckResult {
   id: string;
   label: string;
@@ -133,6 +135,39 @@ export function checkReport(root: ParentNode): CheckResult[] {
     const ids = new Set(risk.map((r) => r.dataset.id));
     const bad = rows(root, 'voucher').map((r) => r.dataset.risk).filter((id) => id && !ids.has(id));
     add('voucher-risk', '바우처 근거 리스크 = 레드팀 표', !bad.length, bad.join(', '));
+  }
+  // 17·18. 신청 준비도 세부 항목: 레이더 점수 = 표 점수, 관점 판정·점수 = 항목 판정 규칙
+  const items = rows(root, 'item');
+  if (items.length) {
+    const radarItems = Array.from(root.querySelectorAll<SVGTextElement>('[data-ckitem]'));
+    const fromTable = items.map((r) => `${r.dataset.label}:${r.dataset.score || '확인 필요'}`).join(' ');
+    const fromRadar = radarItems.map((t) => `${t.getAttribute('data-ckitem')}:${t.textContent?.trim()}`).join(' ');
+    add('item-radar', '세부 항목 레이더 점수 = 표 점수', fromTable === fromRadar, fromTable === fromRadar ? '' : `${fromRadar}  ≠  ${fromTable}`);
+    const bad: string[] = [];
+    for (const axis of rows(root, 'axis').filter((a) => items.some((r) => r.dataset.axis === a.dataset.label))) {
+      const its = items.filter((r) => r.dataset.axis === axis.dataset.label);
+      const sc = its.map((r) => (r.dataset.score ? Number(r.dataset.score) : null)).filter((x): x is number => x !== null);
+      const avg = sc.length ? Math.round(sc.reduce((a, b) => a + b, 0) / sc.length) : null;
+      const st = (r: HTMLElement) => r.dataset.status;
+      const gate = its.some((r) => r.dataset.gate && (st(r) === '미흡' || (r.dataset.gatenull && st(r) === '확인 필요')));
+      const expected = gate ? '미흡' : sc.length < 3 ? '확인 필요' : avg !== null && avg < ITEM_WARN ? '미흡' : avg !== null && avg >= ITEM_PASS && !its.some((r) => st(r) === '보완' || st(r) === '미흡') ? '충족' : '보완';
+      if (axis.dataset.status !== expected || String(avg ?? '') !== (axis.dataset.score ?? '')) bad.push(`${axis.dataset.label} 표시 ${axis.dataset.status}·${axis.dataset.score} ≠ 규칙 ${expected}·${avg}`);
+    }
+    add('item-axis', '관점 판정·점수 = 세부 항목 판정 규칙', !bad.length, bad.join(' / '));
+  }
+  // 21. 핵심요약 = 본문(최우선 과제·핵심기술 1위·신청 준비도·'높음' 리스크 수)
+  const key = one(root, 'key');
+  if (key) {
+    const bad: string[] = [];
+    const k = key.dataset;
+    if (sum && k.p0area && (k.p0area !== sum.dataset.p0area || k.p0act !== sum.dataset.p0act)) bad.push(`최우선 과제 '${k.p0area}·${k.p0act}' ≠ 경영진 요약 '${sum.dataset.p0area}·${sum.dataset.p0act}'`);
+    if (acts.length && k.p0area && k.p0act !== acts[0].dataset.act) bad.push(`최우선 과제 '${k.p0act}' ≠ 90일 계획 '${acts[0].dataset.act}'`);
+    if ((k.toptech ?? '') !== (rank[0]?.dataset.tech ?? '')) bad.push(`핵심기술 '${k.toptech}' ≠ 표 1위 '${rank[0]?.dataset.tech ?? ''}'`);
+    if (ready && k.ready !== ready.dataset.overall) bad.push(`신청 준비도 '${k.ready}' ≠ 본문 '${ready.dataset.overall}'`);
+    if (rc && Number(k.high) !== risk.filter((r) => r.dataset.grade === '높음').length) bad.push(`'높음' 리스크 ${k.high} ≠ 표 ${risk.filter((r) => r.dataset.grade === '높음').length}`);
+    const tile = (key2: string) => txt(key.querySelector(`[data-key="${key2}"] b`));
+    if (k.cap && !tile('position').includes(`${k.cap}점`)) bad.push(`위치 카드 '${tile('position')}'에 역량 ${k.cap}점 없음`);
+    add('key-summary', '핵심요약 = 본문(최우선 과제·핵심기술·준비도·리스크)', !bad.length, bad.join(' / '));
   }
   // 14. 깨진 값·미치환 표식
   const all = txt(root as Element);

@@ -22,7 +22,7 @@ describe('리스크 레지스터', () => {
   it('응답 1~2 → 가능성 높음, 3 → 중간, 4~5 → 낮음 / 등급 = 가능성×영향', () => {
     const rt = run();
     expect(byId(rt, 'R2')).toMatchObject({ likelihood: 3, impact: 3, severity: 9, grade: '높음' });
-    expect(byId(rt, 'R2')!.basis).toContain('Q9 2/5');
+    expect(byId(rt, 'R2')!.basis).toContain("'외부 의존·대체방안' 2/5");
     expect(byId(rt, 'R2')!.basis).toContain('입력: "클라우드 API"');
     expect(byId(rt, 'R6')).toMatchObject({ likelihood: 2, impact: 2, grade: '중간' });
     expect(byId(rt, 'R7')).toMatchObject({ likelihood: 1, impact: 2, grade: '낮음' });
@@ -30,7 +30,7 @@ describe('리스크 레지스터', () => {
   });
   it("'모름'은 낮은 점수가 아니라 확인 필요(가능성 미판단)", () => {
     expect(byId(run(), 'R4')).toMatchObject({ likelihood: null, severity: null, grade: '확인 필요' });
-    expect(byId(run(), 'R4')!.basis).toContain('Q10 모름·미응답');
+    expect(byId(run(), 'R4')!.basis).toContain("'인증·보안 요건 확인' 모름·미응답");
   });
   it('높게 응답했지만 근거가 말뿐이면 가능성을 한 단계 높여 봄', () => {
     const rt = run({ answers: { ...base.answers, q12: 5 }, evidence: { ...base.evidence, q12: 0 } });
@@ -62,7 +62,7 @@ describe('진단 검토(이 진단이 틀릴 수 있는 지점)', () => {
   it('근거 없는 높은 응답·모름·TRL 미확인·오차 범위·단일 응답자', () => {
     const titles = run().diagnostic.map((d) => d.title);
     expect(titles).toEqual(expect.arrayContaining(['근거 없는 높은 응답', '모름·미응답', '핵심기술 TRL 미확인', '점수 오차 범위', '단일 응답자 관점']));
-    expect(run().diagnostic.find((d) => d.title === '근거 없는 높은 응답')!.detail).toContain('Q1');
+    expect(run().diagnostic.find((d) => d.title === '근거 없는 높은 응답')!.detail).toContain("'핵심 기능 구현' 문항이");
     expect(titles.at(-1)).toBe('단일 응답자 관점');
   });
   it("근거 확인 단계에서 묻지 않은 문항은 '말로만 설명'으로 보지 않음", () => {
@@ -70,7 +70,8 @@ describe('진단 검토(이 진단이 틀릴 수 있는 지점)', () => {
     expect(byId(rt, 'R10')).toMatchObject({ likelihood: 1 });
     expect(byId(rt, 'R10')!.basis).toContain('근거 미확인');
     const d = rt.diagnostic.find((x) => x.title === '근거 미확인 높은 응답');
-    expect(d?.detail).toContain('Q12');
+    expect(d?.detail).toContain("'모방 어려운 차별 요소'");
+    expect(d?.detail).not.toMatch(/\bQ\d/);
     expect(rt.diagnostic.find((x) => x.title === '근거 없는 높은 응답')).toBeUndefined();
   });
 });

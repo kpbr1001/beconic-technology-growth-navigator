@@ -46,14 +46,14 @@ describe('개인화 문구', () => {
     const ans = { q7: 2, q8: null, q11: 5, q2: 4 };
     const evName = (id: string) => (id === 'q11' ? '말로만 설명' : '내부 자료');
     const evRank = (id: string) => (id === 'q11' ? 0 : 2);
-    expect(areaDrivers('scale', CORE, ans, evName, evRank).map((d) => d.text)).toEqual(["Q7 확장 시 품질 유지: 2/5 '병목 일부 인지' · 근거 '내부 자료'"]);
+    expect(areaDrivers('scale', CORE, ans, evName, evRank).map((d) => d.text)).toEqual(["'확장 시 품질 유지' 문항: 2/5 '병목 일부 인지' · 근거 '내부 자료'"]);
     expect(areaDrivers('strategy', CORE, ans, evName, evRank).map((d) => d.kind)).toEqual(['unknown', 'weak_evidence']);
     const all = confirmQuestions(CORE, ans, evName, evRank, ['TRL 대조: 실증한 기술을 확인하세요.'], ctx.techs, 30);
     // 핵심 문항 먼저, 미응답과 '모름'을 구분
-    expect(all[0]).toBe("Q1 '핵심 기능 구현' 문항을 응답하지 않았습니다. 누가 확인할 수 있고, 어떤 자료가 있습니까?");
-    expect(all).toContain("Q8 '1~3년 핵심기술 정의' 문항을 '모름'으로 답했습니다. 누가 확인할 수 있고, 어떤 자료가 있습니까?");
+    expect(all[0]).toBe("'핵심 기능 구현' 문항을 응답하지 않았습니다. 누가 확인할 수 있고, 어떤 자료가 있습니까?");
+    expect(all).toContain("'1~3년 핵심기술 정의' 문항을 '모름'으로 답했습니다. 누가 확인할 수 있고, 어떤 자료가 있습니까?");
     expect(all).toContain('실증한 기술을 확인하세요.');
-    expect(all).toContain("Q11 '로드맵 연관성 설명' 문항을 5/5로 답했지만 근거가 '말로만 설명'입니다. 다시 확인할 수 있는 기록은 무엇입니까?");
+    expect(all).toContain("'로드맵 연관성 설명' 문항을 5/5로 답했지만 근거가 '말로만 설명'입니다. 다시 확인할 수 있는 기록은 무엇입니까?");
     expect(all).toContain("핵심기술 '데이터 정규화'의 TRL 3은 어떤 시험·실증 결과로 확인했습니까?");
     expect(confirmQuestions(CORE, ans, evName, evRank, [], ctx.techs)).toHaveLength(4);
   });

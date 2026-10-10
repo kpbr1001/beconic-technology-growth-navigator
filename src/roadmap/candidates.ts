@@ -85,6 +85,32 @@ export function setRoadmapIndex(ix: AppIndex | null) {
   INDEX = ix;
 }
 
+export interface KbSource {
+  /** 문서 이름(분야별 일반 로드맵은 분야명을 뺀 묶음 이름) */
+  doc: string;
+  edition: string;
+  /** 이 문서 묶음의 분야 수와 색인 품목 수 */
+  fields: string[];
+  items: number;
+  /** 이전 판(대조용) — 후보 추천에는 쓰지 않음 */
+  legacy: boolean;
+}
+/** 보고서 부록 '현재 Knowledge Base': 고정 문구 대신 앱에 실린 원문 색인에서 만든다(색인 미로드면 빈 목록) */
+export function kbSources(): KbSource[] {
+  if (!INDEX) return [];
+  const by = new Map<string, KbSource>();
+  for (const [name, f] of Object.entries(INDEX.fields)) {
+    const doc = f.doc.replace(/\s*「[^」]*」\s*$/, '').trim();
+    const key = `${f.collection}|${doc}`;
+    const cur = by.get(key) ?? { doc, edition: f.edition, fields: [], items: 0, legacy: f.collection === '2025-2027_general' };
+    cur.fields.push(name);
+    cur.items += f.items.length;
+    by.set(key, cur);
+  }
+  return [...by.values()];
+}
+export const kbVersion = () => INDEX?.kb_version ?? null;
+
 const itemText = (i: AppItem) => `${i.name} ${i.techs.map((t) => t[0]).join(' ')}`.toLowerCase();
 const DF = new WeakMap<AppField, Map<string, number>>();
 

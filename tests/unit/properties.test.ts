@@ -211,3 +211,36 @@ describe('논리 검증 — 지원사업 신청 준비도', () => {
   });
 });
 
+describe('논리 검증 — 신청 준비도 세부 항목', () => {
+  beforeAll(() => setRoadmapIndex(raw as unknown as AppIndex));
+  afterAll(() => setRoadmapIndex(null));
+  it('응답을 올리면 해당 세부 항목 점수가 내려가지 않음(연구 자원 Q3·차별성 Q12·핵심 기능 Q1)', () => {
+    const at = (inp: AssessmentInput, axis: number, key: string) => reportCore(inp).ready.axes[axis].items?.find((x) => x.key === key)?.score ?? null;
+    for (const inp of cases.slice(0, 80)) {
+      if (reportCore(inp).r.insufficient) continue;
+      for (const [id, axis, key] of [['q3', 1, 'res'], ['q12', 0, 'diff'], ['q1', 0, 'impl']] as const) {
+        const v = inp.answers[id];
+        if (typeof v !== 'number' || v === 5) continue;
+        const a = at(inp, axis, key), b = at({ ...inp, answers: { ...inp.answers, [id]: v + 1 } }, axis, key);
+        if (a !== null && b !== null) expect(b).toBeGreaterThanOrEqual(a);
+      }
+    }
+  });
+  it('관점 판정은 항목 규칙과 일치하고, 충족 관점에는 보완·미흡 항목이 없음', () => {
+    for (const inp of cases.slice(0, 150)) {
+      for (const a of reportCore(inp).ready.axes.filter((x) => x.items)) {
+        if (a.status === '충족') expect(a.items!.every((x) => x.status === '충족' || x.status === '확인 필요')).toBe(true);
+        if (a.items!.some((x) => x.gate && x.status === '미흡')) expect(a.status).toBe('미흡');
+        for (const x of a.items!) if (x.score !== null) expect(x.score >= 0 && x.score <= 100).toBe(true);
+      }
+    }
+  });
+  it('연구전담조직을 입력하면 조직·인력 항목이 확인 필요에서 점수로 바뀌고, 연구소 > 전담부서 > 없음', () => {
+    const inp = cases.find((c) => !reportCore(c).r.insufficient)!;
+    const org = (lab: '연구소' | '전담부서' | '없음') => reportCore({ ...inp, company: { ...inp.company, elig: { lab } } }).ready.axes[1].items!.find((x) => x.key === 'org')!.score!;
+    expect(reportCore(inp).ready.axes[1].items!.find((x) => x.key === 'org')!.score).toBeNull();
+    expect(org('연구소')).toBeGreaterThan(org('전담부서'));
+    expect(org('전담부서')).toBeGreaterThan(org('없음'));
+  });
+});
+
