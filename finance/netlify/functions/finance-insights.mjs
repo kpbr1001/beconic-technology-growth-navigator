@@ -5,6 +5,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { getStore } from '@netlify/blobs';
 import { z } from 'zod';
+import { createHash, timingSafeEqual } from 'node:crypto';
 
 export const config = { path: '/api/finance-insights' };
 
@@ -98,80 +99,100 @@ const SYSTEM = `당신은 한국 중소기업 재무 진단을 돕는 분석 보
 function clientIp(req, context) {
   return context?.ip || req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
 }
+const ipKeyOf = (ip) => String(ip).replace(/[^0-9a-fA-F:.]/g, '').slice(0, 45) || 'unknown';
+const FAIL_LIMIT = 20; // 같은 IP의 하루 이용 코드 오입력 허용 횟수(무차별 대입 방지)
 
-async function takeQuota(ip) {
-  // Netlify Blobs 기반 일일 카운터 (동시 요청 시 소폭 초과 가능 — 예산 상한은 Anthropic 콘솔 한도와 함께 운영)
-  const store = getStore('finance-ai-usage');
-  const day = new Date().toISOString().slice(0, 10);
-  const key = `${day}`;
-  const usage = (await store.get(key, { type: 'json' })) || { total: 0, ip: {} };
-  if (usage.total >= DAILY_LIMIT) return { ok: false, error: '오늘의 AI 사용량 한도에 도달했습니다. 내일 다시 시도하세요.' };
-  const ipKey = ip.replace(/[^0-9a-fA-F:.]/g, '').slice(0, 45);
-  if ((usage.ip[ipKey] || 0) >= IP_LIMIT) return { ok: false, error: '이 네트워크의 오늘 AI 요청 한도를 넘었습니다.' };
-  usage.total += 1;
-  usage.ip[ipKey] = (usage.ip[ipKey] || 0) + 1;
-  await store.setJSON(key, usage);
-  return { ok: true };
+// 이용 코드 비교: 길이·내용과 무관하게 같은 시간이 걸리도록 해시 후 timingSafeEqual
+function sameCode(given, expected) {
+  const a = createHash('sha256').update(String(given ?? '')).digest();
+  const b = createHash('sha256').update(String(expected)).digest();
+  return timingSafeEqual(a, b);
 }
 
-export default async (req, context) => {
-  if (req.method !== 'POST') return json(405, { error: 'POST 요청만 가능합니다.' });
-  if (process.env.BECONIC_AI_ENABLED !== 'true') return json(503, { error: 'AI 기능이 꺼져 있습니다(운영자 설정 필요).' });
-  if (!process.env.ANTHROPIC_API_KEY) return json(503, { error: '서버에 API 키가 설정되지 않았습니다.' });
-  const code = process.env.BECONIC_ACCESS_CODE;
-  if (!code || code.length < 8) return json(503, { error: '승인 코드가 설정되지 않아 AI 기능을 열 수 없습니다.' });
-  if (req.headers.get('x-beconic-access') !== code) return json(401, { error: '이용 코드가 올바르지 않습니다.' });
-  const origin = req.headers.get('origin');
-  if (origin && process.env.URL && origin !== process.env.URL && origin !== process.env.DEPLOY_PRIME_URL) return json(403, { error: '허용되지 않은 출처입니다.' });
-
-  const raw = await req.text();
-  if (raw.length > MAX_BODY) return json(413, { error: '요청이 너무 큽니다.' });
-  let input;
-  try {
-    input = Input.parse(JSON.parse(raw));
-  } catch {
-    return json(422, { error: '검증된 요약 지표 형식이 아닙니다.' });
+// 의존성 주입(테스트에서 저장소·클라이언트를 바꿔 끼움). 운영은 Netlify Blobs + Anthropic SDK.
+export function createHandler({ store: storeFactory = () => getStore('finance-ai-usage'), client: clientFactory = () => new Anthropic({ timeout: 55_000, maxRetries: 1 }), today = () => new Date().toISOString().slice(0, 10) } = {}) {
+  async function usage(store) {
+    return (await store.get(today(), { type: 'json' })) || { total: 0, ip: {}, fail: {} };
   }
+  return async (req, context) => {
+    if (req.method !== 'POST') return json(405, { error: 'POST 요청만 가능합니다.' });
+    if (process.env.BECONIC_AI_ENABLED !== 'true') return json(503, { error: 'AI 기능이 꺼져 있습니다(운영자 설정 필요).' });
+    if (!process.env.ANTHROPIC_API_KEY) return json(503, { error: '서버에 API 키가 설정되지 않았습니다.' });
+    const code = process.env.BECONIC_ACCESS_CODE;
+    if (!code || code.length < 8) return json(503, { error: '승인 코드가 설정되지 않아 AI 기능을 열 수 없습니다.' });
+    const origin = req.headers.get('origin');
+    if (origin && process.env.URL && origin !== process.env.URL && origin !== process.env.DEPLOY_PRIME_URL) return json(403, { error: '허용되지 않은 출처입니다.' });
 
-  try {
-    const q = await takeQuota(clientIp(req, context));
-    if (!q.ok) return json(429, { error: q.error });
-  } catch {
-    return json(503, { error: '사용량 확인 저장소에 접근할 수 없어 요청을 막았습니다.' });
-  }
+    const ipKey = ipKeyOf(clientIp(req, context));
+    let store, u;
+    try {
+      store = storeFactory();
+      u = await usage(store);
+      u.fail = u.fail || {};
+    } catch {
+      return json(503, { error: '사용량 확인 저장소에 접근할 수 없어 요청을 막았습니다.' });
+    }
+    if ((u.fail[ipKey] || 0) >= FAIL_LIMIT) return json(429, { error: '이용 코드 오류가 많아 오늘은 요청을 막았습니다.' });
+    if (!sameCode(req.headers.get('x-beconic-access'), code)) {
+      u.fail[ipKey] = (u.fail[ipKey] || 0) + 1;
+      try { await store.setJSON(today(), u); } catch { /* 카운터 저장 실패는 응답에 영향 없음 */ }
+      return json(401, { error: '이용 코드가 올바르지 않습니다.' });
+    }
 
-  const client = new Anthropic({ timeout: 55_000, maxRetries: 1 });
-  let response;
-  try {
-    response = await client.beta.messages.create({
-      model: MODEL,
-      max_tokens: 6000,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
-      output_config: { effort: 'medium', format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
-      system: SYSTEM,
-      messages: [{ role: 'user', content: `다음 검증된 재무 요약으로 개선처방 초안을 작성하세요.\n\n${JSON.stringify(input)}` }],
-    });
-  } catch (err) {
-    if (err instanceof Anthropic.RateLimitError) return json(429, { error: 'AI 제공자 요청 한도에 걸렸습니다. 잠시 후 다시 시도하세요.' });
-    if (err instanceof Anthropic.APIConnectionTimeoutError) return json(504, { error: 'AI 응답 시간이 초과되었습니다.' });
-    if (err instanceof Anthropic.APIError) return json(502, { error: `AI 제공자 오류(${err.status ?? '연결'})` });
-    return json(502, { error: 'AI 요청 중 오류가 발생했습니다.' });
-  }
+    const raw = await req.text();
+    if (raw.length > MAX_BODY) return json(413, { error: '요청이 너무 큽니다.' });
+    let input;
+    try {
+      input = Input.parse(JSON.parse(raw));
+    } catch {
+      return json(422, { error: '검증된 요약 지표 형식이 아닙니다.' });
+    }
 
-  if (response.stop_reason === 'refusal') return json(422, { error: 'AI가 이 요청에 답하지 않았습니다. 결정론 분석 결과를 사용하세요.' });
-  if (response.stop_reason === 'max_tokens') return json(502, { error: 'AI 응답이 길이 제한으로 잘렸습니다. 다시 시도하세요.' });
-  const text = response.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
-  let result;
-  try {
-    result = Output.parse(JSON.parse(text));
-  } catch {
-    return json(502, { error: 'AI 응답 형식 검증에 실패했습니다.' });
-  }
-  const ids = new Set(input.findings.map((f) => f.id));
-  result.risks = result.risks.map((r) => ({ ...r, findingIds: r.findingIds.filter((id) => ids.has(id)) }));
-  const flat = JSON.stringify(result);
-  if (FORBID.test(flat)) return json(422, { error: '근거 없는 등급·확률·업종 평균 표현이 포함되어 응답을 차단했습니다.' });
+    // 사용량 한도(예산 보호) — 동시 요청 시 소폭 초과 가능, Anthropic 콘솔 월 한도와 함께 운영
+    if (u.total >= DAILY_LIMIT) return json(429, { error: '오늘의 AI 사용량 한도에 도달했습니다. 내일 다시 시도하세요.' });
+    if ((u.ip[ipKey] || 0) >= IP_LIMIT) return json(429, { error: '이 네트워크의 오늘 AI 요청 한도를 넘었습니다.' });
+    u.total += 1;
+    u.ip[ipKey] = (u.ip[ipKey] || 0) + 1;
+    try {
+      await store.setJSON(today(), u);
+    } catch {
+      return json(503, { error: '사용량 확인 저장소에 접근할 수 없어 요청을 막았습니다.' });
+    }
 
-  return json(200, { result, model: response.model, notice: 'AI 작성 초안입니다. 경영진 또는 전문가 검토가 필요합니다.' });
-};
+    let response;
+    try {
+      response = await clientFactory().beta.messages.create({
+        model: MODEL,
+        max_tokens: 6000,
+        betas: ['server-side-fallback-2026-07-01'],
+        fallbacks: 'default',
+        output_config: { effort: 'medium', format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
+        system: SYSTEM,
+        messages: [{ role: 'user', content: `다음 검증된 재무 요약으로 개선처방 초안을 작성하세요.\n\n${JSON.stringify(input)}` }],
+      });
+    } catch (err) {
+      if (err instanceof Anthropic.RateLimitError) return json(429, { error: 'AI 제공자 요청 한도에 걸렸습니다. 잠시 후 다시 시도하세요.' });
+      if (err instanceof Anthropic.APIConnectionTimeoutError) return json(504, { error: 'AI 응답 시간이 초과되었습니다.' });
+      if (err instanceof Anthropic.AuthenticationError) return json(502, { error: 'AI 제공자 인증 실패(서버 키 확인 필요)' });
+      if (err instanceof Anthropic.APIError) return json(502, { error: `AI 제공자 오류(${err.status ?? '연결'})` });
+      return json(502, { error: 'AI 요청 중 오류가 발생했습니다.' });
+    }
+
+    if (response.stop_reason === 'refusal') return json(422, { error: 'AI가 이 요청에 답하지 않았습니다. 결정론 분석 결과를 사용하세요.' });
+    if (response.stop_reason === 'max_tokens') return json(502, { error: 'AI 응답이 길이 제한으로 잘렸습니다. 다시 시도하세요.' });
+    const text = response.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
+    let result;
+    try {
+      result = Output.parse(JSON.parse(text));
+    } catch {
+      return json(502, { error: 'AI 응답 형식 검증에 실패했습니다.' });
+    }
+    const ids = new Set(input.findings.map((f) => f.id));
+    result.risks = result.risks.map((r) => ({ ...r, findingIds: r.findingIds.filter((id) => ids.has(id)) }));
+    if (FORBID.test(JSON.stringify(result))) return json(422, { error: '근거 없는 등급·확률·업종 평균 표현이 포함되어 응답을 차단했습니다.' });
+
+    return json(200, { result, model: response.model, notice: 'AI 작성 초안입니다. 경영진 또는 전문가 검토가 필요합니다.' });
+  };
+}
+
+export default createHandler();

@@ -3,9 +3,10 @@
 # Netlify 사이트 설정에서 Base directory 를 `finance` 로 지정하면 이 파일이 적용됩니다.
 # 화면은 index.html 하나(정적), AI 해석만 서버 함수(/api/finance-insights)를 거칩니다.
 
+# 공개 파일만 dist/ 로 복사해 배포한다(서버 함수 소스·문서·테스트·설정 파일은 공개 URL에 올리지 않음).
 [build]
-  publish = "."
-  command = "echo 'static site — no build step'"
+  publish = "dist"
+  command = "npm run build"
 
 [build.environment]
   NODE_VERSION = "22"
