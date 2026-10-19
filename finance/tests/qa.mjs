@@ -76,6 +76,7 @@ const noBadNumbers = async () => { const t = await page.locator('#app').innerTex
   const ptxt = execFileSync('pdftotext', ['-layout', path.join(OUT, 'report-sample.pdf'), '-']).toString();
   check('보고서에 가상 데이터 경고 표기', ptxt.includes('가상 데이터'));
   check('보고서에 공식 신용평가서 아님 표기', ptxt.includes('공식 기업신용평가서 아님') || ptxt.includes('공식 기업신용평가서·'));
+  check('보고서에 대시보드(카드·차트) 페이지 포함', ptxt.includes('핵심 지표 대시보드') && ptxt.includes('비율 추이') && ptxt.includes('이익률 추이'));
   check('보고서 NaN/undefined 없음', !/NaN|undefined|Infinity/.test(ptxt));
   execFileSync('pdftoppm', ['-r', '50', '-png', '-f', '1', '-l', '4', path.join(OUT, 'report-sample.pdf'), path.join(OUT, 'report-p')]);
   await page.evaluate(() => { document.querySelector('#report').innerHTML = ''; });

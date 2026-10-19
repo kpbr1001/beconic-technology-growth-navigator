@@ -1,4 +1,4 @@
-# BECONIC 기업 재무진단 (v1.1.3)
+# BECONIC 기업 재무진단 (v1.1.4)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-diagnosis-finance.netlify.app

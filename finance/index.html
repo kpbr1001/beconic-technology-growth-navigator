@@ -336,6 +336,26 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
   .cover .meta dt{color:#5F7290}.cover .meta dd{margin:0;font-weight:700}
   .wm{border:1pt dashed #E58D00;color:#8A5A00;background:#FFF6E2;padding:2mm 3mm;border-radius:2mm;font-weight:800;font-size:9pt;margin:2mm 0}
   .small{font-size:7.8pt;color:#5F7290}
+  .rp .info{display:none!important}
+  .rp .kpis{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:2.4mm;margin-top:2.5mm}
+  .rp .kpis.sm{grid-template-columns:repeat(5,1fr)!important}
+  .rp .kpi{padding:2.4mm 3mm;border-radius:2.5mm;border:.6pt solid #C9D6E6;break-inside:avoid;box-shadow:none}
+  .rp .kpi .lb{font-size:7.8pt}
+  .rp .kpi .v{font-size:15pt;margin:1mm 0 .5mm}
+  .rp .kpis.sm .kpi .v{font-size:11.5pt}
+  .rp .kpi.na .v{font-size:10.5pt}
+  .rp .kpi .v small{font-size:7.5pt}
+  .rp .kpi .dl{font-size:6.8pt;min-height:0}
+  .rp .kpi svg{width:100%;height:auto;max-height:19mm;display:block;margin-top:1mm}
+  .rp .charts{display:grid!important;grid-template-columns:1fr 1fr!important;gap:3mm;margin-top:3.5mm}
+  .rp .chart{padding:2.5mm 3mm;border:.6pt solid #DDE6F1;border-radius:3mm;break-inside:avoid}
+  .rp .chart h3{font-size:9pt;margin:0}
+  .rp .chart .cs,.rp .chart .hint{font-size:6.6pt;color:#5F7290}
+  .rp .chart svg{width:100%;height:auto;max-height:58mm;margin-top:1mm}
+  .rp .multiples{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:1.5mm}
+  .rp .multiples .mini{padding:1mm 1.2mm;border:.5pt solid #EDF2F8;border-radius:2mm}
+  .rp .multiples .mini b{font-size:7pt}
+  .rp .legend{gap:3mm}
   .legend{font-size:7.6pt}
 }
 </style>
@@ -603,7 +623,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 /* ═══════════════ BECONIC 기업 재무진단 v1.0 — 단일 HTML ═══════════════
    원칙: 실제 입력값만 계산 · 미입력은 0이 아닌 null · 임의 업종평균/등급/점수 생성 금지
    계산은 이 파일의 결정론 코드가 하고, AI는 검증된 요약수치에 대한 문장 초안만 작성한다. */
-const APP={name:'BECONIC 기업 재무진단',version:'1.1.3',updated:'2026-10-19',url:'https://beconic-diagnosis-finance.netlify.app'};
+const APP={name:'BECONIC 기업 재무진단',version:'1.1.4',updated:'2026-10-19',url:'https://beconic-diagnosis-finance.netlify.app'};
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1218,13 +1238,15 @@ function niceScale(min,max){min=Math.min(0,min);max=Math.max(0,max);if(min===max
 function barChart({cats,series,fmt,unit,w=560,h=250,tipUnit}){
   const vals=series.flatMap(s=>s.vals).filter(v=>v!=null);
   if(!vals.length)return `<svg viewBox="0 0 ${w} 120" role="img" aria-label="자료 없음"><text x="${w/2}" y="64" text-anchor="middle" fill="#8A9AB0" font-size="14">입력값 없음</text></svg>`;
-  const sc=niceScale(Math.min(...vals),Math.max(...vals));const L=56,R=10,T=22,B=30;const ih=h-T-B,iw=w-L-R;
+  const sc=niceScale(Math.min(...vals),Math.max(...vals));const L=56,R=10,T=22,B=30+(Math.min(...vals)<0?14:0);const ih=h-T-B,iw=w-L-R;
   const y=v=>T+ih-(v-sc.min)/(sc.max-sc.min)*ih;const gw=iw/cats.length;const bw=Math.min(34,(gw-24)/series.length-4);
   let g='';for(let t=sc.min;t<=sc.max+1e-9;t+=sc.step){g+=`<line x1="${L}" x2="${w-R}" y1="${y(t)}" y2="${y(t)}" stroke="${Math.abs(t)<1e-9?'#9FB0C6':'#E8EEF5'}" stroke-width="${Math.abs(t)<1e-9?1.2:1}"/><text x="${L-8}" y="${y(t)+4}" text-anchor="end" font-size="11" fill="#6A7A90">${nf(t,sc.step<1?1:0)}</text>`}
-  let bars='';
-  cats.forEach((c,ci)=>{const x0=L+gw*ci+(gw-(bw+4)*series.length+4)/2;series.forEach((s,si)=>{const v=s.vals[ci];const x=x0+si*(bw+4);if(v==null){bars+=`<text x="${x+bw/2}" y="${y(0)-4}" text-anchor="middle" font-size="10" fill="#A3B1C4">—</text>`;return}const y0=y(0),yv=y(v);const top=Math.min(y0,yv),hh=Math.max(1.5,Math.abs(yv-y0));const r=Math.min(4,bw/2);
+  let bars='';const fs=bw<26?9.5:10.5;
+  cats.forEach((c,ci)=>{const x0=L+gw*ci+(gw-(bw+4)*series.length+4)/2;let prevLy=null;series.forEach((s,si)=>{const v=s.vals[ci];const x=x0+si*(bw+4);if(v==null){bars+=`<text x="${x+bw/2}" y="${y(0)-4}" text-anchor="middle" font-size="10" fill="#A3B1C4">—</text>`;return}const y0=y(0),yv=y(v);const top=Math.min(y0,yv),hh=Math.max(1.5,Math.abs(yv-y0));const r=Math.min(4,bw/2);
     const path=v>=0?`M${x},${top+hh}V${top+r}Q${x},${top} ${x+r},${top}H${x+bw-r}Q${x+bw},${top} ${x+bw},${top+r}V${top+hh}Z`:`M${x},${top}V${top+hh-r}Q${x},${top+hh} ${x+r},${top+hh}H${x+bw-r}Q${x+bw},${top+hh} ${x+bw},${top+hh-r}V${top}Z`;
-    bars+=`<path d="${path}" fill="${s.color}" data-tip="${esc(c+' · '+s.name+'\n'+fmt(v)+(tipUnit||''))}"/><text x="${x+bw/2}" y="${v>=0?top-5:top+hh+12}" text-anchor="middle" font-size="10.5" fill="#3C5170" class="num">${fmt(v)}</text>`})});
+    // 이웃 막대의 값 라벨이 겹치면(세로 12px 이내) 한 줄 더 띄운다
+    let ly=v>=0?top-5:top+hh+12;if(prevLy!=null&&Math.abs(ly-prevLy)<12)ly=v>=0?prevLy-12:prevLy+12;prevLy=ly;
+    bars+=`<path d="${path}" fill="${s.color}" data-tip="${esc(c+' · '+s.name+'\n'+fmt(v)+(tipUnit||''))}"/><text x="${x+bw/2}" y="${ly}" text-anchor="middle" font-size="${fs}" fill="#3C5170" class="num">${fmt(v)}</text>`})});
   const xl=cats.map((c,ci)=>`<text x="${L+gw*ci+gw/2}" y="${h-8}" text-anchor="middle" font-size="12" fill="#3C5170" font-weight="700">${esc(c)}</text>`).join('');
   return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(series.map(s=>s.name).join(', '))} 막대 차트 (단위 ${esc(unit)})"><text x="${L-8}" y="12" text-anchor="end" font-size="10.5" fill="#6A7A90">(${esc(unit)})</text>${g}${bars}${xl}</svg>`;
 }
@@ -1232,11 +1254,15 @@ function lineMini({cats,vals,fmt,color='#1E5FD6',w=240,h=120,name,u}){
   const pts=vals.map((v,i)=>({v,i})).filter(p=>p.v!=null);
   if(!pts.length)return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(name)} 자료 없음"><text x="${w/2}" y="${h/2}" text-anchor="middle" fill="#A3B1C4" font-size="12">산출 불가 / 입력 없음</text></svg>`;
   const mn=Math.min(...pts.map(p=>p.v)),mx=Math.max(...pts.map(p=>p.v));const pad=(mx-mn)*.25||Math.abs(mx)*.2||1;const lo=Math.min(mn-pad,u==='%'&&mn>=0?Math.max(0,mn-pad):mn-pad),hi=mx+pad;
-  const L=8,R=8,T=22,B=22;const x=i=>L+(w-L-R)*(i+.5)/cats.length;const y=v=>T+(h-T-B)*(1-(v-lo)/(hi-lo));
+  const L=24,R=24,T=22,B=34;const x=i=>L+(w-L-R)*(i+.5)/cats.length;const y=v=>T+(h-T-B)*(1-(v-lo)/(hi-lo));
   let path='';pts.forEach((p,j)=>{path+=(j&&pts[j-1].i===p.i-1?'L':'M')+x(p.i)+','+y(p.v)});
-  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(name)} 3개년 추이"><path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>${pts.map(p=>`<circle cx="${x(p.i)}" cy="${y(p.v)}" r="4.5" fill="${color}" stroke="#fff" stroke-width="2" data-tip="${esc(cats[p.i]+' · '+name+'\n'+fmt(p.v))}"/><text x="${x(p.i)}" y="${y(p.v)-9}" text-anchor="middle" font-size="11" font-weight="700" fill="#10284C" class="num">${fmt(p.v)}</text>`).join('')}${cats.map((c,i)=>`<text x="${x(i)}" y="${h-5}" text-anchor="middle" font-size="10.5" fill="#6A7A90">${esc(c)}</text>`).join('')}</svg>`;
+  // 라벨 위치: 이웃 점들보다 높으면 위, 낮으면 아래(이웃 라벨과 겹침 방지)
+  const below=p=>{const nb=pts.filter(q=>Math.abs(q.i-p.i)===1);return nb.length&&p.v<nb.reduce((a,q)=>a+q.v,0)/nb.length};
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(name)} 3개년 추이"><path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>${pts.map(p=>`<circle cx="${x(p.i)}" cy="${y(p.v)}" r="4.5" fill="${color}" stroke="#fff" stroke-width="2" data-tip="${esc(cats[p.i]+' · '+name+'\n'+fmt(p.v))}"/><text x="${x(p.i)}" y="${below(p)?y(p.v)+17:y(p.v)-9}" text-anchor="middle" font-size="11" font-weight="700" fill="#10284C" class="num">${fmt(p.v)}</text>`).join('')}${cats.map((c,i)=>`<text x="${x(i)}" y="${h-5}" text-anchor="middle" font-size="10.5" fill="#6A7A90">${esc(c)}</text>`).join('')}</svg>`;
 }
+let hatchSeq=0;
 function bsChart(Y,w=560,h=260){
+  const hid='hatch'+(++hatchSeq);
   const A=Y.map(y=>V(y,'assets')),Lb=Y.map(y=>V(y,'liabilities')),E=Y.map(y=>V(y,'equity'));
   const vals=[...A,...Lb,...E.map((e,i)=>e!=null&&Lb[i]!=null?Lb[i]+Math.max(e,0):null),...E].filter(v=>v!=null);
   if(!vals.length)return barChart({cats:[],series:[{vals:[]}]});
@@ -1247,9 +1273,9 @@ function bsChart(Y,w=560,h=260){
     if(A[i]!=null)b+=`<rect x="${x1}" y="${Math.min(y(A[i]),y0)}" width="${bw}" height="${Math.max(1.5,Math.abs(y0-y(A[i])))}" rx="3" fill="#1E5FD6" data-tip="${yr}년 자산총계\n${fmtMil(A[i])}"/>`;
     if(Lb[i]!=null){b+=`<rect x="${x2}" y="${y(Lb[i])}" width="${bw}" height="${Math.max(1.5,y0-y(Lb[i]))}" rx="3" fill="#E08A1E" data-tip="${yr}년 부채총계\n${fmtMil(Lb[i])}"/>`;
       if(E[i]!=null&&E[i]>0)b+=`<rect x="${x2}" y="${y(Lb[i]+E[i])}" width="${bw}" height="${Math.max(1.5,y(Lb[i])-y(Lb[i]+E[i])-2)}" rx="3" fill="#0E9E79" data-tip="${yr}년 자본총계\n${fmtMil(E[i])}"/>`;
-      if(E[i]!=null&&E[i]<0)b+=`<rect x="${x2}" y="${y0}" width="${bw}" height="${Math.max(1.5,y(E[i])-y0)}" fill="url(#hatch)" stroke="#B4232F" data-tip="${yr}년 자본총계(음수)\n${fmtMil(E[i])}"/>`}
+      if(E[i]!=null&&E[i]<0)b+=`<rect x="${x2}" y="${y0}" width="${bw}" height="${Math.max(1.5,y(E[i])-y0)}" fill="url(#${hid})" stroke="#B4232F" data-tip="${yr}년 자본총계(음수)\n${fmtMil(E[i])}"/>`}
     b+=`<text x="${cx}" y="${h-8}" text-anchor="middle" font-size="12" font-weight="700" fill="#3C5170">${yr}</text><text x="${x1+bw/2}" y="${(A[i]!=null?Math.min(y(A[i]),y0):y0)-5}" text-anchor="middle" font-size="10" fill="#3C5170">자산</text><text x="${x2+bw/2}" y="${(Lb[i]!=null?y(Lb[i]+Math.max(E[i]||0,0)):y0)-5}" text-anchor="middle" font-size="10" fill="#3C5170">부채+자본</text>`});
-  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="재무상태표 구성 3개년 (백만원)"><defs><pattern id="hatch" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#FDECEE"/><line x1="0" y1="0" x2="0" y2="6" stroke="#B4232F" stroke-width="2"/></pattern></defs><text x="${L-8}" y="12" text-anchor="end" font-size="10.5" fill="#6A7A90">(백만원)</text>${g}${b}</svg>`;
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="재무상태표 구성 3개년 (백만원)"><defs><pattern id="${hid}" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#FDECEE"/><line x1="0" y1="0" x2="0" y2="6" stroke="#B4232F" stroke-width="2"/></pattern></defs><text x="${L-8}" y="12" text-anchor="end" font-size="10.5" fill="#6A7A90">(백만원)</text>${g}${b}</svg>`;
 }
 const legend=items=>`<div class="legend">${items.map(([c,n,hatch])=>`<span><i style="background:${hatch?'repeating-linear-gradient(45deg,#FDECEE 0 3px,#B4232F 3px 5px)':c}"></i>${esc(n)}</span>`).join('')}</div>`;
 
@@ -1290,16 +1316,22 @@ function renderDash(M,F,VS){
   <div><h3>주의할 지표</h3>${top.length?`<ul>${top.map(f=>`<li><span class="badge ${SEVL[f.sev][1]}" style="padding:1px 7px">${SEVL[f.sev][0]}</span> ${esc(f.title)}</li>`).join('')}</ul>`:'<p class="hint">정의 기반 징후 없음</p>'}${real.length>3?`<p class="hint">외 ${real.length-3}건은 ⑥에서 확인</p>`:''}</div>
   <div><h3>원인을 확인할 자료</h3>${docs.length?`<ul>${docs.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:'<ul><li>3개년 표준재무제표증명 원본</li><li>차입금 명세(만기·금리)</li><li>최근 12개월 통장 거래내역</li></ul>'}</div>
   <div><h3>지금 할 일</h3><ul>${(acts.length?acts:[{a:'원본 서류와 입력값 대조 후 ③ 검증 완료',t:'30일'},{a:'월별 자금수지표(13주) 작성',t:'90일'}]).map(a=>`<li><b>${esc(a.t)}</b> ${esc(a.a)}</li>`).join('')}</ul></div></div>`;
-  h+=`<div class="kpis">${['revenue','operatingMargin','debtRatio','currentRatio'].map(k=>kpiCard(k,M,Y,true)).join('')}</div>`;
-  h+=`<div class="kpis sm">${['equityRatio','netMargin','impairmentRate','interestCoverage','borrowings'].map(k=>kpiCard(k,M,Y,false)).join('')}</div>`;
+  h+=dashKpis(M,Y)+dashCharts(M,Y);
+  $('#dash').innerHTML=h;
+}
+/* 대시보드 카드·차트 — 화면과 PDF 보고서가 같은 함수를 쓴다 */
+function dashKpis(M,Y){
+  return `<div class="kpis">${['revenue','operatingMargin','debtRatio','currentRatio'].map(k=>kpiCard(k,M,Y,true)).join('')}</div>`+
+  `<div class="kpis sm">${['equityRatio','netMargin','impairmentRate','interestCoverage','borrowings'].map(k=>kpiCard(k,M,Y,false)).join('')}</div>`;
+}
+function dashCharts(M,Y){
   const C=Y.map(String);
-  h+=`<div class="charts">
+  return `<div class="charts">
    <div class="chart"><h3>매출·영업이익·순이익 3개년</h3><div class="cs">같은 단위(백만원) 한 축 · 막대 위 값 표시</div>${barChart({cats:C,series:[{name:'매출액',color:'var(--s1)',vals:Y.map(y=>mil(V(y,'revenue')))},{name:'영업이익',color:'var(--s2)',vals:Y.map(y=>mil(V(y,'operatingIncome')))},{name:'당기순이익',color:'var(--s3)',vals:Y.map(y=>mil(V(y,'netIncome')))}],fmt:v=>nf(v,Math.abs(v)>=100?0:1),unit:'백만원',tipUnit:'백만원'})}${legend([['#1E5FD6','매출액'],['#0E9E79','영업이익'],['#E08A1E','당기순이익']])}</div>
    <div class="chart"><h3>재무상태표 구성 (자산 = 부채 + 자본)</h3><div class="cs">왼쪽 자산, 오른쪽 부채+자본 · 음수 자본은 빗금</div>${bsChart(Y)}${legend([['#1E5FD6','자산총계'],['#E08A1E','부채총계'],['#0E9E79','자본총계'],['','자본총계(음수)',1]])}</div>
-   <div class="chart"><h3>안정성·유동성 비율 추이</h3><div class="cs">지표마다 별도 축(서로 다른 비율을 한 축에 겹치지 않음)</div><div class="multiples">${['currentRatio','debtRatio','equityRatio'].map(k=>`<div class="mini"><b>${MD[k].l}</b>${lineMini({cats:C,vals:Y.map(y=>M[y][k].v),fmt:v=>nf(v,1)+'%',name:MD[k].l,u:'%',w:180,h:120,color:k==='debtRatio'?'#E08A1E':k==='equityRatio'?'#0E9E79':'#1E5FD6'})}${Y.some(y=>M[y][k].st==='hold')?'<div class="hint">일부 연도 표시 보류(자본 0 이하)</div>':''}</div>`).join('')}</div></div>
-   <div class="chart"><h3>이익률 추이 (%)</h3><div class="cs">매출총이익률·영업이익률·순이익률 — 모두 % 단위</div>${barChart({cats:C,series:[{name:'매출총이익률',color:'var(--s1)',vals:Y.map(y=>M[y].grossMargin.v)},{name:'영업이익률',color:'var(--s2)',vals:Y.map(y=>M[y].operatingMargin.v)},{name:'순이익률',color:'var(--s3)',vals:Y.map(y=>M[y].netMargin.v)}],fmt:v=>nf(v,1),unit:'%',tipUnit:'%'})}${legend([['#1E5FD6','매출총이익률'],['#0E9E79','영업이익률'],['#E08A1E','순이익률']])}</div>
+   <div class="chart"><h3>안정성·유동성 비율 추이</h3><div class="cs">지표마다 별도 축(서로 다른 비율을 한 축에 겹치지 않음)</div><div class="multiples">${['currentRatio','debtRatio','equityRatio'].map(k=>`<div class="mini"><b>${MD[k].l}</b>${lineMini({cats:C,vals:Y.map(y=>M[y][k].v),fmt:v=>nf(v,Math.abs(v)>=100?0:1)+'%',name:MD[k].l,u:'%',w:180,h:150,color:k==='debtRatio'?'#E08A1E':k==='equityRatio'?'#0E9E79':'#1E5FD6'})}${Y.some(y=>M[y][k].st==='hold')?'<div class="hint">일부 연도 표시 보류(자본 0 이하)</div>':''}</div>`).join('')}</div></div>
+   <div class="chart"><h3>이익률 추이 (%)</h3><div class="cs">매출총이익률·영업이익률·순이익률 — 모두 % 단위</div>${barChart({cats:C,series:[{name:'매출총이익률',color:'var(--s1)',vals:Y.map(y=>M[y].grossMargin.v)},{name:'영업이익률',color:'var(--s2)',vals:Y.map(y=>M[y].operatingMargin.v)},{name:'순이익률',color:'var(--s3)',vals:Y.map(y=>M[y].netMargin.v)}],fmt:v=>nf(v,1),unit:'%',tipUnit:'%'})}${legend([['#1E5FD6','매출총이익률'],['#0E9E79','영업이익률'],['#E08A1E','순이익률']])}${Y.some(y=>M[y].grossMargin.st==='hold')?'<div class="hint">매출총이익률: 매출원가 0(원가를 판관비로 분류)이라 표시 보류</div>':''}</div>
   </div>`;
-  $('#dash').innerHTML=h;
 }
 function renderDetail(M,VS){
   const Y=years();
@@ -1541,6 +1573,8 @@ function buildReport(){
   <h3>가장 중요한 확인 사항 (최대 3개)</h3>${top.length?top.map(f=>`<div class="rfind sev${f.sev}"><h4>${esc(f.title)}</h4><div>${esc(f.fact)}</div></div>`).join(''):'<p>정의 기반 조건에서 우선 확인할 징후가 나타나지 않았습니다.</p>'}
   <h3>증빙 범위와 신뢰도</h3><p>재무자료 출처: ${S.sources.length?esc([...new Set(S.sources.map(s=>s.kind.toUpperCase()))].join('·'))+' 파일 '+S.sources.length+'건 + 사용자 확인':(S.sample?'가상 데이터':'사용자 직접 입력')} · 입력 완성도 ${nf(completeness()*100,0)}% · 통장 자료 ${S.bank.length?S.bank.length+'개 계좌(제출분)':'없음'} · 공식 신용등급 ${S.credit.rating?'사용자 입력':'미확인'} · 감사의견 ${esc(S.audit.opinion)}</p>
   <p class="small" style="margin-top:auto">본 보고서는 제출 자료에 대한 자체 재무비율 분석으로, 공식 기업신용평가서·회계감사보고서·세무 자문·투자 권유가 아닙니다. 그로스벤처스 주식회사 · 기밀 — 수신자 외 배포 금지</p></section>`);
+  // 1-1. 대시보드(화면과 같은 카드·차트)
+  pages.push(`<section class="rp dashp">${head('재무 대시보드')}<h2>핵심 지표 대시보드</h2><p class="small">${Y[0]}~${Y[2]} 회계연도 · ${esc(S.org.basis)} 재무제표 · 금액 단위 백만원 · ${esc(status)}</p>${dashKpis(M,Y)}${dashCharts(M,Y)}</section>`);
   // 2. 입력자료·검증
   pages.push(`<section class="rp">${head('입력자료·검증')}<h2>1. 입력자료와 검증 현황</h2>
   <table class="rt"><thead><tr><th>연도</th><th>대차 검증</th><th>세부 검증</th></tr></thead><tbody>${VS.vs.map(v=>`<tr><td>${v.year}</td><td>${!v.has?'자료 없음':v.balance===true?'일치':v.balance===false?'<b>불일치</b>':'확인 불가'}</td><td class="small">${v.items.map(i=>esc(i.t)).join('<br>')}</td></tr>`).join('')}</tbody></table>
