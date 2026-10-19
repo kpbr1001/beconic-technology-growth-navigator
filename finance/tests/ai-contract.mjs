@@ -34,7 +34,7 @@ const mock = http.createServer((req, res) => {
   req.on('data', (c) => (body += c));
   req.on('end', () => {
     seen.push({ url: req.url, headers: req.headers, body: JSON.parse(body || '{}') });
-    const msg = (text, stop = 'end_turn') => JSON.stringify({ id: 'msg_test', type: 'message', role: 'assistant', model: 'claude-opus-5-5', content: [{ type: 'text', text }], stop_reason: stop, stop_details: null, usage: { input_tokens: 10, output_tokens: 10 } });
+    const msg = (text, stop = 'end_turn') => JSON.stringify({ id: 'msg_test', type: 'message', role: 'assistant', model: 'claude-opus-5-5', content: [{ type: 'text', text }], stop_reason: stop, stop_details: null, usage: { input_tokens: 3000, output_tokens: 4000 } });
     const send = (st, b) => { res.writeHead(st, { 'content-type': 'application/json' }); res.end(b); };
     if (mode === 'ok') return send(200, msg(JSON.stringify(GOOD)));
     if (mode === 'forbid') return send(200, msg(JSON.stringify({ ...GOOD, executiveSummary: '자본 확충이 우선입니다. 영업이익률이 업종 평균보다 낮습니다.', risks: [{ findingIds: ['F-IMP'], risk: '추정 부도 확률이 높습니다.', verifyNext: '자금수지표 확인' }, ...GOOD.risks] })));
@@ -94,6 +94,8 @@ const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
   const r = await call(INPUT);
   const q = seen.at(-1);
   check('정상: 200 + 구조화 결과', r.st === 200 && r.json.result?.actions?.length === 2, `${r.st}`);
+  check('정상: 실측 토큰·사용료 반환(usage)', r.json.usage?.input === 3000 && r.json.usage?.output === 4000 && r.json.usage?.usd === 0.092, JSON.stringify(r.json.usage));
+  check('요청: 응답 상한 6,000 토큰(1회 비용 상한)', q.body.max_tokens === 6000);
   check('요청: 모델 claude-opus-5-5', q.body.model === 'claude-opus-5-5');
   check('요청: 구조화 출력(json_schema)·effort', q.body.output_config?.format?.type === 'json_schema' && q.body.output_config.effort === 'medium');
   check('요청: 거절 시 대체 모델(fallbacks default + 베타 헤더)', q.body.fallbacks === 'default' && String(q.headers['anthropic-beta']).includes('server-side-fallback-2026-07-01'));
@@ -111,7 +113,7 @@ const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
   mode = 'limit'; r = await call(INPUT, { ip: '10.0.0.2' }); check('한계 설명(\'업종 평균 자료가 없어\')은 유지', r.st === 200 && r.json.removed === 0 && r.json.result.limitations.length === 2);
   mode = 'allbad'; r = await call(INPUT, { ip: '10.0.0.2' }); check('쓸 수 있는 내용이 없으면 422', r.st === 422);
   mode = 'badjson'; r = await call(INPUT, { ip: '10.0.0.2' }); check('형식 깨진 응답 → 502', r.st === 502);
-  mode = 'refusal'; r = await call(INPUT, { ip: '10.0.0.2' }); check('AI 거절 → 422 안내', r.st === 422);
+  mode = 'refusal'; r = await call(INPUT, { ip: '10.0.0.2' }); check('AI 거절 → 422 안내 + 과금 토큰 표시', r.st === 422 && r.json.usage?.usd === 0.092);
   mode = 'auth'; r = await call(INPUT, { ip: '10.0.0.2' }); check('제공자 인증 실패 → 502, 오류 원문(키) 미노출', r.st === 502 && !r.text.includes('CANARY') && !r.text.includes('x-api-key'), r.json.error);
   mode = 'rate'; r = await call(INPUT, { ip: '10.0.0.2' }); check('제공자 429 → 429', r.st === 429);
   mode = 'ok';
@@ -199,6 +201,8 @@ const out = await page.locator('#aiOut').innerText();
 check('화면: AI 결과 표시(경영진 요약·권고)', out.includes('경영진 요약') && out.includes('고정비 항목별 절감 계획'));
 check('화면: 계산에 없는 수치(12.3%p) 문장 차단', out.includes('수치 대조 실패로 제외') && !out.includes('12.3%p'));
 check('화면: 접수 후 결과 조회까지 완료', (await page.locator('#aiStatus').innerText()).includes('작성 완료'));
+check('화면: 이번 호출 토큰·사용료 표시(3,000·4,000 토큰 → $0.0920)', out.includes('입력 3,000·출력 4,000 토큰') && out.includes('$0.0920'));
+check('화면: 전송 전 1회 예상 사용료 안내', /1회 예상 사용료: 약 \$0\.\d+~\$0\.\d+/.test(await page.locator('#aiCost').innerText()));
 const html = await page.content();
 check('화면·네트워크 응답 어디에도 키 없음', !html.includes('CANARY') && !net.some((t) => t.includes('CANARY')));
 const sent = seen.at(-1).body.messages[0].content;
@@ -206,6 +210,16 @@ check('화면에서 보낸 요청: 상호·사업자번호·발급번호 없음'
 const ls = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
 check('브라우저 저장소에 이용 코드 미저장', !ls.includes(CODE));
 await browser.close(); site.close(); mock.close();
+
+{
+  const { costOf, PRICES } = await import('../lib/ai-core.mjs');
+  const a = costOf({ input_tokens: 1e6, output_tokens: 1e6 }, 'claude-opus-5-5');
+  check('사용료: Opus 5.5 단가($4/$20 per 1M) 계산', a.usd === 24 && a.input === 1e6 && a.output === 1e6);
+  const c = costOf({ input_tokens: 0, cache_creation_input_tokens: 1e6, cache_read_input_tokens: 1e6, output_tokens: 0 }, 'claude-sonnet-5-5');
+  check('사용료: 캐시 쓰기 1.25배·읽기 0.1배', c.usd === 2.7);
+  check('사용료: 단가표에 없는 모델은 추정하지 않음(null)', costOf({ input_tokens: 5, output_tokens: 5 }, 'unknown-model').usd === null && costOf(undefined, 'claude-opus-5-5').usd === 0);
+  check('사용료: 기본 모델 단가 등록', !!PRICES['claude-opus-5-5']);
+}
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} 통과`);
 process.exit(failed.length ? 1 : 0);

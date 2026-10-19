@@ -1,4 +1,4 @@
-/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings, fundingEval, gradeRank, exportJSON, refresh, loanSummary -- page.evaluate 안에서 앱 전역 함수를 호출 */
+/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings, fundingEval, gradeRank, exportJSON, refresh, loanSummary, PROGRAMS, progEval -- page.evaluate 안에서 앱 전역 함수를 호출 */
 // BECONIC 재무진단 QA — 실제 Chromium으로 사용자 플로우·레드팀 항목·A4 PDF를 확인한다.
 // 실행: (finance 폴더를 정적 서버로 띄운 뒤) node finance/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -402,6 +402,38 @@ const Y = await page.evaluate(() => years());
   const due = await page.evaluate(() => { const keep = [S.loans, S.loanAsOf]; const d = new Date(); d.setDate(d.getDate() + 30); S.loans = [{ id: 'z', lender: 'x', type: '기타', bal: 1e8, rate: 3, due: d.toISOString().slice(0, 10), repay: '미확인', coll: '' }]; S.loanAsOf = '2020-01-01'; const L = loanSummary(); [S.loans, S.loanAsOf] = keep; return [L.due12, L.stale].join(); });
   check('만기 도래는 오늘 기준·오래된 잔액 확인일 경고', due === '100000000,true', due);
   await page.click('#btnClearSample');
+}
+
+// 8d. 지원사업별 재무자격(2026년 공고 기준)
+{
+  await page.click('#btnSample');
+  await page.waitForTimeout(200);
+  await page.evaluate(() => { S.org.founded = ''; S.dq = {}; refresh(); });
+  const ev = () => page.evaluate(() => Object.fromEntries(PROGRAMS.map((p) => [p.id, progEval(p).st])));
+  let e = await ev();
+  check('지원사업: 8개 사업 판정(창업·R&D·바우처·수출·인증·정책자금)', Object.keys(e).length === 8 && (await page.locator('#fund .pcard').count()) === 8);
+  check('지원사업: R&D 부채비율 172.7% → 1,000% 기준 충족', e.rnd === 'pass');
+  check('지원사업: 설립일 없으면 업력 사업은 확인 필요', e.early === 'check' && e.innobiz === 'check');
+  check('지원사업: 혁신바우처 3년 평균 매출 127억(120~140억 사이) → 확인 필요', e.innov === 'check');
+  await page.fill('#orgFounded', '2024-05-01'); await page.dispatchEvent('#orgFounded', 'change');
+  await page.evaluate(() => { document.querySelector('#critFold').open = true; });
+  await page.fill('#cfRnd', '800'); await page.dispatchEvent('#cfRnd', 'change');
+  await page.fill('#cfExport', '50'); await page.dispatchEvent('#cfExport', 'change');
+  e = await ev();
+  check('지원사업: 업력 2.5년 → 초기창업 충족·도약 미충족·이노비즈 미충족', e.leap === 'fail' && e.innobiz === 'fail' && (await page.evaluate(() => progEval(PROGRAMS[0]).rows[0].st)) === 'pass');
+  check('지원사업: 창업 3년 미만 벤처(연구개발비 800백만) → 비율 요건 미적용·충족', e.venture === 'pass');
+  check('지원사업: 수출실적 50천 달러 → 수출초보 트랙', (await txt('#fund')).includes('수출초보'));
+  await page.evaluate(() => { S.data[years()[2]].liabilities.v = S.data[years()[2]].equity.v * 12; refresh(); });
+  e = await ev();
+  check('레드팀: 부채비율 1,200% → R&D 미충족·필요 감축액 안내', e.rnd === 'fail' && (await txt('#fund')).includes('1,000% 미만이 되려면'));
+  await page.click('[data-pc="창업"]');
+  check('지원사업: 분야 선택(창업) 시 해당 사업만 표시', (await page.locator('#fund .pcard').count()) === 2);
+  await page.click('[data-pc="전체"]');
+  const rep = await page.evaluate(() => buildReport());
+  check('PDF: 지원사업별 재무자격 표·출처 구분 포함', rep.includes('지원사업별 재무자격 (2026년 공고 기준)') && rep.includes('공고 원문 확인') && rep.includes('2차 자료'));
+  check('AI 전송에 지원사업·설립일·수출실적 없음', !/수출|업력|설립|2024-05-01/.test(await page.evaluate(() => JSON.stringify(aiPayload(metrics(), findings(metrics()))))));
+  await page.click('#btnClearSample');
+  await page.evaluate(() => { S.org.founded = ''; S.crit.rnd = null; S.crit.exportK = null; refresh(); });
 }
 
 // 9. 비밀키 노출 없음

@@ -21,8 +21,8 @@ export function createBackground({ jobs: jobsFactory = () => getStore('finance-a
     } catch {
       result = { status: 'error', http: 502, error: 'AI 처리 중 오류가 발생했습니다.' };
     }
-    if (result.status === 'ok') console.log('finance-insights ok', JSON.stringify({ model: result.model, removed: result.removed || 0 }));
-    else console.error('finance-insights 실패', result.http);
+    if (result.status === 'ok') console.log('finance-insights ok', JSON.stringify({ model: result.model, removed: result.removed || 0, usage: result.usage }));
+    else console.error('finance-insights 실패', result.http, JSON.stringify(result.usage || {}));
     await jobs.setJSON(id, { status: 'done', createdAt: job.createdAt, result });
     return new Response(null, { status: 202 });
   };

@@ -7,6 +7,27 @@ export const MODEL = () => process.env.ANTHROPIC_MODEL || 'claude-opus-5-5';
 const EFFORTS = ['low', 'medium', 'high'];
 export const EFFORT = () => (EFFORTS.includes(process.env.BECONIC_AI_EFFORT) ? process.env.BECONIC_AI_EFFORT : 'medium');
 export const defaultClient = () => new Anthropic({ timeout: 300_000, maxRetries: 1 });
+export const MAX_OUTPUT = 6000; // 응답 상한(생각 토큰 포함) — 1회 비용 상한을 정한다
+
+// ── 1회 사용료: 응답의 usage(실측 토큰) × 모델 단가(USD/100만 토큰, Anthropic 공개 단가 2026-10 기준) ──
+// 단가가 바뀌면 이 표만 고친다. 표에 없는 모델은 비용을 '미상'으로 둔다(추정하지 않음).
+export const PRICES = {
+  'claude-opus-5-5': { in: 4, out: 20 },
+  'claude-sonnet-5-5': { in: 2, out: 10 },
+  'claude-haiku-5-5': { in: 0.1, out: 0.5 },
+  'claude-opus-5': { in: 5, out: 25 },
+  'claude-opus-4-8': { in: 5, out: 25 },
+  'claude-fable-5-1': { in: 10, out: 50 },
+};
+export function costOf(usage, model) {
+  const p = PRICES[model];
+  const n = (x) => (Number.isFinite(x) ? x : 0);
+  const inTok = n(usage?.input_tokens), outTok = n(usage?.output_tokens), cw = n(usage?.cache_creation_input_tokens), cr = n(usage?.cache_read_input_tokens);
+  const tokens = { input: inTok + cw + cr, output: outTok };
+  if (!p) return { ...tokens, usd: null };
+  const usd = (inTok * p.in + cw * p.in * 1.25 + cr * p.in * 0.1 + outTok * p.out) / 1e6; // 캐시 쓰기 1.25배·읽기 0.1배
+  return { ...tokens, usd: Math.round(usd * 1e5) / 1e5 };
+}
 
 // ── 입력 스키마: 요약 지표·징후만 허용 (회사명·사업자번호·거래내역 키는 거부) ──
 const num = z.union([z.number().finite(), z.literal('표시보류'), z.null()]);
@@ -115,7 +136,7 @@ export async function runInsights(input, client = defaultClient()) {
   try {
     response = await client.beta.messages.create({
       model: MODEL(),
-      max_tokens: 6000,
+      max_tokens: MAX_OUTPUT,
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
       output_config: { effort: EFFORT(), format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
@@ -129,19 +150,20 @@ export async function runInsights(input, client = defaultClient()) {
     if (err instanceof Anthropic.APIError) return { status: 'error', http: 502, error: `AI 제공자 오류(${err.status ?? '연결'})` };
     return { status: 'error', http: 502, error: 'AI 요청 중 오류가 발생했습니다.' };
   }
-  if (response.stop_reason === 'refusal') return { status: 'error', http: 422, error: 'AI가 이 요청에 답하지 않았습니다. 결정론 분석 결과를 사용하세요.' };
-  if (response.stop_reason === 'max_tokens') return { status: 'error', http: 502, error: 'AI 응답이 길이 제한으로 잘렸습니다. 다시 시도하세요.' };
+  const usage = costOf(response.usage, response.model); // 실패 응답도 과금되므로 함께 돌려준다
+  if (response.stop_reason === 'refusal') return { status: 'error', http: 422, error: 'AI가 이 요청에 답하지 않았습니다. 결정론 분석 결과를 사용하세요.', usage };
+  if (response.stop_reason === 'max_tokens') return { status: 'error', http: 502, error: 'AI 응답이 길이 제한으로 잘렸습니다. 다시 시도하세요.', usage };
   const text = response.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
   let result;
   try {
     result = Output.parse(JSON.parse(text));
   } catch {
-    return { status: 'error', http: 502, error: 'AI 응답 형식 검증에 실패했습니다.' };
+    return { status: 'error', http: 502, error: 'AI 응답 형식 검증에 실패했습니다.', usage };
   }
   const ids = new Set(input.findings.map((f) => f.id));
   result.risks = result.risks.map((r) => ({ ...r, findingIds: r.findingIds.filter((id) => ids.has(id)) }));
   const scrubbed = scrubResult(result);
   const left = [scrubbed.result.executiveSummary, ...scrubbed.result.actions.map((a) => a.action)].filter(Boolean).length;
-  if (!left) return { status: 'error', http: 422, error: '근거 없는 등급·확률·업종 평균 표현만 있어 응답을 사용할 수 없습니다. 다시 시도하세요.' };
-  return { status: 'ok', result: scrubbed.result, removed: scrubbed.removed, model: response.model };
+  if (!left) return { status: 'error', http: 422, error: '근거 없는 등급·확률·업종 평균 표현만 있어 응답을 사용할 수 없습니다. 다시 시도하세요.', usage };
+  return { status: 'ok', result: scrubbed.result, removed: scrubbed.removed, model: response.model, usage };
 }
