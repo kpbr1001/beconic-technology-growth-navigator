@@ -1,4 +1,4 @@
-/* global buildReport, years, V, S, importJSON, analyzeBank -- page.evaluate 안에서 앱 전역 함수를 호출 */
+/* global buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings -- page.evaluate 안에서 앱 전역 함수를 호출 */
 // BECONIC 재무진단 QA — 실제 Chromium으로 사용자 플로우·레드팀 항목·A4 PDF를 확인한다.
 // 실행: (finance 폴더를 정적 서버로 띄운 뒤) node finance/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
+import { ntsHtml, fixtureYear } from './nts-fixture.mjs';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -176,6 +177,78 @@ const Y = await page.evaluate(() => years());
   check('PDF: 음수 영업손실 인식', c.includes('-45,000,000'));
   await page.locator('#candidates .cand').first().screenshot({ path: path.join(OUT, 'pdf-candidates.png') });
   await page.click('[data-drop="0"]');
+}
+
+// 6b. 레드팀 — 홈택스 표준재무제표증명 서식(글자 단위·2단 배치) 가상 픽스처
+{
+  const mkPdf = async (opts) => { const q = await ctx.newPage(); await q.setContent(ntsHtml(opts)); const b = await q.pdf({ format: 'A4' }); await q.close(); return b; };
+  const fx = [fixtureYear(Y[0], 1), fixtureYear(Y[1], 1.1, 900_000_000), fixtureYear(Y[2], 1.2)];
+  const pdfs = await Promise.all(fx.map((f) => mkPdf(f)));
+  await page.evaluate(() => { clearAll(); S.org.name = ''; S.org.industry = ''; });
+  await page.setInputFiles('#fileIn', pdfs.map((b, i) => ({ name: `nts-${fx[i].year}.pdf`, mimeType: 'application/pdf', buffer: b })));
+  await page.waitForFunction(() => S.pending.length === 3, null, { timeout: 30000 });
+  const pend = await page.evaluate(() => S.pending.map((r) => ({ y: r.fileYear, nts: r.nts, co: r.meta.company, biz: r.meta.biz })));
+  check('NTS: 발급일(2026년)이 아닌 사업연도로 연도 인식', pend.map((x) => x.y).join() === Y.join(), pend.map((x) => x.y).join());
+  check('NTS: 서식·발급번호·세무서·신고구분 인식', pend.every((x) => x.nts?.form === '일반법인용' && x.nts.issueNo === '1234-567-8901-234' && x.nts.office === '가상세무서' && x.nts.report === '정기신고'));
+  check('NTS: 상호 인식·사업자번호 마스킹', pend.every((x) => x.co === '(가상)테스트상사 주식회사' && x.biz === '123-45-*****'));
+  const cc = await page.evaluate(() => { const c = crossCheck(); return { blocked: c.blocked, same: c.sameCompany, bal: c.rows.map((r) => r.bal), pl: c.rows.map((r) => r.pl) }; });
+  check('NTS: 교차검증(같은 회사·대차·손익 일치)', !cc.blocked && cc.same && cc.bal.every(Boolean) && cc.pl.every(Boolean), JSON.stringify(cc));
+  const zero = await page.evaluate(() => S.pending[0].items.filter((i) => i.zero).map((i) => i.k + ':' + i.conf));
+  check('NTS: 표시 없는 0원 계정은 확인 필요 후보(보통)로 제시', zero.length > 0 && zero.every((z) => z.endsWith(':mid')), zero.join(','));
+  await page.click('#btnApplyAll');
+  let mism = [];
+  for (const f of fx) for (const [k, v] of Object.entries(f.expect)) { const got = await page.evaluate(([y, kk]) => V(y, kk), [f.year, k]); if (got !== Math.round(v)) mism.push(`${f.year} ${k} ${got}≠${v}`); }
+  check('NTS: 3개년 일괄 반영 값이 원본과 100% 일치(2단 자본총계·음수 결손금 포함)', !mism.length, mism.join(' | '));
+  check('NTS: 3개년 대차 검증 통과', ((await txt('#vcards')).match(/검증 통과/g) || []).length === 3);
+  check('NTS: 회사명·업종 자동 제안', (await page.evaluate(() => [S.org.name, S.org.industry].join('|'))) === '(가상)테스트상사 주식회사|제조업');
+  await page.fill('#orgName', '다른 이름');
+  await page.evaluate(() => applyRes({ ...S.sources[0], items: [], meta: { company: '(가상)테스트상사 주식회사' }, file: 'x' }));
+  check('NTS: 사용자가 입력한 법인명은 덮어쓰지 않음', (await page.evaluate(() => S.org.name)) === '다른 이름');
+  check('NTS: 비교가능성 자동 대조 근거 표시', (await txt('#confirmEvidence')).includes('상호·사업자번호가 같습니다'));
+  const pay = await page.evaluate(() => JSON.stringify(aiPayload(metrics(), findings(metrics()))));
+  check('NTS: AI 전송에 상호·사업자번호·발급번호 없음', !/테스트상사|123-45|1234-567/.test(pay));
+  const fids = await page.evaluate(() => findings(metrics()).map((f) => f.id));
+  check('진단: 특수관계인 차입금·미지급금 신호 규칙 동작', fids.includes('F-INSIDER'), fids.join(','));
+
+  // 다른 회사 + 같은 연도 섞기 → 일괄 반영 차단
+  await page.evaluate(() => clearAll());
+  const other = await mkPdf({ ...fixtureYear(Y[2]), company: '(가상)다른회사 주식회사', biz: '999-88-77777' });
+  await page.setInputFiles('#fileIn', [{ name: 'a.pdf', mimeType: 'application/pdf', buffer: pdfs[2] }, { name: 'b.pdf', mimeType: 'application/pdf', buffer: other }]);
+  await page.waitForFunction(() => S.pending.length === 2, null, { timeout: 30000 });
+  const c2 = await txt('#candidates');
+  check('레드팀: 다른 회사 서류 섞임 → 일괄 반영 차단', (await page.locator('#btnApplyAll').isDisabled()) && c2.includes('서로 다른 상호') && c2.includes('서로 다른 사업자번호'));
+  check('레드팀: 같은 연도 파일 중복 경고', c2.includes(`${Y[2]}년 자료가 여러 파일`));
+  // 같은 파일 두 번
+  await page.evaluate(() => clearAll());
+  await page.setInputFiles('#fileIn', [{ name: 'a.pdf', mimeType: 'application/pdf', buffer: pdfs[2] }]);
+  await page.waitForFunction(() => S.pending.length === 1, null, { timeout: 30000 });
+  await page.setInputFiles('#fileIn', [{ name: 'a-copy.pdf', mimeType: 'application/pdf', buffer: pdfs[2] }]);
+  await page.waitForFunction(() => S.sources.some((s) => /중복/.test(s.status)), null, { timeout: 30000 });
+  check('레드팀: 동일 파일 재업로드 무시', (await page.evaluate(() => S.pending.length)) === 1);
+  // 1개 연도만 → 누락 연도 안내, 검증 미완료
+  const c3 = await txt('#candidates');
+  check('레드팀: 3개 중 1개만 업로드 → 누락 연도 안내', c3.includes(`${Y[0]}, ${Y[1]}년`));
+  await page.click('#btnApplyAll');
+  for (const c of await page.locator('[data-confirm]').all()) await c.check();
+  check('레드팀: 1개년만으로는 검증 완료 불가', !(await txt('#verifyBadge')).includes('검증 완료'));
+  // 분석 기간 밖 연도
+  await page.evaluate(() => clearAll());
+  await page.setInputFiles('#fileIn', [{ name: 'old.pdf', mimeType: 'application/pdf', buffer: await mkPdf(fixtureYear(Y[2] - 5)) }]);
+  await page.waitForFunction(() => S.pending.length === 1, null, { timeout: 30000 });
+  check('레드팀: 분석 기간 밖 연도 경고·미반영', (await txt('#candidates')).includes('분석 기간') && (await page.evaluate(() => S.pending[0].items.every((i) => !document.querySelector(`[data-ci="0:${S.pending[0].items.indexOf(i)}"]`).checked))));
+  // 수정신고
+  await page.evaluate(() => clearAll());
+  await page.setInputFiles('#fileIn', [{ name: 'amend.pdf', mimeType: 'application/pdf', buffer: await mkPdf({ ...fixtureYear(Y[2]), report: '수정 신고' }) }]);
+  await page.waitForFunction(() => S.pending.length === 1, null, { timeout: 30000 });
+  await page.click('#btnApplyAll');
+  check('레드팀: 수정신고분 경고', (await txt('#confirmEvidence')).includes('정기신고가 아닌'));
+  // 스캔(이미지) PDF
+  await page.evaluate(() => clearAll());
+  const q = await ctx.newPage(); await q.setContent('<img src="data:image/png;base64,' + readFileSync(path.join(here, '..', 'og-finance.png')).toString('base64') + '" style="width:600px">'); const scan = await q.pdf({ format: 'A4' }); await q.close();
+  await page.setInputFiles('#fileIn', [{ name: 'scan.pdf', mimeType: 'application/pdf', buffer: scan }]);
+  await page.waitForFunction(() => S.sources.some((s) => /이미지 PDF/.test(s.status)), null, { timeout: 30000 });
+  check('레드팀: 스캔(이미지) PDF → 수동 입력 안내', (await page.evaluate(() => S.pending.length)) === 0);
+  await page.evaluate(() => clearAll());
 }
 
 // 7. 통장: 계좌 간 이체 매칭

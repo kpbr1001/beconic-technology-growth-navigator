@@ -477,6 +477,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
     <label class="check"><input type="checkbox" data-confirm="unitChecked"> <span>원본의 <b>금액 단위</b>(원·천원·백만원)를 확인했고, 입력값이 그 단위로 바르게 들어갔습니다.</span></label>
     <label class="check"><input type="checkbox" data-confirm="sourceChecked"> <span>주요 숫자(자산·부채·자본·매출·영업이익·순이익)를 <b>원본 서류와 대조</b>했습니다.</span></label>
   </div>
+  <div id="confirmEvidence" class="hint" style="margin:4px 0 0 30px"></div>
   <div class="gate callout" id="gateBox"></div>
   <div class="c-only mt">
     <details class="fold" open><summary>자료 출처 관리 (파일·해시·업로드 시각)</summary><div class="in" id="srcTable"></div></details>
@@ -602,7 +603,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 /* ═══════════════ BECONIC 기업 재무진단 v1.0 — 단일 HTML ═══════════════
    원칙: 실제 입력값만 계산 · 미입력은 0이 아닌 null · 임의 업종평균/등급/점수 생성 금지
    계산은 이 파일의 결정론 코드가 하고, AI는 검증된 요약수치에 대한 문장 초안만 작성한다. */
-const APP={name:'BECONIC 기업 재무진단',version:'1.0.0',updated:'2026-10-19',url:'https://beconic-diagnosis-finance.netlify.app'};
+const APP={name:'BECONIC 기업 재무진단',version:'1.1.0',updated:'2026-10-19',url:'https://beconic-diagnosis-finance.netlify.app'};
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -614,13 +615,15 @@ const ACCTS=[
  {k:'assets',l:'자산총계',g:'bs',lv:0,req:1,syn:['자산총계']},
  {k:'currentAssets',l:'유동자산',g:'bs',lv:1,req:1,syn:['유동자산']},
  {k:'cash',l:'현금및현금성자산',g:'bs',lv:2,syn:['현금및현금성자산','현금및현금등가물'],low:['현금및예금','현금과예금']},
- {k:'tradeReceivables',l:'매출채권',g:'bs',lv:2,syn:['매출채권'],low:['매출채권및기타채권','매출채권및기타유동채권','외상매출금']},
+ {k:'tradeReceivables',l:'매출채권',g:'bs',lv:2,syn:['매출채권','매출채권공사분양수입외'],low:['매출채권및기타채권','매출채권및기타유동채권','외상매출금']},
  {k:'inventory',l:'재고자산',g:'bs',lv:2,syn:['재고자산']},
  {k:'noncurrentAssets',l:'비유동자산',g:'bs',lv:1,syn:['비유동자산'],low:['고정자산']},
  {k:'liabilities',l:'부채총계',g:'bs',lv:0,req:1,syn:['부채총계']},
  {k:'currentLiabilities',l:'유동부채',g:'bs',lv:1,req:1,syn:['유동부채']},
  {k:'tradePayables',l:'매입채무',g:'bs',lv:2,syn:['매입채무'],low:['매입채무및기타채무','매입채무및기타유동채무','외상매입금']},
+ {k:'otherPayables',l:'미지급금',g:'bs',lv:2,syn:['미지급금']},
  {k:'shortTermBorrowings',l:'단기차입금',g:'bs',lv:2,syn:['단기차입금']},
+ {k:'insiderBorrowings',l:'└ 주주·임원·직원 차입금',g:'bs',lv:2,syn:['주주임원직원','주주임원직원차입금'],low:['가수금','주주임원종업원단기차입금']},
  {k:'noncurrentLiabilities',l:'비유동부채',g:'bs',lv:1,syn:['비유동부채'],low:['고정부채']},
  {k:'longTermBorrowings',l:'장기차입금',g:'bs',lv:2,syn:['장기차입금']},
  {k:'equity',l:'자본총계',g:'bs',lv:0,req:1,syn:['자본총계']},
@@ -703,13 +706,13 @@ const MDEF=[
  {k:'revenue',l:'매출액',grp:'성장성',u:'amt',f:'손익계산서의 매출액',plain:'회사가 1년 동안 판 금액의 합계입니다.',c:'통장 입금액과 다릅니다(부가세·대출금·이체 포함 여부).'},
  {k:'revenueGrowth',l:'매출액 증가율',grp:'성장성',u:'%',f:'(당기 매출액 − 전기 매출액) ÷ 전기 매출액 × 100',plain:'작년보다 매출이 몇 % 늘었는지(줄었는지)입니다.',c:'전기 매출액이 0 이하이면 산출하지 않습니다. 3개년 중 첫해는 전년 자료가 없어 미산출입니다.'},
  {k:'assetGrowth',l:'총자산 증가율',grp:'성장성',u:'%',f:'(당기 자산총계 − 전기 자산총계) ÷ 전기 자산총계 × 100',plain:'회사 덩치(자산)가 얼마나 커졌는지입니다.',c:'차입으로 자산이 늘어난 경우도 포함됩니다.'},
- {k:'grossMargin',l:'매출총이익률',grp:'수익성',u:'%',f:'매출총이익 ÷ 매출액 × 100',plain:'제품·서비스 자체의 마진(원가를 뺀 몫)입니다.',c:'매출원가에 포함되는 비용 범위는 회사·업종별로 다릅니다.'},
+ {k:'grossMargin',l:'매출총이익률',grp:'수익성',u:'%',f:'매출총이익 ÷ 매출액 × 100',plain:'제품·서비스 자체의 마진(원가를 뺀 몫)입니다.',c:'매출원가에 포함되는 비용 범위는 회사·업종별로 다릅니다. 매출원가가 0이면(서비스업에서 인건비·외주비를 판관비로 분류) 100%로 계산되어 의미가 없으므로 표시하지 않습니다.'},
  {k:'operatingMargin',l:'영업이익률',grp:'수익성',u:'%',f:'영업이익 ÷ 매출액 × 100',plain:'본업으로 100원을 팔아 남긴 이익입니다.',c:'매출액이 0이면 산출할 수 없습니다.'},
  {k:'netMargin',l:'순이익률',grp:'수익성',u:'%',f:'당기순이익 ÷ 매출액 × 100',plain:'이자·세금 등 모든 비용을 빼고 남은 최종 이익의 비율입니다.',c:'일회성 영업외손익의 영향을 크게 받습니다.'},
  {k:'ebitda',l:'EBITDA(간이)',grp:'수익성',u:'amt',f:'영업이익 + 감가상각비 (무형자산상각비 미포함 간이식)',plain:'현금이 나가지 않는 감가상각비를 더해 본 영업 창출력입니다.',c:'감가상각비를 입력한 경우에만 표시합니다. 조정 EBITDA가 아닙니다.'},
  {k:'debtRatio',l:'부채비율',grp:'안정성',u:'%',f:'부채총계 ÷ 자본총계 × 100',plain:'내 돈(자본) 대비 남의 돈(부채)이 얼마인지입니다.',c:'자본총계가 0 이하이면 비율이 의미를 잃어 표시하지 않습니다(자본잠식 별도 표시).'},
  {k:'equityRatio',l:'자기자본비율',grp:'안정성',u:'%',f:'자본총계 ÷ 자산총계 × 100',plain:'전체 자산 중 내 돈으로 마련한 비중입니다.',c:'자본총계가 음수이면 음수 그대로 표시합니다.'},
- {k:'borrowings',l:'총차입금',grp:'안정성',u:'amt',f:'단기차입금 + 장기차입금 (입력된 범위)',plain:'은행 등에서 빌린 이자부 차입금입니다.',c:'사채·유동성장기부채·리스부채는 입력 항목에 없어 포함되지 않습니다.'},
+ {k:'borrowings',l:'총차입금',grp:'안정성',u:'amt',f:'단기차입금 + 장기차입금 (입력된 범위)',plain:'은행·정책자금·대표자 등에게 빌린 차입금입니다.',c:'사채·유동성장기부채·리스부채는 입력 항목에 없어 포함되지 않습니다. 주주·임원·직원 차입금은 단기·장기차입금 안에 포함된 금액입니다.'},
  {k:'borrowingDependence',l:'차입금의존도',grp:'안정성',u:'%',f:'총차입금 ÷ 자산총계 × 100',plain:'자산 중 빌린 돈으로 마련한 비중입니다.',c:'차입금 입력 범위에 따라 달라집니다.'},
  {k:'interestCoverage',l:'이자보상배율',grp:'안정성',u:'배',f:'영업이익 ÷ 이자비용',plain:'본업 이익으로 이자를 몇 번 갚을 수 있는지입니다. 1배 미만이면 영업이익이 이자보다 적다는 뜻입니다.',c:'이자비용이 0이거나 미입력이면 산출하지 않습니다.'},
  {k:'impairmentRate',l:'자본잠식률',grp:'안정성',u:'%',f:'(자본금 − 자본총계) ÷ 자본금 × 100',plain:'납입한 자본금이 결손으로 얼마나 줄었는지입니다.',c:'자본총계가 자본금보다 작을 때만 표시합니다. 100% 이상은 완전자본잠식입니다.'},
@@ -742,7 +745,7 @@ function calc(k,y){
     case 'revenue':return v('revenue')==null?none():ok(v('revenue'));
     case 'revenueGrowth':{const c=v('revenue'),q=p('revenue');if(c==null)return none('당기 매출액 없음');if(q==null)return na('전기(전년) 매출액 자료 없음');if(q<=0)return hold('전기 매출액이 0 이하라 증가율이 의미 없음');return ok((c-q)/q*100,[['당기 매출액',c],['전기 매출액',q]])}
     case 'assetGrowth':{const c=v('assets'),q=p('assets');if(c==null)return none('당기 자산총계 없음');if(q==null)return na('전기 자산총계 자료 없음');if(q<=0)return hold('전기 자산총계가 0 이하');return ok((c-q)/q*100,[['당기 자산총계',c],['전기 자산총계',q]])}
-    case 'grossMargin':{let gp=v('grossProfit');if(gp==null&&v('revenue')!=null&&v('costOfSales')!=null)gp=v('revenue')-v('costOfSales');if(v('revenue')===0)return na('매출액이 0');return pct(gp,v('revenue'),'매출총이익','매출액')}
+    case 'grossMargin':{if(v('costOfSales')===0&&v('revenue')>0)return hold('매출원가 0 — 원가를 판관비로 분류(서비스업 등)한 것으로 보여 매출총이익률 해석 제외');let gp=v('grossProfit');if(gp==null&&v('revenue')!=null&&v('costOfSales')!=null)gp=v('revenue')-v('costOfSales');if(v('revenue')===0)return na('매출액이 0');return pct(gp,v('revenue'),'매출총이익','매출액')}
     case 'operatingMargin':return pct(v('operatingIncome'),v('revenue'),'영업이익','매출액');
     case 'netMargin':return pct(v('netIncome'),v('revenue'),'당기순이익','매출액');
     case 'ebitda':{if(v('depreciation')==null)return none('감가상각비 미입력');if(v('operatingIncome')==null)return none('영업이익 없음');return ok(v('operatingIncome')+v('depreciation'),[['영업이익',v('operatingIncome')],['감가상각비',v('depreciation')]])}
@@ -750,7 +753,7 @@ function calc(k,y){
     case 'equityRatio':{if(v('assets')!=null&&v('assets')<=0)return na('자산총계가 0 이하');return pct(v('equity'),v('assets'),'자본총계','자산총계')}
     case 'borrowings':{const a=v('shortTermBorrowings'),b=v('longTermBorrowings');if(a==null&&b==null)return none('단기·장기차입금 미입력');return ok((a||0)+(b||0),[['단기차입금',a],['장기차입금',b]])}
     case 'borrowingDependence':{const b=calc('borrowings',y);if(b.st!=='ok')return none(b.why);if(v('assets')==null)return none('자산총계 없음');if(v('assets')<=0)return na('자산총계가 0 이하');return ok(b.v/v('assets')*100,[['총차입금',b.v],['자산총계',v('assets')]])}
-    case 'interestCoverage':{const o=v('operatingIncome'),i=v('interestExpense');if(o==null||i==null)return none(`${o==null?'영업이익':'이자비용'} 입력값 없음`);if(i<=0)return na('이자비용이 0 — 산출하지 않음');return ok(o/i,[['영업이익',o],['이자비용',i]])}
+    case 'interestCoverage':{const o=v('operatingIncome'),i=v('interestExpense');if(o==null||i==null)return none(`${o==null?'영업이익':'이자비용'} 입력값 없음`);if(i<=0)return na('이자비용이 0 — 산출하지 않음');if(o<0)return hold('영업손실 — 1배 미만(음수 배율 미표시)');return ok(o/i,[['영업이익',o],['이자비용',i]])}
     case 'impairmentRate':{const c=v('paidInCapital'),e=v('equity');if(c==null||e==null)return none(`${c==null?'자본금':'자본총계'} 입력값 없음`);if(c<=0)return na('자본금이 0 이하');if(e>=c)return na('자본총계 ≥ 자본금 — 자본잠식 아님');return ok((c-e)/c*100,[['자본금',c],['자본총계',e]])}
     case 'currentRatio':{const a=v('currentAssets'),l=v('currentLiabilities');if(a==null||l==null)return none(`${a==null?'유동자산':'유동부채'} 입력값 없음`);if(l<=0)return na('유동부채가 0 이하');return ok(a/l*100,[['유동자산',a],['유동부채',l]])}
     case 'quickRatio':{const a=v('currentAssets'),i=v('inventory'),l=v('currentLiabilities');if(a==null||l==null)return none('유동자산·유동부채 필요');if(i==null)return none('재고자산 미입력');if(l<=0)return na('유동부채가 0 이하');return ok((a-i)/l*100,[['유동자산−재고자산',a-i],['유동부채',l]])}
@@ -803,6 +806,7 @@ function validateYear(y){
   if(G!=null&&SG!=null&&O!=null){const d=G-SG-O;const okk=Math.abs(d)<=tol();r.items.push({s:okk?'ok':'warn',t:okk?'매출총이익 − 판관비 = 영업이익':`영업이익 산식 불일치(차이 ${nf(d/1e6,3)}백만원) — 기타영업손익 여부 확인`})}
   if(r.missing.length)r.items.push({s:'warn',t:'필수 항목 없음: '+r.missing.join(', ')});
   else if(has)r.items.push({s:'ok',t:'필수 6개 항목 입력됨'});
+  const ib=V(y,'insiderBorrowings');if(ib!=null&&ib>(V(y,'shortTermBorrowings')||0)+(V(y,'longTermBorrowings')||0))r.items.push({s:'warn',t:'주주·임원·직원 차입금이 단기+장기차입금보다 큼 — 분류 확인'});
   const ce=V(y,'cash'),ca=V(y,'currentAssets');if(ce!=null&&ca!=null&&ce>ca)r.items.push({s:'warn',t:'현금성자산이 유동자산보다 큼 — 입력 확인'});
   return r;
 }
@@ -830,7 +834,7 @@ function findings(M){
   const CA=V(y3,'currentAssets'),CL=V(y3,'currentLiabilities');
   if(!fin&&CA!=null&&CL!=null&&CA<CL)F.push({id:'F-LIQ',sev:1,cat:'유동성',title:'유동자산이 유동부채보다 적음',fact:`${y3}년 유동비율 ${fmtM('currentRatio',m('currentRatio',y3))}, 순운전자본 ${fmtMil(CA-CL)}.`,mean:'1년 안에 갚아야 할 부채가 1년 안에 현금화할 수 있는 자산보다 많습니다. 만기 연장·회수 일정에 따라 자금 부족이 생길 수 있어 월별 자금계획 점검이 필요합니다(지급불능 확정이 아님).',ev:['currentRatio','quickRatio','workingCapital'],docs:['1년 내 만기 차입금 명세(금리·만기·연장 가능성)','매출채권 연령표(30·60·90일 이상)','향후 13주 자금수지 계획'],q:['1년 안에 만기가 오는 차입금은 얼마이고 연장 협의가 되었나요?','회수가 늦어진 매출채권이 있나요?','단기차입으로 장기 투자(설비 등)를 한 것은 아닌가요?'],act:[{t:'30일',a:'13주 자금수지표 작성 · 1년 내 만기 차입금 상환/연장 계획 수립',o:'재무 담당',kpi:{n:'유동비율',f:'유동자산 ÷ 유동부채 × 100',b:fmtM('currentRatio',m('currentRatio',y3))}},{t:'90일',a:'단기차입의 장기 전환(만기 구조 조정) 및 매출채권 조기 회수 정책 시행',o:'대표·재무 담당',kpi:null}]});
   const O=V(y3,'operatingIncome'),I=V(y3,'interestExpense');
-  if(!fin&&O!=null&&I!=null&&I>0&&O<I)F.push({id:'F-ICR',sev:1,cat:'안정성',title:'영업이익이 이자비용에 못 미침 (이자보상배율 1배 미만)',fact:`${y3}년 영업이익 ${fmtMil(O)}, 이자비용 ${fmtMil(I)} → 이자보상배율 ${fmtM('interestCoverage',m('interestCoverage',y3))}.`,mean:'본업에서 번 돈으로 이자를 다 내지 못한 해입니다. 같은 상황이 이어지면 차입금 상환 재원이 부족해질 수 있습니다.',ev:['interestCoverage','borrowings'],docs:['차입금별 금리·만기 명세','이자비용 상세(금융기관별)','정책자금·보증 이용 현황'],q:['금리가 높은 차입금부터 상환·대환할 수 있나요?','영업이익을 줄인 원인(가격·원가·고정비)은 무엇인가요?'],act:[{t:'90일',a:'고금리 차입금 대환·정책자금 전환 검토 및 이자비용 절감 계획',o:'재무 담당',kpi:{n:'이자보상배율',f:'영업이익 ÷ 이자비용',b:fmtM('interestCoverage',m('interestCoverage',y3))}}]});
+  if(!fin&&O!=null&&I!=null&&I>0&&O<I)F.push({id:'F-ICR',sev:1,cat:'안정성',title:'영업이익이 이자비용에 못 미침 (이자보상배율 1배 미만)',fact:`${y3}년 영업이익 ${fmtMil(O)}, 이자비용 ${fmtMil(I)}${O<0?' → 영업손실 상태라 이자 전액을 본업 이익으로 감당하지 못함':` → 이자보상배율 ${fmtM('interestCoverage',m('interestCoverage',y3))}`}.`,mean:'본업에서 번 돈으로 이자를 다 내지 못한 해입니다. 같은 상황이 이어지면 차입금 상환 재원이 부족해질 수 있습니다.',ev:['interestCoverage','borrowings'],docs:['차입금별 금리·만기 명세','이자비용 상세(금융기관별)','정책자금·보증 이용 현황'],q:['금리가 높은 차입금부터 상환·대환할 수 있나요?','영업이익을 줄인 원인(가격·원가·고정비)은 무엇인가요?'],act:[{t:'90일',a:'고금리 차입금 대환·정책자금 전환 검토 및 이자비용 절감 계획',o:'재무 담당',kpi:{n:'이자보상배율',f:'영업이익 ÷ 이자비용',b:O<0?'영업손실(표시 보류)':fmtM('interestCoverage',m('interestCoverage',y3))}}]});
   const O2=V(y2,'operatingIncome');
   if(O!=null&&O<0)F.push({id:'F-OPL',sev:2,cat:'수익성',title:O2!=null&&O2<0?'2년 연속 영업손실':'영업손실 발생',fact:`${y3}년 영업이익 ${fmtMil(O)}${O2!=null?` (전년 ${fmtMil(O2)})`:''}.`,mean:'본업에서 비용이 매출을 넘었습니다. 매출총이익(가격·원가)과 판관비(고정비) 중 어디서 생겼는지 나눠 봐야 합니다.',ev:['operatingMargin','grossMargin'],docs:['제품·서비스별 매출과 원가','판관비 계정별 3개년 비교','손익분기 매출 추정 자료'],q:['손실이 특정 제품·고객·사업부에서 생겼나요?','고정비 중 줄이거나 변동비로 바꿀 수 있는 항목은?'],act:[{t:'30일',a:'제품·고객별 공헌이익 분석 및 손익분기 매출 산정',o:'대표·재무 담당',kpi:{n:'영업이익률',f:'영업이익 ÷ 매출액 × 100',b:fmtM('operatingMargin',m('operatingMargin',y3))}},{t:'6개월',a:'저수익 제품·거래 정리, 가격 재설정, 고정비 구조 조정',o:'대표·영업/생산 책임자',kpi:null}]});
   const N=V(y3,'netIncome');
@@ -842,7 +846,7 @@ function findings(M){
   if(om.every(x=>x!=null)&&om[0]>om[1]&&om[1]>om[2])F.push({id:'F-OPM',sev:3,cat:'수익성',title:'영업이익률 2년 연속 하락',fact:`영업이익률 ${y1}년 ${nf(om[0],1)}% → ${y2}년 ${nf(om[1],1)}% → ${y3}년 ${nf(om[2],1)}% (누적 ${nf(om[2]-om[0],1)}%p).`,mean:'같은 매출에서 남는 이익이 계속 줄고 있습니다. 원가율과 판관비율 중 어느 쪽이 올랐는지 확인하세요.',ev:['operatingMargin','grossMargin'],docs:['원가 구성(재료비·노무비·외주비) 3개년','판관비 계정별 비교'],q:['원재료·외주 단가 인상을 판매가에 반영했나요?','인건비·임차료 등 고정비가 매출보다 빨리 늘었나요?'],act:[{t:'90일',a:'원가율·판관비율 분해 후 가격 반영·구매 단가 재협상',o:'대표·구매/영업 책임자',kpi:{n:'영업이익률',f:'영업이익 ÷ 매출액 × 100',b:nf(om[2],1)+'%'}}]});
   const gm=[y1,y2,y3].map(y=>mv('grossMargin',y));
   if(gm.every(x=>x!=null)&&gm[0]>gm[1]&&gm[1]>gm[2])F.push({id:'F-GPM',sev:3,cat:'수익성',title:'매출총이익률 2년 연속 하락',fact:`매출총이익률 ${nf(gm[0],1)}% → ${nf(gm[1],1)}% → ${nf(gm[2],1)}%.`,mean:'제품·서비스 자체의 마진이 줄고 있습니다(원가 상승 또는 가격 하락).',ev:['grossMargin'],docs:['주요 제품 단가·원가 추이'],q:['원가 상승분 중 판매가에 반영하지 못한 비율은?'],act:[{t:'90일',a:'주요 품목 원가 재산정과 가격 정책 재설정',o:'영업/생산 책임자',kpi:{n:'매출총이익률',f:'매출총이익 ÷ 매출액 × 100',b:nf(gm[2],1)+'%'}}]});
-  const sg3=V(y3,'sga'),sg2=V(y2,'sga'),r3=V(y3,'revenue'),r2=V(y2,'revenue');
+  const sg3=V(y3,'sga'),sg2=V(y2,'sga'),r3=V(y3,'revenue'),r2=V(y2,'revenue'),CL3=V(y3,'currentLiabilities');
   if(sg3!=null&&sg2!=null&&sg2>0&&r3!=null&&r2!=null&&r2>0){const gs=(sg3-sg2)/sg2*100,gr=(r3-r2)/r2*100;if(gs>gr&&gs>0)F.push({id:'F-SGA',sev:3,cat:'비용구조',title:'판관비 증가율이 매출 증가율보다 높음',fact:`${y3}년 판관비 증가율 ${nf(gs,1)}% vs 매출 증가율 ${nf(gr,1)}%.`,mean:'고정비 성격의 비용이 매출보다 빨리 늘어 이익이 눌리고 있습니다.',ev:['operatingMargin'],docs:['판관비 계정별(인건비·임차료·광고·지급수수료) 3개년'],q:['늘어난 판관비가 미래 매출을 위한 투자인가요, 관리 누수인가요?'],act:[{t:'90일',a:'판관비 계정별 예산제 도입 및 월별 집행 점검',o:'재무 담당',kpi:{n:'판관비율',f:'판매비와관리비 ÷ 매출액 × 100',b:nf(sg3/r3*100,1)+'%'}}]})}
   const rd3=mv('receivableDays',y3),rd2=mv('receivableDays',y2);
   if(rd3!=null&&rd2!=null&&rd3>rd2)F.push({id:'F-AR',sev:3,cat:'운전자본',title:'매출채권 회수기간 증가',fact:`매출채권 회수기간 ${y2}년 ${nf(rd2,0)}일 → ${y3}년 ${nf(rd3,0)}일 (+${nf(rd3-rd2,0)}일).`,mean:'판매대금이 늦게 들어와 운전자금이 더 묶입니다. 이익이 나도 현금이 부족해지는 대표 원인입니다.',ev:['receivableDays','ccc'],docs:['매출채권 연령표(거래처별·기간별)','거래처별 결제조건'],q:['장기 미회수 채권이 특정 거래처에 몰려 있나요?','결제조건을 길게 바꾼 거래가 있나요?'],act:[{t:'30일',a:'90일 이상 미회수 채권 목록화와 거래처별 회수 일정 확정',o:'영업·재무 담당',kpi:{n:'매출채권 회수기간',f:'평균 매출채권 ÷ 매출액 × 365',b:nf(rd3,0)+'일'}}]});
@@ -850,6 +854,10 @@ function findings(M){
   if(id3!=null&&id2!=null&&id3>id2)F.push({id:'F-INV',sev:3,cat:'운전자본',title:'재고 회전기간 증가',fact:`재고자산 회전기간 ${y2}년 ${nf(id2,0)}일 → ${y3}년 ${nf(id3,0)}일.`,mean:'재고가 오래 머물며 자금이 묶이고, 진부화·평가손실 위험이 커집니다.',ev:['inventoryDays','ccc'],docs:['품목별 재고 연령표','장기 체화 재고 목록'],q:['팔리지 않는 품목이 늘었나요, 선구매를 늘렸나요?'],act:[{t:'90일',a:'장기 체화 재고 처분 계획과 품목별 적정 재고 기준 수립',o:'생산/구매 책임자',kpi:{n:'재고 회전기간',f:'평균 재고자산 ÷ 매출원가 × 365',b:nf(id3,0)+'일'}}]});
   const b3=mv('borrowings',y3),b2=mv('borrowings',y2),c3=V(y3,'cash'),c2=V(y2,'cash');
   if(b3!=null&&b2!=null&&b3>b2&&c3!=null&&c2!=null&&c3<c2)F.push({id:'F-DEBT',sev:2,cat:'현금·차입',title:'차입금은 늘고 현금은 줄어듦',fact:`총차입금 ${fmtMil(b2)} → ${fmtMil(b3)}, 현금성자산 ${fmtMil(c2)} → ${fmtMil(c3)} (${y2}→${y3}년).`,mean:'빌린 돈이 늘었는데도 현금이 줄었다면 영업에서 현금이 빠져나가고 있을 가능성이 있습니다(운전자본·손실·투자 확인 필요).',ev:['borrowings','borrowingDependence','workingCapital'],docs:['현금흐름표(있는 경우)','차입금 증감 내역과 용도','통장 거래내역 12개월'],q:['새로 빌린 돈은 어디에 쓰였나요(운영자금·설비·상환)?','영업에서 들어오는 현금이 비용 지출보다 적은 달이 많았나요?'],act:[{t:'30일',a:'차입 용도별 사용 내역 정리와 월별 현금 유입·유출 점검(통장 흐름 활용)',o:'재무 담당',kpi:{n:'총차입금',f:'단기차입금 + 장기차입금',b:fmtMil(b3)}}]});
+  const IB=V(y3,'insiderBorrowings'),Lb3=V(y3,'liabilities');
+  if(IB!=null&&IB>0){const imp=E!=null&&Cap!=null&&E<Cap;const gapCap=imp?Cap-E:0;F.push({id:'F-INSIDER',sev:imp&&IB>=gapCap?2:3,cat:'차입 구조',title:'대표자·임원 등 특수관계인 차입금 있음',fact:`${y3}년 주주·임원·직원 차입금 ${fmtMil(IB)}${Lb3?` (부채총계의 ${nf(IB/Lb3*100,1)}%)`:''}.${[y1,y2].map(y=>V(y,'insiderBorrowings')).some(v=>v!=null)?` 3개년: ${[y1,y2,y3].map(y=>V(y,'insiderBorrowings')!=null?fmtMil(V(y,'insiderBorrowings')):'—').join(' → ')}.`:''}`,mean:`회사가 대표자·임원 등에게 빌린 돈(가수금 성격)입니다. ${imp?(IB>=gapCap?`자본잠식 해소에 필요한 금액(자본금−자본총계 ${fmtMil(gapCap)})보다 크므로, 출자전환하면 잠식을 해소할 수 있는 규모입니다. `:`출자전환해도 자본잠식 해소에 필요한 금액(${fmtMil(gapCap)})에는 못 미칩니다. `):''}상환하면 현금이 빠져나가고, 이자 약정·세무 처리(인정이자 등)도 확인이 필요합니다.`,ev:['borrowings','debtRatio','impairmentRate'],docs:['주주·임원 차입금(가수금) 원장과 차입 약정서','이자 지급 여부·이자율','출자전환 시 세무·등기 검토 의견'],q:['이 차입금은 상환할 계획인가요, 자본으로 전환할 수 있나요?','이자를 지급하고 있나요? 약정서가 있나요?'],act:[{t:'90일',a:'대표자·임원 차입금 정리 방안 비교(상환 일정 vs 출자전환) 및 세무 검토',o:'대표·세무 전문가',kpi:{n:'특수관계인 차입금',f:'주주·임원·직원 차입금 잔액',b:fmtMil(IB)}}]})}
+  const AP3=V(y3,'otherPayables'),AP2=V(y2,'otherPayables');
+  if(AP3!=null&&AP2!=null&&AP2>0&&AP3>AP2&&r3!=null&&r2!=null&&r2>0){const ga=(AP3-AP2)/AP2*100,gr=(r3-r2)/r2*100;if(ga>gr)F.push({id:'F-AP',sev:3,cat:'운전자본',title:'미지급금 증가율이 매출 증가율보다 높음',fact:`미지급금 ${fmtMil(AP2)} → ${fmtMil(AP3)} (+${nf(ga,1)}%), 매출 증가율 ${nf(gr,1)}% (${y2}→${y3}년)${CL3?` · 유동부채의 ${nf(AP3/CL3*100,1)}%`:''}.`,mean:'비용 지급을 뒤로 미뤄 현금을 유지하고 있을 가능성이 있습니다. 지급 시점이 몰리면 단기 자금 부담이 커집니다.',ev:['currentRatio','workingCapital'],docs:['미지급금 거래처별·만기별 명세','외주·용역비 지급 조건'],q:['미지급금 중 결산일 이후 3개월 안에 나갈 금액은 얼마인가요?','지급을 미룬 이유가 자금 부족인가요, 거래 조건인가요?'],act:[{t:'30일',a:'미지급금 만기별 지급 계획을 13주 자금수지표에 반영',o:'재무 담당',kpi:{n:'미지급금',f:'미지급금 잔액(만기별)',b:fmtMil(AP3)}}]})}
   const R3=V(y3,'revenue');
   if(R3!=null&&R3===0)F.push({id:'F-REV0',sev:3,cat:'성장성',title:'매출 미발생 (초기·준비 단계)',fact:`${y3}년 매출액 0원.`,mean:'매출 기반 지표(이익률·회전율)는 의미가 없어 표시하지 않습니다. 현금 소진 속도와 자금조달 계획이 핵심입니다.',ev:['workingCapital'],docs:['월별 지출 계획(번레이트)','투자·정책자금 조달 계획'],q:['현재 현금으로 몇 개월 운영할 수 있나요?'],act:[{t:'30일',a:'월 고정지출 기준 현금 소진 개월 수 산정과 조달 일정 수립',o:'대표',kpi:null}]});
   const order={0:0,1:1,2:2,3:3};
@@ -969,19 +977,114 @@ function extractFromRows(allRows,file,pages){
   if(!unit&&file.kind==='paste'){warnings.pop();return {id:'f'+Math.random().toString(36).slice(2,9),file:file.name,kind:file.kind,unit:S.unit,unitDetected:true,fileYear,colYear:!!colYear,items,warnings,meta}}
   return {id:'f'+Math.random().toString(36).slice(2,9),file:file.name,kind:file.kind,unit:unit||'원',unitDetected:!!unit,fileYear,colYear:!!colYear,items,warnings,meta};
 }
+/* PDF 텍스트 → 줄·토큰. 홈택스 발급 PDF는 글자 1개가 텍스트 조각 1개라서 x 간격으로 단어를 다시 붙인다. */
+function pdfLines(tc){
+  const its=tc.items.filter(i=>typeof i.str==='string'&&i.transform).map(i=>({s:i.str,x:i.transform[4],y:i.transform[5],w:i.width||0,h:Math.abs(i.transform[3])||8}));
+  const lines=[];
+  for(const it of its){if(!it.s)continue;let ln=lines.find(l=>Math.abs(l.y-it.y)<=2);if(!ln){ln={y:it.y,items:[]};lines.push(ln)}ln.items.push(it)}
+  lines.sort((a,b)=>b.y-a.y);
+  return lines.map(l=>{
+    l.items.sort((a,b)=>a.x-b.x);const toks=[];let cur='',end=null;
+    for(const it of l.items){
+      if(!it.s.trim()){if(cur){toks.push(cur);cur=''}end=it.x+it.w;continue}
+      const gap=end==null?0:it.x-end;
+      if(cur&&gap>Math.max(2.5,it.h*0.35)){toks.push(cur);cur=''}
+      cur+=it.s;end=it.x+it.w;
+    }
+    if(cur)toks.push(cur);
+    return toks.flatMap(t=>t.split(/\s{2,}/)).flatMap(t=>t.trim().split(/\s(?=[\(△▲\-]?\d{1,3}(?:,\d{3})+\)?$)/)).map(t=>t.trim()).filter(Boolean);
+  }).filter(t=>t.length);
+}
+/* 국세청 표준재무제표(일반법인용) 코드표 — 실제 발급 증명서에서 확인한 코드만 사용 */
+const NTS_CODES={
+  bs:{'001':'currentAssets','003':'cash','009':'tradeReceivables','044':'inventory','080':'noncurrentAssets','228':'assets','229':'currentLiabilities','234':'shortTermBorrowings','236':'insiderBorrowings','238':'otherPayables','284':'noncurrentLiabilities','289':'longTermBorrowings','333':'liabilities','334':'paidInCapital','372':'retainedEarnings','382':'equity'},
+  is:{'001':'revenue','035':'costOfSales','066':'grossProfit','067':'sga','129':'operatingIncome','180':'interestExpense','219':'netIncome'}
+};
+function ntsSegments(toks){
+  const segs=[];let lab=[];
+  for(let i=0;i<toks.length;i++){const t=toks[i];
+    if(/^\d{3}$/.test(t)&&lab.length&&i+1<toks.length&&parseAmount(toks[i+1])&&!parseAmount(toks[i+1]).dash){segs.push({label:lab.join(' '),code:t,raw:toks[i+1]});lab=[];i++;continue}
+    lab.push(t)}
+  return segs;
+}
+function suggestIndustry(s){s=String(s||'');const m=[[/금융|보험/,'금융·보험업'],[/제조/,'제조업'],[/도매|소매|상품중개/,'도매 및 소매업'],[/정보통신|소프트웨어|출판|프로그래밍|정보서비스/,'정보통신업(소프트웨어·IT)'],[/전문|과학|기술서비스|컨설팅/,'전문·과학·기술 서비스업'],[/건설/,'건설업'],[/숙박|음식/,'숙박·음식점업'],[/운수|창고|운송/,'운수·창고업'],[/교육|보건|사회복지|서비스/,'교육·보건·기타 서비스업']];for(const [re,v] of m)if(re.test(s))return v;return s?'기타':''}
+function ntsMeta(pages){
+  const lineStr=pages.flatMap(p=>p.rows.map(r=>r.join(' ')));
+  const compactLines=lineStr.map(s=>s.replace(/\s/g,''));const all=compactLines.join('|');
+  const n={};
+  n.isNts=/표준재무제표증명|표준재무상태표|표준손익계산서/.test(all);
+  n.form=(all.match(/\((일반법인용|금융보험업용|비영리법인용|개인사업자용)\)/)||[])[1]||'';
+  n.issueNo=(all.match(/\d{4}-\d{3}-\d{4}-\d{3}/)||[])[0]||'';
+  const offTok=pages.flatMap(p=>p.rows.flat()).find(t=>/^[가-힣]{1,8}세무서장$/.test(t));const off=offTok?[null,offTok.replace(/장$/,'')]:null;if(off)n.office=off[1];
+  const iss=[...all.matchAll(/(20\d{2})년(\d{1,2})월(\d{1,2})일(?!현재|까지|부터)/g)];
+  if(off&&iss.length){const d=iss[iss.length-1];n.issuedAt=`${d[1]}-${d[2].padStart(2,'0')}-${d[3].padStart(2,'0')}`}
+  const rp=all.match(/신고구분\|?([가-힣]+?신고)\|?신고일\|?(20\d{2}[.\-]\d{1,2}[.\-]\d{1,2})/);if(rp){n.report=rp[1];n.reportDate=rp[2].replace(/\./g,'-')}
+  const bt=compactLines.find(s=>/^업태/.test(s));if(bt)n.bizType=bt.replace(/^업태/,'');
+  const bi=compactLines.find(s=>/^종목/.test(s));if(bi)n.bizItem=bi.replace(/^종목/,'');
+  const meta={};
+  const b=all.match(/(\d{3})-(\d{2})-(\d{5})/);if(b)meta.biz=`${b[1]}-${b[2]}-*****`;
+  // 상호: 1쪽 '상호(법인명) … 사업자등록번호'를 우선, 띄어쓰기 있는 표기는 손익계산서 머리글에서 찾는다
+  let co=null;const m1=all.match(/상호\(법인명\)\|?([^|]+?)\|?사업자등록번호/);if(m1)co=m1[1];
+  if(!co){for(const s of lineStr){const m=s.match(/법인명\s+([^0-9]+?)(?:\s+사업자등록번호|$)/);if(m&&m[1].replace(/\s/g,'').length>=2){co=m[1];break}}}
+  if(co){co=co.trim();const pretty=lineStr.map(s=>(s.match(/법인명\s+([^0-9]+?)(?:\s+사업자등록번호|$)/)||[])[1]).find(x=>x&&x.replace(/\s/g,'')===co.replace(/\s/g,''));meta.company=(pretty||co).trim()}
+  // 사업연도 종료일: '현재'(재무상태표), '까지'(손익계산서), '~YYYY.MM.DD'(증명서 1쪽). 발급일은 제외된다.
+  const ends=[];let m;const re=[/(20\d{2})년(\d{1,2})월(\d{1,2})일현재/g,/(20\d{2})년(\d{1,2})월(\d{1,2})일까지/g,/~\|?(20\d{2})[.\-](\d{1,2})[.\-](\d{1,2})/g,/~\|?(20\d{2})년(\d{1,2})월(\d{1,2})일/g];
+  for(const r of re)while((m=r.exec(all)))ends.push({y:+m[1],mo:+m[2]});
+  return {nts:n,meta,ends};
+}
 async function extractPdf(file){
   const pdfjs=await needPdf();const buf=await file.arrayBuffer();
   const doc=await pdfjs.getDocument({data:new Uint8Array(buf),isEvalSupported:false,disableFontFace:true}).promise;
-  const pages=[];let textLen=0;const all=[];
+  const pages=[];let textLen=0;
   for(let p=1;p<=Math.min(doc.numPages,30);p++){
     const page=await doc.getPage(p);const tc=await page.getTextContent();
-    const lines=[];for(const it of tc.items){const s=(it.str||'').trim();if(!s)continue;textLen+=s.length;const y=Math.round(it.transform[5]);const x=it.transform[4];let ln=lines.find(l=>Math.abs(l.y-y)<=3);if(!ln){ln={y,items:[]};lines.push(ln)}ln.items.push({x,s})}
-    lines.sort((a,b)=>b.y-a.y);
-    const rows=lines.map(l=>{l.items.sort((a,b)=>a.x-b.x);const toks=[];l.items.forEach(i=>i.s.split(/\s{2,}|\s(?=[\(△▲\-]?\d)|(?<=\d)\s(?=[가-힣])/).forEach(t=>{t=t.trim();if(t)toks.push(t)}));return toks});
-    pages.push({page:p,rows});all.push(...rows);
+    textLen+=tc.items.reduce((a,i)=>a+(i.str||'').trim().length,0);
+    pages.push({page:p,rows:pdfLines(tc)});
   }
   if(textLen<40)return {scanned:true};
-  return extractFromRows(all,file,pages);
+  const {nts,meta,ends}=ntsMeta(pages);
+  const res=nts.isNts?extractNts(pages,file):extractFromRows(pages.flatMap(p=>p.rows),file,pages);
+  // 연도: 문서 내 회계기간 종료일 우선
+  if(ends.length){const cnt={};ends.forEach(e=>cnt[e.y]=(cnt[e.y]||0)+1);const ys=Object.keys(cnt).map(Number);res.fileYear=+Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0][0];res.yearSource='회계기간 종료일';res.warnings=res.warnings.filter(w=>!/회계기간을 찾지 못해/.test(w));if(ys.length>1)res.warnings.push(`문서 안에 서로 다른 회계연도(${ys.join('·')})가 있습니다. 연도를 확인하세요.`);const mo=ends[0].mo;res.periodMonth=mo;res.warnings=res.warnings.filter(w=>!/결산월/.test(w));if(mo&&mo!==S.org.fye)res.warnings.push(`문서의 결산월(${mo}월)이 회사 정보의 결산월(${S.org.fye}월)과 다릅니다.`)}
+  if(nts.isNts){res.nts=nts;res.meta={...res.meta,...meta}}
+  return res;
+}
+function ntsNonOpSeen(pages){return pages.some(pg=>pg.rows.some(r=>ntsSegments(r).some(sg=>/^영업외비용$/.test(normLabel(sg.label)))))}
+function extractNts(pages,file){
+  const items=[];const warnings=[];
+  for(const pg of pages){
+    const comp=pg.rows.map(r=>r.join('')).join('').replace(/\s/g,'');
+    const type=/표준재무상태표/.test(comp)&&!/표준손익계산서/.test(comp)?'bs':/표준손익계산서/.test(comp)&&!/표준재무상태표/.test(comp)?'is':/제조원가명세서|공사원가명세서/.test(comp)?'cost':'mixed';
+    for(const r of pg.rows)for(const sg of ntsSegments(r)){
+      const n=normLabel(sg.label);const hit=LABEL_MAP.get(n);const codeKey=(NTS_CODES[type]||{})[sg.code];
+      let k=null,conf='low',note='';
+      if(type==='cost'){if(hit&&hit.k==='depreciation'){k='depreciation';note='원가명세서의 감가상각비 — 판관비분과 합산 여부 확인'}else continue}
+      else if(hit&&codeKey&&hit.k===codeKey){k=hit.k;conf='high';note=`국세청 코드 ${sg.code} 일치`}
+      else if(hit&&codeKey&&hit.k!==codeKey){k=hit.k;conf='low';note=`계정명과 코드(${sg.code})가 다름 — 확인 필요`}
+      else if(hit){k=hit.k;conf=hit.conf;note=hit.neg?'손실 표기 라벨 — 부호 확인':''}
+      else if(codeKey){k=codeKey;conf='mid';note=`코드 ${sg.code}로 인식 — 계정명 확인`}
+      else continue;
+      const p=parseAmount(sg.raw);if(!p)continue;
+      let v=p.n;if(hit&&hit.neg&&v>0){v=-v;conf='low';note='손실 표기 라벨 — 음수로 변환, 확인 필요'}
+      items.push({k,label:sg.label,raw:sg.raw,n:v,yearHint:null,rel:null,page:pg.page,code:sg.code,conf,note});
+    }
+  }
+  // 국세청 표준재무제표는 0원 계정을 표시하지 않는다 → 합계가 있는 표에서 빠진 세부 계정은 0원 후보로 제시(사용자 확인)
+  const has=k=>items.some(i=>i.k===k);
+  const bsPage=items.find(i=>i.k==='assets')?.page,isPage=items.find(i=>i.k==='revenue')?.page;
+  const zero=(k,pg,why)=>items.push({k,label:'(증명서에 표시 없음)',raw:'0',n:0,yearHint:null,rel:null,page:pg,code:'',conf:'mid',note:why,zero:true});
+  if(bsPage!=null&&has('liabilities')&&has('currentAssets'))['cash','tradeReceivables','inventory','tradePayables','otherPayables','shortTermBorrowings','insiderBorrowings','longTermBorrowings'].forEach(k=>{if(!has(k))zero(k,bsPage,'국세청 표준재무제표는 0원 계정을 표시하지 않음 → 0원으로 처리(확인 필요)')});
+  if(isPage!=null&&!has('interestExpense')&&ntsNonOpSeen(pages))zero('interestExpense',isPage,'영업외비용 내역에 이자비용 없음 → 0원으로 처리(확인 필요)');
+  if(isPage!=null&&!has('costOfSales')&&has('grossProfit'))zero('costOfSales',isPage,'매출원가 표시 없음 → 0원으로 처리(확인 필요)');
+  // 주주·임원·직원 차입금은 단기·장기 하위에 각각 나올 수 있어 합산
+  const ins=items.filter(i=>i.k==='insiderBorrowings');
+  if(ins.length>1){const sum=ins.reduce((a,i)=>a+i.n,0);ins[0].n=sum;ins[0].raw=ins.map(i=>i.raw).join(' + ');ins[0].note='단기·장기 차입금 하위 금액 합산';items.splice(0,items.length,...items.filter(i=>i.k!=='insiderBorrowings'||i===ins[0]))}
+  const seen=new Set();
+  items.forEach(it=>{if(seen.has(it.k)){it.dup=true;it.conf='low';it.note=(it.note?it.note+' · ':'')+'같은 계정이 여러 번 나옴(세부 내역일 수 있음)'}else seen.add(it.k)});
+  if(!items.length)warnings.push('표준재무제표 서식은 인식했지만 계정·금액을 찾지 못했습니다. 스캔본이거나 다른 서식일 수 있습니다.');
+  const txt=pages.flatMap(p=>p.rows.map(r=>r.join(' '))).join('\n');
+  const unit=detectUnit(txt);
+  return {id:'f'+Math.random().toString(36).slice(2,9),file:file.name,kind:'pdf',unit:unit||'원',unitDetected:!!unit,fileYear:null,colYear:false,items,warnings,meta:{}};
 }
 async function extractSheet(file){
   const XLSX=await needXlsx();const buf=await file.arrayBuffer();
@@ -1001,6 +1104,7 @@ async function handleFiles(list){
     S.sources.push(src);renderSources();
     try{
       src.sha256=await sha256(await f.arrayBuffer());
+      if(S.sources.some(o=>o!==src&&o.sha256===src.sha256&&!/^오류|중복/.test(o.status))){src.status='중복 파일 — 무시';toast(`${f.name}: 이미 올린 파일과 같은 파일입니다.`);renderSources();continue}
       let res;
       if(kind==='pdf'){res=await extractPdf({name:f.name,kind,arrayBuffer:()=>f.arrayBuffer()});if(res.scanned){src.status='이미지 PDF — 자동 인식 불가';toast(`${f.name}: 글자가 없는 스캔 PDF입니다. 직접 입력해 주세요.`);renderSources();continue}}
       else if(kind==='csv'){const t=await readText(f);const rows=parseCSV(t);res=extractFromRows(rows,{name:f.name,kind},[{page:null,rows}])}
@@ -1013,35 +1117,100 @@ async function handleFiles(list){
 }
 function addPending(res){S.pending.push(res);switchTab('file');renderCandidates()}
 function resolveYear(res,it){const fy=+(res.chosenYear||res.fileYear||S.baseYear);if(it.yearHint)return it.yearHint;if(it.rel!=null)return fy+it.rel;return fy}
+const compactName=s=>String(s||'').replace(/\s|\(주\)|㈜|주식회사|\(|\)/g,'');
+function pendingDefault(res,it){const Y=years();const y=resolveYear(res,it);return it.apply!=null?it.apply:(it.conf!=='low'&&!it.dup&&Y.includes(y))}
+/* 여러 파일 교차검증: 같은 회사·연도 중복·대차/손익 산식 사전 확인 */
+function crossCheck(){
+  const Y=years();const rows=[];const issues=[];
+  const fileYears={};
+  S.pending.forEach((res,ri)=>{
+    const sel=res.items.filter(it=>pendingDefault(res,it));const yrs=[...new Set(res.items.map(it=>resolveYear(res,it)))];
+    yrs.forEach(y=>{(fileYears[y]=fileYears[y]||[]).push(res.file)});
+    yrs.forEach(y=>{
+      const g=k=>{const it=sel.find(i=>i.k===k&&resolveYear(res,i)===y);return it?Math.round(it.n*UNITS[res.unit]):null};
+      const A=g('assets'),L=g('liabilities'),E=g('equity'),R=g('revenue'),C=g('costOfSales'),G=g('grossProfit'),SG=g('sga'),O=g('operatingIncome');
+      const t=Math.max(UNITS[res.unit],2);
+      const bal=A!=null&&L!=null&&E!=null?Math.abs(A-L-E)<=t:null;
+      const pl=R!=null&&C!=null&&G!=null&&SG!=null&&O!=null?(Math.abs(R-C-G)<=t&&Math.abs(G-SG-O)<=t):null;
+      rows.push({ri,file:res.file,y,inRange:Y.includes(y),company:res.meta.company||'',biz:res.meta.biz||'',bal,pl,n:sel.filter(i=>resolveYear(res,i)===y).length,nts:res.nts});
+    });
+  });
+  const cos=[...new Set(rows.map(r=>compactName(r.company)).filter(Boolean))];
+  const bizs=[...new Set(rows.map(r=>r.biz).filter(Boolean))];
+  if(cos.length>1)issues.push({lv:'bad',t:`서로 다른 상호가 섞여 있습니다: ${[...new Set(rows.map(r=>r.company).filter(Boolean))].join(' / ')}`});
+  if(bizs.length>1)issues.push({lv:'bad',t:`서로 다른 사업자번호가 섞여 있습니다: ${bizs.join(' / ')}`});
+  if(S.org.name&&cos.length===1&&!S.sample&&compactName(S.org.name)&&compactName(S.org.name)!==cos[0])issues.push({lv:'warn',t:`문서 상호(${rows.find(r=>r.company).company})가 ① 법인명(${S.org.name})과 다릅니다.`});
+  Object.entries(fileYears).forEach(([y,fs])=>{if(fs.length>1)issues.push({lv:'bad',t:`${y}년 자료가 여러 파일에 있습니다(${fs.join(', ')}). 하나만 남기세요.`})});
+  rows.filter(r=>!r.inRange).forEach(r=>issues.push({lv:'warn',t:`${r.file}: ${r.y}년은 분석 기간(${Y[0]}~${Y[2]}) 밖이라 반영되지 않습니다. ① 최근 결산 연도를 확인하세요.`}));
+  rows.filter(r=>r.bal===false).forEach(r=>issues.push({lv:'bad',t:`${r.file} ${r.y}년: 자산 ≠ 부채 + 자본 — 추출값 확인 필요`}));
+  rows.filter(r=>r.pl===false).forEach(r=>issues.push({lv:'warn',t:`${r.file} ${r.y}년: 손익 산식(매출−원가=총이익, 총이익−판관비=영업이익) 불일치`}));
+  const missing=Y.filter(y=>!rows.some(r=>r.y===y)&&!ACCTS.some(a=>V(y,a.k)!=null));
+  const blocked=issues.some(i=>i.lv==='bad');
+  return {rows,issues,missing,blocked,sameCompany:cos.length===1&&bizs.length<=1&&rows.length>1};
+}
 function renderCandidates(){
   const box=$('#candidates');
   if(!S.pending.length){box.innerHTML='';return}
-  const Y=years();
-  box.innerHTML=S.pending.map((res,ri)=>{
+  const Y=years();const cc=crossCheck();
+  const summary=`<div class="cand" style="border-color:#BFD5F5"><div class="cand-h" style="background:#EEF5FF"><div><b>일괄 검토</b> <span class="hint">· 파일 ${S.pending.length}개 · 반영 전 자동 대조</span></div><div class="cand-ctl"><button class="btn small" type="button" id="btnApplyAll" ${cc.blocked?'disabled':''}>확인한 값 모두 반영</button></div></div>
+  <div style="overflow-x:auto"><table class="t"><thead><tr><th>연도</th><th>파일</th><th>문서</th><th>상호</th><th>사업자번호</th><th>대차</th><th>손익 산식</th><th class="r">선택 항목</th></tr></thead><tbody>${cc.rows.sort((a,b)=>a.y-b.y).map(r=>`<tr><td><b>${r.y}년</b>${r.inRange?'':' <span class="s-warn">(범위 밖)</span>'}</td><td>${esc(r.file)}</td><td>${r.nts?.isNts?`<span class="badge b-info">홈택스 표준재무제표${r.nts.form?'('+esc(r.nts.form)+')':''}</span>`:'<span class="hint">일반 파일</span>'}</td><td>${esc(r.company||'—')}</td><td>${esc(r.biz||'—')}</td><td>${r.bal==null?'<span class="s-mute">—</span>':r.bal?'<span class="s-ok">✓ 일치</span>':'<span class="s-bad">✕ 불일치</span>'}</td><td>${r.pl==null?'<span class="s-mute">—</span>':r.pl?'<span class="s-ok">✓ 일치</span>':'<span class="s-warn">! 불일치</span>'}</td><td class="r">${r.n}</td></tr>`).join('')}</tbody></table></div>
+  ${cc.issues.length?`<div class="callout ${cc.blocked?'bad':'warn'}" style="margin:10px 14px"><span class="ci">!</span><span>${cc.issues.map(i=>esc(i.t)).join('<br>')}${cc.blocked?'<br><b>문제를 해결(파일 버리기·연도 선택)하기 전에는 일괄 반영을 막습니다.</b>':''}</span></div>`:cc.sameCompany?'<div class="callout ok" style="margin:10px 14px"><span class="ci">✓</span><span>모든 문서의 상호·사업자번호가 같고, 연도가 겹치지 않습니다.</span></div>':''}
+  ${cc.missing.length?`<p class="hint" style="margin:0 14px 12px">아직 자료가 없는 연도: ${cc.missing.join(', ')}년 — 해당 연도 증명서를 추가로 올리세요.</p>`:''}</div>`;
+  box.innerHTML=summary+S.pending.map((res,ri)=>{
     const yOpts=[...new Set([...Y,res.fileYear].filter(Boolean))].sort();
-    const multi=res.colYear;
-    const rows=res.items.map((it,ii)=>{const y=resolveYear(res,it);const inRange=Y.includes(y);const won=Math.round(it.n*UNITS[res.unit]);const def=it.apply!=null?it.apply:(it.conf!=='low'&&!it.dup&&inRange);
-      return `<tr><td><input type="checkbox" data-ci="${ri}:${ii}" ${def?'checked':''} ${inRange?'':'disabled'} aria-label="${esc(AK[it.k].l)} 반영"></td><td><b>${esc(AK[it.k].l)}</b></td><td>${esc(it.label)}</td><td class="r num">${esc(it.raw)}</td><td class="r num">${fmtMil(won)}</td><td>${inRange?y+'년':`<span class="s-warn">${y}년(범위 밖)</span>`}</td><td>${it.page!=null?esc(it.page):'—'}</td><td><span class="badge ${it.conf==='high'?'b-ok':it.conf==='mid'?'b-warn':'b-bad'}">${it.conf==='high'?'높음':it.conf==='mid'?'보통':'낮음'}</span>${it.note?`<div class="hint">${esc(it.note)}</div>`:''}</td></tr>`}).join('');
+    const multi=res.colYear;const n=res.nts;
+    const rows=res.items.map((it,ii)=>{const y=resolveYear(res,it);const inRange=Y.includes(y);const won=Math.round(it.n*UNITS[res.unit]);const def=pendingDefault(res,it);
+      return `<tr><td><input type="checkbox" data-ci="${ri}:${ii}" ${def?'checked':''} ${inRange?'':'disabled'} aria-label="${esc(AK[it.k].l)} 반영"></td><td><b>${esc(AK[it.k].l)}</b></td><td>${esc(it.label)}${it.code?` <span class="hint">[${esc(it.code)}]</span>`:''}</td><td class="r num">${esc(it.raw)}</td><td class="r num">${fmtMil(won)}</td><td>${inRange?y+'년':`<span class="s-warn">${y}년(범위 밖)</span>`}</td><td>${it.page!=null?esc(it.page):'—'}</td><td><span class="badge ${it.conf==='high'?'b-ok':it.conf==='mid'?'b-warn':'b-bad'}">${it.conf==='high'?'높음':it.conf==='mid'?'보통':'낮음'}</span>${it.note?`<div class="hint">${esc(it.note)}</div>`:''}</td></tr>`}).join('');
+    const ntsLine=n&&n.isNts?`<div class="hint" style="padding:8px 14px 0">문서: 홈택스 표준재무제표증명${n.form?'('+esc(n.form)+')':''}${n.issueNo?' · 발급번호 '+esc(n.issueNo):''}${n.issuedAt?' · 발급일 '+esc(n.issuedAt):''}${n.office?' · '+esc(n.office):''}${n.report?' · '+esc(n.report)+(n.reportDate?' '+esc(n.reportDate):''):''}${n.bizType?' · 업태 '+esc(n.bizType):''}${n.bizItem?' · 종목 '+esc(n.bizItem):''}<br>발급번호로 홈택스 ‘민원증명 원본확인’에서 발급일로부터 90일 안에 위·변조 여부를 확인할 수 있습니다(이 서비스는 진위를 확인하지 않음).</div>`:'';
     return `<div class="cand" data-ri="${ri}"><div class="cand-h"><div><b>📄 ${esc(res.file)}</b> <span class="hint">· ${res.items.length}개 후보${res.meta.company?' · 문서 상호: '+esc(res.meta.company):''}${res.meta.biz?' · 사업자번호 '+esc(res.meta.biz):''}</span></div>
     <div class="cand-ctl">${multi?'<span class="badge b-info">열 머리글에서 연도 인식</span>':`<label>회계연도 <select data-res-year="${ri}">${yOpts.map(y=>`<option value="${y}" ${(+(res.chosenYear||res.fileYear||S.baseYear))===y?'selected':''}>${y}년${y===res.fileYear?' (문서 인식)':''}</option>`).join('')}</select></label>`}
     <label>원본 단위 <select data-res-unit="${ri}">${Object.keys(UNITS).map(u=>`<option ${u===res.unit?'selected':''}>${u}</option>`).join('')}</select></label>${res.unitDetected?'<span class="badge b-ok">단위 인식</span>':'<span class="badge b-warn">단위 추정</span>'}
-    <button class="btn small" type="button" data-apply="${ri}">선택 값 반영</button><button class="btn small ghost" type="button" data-drop="${ri}">버리기</button></div></div>
+    <button class="btn small sec" type="button" data-apply="${ri}">이 파일만 반영</button><button class="btn small ghost" type="button" data-drop="${ri}">버리기</button></div></div>${ntsLine}
     ${res.warnings.length?`<div class="callout warn" style="margin:10px 14px"><span class="ci">!</span><span>${res.warnings.map(esc).join('<br>')}</span></div>`:''}
-    ${res.items.length?`<div style="overflow-x:auto"><table class="t"><thead><tr><th>반영</th><th>계정</th><th>원문 라벨</th><th class="r">원문 금액</th><th class="r">변환(백만원)</th><th>연도</th><th>쪽</th><th>신뢰도</th></tr></thead><tbody>${rows}</tbody></table></div>`:''}</div>`}).join('')+
-  `<p class="hint">신뢰도 ‘낮음’ 후보는 기본으로 체크하지 않습니다. 원본과 대조한 뒤 직접 체크하세요. 반영 후에도 ② 입력표에서 고칠 수 있으며, 고친 내역은 기록됩니다.</p>`;
+    ${res.items.length?`<div style="overflow-x:auto"><table class="t"><thead><tr><th>반영</th><th>계정</th><th>원문 라벨 [코드]</th><th class="r">원문 금액</th><th class="r">변환(백만원)</th><th>연도</th><th>쪽</th><th>신뢰도</th></tr></thead><tbody>${rows}</tbody></table></div>`:''}</div>`}).join('')+
+  `<p class="hint">국세청 계정명과 코드가 모두 맞으면 신뢰도 ‘높음’입니다. ‘낮음’ 후보(세부 내역·중복·부호 확인)는 기본으로 체크하지 않습니다. 반영 후에도 ② 입력표에서 고칠 수 있으며, 고친 내역은 기록됩니다.</p>`;
+}
+function syncChecks(ri){$$(`[data-ci^="${ri}:"]`).forEach(cb=>{const ii=+cb.dataset.ci.split(':')[1];S.pending[ri].items[ii].apply=cb.checked})}
+function applyRes(res){
+  const Y=years();let n=0;
+  res.items.forEach(it=>{if(!pendingDefault(res,it))return;const y=resolveYear(res,it);if(!Y.includes(y))return;setCell(y,it.k,Math.round(it.n*UNITS[res.unit]),{src:res.kind,file:res.file,page:it.page,label:it.label,conf:it.conf});n++});
+  const src=S.sources.find(s=>s.id===res.sourceId);
+  if(src){src.status=`${n}건 반영(사용자 확인)`;src.years=res.colYear?'열 머리글':(res.chosenYear||res.fileYear);src.unit=res.unit;if(res.nts&&res.nts.isNts){src.doc=`홈택스 표준재무제표증명${res.nts.form?'('+res.nts.form+')':''}`;src.issueNo=res.nts.issueNo||'';src.issuedAt=res.nts.issuedAt||'';src.office=res.nts.office||'';src.report=[res.nts.report,res.nts.reportDate].filter(Boolean).join(' ');src.company=res.meta.company||'';src.biz=res.meta.biz||''}}
+  // 회사 정보 자동 제안(비어 있을 때만)
+  if(res.meta.company&&!S.org.name){S.org.name=res.meta.company}
+  if(res.nts&&res.nts.bizType&&!S.org.industry){const ind=suggestIndustry(res.nts.bizType+' '+(res.nts.bizItem||''));if(ind)S.org.industry=ind}
+  if(res.meta.biz&&!S.bizMasked)S.bizMasked=res.meta.biz;
+  return n;
 }
 function applyPending(ri){
-  const res=S.pending[ri];if(!res)return;const Y=years();let n=0;
-  $$(`[data-ci^="${ri}:"]`).forEach(cb=>{const ii=+cb.dataset.ci.split(':')[1];res.items[ii].apply=cb.checked});
-  res.items.forEach(it=>{if(!it.apply)return;const y=resolveYear(res,it);if(!Y.includes(y))return;setCell(y,it.k,Math.round(it.n*UNITS[res.unit]),{src:res.kind,file:res.file,page:it.page,label:it.label,conf:it.conf});n++});
-  const src=S.sources.find(s=>s.id===res.sourceId);if(src){src.status=`${n}건 반영(사용자 확인)`;src.years=res.colYear?'열 머리글':(res.chosenYear||res.fileYear);src.unit=res.unit}
-  S.pending.splice(ri,1);renderCandidates();renderGrid();renderSources();refresh();
+  const res=S.pending[ri];if(!res)return;syncChecks(ri);
+  const n=applyRes(res);S.pending.splice(ri,1);
+  syncForm();renderCandidates();renderGrid();renderSources();refresh();
   toast(`${n}개 값을 반영했습니다. ③ 추출·검증에서 확인하세요.`);
+}
+function applyAll(){
+  const cc=crossCheck();if(cc.blocked){toast('교차검증 문제를 먼저 해결하세요.');return}
+  S.pending.forEach((_,ri)=>syncChecks(ri));
+  let n=0;S.pending.forEach(res=>{n+=applyRes(res)});const files=S.pending.length;S.pending=[];
+  syncForm();renderCandidates();renderGrid();renderSources();refresh();
+  toast(`${files}개 파일에서 ${n}개 값을 반영했습니다. ③에서 비교 가능성을 확인하세요.`);
+  location.hash='#s-verify';
+}
+function sourceEvidence(){
+  const ns=S.sources.filter(s=>s.doc&&/반영/.test(s.status));if(!ns.length)return '';
+  const cos=[...new Set(ns.map(s=>compactName(s.company)).filter(Boolean))],bz=[...new Set(ns.map(s=>s.biz).filter(Boolean))],us=[...new Set(ns.map(s=>s.unit))];
+  const yrs=[...new Set(ns.map(s=>+s.years).filter(Boolean))].sort();
+  const lines=[];
+  lines.push(cos.length===1&&bz.length<=1?`✓ 홈택스 증명서 ${ns.length}건(${yrs.join('·')}년)의 상호·사업자번호가 같습니다(자동 대조).`:`✕ 증명서 간 상호·사업자번호가 다릅니다 — 같은 회사 자료인지 확인하세요.`);
+  lines.push(us.length===1?`✓ 문서 금액 단위: ${us[0]} (모두 같음)`:`! 문서 단위가 섞여 있습니다: ${us.join(', ')}`);
+  const fm=[...new Set(ns.map(s=>s.doc))];lines.push(fm.length===1?`✓ 같은 서식: ${fm[0]}`:`! 서식이 다릅니다: ${fm.join(', ')}`);
+  const rep=ns.filter(s=>s.report&&!/정기/.test(s.report));if(rep.length)lines.push(`! 정기신고가 아닌 신고분이 있습니다(${rep.map(s=>s.years+'년 '+s.report).join(', ')}) — 최종 신고분인지 확인하세요.`);
+  return lines;
 }
 function renderSources(){
   const el=$('#srcTable');if(!el)return;
   if(!S.sources.length){el.innerHTML='<p class="hint">업로드한 파일이 없습니다.</p>';return}
-  el.innerHTML=`<div class="tbl-wrap"><table class="t"><thead><tr><th>파일</th><th>형식</th><th>크기</th><th>SHA-256</th><th>업로드</th><th>단위</th><th>연도</th><th>상태</th></tr></thead><tbody>${S.sources.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.kind)}</td><td class="r">${nf(s.size/1024,0)}KB</td><td><code title="${esc(s.sha256)}">${esc(String(s.sha256).slice(0,16))}…</code></td><td>${esc(new Date(s.uploadedAt).toLocaleString('ko-KR'))}</td><td>${esc(s.unit)}</td><td>${esc(s.years)}</td><td>${esc(s.status)}</td></tr>`).join('')}</tbody></table></div><p class="hint">원본 파일은 저장·전송하지 않고 해시값만 기록합니다(동일 파일 여부 확인용). ‘사용자 제출’ 자료이며 발급기관 진위 확인을 뜻하지 않습니다.</p>`;
+  el.innerHTML=`<div class="tbl-wrap"><table class="t"><thead><tr><th>파일</th><th>문서</th><th>발급번호 · 발급일</th><th>신고</th><th>SHA-256</th><th>업로드</th><th>단위</th><th>연도</th><th>상태</th></tr></thead><tbody>${S.sources.map(s=>`<tr><td>${esc(s.name)}<div class="hint">${esc(s.kind)} · ${nf(s.size/1024,0)}KB</div></td><td>${esc(s.doc||'사용자 파일')}</td><td>${esc(s.issueNo||'—')}${s.issuedAt?'<div class="hint">'+esc(s.issuedAt)+' '+esc(s.office||'')+'</div>':''}</td><td>${esc(s.report||'—')}</td><td><code title="${esc(s.sha256)}">${esc(String(s.sha256).slice(0,12))}…</code></td><td>${esc(new Date(s.uploadedAt).toLocaleString('ko-KR'))}</td><td>${esc(s.unit)}</td><td>${esc(s.years)}</td><td>${esc(s.status)}</td></tr>`).join('')}</tbody></table></div><p class="hint">원본 파일은 저장·전송하지 않고 해시값만 기록합니다. 홈택스 증명서는 발급번호로 90일 안에 원본 확인이 가능하지만, 이 서비스가 진위를 확인한 것은 아닙니다(‘사용자 제출’ 자료).</p>`;
 }
 
 /* ═══════════ 차트 (SVG, 단일 축) ═══════════ */
@@ -1173,6 +1342,7 @@ function renderVerify(VS){
   else if(VS.verified){g.className='gate callout ok';g.innerHTML='<span><b>검증 완료</b> — 3개년 대차 일치·필수 항목·비교 가능성 확인이 끝났습니다. AI 개선처방과 보고서에 ‘검증 완료 자료’로 표시됩니다.</span>'}
   else{const why=[];if(!VS.anyData)why.push('재무자료 입력');else{if(!VS.allBalanced)why.push('3개년 모두 대차 일치');if(!VS.allReq)why.push('필수 항목(자산·부채·자본·매출·영업이익·순이익) 3개년 입력')}if(!VS.confirmed)why.push('비교 가능성 4개 항목 확인');g.className='gate callout';g.innerHTML=`<span>검증 완료까지 남은 일: <b>${why.join(' · ')}</b></span>`}
   $$('.basisName').forEach(e=>e.textContent=S.org.basis);
+  const ev=sourceEvidence();$('#confirmEvidence').innerHTML=ev?'<b>자동 대조 근거</b> (체크는 직접 해 주세요)<br>'+ev.map(esc).join('<br>'):'';
   const log=$('#editLog');if(log)log.innerHTML=S.editLog.length?`<div class="tbl-wrap"><table class="t"><thead><tr><th>시각</th><th>연도</th><th>계정</th><th class="r">이전(백만원)</th><th class="r">변경(백만원)</th><th>이전 출처</th></tr></thead><tbody>${S.editLog.map(e=>`<tr><td>${esc(new Date(e.at).toLocaleString('ko-KR'))}</td><td>${e.year}</td><td>${esc(AK[e.key].l)}</td><td class="r">${fmtMil(e.from,false)}</td><td class="r">${fmtMil(e.to,false)}</td><td>${esc(e.prevSrc)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">수정 기록이 없습니다.</p>';
 }
 
@@ -1365,7 +1535,7 @@ function buildReport(){
   pages.push(`<section class="rp">${head('입력자료·검증')}<h2>1. 입력자료와 검증 현황</h2>
   <table class="rt"><thead><tr><th>연도</th><th>대차 검증</th><th>세부 검증</th></tr></thead><tbody>${VS.vs.map(v=>`<tr><td>${v.year}</td><td>${!v.has?'자료 없음':v.balance===true?'일치':v.balance===false?'<b>불일치</b>':'확인 불가'}</td><td class="small">${v.items.map(i=>esc(i.t)).join('<br>')}</td></tr>`).join('')}</tbody></table>
   <h3>비교 가능성 확인(사용자)</h3><table class="rt"><tbody>${[['sameEntity','동일 회사'],['sameBasis','동일 재무제표 구분·결산월·회계기준'],['unitChecked','금액 단위 확인'],['sourceChecked','원본 대조']].map(([k,l])=>`<tr><td>${l}</td><td>${S.confirm[k]?'확인함':'미확인'}</td></tr>`).join('')}</tbody></table>
-  ${S.sources.length?`<h3>제출 파일</h3><table class="rt"><thead><tr><th>파일</th><th>형식</th><th>단위</th><th>연도</th><th>SHA-256(앞 16자)</th><th>상태</th></tr></thead><tbody>${S.sources.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.kind)}</td><td>${esc(s.unit)}</td><td>${esc(s.years)}</td><td>${esc(String(s.sha256).slice(0,16))}</td><td>${esc(s.status)}</td></tr>`).join('')}</tbody></table>`:''}
+  ${S.sources.length?`<h3>제출 자료</h3><table class="rt"><thead><tr><th>연도</th><th>문서</th><th>발급번호·발급일</th><th>신고</th><th>단위</th><th>SHA-256(앞 12자)</th><th>상태</th></tr></thead><tbody>${S.sources.filter(s=>!/중복/.test(s.status)).map(s=>`<tr><td>${esc(s.years)}</td><td>${esc(s.doc||s.kind.toUpperCase()+' 파일')}<div class="small">${esc(s.name)}</div></td><td>${esc(s.issueNo||'—')}<div class="small">${esc(s.issuedAt||'')} ${esc(s.office||'')}</div></td><td>${esc(s.report||'—')}</td><td>${esc(s.unit)}</td><td>${esc(String(s.sha256).slice(0,12))}</td><td>${esc(s.status)}</td></tr>`).join('')}</tbody></table><p class="small">홈택스 발급 증명서는 발급번호로 발급일부터 90일 안에 원본 확인이 가능합니다. 본 보고서는 증명서의 진위를 확인하지 않았습니다(사용자 제출 자료).</p>`:''}
   <h3>요약 재무제표 (백만원)</h3><table class="rt"><thead><tr><th>계정과목</th>${Y.map(y=>`<th class="r">${y}</th>`).join('')}</tr></thead><tbody>${ACCTS.filter(a=>Y.some(y=>V(y,a.k)!=null)).map(a=>`<tr><td>${a.lv?'&nbsp;'.repeat(a.lv*3):''}${esc(a.l)}</td>${Y.map(y=>`<td class="r">${V(y,a.k)!=null?fmtMil(V(y,a.k),false):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></section>`);
   // 3. 성장·수익성
   const C=Y.map(String);
@@ -1459,7 +1629,7 @@ function clearAll(){S.data={};S.sample=false;S.editLog=[];S.sources=[];S.pending
 function syncForm(){
   const by=$('#baseYear');const cy=now.getFullYear();by.innerHTML='';for(let y=cy;y>=cy-8;y--)by.insertAdjacentHTML('beforeend',`<option value="${y}">${y}년${y===cy?' (결산 완료 시)':''}</option>`);by.value=S.baseYear;
   const fy=$('#orgFye');if(!fy.options.length)for(let m=1;m<=12;m++)fy.insertAdjacentHTML('beforeend',`<option value="${m}">${m}월</option>`);fy.value=S.org.fye;
-  $('#orgName').value=S.org.name;$('#orgIndustry').value=S.org.industry;$('#orgBasis').value=S.org.basis;$('#orgStd').value=S.org.std;$('#orgAudited').value=S.org.audited;$('#unitSel').value=S.unit;
+  $('#orgName').value=S.org.name;$('#orgBizNo').value=S.bizMasked||'';$('#orgIndustry').value=S.org.industry;$('#orgBasis').value=S.org.basis;$('#orgStd').value=S.org.std;$('#orgAudited').value=S.org.audited;$('#unitSel').value=S.unit;
   $$('[data-confirm]').forEach(c=>c.checked=!!S.confirm[c.dataset.confirm]);
   $('#crAgency').value=S.credit.agency;$('#crRating').value=S.credit.rating;$('#crScale').value=S.credit.scale;$('#crIssued').value=S.credit.issued;$('#crValid').value=S.credit.valid;$('#crBasis').value=S.credit.basis;
   $('#auOpinion').value=S.audit.opinion;$('#auYear').value=S.audit.year;$('#auAuditor').value=S.audit.auditor;$('#auDate').value=S.audit.date;$('#auGC').checked=S.audit.gc;
@@ -1490,8 +1660,8 @@ function bind(){
   $$('[data-confirm]').forEach(c=>c.addEventListener('change',()=>{S.confirm[c.dataset.confirm]=c.checked;refresh()}));
   const drop=$('#drop');['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
   drop.addEventListener('drop',e=>handleFiles(e.dataTransfer.files));$('#fileIn').addEventListener('change',e=>{handleFiles(e.target.files).finally(()=>e.target.value='')});
-  $('#candidates').addEventListener('click',e=>{const a=e.target.closest('[data-apply]');if(a)applyPending(+a.dataset.apply);const d=e.target.closest('[data-drop]');if(d){S.pending.splice(+d.dataset.drop,1);renderCandidates()}});
-  $('#candidates').addEventListener('change',e=>{const y=e.target.closest('[data-res-year]');if(y){S.pending[+y.dataset.resYear].chosenYear=+y.value;S.pending[+y.dataset.resYear].items.forEach(i=>delete i.apply);renderCandidates()}const u=e.target.closest('[data-res-unit]');if(u){S.pending[+u.dataset.resUnit].unit=u.value;renderCandidates()}const c=e.target.closest('[data-ci]');if(c){const [ri,ii]=c.dataset.ci.split(':').map(Number);S.pending[ri].items[ii].apply=c.checked}});
+  $('#candidates').addEventListener('click',e=>{if(e.target.closest('#btnApplyAll')){applyAll();return}const a=e.target.closest('[data-apply]');if(a)applyPending(+a.dataset.apply);const d=e.target.closest('[data-drop]');if(d){S.pending.splice(+d.dataset.drop,1);renderCandidates()}});
+  $('#candidates').addEventListener('change',e=>{const y=e.target.closest('[data-res-year]');if(y){S.pending[+y.dataset.resYear].chosenYear=+y.value;S.pending[+y.dataset.resYear].items.forEach(i=>delete i.apply);renderCandidates()}const u=e.target.closest('[data-res-unit]');if(u){S.pending[+u.dataset.resUnit].unit=u.value;renderCandidates()}const c=e.target.closest('[data-ci]');if(c){const [ri,ii]=c.dataset.ci.split(':').map(Number);S.pending[ri].items[ii].apply=c.checked;const sy=scrollY;renderCandidates();scrollTo(0,sy)}});
   $('#btnTemplate').addEventListener('click',templateCSV);
   $('#jsonIn').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{importJSON(JSON.parse(await f.text()));toast('저장한 진단을 불러왔습니다.')}catch(err){toast('불러오기 실패: '+err.message)}e.target.value=''});
   $('#btnClear').addEventListener('click',()=>{if(confirm('입력한 재무값·업로드 기록을 모두 지울까요?'))clearAll()});

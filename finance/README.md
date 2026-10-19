@@ -1,4 +1,4 @@
-# BECONIC 기업 재무진단 (v1.0.0)
+# BECONIC 기업 재무진단 (v1.1.0)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-diagnosis-finance.netlify.app
@@ -16,7 +16,9 @@ finance/
 │  └─ xlsx-0.18.5.full.min.js                             # SheetJS CE (Apache-2.0)
 ├─ netlify/functions/finance-insights.mjs  # AI 개선처방 서버 함수(/api/finance-insights)
 ├─ netlify.toml · package.json · .env.example
-├─ tests/qa.mjs                     # Chromium 자동 QA(52개 항목) + A4 PDF 생성
+├─ tests/qa.mjs                     # Chromium 자동 QA(72개 항목, 레드팀 포함) + A4 PDF 생성
+├─ tests/nts-fixture.mjs            # 홈택스 표준재무제표증명 서식의 가상 PDF 생성기(실데이터 없음)
+├─ tests/nts-regress.mjs            # 실제 증명서 PDF 로컬 회귀(pdftotext 오라클 대조, 저장소에 실데이터 없음)
 └─ docs/  REQUIREMENTS · CHANGELOG · QA_REPORT · PRIVACY_NOTES · 마스터 프롬프트
 ```
 
@@ -34,4 +36,5 @@ finance/
 ```bash
 cd finance && python3 -m http.server 8790      # http://127.0.0.1:8790
 node tests/qa.mjs http://127.0.0.1:8790/       # 루트에서 npm ci 후 (playwright 사용)
+node tests/nts-regress.mjs 2023.pdf 2024.pdf 2025.pdf   # 실제 홈택스 증명서로 로컬 회귀(파일은 커밋 금지)
 ```
