@@ -73,17 +73,41 @@ export const Output = z.object({
   limitations: z.array(z.string().max(300)).max(8),
 });
 
-export const FORBID = /(신용\s*등급\s*[은는이가]?\s*[A-D]|[A-D]{1,3}[+-]?\s*등급|부도\s*확률|파산\s*확률|업종\s*평균|동종\s*업계\s*평균|산업\s*평균)/;
+export const FORBID = /(신용\s*등급\s*[은는이가]?\s*[A-D]|(?<![A-Za-z])[A-D]{1,3}[+-]?\s*등급|부도\s*확률|파산\s*확률|업종\s*평균|동종\s*업계\s*평균|산업\s*평균)/;
 
 export const SYSTEM = `당신은 한국 중소기업 재무 진단을 돕는 분석 보조자입니다. 입력은 회사가 제출하고 사람이 검증한 3개년 재무지표(결정론 코드로 계산된 값)와, 수치 정의로 확인된 징후 목록입니다.
 작성 원칙:
 - '확인된 사실'(observations), '추가 확인 필요'(risks), '권고사항'(actions)을 분리합니다.
 - 수치는 입력에 있는 값만, 입력과 같은 단위·소수 자리로 인용합니다. 새 숫자를 계산하거나 만들지 않습니다. 비율 차이는 %p로 표기합니다.
 - 공식 신용등급, 부도·파산 확률, 업종·산업 평균, 금액 목표치를 생성하지 않습니다. 미래 매출·상환능력을 사실처럼 단정하지 않습니다.
+- 한계(limitations)는 '업종 비교 자료 없음', '공식 신용등급 미확인'처럼 자료가 없다는 사실로만 적습니다.
 - 인과관계는 가능성으로 쓰고, 확인할 자료와 질문을 함께 제시합니다. risks.findingIds 에는 입력 findings 의 id 만 씁니다.
 - 실행 과제는 중소기업 대표·재무담당자가 바로 착수할 수 있게 구체적으로, KPI는 산식으로만 씁니다(목표값 없음).
 - 한국어, 쉬운 경영 용어, 존댓말로 간결하게 씁니다.`;
 
+
+// '자료가 없어 비교하지 않았다'처럼 한계를 밝히는 문장은 허용(단정·비교 문장만 제거)
+export const NEGATED = /(자료[가는]?\s*없|정보[가는]?\s*없|비교하지\s*않|비교할\s*수\s*없|산출하지\s*않|생성하지\s*않|제공하지\s*않|포함하지\s*않|확인되지\s*않|미확인|불가|제외)/;
+const sentences = (s) => String(s ?? '').split(/(?<=[.!?。])\s+|\n+/).map((x) => x.trim()).filter(Boolean);
+/** 금지 표현이 든 문장만 제거(한계 설명 문장은 유지). 응답 전체를 버리지 않는다 */
+export function scrubText(s) {
+  let removed = 0;
+  const kept = sentences(s).filter((x) => { const bad = FORBID.test(x) && !NEGATED.test(x); if (bad) removed++; return !bad; });
+  return { text: kept.join(' '), removed };
+}
+export function scrubResult(result) {
+  let removed = 0;
+  const fix = (s) => { const r = scrubText(s); removed += r.removed; return r.text; };
+  const out = {
+    executiveSummary: fix(result.executiveSummary),
+    observations: result.observations.map((o) => ({ ...o, fact: fix(o.fact), impact: fix(o.impact) })).filter((o) => o.fact),
+    risks: result.risks.map((r) => ({ ...r, risk: fix(r.risk), verifyNext: fix(r.verifyNext) })).filter((r) => r.risk),
+    actions: result.actions.map((a) => ({ ...a, action: fix(a.action), kpiFormula: fix(a.kpiFormula), neededData: fix(a.neededData) })).filter((a) => a.action),
+    questions: result.questions.map(fix).filter(Boolean),
+    limitations: result.limitations.map(fix).filter(Boolean),
+  };
+  return { result: out, removed };
+}
 
 /** Claude 1회 호출 → 검증된 결과 또는 오류 코드. 오류 원문(키 등)은 밖으로 내보내지 않는다 */
 export async function runInsights(input, client = defaultClient()) {
@@ -116,6 +140,8 @@ export async function runInsights(input, client = defaultClient()) {
   }
   const ids = new Set(input.findings.map((f) => f.id));
   result.risks = result.risks.map((r) => ({ ...r, findingIds: r.findingIds.filter((id) => ids.has(id)) }));
-  if (FORBID.test(JSON.stringify(result))) return { status: 'error', http: 422, error: '근거 없는 등급·확률·업종 평균 표현이 포함되어 응답을 차단했습니다.' };
-  return { status: 'ok', result, model: response.model };
+  const scrubbed = scrubResult(result);
+  const left = [scrubbed.result.executiveSummary, ...scrubbed.result.actions.map((a) => a.action)].filter(Boolean).length;
+  if (!left) return { status: 'error', http: 422, error: '근거 없는 등급·확률·업종 평균 표현만 있어 응답을 사용할 수 없습니다. 다시 시도하세요.' };
+  return { status: 'ok', result: scrubbed.result, removed: scrubbed.removed, model: response.model };
 }

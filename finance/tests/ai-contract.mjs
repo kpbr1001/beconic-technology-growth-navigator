@@ -37,7 +37,9 @@ const mock = http.createServer((req, res) => {
     const msg = (text, stop = 'end_turn') => JSON.stringify({ id: 'msg_test', type: 'message', role: 'assistant', model: 'claude-opus-5-5', content: [{ type: 'text', text }], stop_reason: stop, stop_details: null, usage: { input_tokens: 10, output_tokens: 10 } });
     const send = (st, b) => { res.writeHead(st, { 'content-type': 'application/json' }); res.end(b); };
     if (mode === 'ok') return send(200, msg(JSON.stringify(GOOD)));
-    if (mode === 'forbid') return send(200, msg(JSON.stringify({ ...GOOD, executiveSummary: '업종 평균보다 낮습니다.' })));
+    if (mode === 'forbid') return send(200, msg(JSON.stringify({ ...GOOD, executiveSummary: '자본 확충이 우선입니다. 영업이익률이 업종 평균보다 낮습니다.', risks: [{ findingIds: ['F-IMP'], risk: '추정 부도 확률이 높습니다.', verifyNext: '자금수지표 확인' }, ...GOOD.risks] })));
+    if (mode === 'limit') return send(200, msg(JSON.stringify({ ...GOOD, limitations: ['업종 평균 자료가 없어 비교하지 않았습니다.', '공식 신용등급은 미확인입니다.'] })));
+    if (mode === 'allbad') return send(200, msg(JSON.stringify({ ...GOOD, executiveSummary: '업종 평균보다 나쁩니다.', actions: GOOD.actions.map((a) => ({ ...a, action: '신용등급 B 회복을 목표로 합니다.' })) })));
     if (mode === 'badjson') return send(200, msg('이건 JSON이 아님'));
     if (mode === 'refusal') return send(200, msg('', 'refusal'));
     if (mode === 'auth') return send(401, JSON.stringify({ type: 'error', error: { type: 'authentication_error', message: `invalid x-api-key ${CANARY}` } }));
@@ -104,7 +106,10 @@ const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
 }
 // 2. 차단 경로
 {
-  mode = 'forbid'; let r = await call(INPUT, { ip: '10.0.0.2' }); check('금지 표현(업종 평균) → 422 차단', r.st === 422);
+  mode = 'forbid'; let r = await call(INPUT, { ip: '10.0.0.2' });
+  check('금지 표현 문장만 제거, 나머지 결과는 전달', r.st === 200 && r.json.removed === 2 && !/업종 평균|부도 확률/.test(r.text) && r.json.result.executiveSummary === '자본 확충이 우선입니다.' && r.json.result.actions.length === 2, `${r.st} removed=${r.json.removed}`);
+  mode = 'limit'; r = await call(INPUT, { ip: '10.0.0.2' }); check('한계 설명(\'업종 평균 자료가 없어\')은 유지', r.st === 200 && r.json.removed === 0 && r.json.result.limitations.length === 2);
+  mode = 'allbad'; r = await call(INPUT, { ip: '10.0.0.2' }); check('쓸 수 있는 내용이 없으면 422', r.st === 422);
   mode = 'badjson'; r = await call(INPUT, { ip: '10.0.0.2' }); check('형식 깨진 응답 → 502', r.st === 502);
   mode = 'refusal'; r = await call(INPUT, { ip: '10.0.0.2' }); check('AI 거절 → 422 안내', r.st === 422);
   mode = 'auth'; r = await call(INPUT, { ip: '10.0.0.2' }); check('제공자 인증 실패 → 502, 오류 원문(키) 미노출', r.st === 502 && !r.text.includes('CANARY') && !r.text.includes('x-api-key'), r.json.error);

@@ -94,7 +94,7 @@ export function createHandler({
       }
       await jobs.delete(id).catch(() => {});
       const r = job.result || {};
-      if (r.status === 'ok') return json(200, { result: r.result, model: r.model, notice: 'AI 작성 초안입니다. 경영진 또는 전문가 검토가 필요합니다.' });
+      if (r.status === 'ok') return json(200, { result: r.result, model: r.model, removed: r.removed || 0, notice: 'AI 작성 초안입니다. 경영진 또는 전문가 검토가 필요합니다.' });
       return json(r.http || 502, { error: r.error || 'AI 처리에 실패했습니다.' });
     }
 
