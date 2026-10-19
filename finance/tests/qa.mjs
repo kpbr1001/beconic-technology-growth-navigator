@@ -1,4 +1,4 @@
-/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings -- page.evaluate 안에서 앱 전역 함수를 호출 */
+/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings, fundingEval, gradeRank, exportJSON, refresh -- page.evaluate 안에서 앱 전역 함수를 호출 */
 // BECONIC 재무진단 QA — 실제 Chromium으로 사용자 플로우·레드팀 항목·A4 PDF를 확인한다.
 // 실행: (finance 폴더를 정적 서버로 띄운 뒤) node finance/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -89,6 +89,7 @@ const noBadNumbers = async () => { const t = await page.locator('#app').innerTex
   execFileSync('pdftoppm', ['-r', '50', '-png', '-f', '1', '-l', '4', path.join(OUT, 'report-sample.pdf'), path.join(OUT, 'report-p')]);
   await page.evaluate(() => { document.querySelector('#report').innerHTML = ''; });
   await page.click('#btnClearSample');
+  check('가상 데이터 지우기 시 가상 대출·제한사유도 삭제', (await page.evaluate(() => S.loans.length + Object.keys(S.dq).length)) === 0);
 }
 
 // 3. CSV 업로드 (계정과목 + 연도 열)
@@ -287,6 +288,97 @@ const Y = await page.evaluate(() => years());
   const v = await txt('#creditView');
   check('감사 비대상과 의견거절 구분', v.includes('외부감사 비대상(의견거절과 다름)'));
   check('신용등급 미입력 시 미확인', v.includes('미확인'));
+}
+
+// 8b. 신용·대출·지원자격 (v1.3) — 정의 기반 여력·사용자 기준 판정·개인신용 보호
+{
+  await page.click('#btnSample');
+  await page.waitForTimeout(200);
+  const f = await txt('#fund');
+  check('대출·자격: 가상 예시 대출 3건 반영·여력 카드 표시', f.includes('기존 대출 잔액') && f.includes('3,750') && f.includes('이자 감당 기준 추가 차입 여력'));
+  check('대출·자격: 영업이익 ≤ 기존 이자 → 추가 여력 없음', f.includes('추가 이자 감당 여력이 없습니다'));
+  check('대출·자격: 기준 미입력 시 판정하지 않음 안내', f.includes('공고 기준이 입력되지 않아'));
+  const fids = await page.evaluate(() => findings(metrics()).map((x) => x.id));
+  check('대출·자격: 1년 내 만기 > 현금 징후(F-DUE)', fids.includes('F-DUE'), fids.join(','));
+  const room = await page.evaluate(() => { const keep = S.loans; S.loans = [{ id: 't', lender: 'x', type: '은행 신용', bal: 100e6, rate: 5, due: '', repay: '미확인', coll: '' }]; const r = fundingEval(metrics()).room; S.loans = keep; return r; });
+  check('대출·자격: 여력 = (영업이익−기존이자)÷금리 (30−5)÷5% = 500백만원', Math.round(room) === 500e6, String(room));
+  // 사용자 기준: 부채비율 상한 150% → 부채 800 감축 또는 자본 533.3 확충
+  await page.evaluate(() => { document.querySelector('#critFold').open = true; });
+  await page.fill('#cfDebtMax', '150'); await page.dispatchEvent('#cfDebtMax', 'change');
+  let f2 = await txt('#fund');
+  check('공고 기준: 부채비율 150% 초과 → 미충족·필요 감축/확충액 계산', f2.includes('부채비율 150% 이하') && f2.includes('부채 800백만원 감축') && f2.includes('자본 533백만원 확충'));
+  await page.fill('#cfDebtMax', '-5'); await page.dispatchEvent('#cfDebtMax', 'change');
+  check('레드팀: 음수 기준값 거부', (await page.evaluate(() => S.crit.debtMax)) === 150);
+  // 등급 비교(같은 AAA~D 체계일 때만)
+  const g = await page.evaluate(() => [gradeRank('BB+') < gradeRank('BBB-'), gradeRank('A0') < gradeRank('BBB'), gradeRank('B1'), gradeRank('bbb')].join());
+  check('등급 비교: 표준 체계만 비교, 비표준 표기는 null', g === 'false,true,,10', g);
+  await page.fill('#crRating', 'BB+'); await page.dispatchEvent('#crRating', 'change');
+  await page.fill('#cfGrade', 'BBB-'); await page.dispatchEvent('#cfGrade', 'change');
+  f2 = await txt('#fund');
+  check('공고 기준: 요구 등급 미달 → 미충족', /기업신용등급 BBB- 이상\s+BB\+\s+미충족/.test(f2), f2.match(/기업신용등급 BBB-[^\n]*/)?.[0]);
+  await page.fill('#crRating', '우수(기관 자체 표기)'); await page.dispatchEvent('#crRating', 'change');
+  check('공고 기준: 체계가 다른 등급은 자동 비교 안 함(확인 필요)', (await txt('#fund')).includes('자동 비교 불가'));
+  // 업력
+  await page.fill('#orgFounded', '2015-03-01'); await page.dispatchEvent('#orgFounded', 'change');
+  await page.fill('#cfAgeMax', '7'); await page.dispatchEvent('#cfAgeMax', 'change');
+  check('공고 기준: 업력 7년 초과 → 미충족', /업력 7년 이내\s+업력 [\d.]+년[^\n]*미충족/.test(await txt('#fund')));
+  // 개인신용평점: 범위·형식 검증
+  for (const bad of ['1001', '0', '85.5', 'abc']) { await page.fill('#pNice', bad); await page.dispatchEvent('#pNice', 'change'); }
+  check('레드팀: 평점 범위 밖·소수·문자 거부(1~1000 정수)', (await page.evaluate(() => S.person.nice)) === null);
+  await page.fill('#pNice', '873'); await page.dispatchEvent('#pNice', 'change');
+  await page.fill('#pKcb', '861'); await page.dispatchEvent('#pKcb', 'change');
+  await page.fill('#pNiceDate', '2099-01-01'); await page.dispatchEvent('#pNiceDate', 'change');
+  check('레드팀: 미래 조회일 거부', (await page.evaluate(() => S.person.niceDate)) === '');
+  await page.fill('#cfScoreMin', '870'); await page.dispatchEvent('#cfScoreMin', 'change');
+  check('공고 기준: 평점 둘 다 870 이상 → KCB 861로 미충족', /대표자 평점 870점 이상\(둘 다\)[^\n]*미충족/.test(await txt('#fund')));
+  await page.selectOption('#cfScoreAgency', '둘 중 하나');
+  check('공고 기준: 둘 중 하나 870 이상 → 충족', /대표자 평점 870점 이상\(둘 중 하나\)[^\n]*충족/.test(await txt('#fund')) && !/대표자 평점 870점 이상\(둘 중 하나\)[^\n]*미충족/.test(await txt('#fund')));
+  const pay = await page.evaluate(() => JSON.stringify(aiPayload(metrics(), findings(metrics()))));
+  check('개인정보: AI 전송에 평점·대출기관·제한사유·F-DUE 없음', !/873|861|A은행|정책자금\(|F-DUE|F-DQ|NICE|KCB/.test(pay));
+  const dl = async () => { const [d] = await Promise.all([page.waitForEvent('download'), page.evaluate(() => exportJSON())]); return JSON.parse(readFileSync(await d.path(), 'utf8')); };
+  let j = await dl();
+  check('개인정보: JSON 저장 기본값은 평점 제외', j.person && j.person.nice === undefined && !JSON.stringify(j).includes('873'));
+  await page.check('#pSaveJson');
+  j = await dl();
+  check('개인정보: 사용자가 선택하면 JSON에 평점 포함·불러오기 복원', j.person.nice === 873);
+  await page.evaluate((o) => { o.person.nice = 5000; o.loans.push({ lender: '<img src=x onerror=alert(1)>', type: '해킹', bal: -5, rate: 999, due: 'x' }); importJSON(o); }, j);
+  const imp = await page.evaluate(() => ({ nice: S.person.nice, n: S.loans.length, last: S.loans[S.loans.length - 1] }));
+  check('레드팀: JSON 불러오기 시 범위 밖 평점·잘못된 대출값 정화', imp.nice === null && imp.last.bal === null && imp.last.rate === null && imp.last.type === '기타' && imp.last.due === '', JSON.stringify(imp));
+  check('레드팀: 대출 기관명 HTML 주입이 실행되지 않음(이스케이프)', (await page.locator('#loanTable img').count()) === 0);
+  // 대출 입력 검증
+  await page.evaluate(() => { S.loans = []; refresh(); });
+  await page.click('#btnLoanAdd');
+  const bal = page.locator('#loanTbl [data-f="bal"]').first();
+  await bal.fill('-100'); await bal.dispatchEvent('change');
+  check('레드팀: 음수 대출 잔액 거부', (await page.evaluate(() => S.loans[0].bal)) === null);
+  await page.locator('#loanTbl [data-f="bal"]').first().fill('500'); await page.locator('#loanTbl [data-f="bal"]').first().dispatchEvent('change');
+  await page.locator('#loanTbl [data-f="rate"]').first().fill('25'); await page.locator('#loanTbl [data-f="rate"]').first().dispatchEvent('change');
+  await page.locator('#loanTbl [data-f="due"]').first().fill('2020-01-01'); await page.locator('#loanTbl [data-f="due"]').first().dispatchEvent('change');
+  const lt = await txt('#loanTable');
+  check('대출 입력: 백만원 단위 환산·최고금리 초과·만기 경과 경고', (await page.evaluate(() => S.loans[0].bal)) === 500e6 && lt.includes('법정 최고금리') && lt.includes('만기 경과'));
+  // 제한 사유 있음 → 최우선 징후·판정
+  await page.selectOption('[data-dq="tax"]', '있음');
+  const f3 = await txt('#fund');
+  check('제한 사유 있음 → 최우선 판정·보완 과제(납세증명서)', f3.includes('제한 사유 해소가 먼저입니다') && f3.includes('납세증명서 재발급'));
+  check('제한 사유 있음 → 우선 확인 징후(F-DQ)', (await page.evaluate(() => findings(metrics()).find((x) => x.id === 'F-DQ')?.sev)) === 1);
+  // PDF: 장 포함·평점 숫자 비표시(기본)
+  await page.evaluate(() => { document.querySelector('#report').innerHTML = buildReport(); });
+  await page.emulateMedia({ media: 'print' });
+  writeFileSync(path.join(OUT, 'report-fund.pdf'), await page.pdf({ format: 'A4', preferCSSPageSize: true, printBackground: true }));
+  await page.emulateMedia({ media: 'screen' });
+  const ft = execFileSync('pdftotext', ['-layout', path.join(OUT, 'report-fund.pdf'), '-']).toString();
+  check('PDF: 대출 여력·지원자격 장과 보완 포함', ft.includes('대출 여력과 지원사업 재무자격') && ft.includes('재무자격 사전점검과 보완'));
+  check('PDF: 평점 숫자는 기본 비표시(입력됨·판정만)', !/873|861/.test(ft) && ft.includes('KCB 입력됨'));
+  check('PDF: NaN/undefined 없음(대출·자격)', !/NaN|undefined|Infinity/.test(ft));
+  await page.locator('#s-fund').screenshot({ path: path.join(OUT, 'fund-1440.png') });
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.waitForTimeout(150);
+  check('375px: 신용·대출·자격 화면 가로 스크롤 없음', (await page.evaluate(() => document.documentElement.scrollWidth)) <= 375);
+  await page.locator('#s-credit').screenshot({ path: path.join(OUT, 'credit-375.png') });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.evaluate(() => { document.querySelector('#report').innerHTML = ''; });
+  await page.click('#btnClearSample');
+  check('가상 데이터 지우기: 사용자가 입력한 대출은 유지', (await page.evaluate(() => S.loans.length)) === 1);
 }
 
 // 9. 비밀키 노출 없음
