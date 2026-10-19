@@ -303,13 +303,6 @@ table.t tr.grp td{background:#F1F6FC;font-weight:800;font-size:12px;color:var(--
 .ai-out h3{font-size:15px;margin:14px 0 6px}
 .ai-out h3:first-child{margin-top:0}
 .blocked{background:var(--badbg);border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--bad)}
-/* bank */
-.acct{border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
-.acct-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
-.stat3{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
-.stat3>div{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
-.stat3 small{display:block;font-size:12px;color:var(--muted)}
-.stat3 b{font-size:19px}
 /* dialog */
 dialog{border:0;border-radius:18px;padding:0;max-width:560px;width:calc(100% - 32px);box-shadow:0 30px 80px rgba(16,40,76,.3);color:var(--ink)}
 dialog::backdrop{background:rgba(16,40,76,.45)}
@@ -409,6 +402,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
   .rfind{font-size:8.6pt;margin:0 0 2.6mm!important}
   .rfind .rg2 li{margin:0}
   table.rt.gl{font-size:7pt;line-height:1.3}
+  table.rt.tight{font-size:8.2pt;margin:1.2mm 0 2mm}table.rt.tight th,table.rt.tight td{padding:.6mm 1.8mm}
   table.rt.gl td{padding:.45mm 1.4mm}
   .rfind ul{margin:1mm 0 0;padding-left:4.5mm}
   .wm{border:1pt dashed #E58D00;color:#8A5A00;background:#FFF6E2;padding:2mm 3mm;border-radius:2mm;font-weight:800;font-size:9pt;margin:2mm 0}
@@ -510,7 +504,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
       <ul class="features" aria-label="진단 영역">
         <li><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4" height="9" rx="1.5"/><rect x="10" y="7" width="4" height="14" rx="1.5"/><rect x="17" y="3" width="4" height="18" rx="1.5"/></svg></span><b>매출 분석</b><span>성장률·매출구조</span></li>
         <li><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span><b>수익성 진단</b><span>영업이익·마진</span></li>
-        <li><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 9c0 1.7 3.6 3 8 3s8-1.3 8-3v3c0 1.7-3.6 3-8 3s-8-1.3-8-3zM4 15c0 1.7 3.6 3 8 3s8-1.3 8-3v3c0 1.7-3.6 3-8 3s-8-1.3-8-3z"/></svg></span><b>현금흐름 점검</b><span>유입·유출 분석</span></li>
+        <li><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 9c0 1.7 3.6 3 8 3s8-1.3 8-3v3c0 1.7-3.6 3-8 3s-8-1.3-8-3zM4 15c0 1.7 3.6 3 8 3s8-1.3 8-3v3c0 1.7-3.6 3-8 3s-8-1.3-8-3z"/></svg></span><b>자금조달 진단</b><span>대출 여력·지원사업 자격</span></li>
         <li><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="2" width="14" height="20" rx="3"/><rect x="8" y="7" width="8" height="1.8" rx=".9" fill="#fff"/><rect x="8" y="11" width="8" height="1.8" rx=".9" fill="#fff"/><rect x="8" y="15" width="5" height="1.8" rx=".9" fill="#fff"/></svg></span><b>비용구조 분석</b><span>매출원가·판관비</span></li>
         <li><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5z"/><path d="M8.5 12l2.5 2.5 4.5-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span><b>안정성 진단</b><span>부채·유동성</span></li>
         <li><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span><b>재무 로드맵</b><span>90일·12개월 개선</span></li>
@@ -528,7 +522,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
         <li><span class="n">1</span><span><b>3개년 재무서류 올리기</b><small>표준재무제표증명 PDF · 엑셀 · CSV · 붙여넣기</small></span><em>브라우저 처리</em></li>
         <li><span class="n">2</span><span><b>추출값 확인·보정</b><small>원문 라벨·쪽 번호 대조, 단위·연도 확인</small></span><em>사람이 승인</em></li>
         <li><span class="n">3</span><span><b>대차·손익 자동 검증</b><small>자산 = 부채 + 자본, 소계 일치 여부</small></span><em>검증 게이트</em></li>
-        <li><span class="n">4</span><span><b>지표·징후·원인 질문</b><small>성장·수익·안정·유동·활동성 + 통장 흐름</small></span><em>결정론 계산</em></li>
+        <li><span class="n">4</span><span><b>지표·징후·원인 질문</b><small>성장·수익·안정·유동·활동성 + 대출·지원자격</small></span><em>결정론 계산</em></li>
         <li><span class="n">5</span><span><b>개선과제·로드맵·A4 보고서</b><small>AI 해석은 동의 후 요약수치만 전송</small></span><em>PDF 저장</em></li>
       </ol>
       <div class="pv-note"><span aria-hidden="true">ⓘ</span><span>재무비율 진단은 공식 기업신용평가등급이 아니며, 회계감사·세무신고를 대체하지 않습니다.</span></div>
@@ -544,12 +538,11 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
     <li><a href="#s-dash" data-step="dash"><span class="d">4</span>요약</a></li>
     <li><a href="#s-detail" data-step="detail"><span class="d">5</span>성장·안정성</a></li>
     <li><a href="#s-risk" data-step="risk"><span class="d">6</span>징후·원인</a></li>
-    <li><a href="#s-cash" data-step="cash"><span class="d">7</span>통장 흐름</a></li>
-    <li><a href="#s-credit" data-step="credit"><span class="d">8</span>신용·대출</a></li>
-    <li><a href="#s-fund" data-step="fund"><span class="d">9</span>대출·지원자격</a></li>
-    <li><a href="#s-ai" data-step="ai"><span class="d">10</span>AI 개선처방</a></li>
-    <li><a href="#s-road" data-step="road"><span class="d">11</span>로드맵</a></li>
-    <li><a href="#s-report" data-step="report"><span class="d">12</span>보고서</a></li>
+    <li><a href="#s-credit" data-step="credit"><span class="d">7</span>신용·대출</a></li>
+    <li><a href="#s-fund" data-step="fund"><span class="d">8</span>대출·지원자격</a></li>
+    <li><a href="#s-ai" data-step="ai"><span class="d">9</span>AI 개선처방</a></li>
+    <li><a href="#s-road" data-step="road"><span class="d">10</span>로드맵</a></li>
+    <li><a href="#s-report" data-step="report"><span class="d">11</span>보고서</a></li>
   </ol>
 </nav>
 
@@ -635,7 +628,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 
 <!-- 5. 세부 분석 -->
 <section class="sec" id="s-detail" aria-labelledby="h-detail">
-  <div class="shead"><div><h2 id="h-detail"><span class="no">05</span>성장성·수익성·안정성</h2><p>모든 지표는 입력값으로만 계산합니다. PDF 보고서 03·04장과 같은 차트·표입니다.</p></div><span class="badge b-info">업종 평균·임의 기준선 미적용</span></div>
+  <div class="shead"><div><h2 id="h-detail"><span class="no">05</span>성장성·수익성·안정성</h2><p>모든 지표는 입력값으로만 계산합니다. PDF 보고서 03장과 같은 지표표입니다(차트는 ④ 요약에 있습니다).</p></div><span class="badge b-info">업종 평균·임의 기준선 미적용</span></div>
   <div id="detail"></div>
 </section>
 
@@ -645,40 +638,23 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
   <div id="risks"></div>
 </section>
 
-<!-- 7. 통장 흐름 -->
-<section class="sec" id="s-cash" aria-labelledby="h-cash">
-  <div class="shead"><div><h2 id="h-cash"><span class="no">07</span>통장 입출금 흐름 (선택)</h2><p>은행에서 내려받은 거래내역(CSV·XLSX)을 계좌별로 올리면 월별 입금·출금·순입출금을 보여드립니다.</p></div><span class="badge b-warn">입금 합계 ≠ 매출 · 순입출금 ≠ 영업현금흐름</span></div>
-  <div class="grid g4">
-    <label class="field">계좌 별칭<input id="bkAlias" maxlength="20" placeholder="예: 주거래 A" autocomplete="off"><small>계좌번호 대신 별칭만 저장합니다</small></label>
-    <label class="field">은행<input id="bkBank" maxlength="20" placeholder="예: ○○은행" autocomplete="off"></label>
-    <label class="field">금액 단위<select id="bkUnit"><option>원</option><option>천원</option></select></label>
-    <label class="field">거래내역 파일<input id="bkFile" type="file" accept=".csv,.xlsx,.xls,text/csv"></label>
-  </div>
-  <div id="bank"></div>
-</section>
-
 <!-- 8. 신용·감사 -->
 <section class="sec" id="s-credit" aria-labelledby="h-credit">
-  <div class="shead"><div><h2 id="h-credit"><span class="no">08</span>신용·대출 정보 (선택)</h2><p>기업신용등급·감사의견·기존 대출·대표자 개인신용을 <b>보유 서류의 원문 그대로</b> 적어 주세요. 이 서비스는 등급·점수를 만들거나 추정하지 않습니다.</p></div><span class="badge b-info">⑨ 대출 여력·지원자격 점검에 사용</span></div>
+  <div class="shead"><div><h2 id="h-credit"><span class="no">07</span>신용·대출 정보 (선택)</h2><p>기업신용등급·감사의견·기존 대출·대표자 개인신용을 <b>보유 서류의 원문 그대로</b> 적어 주세요. 이 서비스는 등급·점수를 만들거나 추정하지 않습니다.</p></div><span class="badge b-info">⑧ 대출 여력·지원자격 점검에 사용</span></div>
   <div class="grid g2">
     <fieldset style="border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0">
       <legend style="font-weight:800;padding:0 6px">기업신용평가</legend>
       <div class="grid g2">
         <label class="field">평가기관<input id="crAgency" maxlength="40" placeholder="평가서에 적힌 기관명"></label>
         <label class="field">등급(원문)<input id="crRating" maxlength="20" placeholder="평가서 표기 그대로"></label>
-        <label class="field">등급체계<input id="crScale" maxlength="60" placeholder="예: 기관별 ○단계 체계"></label>
         <label class="field">평가 기준일<input id="crIssued" type="date"></label>
         <label class="field">유효기간 만료일<input id="crValid" type="date"></label>
-        <label class="field">근거 문서<select id="crBasis"><option value="">선택</option><option>평가서 원본 보유·대조함</option><option>사본·전언(원문 미대조)</option></select></label>
       </div>
     </fieldset>
     <fieldset style="border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0">
       <legend style="font-weight:800;padding:0 6px">외부감사</legend>
       <div class="grid g2">
         <label class="field">감사의견<select id="auOpinion"><option value="미확인">미확인</option><option value="비대상">외부감사 비대상</option><option>적정</option><option>한정</option><option>부적정</option><option>의견거절</option></select></label>
-        <label class="field">감사 대상 회계연도<input id="auYear" inputmode="numeric" maxlength="4" placeholder="예: 직전 회계연도"></label>
-        <label class="field">감사인<input id="auAuditor" maxlength="40"></label>
-        <label class="field">감사보고서일<input id="auDate" type="date"></label>
       </div>
       <label class="check"><input type="checkbox" id="auGC"> <span>계속기업 관련 중요한 불확실성 문단 또는 강조사항이 있음</span></label>
     </fieldset>
@@ -719,18 +695,15 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 
 <!-- 9. 대출 여력·지원사업 자격 -->
 <section class="sec" id="s-fund" aria-labelledby="h-fund">
-  <div class="shead"><div><h2 id="h-fund"><span class="no">09</span>대출 여력과 지원사업 재무자격</h2><p>재무제표·대출 현황·자가확인 항목으로 <b>정의에 따라 계산되는 여력</b>과 <b>공고 기준 충족 여부</b>를 사전 점검합니다. 실제 한도·선정은 금융기관·운영기관 심사로 정해집니다.</p></div><span class="badge b-warn">사전 자가점검 · 공식 판정 아님</span></div>
+  <div class="shead"><div><h2 id="h-fund"><span class="no">08</span>대출 여력과 지원사업 재무자격</h2><p>재무제표·대출 현황·자가확인 항목으로 <b>정의에 따라 계산되는 여력</b>과 <b>공고 기준 충족 여부</b>를 사전 점검합니다. 실제 한도·선정은 금융기관·운영기관 심사로 정해집니다.</p></div><span class="badge b-warn">사전 자가점검 · 공식 판정 아님</span></div>
   <details class="fold" id="critFold"><summary>공고 기준·추가 정보 입력 (입력한 항목만 판정)</summary><div class="in">
     <div class="grid g4">
-      <label class="field">기준 이름<input id="cfName" maxlength="60" placeholder="예: ○○년 ○○ 정책자금 공고"></label>
-      <label class="field">기준 출처<input id="cfSrc" maxlength="80" placeholder="예: 공고문 ○쪽, 상담 일자"></label>
       <label class="field">부채비율 상한(%)<input id="cfDebtMax" inputmode="decimal" maxlength="7" placeholder="공고 기준"></label>
       <label class="field">업력 상한(년)<input id="cfAgeMax" inputmode="decimal" maxlength="4" placeholder="예: 창업 ○년 이내"></label>
       <label class="field">최소 매출액(백만원)<input id="cfRevMin" inputmode="decimal" maxlength="10" placeholder="공고 기준"></label>
       <label class="field">요구 기업신용등급(이상)<input id="cfGrade" maxlength="10" placeholder="평가서와 같은 체계"></label>
       <label class="field">대표자 평점 하한<input id="cfScoreMin" inputmode="numeric" maxlength="4" placeholder="1~1000"></label>
       <label class="field">평점 적용<select id="cfScoreAgency"><option>둘 다</option><option>둘 중 하나</option><option>NICE</option><option>KCB</option></select></label>
-      <label class="field">매출 대비 차입 한도(%)<input id="cfRevLimit" inputmode="decimal" maxlength="6" placeholder="기관 안내 기준"></label>
       <label class="field">신규 차입 가정 금리(%)<input id="cfRate" inputmode="decimal" maxlength="5" placeholder="비우면 기존 가중평균"></label>
       <label class="field">전년도 수출실적(천 달러)<input id="cfExport" inputmode="decimal" maxlength="9" placeholder="수출바우처 트랙 판정"><small>수출 없으면 0</small></label>
       <label class="field">최근 4개 분기 연구개발비(백만원)<input id="cfRnd" inputmode="decimal" maxlength="9" placeholder="벤처확인 판정"></label>
@@ -743,7 +716,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 
 <!-- 9. AI -->
 <section class="sec" id="s-ai" aria-labelledby="h-ai">
-  <div class="shead"><div><h2 id="h-ai"><span class="no">10</span>AI 개선처방 (선택)</h2><p>검증이 끝난 <b>요약 지표와 징후만</b> 서버를 거쳐 Claude에 보내 원인 점검 질문과 실행 과제 초안을 받습니다. 원본 파일·사업자번호·회사명·통장 거래내역은 보내지 않습니다.</p></div><span class="badge b-info">수치 대조 후 표시</span></div>
+  <div class="shead"><div><h2 id="h-ai"><span class="no">09</span>AI 개선처방 (선택)</h2><p>검증이 끝난 <b>요약 지표와 징후만</b> 서버를 거쳐 Claude에 보내 원인 점검 질문과 실행 과제 초안을 받습니다. 원본 파일·사업자번호·회사명은 보내지 않습니다.</p></div><span class="badge b-info">수치 대조 후 표시</span></div>
   <div id="aiGate"></div>
   <label class="check"><input type="checkbox" id="aiConsent"> <span>아래 ‘전송 내용 미리보기’의 <b>요약 재무지표</b>가 외부 AI 제공자(Anthropic)에게 전송되는 데 동의합니다. (회사명·식별정보 제외)</span></label>
   <div class="grid g3">
@@ -756,19 +729,18 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 
 <!-- 10. 로드맵 -->
 <section class="sec" id="s-road" aria-labelledby="h-road">
-  <div class="shead"><div><h2 id="h-road"><span class="no">11</span>개선과제와 12개월 로드맵</h2><p>확인된 징후에서 출발한 과제만 담았습니다. 금액 목표는 경영진 협의 전에는 정하지 않고, <b>측정 산식과 현재값</b>을 함께 둡니다.</p></div></div>
+  <div class="shead"><div><h2 id="h-road"><span class="no">10</span>개선과제와 12개월 로드맵</h2><p>확인된 징후에서 출발한 과제만 담았습니다. 금액 목표는 경영진 협의 전에는 정하지 않고, <b>측정 산식과 현재값</b>을 함께 둡니다.</p></div></div>
   <div id="road"></div>
 </section>
 
 <!-- 11. 보고서 -->
 <section class="sec" id="s-report" aria-labelledby="h-report">
-  <div class="shead"><div><h2 id="h-report"><span class="no">12</span>보고서·저장</h2><p>A4 세로 컨설팅 보고서를 브라우저 인쇄로 PDF 저장합니다. 자료가 없는 장은 만들지 않습니다(8~15쪽 가변 · 대출·지원자격 장은 재무자료가 있을 때).</p></div></div>
+  <div class="shead"><div><h2 id="h-report"><span class="no">11</span>보고서·저장</h2><p>A4 세로 컨설팅 보고서를 브라우저 인쇄로 PDF 저장합니다. 자료가 없는 장은 만들지 않습니다(8~15쪽 가변 · 대출·지원자격 장은 재무자료가 있을 때).</p></div></div>
   <div class="row">
     <button class="btn" type="button" id="btnPrint">A4 PDF 보고서 저장</button>
     <button class="btn alt" type="button" id="btnSave">진단 저장(JSON)</button>
   </div>
   <p class="hint mt">인쇄 창에서 ‘대상: PDF로 저장’, ‘배경 그래픽’ 켜기를 선택하세요. 새로고침하면 입력값이 사라지므로 필요하면 JSON으로 저장해 두세요(서버 저장 없음).</p>
-  <details class="fold"><summary>산식·용어집·유의사항</summary><div class="in" id="glossary"></div></details>
 </section>
 </main>
 
@@ -794,7 +766,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 /* ═══════════════ BECONIC 기업 재무진단 v1.0 — 단일 HTML ═══════════════
    원칙: 실제 입력값만 계산 · 미입력은 0이 아닌 null · 임의 업종평균/등급/점수 생성 금지
    계산은 이 파일의 결정론 코드가 하고, AI는 검증된 요약수치에 대한 문장 초안만 작성한다. */
-const APP={name:'BECONIC 기업 재무진단',version:'1.6.0',released:'2026-10-19',home:'https://beconic-diagnosis-finance.netlify.app'};
+const APP={name:'BECONIC 기업 재무진단',version:'1.7.0',released:'2026-10-19',home:'https://beconic-diagnosis-finance.netlify.app'};
 // 배포 주소·업데이트 일자는 실행 환경에서 읽는다(배포 시 자동 갱신). 로컬 파일로 열면 기본값 사용
 APP.url=/^https?:$/.test(location.protocol)&&!/^(localhost|127\.)/.test(location.hostname)?location.origin:APP.home;
 APP.updated=(()=>{const d=new Date(document.lastModified);return isNaN(d)||d.getFullYear()<2020?APP.released:d.toISOString().slice(0,10)})();
@@ -861,13 +833,12 @@ const S={
   sources:[],       // {id,name,size,sha256,kind,unit,years,uploadedAt,status,warnings}
   editLog:[],
   confirm:{sameEntity:false,sameBasis:false,unitChecked:false,sourceChecked:false},
-  bank:[],bankExcludeXfer:false,
-  credit:{agency:'',rating:'',scale:'',issued:'',valid:'',basis:''},
-  audit:{opinion:'미확인',year:'',auditor:'',date:'',gc:false},
+  credit:{agency:'',rating:'',issued:'',valid:''},
+  audit:{opinion:'미확인',gc:false},
   loans:[],loanUnit:'백만원',loanAsOf:'',  // loans[i] = {id,lender,type,bal:원,rate:%|null,due,repay,coll}
   person:{nice:null,niceDate:'',kcb:null,kcbDate:'',showInReport:false,saveInJson:false}, // 대표자 개인신용평점: AI 전송 안 함
   dq:{},            // 제한 사유 자가확인: {tax:'없음'|'있음'|'미확인', ...}
-  crit:{name:'',src:'',debtMax:null,ageMax:null,revMin:null,grade:'',scoreMin:null,scoreAgency:'둘 다',revLimit:null,rate:null,exportK:null,rnd:null}, // 사용자가 공고문에서 옮긴 기준·추가 정보
+  crit:{debtMax:null,ageMax:null,revMin:null,grade:'',scoreMin:null,scoreAgency:'둘 다',rate:null,exportK:null,rnd:null}, // 사용자가 공고문에서 옮긴 기준·추가 정보
   progSel:null,     // 화면·보고서에 보일 지원사업 id 목록(null=전체)
   extrasSample:false,
   sample:false,
@@ -1062,7 +1033,7 @@ function findings(M){
   const id3=mv('inventoryDays',y3),id2=mv('inventoryDays',y2);
   if(id3!=null&&id2!=null&&id3>id2)F.push({id:'F-INV',sev:3,cat:'운전자본',title:'재고 회전기간 증가',fact:`재고자산 회전기간 ${y2}년 ${nf(id2,0)}일 → ${y3}년 ${nf(id3,0)}일.`,mean:'재고가 오래 머물며 자금이 묶이고, 진부화·평가손실 위험이 커집니다.',ev:['inventoryDays','ccc'],docs:['품목별 재고 연령표','장기 체화 재고 목록'],q:['팔리지 않는 품목이 늘었나요, 선구매를 늘렸나요?'],act:[{t:'90일',a:'장기 체화 재고 처분 계획과 품목별 적정 재고 기준 수립',o:'생산/구매 책임자',kpi:{n:'재고 회전기간',f:'평균 재고자산 ÷ 매출원가 × 365',b:nf(id3,0)+'일'}}]});
   const b3=mv('borrowings',y3),b2=mv('borrowings',y2),c3=V(y3,'cash'),c2=V(y2,'cash');
-  if(b3!=null&&b2!=null&&b3>b2&&c3!=null&&c2!=null&&c3<c2)F.push({id:'F-DEBT',sev:2,cat:'현금·차입',title:'차입금은 늘고 현금은 줄어듦',fact:`총차입금 ${fmtMil(b2)} → ${fmtMil(b3)}, 현금성자산 ${fmtMil(c2)} → ${fmtMil(c3)} (${y2}→${y3}년).`,mean:'빌린 돈이 늘었는데도 현금이 줄었다면 영업에서 현금이 빠져나가고 있을 가능성이 있습니다(운전자본·손실·투자 확인 필요).',ev:['borrowings','borrowingDependence','workingCapital'],docs:['현금흐름표(있는 경우)','차입금 증감 내역과 용도','통장 거래내역 12개월'],q:['새로 빌린 돈은 어디에 쓰였나요(운영자금·설비·상환)?','영업에서 들어오는 현금이 비용 지출보다 적은 달이 많았나요?'],act:[{t:'30일',a:'차입 용도별 사용 내역 정리와 월별 현금 유입·유출 점검(통장 흐름 활용)',o:'재무 담당',kpi:{n:'총차입금',f:'단기차입금 + 장기차입금',b:fmtMil(b3)}}]});
+  if(b3!=null&&b2!=null&&b3>b2&&c3!=null&&c2!=null&&c3<c2)F.push({id:'F-DEBT',sev:2,cat:'현금·차입',title:'차입금은 늘고 현금은 줄어듦',fact:`총차입금 ${fmtMil(b2)} → ${fmtMil(b3)}, 현금성자산 ${fmtMil(c2)} → ${fmtMil(c3)} (${y2}→${y3}년).`,mean:'빌린 돈이 늘었는데도 현금이 줄었다면 영업에서 현금이 빠져나가고 있을 가능성이 있습니다(운전자본·손실·투자 확인 필요).',ev:['borrowings','borrowingDependence','workingCapital'],docs:['현금흐름표(있는 경우)','차입금 증감 내역과 용도','통장 거래내역 12개월'],q:['새로 빌린 돈은 어디에 쓰였나요(운영자금·설비·상환)?','영업에서 들어오는 현금이 비용 지출보다 적은 달이 많았나요?'],act:[{t:'30일',a:'차입 용도별 사용 내역 정리와 월별 현금 유입·유출 점검',o:'재무 담당',kpi:{n:'총차입금',f:'단기차입금 + 장기차입금',b:fmtMil(b3)}}]});
   const IB=V(y3,'insiderBorrowings'),Lb3=V(y3,'liabilities');
   if(IB!=null&&IB>0){const imp=E!=null&&Cap!=null&&E<Cap;const gapCap=imp?Cap-E:0;F.push({id:'F-INSIDER',sev:imp&&IB>=gapCap?2:3,cat:'차입 구조',title:'대표자·임원 등 특수관계인 차입금 있음',fact:`${y3}년 주주·임원·직원 차입금 ${fmtMil(IB)}${Lb3?` (부채총계의 ${nf(IB/Lb3*100,1)}%)`:''}.${[y1,y2].map(y=>V(y,'insiderBorrowings')).some(v=>v!=null)?` 3개년: ${[y1,y2,y3].map(y=>V(y,'insiderBorrowings')!=null?fmtMil(V(y,'insiderBorrowings')):'—').join(' → ')}.`:''}`,mean:`회사가 대표자·임원 등에게 빌린 돈(가수금 성격)입니다. ${imp?(IB>=gapCap?`자본잠식 해소에 필요한 금액(자본금−자본총계 ${fmtMil(gapCap)})보다 크므로, 출자전환하면 잠식을 해소할 수 있는 규모입니다. `:`출자전환해도 자본잠식 해소에 필요한 금액(${fmtMil(gapCap)})에는 못 미칩니다. `):''}상환하면 현금이 빠져나가고, 이자 약정·세무 처리(인정이자 등)도 확인이 필요합니다.`,ev:['borrowings','debtRatio','impairmentRate'],docs:['주주·임원 차입금(가수금) 원장과 차입 약정서','이자 지급 여부·이자율','출자전환 시 세무·등기 검토 의견'],q:['이 차입금은 상환할 계획인가요, 자본으로 전환할 수 있나요?','이자를 지급하고 있나요? 약정서가 있나요?'],act:[{t:'90일',a:'대표자·임원 차입금 정리 방안 비교(상환 일정 vs 출자전환) 및 세무 검토',o:'대표·세무 전문가',kpi:{n:'특수관계인 차입금',f:'주주·임원·직원 차입금 잔액',b:fmtMil(IB)}}]})}
   const AP3=V(y3,'otherPayables'),AP2=V(y2,'otherPayables');
@@ -1532,7 +1503,7 @@ function dashCharts(M,Y){
 }
 function renderDetail(P){
   if(!P){$('#detail').innerHTML='<p class="hint">자료 입력 후 표시됩니다.</p>';return}
-  $('#detail').innerHTML=`<div class="rv"><h3 class="rvh">${esc(P.growth.title)}</h3>${P.growth.body}<h3 class="rvh">${esc(P.stab.title)}</h3>${P.stab.body}</div><p class="hint">ⓘ를 누르면 산식·분자·분모·해석 주의를 볼 수 있습니다. ‘보류’는 계산은 되지만 의미가 왜곡되는 경우(예: 자본총계 0 이하의 부채비율), ‘산출 불가’는 분모가 0이거나 전년 자료가 없는 경우입니다.</p>`;
+  $('#detail').innerHTML=`<div class="rv">${P.growth.body}</div><p class="hint">ⓘ를 누르면 산식·분자·분모·해석 주의를 볼 수 있습니다. ‘보류’는 계산은 되지만 의미가 왜곡되는 경우(예: 자본총계 0 이하의 부채비율), ‘산출 불가’는 분모가 0이거나 전년 자료가 없는 경우입니다.</p>`;
 }
 function renderRisks(P){
   if(!P){$('#risks').innerHTML='<p class="hint">자료 입력 후 표시됩니다.</p>';return}
@@ -1568,83 +1539,20 @@ function roadmap(F,M){
 }
 function renderRoad(P){
   if(!P){$('#road').innerHTML='<p class="hint">자료 입력 후 표시됩니다.</p>';return}
-  $('#road').innerHTML=`<div class="rv"><h3 class="rvh">${esc(P.improve.title)}</h3>${P.improve.body}<h3 class="rvh">${esc(P.road.title)}</h3>${P.road.body}</div><p class="hint">목표값은 업종 자료·사업계획·경영진 협의 없이 임의로 정하지 않습니다. AI 개선처방 초안은 ⑩에 따로 표시되고, PDF에는 이 장에 함께 실립니다.</p>`;
-}
-
-/* ═══════════ 통장 흐름 ═══════════ */
-function excelDate(n){const d=new Date(Math.round((n-25569)*864e5));return d.toISOString().slice(0,10)}
-function parseDate(v){if(v==null||v==='')return null;if(typeof v==='number'&&v>20000&&v<80000)return excelDate(v);const s=String(v).trim();let m=s.match(/(20\d{2})[.\-\/년\s]*(\d{1,2})[.\-\/월\s]*(\d{1,2})/);if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;m=s.match(/^(20\d{2})(\d{2})(\d{2})/);if(m)return `${m[1]}-${m[2]}-${m[3]}`;return null}
-function parseBank(rows){
-  const H={date:/거래일|일자|날짜|거래일시|date/i,inn:/입금|맡기신|받으신|deposit|credit/i,out:/출금|찾으신|지급|withdraw|debit/i,amt:/^(거래)?금액$/,bal:/잔액|balance/i,desc:/적요|내용|기재|받는|보낸|메모|비고|description/i};
-  let hi=-1,map=null;
-  for(let i=0;i<Math.min(rows.length,40);i++){const r=rows[i].map(c=>String(c??'').replace(/\s/g,''));const f=k=>r.findIndex(c=>c&&H[k].test(c)&&!(k!=='bal'&&/잔액/.test(c)));const m={date:f('date'),inn:f('inn'),out:f('out'),amt:f('amt'),bal:f('bal'),desc:f('desc')};if(m.date>=0&&((m.inn>=0&&m.out>=0)||m.amt>=0)){hi=i;map=m;break}}
-  if(!map)throw new Error('머리글(거래일자·입금·출금 또는 거래금액)을 찾지 못했습니다.');
-  const out=[];let bad=0;
-  for(const r of rows.slice(hi+1)){const d=parseDate(r[map.date]);if(!d){if(r.some(c=>String(c).trim()))bad++;continue}
-    let i=0,o=0;
-    if(map.inn>=0&&map.out>=0){const a=parseAmount(r[map.inn]),b=parseAmount(r[map.out]);i=a?Math.abs(a.n):0;o=b?Math.abs(b.n):0}
-    else{const a=parseAmount(r[map.amt]);if(!a){bad++;continue}if(a.n>=0)i=a.n;else o=-a.n}
-    const bl=map.bal>=0?parseAmount(r[map.bal]):null;
-    out.push({d,i,o,b:bl?bl.n:null,desc:map.desc>=0?String(r[map.desc]??'').slice(0,40):''});
-  }
-  return {rows:out,bad,map};
-}
-const CATS=[['세금·공과',/국세|지방세|부가세|부가가치세|원천세|법인세|세무서|국세청|건강보험|국민연금|고용보험|산재|4대보험|공과금/],['인건비',/급여|상여|임금|퇴직|월급/],['차입·상환',/대출|여신|원리금|상환|이자|할부/],['카드대금',/카드/]];
-function catOf(r){if(r.cat)return r.cat;for(const [n,re] of CATS)if(re.test(r.desc))return n;return '미분류'}
-function analyzeBank(){
-  const all=[];S.bank.forEach(a=>a.rows.forEach((r,ri)=>{r.acct=a.id;r.ri=ri;r.xfer=null;all.push(r)}));
-  // 계좌 간 이체 후보: 같은 금액, 반대 방향, 다른 계좌, ±1일
-  let pid=0;const outs=all.filter(r=>r.o>0),ins=all.filter(r=>r.i>0);
-  for(const o of outs){const od=Date.parse(o.d);const m=ins.find(i=>!i.xfer&&i.acct!==o.acct&&i.i===o.o&&Math.abs(Date.parse(i.d)-od)<=864e5);if(m){pid++;o.xfer=m.xfer='P'+pid}}
-  const months={};const cats={};let tin=0,tout=0,xin=0,xout=0;
-  for(const r of all){const m=r.d.slice(0,7);months[m]=months[m]||{i:0,o:0};const ex=S.bankExcludeXfer&&r.xfer;if(r.xfer){xin+=r.i;xout+=r.o}if(ex)continue;months[m].i+=r.i;months[m].o+=r.o;tin+=r.i;tout+=r.o;const c=r.xfer?'내부이체 후보':catOf(r);cats[c]=cats[c]||{i:0,o:0,n:0};cats[c].i+=r.i;cats[c].o+=r.o;cats[c].n++}
-  return {months,cats,tin,tout,pairs:pid,xin,xout};
-}
-function balanceCheck(rows){
-  const withB=rows.filter(r=>r.b!=null);if(withB.length<3)return null;
-  const chk=arr=>{let okc=0,n=0;for(let k=1;k<arr.length;k++){if(arr[k].b==null||arr[k-1].b==null)continue;n++;if(Math.abs(arr[k-1].b+arr[k].i-arr[k].o-arr[k].b)<1)okc++}return {okc,n}};
-  const a=chk(rows),b=chk([...rows].reverse());const best=a.okc>=b.okc?{...a,order:rows}:{...b,order:[...rows].reverse()};
-  const o=best.order;const first=o.find(r=>r.b!=null),last=[...o].reverse().find(r=>r.b!=null);
-  return {match:best.okc,total:best.n,start:first.b-first.i+first.o,end:last.b};
-}
-function renderBank(){
-  const el=$('#bank');
-  if(!S.bank.length){el.innerHTML='<p class="hint mt">계좌별로 별칭을 정한 뒤 파일을 올리세요. 머리글(거래일자·입금·출금·잔액·적요)을 자동으로 찾습니다. 적요는 분류에만 쓰고 저장(JSON)·보고서·AI 전송에 포함하지 않습니다.</p>';return}
-  const A=analyzeBank();const ms=Object.keys(A.months).sort();
-  let h=S.bank.map(a=>{const ds=a.rows.map(r=>r.d).sort();const bc=balanceCheck(a.rows);const dup=a.rows.length-new Set(a.rows.map(r=>[r.d,r.i,r.o,r.b].join('|'))).size;
-    return `<div class="acct"><div class="acct-h"><div><b>${esc(a.alias)}</b> <span class="hint">${esc(a.bank)} · ${esc(a.file)} · ${a.rows.length}건 · ${ds[0]||''} ~ ${ds[ds.length-1]||''}${a.unit!=='원'?' · 단위 '+a.unit:''}</span></div><button class="btn small danger" type="button" data-del-acct="${a.id}">삭제</button></div>
-    <div class="row mt" style="gap:6px">${bc?`<span class="badge ${bc.match===bc.total?'b-ok':'b-warn'}">잔액 연속성 ${bc.match}/${bc.total} 일치</span>`:'<span class="badge b-mute">잔액 열 없음 — 잔액 검증 불가</span>'}${dup?`<span class="badge b-warn">중복 의심 ${dup}건(자동 삭제 안 함)</span>`:''}${a.bad?`<span class="badge b-mute">날짜를 읽지 못한 행 ${a.bad}건 제외</span>`:''}</div></div>`}).join('');
-  h+=`<div class="stat3"><div><small>제출 계좌 총입금</small><b class="num">${fmtMil(A.tin)}</b></div><div><small>제출 계좌 총출금</small><b class="num">${fmtMil(A.tout)}</b></div><div><small>제출 계좌 순입출금</small><b class="num">${fmtMil(A.tin-A.tout)}</b></div><div><small>계좌 간 이체 후보</small><b class="num">${A.pairs}쌍</b><small>${fmtMil(A.xout)}</small></div></div>`;
-  h+=`<label class="check"><input type="checkbox" id="bkX" ${S.bankExcludeXfer?'checked':''}> <span>계좌 간 이체 후보 ${A.pairs}쌍을 합계에서 제외합니다(사용자 승인). 같은 회사 계좌끼리 옮긴 돈이 입금·출금으로 두 번 잡히는 것을 막습니다.</span></label>`;
-  if(ms.length<12)h+=`<div class="callout warn"><span class="ci">!</span><span>제출된 기간이 ${ms.length}개월입니다. 계절성을 보려면 최근 12개월 이상의 거래내역이 필요합니다.</span></div>`;
-  h+=`<div class="chart mt"><h3>월별 입금·출금 (제출된 계좌 기준)</h3><div class="cs">백만원 · 영업현금흐름이 아닌 통장 입출금 합계입니다</div>${barChart({cats:ms.map(m=>m.slice(2).replace('-','.')),series:[{name:'입금',color:'var(--s2)',vals:ms.map(m=>A.months[m].i/1e6)},{name:'출금',color:'var(--s3)',vals:ms.map(m=>A.months[m].o/1e6)}],fmt:v=>nf(v,Math.abs(v)>=100?0:1),unit:'백만원',w:Math.max(560,ms.length*70),tipUnit:'백만원'})}${legend([['#0E9E79','입금'],['#E08A1E','출금']])}</div>`;
-  h+=`<div class="tbl-wrap mt"><table class="t"><thead><tr><th>분류(키워드 자동·확인 필요)</th><th class="r">건수</th><th class="r">입금(백만원)</th><th class="r">출금(백만원)</th></tr></thead><tbody>${Object.entries(A.cats).sort((a,b)=>(b[1].i+b[1].o)-(a[1].i+a[1].o)).map(([c,v])=>`<tr><td>${esc(c)}</td><td class="r">${v.n}</td><td class="r num">${fmtMil(v.i,false)}</td><td class="r num">${fmtMil(v.o,false)}</td></tr>`).join('')}</tbody></table></div>
-  <p class="hint">입금에는 매출 대금 외에 대출 실행·투자금·부가세 환급·계좌 간 이체가 섞일 수 있어 <b>매출액과 같지 않습니다</b>. 일부 계좌만 제출했다면 회사 전체가 아니라 ‘제출된 계좌’의 흐름입니다. 재무제표나 거래내역만으로 오늘의 현금잔액을 확정할 수 없습니다.</p>`;
-  el.innerHTML=h;
-}
-async function addBankFile(f){
-  const alias=$('#bkAlias').value.trim()||`계좌 ${S.bank.length+1}`;const bank=$('#bkBank').value.trim()||'은행 미기재';const unit=$('#bkUnit').value;
-  try{
-    let rows;const ext=f.name.split('.').pop().toLowerCase();
-    if(ext==='csv')rows=parseCSV(await readText(f));else{const X=await needXlsx();const wb=X.read(await f.arrayBuffer(),{type:'array'});rows=X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:true,defval:''})}
-    const r=parseBank(rows);if(!r.rows.length)throw new Error('거래 행이 없습니다.');
-    const k=UNITS[unit];r.rows.forEach(x=>{x.i*=k;x.o*=k;if(x.b!=null)x.b*=k});
-    S.bank.push({id:'a'+Math.random().toString(36).slice(2,8),alias,bank,unit,file:f.name,rows:r.rows,bad:r.bad,sha:await sha256(await f.arrayBuffer())});
-    $('#bkAlias').value='';$('#bkFile').value='';renderBank();toast(`${alias}: ${r.rows.length}건을 불러왔습니다.`);
-  }catch(e){toast(`${f.name}: ${e.message}`);$('#bkFile').value=''}
+  $('#road').innerHTML=`<div class="rv"><h3 class="rvh">${esc(P.improve.title)}</h3>${P.improve.body}<h3 class="rvh">${esc(P.road.title)}</h3>${P.road.body}</div><p class="hint">목표값은 업종 자료·사업계획·경영진 협의 없이 임의로 정하지 않습니다. AI 개선처방 초안은 ⑨에 따로 표시되고, PDF에는 이 장에 함께 실립니다.</p>`;
 }
 
 /* ═══════════ 신용·감사 ═══════════ */
 function renderCredit(){
   const c=S.credit,a=S.audit;const parts=[];
-  if(c.rating){const exp=c.valid&&c.valid<today();parts.push(`<div class="callout ${exp?'warn':''}"><span class="ci">ⓘ</span><span><b>공식 기업신용평가(사용자 입력)</b> · ${esc(c.agency||'기관 미기재')} · 등급 <b>${esc(c.rating)}</b>${c.scale?` (${esc(c.scale)})`:''} · 기준일 ${esc(c.issued||'미기재')} · 유효기간 ${esc(c.valid||'미기재')}${exp?' — <b>유효기간 경과</b>':''} · ${esc(c.basis||'근거 문서 미선택')}<br><span class="hint">등급은 원문 그대로 표시하며, 이 서비스의 재무비율 분석과 별개입니다.</span></span></div>`)}
+  if(c.rating){const exp=c.valid&&c.valid<today();parts.push(`<div class="callout ${exp?'warn':''}"><span class="ci">ⓘ</span><span><b>공식 기업신용평가(사용자 입력)</b> · ${esc(c.agency||'기관 미기재')} · 등급 <b>${esc(c.rating)}</b> · 기준일 ${esc(c.issued||'미기재')} · 유효기간 ${esc(c.valid||'미기재')}${exp?' — <b>유효기간 경과</b>':''}<br><span class="hint">등급은 원문 그대로 표시하며, 이 서비스의 재무비율 분석과 별개입니다.</span></span></div>`)}
   else parts.push('<p class="hint">공식 기업신용등급: <b>미확인</b> (입력된 평가서 정보 없음)</p>');
   const op=a.opinion;const opTxt=op==='미확인'?'미확인':op==='비대상'?'외부감사 비대상(의견거절과 다름)':op;
-  parts.push(`<p class="hint">감사의견: <b>${esc(opTxt)}</b>${a.year?` · ${esc(a.year)}년`:''}${a.auditor?` · ${esc(a.auditor)}`:''}${a.gc?' · <b class="s-bad">계속기업 관련 중요한 불확실성/강조사항 있음</b>':''}${op==='적정'?' — 적정의견은 재무제표가 기준에 맞게 작성되었다는 뜻이며 재무 안정성을 보증하지 않습니다.':''}${['한정','부적정','의견거절'].includes(op)?' — <b>의견 근거 문단을 반드시 확인하세요.</b>':''}</p>`);
+  parts.push(`<p class="hint">감사의견: <b>${esc(opTxt)}</b>${a.gc?' · <b class="s-bad">계속기업 관련 중요한 불확실성/강조사항 있음</b>':''}${op==='적정'?' — 적정의견은 재무제표가 기준에 맞게 작성되었다는 뜻이며 재무 안정성을 보증하지 않습니다.':''}${['한정','부적정','의견거절'].includes(op)?' — <b>의견 근거 문단을 반드시 확인하세요.</b>':''}</p>`);
   $('#creditView').innerHTML=parts.join('');
 }
 
-/* ═══════════ 신용·대출·지원자격 (⑧ 입력 · ⑨ 점검) ═══════════
+/* ═══════════ 신용·대출·지원자격 (⑦ 입력 · ⑧ 점검) ═══════════
    원칙: 한도·등급·평점을 만들지 않는다. 여력은 정의(이자보상배율 1배 경계·사용자 입력 기준)로만 계산하고,
    공고 기준값은 사용자가 공고문에서 옮겨 적은 것만 쓴다. 대표자 개인신용평점은 AI로 보내지 않는다. */
 const LOAN_TYPES=['은행 신용','은행 담보','정책자금(직접대출)','보증부 대출','2금융권','대표자·특수관계인','기타'];
@@ -1747,7 +1655,7 @@ function fundingEval(M){
   const op=S.audit.opinion;
   if(['한정','부적정','의견거절'].includes(op))add('재무 정의','외부감사 의견 적정','fail',`감사의견 ${op}`,'비적정 감사의견은 제한 사유로 쓰이는 경우가 많음(공고 확인)','의견 근거 문단의 사유 해소 후 차기 감사에서 적정의견 확보',{owner:'대표·감사인'});
   else if(op==='적정'||op==='비대상'||S.org.audited==='no')add('재무 정의','외부감사 의견 적정','pass',op==='적정'?'감사의견 적정':'외부감사 비대상','감사보고서','');
-  else if(S.org.audited==='yes')add('재무 정의','외부감사 의견 적정','check','감사의견 미입력','감사보고서','⑧에 감사의견 입력');
+  else if(S.org.audited==='yes')add('재무 정의','외부감사 의견 적정','check','감사의견 미입력','감사보고서','⑦에 감사의견 입력');
   if(S.audit.gc)add('재무 정의','계속기업 불확실성 문단 없음','fail','강조사항·불확실성 문단 있음','감사보고서','불확실성 사유(결손·유동성)별 해소 계획 수립과 차기 감사 대응',{owner:'대표·감사인'});
   // ③ 기업신용등급(원문)
   const c=S.credit;const exp=c.valid&&c.valid<today();
@@ -1777,7 +1685,7 @@ function fundingEval(M){
   if(O==null)roomWhy='영업이익 자료 없음';else if(icrBase==null)roomWhy='기존 이자(대출 금리 또는 이자비용) 자료 없음';
   else if(O<=icrBase){room=0;roomWhy=O<0?'영업손실 — 영업이익으로 감당할 추가 이자 여력 없음':'영업이익이 기존 이자 이하 — 추가 이자 여력 없음'}
   else if(!rate)roomWhy='가정 금리 없음 — 대출 금리 또는 신규 차입 가정 금리 입력';else room=(O-icrBase)/(rate/100);
-  const revCap=C.revLimit!=null&&R!=null?R*C.revLimit/100:null;const revRem=revCap!=null&&existing!=null?revCap-existing:null;
+
   const stress=existing&&icrBase!=null&&O!=null?[1,2].map(d=>{const ni=icrBase+existing*d/100;return {d,add:existing*d/100,icr:ni>0&&O>=0?O/ni:null}}):[];
   const recon=LS.n&&bs!=null?{bs,diff:LS.total-bs}:null;
   // ⑥ 종합 문장(규칙 기반)
@@ -1794,7 +1702,7 @@ function fundingEval(M){
   if(LS.overdue.length)fixes.unshift({t:'30일',a:`만기 경과 대출 ${LS.overdue.length}건 상환·연장 상태 확인(연체 여부)`,o:'재무 담당',src:'대출 현황',st:'fail'});
   if(LS.due12&&cash!=null&&LS.due12>cash)fixes.push({t:'30일',a:`1년 내 만기 대출 ${fmtMil(LS.due12)}의 연장·대환 일정 확정(13주 자금수지표 반영)`,o:'재무 담당',src:'대출 만기 구조',st:'check'});
   const ord={'30일':0,'90일':1,'6개월':2,'12개월':3};fixes.sort((a,b)=>ord[a.t]-ord[b.t]);
-  return {rows,LS,existing,existingSrc,icrBase,intSrc,rate,rateSrc,room,roomWhy,revCap,revRem,stress,recon,verdict,fixes,cash,O,counts:{pass:cnt('pass'),fail:cnt('fail'),check:cnt('check'),info:cnt('info')}};
+  return {rows,LS,existing,existingSrc,icrBase,intSrc,rate,rateSrc,room,roomWhy,stress,recon,verdict,fixes,cash,O,counts:{pass:cnt('pass'),fail:cnt('fail'),check:cnt('check'),info:cnt('info')}};
 }
 function fundRowsPacked(rows){const out=[];rows.forEach(r=>{const last=out[out.length-1];if(r.status==='pass'&&last&&last.status==='pass'&&last.grp===r.grp&&!/점수|평점/.test(r.label)){last.label+=' · '+r.label;last.nowR='모두 충족';return}out.push({...r})});return out}
 function renderProgBar(){const el=$('#progBar');if(!el)return;const cur=S.progSel==null?'전체':(PROGRAMS.find(p=>p.id===S.progSel[0])||{}).cat;el.innerHTML=`<span class="hint">지원사업 분야</span>${['전체',...PROG_CATS].map(c=>`<button type="button" class="chip" data-pc="${c}" aria-pressed="${c===cur}">${c}</button>`).join('')}`}
@@ -1809,7 +1717,7 @@ function progBlock(opt){
   return h;
 }
 function fundActive(){return Object.values(S.data).some(r=>Object.values(r||{}).some(c=>c&&c.v!=null))}
-function critSrc(){const C=S.crit;return C.name||C.src?`사용자 입력 기준: ${[C.name,C.src].filter(Boolean).join(' · ')}`:'사용자 입력 기준(출처 미기재)'}
+function critSrc(){return '사용자가 공고문에서 옮겨 입력한 기준'}
 const ST={pass:'충족',fail:'미충족',check:'확인 필요',info:'참고'};
 function renderLoans(){
   const u=S.loanUnit,asOf=loanAsOf();const el=$('#loanTable');if(!el)return;
@@ -1831,13 +1739,13 @@ function onLoanChange(e){
 function renderDQ(){$('#dqBox').innerHTML=DQ.map(([k,l])=>`<label class="field">${esc(l)}<select data-dq="${k}">${DQV.map(x=>`<option ${(S.dq[k]||'미확인')===x?'selected':''}>${x}</option>`).join('')}</select></label>`).join('')}
 function syncFund(){
   const p=S.person;$('#pNice').value=p.nice??'';$('#pKcb').value=p.kcb??'';$('#pNiceDate').value=p.niceDate;$('#pKcbDate').value=p.kcbDate;$('#pShowReport').checked=p.showInReport;$('#pSaveJson').checked=p.saveInJson;
-  const C=S.crit;$('#cfName').value=C.name;$('#cfSrc').value=C.src;$('#cfDebtMax').value=C.debtMax??'';$('#cfAgeMax').value=C.ageMax??'';$('#cfRevMin').value=C.revMin??'';$('#cfGrade').value=C.grade;$('#cfScoreMin').value=C.scoreMin??'';$('#cfScoreAgency').value=C.scoreAgency;$('#cfRevLimit').value=C.revLimit??'';$('#cfRate').value=C.rate??'';$('#cfExport').value=C.exportK??'';$('#cfRnd').value=C.rnd??'';renderProgBar();
+  const C=S.crit;$('#cfDebtMax').value=C.debtMax??'';$('#cfAgeMax').value=C.ageMax??'';$('#cfRevMin').value=C.revMin??'';$('#cfGrade').value=C.grade;$('#cfScoreMin').value=C.scoreMin??'';$('#cfScoreAgency').value=C.scoreAgency;$('#cfRate').value=C.rate??'';$('#cfExport').value=C.exportK??'';$('#cfRnd').value=C.rnd??'';renderProgBar();
   $('#orgFounded').value=S.org.founded||'';$('#orgFounded').max=today();
   renderDQ();renderLoans();
 }
 function renderFund(P){
   const el=$('#fund');
-  if(!P||!P.fund){el.innerHTML='<p class="hint">② 재무자료와 ⑧ 신용·대출 정보를 입력하면 대출 여력과 지원사업 재무자격을 점검합니다.</p>';return}
+  if(!P||!P.fund){el.innerHTML='<p class="hint">② 재무자료와 ⑦ 신용·대출 정보를 입력하면 대출 여력과 지원사업 재무자격을 점검합니다.</p>';return}
   el.innerHTML=`<div class="rv">${P.fund.body}</div>`;
 }
 
@@ -1847,7 +1755,7 @@ function aiPayload(M,F){
   const metricsOut={};for(const k of keys){const row={};Y.forEach(y=>{const r=M[y][k];if(r.st==='ok')row[y]=MD[k].u==='amt'?Math.round(r.v/1e5)/10:Math.round(r.v*100)/100;else row[y]=r.st==='hold'?'표시보류':null});metricsOut[k]={label:MD[k].l,unit:MD[k].u==='amt'?'백만원':MD[k].u,values:row}}
   return {industry:S.org.industry||'미입력',basis:S.org.basis,accountingStandard:S.org.std,years:Y,metrics:metricsOut,
     findings:F.filter(f=>f.sev>0&&!f.local).map(f=>({id:f.id,title:f.title,fact:f.fact,category:f.cat})),
-    scope:{bankData:S.bank.length?'제출된 계좌 일부':'없음',audit:S.audit.opinion,creditRating:S.credit.rating?'사용자 입력 있음(전송 안 함)':'미확인'}};
+    scope:{bankData:'없음',audit:S.audit.opinion,creditRating:S.credit.rating?'사용자 입력 있음(전송 안 함)':'미확인'}};
 }
 function allowedNumbers(p){
   const set=new Set();const add=v=>{if(typeof v!=='number'||!Number.isFinite(v))return;[0,1,2].forEach(d=>{const r=Math.round(v*10**d)/10**d;set.add(r.toFixed(d));set.add(Math.abs(r).toFixed(d))});const iv=Math.round(Math.abs(v));set.add(String(iv))};
@@ -1909,7 +1817,6 @@ function renderAI(payload){
   if(r.risks?.length)h+=`<h3>추가 확인 필요</h3><ul>${r.risks.map(x=>`<li>${(x.findingIds||[]).filter(i=>ids.has(i)).length?'':'<span class="badge b-warn">근거 징후 ID 없음</span> '}${safe(x.risk)}<br><span class="hint">다음 확인: ${safe(x.verifyNext)}</span></li>`).join('')}</ul>`;
   if(r.actions?.length)h+=`<h3>권고사항 (실행 과제 초안)</h3><div class="tbl-wrap"><table class="t"><thead><tr><th>우선</th><th>과제</th><th>담당</th><th>기한</th><th>KPI 산식</th><th>필요 자료</th></tr></thead><tbody>${r.actions.map(a=>`<tr><td>${esc(a.priority)}</td><td>${safe(a.action)}</td><td>${esc(a.ownerRole)}</td><td>${esc(a.timeline)}</td><td class="hint">${safe(a.kpiFormula)}</td><td class="hint">${safe(a.neededData)}</td></tr>`).join('')}</tbody></table></div>`;
   if(r.questions?.length)h+=`<h3>원인 점검 질문</h3><ul>${r.questions.map(q=>`<li>${safe(q)}</li>`).join('')}</ul>`;
-  if(r.limitations?.length)h+=`<h3>한계</h3><ul>${r.limitations.map(q=>`<li>${safe(q)}</li>`).join('')}</ul>`;
   h+=`<p class="hint">${esc(new Date(S.ai.at).toLocaleString('ko-KR'))} 작성${S.ai.model?' · '+esc(S.ai.model):''} · 수치 대조 제외 ${blocked}건${S.ai.serverRemoved?` · 서버에서 근거 없는 표현 ${S.ai.serverRemoved}문장 제거`:''}. AI 초안은 사실이 아닌 권고이며 경영진·전문가 검토가 필요합니다.</p></div>`;
   el.innerHTML=h;S.ai.blocked=blocked;
 }
@@ -1963,8 +1870,8 @@ function gantt(items){
     g+=`<text x="4" y="${y+13.5}" font-size="10.5" fill="#14213D">${esc(lab)}</text><rect x="${LW+a*cw+2}" y="${y+4}" width="${(b-a)*cw-4}" height="${RH-8}" rx="3" fill="${col[r.pi]}"/>`});
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="12개월 실행 로드맵">${g}</svg>`;
 }
-/* 보고서 장(章) 생성 — 화면(④⑤⑥⑨⑪)과 A4 PDF가 같은 함수를 쓴다. opt.screen이면 화면 전용(정보 버튼·AI 중복 제외) */
-const SEC_KEYS=[[/^경영진/,'exec'],[/대시보드/,'dash'],[/^성장성/,'growth'],[/^안정성/,'stab'],[/^통장/,'bank'],[/^징후/,'find'],[/^대출 여력/,'fund'],[/^개선전략/,'improve'],[/로드맵/,'road'],[/^부록 A/,'appA'],[/^부록 B/,'appB'],[/^부록 C/,'appC']];
+/* 보고서 장(章) 생성 — 화면(④⑤⑥⑧⑩)과 A4 PDF가 같은 함수를 쓴다. opt.screen이면 화면 전용(정보 버튼·AI 중복 제외) */
+const SEC_KEYS=[[/^경영진/,'exec'],[/대시보드/,'dash'],[/^성장성/,'growth'],[/^안정성/,'stab'],[/^징후/,'find'],[/^대출 여력/,'fund'],[/^개선전략/,'improve'],[/로드맵/,'road'],[/^부록 A/,'appA'],[/^부록 B/,'appB'],[/^부록 C/,'appC']];
 function reportParts(opt={}){
   const M=metrics(),F=findings(M),VS=verifyState(),Y=years();const fin=S.org.industry==='금융·보험업';
   const name=S.org.name||'기업명 미기재';const C=COMPANY;
@@ -1987,27 +1894,20 @@ function reportParts(opt={}){
    <div class="rbox"><h3>핵심 발견 (최대 3개)</h3>${top.length?top.map((f,i)=>`<div class="kf sev${f.sev}"><b>${i+1}. ${esc(f.title)}</b><div>${esc(f.fact)}</div></div>`).join(''):'<p>정의 기반 조건에서 우선 확인할 징후가 없습니다.</p>'}</div></div>
    ${top.length?`<div class="rbox"><h3>시사점</h3><ul>${top.map(f=>`<li>${esc(f.mean.split(/(?<=다\.)\s/)[0])}</li>`).join('')}</ul></div>`:''}
    <h3>권고 — 향후 90일 우선 과제</h3><table class="rt"><thead><tr><th style="width:9mm">#</th><th>과제</th><th>담당</th><th>기한</th></tr></thead><tbody>${next.map((i,n)=>`<tr><td>${n+1}</td><td>${esc(i.a)}</td><td>${esc(i.o)}</td><td>${PHASES.find(([k])=>items[k].includes(i))[0]==='30일'?'30일 이내':'90일 이내'}</td></tr>`).join('')}</tbody></table>
-   <p class="small">증빙 범위: 재무자료 ${S.sources.length?S.sources.filter(s=>/반영/.test(s.status)).length+'개 파일(사용자 확인 후 반영)':(S.sample?'가상 데이터':'사용자 직접 입력')} · 입력 완성도 ${nf(completeness()*100,0)}% · 통장 ${S.bank.length?S.bank.length+'개 계좌':'없음'} · 공식 신용등급 ${S.credit.rating?'사용자 입력':'미확인'} · 감사의견 ${esc(S.audit.opinion)} · 대출 현황 ${S.loans.filter(l=>l.bal>0).length}건</p>`);
+   <p class="small">증빙 범위: 재무자료 ${S.sources.length?S.sources.filter(s=>/반영/.test(s.status)).length+'개 파일(사용자 확인 후 반영)':(S.sample?'가상 데이터':'사용자 직접 입력')} · 입력 완성도 ${nf(completeness()*100,0)}% · 공식 신용등급 ${S.credit.rating?'사용자 입력':'미확인'} · 감사의견 ${esc(S.audit.opinion)} · 대출 현황 ${S.loans.filter(l=>l.bal>0).length}건</p>`);
   // ── 대시보드 ──
   add('핵심 지표 대시보드','재무 대시보드',`${atitle(ex[0]||'핵심 지표 요약')}${dashKpis(M,Y)}${dashCharts(M,Y)}${src}`);
   // ── 성장·수익성(+효율성) ──
   const CC=Y.map(String);
   const act=['assetTurnover','roa','roe','receivableDays','inventoryDays','payableDays','ccc'].filter(k=>Y.some(y=>M[y][k].st==='ok'));
   add(act.length?'성장성·수익성·효율성':'성장성과 수익성','성장성·수익성',`${atitle(msgGrowth(M,Y),(o=>o.v!=null&&o.v<0?'bad':(M[Y[2]].revenueGrowth.v??0)<0||(o.v!=null&&M[Y[1]].operatingMargin.v!=null&&o.v<M[Y[1]].operatingMargin.v)?'warn':'info')(M[Y[2]].operatingMargin))}
-   <div class="rchart"><b>매출·영업이익·순이익 (백만원)</b>${barChart({cats:CC,series:[{name:'매출액',color:'#1E5FD6',vals:Y.map(y=>mil(V(y,'revenue')))},{name:'영업이익',color:'#0E9E79',vals:Y.map(y=>mil(V(y,'operatingIncome')))},{name:'당기순이익',color:'#E08A1E',vals:Y.map(y=>mil(V(y,'netIncome')))}],fmt:v=>nf(v,Math.abs(v)>=100?0:1),unit:'백만원',w:opt.screen?980:760,h:opt.screen?300:230})}${legend([['#1E5FD6','매출액'],['#0E9E79','영업이익'],['#E08A1E','당기순이익']])}${src}</div>
    ${mtable(['revenue','revenueGrowth','assetGrowth','grossMargin','operatingMargin','netMargin',...(Y.some(y=>V(y,'depreciation')!=null)?['ebitda']:[])])}
    ${act.length?`<h3>효율성·운전자본</h3>${mtable(act)}`:''}
 `);
   // ── 안정·유동성 ──
   add('안정성과 유동성','안정성·유동성',`${atitle(msgStability(M,Y),(d=>d.impairmentRate.v!=null||d.debtRatio.st==='hold'?'bad':d.currentRatio.v!=null&&d.currentRatio.v<100?'warn':'info')(M[Y[2]]))}${fin?'<div class="wm">금융·보험업은 일반 기업용 유동성·안정성 비율의 해석이 맞지 않아 참고로만 표시합니다.</div>':''}
-   <div class="rchart"><b>재무상태표 구성 (백만원)</b>${bsChart(Y,opt.screen?980:760,opt.screen?300:230)}${legend([['#1E5FD6','자산총계'],['#E08A1E','부채총계'],['#0E9E79','자본총계']])}${src}</div>
    ${mtable(['debtRatio','equityRatio','borrowings','borrowingDependence','interestCoverage','impairmentRate','currentRatio','quickRatio','workingCapital'])}
-   <p class="small">자본총계가 0 이하이면 부채비율을 음수로 표시하지 않고 ‘보류’로 둡니다. 유동비율 등은 지급불능 여부를 확정하지 않습니다.</p>`);
-  // ── 통장 ──
-  if(S.bank.length){const A=analyzeBank();const ms=Object.keys(A.months).sort();add('통장 입출금 흐름','통장 입출금',`${atitle(`제출 계좌 ${S.bank.length}개 · ${ms.length}개월 순입출금 ${fmtMil(A.tin-A.tout)} — 매출·영업현금흐름과는 다른 지표`)}<div class="rkpi"><div><small>총입금</small><b>${fmtMil(A.tin)}</b></div><div><small>총출금</small><b>${fmtMil(A.tout)}</b></div><div><small>순입출금</small><b>${fmtMil(A.tin-A.tout)}</b></div><div><small>계좌 간 이체 후보</small><b>${A.pairs}쌍</b><div class="small">${S.bankExcludeXfer?'합계에서 제외함':'합계에 포함'}</div></div></div>
-   <div class="rchart"><b>월별 입금·출금 (백만원)</b>${barChart({cats:ms.map(m=>m.slice(2).replace('-','.')),series:[{name:'입금',color:'#0E9E79',vals:ms.map(m=>A.months[m].i/1e6)},{name:'출금',color:'#E08A1E',vals:ms.map(m=>A.months[m].o/1e6)}],fmt:v=>nf(v,Math.abs(v)>=100?0:1),unit:'백만원',h:220,w:Math.max(560,ms.length*60)})}<p class="src">자료: 사용자 제출 통장 거래내역 · BECONIC 분석</p></div>
-   <table class="rt"><thead><tr><th>계좌(별칭)</th><th>은행</th><th>기간</th><th class="r">건수</th></tr></thead><tbody>${S.bank.map(a=>{const ds=a.rows.map(r=>r.d).sort();return `<tr><td>${esc(a.alias)}</td><td>${esc(a.bank)}</td><td>${ds[0]} ~ ${ds[ds.length-1]}</td><td class="r">${a.rows.length}</td></tr>`}).join('')}</tbody></table>
-   <p class="small">통장 입금 합계는 매출액이 아니며, 순입출금은 영업현금흐름이 아닙니다(대출·투자·이체·세금 환급 포함 가능).</p>`)}
+`);
   // ── 징후 매트릭스 + 상세 ──
   add('징후 진단과 원인','징후·원인',`${atitle(F.length?`정의 기반 징후 ${F.length}건(우선 확인 ${cnt(1)}건, 주의 ${cnt(2)}건, 관찰 ${cnt(3)}건${cnt(0)?`, 자료 확인 ${cnt(0)}건`:''}) — 부실을 확정하는 판단이 아니라 원인을 확인할 신호입니다`:'정의 기반 조건에서 확인된 징후가 없습니다',sevLv(F))}
    ${F.length?`<table class="rt mx"><thead><tr><th style="width:7mm">#</th><th>징후</th><th style="width:16mm">영역</th><th style="width:15mm">수준</th><th>확인된 사실</th></tr></thead><tbody>${F.map((f,i)=>`<tr><td>${i+1}</td><td><b>${esc(f.title)}</b></td><td>${esc(f.cat)}</td><td><span class="lv lv${f.sev}">${SEVL[f.sev][0]}</span></td><td class="small">${esc(f.fact)}</td></tr>`).join('')}</tbody></table>`:''}
@@ -2020,12 +1920,12 @@ function reportParts(opt={}){
     const kc=(lb,v,dl)=>`<div><small>${lb}</small><b>${v}</b><div class="small">${dl}</div></div>`;
     add('대출 여력과 지원사업 재무자격','대출·지원자격',`${atitle(`${R.verdict.t} — 충족 ${R.counts.pass}건, 미충족 ${R.counts.fail}건, 확인 필요 ${R.counts.check}건`,R.verdict.c)}
      <div class="rkpi">${kc('기존 대출 잔액',R.existing!=null?esc(fmtMil(R.existing)):'—',esc(R.existingSrc||'대출 현황·차입금 미입력'))}${kc('1년 내 만기 도래(오늘 기준)',!LS.n?'—':LS.due12?esc(fmtMil(LS.due12)):'없음',LS.n?`${LS.dueN}건${R.cash!=null?` · ${Y[2]}년 말 현금 ${esc(fmtMil(R.cash))}`:''}`:'대출 현황 입력 시 계산')}${kc('연간 이자(추정)',R.icrBase!=null?esc(fmtMil(R.icrBase)):'—',esc(R.intSrc||'금리 또는 이자비용 필요'))}${kc('이자 감당 기준 추가 차입 여력',R.room===0?'없음':R.room!=null?esc(fmtMil(R.room)):'—',R.room>0?`가정 금리 ${nf(R.rate,2)}% · 이론치`:esc(R.roomWhy))}</div>
-     <p class="small">추가 차입 여력 = (${Y[2]}년 영업이익 − 기존 연이자) ÷ 가정 금리 — 이자보상배율 1배 경계의 이론치이며 <b>대출 한도가 아닙니다</b>(원금 상환·담보·심사 미반영).${R.revCap!=null?` 매출 대비 한도 기준(${nf(S.crit.revLimit,1)}%): ${R.revRem>=0?'잔여 '+esc(fmtMil(R.revRem)):'초과 '+esc(fmtMil(-R.revRem))}.`:''}${R.stress.length?` 금리 +1%p 시 연이자 ${esc(fmtMil(R.stress[0].add))} 증가${R.stress[0].icr!=null?`(이자보상배율 ${nf(R.stress[0].icr,2)}배)`:''}.`:''}${R.recon?` 대출 현황과 ${Y[2]}년 말 재무상태표 차입금 차이 ${esc(fmtMil(R.recon.diff))}(결산일 이후 변동·계정 분류 차이 가능).`:''}</p>
+     <p class="small">추가 차입 여력 = (${Y[2]}년 영업이익 − 기존 연이자) ÷ 가정 금리 — 이자보상배율 1배 경계의 이론치이며 <b>대출 한도가 아닙니다</b>(원금 상환·담보·심사 미반영).${R.stress.length?` 금리 +1%p 시 연이자 ${esc(fmtMil(R.stress[0].add))} 증가${R.stress[0].icr!=null?`(이자보상배율 ${nf(R.stress[0].icr,2)}배)`:''}.`:''}${R.recon?` 대출 현황과 ${Y[2]}년 말 재무상태표 차입금 차이 ${esc(fmtMil(R.recon.diff))}(결산일 이후 변동·계정 분류 차이 가능).`:''}</p>
      ${wn.length?`<div class="wm">${wn.map(esc).join('<br>')}</div>`:''}
      ${LS.n?`<table class="rt"><thead><tr><th>금융기관</th><th>구분</th><th class="r">잔액(백만원)</th><th class="r">금리</th><th>만기</th><th>상환</th></tr></thead><tbody>${S.loans.filter(l=>l.bal>0).map(l=>`<tr><td>${esc(l.lender||'—')}</td><td>${esc(l.type)}</td><td class="r">${esc(fmtMil(l.bal,false))}</td><td class="r">${l.rate!=null?nf(l.rate,2)+'%':'—'}</td><td>${esc(l.due||'—')}${l.due&&l.due<today()?' (경과)':''}</td><td>${esc(l.repay)}</td></tr>`).join('')}</tbody></table>`:''}
      <h3>재무자격 사전점검과 보완</h3><table class="rt"><thead><tr><th style="width:16mm">구분</th><th style="width:42mm">점검 항목</th><th>현재 · 보완</th><th style="width:15mm">판정</th></tr></thead><tbody>${fundRowsPacked(R.rows).map(r=>`<tr><td class="small">${esc(r.grp)}</td><td>${esc(r.label)}</td><td class="small">${esc(opt.screen?r.now:r.nowR)}${r.fix&&r.status!=='pass'?`<div><b>→ ${esc(r.fix)}</b></div>`:''}</td><td><span class="st k-${r.status}">${ST[r.status]}</span></td></tr>`).join('')}${R.fixes.filter(f=>!R.rows.some(r=>r.fix===f.a)).map(f=>`<tr><td class="small">${esc(f.src)}</td><td>추가 보완</td><td class="small"><b>→ ${esc(f.a)}</b></td><td><span class="st k-${f.st}">${ST[f.st]}</span></td></tr>`).join('')}</tbody></table>
      ${progBlock(opt)}
-     <p class="small">${['debtMax','ageMax','revMin','scoreMin','revLimit'].some(k=>S.crit[k]!=null)||S.crit.grade?esc(critSrc())+'. ':'공고 기준(부채비율·업력·매출·등급·평점) 미입력 — 해당 항목은 판정하지 않았습니다. '}제한 사유는 사용자 자가확인이며, 본 점검은 대출 승인·한도·지원사업 선정 판단이 아닙니다(공고문 원문 우선).</p>`)}
+     <p class="small">${['debtMax','ageMax','revMin','scoreMin'].some(k=>S.crit[k]!=null)||S.crit.grade?esc(critSrc())+'. ':'공고 기준(부채비율·업력·매출·등급·평점) 미입력 — 해당 항목은 판정하지 않았습니다. '}제한 사유는 사용자 자가확인이며, 본 점검은 대출 승인·한도·지원사업 선정 판단이 아닙니다(공고문 원문 우선).</p>`)}
   // ── 개선과제 (+AI) ──
   let aiBlock='';if(S.ai&&S.ai.result&&!opt.screen){const p=aiPayload(M,F);const allow=allowedNumbers(p);const r=S.ai.result;const okT=t=>!checkText(stripIds(t),allow);const acts=(r.actions||[]).filter(a=>okT(a.action)&&okT(a.kpiFormula));aiBlock=`<h3>AI 개선처방 초안 (수치 대조 통과분 · 검토 필요)</h3>${okT(r.executiveSummary)&&r.executiveSummary?`<p>${esc(stripIds(r.executiveSummary))}</p>`:''}${acts.length?`<table class="rt"><thead><tr><th>우선</th><th>과제</th><th>담당</th><th>기한</th><th>KPI 산식</th></tr></thead><tbody>${acts.map(a=>`<tr><td>${esc(a.priority)}</td><td>${esc(stripIds(a.action))}</td><td>${esc(a.ownerRole)}</td><td>${esc(a.timeline)}</td><td class="small">${esc(a.kpiFormula)}</td></tr>`).join('')}</tbody></table>`:''}`}
   const nAll=PHASES.reduce((a,[k])=>a+items[k].length,0);
@@ -2033,7 +1933,7 @@ function reportParts(opt={}){
   // ── 로드맵 ──
   add('12개월 실행 로드맵과 KPI','로드맵·KPI',`${atitle('검증 → 우선 대응 → 구조 개선 → 재진단 순으로 12개월 안에 같은 기준으로 다시 측정합니다')}
    <div class="rchart gt"><b>실행 로드맵 (월)</b><div class="gw">${gantt(items)}</div>${legend([['#B4232F','즉시(1개월)'],['#E08A1E','90일'],['#146FE8','6개월'],['#0E9E79','12개월']])}</div>
-   <h3>KPI와 측정법</h3><table class="rt"><thead><tr><th>KPI</th><th>산식</th><th class="r">현재값(${Y[2]})</th><th>목표값</th><th>주기</th></tr></thead><tbody>${kpis.map(k=>`<tr><td>${esc(k.n)}</td><td class="small">${esc(k.f)}</td><td class="r">${esc(k.b??'—')}</td><td class="small">경영진 협의 후 설정</td><td>월·분기</td></tr>`).join('')}</tbody></table>`);
+   <h3>KPI와 측정법</h3><table class="rt"><thead><tr><th>KPI</th><th>산식</th><th class="r">현재값(${Y[2]})</th></tr></thead><tbody>${kpis.map(k=>`<tr><td>${esc(k.n)}</td><td class="small">${esc(k.f)}</td><td class="r">${esc(k.b??'—')}</td></tr>`).join('')}</tbody></table><p class="small">목표값은 경영진 협의 후 정하고, 매월 결산 후 같은 산식으로 측정합니다.</p>`);
   // ── 부록 ──
   add('부록 A. 입력자료와 검증','부록 · 자료·검증',`${atitle(VS.verified?'3개년 대차·필수 항목·비교 가능성 확인을 마친 자료로 작성했습니다':'검증이 끝나지 않은 항목이 있어 해석에 유의가 필요합니다',VS.verified?'ok':'warn')}
    <table class="rt"><thead><tr><th>연도</th><th>사업연도</th><th>대차 검증</th><th>세부 검증</th></tr></thead><tbody>${VS.vs.map(v=>`<tr><td>${yh(v.year)}</td><td class="small">${fyPeriod(v.year).start}~${fyPeriod(v.year).end}</td><td>${!v.has?'자료 없음':v.balance===true?'일치':v.balance===false?'<b>불일치</b>':'확인 불가'}</td><td class="small">${v.items.map(i=>esc(i.t)).join('<br>')}</td></tr>`).join('')}</tbody></table>
@@ -2041,8 +1941,11 @@ function reportParts(opt={}){
    ${S.sources.length?`<table class="rt"><thead><tr><th>연도</th><th>문서</th><th>발급번호·발급일</th><th>신고</th><th>단위</th><th>SHA-256</th></tr></thead><tbody>${S.sources.filter(s=>!/중복|오류|이미지/.test(s.status)).map(s=>`<tr><td>${esc(s.years)}</td><td>${esc(s.doc||s.kind.toUpperCase()+' 파일')}<div class="small">${esc(s.name)}</div></td><td>${esc(s.issueNo||'—')}<div class="small">${esc(s.issuedAt||'')} ${esc(s.office||'')}</div></td><td>${esc(s.report||'—')}</td><td>${esc(s.unit)}</td><td class="small">${esc(String(s.sha256).slice(0,12))}</td></tr>`).join('')}</tbody></table><p class="small">홈택스 발급 증명서는 발급번호로 발급일부터 90일 안에 원본 확인이 가능합니다. 본 보고서는 증명서의 진위를 확인하지 않았습니다(사용자 제출 자료).</p>`:''}`);
   add('부록 B. 요약 재무제표','부록 · 재무제표',`${atitle(`${Y[0]}~${Y[2]} 회계연도 요약 재무제표 (백만원, ${S.org.basis})`)}<div class="rg2 fs">${['bs','is'].map(g=>`<table class="rt fs"><thead><tr><th>${g==='bs'?'재무상태표':'손익계산서'}</th>${Y.map(y=>`<th class="r">${yh(y)}</th>`).join('')}</tr></thead><tbody>${ACCTS.filter(a=>a.g===g&&Y.some(y=>V(y,a.k)!=null)).map(a=>`<tr class="l${a.lv}"><td>${esc(a.l.replace(/^└\s*/,''))}</td>${Y.map(y=>`<td class="r">${V(y,a.k)!=null?fmtMil(V(y,a.k),false):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table>`).join('')}</div>${src}`);
   add('부록 C. 산식·용어·유의사항','부록 · 산식·용어',`<table class="rt gl"><thead><tr><th style="width:24mm">지표</th><th style="width:46mm">산식</th><th>쉬운 뜻 / 주의</th></tr></thead><tbody>${MDEF.map(m=>`<tr><td>${esc(m.l)}</td><td class="small">${esc(m.f)}</td><td class="small">${esc(m.plain)} ${esc(m.c)}</td></tr>`).join('')}</tbody></table>
-   <h3>유의사항</h3><ul class="small"><li>증감은 비율이면 %p, 금액이면 %(상대 증감). 평균값은 (기초+기말)÷2, 기간은 365일 기준(첫해 미산출). 업종 평균과 비교하지 않았습니다.</li><li>징후는 수치 정의로 확인되는 신호이며 부실·지급불능을 확정하지 않습니다.</li><li>제출 자료(사용자 제출)를 기반으로 하며, 발급기관 진위 확인을 의미하지 않습니다.</li><li>업종 평균·임의 기준선·종합 점수·신용등급을 생성하지 않았습니다.</li><li>재무제표증명·거래내역만으로 현재 현금잔액이나 상환능력을 확정할 수 없습니다.</li><li>AI 문장은 검증된 요약수치로 작성된 초안이며, 계산 결과와 다른 수치·근거 없는 표현이 포함된 문장은 제외했습니다.</li></ul>
+   <h3>유의사항</h3><ul class="small"><li>증감은 비율이면 %p, 금액이면 %(상대 증감). 평균값은 (기초+기말)÷2, 기간은 365일 기준(첫해 미산출). 업종 평균과 비교하지 않았습니다.</li><li>징후는 수치 정의로 확인되는 신호이며 부실·지급불능을 확정하지 않습니다.</li><li>자본총계가 0 이하이면 부채비율을 음수로 표시하지 않고 ‘보류’로 둡니다. 유동비율 등은 지급불능 여부를 확정하지 않습니다.</li><li>제출 자료(사용자 제출)를 기반으로 하며, 발급기관 진위 확인을 의미하지 않습니다.</li><li>업종 평균·임의 기준선·종합 점수·신용등급을 생성하지 않았습니다.</li><li>재무제표증명·거래내역만으로 현재 현금잔액이나 상환능력을 확정할 수 없습니다.</li><li>AI 문장은 검증된 요약수치로 작성된 초안이며, 계산 결과와 다른 수치·근거 없는 표현이 포함된 문장은 제외했습니다.</li></ul>
 `);
+  // 성장·수익성과 안정·유동성은 한 장으로(각각 반쪽이라 지면 낭비)
+  const gi=secs.findIndex(x=>x.key==='growth'),si=secs.findIndex(x=>x.key==='stab');
+  if(gi>=0&&si>=0){const g=secs[gi],st=secs[si];g.title='성장성·수익성·안정성';g.short='성장·수익·안정성';g.body=`<h3>성장성·수익성${act.length?'·효율성':''}</h3>${g.body}<h3>안정성과 유동성</h3>${st.body}`.replace(/<table class="rt"/g,'<table class="rt tight"');secs.splice(si,1)}
   return {secs,ctx:{name,C,Y,wm,status}};
 }
 function buildReport(){
@@ -2056,7 +1959,7 @@ function buildReport(){
    <dl class="meta"><dt>분석 기간</dt><dd>${fyPeriod(Y[0]).start} ~ ${fyPeriod(Y[2]).end} (결산월 ${S.org.fye}월)</dd><dt>회계기준</dt><dd>${esc(S.org.std)}</dd><dt>자료 상태</dt><dd>${esc(status)}</dd><dt>작성일</dt><dd>${ds}</dd><dt>작성</dt><dd>${C.name} · BECONIC 기업 재무진단 v${APP.version}</dd></dl>
    <div class="cfoot">본 보고서는 제출 자료에 대한 자체 재무비율 분석으로, 공식 기업신용평가서·회계감사보고서·세무 자문·투자 권유가 아닙니다.<br>수신자 외 배포·복제를 금합니다. © ${C.since}~${date.getFullYear()} ${C.en}</div></section>`;
   const toc=`<section class="rp">${'<div class="rhead"><span class="bl"><svg><use href="#gvShield"/></svg>BECONIC 기업 재무진단</span><span>목차·개요</span></div>'}<h2>목차</h2><ol class="toc">${secs.map((s,i)=>`<li><span class="no">${String(i+1).padStart(2,'0')}</span><span class="tt">${esc(s.title)}</span></li>`).join('')}</ol>
-   <h2 style="margin-top:8mm">진단 개요</h2><div class="rgrid"><div class="rbox"><h3>범위</h3><p>${Y[0]}~${Y[2]} 회계연도(${Y.map(relY).join('·')}) ${esc(S.org.basis)} 재무제표 · 성장성·수익성·안정성·유동성·활동성${S.bank.length?' · 통장 입출금':''}${fundActive()?' · 대출 여력·지원사업 재무자격(신용등급·감사의견 포함)':''}</p></div>
+   <h2 style="margin-top:8mm">진단 개요</h2><div class="rgrid"><div class="rbox"><h3>범위</h3><p>${Y[0]}~${Y[2]} 회계연도(${Y.map(relY).join('·')}) ${esc(S.org.basis)} 재무제표 · 성장성·수익성·안정성·유동성·활동성${fundActive()?' · 대출 여력·지원사업 재무자격(신용등급·감사의견 포함)':''}</p></div>
    <div class="rbox"><h3>방법</h3><p>원본 추출 → 사용자 확인 → 결정론 계산 → 대차·손익 검증 → 정의 기반 징후 → 과제·로드맵. AI 문장은 검증된 요약 지표에 대한 초안이며 수치 대조를 통과한 내용만 싣습니다.</p></div>
    <div class="rbox"><h3>읽는 법</h3><p><span class="lv lv1">우선 확인</span> 지급능력·자본에 직접 영향 · <span class="lv lv2">주의</span> 손익·현금 흐름 · <span class="lv lv3">관찰</span> 추세·효율. 비율 증감은 %p, 금액 증감은 %.</p></div>
    <div class="rbox"><h3>하지 않은 것</h3><p>업종 평균 비교, 종합 점수, 신용등급·부도확률 산출, 금액 목표 설정 — 근거 자료 없이 만들지 않습니다.</p></div></div>
@@ -2079,24 +1982,22 @@ function download(name,str,type){const a=document.createElement('a');const u=URL
 function exportJSON(){
   const o={app:APP.name,version:APP.version,exportedAt:new Date().toISOString(),notice:'사용자 제출 자료 기반. 원본 파일·사업자번호·계좌 적요는 포함하지 않음.',baseYear:S.baseYear,unit:S.unit,org:S.org,data:S.data,sources:S.sources,editLog:S.editLog,confirm:S.confirm,credit:S.credit,audit:S.audit,sample:S.sample,
     loans:S.loans.map(({lender,type,bal,rate,due,repay,coll})=>({lender,type,bal,rate,due,repay,coll})),loanUnit:S.loanUnit,loanAsOf:S.loanAsOf,dq:S.dq,crit:S.crit,progSel:S.progSel,
-    person:S.person.saveInJson?{...S.person}:{showInReport:S.person.showInReport,saveInJson:false},
-    bank:S.bank.map(a=>({alias:a.alias,bank:a.bank,unit:a.unit,file:a.file,sha:a.sha,rows:a.rows.map(r=>({d:r.d,i:r.i,o:r.o,b:r.b,c:catOf(r)}))})),bankExcludeXfer:S.bankExcludeXfer,ai:S.ai};
+    person:S.person.saveInJson?{...S.person}:{showInReport:S.person.showInReport,saveInJson:false},ai:S.ai};
   download(`BECONIC_재무진단_${(S.org.name||'기업').replace(/[\\/:*?"<>|\s]/g,'')}_${today()}.json`,JSON.stringify(o,null,2),'application/json');
 }
 function importJSON(o){
   if(!o||typeof o!=='object'||!o.data||!o.baseYear)throw new Error('BECONIC 재무진단 JSON 형식이 아닙니다.');
   const clean={};for(const [y,row] of Object.entries(o.data)){if(!/^\d{4}$/.test(y))continue;clean[y]={};for(const [k,c] of Object.entries(row||{})){if(!AK[k]||!c||typeof c!=='object')continue;const v=c.v==null?null:Number(c.v);if(v!=null&&!Number.isFinite(v))continue;clean[y][k]={v,src:String(c.src||'json').slice(0,10),file:c.file?String(c.file).slice(0,80):'',page:c.page??null,label:c.label?String(c.label).slice(0,60):'',conf:c.conf||'high'}}}
   S.baseYear=+o.baseYear;S.baseTouched=true;S.unit=UNITS[o.unit]?o.unit:'천원';Object.assign(S.org,o.org||{});S.data=clean;S.sources=Array.isArray(o.sources)?o.sources.slice(0,50):[];S.editLog=Array.isArray(o.editLog)?o.editLog.slice(0,500):[];
-  Object.assign(S.confirm,o.confirm||{});Object.assign(S.credit,o.credit||{});Object.assign(S.audit,o.audit||{});S.sample=!!o.sample;S.bankExcludeXfer=!!o.bankExcludeXfer;S.ai=o.ai&&o.ai.result?o.ai:null;
+  Object.assign(S.confirm,o.confirm||{});Object.assign(S.credit,o.credit||{});Object.assign(S.audit,o.audit||{});S.sample=!!o.sample;S.ai=o.ai&&o.ai.result?o.ai:null;
   const str=(x,n)=>x==null?'':String(x).slice(0,n);const num=(x,a,b)=>{const n=x==null||x===''?null:Number(x);return n!=null&&Number.isFinite(n)&&n>=a&&n<=b?n:null};const dt=x=>/^\d{4}-\d{2}-\d{2}$/.test(String(x||''))?String(x):'';
   S.org.founded=dt(S.org.founded);
   S.loans=Array.isArray(o.loans)?o.loans.slice(0,30).map(l=>({id:'l'+Math.random().toString(36).slice(2,8),lender:str(l.lender,30),type:LOAN_TYPES.includes(l.type)?l.type:'기타',bal:num(l.bal,0,1e15),rate:num(l.rate,0,100),due:dt(l.due),repay:REPAY.includes(l.repay)?l.repay:'미확인',coll:str(l.coll,30)})):[];
   S.loanUnit=UNITS[o.loanUnit]?o.loanUnit:'백만원';S.loanAsOf=dt(o.loanAsOf);
   S.dq={};if(o.dq&&typeof o.dq==='object')DQ.forEach(([k])=>{if(DQV.includes(o.dq[k]))S.dq[k]=o.dq[k]});
-  const cr=o.crit||{};S.crit={name:str(cr.name,60),src:str(cr.src,80),debtMax:num(cr.debtMax,0,100000),ageMax:num(cr.ageMax,0,100),revMin:num(cr.revMin,0,1e9),grade:str(cr.grade,10),scoreMin:num(cr.scoreMin,1,1000),scoreAgency:['둘 다','둘 중 하나','NICE','KCB'].includes(cr.scoreAgency)?cr.scoreAgency:'둘 다',revLimit:num(cr.revLimit,0,1000),rate:num(cr.rate,0.01,100),exportK:num(cr.exportK,0,1e9),rnd:num(cr.rnd,0,1e9)};S.progSel=Array.isArray(o.progSel)?o.progSel.filter(id=>PROGRAMS.some(p=>p.id===id)):null;
+  const cr=o.crit||{};S.crit={debtMax:num(cr.debtMax,0,100000),ageMax:num(cr.ageMax,0,100),revMin:num(cr.revMin,0,1e9),grade:str(cr.grade,10),scoreMin:num(cr.scoreMin,1,1000),scoreAgency:['둘 다','둘 중 하나','NICE','KCB'].includes(cr.scoreAgency)?cr.scoreAgency:'둘 다',rate:num(cr.rate,0.01,100),exportK:num(cr.exportK,0,1e9),rnd:num(cr.rnd,0,1e9)};S.progSel=Array.isArray(o.progSel)?o.progSel.filter(id=>PROGRAMS.some(p=>p.id===id)):null;
   const pp=o.person||{};const sc=x=>scoreOk(Number(x))&&x!==''&&x!=null?Number(x):null;S.person={nice:sc(pp.nice),niceDate:dt(pp.niceDate),kcb:sc(pp.kcb),kcbDate:dt(pp.kcbDate),showInReport:!!pp.showInReport,saveInJson:!!pp.saveInJson};S.extrasSample=false;
-  S.bank=Array.isArray(o.bank)?o.bank.map(a=>({id:'a'+Math.random().toString(36).slice(2,8),alias:String(a.alias||'계좌'),bank:String(a.bank||''),unit:a.unit||'원',file:String(a.file||''),sha:a.sha||'',bad:0,rows:(a.rows||[]).map(r=>({d:String(r.d),i:+r.i||0,o:+r.o||0,b:r.b==null?null:+r.b,desc:'',cat:r.c&&r.c!=='미분류'&&r.c!=='내부이체 후보'?String(r.c):''}))})):[];
-  syncForm();renderGrid();renderSources();renderBank();refresh();if(S.ai)renderAI();
+  syncForm();renderGrid();renderSources();refresh();if(S.ai)renderAI();
 }
 function verifyCSV(){
   const rows=[['연도','계정','값(원)','출처','파일','쪽','원문 라벨','신뢰도']];
@@ -2132,12 +2033,12 @@ function syncForm(){
   ['#baseYear','#baseYear2'].forEach(id=>{const el=$(id);el.innerHTML=opts.join('');el.value=S.baseYear});
   const p=fyPeriod(def);$('#baseHint').textContent=`결산월 ${S.org.fye}월 기준 ${def}년 사업연도(${p.start}~${p.end})는 법인세 신고기한(${p.deadline})이 지나 기본값으로 정했습니다. 해가 바뀌면 자동으로 바뀝니다.`;
   $('#yearChips').innerHTML=years().slice().reverse().map(y=>{const q=fyPeriod(y);return `<div class="ychip"><b>${relY(y)}</b> ${y}년<span>${q.start}~${q.end}</span></div>`}).join('');
-  $('#auYear').placeholder=`예: ${S.baseYear}`;
+  
   const fy=$('#orgFye');if(!fy.options.length)for(let m=1;m<=12;m++)fy.insertAdjacentHTML('beforeend',`<option value="${m}">${m}월</option>`);fy.value=S.org.fye;
   $('#orgName').value=S.org.name;$('#orgBizNo').value=S.bizMasked||'';$('#orgIndustry').value=S.org.industry;$('#orgBasis').value=S.org.basis;$('#orgStd').value=S.org.std;$('#orgAudited').value=S.org.audited;$('#unitSel').value=S.unit;
   $$('[data-confirm]').forEach(c=>c.checked=!!S.confirm[c.dataset.confirm]);
-  $('#crAgency').value=S.credit.agency;$('#crRating').value=S.credit.rating;$('#crScale').value=S.credit.scale;$('#crIssued').value=S.credit.issued;$('#crValid').value=S.credit.valid;$('#crBasis').value=S.credit.basis;
-  $('#auOpinion').value=S.audit.opinion;$('#auYear').value=S.audit.year;$('#auAuditor').value=S.audit.auditor;$('#auDate').value=S.audit.date;$('#auGC').checked=S.audit.gc;
+  $('#crAgency').value=S.credit.agency;$('#crRating').value=S.credit.rating;$('#crIssued').value=S.credit.issued;$('#crValid').value=S.credit.valid;
+  $('#auOpinion').value=S.audit.opinion;$('#auGC').checked=S.audit.gc;
   $('#finWarn').hidden=S.org.industry!=='금융·보험업';
   syncFund();
 }
@@ -2146,7 +2047,7 @@ function refresh(){
   const P=VS.anyData?Object.fromEntries(reportParts({screen:true}).secs.map(x=>[x.key,x])):null; // 화면 결과 = PDF와 같은 장
   renderVerify(VS);renderDash(P,VS);renderDetail(P);renderRisks(P);renderRoad(P);renderAIGate(VS);renderCredit();renderFund(P);
   $('#aiPreview').textContent=VS.anyData?JSON.stringify(aiPayload(M,F),null,2):'(자료 입력 후 표시)';
-  const done={company:!!(S.org.name&&S.org.industry),input:VS.anyData,verify:VS.verified,dash:VS.anyData,detail:VS.anyData,risk:VS.anyData,cash:S.bank.length>0,credit:!!S.credit.rating||S.audit.opinion!=='미확인'||S.loans.length>0,fund:fundActive(),ai:!!S.ai,road:VS.anyData,report:false};
+  const done={company:!!(S.org.name&&S.org.industry),input:VS.anyData,verify:VS.verified,dash:VS.anyData,detail:VS.anyData,risk:VS.anyData,credit:!!S.credit.rating||S.audit.opinion!=='미확인'||S.loans.length>0,fund:fundActive(),ai:!!S.ai,road:VS.anyData,report:false};
   $$('#stepper a').forEach(a=>a.classList.toggle('done',!!done[a.dataset.step]));
 }
 function switchTab(which){const f=which==='file';$('#t-file').setAttribute('aria-selected',f);$('#t-grid').setAttribute('aria-selected',!f);$('#tab-file').hidden=!f;$('#tab-grid').hidden=f}
@@ -2173,11 +2074,9 @@ function bind(){
   $('#jsonIn').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{importJSON(JSON.parse(await f.text()));toast('저장한 진단을 불러왔습니다.')}catch(err){toast('불러오기 실패: '+err.message)}e.target.value=''});
   $('#btnClear').addEventListener('click',()=>{if(confirm('입력한 재무값·업로드 기록을 모두 지울까요?'))clearAll()});
   $('#btnSample').addEventListener('click',loadSample);$('#btnClearSample').addEventListener('click',clearAll);
-  document.addEventListener('click',e=>{const i=e.target.closest('[data-info]');if(i)openInfo(i.dataset.info);const d=e.target.closest('[data-del-acct]');if(d&&confirm('이 계좌 자료를 삭제할까요?')){S.bank=S.bank.filter(a=>a.id!==d.dataset.delAcct);renderBank();refresh()}});
-  $('#bkFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)addBankFile(f).then(refresh)});
-  $('#bank').addEventListener('change',e=>{if(e.target.id==='bkX'){S.bankExcludeXfer=e.target.checked;renderBank()}});
-  const crMap={crAgency:'agency',crRating:'rating',crScale:'scale',crIssued:'issued',crValid:'valid',crBasis:'basis'};Object.entries(crMap).forEach(([id,k])=>$('#'+id).addEventListener('change',e=>{S.credit[k]=e.target.value.trim();refresh()}));
-  const auMap={auOpinion:'opinion',auYear:'year',auAuditor:'auditor',auDate:'date'};Object.entries(auMap).forEach(([id,k])=>$('#'+id).addEventListener('change',e=>{S.audit[k]=e.target.value.trim();refresh()}));
+  document.addEventListener('click',e=>{const i=e.target.closest('[data-info]');if(i)openInfo(i.dataset.info);});
+  const crMap={crAgency:'agency',crRating:'rating',crIssued:'issued',crValid:'valid'};Object.entries(crMap).forEach(([id,k])=>$('#'+id).addEventListener('change',e=>{S.credit[k]=e.target.value.trim();refresh()}));
+  const auMap={auOpinion:'opinion'};Object.entries(auMap).forEach(([id,k])=>$('#'+id).addEventListener('change',e=>{S.audit[k]=e.target.value.trim();refresh()}));
   $('#auGC').addEventListener('change',e=>{S.audit.gc=e.target.checked;refresh()});
   $('#orgFounded').addEventListener('change',e=>{const v=e.target.value;if(v&&v>today()){toast('설립일이 오늘 이후입니다.');e.target.value=S.org.founded||'';return}S.org.founded=v;refresh()});
   $('#btnLoanAdd').addEventListener('click',()=>{if(S.loans.length>=30){toast('대출은 30건까지 입력할 수 있습니다.');return}S.loans.push({id:'l'+Math.random().toString(36).slice(2,8),lender:'',type:LOAN_TYPES[0],bal:null,rate:null,due:'',repay:'미확인',coll:''});renderLoans();refresh();const ins=$$('#loanTbl [data-f="lender"]');ins[ins.length-1]?.focus()});
@@ -2192,9 +2091,9 @@ function bind(){
   $('#pShowReport').addEventListener('change',e=>{S.person.showInReport=e.target.checked});
   $('#pSaveJson').addEventListener('change',e=>{S.person.saveInJson=e.target.checked});
   const numCrit=(id,k,min,max,int)=>$(id).addEventListener('change',e=>{const raw=e.target.value.replace(/[,%\s]/g,'');if(!raw){S.crit[k]=null;refresh();return}const n=Number(raw);if(!Number.isFinite(n)||n<min||n>max||(int&&!Number.isInteger(n))){toast(`${min}~${max} 사이 숫자로 입력하세요.`);e.target.value=S.crit[k]??'';return}S.crit[k]=n;refresh()});
-  numCrit('#cfDebtMax','debtMax',0,100000);numCrit('#cfAgeMax','ageMax',0,100);numCrit('#cfRevMin','revMin',0,1e9);numCrit('#cfScoreMin','scoreMin',1,1000,true);numCrit('#cfRevLimit','revLimit',0,1000);numCrit('#cfRate','rate',0.01,100);numCrit('#cfExport','exportK',0,1e9);numCrit('#cfRnd','rnd',0,1e9);
+  numCrit('#cfDebtMax','debtMax',0,100000);numCrit('#cfAgeMax','ageMax',0,100);numCrit('#cfRevMin','revMin',0,1e9);numCrit('#cfScoreMin','scoreMin',1,1000,true);numCrit('#cfRate','rate',0.01,100);numCrit('#cfExport','exportK',0,1e9);numCrit('#cfRnd','rnd',0,1e9);
   $('#progBar').addEventListener('click',e=>{const b=e.target.closest('[data-pc]');if(!b)return;const c=b.dataset.pc;const ids=c==='전체'?null:PROGRAMS.filter(p=>p.cat===c).map(p=>p.id);S.progSel=ids;renderProgBar();refresh()});
-  [['#cfName','name'],['#cfSrc','src'],['#cfGrade','grade'],['#cfScoreAgency','scoreAgency']].forEach(([id,k])=>$(id).addEventListener('change',e=>{S.crit[k]=e.target.value.trim();refresh()}));
+  [['#cfGrade','grade'],['#cfScoreAgency','scoreAgency']].forEach(([id,k])=>$(id).addEventListener('change',e=>{S.crit[k]=e.target.value.trim();refresh()}));
   $('#btnAI').addEventListener('click',runAI);
   $('#btnPrint').addEventListener('click',printReport);$('#btnSave').addEventListener('click',exportJSON);$('#btnVerifyCsv').addEventListener('click',verifyCSV);
   window.addEventListener('beforeprint',()=>{if(!$('#report').innerHTML)$('#report').innerHTML=buildReport()});
@@ -2203,13 +2102,11 @@ function bind(){
   const obs=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){const id=en.target.id.replace('s-','');$$('#stepper a').forEach(a=>{const on=a.dataset.step===id;a.classList.toggle('cur',on);if(on){const ol=a.parentElement.parentElement;if(ol.scrollWidth>ol.clientWidth)ol.scrollTo({left:a.offsetLeft-ol.clientWidth/2+a.offsetWidth/2,behavior:'smooth'})}})}}),{rootMargin:'-40% 0px -55% 0px'});
   $$('main .sec').forEach(s=>obs.observe(s));
 }
-function glossary(){
-  $('#glossary').innerHTML=`<div class="tbl-wrap"><table class="t"><thead><tr><th>지표</th><th>산식</th><th>쉬운 뜻</th><th>주의</th></tr></thead><tbody>${MDEF.map(m=>`<tr><td><b>${esc(m.l)}</b></td><td class="hint">${esc(m.f)}</td><td>${esc(m.plain)}</td><td class="hint">${esc(m.c)}</td></tr>`).join('')}</tbody></table></div>
-  <ul class="hint" style="margin-top:12px"><li><b>자본잠식</b>: 결손이 쌓여 자본총계가 납입자본금보다 작아진 상태. 자본총계가 0 이하이면 완전자본잠식.</li><li><b>%p(퍼센트포인트)</b>: 비율끼리의 차이. 영업이익률 5%→3%는 ‘2%p 하락’(상대적으로는 40% 감소).</li><li>이 서비스는 업종 평균·임의 기준선·종합 점수·신용등급을 만들지 않습니다. 공식 등급은 평가기관의 유효한 평가서로만 확인할 수 있습니다.</li><li>입력·업로드 자료는 브라우저 메모리에서만 처리되며, 새로고침하면 사라집니다. AI 해석은 동의한 경우에 한해 요약 지표만 전송합니다.</li></ul>`;
+function renderFooter(){
   $('#verInfo').innerHTML=`v${APP.version} · 업데이트 ${APP.updated}<br>${APP.url.replace(/^https?:\/\//,'')}`;
   const C=COMPANY;$('#footCo').innerHTML=`<strong>${C.name}</strong><div class="det">주소 ${C.addr} · 전화 <a href="tel:${C.tel.replace(/-/g,'')}">${C.tel}</a><br>이메일 <a href="mailto:${C.email}">${C.email}</a> · 사이트 <a href="https://${C.site}/" target="_blank" rel="noopener noreferrer">${C.site}</a><br>${C.cert}</div><small>© ${C.since}~${new Date().getFullYear()} Copyright ⓒ ${C.en} All rights reserved.</small>`;
 }
-syncForm();renderGrid();renderSources();renderBank();glossary();bind();refresh();
+syncForm();renderGrid();renderSources();renderFooter();bind();refresh();
 </script>
 </body>
 </html>

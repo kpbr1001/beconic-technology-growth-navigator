@@ -1,4 +1,4 @@
-/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings, fundingEval, gradeRank, exportJSON, refresh, loanSummary, PROGRAMS, progEval, renderAI -- page.evaluate 안에서 앱 전역 함수를 호출 */
+/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, clearAll, crossCheck, applyRes, aiPayload, metrics, findings, fundingEval, gradeRank, exportJSON, refresh, loanSummary, PROGRAMS, progEval, renderAI -- page.evaluate 안에서 앱 전역 함수를 호출 */
 // BECONIC 재무진단 QA — 실제 Chromium으로 사용자 플로우·레드팀 항목·A4 PDF를 확인한다.
 // 실행: (finance 폴더를 정적 서버로 띄운 뒤) node finance/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -262,26 +262,6 @@ const Y = await page.evaluate(() => years());
   await page.evaluate(() => clearAll());
 }
 
-// 7. 통장: 계좌 간 이체 매칭
-{
-  const a = '거래일자,적요,입금,출금,잔액\n2025-01-03,매출입금 A사,"5,000,000",,15000000\n2025-01-05,B계좌로 이체,,"3,000,000",12000000\n2025-02-10,급여,,"4,000,000",8000000\n';
-  const b = '거래일시,내용,맡기신금액,찾으신금액,거래후잔액\n2025.01.05 10:00,A계좌에서,3000000,0,3000000\n2025.02.01 09:00,국세청 부가세,0,500000,2500000\n';
-  await page.fill('#bkAlias', '주거래 A');
-  await page.setInputFiles('#bkFile', { name: 'a.csv', mimeType: 'text/csv', buffer: Buffer.from(a) });
-  await page.waitForSelector('#bank .acct');
-  await page.fill('#bkAlias', '보조 B');
-  await page.setInputFiles('#bkFile', { name: 'b.csv', mimeType: 'text/csv', buffer: Buffer.from(b) });
-  await page.waitForFunction(() => document.querySelectorAll('#bank .acct').length === 2);
-  const t = await txt('#bank');
-  check('통장: 이체 후보 1쌍', t.includes('1쌍'));
-  check('통장: 잔액 연속성 검증', t.includes('잔액 연속성 3/3 일치') || t.includes('잔액 연속성 2/2 일치'), t.match(/잔액 연속성[^\n]*/g)?.join(','));
-  const before = await page.evaluate(() => analyzeBank().tin);
-  await page.check('#bkX');
-  const after = await page.evaluate(() => analyzeBank().tin);
-  check('통장: 이체 제외 시 입금 중복 제거', before - after === 3000000, `${before}→${after}`);
-  check('통장: 매출·영업현금흐름으로 표현 안 함', t.includes('매출액과 같지 않습니다') && !t.includes('영업현금흐름:'));
-}
-
 // 8. 신용·감사 구분
 {
   await page.selectOption('#auOpinion', '비대상');
@@ -391,11 +371,11 @@ const Y = await page.evaluate(() => years());
   check('기본 버튼 높이 통일', hs.length >= 3 && new Set(hs).size === 1, [...new Set(hs)].join(','));
   const bad = [];
   for (const a of await page.locator('#stepper a').all()) {
-    const step = await a.getAttribute('data-step'); await a.click(); await page.waitForTimeout(500);
+    const step = await a.getAttribute('data-step'); await a.click(); await page.waitForTimeout(1200);
     const ok = await page.evaluate((s) => { const h = document.querySelector('#s-' + s + ' h2').getBoundingClientRect(); return h.top >= document.querySelector('.stepper').getBoundingClientRect().bottom - 1 && h.top < innerHeight; }, step);
     if (!ok) bad.push(step);
   }
-  check('내비게이션: 12단계 클릭 시 제목이 고정 메뉴에 가리지 않음', !bad.length, bad.join(','));
+  check('내비게이션: 11단계 클릭 시 제목이 고정 메뉴에 가리지 않음', !bad.length, bad.join(','));
   const same = await page.evaluate(() => { const r = document.createElement('div'); r.innerHTML = buildReport(); const at = (sel) => [...document.querySelectorAll(sel + ' .atitle')].map((x) => x.textContent); const rep = [...r.querySelectorAll('.atitle')].map((x) => x.textContent); return ['#s-dash', '#s-detail', '#s-risk', '#s-fund', '#s-road'].every((s) => at(s).length && at(s).every((t) => rep.includes(t))); });
   check('화면 결과(④⑤⑥⑨⑪)의 핵심 메시지 = PDF 장 메시지', same);
   check('PDF에서 빈 외부 평가 단독 장 제거', !(await page.evaluate(() => buildReport().includes('외부 신용등급·감사 정보'))));
@@ -453,6 +433,17 @@ const Y = await page.evaluate(() => years());
   check('AI 문장: 징후 코드(F-OPL) 숨김', !/F-OPL|F-NL/.test(ai) && ai.includes('영업손실이 이어졌습니다.'));
   check('AI: 사용료 표시 없음', !ai.includes('토큰') && !(await page.locator('#aiCost').count()));
   await page.evaluate(() => { S.ai = null; renderAI(); });
+  await page.click('#btnClearSample');
+}
+
+// 8f. v1.7 덜어내기 — 가치가 적은 기능 제거 확인
+{
+  check('제거: 통장 흐름 단계·업로드 없음(11단계)', (await page.locator('#s-cash, #bkFile').count()) === 0 && (await page.locator('#stepper a').count()) === 11);
+  check('제거: 용어집 접기·쓰임 적은 입력칸 없음', (await page.locator('#glossary, #crScale, #crBasis, #auYear, #auAuditor, #auDate, #cfName, #cfSrc, #cfRevLimit').count()) === 0);
+  await page.click('#btnSample'); await page.waitForTimeout(200);
+  check('제거: ⑤의 중복 차트(④ 대시보드와 같은 차트) 없음', (await page.locator('#detail svg').count()) === 0 && (await page.locator('#dash svg').count()) > 0);
+  const road = await txt('#road');
+  check('제거: KPI 표의 반복 열(목표값·주기) 대신 한 줄 안내', !road.includes('경영진 협의 후 설정\t') && road.includes('목표값은 경영진 협의 후 정하고'));
   await page.click('#btnClearSample');
 }
 
