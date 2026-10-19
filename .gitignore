@@ -13,3 +13,7 @@ dist/
 # Python
 __pycache__/
 *.pyc
+
+# 재무진단 QA 산출물
+finance/tests/out/
+finance/node_modules/
