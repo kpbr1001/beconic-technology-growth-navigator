@@ -1,4 +1,4 @@
-/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings, fundingEval, gradeRank, exportJSON, refresh, loanSummary, PROGRAMS, progEval -- page.evaluate 안에서 앱 전역 함수를 호출 */
+/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings, fundingEval, gradeRank, exportJSON, refresh, loanSummary, PROGRAMS, progEval, renderAI -- page.evaluate 안에서 앱 전역 함수를 호출 */
 // BECONIC 재무진단 QA — 실제 Chromium으로 사용자 플로우·레드팀 항목·A4 PDF를 확인한다.
 // 실행: (finance 폴더를 정적 서버로 띄운 뒤) node finance/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -434,6 +434,26 @@ const Y = await page.evaluate(() => years());
   check('AI 전송에 지원사업·설립일·수출실적 없음', !/수출|업력|설립|2024-05-01/.test(await page.evaluate(() => JSON.stringify(aiPayload(metrics(), findings(metrics()))))));
   await page.click('#btnClearSample');
   await page.evaluate(() => { S.org.founded = ''; S.crit.rnd = null; S.crit.exportK = null; refresh(); });
+}
+
+// 8e. v1.6 가독성 — 신호등·기간/건수 분리·AI 문장 정리
+{
+  await page.click('#btnSample');
+  await page.waitForTimeout(200);
+  const d = await txt('#s-dash');
+  check('신호등: 핵심 메시지 상자에 수준 표시(우선 확인/주의/안내)', (await page.locator('#s-dash .atitle.sig-bad').count()) >= 1 && d.includes('우선 확인'));
+  check('신호등: KPI 카드 정의 기반 표시(영업손실·순손실·1배 미만 등)', (await page.locator('#s-dash .kpi.sig-bad').count()) >= 1 && (await page.locator('#s-dash .kpi.sig-warn').count()) >= 1);
+  const r = await txt('#road');
+  check('기간과 건수 분리 표기(즉시(30일 내) N건, 90일 내 N건)', /즉시\(30일 내\) \d+건, 90일 내 \d+건, 6개월 내 \d+건, 12개월 내 \d+건/.test(r));
+  const all = await page.locator('main').innerText();
+  check('문장: “vs” 같은 약식 표현 없음', !/\svs\s/.test(all));
+  await page.evaluate(() => { S.ai = { at: new Date().toISOString(), model: '', result: { executiveSummary: '영업손실이 이어졌습니다(F-OPL, F-NL). 원인 확인이 필요합니다.', observations: [{ metricId: 'revenue', fact: '매출액은 전년보다 줄었습니다.', impact: '고정비 부담이 커질 수 있습니다.' }, { metricId: 'roe', fact: 'ROE는 음수로 바뀌었습니다.', impact: '자본 대비 손실입니다.' }], risks: [], actions: [], questions: [], limitations: [] } }; renderAI(); });
+  const ai = await page.locator('#aiOut').innerText();
+  check('AI 문장: 지표 이름 중복(매출액 매출액은) 제거', !ai.includes('매출액 · 매출액') && ai.includes('매출액 · 전년보다') && !/ROE\(자기자본순이익률\) · ROE/.test(ai));
+  check('AI 문장: 징후 코드(F-OPL) 숨김', !/F-OPL|F-NL/.test(ai) && ai.includes('영업손실이 이어졌습니다.'));
+  check('AI: 사용료 표시 없음', !ai.includes('토큰') && !(await page.locator('#aiCost').count()));
+  await page.evaluate(() => { S.ai = null; renderAI(); });
+  await page.click('#btnClearSample');
 }
 
 // 9. 비밀키 노출 없음
