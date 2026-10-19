@@ -603,7 +603,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 /* ═══════════════ BECONIC 기업 재무진단 v1.0 — 단일 HTML ═══════════════
    원칙: 실제 입력값만 계산 · 미입력은 0이 아닌 null · 임의 업종평균/등급/점수 생성 금지
    계산은 이 파일의 결정론 코드가 하고, AI는 검증된 요약수치에 대한 문장 초안만 작성한다. */
-const APP={name:'BECONIC 기업 재무진단',version:'1.1.1',updated:'2026-10-19',url:'https://beconic-diagnosis-finance.netlify.app'};
+const APP={name:'BECONIC 기업 재무진단',version:'1.1.2',updated:'2026-10-19',url:'https://beconic-diagnosis-finance.netlify.app'};
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1476,15 +1476,24 @@ async function runAI(){
   const VS=verifyState();if(!VS.verified||S.sample){toast('검증 완료 후 요청할 수 있습니다.');return}
   if(!$('#aiConsent').checked){toast('외부 AI 전송 동의가 필요합니다.');return}
   const M=metrics(),F=findings(M);const payload=aiPayload(M,F);
-  const st=$('#aiStatus'),btn=$('#btnAI');st.textContent='서버에서 입력 검증 후 AI가 작성 중입니다… (최대 60초)';btn.disabled=true;
+  const st=$('#aiStatus'),btn=$('#btnAI');st.textContent='서버에서 입력을 검증하고 AI 작업을 접수하는 중입니다…';btn.disabled=true;
+  const code=$('#aiCode').value.trim();
+  const call=async(url,opt)=>{const r=await fetch(url,{...opt,headers:{...(opt&&opt.headers||{}),'X-Beconic-Access':code}});let data={};try{data=await r.json()}catch{}if(r.status>=500&&!data.error)data.error=r.status===504?'서버 시간 초과(잠시 후 다시 시도)':`서버 응답 ${r.status}`;return {r,data}};
   try{
-    const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),70000);
-    const r=await fetch('/api/finance-insights',{method:'POST',headers:{'Content-Type':'application/json','X-Beconic-Access':$('#aiCode').value.trim()},body:JSON.stringify(payload),signal:ctl.signal});
-    clearTimeout(to);let data={};try{data=await r.json()}catch{}
-    if(!r.ok)throw new Error(data.error||`서버 응답 ${r.status}`);
-    S.ai={at:new Date().toISOString(),model:data.model||'',result:data.result,payloadHash:JSON.stringify(payload).length};
+    let {r,data}=await call('/api/finance-insights',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(r.status!==202||!data.job)throw new Error(data.error||`서버 응답 ${r.status}`);
+    // 백그라운드 처리 결과를 2.5초 간격으로 조회(서버가 5분 넘으면 중단 응답)
+    const jobId=data.job,started=Date.now();
+    for(;;){
+      await new Promise(res=>setTimeout(res,2500));
+      ({r,data}=await call('/api/finance-insights?job='+encodeURIComponent(jobId),{method:'GET'}));
+      if(r.status===202){st.textContent=`AI가 작성 중입니다… ${Math.round((Date.now()-started)/1000)}초 (보통 20~60초)`;continue}
+      if(!r.ok)throw new Error(data.error||`서버 응답 ${r.status}`);
+      break;
+    }
+    S.ai={at:new Date().toISOString(),model:data.model||'',result:data.result};
     renderAI(payload);st.textContent='작성 완료 · 수치 대조를 통과한 내용만 표시합니다. 반드시 검토 후 사용하세요.';
-  }catch(e){st.textContent='AI 연동 실패: '+(e.name==='AbortError'?'시간 초과':e.message)+' — 결정론 분석과 보고서는 그대로 사용할 수 있습니다.'}
+  }catch(e){st.textContent='AI 연동 실패: '+e.message+' — 결정론 분석과 보고서는 그대로 사용할 수 있습니다.'}
   finally{renderAIGate(verifyState())}
 }
 function renderAI(payload){

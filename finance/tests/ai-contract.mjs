@@ -49,10 +49,28 @@ const MOCK = `http://127.0.0.1:${mock.address().port}`;
 
 Object.assign(process.env, { BECONIC_AI_ENABLED: 'true', ANTHROPIC_API_KEY: CANARY, BECONIC_ACCESS_CODE: CODE, ANTHROPIC_BASE_URL: MOCK, URL: '' });
 const { createHandler } = await import('../netlify/functions/finance-insights.mjs');
+const { createBackground } = await import('../netlify/functions/finance-insights-background.mjs');
+const mkStore = (m) => ({ get: async (k) => (m.has(k) ? JSON.parse(m.get(k)) : null), setJSON: async (k, v) => m.set(k, JSON.stringify(v)), delete: async (k) => m.delete(k) });
 const mem = new Map();
-const memStore = { get: async (k) => (mem.has(k) ? JSON.parse(mem.get(k)) : null), setJSON: async (k, v) => mem.set(k, JSON.stringify(v)) };
+const memStore = mkStore(mem);
+const jobMem = new Map();
+const jobStore = mkStore(jobMem);
 let storeBroken = false;
-const handler = createHandler({ store: () => { if (storeBroken) throw new Error('blobs down'); return memStore; } });
+let clock = Date.now();
+let triggerFails = false;
+const background = createBackground({ jobs: () => jobStore });
+// 접수 함수 → (트리거) 백그라운드 함수를 같은 프로세스에서 실행
+const handler = createHandler({
+  store: () => { if (storeBroken) throw new Error('blobs down'); return memStore; },
+  jobs: () => jobStore,
+  now: () => clock,
+  trigger: async (id) => { if (triggerFails) throw new Error('trigger down'); await background(new Request('http://x/.netlify/functions/finance-insights-background', { method: 'POST', body: JSON.stringify({ job: id }) })); },
+});
+const getJob = async (id, { code = CODE, ip = '10.0.0.1' } = {}) => {
+  const r = await handler(new Request('http://x/api/finance-insights?job=' + id, { headers: { 'x-beconic-access': code } }), { ip });
+  const text = await r.text();
+  return { st: r.status, text, json: JSON.parse(text) };
+};
 
 const INPUT = {
   industry: '제조업', basis: '개별', accountingStandard: '일반기업회계기준', years: [2023, 2024, 2025],
@@ -63,7 +81,10 @@ const INPUT = {
 const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
   const r = await handler(new Request('http://x/api/finance-insights', { method: 'POST', headers: { 'content-type': 'application/json', 'x-beconic-access': code }, body: typeof body === 'string' ? body : JSON.stringify(body) }), { ip });
   const text = await r.text();
-  return { st: r.status, text, json: JSON.parse(text) };
+  const first = { st: r.status, text, json: JSON.parse(text) };
+  if (first.st !== 202 || !first.json.job) return first;
+  const g = await getJob(first.json.job, { ip }); // 접수 → 백그라운드 처리 → 조회
+  return { ...g, job: first.json.job, enqueue: first };
 };
 
 // 1. 정상 호출 — 요청 형식과 키 비노출
@@ -77,6 +98,8 @@ const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
   check('요청: 키는 x-api-key 헤더로만 전송', q.headers['x-api-key'] === CANARY && !JSON.stringify(q.body).includes(CANARY));
   check('요청: 회사명·사업자번호 없음', !/주식회사|\d{3}-\d{2}-\d{5}/.test(JSON.stringify(q.body)));
   check('응답: 카나리 키 미포함', !r.text.includes(CANARY) && !r.text.includes('CANARY'));
+  check('접수: 202 + 작업 번호(UUID)', r.enqueue?.st === 202 && /^[0-9a-f-]{36}$/.test(r.job));
+  check('조회: 결과는 한 번 읽으면 삭제', (await getJob(r.job)).st === 404 && !jobMem.has(r.job));
   check('응답: 입력에 없는 징후 ID 제거', JSON.stringify(r.json.result.risks[0].findingIds) === '["F-IMP"]');
 }
 // 2. 차단 경로
@@ -105,11 +128,31 @@ const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
   storeBroken = true; r = await call(INPUT, { ip: '10.0.0.5' }); check('사용량 저장소 장애 → 503(차단 유지)', r.st === 503); storeBroken = false;
   process.env.BECONIC_ACCESS_CODE = 'short'; r = await call(INPUT); check('짧은 승인 코드 설정 → 503', r.st === 503); process.env.BECONIC_ACCESS_CODE = CODE;
   process.env.BECONIC_AI_ENABLED = 'false'; r = await call(INPUT); check('스위치 꺼짐 → 503', r.st === 503); process.env.BECONIC_AI_ENABLED = 'true';
-  const g = await handler(new Request('http://x/api/finance-insights'), { ip: '1.1.1.1' }); check('GET → 405', g.status === 405);
+  const g = await handler(new Request('http://x/api/finance-insights', { method: 'DELETE' }), { ip: '1.1.1.1' }); check('DELETE → 405', g.status === 405);
+}
+// 3b. 작업 조회·백그라운드 경로
+{
+  mem.clear(); jobMem.clear();
+  let r = await getJob('not-a-uuid'); check('조회: 잘못된 작업 번호 → 400', r.st === 400);
+  r = await getJob('00000000-0000-4000-8000-000000000000'); check('조회: 없는 작업 → 404', r.st === 404);
+  const id = '11111111-1111-4111-8111-111111111111';
+  await jobStore.setJSON(id, { status: 'queued', createdAt: clock, request: INPUT });
+  r = await getJob(id); check('조회: 처리 중이면 202', r.st === 202);
+  r = await getJob(id, { code: 'wrong-code-xxxx', ip: '10.1.1.1' }); check('조회: 이용 코드 오류 → 401', r.st === 401);
+  clock += 6 * 60_000; r = await getJob(id); check('조회: 5분 넘은 작업 → 504 후 삭제', r.st === 504 && !jobMem.has(id)); clock = Date.now();
+  await background(new Request('http://x', { method: 'POST', body: JSON.stringify({ job: id }) }));
+  check('백그라운드: 대기 작업이 아니면 아무것도 안 함', !jobMem.has(id));
+  const id2 = '22222222-2222-4222-8222-222222222222';
+  await jobStore.setJSON(id2, { status: 'queued', createdAt: clock, request: INPUT });
+  await background(new Request('http://x', { method: 'POST', body: JSON.stringify({ job: id2 }) }));
+  const stored = JSON.parse(jobMem.get(id2));
+  check('백그라운드: 처리 후 입력(요약 지표) 삭제·결과만 보관', stored.status === 'done' && !stored.request && stored.result?.status === 'ok');
+  check('백그라운드: 저장된 결과에 키 없음', !jobMem.get(id2).includes('CANARY'));
+  triggerFails = true; r = await call(INPUT, { ip: '10.0.0.4' }); check('백그라운드 시작 실패 → 502, 작업 삭제', r.st === 502 && jobMem.size === 1); triggerFails = false;
 }
 
 // 4. 화면 연동 — dist 정적 파일 + /api 를 모의 함수로 연결
-mem.clear();
+mem.clear(); jobMem.clear();
 const dist = path.join(here, '..', 'dist');
 if (!existsSync(path.join(dist, 'index.html'))) throw new Error('먼저 npm run build');
 const site = http.createServer(async (req, res) => {
@@ -150,6 +193,7 @@ await page.waitForFunction(() => /작성 완료|실패/.test(document.querySelec
 const out = await page.locator('#aiOut').innerText();
 check('화면: AI 결과 표시(경영진 요약·권고)', out.includes('경영진 요약') && out.includes('고정비 항목별 절감 계획'));
 check('화면: 계산에 없는 수치(12.3%p) 문장 차단', out.includes('수치 대조 실패로 제외') && !out.includes('12.3%p'));
+check('화면: 접수 후 결과 조회까지 완료', (await page.locator('#aiStatus').innerText()).includes('작성 완료'));
 const html = await page.content();
 check('화면·네트워크 응답 어디에도 키 없음', !html.includes('CANARY') && !net.some((t) => t.includes('CANARY')));
 const sent = seen.at(-1).body.messages[0].content;
