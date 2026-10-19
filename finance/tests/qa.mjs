@@ -1,4 +1,4 @@
-/* global buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings -- page.evaluate 안에서 앱 전역 함수를 호출 */
+/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings -- page.evaluate 안에서 앱 전역 함수를 호출 */
 // BECONIC 재무진단 QA — 실제 Chromium으로 사용자 플로우·레드팀 항목·A4 PDF를 확인한다.
 // 실행: (finance 폴더를 정적 서버로 띄운 뒤) node finance/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -34,6 +34,14 @@ const noBadNumbers = async () => { const t = await page.locator('#app').innerTex
 
 // 1. 빈 상태: 어떤 숫자도 자동 표시되지 않음
 {
+  check('빈 상태: 업종 미선택 시 금융업 경고 숨김', !(await page.locator('#finWarn').isVisible()));
+  check('빈 상태: 가상 데이터 배너 숨김', !(await page.locator('#sampleBanner').isVisible()));
+  const yr = await page.evaluate(() => [defaultBaseYear(12, new Date(2026, 2, 31, 12)), defaultBaseYear(12, new Date(2026, 3, 1, 9)), defaultBaseYear(6, new Date(2026, 9, 19)), defaultBaseYear(3, new Date(2026, 5, 15))].join(','));
+  check('기본 연도: 결산월·신고기한 기준 자동 계산', yr === '2024,2025,2026,2025', yr);
+  const fy = await page.evaluate(() => { const p = fyPeriod(2025, 3); return p.start + '~' + p.end + '/' + p.deadline; });
+  check('사업연도 기간: 3월 결산', fy === '2024.04.01~2025.03.31/2025.06.30', fy);
+  check('푸터 저작권 연도 = 올해', (await page.locator('#footCo small').innerText()).includes('~' + new Date().getFullYear()));
+  check('3단계 연도 선택·당기/전기/전전기 표시', (await page.locator('#yearChips').innerText()).includes('당기') && (await page.locator('#baseYear2 option').count()) > 3);
   const dash = await txt('#dash');
   check('빈 상태에서 대시보드에 숫자 없음', !/\d/.test(dash.replace(/\d+단계|②/g, '')), dash.slice(0, 60));
   check('빈 상태 AI 버튼 비활성', await page.locator('#btnAI').isDisabled());
@@ -153,7 +161,7 @@ const Y = await page.evaluate(() => years());
   await page.setInputFiles('#fileIn', { name: 'bs.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: buf });
   await page.waitForSelector('#candidates .cand', { timeout: 15000 });
   const c = await txt('#candidates');
-  check('XLSX: 회계연도 인식', c.includes(`${Y[2]}년 (문서 인식)`));
+  check('XLSX: 회계연도 인식', c.includes(`${Y[2]}년 · 당기 (문서 인식)`));
   check('XLSX: 천원 단위 인식', /천원/.test(await page.locator('[data-res-unit]').last().inputValue()));
   check('XLSX: 괄호 음수 인식', c.includes('(120,000)') && c.includes('-120'));
   await page.click('[data-drop="0"]');
@@ -173,7 +181,7 @@ const Y = await page.evaluate(() => years());
   const c = await txt('#candidates');
   check('PDF: 계정 인식(자산총계·매출액·영업이익)', ['자산총계', '매출액', '영업이익(손실)'].every((k) => c.includes(k)), c.slice(0, 200));
   check('PDF: 코드 대신 금액 선택', c.includes('2,345,678,000') && !/자산총계\s+자산총계\s+228\s/.test(c));
-  check('PDF: 연도·단위 인식', c.includes(`${Y[2]}년 (문서 인식)`) && c.includes('단위 인식'));
+  check('PDF: 연도·단위 인식', c.includes(`${Y[2]}년 · 당기 (문서 인식)`) && c.includes('단위 인식'));
   check('PDF: 사업자번호 마스킹', c.includes('123-45-*****') && !c.includes('67890'));
   check('PDF: 음수 영업손실 인식', c.includes('-45,000,000'));
   await page.locator('#candidates .cand').first().screenshot({ path: path.join(OUT, 'pdf-candidates.png') });
@@ -199,6 +207,7 @@ const Y = await page.evaluate(() => years());
   await page.click('#btnApplyAll');
   let mism = [];
   for (const f of fx) for (const [k, v] of Object.entries(f.expect)) { const got = await page.evaluate(([y, kk]) => V(y, kk), [f.year, k]); if (got !== Math.round(v)) mism.push(`${f.year} ${k} ${got}≠${v}`); }
+  check('NTS: 입력표 단위가 원본 단위(원)를 따라감', (await page.evaluate(() => S.unit)) === '원');
   check('NTS: 3개년 일괄 반영 값이 원본과 100% 일치(2단 자본총계·음수 결손금 포함)', !mism.length, mism.join(' | '));
   check('NTS: 3개년 대차 검증 통과', ((await txt('#vcards')).match(/검증 통과/g) || []).length === 3);
   check('NTS: 회사명·업종 자동 제안', (await page.evaluate(() => [S.org.name, S.org.industry].join('|'))) === '(가상)테스트상사 주식회사|제조업');

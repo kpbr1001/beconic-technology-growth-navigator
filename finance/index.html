@@ -39,6 +39,7 @@
   --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--font);word-break:keep-all;overflow-wrap:break-word;overflow-x:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -165,6 +166,13 @@ table.t tr.grp td{background:#F1F6FC;font-weight:800;font-size:12px;color:var(--
 .prov{display:block;font-size:10.5px;color:var(--muted);text-align:right;margin-top:2px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:auto}
 body[data-mode=ceo] .c-only{display:none!important}
 /* validation */
+.yearbar{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin:0 0 14px;padding:12px 14px;background:#F7FAFE;border:1px solid var(--line);border-radius:14px}
+.yearbar .yb{flex-direction:row;align-items:center;gap:10px;margin:0}
+.yearbar .yb select{width:auto;min-height:40px}
+.ychips{display:flex;gap:8px;flex-wrap:wrap}
+.ychip{background:#fff;border:1px solid var(--line2);border-radius:10px;padding:6px 10px;font-size:12.5px;line-height:1.35}
+.ychip b{color:var(--navy)}.ychip span{display:block;color:var(--muted);font-size:11.5px}
+.vcard .per{font-size:11.5px;color:var(--muted);font-weight:500;margin:-4px 0 8px}
 .vcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .vcard{border:1px solid var(--line);border-radius:14px;padding:14px 16px}
 .vcard h3{margin:0 0 8px;font-size:15px;display:flex;justify-content:space-between;gap:8px;align-items:center}
@@ -284,6 +292,11 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
   .kpi .v{font-size:22px}
   .multiples{grid-template-columns:1fr}
   .stat3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .yearbar{flex-direction:column;align-items:stretch;gap:10px}
+  .yearbar .yb{flex-direction:column;align-items:stretch;gap:6px}
+  .yearbar .yb select{width:100%}
+  .ychips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .ychip{padding:6px 7px;font-size:11.5px}.ychip span{font-size:10px}
   .shead h2{font-size:19px}
   .foot .ver{margin-left:0;text-align:left}
 }
@@ -307,7 +320,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
   .rhead .bl{display:flex;align-items:center;gap:2mm;font-weight:800;color:#10284C;font-size:9pt;letter-spacing:.06em}
   .rhead svg{width:6mm;height:6.2mm;color:#10284C}
   table.rt{border-collapse:collapse;width:100%;font-size:8.6pt;margin:2mm 0 3mm}
-  table.rt th,table.rt td{border-bottom:.5pt solid #D5DEEA;padding:1.6mm 2mm;text-align:left;vertical-align:top}
+  table.rt th,table.rt td{border-bottom:.5pt solid #D5DEEA;padding:1.15mm 1.8mm;text-align:left;vertical-align:top}
   table.rt thead{display:table-header-group}
   table.rt thead th{background:#EEF3FA;color:#10284C;font-weight:800;border-bottom:1pt solid #10284C}
   table.rt tr{break-inside:avoid;page-break-inside:avoid}
@@ -324,16 +337,12 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
   .rchart svg{width:100%;height:auto;max-height:68mm}
   .rfind{border-left:2.2pt solid #B4232F;padding:1.5mm 0 1.5mm 3.5mm;margin:0 0 3.5mm;break-inside:avoid}
   .rfind.sev2{border-left-color:#E58D00}.rfind.sev3{border-left-color:#146FE8}.rfind.sev0{border-left-color:#7A8BA3}
-  .rfind h4{margin:0 0 1mm;font-size:10.2pt}
+  .rfind h4{margin:0 0 .8mm;font-size:9.8pt}
+  .rfind{font-size:8.6pt;margin:0 0 2.6mm!important}
+  .rfind .rg2 li{margin:0}
+  table.rt.gl{font-size:7.6pt}
+  table.rt.gl td{padding:.9mm 1.6mm}
   .rfind ul{margin:1mm 0 0;padding-left:4.5mm}
-  .cover{min-height:240mm;display:flex;flex-direction:column}
-  .cover .logo{display:flex;align-items:center;gap:3mm}
-  .cover .logo svg{width:13mm;height:13.6mm;color:#10284C}
-  .cover .logo b{font-size:20pt;letter-spacing:.08em;color:#10284C;display:block;line-height:1}
-  .cover .logo small{font-size:7.5pt;letter-spacing:.2em;color:#5F7290}
-  .cover h1{font-size:27pt;line-height:1.2;margin:16mm 0 3mm;color:#10284C;letter-spacing:-.03em}
-  .cover .meta{font-size:9.5pt;color:#3C5170;border-top:.8pt solid #C9D6E6;border-bottom:.8pt solid #C9D6E6;padding:3mm 0;margin:4mm 0 6mm;display:grid;grid-template-columns:28mm 1fr;gap:1.2mm 4mm}
-  .cover .meta dt{color:#5F7290}.cover .meta dd{margin:0;font-weight:700}
   .wm{border:1pt dashed #E58D00;color:#8A5A00;background:#FFF6E2;padding:2mm 3mm;border-radius:2mm;font-weight:800;font-size:9pt;margin:2mm 0}
   .small{font-size:7.8pt;color:#5F7290}
   .rp .info{display:none!important}
@@ -356,6 +365,50 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
   .rp .multiples .mini{padding:1mm 1.2mm;border:.5pt solid #EDF2F8;border-radius:2mm}
   .rp .multiples .mini b{font-size:7pt}
   .rp .legend{gap:3mm}
+  /* ── 컨설팅 보고서 레이아웃 ── */
+  .rp h2{font-size:16pt;margin:0 0 2.5mm}
+  .sno{font-size:7.5pt;letter-spacing:.22em;color:#146FE8;font-weight:800;margin:0 0 1mm}
+  .atitle{border-left:2.4pt solid #12B98D;background:#F2F8F6;padding:2.6mm 3.5mm;margin:0 0 4mm;font-size:10.6pt;font-weight:800;color:#10284C;line-height:1.45;break-inside:avoid}
+  .src{font-size:6.8pt;color:#7A8BA3;margin:1.2mm 0 0;text-align:right}
+  .ry{display:block;font-size:6.5pt;font-weight:600;color:#7A8BA3}
+  table.rt tbody tr:nth-child(even) td{background:#F8FAFD}
+  table.rt.mx td{vertical-align:middle}
+  .lv{display:inline-block;font-size:7pt;font-weight:800;border-radius:2mm;padding:.4mm 1.8mm;white-space:nowrap}
+  .lv0{background:#EEF2F7;color:#5F7290}.lv1{background:#FDECEE;color:#B4232F}.lv2{background:#FFF6E2;color:#8A5A00}.lv3{background:#EAF2FE;color:#1F5FB8}
+  .kf{border-left:2pt solid #B4232F;padding:.8mm 0 .8mm 2.5mm;margin:0 0 2mm;font-size:8.6pt}
+  .kf.sev2{border-left-color:#E58D00}.kf.sev3{border-left-color:#146FE8}.kf.sev0{border-left-color:#7A8BA3}
+  .rbox h3{margin:0 0 1.5mm;font-size:9.8pt}
+  .rbox ul{margin:0;padding-left:4.5mm}
+  .rg2{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin-top:1.5mm}
+  .rg2 ul{margin:.5mm 0 0;padding-left:4.5mm}
+  .rg2.fs{align-items:start}
+  table.rt.fs{font-size:7.8pt}
+  table.rt.fs tr.l0 td{font-weight:800}
+  table.rt.fs tr.l1 td:first-child{padding-left:4mm}
+  table.rt.fs tr.l2 td:first-child{padding-left:7mm;color:#3C5170}
+  .toc{list-style:none;margin:2mm 0 0;padding:0;columns:2;column-gap:10mm}
+  .toc li{display:flex;gap:3mm;align-items:baseline;padding:2.2mm 0;border-bottom:.5pt solid #DDE6F1;break-inside:avoid;font-size:10pt}
+  .toc .no{font-weight:900;color:#146FE8;font-size:11pt;min-width:8mm}
+  .toc .tt{font-weight:700;color:#10284C}
+  /* 표지 */
+  .cover{min-height:252mm;display:flex;flex-direction:column}
+  .cband{display:flex;justify-content:space-between;align-items:center;background:#10284C;color:#fff;margin:-2mm -2mm 0;padding:5mm 6mm;border-radius:2mm}
+  .cband .logo{display:flex;align-items:center;gap:3mm}
+  .cband .logo svg{width:11mm;height:11.5mm;color:#fff}
+  .cband .logo b{font-size:17pt;letter-spacing:.08em;display:block;line-height:1;color:#fff}
+  .cband .logo small{font-size:6.8pt;letter-spacing:.22em;color:#A9C0DE}
+  .cband .conf{font-size:7.5pt;letter-spacing:.24em;border:.8pt solid #8FE3C8;color:#8FE3C8;padding:1mm 2.5mm;border-radius:1mm}
+  .ctitle{margin:30mm 0 12mm;border-left:3pt solid #12B98D;padding-left:6mm}
+  .ctitle .kicker{font-size:8pt;letter-spacing:.3em;color:#146FE8;font-weight:800}
+  .ctitle h1{font-size:30pt;line-height:1.15;margin:2mm 0 2.5mm;color:#10284C;letter-spacing:-.03em}
+  .ctitle .sub{font-size:10.5pt;color:#3C5170}
+  .client{background:#F5F8FC;border-radius:2.5mm;padding:5mm 6mm;margin-bottom:5mm}
+  .client small{display:block;font-size:7.5pt;letter-spacing:.12em;color:#5F7290}
+  .client b{display:block;font-size:19pt;color:#10284C;margin:1mm 0}
+  .client span{font-size:9pt;color:#3C5170}
+  .cover .meta{font-size:9pt;color:#3C5170;border-top:.8pt solid #C9D6E6;padding-top:3mm;margin:2mm 0 0;display:grid;grid-template-columns:24mm 1fr;gap:1.6mm 4mm}
+  .cover .meta dt{color:#5F7290}.cover .meta dd{margin:0;font-weight:700}
+  .cfoot{margin-top:auto;font-size:7.5pt;color:#5F7290;border-top:.8pt solid #10284C;padding-top:3mm;line-height:1.6}
   .legend{font-size:7.6pt}
 }
 </style>
@@ -447,7 +500,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
     <label class="field">재무제표 구분<select id="orgBasis"><option>개별</option><option>별도</option><option>연결</option></select></label>
     <label class="field">회계기준<select id="orgStd"><option>일반기업회계기준</option><option>중소기업회계기준</option><option>K-IFRS</option><option>확인 필요</option></select></label>
     <label class="field">결산월<select id="orgFye"></select></label>
-    <label class="field">최근 결산 회계연도<select id="baseYear"></select><small>이 연도와 직전 2개 연도를 비교합니다.</small></label>
+    <label class="field">분석 기준 연도(당기)<select id="baseYear"></select><small id="baseHint">이 연도(당기)와 전기·전전기를 비교합니다.</small></label>
     <label class="field">사업자등록번호 (선택)<input id="orgBizNo" inputmode="numeric" maxlength="12" placeholder="000-00-00000" autocomplete="off"><small>마스킹해 화면에만 표시 · 저장/전송하지 않음</small></label>
     <label class="field">외부감사 대상 여부<select id="orgAudited"><option value="unknown">확인 필요</option><option value="yes">대상</option><option value="no">비대상</option></select></label>
   </div>
@@ -489,6 +542,10 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 <!-- 3. 검증 -->
 <section class="sec" id="s-verify" aria-labelledby="h-verify">
   <div class="shead"><div><h2 id="h-verify"><span class="no">03</span>추출·검증</h2><p>숫자가 맞아야 분석이 의미 있습니다. 대차 일치·소계 일치·필수 항목을 자동 확인하고, 비교 가능성은 직접 확인해 주세요.</p></div><span id="verifyBadge" class="badge b-mute">자료 대기</span></div>
+  <div class="yearbar">
+    <label class="field yb">분석 기준 연도(당기)<select id="baseYear2" aria-label="분석 기준 연도"></select></label>
+    <div class="ychips" id="yearChips"></div>
+  </div>
   <div class="vcards" id="vcards"></div>
   <div class="mt2">
     <h3 style="font-size:15px;margin:0 0 6px">비교 가능성 확인 (사용자 확인)</h3>
@@ -557,7 +614,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
       <legend style="font-weight:800;padding:0 6px">외부감사</legend>
       <div class="grid g2">
         <label class="field">감사의견<select id="auOpinion"><option value="미확인">미확인</option><option value="비대상">외부감사 비대상</option><option>적정</option><option>한정</option><option>부적정</option><option>의견거절</option></select></label>
-        <label class="field">감사 대상 회계연도<input id="auYear" inputmode="numeric" maxlength="4" placeholder="예: 2025"></label>
+        <label class="field">감사 대상 회계연도<input id="auYear" inputmode="numeric" maxlength="4" placeholder="예: 직전 회계연도"></label>
         <label class="field">감사인<input id="auAuditor" maxlength="40"></label>
         <label class="field">감사보고서일<input id="auDate" type="date"></label>
       </div>
@@ -603,9 +660,7 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
   <div class="wrap">
     <svg class="shield" role="img" aria-label="그로스벤처스 방패 로고"><use href="#gvShield"/></svg>
     <div>
-      <strong>그로스벤처스 주식회사</strong>
-      <div class="det">주소 서울시 구로구 디지털로27길 24, 209호 · 전화 <a href="tel:07041034177">070-4103-4177</a><br>이메일 <a href="mailto:start@gven.kr">start@gven.kr</a> · 사이트 <a href="https://www.beconic.kr/" target="_blank" rel="noopener noreferrer">www.beconic.kr</a><br>중소벤처기업부 공식 인증 중소기업상담회사 (제2025-684호)</div>
-      <small>© 2023~2026 Copyright ⓒ growthventures Co., Ltd. All rights reserved.</small>
+      <div id="footCo"></div>
     </div>
     <div class="ver" id="verInfo"></div>
   </div>
@@ -623,7 +678,11 @@ dialog::backdrop{background:rgba(16,40,76,.45)}
 /* ═══════════════ BECONIC 기업 재무진단 v1.0 — 단일 HTML ═══════════════
    원칙: 실제 입력값만 계산 · 미입력은 0이 아닌 null · 임의 업종평균/등급/점수 생성 금지
    계산은 이 파일의 결정론 코드가 하고, AI는 검증된 요약수치에 대한 문장 초안만 작성한다. */
-const APP={name:'BECONIC 기업 재무진단',version:'1.1.4',updated:'2026-10-19',url:'https://beconic-diagnosis-finance.netlify.app'};
+const APP={name:'BECONIC 기업 재무진단',version:'1.2.0',released:'2026-10-19',home:'https://beconic-diagnosis-finance.netlify.app'};
+// 배포 주소·업데이트 일자는 실행 환경에서 읽는다(배포 시 자동 갱신). 로컬 파일로 열면 기본값 사용
+APP.url=/^https?:$/.test(location.protocol)&&!/^(localhost|127\.)/.test(location.hostname)?location.origin:APP.home;
+APP.updated=(()=>{const d=new Date(document.lastModified);return isNaN(d)||d.getFullYear()<2020?APP.released:d.toISOString().slice(0,10)})();
+const COMPANY={name:'그로스벤처스 주식회사',en:'growthventures Co., Ltd.',since:2023,addr:'서울시 구로구 디지털로27길 24, 209호',tel:'070-4103-4177',email:'start@gven.kr',site:'www.beconic.kr',cert:'중소벤처기업부 공식 인증 중소기업상담회사 (제2025-684호)'};
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -668,9 +727,18 @@ const LABEL_MAP=(()=>{const m=new Map();for(const a of ACCTS){for(const s of a.s
 
 /* ── 상태 ── */
 const now=new Date();
-const DEFAULT_BASE=now.getMonth()>=4?now.getFullYear()-1:now.getFullYear()-2; // 5월 이후면 직전연도 결산 확정 가정
+/** 기본 '당기' = 법인세 신고기한(사업연도 종료 후 3개월)이 지난 가장 최근 사업연도. 해가 바뀌면 자동으로 따라간다 */
+function defaultBaseYear(fye=12,d=new Date()){
+  for(let y=d.getFullYear();y>d.getFullYear()-3;y--){const deadline=new Date(y,fye+3,0,23,59,59);if(d>deadline)return y}
+  return d.getFullYear()-2;
+}
+/** 사업연도 기간(결산월 기준) */
+function fyPeriod(y,fye=S.org.fye){const end=new Date(y,fye,0),start=new Date(y-1,fye,1);const f=x=>`${x.getFullYear()}.${String(x.getMonth()+1).padStart(2,'0')}.${String(x.getDate()).padStart(2,'0')}`;return {start:f(start),end:f(end),deadline:f(new Date(y,fye+3,0))}}
+/** 당기·전기·전전기 */
+function relY(y){const d=S.baseYear-y;return d===0?'당기':d===1?'전기':d===2?'전전기':''}
+const DEFAULT_BASE=defaultBaseYear(12);
 const S={
-  mode:'ceo',baseYear:DEFAULT_BASE,unit:'천원',
+  mode:'ceo',baseYear:DEFAULT_BASE,baseTouched:false,unit:'천원',
   org:{name:'',industry:'',basis:'개별',std:'일반기업회계기준',fye:12,audited:'unknown'},
   bizMasked:'',
   data:{},          // data[year][key] = {v:원(정수)|null, src, file, page, label, conf}
@@ -888,7 +956,7 @@ const SEVL={0:['자료 확인','b-mute'],1:['우선 확인','b-bad'],2:['주의'
 /* ═══════════ 렌더링: 입력 그리드 ═══════════ */
 function renderGrid(){
   const Y=years(),u=S.unit;
-  let h=`<table class="t" id="grid"><thead><tr><th style="min-width:180px">계정과목</th>${Y.map(y=>`<th class="r">${y}년 <small style="font-weight:500">(${u})</small></th>`).join('')}</tr></thead><tbody>`;
+  let h=`<table class="t" id="grid"><thead><tr><th style="min-width:180px">계정과목</th>${Y.map(y=>`<th class="r">${y}년 <small style="font-weight:500">(${relY(y)} · ${u})</small></th>`).join('')}</tr></thead><tbody>`;
   let g='';
   for(const a of ACCTS){
     if(a.g!==g){g=a.g;h+=`<tr class="grp"><td colspan="4">${g==='bs'?'재무상태표':'손익계산서'}</td></tr>`}
@@ -1183,7 +1251,7 @@ function renderCandidates(){
       return `<tr><td><input type="checkbox" data-ci="${ri}:${ii}" ${def?'checked':''} ${inRange?'':'disabled'} aria-label="${esc(AK[it.k].l)} 반영"></td><td><b>${esc(AK[it.k].l)}</b></td><td>${esc(it.label)}${it.code?` <span class="hint">[${esc(it.code)}]</span>`:''}</td><td class="r num">${esc(it.raw)}</td><td class="r num">${fmtMil(won)}</td><td>${inRange?y+'년':`<span class="s-warn">${y}년(범위 밖)</span>`}</td><td>${it.page!=null?esc(it.page):'—'}</td><td><span class="badge ${it.conf==='high'?'b-ok':it.conf==='mid'?'b-warn':'b-bad'}">${it.conf==='high'?'높음':it.conf==='mid'?'보통':'낮음'}</span>${it.note?`<div class="hint">${esc(it.note)}</div>`:''}</td></tr>`}).join('');
     const ntsLine=n&&n.isNts?`<div class="hint" style="padding:8px 14px 0">문서: 홈택스 표준재무제표증명${n.form?'('+esc(n.form)+')':''}${n.issueNo?' · 발급번호 '+esc(n.issueNo):''}${n.issuedAt?' · 발급일 '+esc(n.issuedAt):''}${n.office?' · '+esc(n.office):''}${n.report?' · '+esc(n.report)+(n.reportDate?' '+esc(n.reportDate):''):''}${n.bizType?' · 업태 '+esc(n.bizType):''}${n.bizItem?' · 종목 '+esc(n.bizItem):''}<br>발급번호로 홈택스 ‘민원증명 원본확인’에서 발급일로부터 90일 안에 위·변조 여부를 확인할 수 있습니다(이 서비스는 진위를 확인하지 않음).</div>`:'';
     return `<div class="cand" data-ri="${ri}"><div class="cand-h"><div><b>📄 ${esc(res.file)}</b> <span class="hint">· ${res.items.length}개 후보${res.meta.company?' · 문서 상호: '+esc(res.meta.company):''}${res.meta.biz?' · 사업자번호 '+esc(res.meta.biz):''}</span></div>
-    <div class="cand-ctl">${multi?'<span class="badge b-info">열 머리글에서 연도 인식</span>':`<label>회계연도 <select data-res-year="${ri}">${yOpts.map(y=>`<option value="${y}" ${(+(res.chosenYear||res.fileYear||S.baseYear))===y?'selected':''}>${y}년${y===res.fileYear?' (문서 인식)':''}</option>`).join('')}</select></label>`}
+    <div class="cand-ctl">${multi?'<span class="badge b-info">열 머리글에서 연도 인식</span>':`<label>회계연도 <select data-res-year="${ri}">${yOpts.map(y=>`<option value="${y}" ${(+(res.chosenYear||res.fileYear||S.baseYear))===y?'selected':''}>${y}년${relY(y)?' · '+relY(y):''}${y===res.fileYear?' (문서 인식)':''}</option>`).join('')}</select></label>`}
     <label>원본 단위 <select data-res-unit="${ri}">${Object.keys(UNITS).map(u=>`<option ${u===res.unit?'selected':''}>${u}</option>`).join('')}</select></label>${res.unitDetected?'<span class="badge b-ok">단위 인식</span>':'<span class="badge b-warn">단위 추정</span>'}
     <button class="btn small sec" type="button" data-apply="${ri}">이 파일만 반영</button><button class="btn small ghost" type="button" data-drop="${ri}">버리기</button></div></div>${ntsLine}
     ${res.warnings.length?`<div class="callout warn" style="margin:10px 14px"><span class="ci">!</span><span>${res.warnings.map(esc).join('<br>')}</span></div>`:''}
@@ -1193,6 +1261,9 @@ function renderCandidates(){
 function syncChecks(ri){$$(`[data-ci^="${ri}:"]`).forEach(cb=>{const ii=+cb.dataset.ci.split(':')[1];S.pending[ri].items[ii].apply=cb.checked})}
 function applyRes(res){
   const Y=years();let n=0;
+  // 직접 입력한 값이 없으면 입력표 단위를 원본 단위에 맞춘다(원 단위 증명서가 '천원·소수점'으로 보이지 않게)
+  const manual=Object.values(S.data).some(r=>Object.values(r).some(c=>c&&c.src==='manual'));
+  if(!manual&&UNITS[res.unit])S.unit=res.unit;
   res.items.forEach(it=>{if(!pendingDefault(res,it))return;const y=resolveYear(res,it);if(!Y.includes(y))return;setCell(y,it.k,Math.round(it.n*UNITS[res.unit]),{src:res.kind,file:res.file,page:it.page,label:it.label,conf:it.conf});n++});
   const src=S.sources.find(s=>s.id===res.sourceId);
   if(src){src.status=`${n}건 반영(사용자 확인)`;src.years=res.colYear?'열 머리글':(res.chosenYear||res.fileYear);src.unit=res.unit;if(res.nts&&res.nts.isNts){src.doc=`홈택스 표준재무제표증명${res.nts.form?'('+res.nts.form+')':''}`;src.issueNo=res.nts.issueNo||'';src.issuedAt=res.nts.issuedAt||'';src.office=res.nts.office||'';src.report=[res.nts.report,res.nts.reportDate].filter(Boolean).join(' ');src.company=res.meta.company||'';src.biz=res.meta.biz||''}}
@@ -1367,7 +1438,7 @@ function renderDocReq(F){
   el.dataset.docs=JSON.stringify(docs);
 }
 function renderVerify(VS){
-  $('#vcards').innerHTML=VS.vs.map(v=>`<div class="vcard"><h3>${v.year}년 <span class="badge ${!v.has?'b-mute':v.balance===false?'b-bad':v.balance&&!v.missing.length?'b-ok':'b-warn'}">${!v.has?'자료 없음':v.balance===false?'불일치':v.balance&&!v.missing.length?'검증 통과':'확인 필요'}</span></h3><ul class="vlist">${v.items.map(i=>`<li><span class="s s-${i.s}">${i.s==='ok'?'✓':i.s==='bad'?'✕':i.s==='warn'?'!':'·'}</span><span>${esc(i.t)}</span></li>`).join('')}</ul></div>`).join('');
+  $('#vcards').innerHTML=VS.vs.map(v=>`<div class="vcard"><h3>${relY(v.year)} · ${v.year}년 <span class="badge ${!v.has?'b-mute':v.balance===false?'b-bad':v.balance&&!v.missing.length?'b-ok':'b-warn'}">${!v.has?'자료 없음':v.balance===false?'불일치':v.balance&&!v.missing.length?'검증 통과':'확인 필요'}</span></h3><div class="per">사업연도 ${fyPeriod(v.year).start} ~ ${fyPeriod(v.year).end}</div><ul class="vlist">${v.items.map(i=>`<li><span class="s s-${i.s}">${i.s==='ok'?'✓':i.s==='bad'?'✕':i.s==='warn'?'!':'·'}</span><span>${esc(i.t)}</span></li>`).join('')}</ul></div>`).join('');
   const b=$('#verifyBadge');b.className='badge '+(S.sample?'b-warn':VS.verified?'b-ok':VS.anyData?'b-warn':'b-mute');b.textContent=S.sample?'가상 데이터':VS.verified?'검증 완료':VS.anyData?'확인 필요':'자료 대기';
   const g=$('#gateBox');
   if(S.sample){g.className='gate callout warn';g.innerHTML='<span>가상 데이터는 검증 완료 처리하지 않습니다. 실제 자료를 넣어 주세요.</span>'}
@@ -1555,76 +1626,129 @@ document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]')
 document.addEventListener('mousemove',e=>{const tip=$('#tip');if(tip.style.display==='block'){tip.style.left=Math.min(e.clientX+14,innerWidth-270)+'px';tip.style.top=(e.clientY+14)+'px'}});
 
 /* ═══════════ 보고서 (A4) ═══════════ */
+/* ── 보고서 보조: 핵심 메시지(액션 타이틀)·출처·간트 ── */
+function srcNote(){
+  const Y=years();
+  if(S.sample)return '자료: 체험용 가상 데이터 · BECONIC 분석';
+  const nts=S.sources.filter(s=>s.doc&&/반영/.test(s.status));
+  const base=nts.length?`홈택스 표준재무제표증명(${[...new Set(nts.map(s=>s.years))].sort().join('·')}년, 사용자 제출)`:(S.sources.length?'사용자 제출 재무 파일':'사용자 입력 재무자료');
+  return `자료: ${base} · ${Y[0]}~${Y[2]} 회계연도 · 금액 단위 백만원 · BECONIC 분석`;
+}
+function msgGrowth(M,Y){
+  const g=M[Y[2]].revenueGrowth,om=M[Y[2]].operatingMargin,omp=M[Y[1]].operatingMargin;const parts=[];
+  if(g.v!=null)parts.push(`매출 전년 대비 ${g.v>=0?'+':''}${nf(g.v,1)}%`);else if(M[Y[2]].revenue.v!=null)parts.push(`매출 ${fmtMil(M[Y[2]].revenue.v)}`);
+  if(om.v!=null)parts.push(`영업이익률 ${nf(om.v,1)}%${omp.v!=null?`(${om.v-omp.v>=0?'+':''}${nf(om.v-omp.v,1)}%p)`:''}`);
+  const tail=om.v!=null&&om.v<0?' — 매출 성장에도 본업 손실이 이어져 비용 구조 점검이 우선':om.v!=null&&omp.v!=null&&om.v<omp.v?' — 수익성이 낮아지는 추세':'';
+  return parts.length?`${Y[2]}년 ${parts.join(', ')}${tail}`:'성장성·수익성 판단에 필요한 손익 자료가 부족합니다';
+}
+function msgStability(M,Y){
+  const d=M[Y[2]];const parts=[];
+  if(d.impairmentRate.v!=null)parts.push(`자본잠식률 ${nf(d.impairmentRate.v,1)}%`);
+  if(d.debtRatio.v!=null)parts.push(`부채비율 ${nf(d.debtRatio.v,1)}%`);else if(d.debtRatio.st==='hold')parts.push('자본총계 0 이하(부채비율 보류)');
+  if(d.currentRatio.v!=null)parts.push(`유동비율 ${nf(d.currentRatio.v,1)}%`);
+  const tail=d.impairmentRate.v!=null||d.debtRatio.st==='hold'?' — 자본 확충과 결손 원인 확인이 우선':d.currentRatio.v!=null&&d.currentRatio.v<100?' — 단기 지급 여력 점검 필요':d.currentRatio.v!=null?' — 단기 지급 여력은 유동부채 이상':'';
+  return parts.length?`${Y[2]}년 ${parts.join(', ')}${tail}`:'안정성 판단에 필요한 재무상태표 자료가 부족합니다';
+}
+const atitle=t=>`<div class="atitle">${esc(t)}</div>`;
+function gantt(items){
+  const rows=[];PHASES.forEach(([k],pi)=>items[k].forEach(i=>rows.push({...i,pi})));
+  const span=[[0,1],[1,3],[3,6],[6,12]],col=['#B4232F','#E08A1E','#146FE8','#0E9E79'];
+  const W=760,LW=380,RH=20,T=26,H=T+rows.length*RH+6,cw=(W-LW-6)/12;
+  let g=`<rect x="${LW}" y="0" width="${W-LW}" height="${H}" fill="#fff"/>`;
+  for(let m=0;m<=12;m++){const x=LW+m*cw;g+=`<line x1="${x}" x2="${x}" y1="${T-6}" y2="${H}" stroke="${[0,1,3,6,12].includes(m)?'#9FB0C6':'#EEF2F7'}"/>`;if(m<12)g+=`<text x="${x+cw/2}" y="${T-10}" text-anchor="middle" font-size="9" fill="#6A7A90">${m+1}월</text>`}
+  rows.forEach((r,i)=>{const y=T+i*RH;const [a,b]=span[r.pi];const lab=r.a.length>38?r.a.slice(0,37)+"…":r.a;
+    if(i%2)g+=`<rect x="0" y="${y}" width="${W}" height="${RH}" fill="#F8FAFD"/>`;
+    g+=`<text x="4" y="${y+13.5}" font-size="10.5" fill="#14213D">${esc(lab)}</text><rect x="${LW+a*cw+2}" y="${y+4}" width="${(b-a)*cw-4}" height="${RH-8}" rx="3" fill="${col[r.pi]}"/>`});
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="12개월 실행 로드맵">${g}</svg>`;
+}
 function buildReport(){
   const M=metrics(),F=findings(M),VS=verifyState(),Y=years();const fin=S.org.industry==='금융·보험업';
-  const name=S.org.name||'기업명 미기재';
-  const head=t=>`<div class="rhead"><span class="bl"><svg><use href="#gvShield"/></svg>BECONIC 기업 재무진단</span><span>${esc(name)} · ${Y[0]}~${Y[2]} 회계연도 · ${esc(t)}</span></div>`;
+  const name=S.org.name||'기업명 미기재';const C=COMPANY;
   const status=S.sample?'체험용 가상 데이터 (실제 회사 아님)':VS.verified?'검증 완료(대차·필수항목·비교가능성 확인)':'검증 미완료 — 참고용';
+  const yh=y=>`${y}<span class="ry">${relY(y)}</span>`;
   const mrow=k=>`<tr><td>${esc(MD[k].l)}</td>${Y.map(y=>{const r=M[y][k];return `<td class="r">${r.v!=null?esc(fmtM(k,r)):naText(r)}</td>`}).join('')}<td class="small">${esc(MD[k].f)}</td></tr>`;
-  const mtable=ks=>`<table class="rt"><thead><tr><th>지표</th>${Y.map(y=>`<th class="r">${y}</th>`).join('')}<th>산식</th></tr></thead><tbody>${ks.map(mrow).join('')}</tbody></table>`;
+  const mtable=ks=>`<table class="rt"><thead><tr><th>지표</th>${Y.map(y=>`<th class="r">${yh(y)}</th>`).join('')}<th>산식</th></tr></thead><tbody>${ks.map(mrow).join('')}</tbody></table>`;
   const wm=S.sample?'<div class="wm">⚠ 체험용 가상 데이터로 만든 예시 보고서입니다. 실제 기업의 재무 정보가 아닙니다.</div>':(!VS.verified?'<div class="wm">⚠ 검증이 완료되지 않은 자료로 작성되었습니다. 의사결정 전 원본 대조가 필요합니다.</div>':'');
-  const pages=[];
-  const ex=execSummary(M,F);const top=F.filter(f=>f.sev>0).slice(0,3);
-  pages.push(`<section class="rp cover"><div class="logo"><svg><use href="#gvShield"/></svg><div><b>BECONIC</b><small>by GROWTH VENTURES</small></div></div>
-  <h1>기업 재무진단 보고서</h1><div style="font-size:11pt;color:#3C5170">3개년 증빙기반 재무 분석 · 개선과제 · 로드맵</div>
-  <dl class="meta"><dt>기업명</dt><dd>${esc(name)}</dd><dt>업종</dt><dd>${esc(S.org.industry||'미입력')}</dd><dt>분석 기간</dt><dd>${Y[0]}~${Y[2]} 회계연도 (결산월 ${S.org.fye}월)</dd><dt>재무제표</dt><dd>${esc(S.org.basis)} · ${esc(S.org.std)}</dd><dt>자료 상태</dt><dd>${esc(status)}</dd><dt>작성일</dt><dd>${esc(new Date().toLocaleDateString('ko-KR'))}</dd></dl>
-  ${wm}
-  <div class="rbox navy"><h3>Executive Summary</h3>${ex.map(t=>`<p>${esc(t)}</p>`).join('')}</div>
-  <h3>가장 중요한 확인 사항 (최대 3개)</h3>${top.length?top.map(f=>`<div class="rfind sev${f.sev}"><h4>${esc(f.title)}</h4><div>${esc(f.fact)}</div></div>`).join(''):'<p>정의 기반 조건에서 우선 확인할 징후가 나타나지 않았습니다.</p>'}
-  <h3>증빙 범위와 신뢰도</h3><p>재무자료 출처: ${S.sources.length?esc([...new Set(S.sources.map(s=>s.kind.toUpperCase()))].join('·'))+' 파일 '+S.sources.length+'건 + 사용자 확인':(S.sample?'가상 데이터':'사용자 직접 입력')} · 입력 완성도 ${nf(completeness()*100,0)}% · 통장 자료 ${S.bank.length?S.bank.length+'개 계좌(제출분)':'없음'} · 공식 신용등급 ${S.credit.rating?'사용자 입력':'미확인'} · 감사의견 ${esc(S.audit.opinion)}</p>
-  <p class="small" style="margin-top:auto">본 보고서는 제출 자료에 대한 자체 재무비율 분석으로, 공식 기업신용평가서·회계감사보고서·세무 자문·투자 권유가 아닙니다. 그로스벤처스 주식회사 · 기밀 — 수신자 외 배포 금지</p></section>`);
-  // 1-1. 대시보드(화면과 같은 카드·차트)
-  pages.push(`<section class="rp dashp">${head('재무 대시보드')}<h2>핵심 지표 대시보드</h2><p class="small">${Y[0]}~${Y[2]} 회계연도 · ${esc(S.org.basis)} 재무제표 · 금액 단위 백만원 · ${esc(status)}</p>${dashKpis(M,Y)}${dashCharts(M,Y)}</section>`);
-  // 2. 입력자료·검증
-  pages.push(`<section class="rp">${head('입력자료·검증')}<h2>1. 입력자료와 검증 현황</h2>
-  <table class="rt"><thead><tr><th>연도</th><th>대차 검증</th><th>세부 검증</th></tr></thead><tbody>${VS.vs.map(v=>`<tr><td>${v.year}</td><td>${!v.has?'자료 없음':v.balance===true?'일치':v.balance===false?'<b>불일치</b>':'확인 불가'}</td><td class="small">${v.items.map(i=>esc(i.t)).join('<br>')}</td></tr>`).join('')}</tbody></table>
-  <h3>비교 가능성 확인(사용자)</h3><table class="rt"><tbody>${[['sameEntity','동일 회사'],['sameBasis','동일 재무제표 구분·결산월·회계기준'],['unitChecked','금액 단위 확인'],['sourceChecked','원본 대조']].map(([k,l])=>`<tr><td>${l}</td><td>${S.confirm[k]?'확인함':'미확인'}</td></tr>`).join('')}</tbody></table>
-  ${S.sources.length?`<h3>제출 자료</h3><table class="rt"><thead><tr><th>연도</th><th>문서</th><th>발급번호·발급일</th><th>신고</th><th>단위</th><th>SHA-256(앞 12자)</th><th>상태</th></tr></thead><tbody>${S.sources.filter(s=>!/중복/.test(s.status)).map(s=>`<tr><td>${esc(s.years)}</td><td>${esc(s.doc||s.kind.toUpperCase()+' 파일')}<div class="small">${esc(s.name)}</div></td><td>${esc(s.issueNo||'—')}<div class="small">${esc(s.issuedAt||'')} ${esc(s.office||'')}</div></td><td>${esc(s.report||'—')}</td><td>${esc(s.unit)}</td><td>${esc(String(s.sha256).slice(0,12))}</td><td>${esc(s.status)}</td></tr>`).join('')}</tbody></table><p class="small">홈택스 발급 증명서는 발급번호로 발급일부터 90일 안에 원본 확인이 가능합니다. 본 보고서는 증명서의 진위를 확인하지 않았습니다(사용자 제출 자료).</p>`:''}
-  <h3>요약 재무제표 (백만원)</h3><table class="rt"><thead><tr><th>계정과목</th>${Y.map(y=>`<th class="r">${y}</th>`).join('')}</tr></thead><tbody>${ACCTS.filter(a=>Y.some(y=>V(y,a.k)!=null)).map(a=>`<tr><td>${a.lv?'&nbsp;'.repeat(a.lv*3):''}${esc(a.l)}</td>${Y.map(y=>`<td class="r">${V(y,a.k)!=null?fmtMil(V(y,a.k),false):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></section>`);
-  // 3. 성장·수익성
-  const C=Y.map(String);
-  pages.push(`<section class="rp">${head('성장성·수익성')}<h2>2. 성장성과 수익성</h2>
-  <div class="rkpi">${['revenue','revenueGrowth','operatingMargin','netMargin'].map(k=>`<div><small>${esc(MD[k].l)} (${Y[2]})</small><b>${esc(fmtM(k,M[Y[2]][k]))}</b><div class="small">${esc(deltaText(k,M[Y[2]][k],M[Y[1]][k]))}</div></div>`).join('')}</div>
-  <div class="rchart"><b>매출·영업이익·순이익 (백만원)</b>${barChart({cats:C,series:[{name:'매출액',color:'#1E5FD6',vals:Y.map(y=>mil(V(y,'revenue')))},{name:'영업이익',color:'#0E9E79',vals:Y.map(y=>mil(V(y,'operatingIncome')))},{name:'당기순이익',color:'#E08A1E',vals:Y.map(y=>mil(V(y,'netIncome')))}],fmt:v=>nf(v,Math.abs(v)>=100?0:1),unit:'백만원',h:220})}${legend([['#1E5FD6','매출액'],['#0E9E79','영업이익'],['#E08A1E','당기순이익']])}</div>
-  ${mtable(['revenue','revenueGrowth','assetGrowth','grossMargin','operatingMargin','netMargin',...(Y.some(y=>V(y,'depreciation')!=null)?['ebitda']:[])])}
-  <p class="small">증감 표기: 비율은 %p(퍼센트포인트), 금액은 %(상대 증감). 업종 평균과의 비교는 하지 않았습니다.</p></section>`);
-  // 4. 안정·유동성
-  pages.push(`<section class="rp">${head('안정성·유동성')}<h2>3. 안정성·유동성과 자본잠식 확인</h2>${fin?'<div class="wm">금융·보험업은 일반 기업용 유동성·안정성 비율의 해석이 맞지 않아 참고로만 표시합니다.</div>':''}
-  <div class="rkpi">${['debtRatio','currentRatio','equityRatio','interestCoverage'].map(k=>`<div><small>${esc(MD[k].l)} (${Y[2]})</small><b>${M[Y[2]][k].v!=null?esc(fmtM(k,M[Y[2]][k])):(M[Y[2]][k].st==='hold'?'표시 보류':'—')}</b><div class="small">${esc(deltaText(k,M[Y[2]][k],M[Y[1]][k]))}</div></div>`).join('')}</div>
-  <div class="rchart"><b>재무상태표 구성 (백만원)</b>${bsChart(Y,560,220)}${legend([['#1E5FD6','자산총계'],['#E08A1E','부채총계'],['#0E9E79','자본총계']])}</div>
-  ${mtable(['debtRatio','equityRatio','borrowings','borrowingDependence','interestCoverage','impairmentRate','currentRatio','quickRatio','workingCapital'])}
-  <p class="small">자본총계가 0 이하이면 부채비율을 음수로 표시하지 않고 ‘보류’로 둡니다. 유동비율 등은 지급불능 여부를 확정하지 않습니다.</p></section>`);
-  // 5. 활동성 (자료 있을 때)
-  const act=['assetTurnover','roa','roe','receivableDays','inventoryDays','payableDays','ccc'].filter(k=>Y.some(y=>M[y][k].st==='ok'));
-  if(act.length)pages.push(`<section class="rp">${head('활동성·운전자본')}<h2>4. 활동성과 운전자본</h2>${mtable(act)}<p class="small">평균값은 (기초+기말)÷2, 기간은 365일 기준입니다. 3개년 중 첫해는 기초 자료가 없어 산출하지 않습니다.</p></section>`);
-  // 6. 통장
-  if(S.bank.length){const A=analyzeBank();const ms=Object.keys(A.months).sort();pages.push(`<section class="rp">${head('통장 입출금')}<h2>${act.length?5:4}. 통장 입출금 흐름 (제출된 계좌)</h2><div class="rkpi"><div><small>총입금</small><b>${fmtMil(A.tin)}</b></div><div><small>총출금</small><b>${fmtMil(A.tout)}</b></div><div><small>순입출금</small><b>${fmtMil(A.tin-A.tout)}</b></div><div><small>계좌 간 이체 후보</small><b>${A.pairs}쌍</b><div class="small">${S.bankExcludeXfer?'합계에서 제외함':'합계에 포함'}</div></div></div>
-  <div class="rchart"><b>월별 입금·출금 (백만원)</b>${barChart({cats:ms.map(m=>m.slice(2).replace('-','.')),series:[{name:'입금',color:'#0E9E79',vals:ms.map(m=>A.months[m].i/1e6)},{name:'출금',color:'#E08A1E',vals:ms.map(m=>A.months[m].o/1e6)}],fmt:v=>nf(v,Math.abs(v)>=100?0:1),unit:'백만원',h:220,w:Math.max(560,ms.length*60)})}</div>
-  <table class="rt"><thead><tr><th>계좌(별칭)</th><th>은행</th><th>기간</th><th class="r">건수</th></tr></thead><tbody>${S.bank.map(a=>{const ds=a.rows.map(r=>r.d).sort();return `<tr><td>${esc(a.alias)}</td><td>${esc(a.bank)}</td><td>${ds[0]} ~ ${ds[ds.length-1]}</td><td class="r">${a.rows.length}</td></tr>`}).join('')}</tbody></table>
-  <p class="small">통장 입금 합계는 매출액이 아니며, 순입출금은 영업현금흐름이 아닙니다(대출·투자·이체·세금 환급 포함 가능). 분류는 키워드 자동분류로 확인이 필요합니다.</p></section>`)}
-  // 7. 신용·감사
-  if(S.credit.rating||S.audit.opinion!=='미확인')pages.push(`<section class="rp">${head('외부 평가 정보')}<h2>외부 신용등급·감사 정보 (사용자 입력)</h2><table class="rt"><tbody><tr><td>평가기관</td><td>${esc(S.credit.agency||'—')}</td></tr><tr><td>등급(원문)</td><td>${esc(S.credit.rating||'미확인')}</td></tr><tr><td>등급체계</td><td>${esc(S.credit.scale||'—')}</td></tr><tr><td>기준일 / 유효기간</td><td>${esc(S.credit.issued||'—')} / ${esc(S.credit.valid||'—')}${S.credit.valid&&S.credit.valid<today()?' (경과)':''}</td></tr><tr><td>근거</td><td>${esc(S.credit.basis||'—')}</td></tr><tr><td>감사의견</td><td>${esc(S.audit.opinion==='비대상'?'외부감사 비대상':S.audit.opinion)}${S.audit.year?' · '+esc(S.audit.year)+'년':''}${S.audit.auditor?' · '+esc(S.audit.auditor):''}</td></tr><tr><td>계속기업 불확실성·강조사항</td><td>${S.audit.gc?'있음':'없음/미확인'}</td></tr></tbody></table><p class="small">등급은 원문 그대로이며 이 보고서의 재무비율 분석과 무관합니다. 감사의견 ‘적정’은 재무 안정성의 보증이 아닙니다.</p></section>`);
-  // 8. 원인·리스크
-  pages.push(`<section class="rp">${head('징후·원인')}<h2>원인과 리스크 — 확인된 징후</h2>${F.length?F.map(f=>`<div class="rfind sev${f.sev}"><h4>[${SEVL[f.sev][0]}] ${esc(f.title)}</h4><div><b>사실</b> ${esc(f.fact)}</div><div>${esc(f.mean)}</div><div><b>원인 점검 질문</b><ul>${f.q.map(q=>`<li>${esc(q)}</li>`).join('')}</ul></div><div><b>확인할 자료</b> ${f.docs.map(esc).join(' · ')}</div></div>`).join(''):'<p>정의 기반 조건에서 확인된 징후가 없습니다.</p>'}<p class="small">징후는 수치의 정의에서 직접 확인되는 신호이며 부실·지급불능을 확정하지 않습니다.</p></section>`);
-  // 9. 개선전략 (AI 포함)
+  const src=`<p class="src">${esc(srcNote())}</p>`;
+  const real=F.filter(f=>f.sev>0),top=real.slice(0,3);const cnt=s=>F.filter(f=>f.sev===s).length;
   const {items,kpis}=roadmap(F,M);
-  let aiBlock='';if(S.ai&&S.ai.result){const p=aiPayload(M,F);const allow=allowedNumbers(p);const r=S.ai.result;const okT=t=>!checkText(t,allow);aiBlock=`<h3>AI 개선처방 초안 (수치 대조 통과분, 검토 필요)</h3>${okT(r.executiveSummary)?`<p>${esc(r.executiveSummary)}</p>`:''}${(r.actions||[]).filter(a=>okT(a.action)&&okT(a.kpiFormula)).length?`<table class="rt"><thead><tr><th>우선</th><th>과제</th><th>담당</th><th>기한</th><th>KPI 산식</th></tr></thead><tbody>${r.actions.filter(a=>okT(a.action)&&okT(a.kpiFormula)).map(a=>`<tr><td>${esc(a.priority)}</td><td>${esc(a.action)}</td><td>${esc(a.ownerRole)}</td><td>${esc(a.timeline)}</td><td class="small">${esc(a.kpiFormula)}</td></tr>`).join('')}</tbody></table>`:''}`}
-  pages.push(`<section class="rp">${head('개선과제')}<h2>개선전략과 우선과제</h2><table class="rt"><thead><tr><th>시기</th><th>과제</th><th>담당</th><th>근거 징후</th></tr></thead><tbody>${PHASES.flatMap(([k])=>items[k].map(i=>`<tr><td>${k==='30일'?'즉시(30일)':k}</td><td>${esc(i.a)}</td><td>${esc(i.o)}</td><td class="small">${esc(i.src)}</td></tr>`)).join('')}</tbody></table>${aiBlock}</section>`);
-  // 10. 로드맵·KPI
-  pages.push(`<section class="rp">${head('로드맵·KPI')}<h2>90일·12개월 로드맵과 KPI</h2><div class="rgrid">${PHASES.map(([k,t])=>`<div class="rbox"><b>${esc(t)}</b><ul style="margin:1.5mm 0 0;padding-left:4.5mm">${items[k].map(i=>`<li>${esc(i.a)}</li>`).join('')}</ul></div>`).join('')}</div>
-  <h3>KPI와 측정법</h3><table class="rt"><thead><tr><th>KPI</th><th>산식</th><th class="r">현재값</th><th>목표값</th><th>주기</th></tr></thead><tbody>${kpis.map(k=>`<tr><td>${esc(k.n)}</td><td class="small">${esc(k.f)}</td><td class="r">${esc(k.b??'—')}</td><td class="small">경영진 협의 후 설정</td><td>월·분기</td></tr>`).join('')}</tbody></table></section>`);
-  // 11. 근거·용어·유의사항
-  pages.push(`<section class="rp">${head('근거·용어·유의사항')}<h2>산식·용어집·유의사항</h2><table class="rt"><thead><tr><th>지표</th><th>산식</th><th>쉬운 뜻 / 주의</th></tr></thead><tbody>${MDEF.map(m=>`<tr><td>${esc(m.l)}</td><td class="small">${esc(m.f)}</td><td class="small">${esc(m.plain)} ${esc(m.c)}</td></tr>`).join('')}</tbody></table>
-  <h3>유의사항</h3><ul class="small"><li>제출 자료(사용자 제출)를 기반으로 하며, 발급기관 진위 확인을 의미하지 않습니다.</li><li>업종 평균·임의 기준선·종합 점수·신용등급을 생성하지 않았습니다.</li><li>재무제표증명·거래내역만으로 현재 현금잔액이나 상환능력을 확정할 수 없습니다.</li><li>AI 문장은 검증된 요약수치로 작성된 초안이며, 계산 결과와 다른 수치가 포함된 문장은 제외했습니다.</li></ul>
-  <p class="small">작성: BECONIC 기업 재무진단 v${APP.version} (${APP.updated}) · ${APP.url}<br>그로스벤처스 주식회사 · 서울시 구로구 디지털로27길 24, 209호 · 070-4103-4177 · start@gven.kr · www.beconic.kr · 중소벤처기업부 공식 인증 중소기업상담회사 (제2025-684호)</p></section>`);
-  return pages.join('');
+  const secs=[];const add=(title,short,body)=>secs.push({title,short,body});
+  // ── Executive Summary ──
+  const ex=execSummary(M,F);
+  const execMsg=real.length?`우선 확인 ${cnt(1)}건 · 주의 ${cnt(2)}건 · 관찰 ${cnt(3)}건 — 최우선 과제는 ‘${real[0].title}’`:'수치 정의로 확인되는 우선 징후 없음 — 현 수준 유지와 정기 점검 권고';
+  const next=[...items['30일'],...items['90일']].slice(0,5);
+  add('경영진 요약','Executive Summary',`${atitle(execMsg)}
+   <div class="rkpi">${['revenue','operatingMargin','debtRatio','currentRatio'].map(k=>{const r=M[Y[2]][k];return `<div><small>${esc(MD[k].l)} (${Y[2]})</small><b>${r.v!=null?esc(fmtM(k,r)):naText(r)}</b><div class="small">${esc(deltaText(k,r,M[Y[1]][k]))}</div></div>`}).join('')}</div>
+   <div class="rgrid"><div class="rbox"><h3>현재 상태</h3>${ex.map(t=>`<p>${esc(t)}</p>`).join('')}</div>
+   <div class="rbox"><h3>핵심 발견 (최대 3개)</h3>${top.length?top.map((f,i)=>`<div class="kf sev${f.sev}"><b>${i+1}. ${esc(f.title)}</b><div>${esc(f.fact)}</div></div>`).join(''):'<p>정의 기반 조건에서 우선 확인할 징후가 없습니다.</p>'}</div></div>
+   ${top.length?`<div class="rbox"><h3>시사점</h3><ul>${top.map(f=>`<li>${esc(f.mean.split(/(?<=다\.)\s/)[0])}</li>`).join('')}</ul></div>`:''}
+   <h3>권고 — 향후 90일 우선 과제</h3><table class="rt"><thead><tr><th style="width:9mm">#</th><th>과제</th><th>담당</th><th>기한</th></tr></thead><tbody>${next.map((i,n)=>`<tr><td>${n+1}</td><td>${esc(i.a)}</td><td>${esc(i.o)}</td><td>${PHASES.find(([k])=>items[k].includes(i))[0]==='30일'?'30일 이내':'90일 이내'}</td></tr>`).join('')}</tbody></table>
+   <p class="small">증빙 범위: 재무자료 ${S.sources.length?S.sources.filter(s=>/반영/.test(s.status)).length+'개 파일(사용자 확인 후 반영)':(S.sample?'가상 데이터':'사용자 직접 입력')} · 입력 완성도 ${nf(completeness()*100,0)}% · 통장 ${S.bank.length?S.bank.length+'개 계좌':'없음'} · 공식 신용등급 ${S.credit.rating?'사용자 입력':'미확인'} · 감사의견 ${esc(S.audit.opinion)}</p>`);
+  // ── 대시보드 ──
+  add('핵심 지표 대시보드','재무 대시보드',`${atitle(ex[0]||'핵심 지표 요약')}${dashKpis(M,Y)}${dashCharts(M,Y)}${src}`);
+  // ── 성장·수익성(+효율성) ──
+  const CC=Y.map(String);
+  const act=['assetTurnover','roa','roe','receivableDays','inventoryDays','payableDays','ccc'].filter(k=>Y.some(y=>M[y][k].st==='ok'));
+  add(act.length?'성장성·수익성·효율성':'성장성과 수익성','성장성·수익성',`${atitle(msgGrowth(M,Y))}
+   <div class="rchart"><b>매출·영업이익·순이익 (백만원)</b>${barChart({cats:CC,series:[{name:'매출액',color:'#1E5FD6',vals:Y.map(y=>mil(V(y,'revenue')))},{name:'영업이익',color:'#0E9E79',vals:Y.map(y=>mil(V(y,'operatingIncome')))},{name:'당기순이익',color:'#E08A1E',vals:Y.map(y=>mil(V(y,'netIncome')))}],fmt:v=>nf(v,Math.abs(v)>=100?0:1),unit:'백만원',h:220})}${legend([['#1E5FD6','매출액'],['#0E9E79','영업이익'],['#E08A1E','당기순이익']])}${src}</div>
+   ${mtable(['revenue','revenueGrowth','assetGrowth','grossMargin','operatingMargin','netMargin',...(Y.some(y=>V(y,'depreciation')!=null)?['ebitda']:[])])}
+   ${act.length?`<h3>효율성·운전자본</h3>${mtable(act)}`:''}
+   <p class="small">증감 표기: 비율은 %p(퍼센트포인트), 금액은 %(상대 증감). 평균값은 (기초+기말)÷2, 기간은 365일 기준(첫해 미산출). 업종 평균과의 비교는 하지 않았습니다.</p>`);
+  // ── 안정·유동성 ──
+  add('안정성과 유동성','안정성·유동성',`${atitle(msgStability(M,Y))}${fin?'<div class="wm">금융·보험업은 일반 기업용 유동성·안정성 비율의 해석이 맞지 않아 참고로만 표시합니다.</div>':''}
+   <div class="rchart"><b>재무상태표 구성 (백만원)</b>${bsChart(Y,560,180)}${legend([['#1E5FD6','자산총계'],['#E08A1E','부채총계'],['#0E9E79','자본총계']])}${src}</div>
+   ${mtable(['debtRatio','equityRatio','borrowings','borrowingDependence','interestCoverage','impairmentRate','currentRatio','quickRatio','workingCapital'])}
+   <p class="small">자본총계가 0 이하이면 부채비율을 음수로 표시하지 않고 ‘보류’로 둡니다. 유동비율 등은 지급불능 여부를 확정하지 않습니다.</p>`);
+  // ── 통장 ──
+  if(S.bank.length){const A=analyzeBank();const ms=Object.keys(A.months).sort();add('통장 입출금 흐름','통장 입출금',`${atitle(`제출 계좌 ${S.bank.length}개 · ${ms.length}개월 순입출금 ${fmtMil(A.tin-A.tout)} — 매출·영업현금흐름과는 다른 지표`)}<div class="rkpi"><div><small>총입금</small><b>${fmtMil(A.tin)}</b></div><div><small>총출금</small><b>${fmtMil(A.tout)}</b></div><div><small>순입출금</small><b>${fmtMil(A.tin-A.tout)}</b></div><div><small>계좌 간 이체 후보</small><b>${A.pairs}쌍</b><div class="small">${S.bankExcludeXfer?'합계에서 제외함':'합계에 포함'}</div></div></div>
+   <div class="rchart"><b>월별 입금·출금 (백만원)</b>${barChart({cats:ms.map(m=>m.slice(2).replace('-','.')),series:[{name:'입금',color:'#0E9E79',vals:ms.map(m=>A.months[m].i/1e6)},{name:'출금',color:'#E08A1E',vals:ms.map(m=>A.months[m].o/1e6)}],fmt:v=>nf(v,Math.abs(v)>=100?0:1),unit:'백만원',h:220,w:Math.max(560,ms.length*60)})}<p class="src">자료: 사용자 제출 통장 거래내역 · BECONIC 분석</p></div>
+   <table class="rt"><thead><tr><th>계좌(별칭)</th><th>은행</th><th>기간</th><th class="r">건수</th></tr></thead><tbody>${S.bank.map(a=>{const ds=a.rows.map(r=>r.d).sort();return `<tr><td>${esc(a.alias)}</td><td>${esc(a.bank)}</td><td>${ds[0]} ~ ${ds[ds.length-1]}</td><td class="r">${a.rows.length}</td></tr>`}).join('')}</tbody></table>
+   <p class="small">통장 입금 합계는 매출액이 아니며, 순입출금은 영업현금흐름이 아닙니다(대출·투자·이체·세금 환급 포함 가능).</p>`)}
+  // ── 신용·감사 ──
+  if(S.credit.rating||S.audit.opinion!=='미확인')add('외부 신용등급·감사 정보','외부 평가 정보',`${atitle('외부 평가 정보는 사용자가 입력한 원문 그대로이며 본 분석과 독립적입니다')}<table class="rt"><tbody><tr><td>평가기관</td><td>${esc(S.credit.agency||'—')}</td></tr><tr><td>등급(원문)</td><td>${esc(S.credit.rating||'미확인')}</td></tr><tr><td>등급체계</td><td>${esc(S.credit.scale||'—')}</td></tr><tr><td>기준일 / 유효기간</td><td>${esc(S.credit.issued||'—')} / ${esc(S.credit.valid||'—')}${S.credit.valid&&S.credit.valid<today()?' (경과)':''}</td></tr><tr><td>근거</td><td>${esc(S.credit.basis||'—')}</td></tr><tr><td>감사의견</td><td>${esc(S.audit.opinion==='비대상'?'외부감사 비대상':S.audit.opinion)}${S.audit.year?' · '+esc(S.audit.year)+'년':''}${S.audit.auditor?' · '+esc(S.audit.auditor):''}</td></tr><tr><td>계속기업 불확실성·강조사항</td><td>${S.audit.gc?'있음':'없음/미확인'}</td></tr></tbody></table><p class="small">감사의견 ‘적정’은 재무 안정성의 보증이 아닙니다.</p>`);
+  // ── 징후 매트릭스 + 상세 ──
+  add('징후 진단과 원인','징후·원인',`${atitle(F.length?`정의 기반 징후 ${F.length}건 — 우선 확인 ${cnt(1)} · 주의 ${cnt(2)} · 관찰 ${cnt(3)}${cnt(0)?` · 자료 확인 ${cnt(0)}`:''}`:'정의 기반 조건에서 확인된 징후가 없습니다')}
+   ${F.length?`<table class="rt mx"><thead><tr><th style="width:7mm">#</th><th>징후</th><th style="width:16mm">영역</th><th style="width:15mm">수준</th><th>확인된 사실</th></tr></thead><tbody>${F.map((f,i)=>`<tr><td>${i+1}</td><td><b>${esc(f.title)}</b></td><td>${esc(f.cat)}</td><td><span class="lv lv${f.sev}">${SEVL[f.sev][0]}</span></td><td class="small">${esc(f.fact)}</td></tr>`).join('')}</tbody></table>`:''}
+   ${F.map((f,i)=>`<div class="rfind sev${f.sev}"><h4>${i+1}. ${esc(f.title)}</h4><div>${esc(f.mean)}</div><div class="rg2"><div><b>원인 점검 질문</b><ul>${f.q.map(q=>`<li>${esc(q)}</li>`).join('')}</ul></div><div><b>확인할 자료</b><ul>${f.docs.map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div></div></div>`).join('')}
+   <p class="small">징후는 수치의 정의에서 직접 확인되는 신호이며 부실·지급불능을 확정하지 않습니다.</p>`);
+  // ── 개선과제 (+AI) ──
+  let aiBlock='';if(S.ai&&S.ai.result){const p=aiPayload(M,F);const allow=allowedNumbers(p);const r=S.ai.result;const okT=t=>!checkText(t,allow);const acts=(r.actions||[]).filter(a=>okT(a.action)&&okT(a.kpiFormula));aiBlock=`<h3>AI 개선처방 초안 (수치 대조 통과분 · 검토 필요)</h3>${okT(r.executiveSummary)&&r.executiveSummary?`<p>${esc(r.executiveSummary)}</p>`:''}${acts.length?`<table class="rt"><thead><tr><th>우선</th><th>과제</th><th>담당</th><th>기한</th><th>KPI 산식</th></tr></thead><tbody>${acts.map(a=>`<tr><td>${esc(a.priority)}</td><td>${esc(a.action)}</td><td>${esc(a.ownerRole)}</td><td>${esc(a.timeline)}</td><td class="small">${esc(a.kpiFormula)}</td></tr>`).join('')}</tbody></table>`:''}`}
+  const nAll=PHASES.reduce((a,[k])=>a+items[k].length,0);
+  add('개선전략과 우선과제','개선과제',`${atitle(`과제 ${nAll}건 — 즉시 ${items['30일'].length} · 90일 ${items['90일'].length} · 6개월 ${items['6개월'].length} · 12개월 ${items['12개월'].length}`)}<table class="rt"><thead><tr><th style="width:18mm">시기</th><th>과제</th><th style="width:26mm">담당</th><th>근거 징후</th></tr></thead><tbody>${PHASES.flatMap(([k])=>items[k].map(i=>`<tr><td>${k==='30일'?'즉시(30일)':k}</td><td>${esc(i.a)}</td><td>${esc(i.o)}</td><td class="small">${esc(i.src)}</td></tr>`)).join('')}</tbody></table>${aiBlock}`);
+  // ── 로드맵 ──
+  add('12개월 실행 로드맵과 KPI','로드맵·KPI',`${atitle('검증 → 우선 대응 → 구조 개선 → 재진단 순으로 12개월 안에 같은 기준으로 다시 측정합니다')}
+   <div class="rchart"><b>실행 로드맵 (월)</b>${gantt(items)}${legend([['#B4232F','즉시(1개월)'],['#E08A1E','90일'],['#146FE8','6개월'],['#0E9E79','12개월']])}</div>
+   <h3>KPI와 측정법</h3><table class="rt"><thead><tr><th>KPI</th><th>산식</th><th class="r">현재값(${Y[2]})</th><th>목표값</th><th>주기</th></tr></thead><tbody>${kpis.map(k=>`<tr><td>${esc(k.n)}</td><td class="small">${esc(k.f)}</td><td class="r">${esc(k.b??'—')}</td><td class="small">경영진 협의 후 설정</td><td>월·분기</td></tr>`).join('')}</tbody></table>`);
+  // ── 부록 ──
+  add('부록 A. 입력자료와 검증','부록 · 자료·검증',`${atitle(VS.verified?'3개년 대차·필수 항목·비교 가능성 확인을 마친 자료로 작성했습니다':'검증이 끝나지 않은 항목이 있어 해석에 유의가 필요합니다')}
+   <table class="rt"><thead><tr><th>연도</th><th>사업연도</th><th>대차 검증</th><th>세부 검증</th></tr></thead><tbody>${VS.vs.map(v=>`<tr><td>${yh(v.year)}</td><td class="small">${fyPeriod(v.year).start}~${fyPeriod(v.year).end}</td><td>${!v.has?'자료 없음':v.balance===true?'일치':v.balance===false?'<b>불일치</b>':'확인 불가'}</td><td class="small">${v.items.map(i=>esc(i.t)).join('<br>')}</td></tr>`).join('')}</tbody></table>
+   <table class="rt"><thead><tr><th>비교 가능성(사용자 확인)</th><th>결과</th></tr></thead><tbody>${[['sameEntity','동일 회사'],['sameBasis','동일 재무제표 구분·결산월·회계기준'],['unitChecked','금액 단위 확인'],['sourceChecked','원본 대조']].map(([k,l])=>`<tr><td>${l}</td><td>${S.confirm[k]?'확인함':'미확인'}</td></tr>`).join('')}</tbody></table>
+   ${S.sources.length?`<table class="rt"><thead><tr><th>연도</th><th>문서</th><th>발급번호·발급일</th><th>신고</th><th>단위</th><th>SHA-256</th></tr></thead><tbody>${S.sources.filter(s=>!/중복|오류|이미지/.test(s.status)).map(s=>`<tr><td>${esc(s.years)}</td><td>${esc(s.doc||s.kind.toUpperCase()+' 파일')}<div class="small">${esc(s.name)}</div></td><td>${esc(s.issueNo||'—')}<div class="small">${esc(s.issuedAt||'')} ${esc(s.office||'')}</div></td><td>${esc(s.report||'—')}</td><td>${esc(s.unit)}</td><td class="small">${esc(String(s.sha256).slice(0,12))}</td></tr>`).join('')}</tbody></table><p class="small">홈택스 발급 증명서는 발급번호로 발급일부터 90일 안에 원본 확인이 가능합니다. 본 보고서는 증명서의 진위를 확인하지 않았습니다(사용자 제출 자료).</p>`:''}`);
+  add('부록 B. 요약 재무제표','부록 · 재무제표',`${atitle(`${Y[0]}~${Y[2]} 회계연도 요약 재무제표 (백만원, ${S.org.basis})`)}<div class="rg2 fs">${['bs','is'].map(g=>`<table class="rt fs"><thead><tr><th>${g==='bs'?'재무상태표':'손익계산서'}</th>${Y.map(y=>`<th class="r">${yh(y)}</th>`).join('')}</tr></thead><tbody>${ACCTS.filter(a=>a.g===g&&Y.some(y=>V(y,a.k)!=null)).map(a=>`<tr class="l${a.lv}"><td>${esc(a.l.replace(/^└\s*/,''))}</td>${Y.map(y=>`<td class="r">${V(y,a.k)!=null?fmtMil(V(y,a.k),false):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table>`).join('')}</div>${src}`);
+  add('부록 C. 산식·용어·유의사항','부록 · 산식·용어',`<table class="rt gl"><thead><tr><th>지표</th><th>산식</th><th>쉬운 뜻 / 주의</th></tr></thead><tbody>${MDEF.map(m=>`<tr><td>${esc(m.l)}</td><td class="small">${esc(m.f)}</td><td class="small">${esc(m.plain)} ${esc(m.c)}</td></tr>`).join('')}</tbody></table>
+   <h3>유의사항</h3><ul class="small"><li>제출 자료(사용자 제출)를 기반으로 하며, 발급기관 진위 확인을 의미하지 않습니다.</li><li>업종 평균·임의 기준선·종합 점수·신용등급을 생성하지 않았습니다.</li><li>재무제표증명·거래내역만으로 현재 현금잔액이나 상환능력을 확정할 수 없습니다.</li><li>AI 문장은 검증된 요약수치로 작성된 초안이며, 계산 결과와 다른 수치·근거 없는 표현이 포함된 문장은 제외했습니다.</li></ul>
+   <p class="small">작성: ${esc(APP.name)} v${APP.version} (${APP.updated}) · ${esc(APP.url)}<br>${C.name} · ${C.addr} · ${C.tel} · ${C.email} · ${C.site} · ${C.cert}</p>`);
+  // ── 조립: 표지 → 목차·개요 → 섹션 ──
+  const date=new Date();const ds=`${date.getFullYear()}년 ${date.getMonth()+1}월 ${date.getDate()}일`;
+  const cover=`<section class="rp cover"><div class="cband"><div class="logo"><svg><use href="#gvShield"/></svg><div><b>BECONIC</b><small>by GROWTH VENTURES</small></div></div><span class="conf">CONFIDENTIAL</span></div>
+   <div class="ctitle"><div class="kicker">FINANCIAL DIAGNOSIS REPORT</div><h1>기업 재무진단 보고서</h1><div class="sub">3개년 증빙기반 재무 분석 · 징후 진단 · 12개월 개선 로드맵</div></div>
+   <div class="client"><small>대상 기업</small><b>${esc(name)}</b><span>${esc(S.org.industry||'업종 미입력')} · ${Y[0]}~${Y[2]} 회계연도(${relY(Y[2])} ${Y[2]}) · ${esc(S.org.basis)} 재무제표</span></div>
+   ${wm}
+   <dl class="meta"><dt>분석 기간</dt><dd>${fyPeriod(Y[0]).start} ~ ${fyPeriod(Y[2]).end} (결산월 ${S.org.fye}월)</dd><dt>회계기준</dt><dd>${esc(S.org.std)}</dd><dt>자료 상태</dt><dd>${esc(status)}</dd><dt>작성일</dt><dd>${ds}</dd><dt>작성</dt><dd>${C.name} · BECONIC 기업 재무진단 v${APP.version}</dd></dl>
+   <div class="cfoot">본 보고서는 제출 자료에 대한 자체 재무비율 분석으로, 공식 기업신용평가서·회계감사보고서·세무 자문·투자 권유가 아닙니다.<br>수신자 외 배포·복제를 금합니다. © ${C.since}~${date.getFullYear()} ${C.en}</div></section>`;
+  const toc=`<section class="rp">${'<div class="rhead"><span class="bl"><svg><use href="#gvShield"/></svg>BECONIC 기업 재무진단</span><span>목차·개요</span></div>'}<h2>목차</h2><ol class="toc">${secs.map((s,i)=>`<li><span class="no">${String(i+1).padStart(2,'0')}</span><span class="tt">${esc(s.title)}</span></li>`).join('')}</ol>
+   <h2 style="margin-top:8mm">진단 개요</h2><div class="rgrid"><div class="rbox"><h3>범위</h3><p>${Y[0]}~${Y[2]} 회계연도(${Y.map(relY).join('·')}) ${esc(S.org.basis)} 재무제표 · 성장성·수익성·안정성·유동성·활동성${S.bank.length?' · 통장 입출금':''}${S.credit.rating||S.audit.opinion!=='미확인'?' · 외부 평가 정보':''}</p></div>
+   <div class="rbox"><h3>방법</h3><p>원본 추출 → 사용자 확인 → 결정론 계산 → 대차·손익 검증 → 정의 기반 징후 → 과제·로드맵. AI 문장은 검증된 요약 지표에 대한 초안이며 수치 대조를 통과한 내용만 싣습니다.</p></div>
+   <div class="rbox"><h3>읽는 법</h3><p><span class="lv lv1">우선 확인</span> 지급능력·자본에 직접 영향 · <span class="lv lv2">주의</span> 손익·현금 흐름 · <span class="lv lv3">관찰</span> 추세·효율. 비율 증감은 %p, 금액 증감은 %.</p></div>
+   <div class="rbox"><h3>하지 않은 것</h3><p>업종 평균 비교, 종합 점수, 신용등급·부도확률 산출, 금액 목표 설정 — 근거 자료 없이 만들지 않습니다.</p></div></div></section>`;
+  return cover+toc+secs.map((s,i)=>`<section class="rp"><div class="rhead"><span class="bl"><svg><use href="#gvShield"/></svg>BECONIC 기업 재무진단</span><span>${String(i+1).padStart(2,'0')} · ${esc(s.short)}</span></div><div class="sno">SECTION ${String(i+1).padStart(2,'0')}</div><h2>${esc(s.title)}</h2>${s.body}</section>`).join('');
 }
 function printReport(){
   const VS=verifyState();if(!VS.anyData){toast('보고서를 만들 자료가 없습니다.');return}
   $('#report').innerHTML=buildReport();
   const old=document.getElementById('pageStyle');if(old)old.remove();
   const st=document.createElement('style');st.id='pageStyle';const nm=(S.org.name||'기업명 미기재').replace(/["\\\n]/g,' ');
-  st.textContent=`@page{@top-left{content:"${nm} · ${years()[0]}~${years()[2]} 회계연도";font-size:8pt;font-family:"Pretendard Variable",Pretendard,sans-serif;color:#6A7A90}@top-right{content:"그로스벤처스 · 기밀";font-size:8pt;font-family:"Pretendard Variable",Pretendard,sans-serif;color:#6A7A90}}`;
+  st.textContent=`@page{@top-left{content:"${nm} · ${years()[0]}~${years()[2]} 회계연도";font-size:7.5pt;font-family:"Pretendard Variable",Pretendard,sans-serif;color:#6A7A90}@top-right{content:"${COMPANY.name.replace(/주식회사/,'').trim()} · CONFIDENTIAL";font-size:7.5pt;font-family:"Pretendard Variable",Pretendard,sans-serif;color:#6A7A90}}@page:first{@top-left{content:none}@top-right{content:none}}`;
   document.head.appendChild(st);
   const prevTitle=document.title;document.title=`BECONIC_재무진단_${(S.org.name||'기업').replace(/[\\/:*?"<>|\s]/g,'')}_${years()[2]}`;
   setTimeout(()=>{window.print();document.title=prevTitle},60);
@@ -1640,7 +1764,7 @@ function exportJSON(){
 function importJSON(o){
   if(!o||typeof o!=='object'||!o.data||!o.baseYear)throw new Error('BECONIC 재무진단 JSON 형식이 아닙니다.');
   const clean={};for(const [y,row] of Object.entries(o.data)){if(!/^\d{4}$/.test(y))continue;clean[y]={};for(const [k,c] of Object.entries(row||{})){if(!AK[k]||!c||typeof c!=='object')continue;const v=c.v==null?null:Number(c.v);if(v!=null&&!Number.isFinite(v))continue;clean[y][k]={v,src:String(c.src||'json').slice(0,10),file:c.file?String(c.file).slice(0,80):'',page:c.page??null,label:c.label?String(c.label).slice(0,60):'',conf:c.conf||'high'}}}
-  S.baseYear=+o.baseYear;S.unit=UNITS[o.unit]?o.unit:'천원';Object.assign(S.org,o.org||{});S.data=clean;S.sources=Array.isArray(o.sources)?o.sources.slice(0,50):[];S.editLog=Array.isArray(o.editLog)?o.editLog.slice(0,500):[];
+  S.baseYear=+o.baseYear;S.baseTouched=true;S.unit=UNITS[o.unit]?o.unit:'천원';Object.assign(S.org,o.org||{});S.data=clean;S.sources=Array.isArray(o.sources)?o.sources.slice(0,50):[];S.editLog=Array.isArray(o.editLog)?o.editLog.slice(0,500):[];
   Object.assign(S.confirm,o.confirm||{});Object.assign(S.credit,o.credit||{});Object.assign(S.audit,o.audit||{});S.docReq=o.docReq||{};S.sample=!!o.sample;S.bankExcludeXfer=!!o.bankExcludeXfer;S.ai=o.ai&&o.ai.result?o.ai:null;
   S.bank=Array.isArray(o.bank)?o.bank.map(a=>({id:'a'+Math.random().toString(36).slice(2,8),alias:String(a.alias||'계좌'),bank:String(a.bank||''),unit:a.unit||'원',file:String(a.file||''),sha:a.sha||'',bad:0,rows:(a.rows||[]).map(r=>({d:String(r.d),i:+r.i||0,o:+r.o||0,b:r.b==null?null:+r.b,desc:'',cat:r.c&&r.c!=='미분류'&&r.c!=='내부이체 후보'?String(r.c):''}))})):[];
   syncForm();renderGrid();renderSources();renderBank();refresh();if(S.ai)renderAI();
@@ -1671,7 +1795,12 @@ function clearAll(){S.data={};S.sample=false;S.editLog=[];S.sources=[];S.pending
 
 /* ═══════════ 폼 동기화·이벤트 ═══════════ */
 function syncForm(){
-  const by=$('#baseYear');const cy=now.getFullYear();by.innerHTML='';for(let y=cy;y>=cy-8;y--)by.insertAdjacentHTML('beforeend',`<option value="${y}">${y}년${y===cy?' (결산 완료 시)':''}</option>`);by.value=S.baseYear;
+  const cy=new Date().getFullYear(),def=defaultBaseYear(S.org.fye);
+  const opts=[];for(let y=cy;y>=cy-8;y--)opts.push(`<option value="${y}">${y}년${y===def?' (최근 확정 결산)':y>def?' (신고 전일 수 있음)':''}</option>`);
+  ['#baseYear','#baseYear2'].forEach(id=>{const el=$(id);el.innerHTML=opts.join('');el.value=S.baseYear});
+  const p=fyPeriod(def);$('#baseHint').textContent=`결산월 ${S.org.fye}월 기준 ${def}년 사업연도(${p.start}~${p.end})는 법인세 신고기한(${p.deadline})이 지나 기본값으로 정했습니다. 해가 바뀌면 자동으로 바뀝니다.`;
+  $('#yearChips').innerHTML=years().slice().reverse().map(y=>{const q=fyPeriod(y);return `<div class="ychip"><b>${relY(y)}</b> ${y}년<span>${q.start}~${q.end}</span></div>`}).join('');
+  $('#auYear').placeholder=`예: ${S.baseYear}`;
   const fy=$('#orgFye');if(!fy.options.length)for(let m=1;m<=12;m++)fy.insertAdjacentHTML('beforeend',`<option value="${m}">${m}월</option>`);fy.value=S.org.fye;
   $('#orgName').value=S.org.name;$('#orgBizNo').value=S.bizMasked||'';$('#orgIndustry').value=S.org.industry;$('#orgBasis').value=S.org.basis;$('#orgStd').value=S.org.std;$('#orgAudited').value=S.org.audited;$('#unitSel').value=S.unit;
   $$('[data-confirm]').forEach(c=>c.checked=!!S.confirm[c.dataset.confirm]);
@@ -1694,10 +1823,11 @@ function bind(){
   $('#orgIndustry').addEventListener('change',e=>{S.org.industry=e.target.value;$('#finWarn').hidden=S.org.industry!=='금융·보험업';refresh()});
   $('#orgBasis').addEventListener('change',e=>{S.org.basis=e.target.value;S.confirm.sameBasis=false;syncForm();refresh()});
   $('#orgStd').addEventListener('change',e=>{S.org.std=e.target.value;refresh()});
-  $('#orgFye').addEventListener('change',e=>{S.org.fye=+e.target.value;refresh()});
+  $('#orgFye').addEventListener('change',e=>{S.org.fye=+e.target.value;if(!S.baseTouched&&!Object.keys(S.data).length)S.baseYear=defaultBaseYear(S.org.fye);syncForm();renderGrid();refresh()});
   $('#orgAudited').addEventListener('change',e=>{S.org.audited=e.target.value;if(e.target.value==='no'&&S.audit.opinion==='미확인'){S.audit.opinion='비대상';syncForm()}refresh()});
   $('#orgBizNo').addEventListener('change',e=>{const d=e.target.value.replace(/\D/g,'');S.bizMasked=d.length===10?`${d.slice(0,3)}-${d.slice(3,5)}-*****`:'';e.target.value=S.bizMasked||'';if(d&&d.length!==10)toast('사업자등록번호는 10자리입니다.')});
-  $('#baseYear').addEventListener('change',e=>{const ny=+e.target.value;if(Object.keys(S.data).length&&!confirm('기준 연도를 바꾸면 비교 연도가 달라집니다. 입력값은 연도별로 유지됩니다. 계속할까요?')){e.target.value=S.baseYear;return}S.baseYear=ny;Object.keys(S.confirm).forEach(k=>S.confirm[k]=false);syncForm();renderGrid();renderCandidates();refresh()});
+  const onBase=e=>{const ny=+e.target.value;if(ny===S.baseYear)return;if(Object.keys(S.data).length&&!confirm('기준 연도(당기)를 바꾸면 비교 연도가 달라집니다. 입력값은 연도별로 유지됩니다. 계속할까요?')){e.target.value=S.baseYear;return}S.baseYear=ny;S.baseTouched=true;Object.keys(S.confirm).forEach(k=>S.confirm[k]=false);syncForm();renderGrid();renderCandidates();refresh()};
+  $('#baseYear').addEventListener('change',onBase);$('#baseYear2').addEventListener('change',onBase);
   $('#unitSel').addEventListener('change',e=>{S.unit=e.target.value;S.confirm.unitChecked=false;syncForm();renderGrid();refresh()});
   $('#gridWrap').addEventListener('change',onGridChange);$('#gridWrap').addEventListener('paste',onGridPaste);
   $('#gridWrap').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.gridin')){e.preventDefault();const ins=$$('.gridin');const i=ins.indexOf(e.target);const Y=years().length;const nxt=ins[i+Y];if(nxt)nxt.focus()}});
@@ -1728,7 +1858,8 @@ function bind(){
 function glossary(){
   $('#glossary').innerHTML=`<div class="tbl-wrap"><table class="t"><thead><tr><th>지표</th><th>산식</th><th>쉬운 뜻</th><th>주의</th></tr></thead><tbody>${MDEF.map(m=>`<tr><td><b>${esc(m.l)}</b></td><td class="hint">${esc(m.f)}</td><td>${esc(m.plain)}</td><td class="hint">${esc(m.c)}</td></tr>`).join('')}</tbody></table></div>
   <ul class="hint" style="margin-top:12px"><li><b>자본잠식</b>: 결손이 쌓여 자본총계가 납입자본금보다 작아진 상태. 자본총계가 0 이하이면 완전자본잠식.</li><li><b>%p(퍼센트포인트)</b>: 비율끼리의 차이. 영업이익률 5%→3%는 ‘2%p 하락’(상대적으로는 40% 감소).</li><li>이 서비스는 업종 평균·임의 기준선·종합 점수·신용등급을 만들지 않습니다. 공식 등급은 평가기관의 유효한 평가서로만 확인할 수 있습니다.</li><li>입력·업로드 자료는 브라우저 메모리에서만 처리되며, 새로고침하면 사라집니다. AI 해석은 동의한 경우에 한해 요약 지표만 전송합니다.</li></ul>`;
-  $('#verInfo').innerHTML=`v${APP.version} · 업데이트 ${APP.updated}<br>${APP.url.replace('https://','')}`;
+  $('#verInfo').innerHTML=`v${APP.version} · 업데이트 ${APP.updated}<br>${APP.url.replace(/^https?:\/\//,'')}`;
+  const C=COMPANY;$('#footCo').innerHTML=`<strong>${C.name}</strong><div class="det">주소 ${C.addr} · 전화 <a href="tel:${C.tel.replace(/-/g,'')}">${C.tel}</a><br>이메일 <a href="mailto:${C.email}">${C.email}</a> · 사이트 <a href="https://${C.site}/" target="_blank" rel="noopener noreferrer">${C.site}</a><br>${C.cert}</div><small>© ${C.since}~${new Date().getFullYear()} Copyright ⓒ ${C.en} All rights reserved.</small>`;
 }
 syncForm();renderGrid();renderSources();renderBank();glossary();bind();refresh();
 </script>
