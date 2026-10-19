@@ -1,6 +1,6 @@
 {
   "name": "beconic-finance-diagnosis",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "type": "module",
   "description": "BECONIC 기업 재무진단 — 단일 HTML 웹앱 + AI 개선처방 서버 함수",
