@@ -1,4 +1,4 @@
-/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings, fundingEval, gradeRank, exportJSON, refresh -- page.evaluate 안에서 앱 전역 함수를 호출 */
+/* global defaultBaseYear, fyPeriod, buildReport, years, V, S, importJSON, analyzeBank, clearAll, crossCheck, applyRes, aiPayload, metrics, findings, fundingEval, gradeRank, exportJSON, refresh, loanSummary -- page.evaluate 안에서 앱 전역 함수를 호출 */
 // BECONIC 재무진단 QA — 실제 Chromium으로 사용자 플로우·레드팀 항목·A4 PDF를 확인한다.
 // 실행: (finance 폴더를 정적 서버로 띄운 뒤) node finance/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -297,7 +297,7 @@ const Y = await page.evaluate(() => years());
   const f = await txt('#fund');
   check('대출·자격: 가상 예시 대출 3건 반영·여력 카드 표시', f.includes('기존 대출 잔액') && f.includes('3,750') && f.includes('이자 감당 기준 추가 차입 여력'));
   check('대출·자격: 영업이익 ≤ 기존 이자 → 추가 여력 없음', f.includes('추가 이자 감당 여력이 없습니다'));
-  check('대출·자격: 기준 미입력 시 판정하지 않음 안내', f.includes('공고 기준이 입력되지 않아'));
+  check('대출·자격: 기준 미입력 시 판정하지 않음 안내', f.includes('해당 항목은 판정하지 않았습니다'));
   const fids = await page.evaluate(() => findings(metrics()).map((x) => x.id));
   check('대출·자격: 1년 내 만기 > 현금 징후(F-DUE)', fids.includes('F-DUE'), fids.join(','));
   const room = await page.evaluate(() => { const keep = S.loans; S.loans = [{ id: 't', lender: 'x', type: '은행 신용', bal: 100e6, rate: 5, due: '', repay: '미확인', coll: '' }]; const r = fundingEval(metrics()).room; S.loans = keep; return r; });
@@ -315,13 +315,14 @@ const Y = await page.evaluate(() => years());
   await page.fill('#crRating', 'BB+'); await page.dispatchEvent('#crRating', 'change');
   await page.fill('#cfGrade', 'BBB-'); await page.dispatchEvent('#cfGrade', 'change');
   f2 = await txt('#fund');
-  check('공고 기준: 요구 등급 미달 → 미충족', /기업신용등급 BBB- 이상\s+BB\+\s+미충족/.test(f2), f2.match(/기업신용등급 BBB-[^\n]*/)?.[0]);
+  const st = (re) => page.evaluate((src) => fundingEval(metrics()).rows.filter((r) => new RegExp(src).test(r.label)).map((r) => r.status).join(), re);
+  check('공고 기준: 요구 등급 미달 → 미충족', (await st('BBB- 이상')) === 'fail' && f2.includes('BBB- 이상'));
   await page.fill('#crRating', '우수(기관 자체 표기)'); await page.dispatchEvent('#crRating', 'change');
-  check('공고 기준: 체계가 다른 등급은 자동 비교 안 함(확인 필요)', (await txt('#fund')).includes('자동 비교 불가'));
+  check('공고 기준: 체계가 다른 등급은 자동 비교 안 함(확인 필요)', (await st('BBB- 이상')) === 'check' && (await txt('#fund')).includes('직접 대조'));
   // 업력
   await page.fill('#orgFounded', '2015-03-01'); await page.dispatchEvent('#orgFounded', 'change');
   await page.fill('#cfAgeMax', '7'); await page.dispatchEvent('#cfAgeMax', 'change');
-  check('공고 기준: 업력 7년 초과 → 미충족', /업력 7년 이내\s+업력 [\d.]+년[^\n]*미충족/.test(await txt('#fund')));
+  check('공고 기준: 업력 7년 초과 → 미충족', (await st('업력 7년')) === 'fail' && (await txt('#fund')).includes('업력 7년 이내'));
   // 개인신용평점: 범위·형식 검증
   for (const bad of ['1001', '0', '85.5', 'abc']) { await page.fill('#pNice', bad); await page.dispatchEvent('#pNice', 'change'); }
   check('레드팀: 평점 범위 밖·소수·문자 거부(1~1000 정수)', (await page.evaluate(() => S.person.nice)) === null);
@@ -330,9 +331,9 @@ const Y = await page.evaluate(() => years());
   await page.fill('#pNiceDate', '2099-01-01'); await page.dispatchEvent('#pNiceDate', 'change');
   check('레드팀: 미래 조회일 거부', (await page.evaluate(() => S.person.niceDate)) === '');
   await page.fill('#cfScoreMin', '870'); await page.dispatchEvent('#cfScoreMin', 'change');
-  check('공고 기준: 평점 둘 다 870 이상 → KCB 861로 미충족', /대표자 평점 870점 이상\(둘 다\)[^\n]*미충족/.test(await txt('#fund')));
+  check('공고 기준: 평점 둘 다 870 이상 → KCB 861로 미충족', (await st('870점 이상')) === 'fail');
   await page.selectOption('#cfScoreAgency', '둘 중 하나');
-  check('공고 기준: 둘 중 하나 870 이상 → 충족', /대표자 평점 870점 이상\(둘 중 하나\)[^\n]*충족/.test(await txt('#fund')) && !/대표자 평점 870점 이상\(둘 중 하나\)[^\n]*미충족/.test(await txt('#fund')));
+  check('공고 기준: 둘 중 하나 870 이상 → 충족', (await st('870점 이상')) === 'pass');
   const pay = await page.evaluate(() => JSON.stringify(aiPayload(metrics(), findings(metrics()))));
   check('개인정보: AI 전송에 평점·대출기관·제한사유·F-DUE 없음', !/873|861|A은행|정책자금\(|F-DUE|F-DQ|NICE|KCB/.test(pay));
   const dl = async () => { const [d] = await Promise.all([page.waitForEvent('download'), page.evaluate(() => exportJSON())]); return JSON.parse(readFileSync(await d.path(), 'utf8')); };
@@ -379,6 +380,28 @@ const Y = await page.evaluate(() => years());
   await page.evaluate(() => { document.querySelector('#report').innerHTML = ''; });
   await page.click('#btnClearSample');
   check('가상 데이터 지우기: 사용자가 입력한 대출은 유지', (await page.evaluate(() => S.loans.length)) === 1);
+}
+
+// 8c. v1.4 사용자 관점 — 모드 제거·버튼 통일·내비게이션·화면=PDF
+{
+  await page.click('#btnSample');
+  await page.waitForTimeout(200);
+  check('대표자/컨설턴트 모드 토글 제거', (await page.locator('[data-mode]').count()) === 0 && (await page.locator('.c-only').count()) === 0);
+  const hs = await page.evaluate(() => [...document.querySelectorAll('main .btn:not(.small):not(.lg)')].filter((b) => b.offsetParent).map((b) => Math.round(b.getBoundingClientRect().height)));
+  check('기본 버튼 높이 통일', hs.length >= 3 && new Set(hs).size === 1, [...new Set(hs)].join(','));
+  const bad = [];
+  for (const a of await page.locator('#stepper a').all()) {
+    const step = await a.getAttribute('data-step'); await a.click(); await page.waitForTimeout(500);
+    const ok = await page.evaluate((s) => { const h = document.querySelector('#s-' + s + ' h2').getBoundingClientRect(); return h.top >= document.querySelector('.stepper').getBoundingClientRect().bottom - 1 && h.top < innerHeight; }, step);
+    if (!ok) bad.push(step);
+  }
+  check('내비게이션: 12단계 클릭 시 제목이 고정 메뉴에 가리지 않음', !bad.length, bad.join(','));
+  const same = await page.evaluate(() => { const r = document.createElement('div'); r.innerHTML = buildReport(); const at = (sel) => [...document.querySelectorAll(sel + ' .atitle')].map((x) => x.textContent); const rep = [...r.querySelectorAll('.atitle')].map((x) => x.textContent); return ['#s-dash', '#s-detail', '#s-risk', '#s-fund', '#s-road'].every((s) => at(s).length && at(s).every((t) => rep.includes(t))); });
+  check('화면 결과(④⑤⑥⑨⑪)의 핵심 메시지 = PDF 장 메시지', same);
+  check('PDF에서 빈 외부 평가 단독 장 제거', !(await page.evaluate(() => buildReport().includes('외부 신용등급·감사 정보'))));
+  const due = await page.evaluate(() => { const keep = [S.loans, S.loanAsOf]; const d = new Date(); d.setDate(d.getDate() + 30); S.loans = [{ id: 'z', lender: 'x', type: '기타', bal: 1e8, rate: 3, due: d.toISOString().slice(0, 10), repay: '미확인', coll: '' }]; S.loanAsOf = '2020-01-01'; const L = loanSummary(); [S.loans, S.loanAsOf] = keep; return [L.due12, L.stale].join(); });
+  check('만기 도래는 오늘 기준·오래된 잔액 확인일 경고', due === '100000000,true', due);
+  await page.click('#btnClearSample');
 }
 
 // 9. 비밀키 노출 없음
