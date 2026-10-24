@@ -1,0 +1,29 @@
+# BECONIC 창업 재무분석 LAB — Netlify 배포 설정
+# Netlify 사이트 설정에서 Base directory 를 `startup-finance-lab` 으로 지정하면 이 파일이 적용됩니다.
+# 화면은 index.html 하나(정적)이며 서버로 보내는 데이터가 없습니다.
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net data:; img-src 'self' data: blob:; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# 카카오톡은 미리보기 이미지를 오래 캐시하므로, 이미지를 바꿀 땐 파일명을 바꾸고 카카오 공유 디버거에서 캐시 초기화
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

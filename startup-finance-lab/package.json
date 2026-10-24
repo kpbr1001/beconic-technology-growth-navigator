@@ -1,0 +1,11 @@
+{
+  "name": "beconic-startup-finance-lab",
+  "version": "2.1.0",
+  "private": true,
+  "type": "module",
+  "description": "BECONIC 창업 재무분석 LAB — 단일 HTML 재무 시뮬레이터 (예비·초기창업자용)",
+  "scripts": {
+    "build": "node build.mjs",
+    "qa": "node tests/qa.mjs"
+  }
+}

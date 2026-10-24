@@ -3,9 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#3182F6">
-<title>창업 재무분석 LAB</title>
-<meta name="description" content="제조원가·손익·BEP·자금계획·24개월 현금흐름·종합진단을 한 번에 — 예비창업자·소상공인용 재무 시뮬레이터">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17171C" media="(prefers-color-scheme: dark)">
+<title>창업 재무분석 LAB | BECONIC</title>
+<meta name="description" content="내 창업 아이템, 숫자로 검증해볼까요? 제조원가·손익·손익분기점(BEP)·자금조달·현금흐름을 한 번에 분석하는 예비·초기창업자용 무료 재무 시뮬레이터.">
+<meta name="author" content="그로스벤처스(주) BECONIC">
+<meta name="robots" content="index,follow">
+<meta name="format-detection" content="telephone=no">
+<link rel="canonical" href="https://beconic-startup-lab.netlify.app/">
+<!-- 카카오톡·페이스북 공유 미리보기 (Open Graph): 이미지·주소는 반드시 https 절대경로 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BECONIC by 그로스벤처스">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:url" content="https://beconic-startup-lab.netlify.app/">
+<meta property="og:title" content="내 창업 아이템, 숫자로 검증해볼까요? | 창업 재무분석 LAB">
+<meta property="og:description" content="제조원가·손익·BEP·자금조달을 한 번에. 예비·초기창업자가 꼭 알아야 할 창업 숫자를 무료로 점검하세요.">
+<meta property="og:image" content="https://beconic-startup-lab.netlify.app/assets/og-startup-lab.jpg">
+<meta property="og:image:secure_url" content="https://beconic-startup-lab.netlify.app/assets/og-startup-lab.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BECONIC 창업 재무분석 LAB — BEP·손익·제조원가·자금조달을 한 번에">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="내 창업 아이템, 숫자로 검증해볼까요? | 창업 재무분석 LAB">
+<meta name="twitter:description" content="제조원가·손익·BEP·자금조달을 한 번에. 예비·초기창업자가 꼭 알아야 할 창업 숫자를 무료로 점검하세요.">
+<meta name="twitter:image" content="https://beconic-startup-lab.netlify.app/assets/og-startup-lab.jpg">
+<meta name="twitter:image:alt" content="BECONIC 창업 재무분석 LAB">
+<!-- 아이콘: 파일 하나로도 보이도록 방패 로고를 SVG로 내장 -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 107.0 112.0'%3E%3Cpath fill='%231b2c55' d='M56.15 96.28 L56.15 81.19 L56.15 54.90 L51.99 54.90 L50.34 54.90 L47.29 90.64 C49.95 92.48 52.89 94.36 56.14 96.29 C56.14 96.29 56.15 96.29 56.15 96.28'/%3E%3Cpath fill='%231b2c55' d='M28.53 50.24 L28.53 40.46 L44.93 43.57 L44.93 47.12 M56.14 13.12 L23.93 13.12 L23.93 31.48 L23.93 33.59 L23.93 39.58 L23.93 51.11 L23.93 59.44 L23.93 60.53 L23.93 62.28 C23.93 65.50 24.88 68.64 26.64 71.33 C29.48 75.66 34.86 81.59 44.10 88.37 L47.69 54.90 L46.07 54.90 L43.77 50.30 L48.06 50.30 L48.06 38.93 L46.33 38.93 L46.33 36.13 L54.65 33.47 L54.65 30.27 L56.15 30.27 L57.64 30.27 L57.64 33.47 L65.97 36.13 L65.97 38.93 L65.72 38.93 L64.23 38.93 L59.81 38.93 L56.15 38.93 L52.49 38.93 L49.95 38.93 L49.95 39.86 L52.49 41.58 L52.49 50.30 L56.15 50.30 L59.81 50.30 L59.81 41.58 L64.23 41.58 L64.23 50.30 L68.52 50.30 L66.23 54.90 L64.61 54.90 L68.20 88.36 C77.43 81.59 82.80 75.66 85.64 71.33 C87.40 68.64 88.35 65.50 88.35 62.28 L88.35 51.12 L67.31 47.12 L67.31 43.57 L82.83 40.62 L88.35 39.58 L95.34 38.25 L95.34 62.26 C95.34 66.95 93.98 71.52 91.39 75.47 C87.41 81.54 78.79 91.09 60.34 102.04 L56.14 104.54 L51.94 102.04 C33.48 91.08 24.87 81.54 20.89 75.47 C18.30 71.52 16.93 66.95 16.93 62.26 L16.93 6.55 L18.40 6.29 L93.88 6.29 L95.34 6.55 L95.34 29.77 L88.35 31.27 L88.35 13.12 L56.14 13.12 M112.27 -0.37 L106.69 -0.37 L56.15 -0.37 L56.14 -0.37 L5.59 -0.37 L0.02 -0.37 L5.59 6.67 L5.59 62.26 C5.59 68.26 7.51 74.09 11.15 79.12 C15.96 85.79 26.21 96.16 47.76 107.77 L56.14 112.29 L64.52 107.77 C86.06 96.17 96.32 85.79 101.13 79.12 C104.77 74.09 106.69 68.26 106.69 62.26 L106.69 6.68 L112.27 -0.37'/%3E%3Cpath fill='%23e58d00' d='M28.53 40.45 L28.53 50.24 L44.93 47.12 L44.93 43.57 L28.53 40.45'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="창업재무LAB">
+<meta name="application-name" content="창업 재무분석 LAB">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
@@ -1404,44 +1433,349 @@ body.printing .section { display: block !important; animation: none; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
+/* =====================================================================
+   v2.1 — 브랜드·초보자 안내·접근성·레드팀 보완
+   ===================================================================== */
+
+/* 라이트 모드 상태색 대비 보강 (WCAG AA 4.5:1 이상, 원본 초록 2.1:1·노랑 1.9:1) */
+:root {
+  --success: #007A45;
+  --warning: #9A5B00;
+  --danger: #D11F2E;
+  --text-3: #6B7684;
+  --text-4: #8B95A1;
+  --brand-navy: #1b2c55;
+  --brand-orange: #e58d00;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --success: #00C471;
+    --warning: #F5B644;
+    --danger: #FF6B76;
+    --text-3: #8B95A1;
+    --text-4: #8B95A1;
+  }
+}
+
+/* 브랜드 헤더 */
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark { width: 40px; height: 42px; flex-shrink: 0; display: block; }
+.brand-mark svg { width: 100%; height: 100%; display: block; }
+@media (prefers-color-scheme: dark) {
+  .brand-mark { background: #fff; border-radius: 10px; padding: 4px; box-sizing: border-box; }
+}
+.brand-text h1 { margin: 0; }
+header .eyebrow { color: var(--brand-navy); letter-spacing: 0.02em; }
+@media (prefers-color-scheme: dark) { header .eyebrow { color: var(--accent); } }
+header .eyebrow .ver { color: var(--text-3); font-weight: 600; margin-left: 2px; }
+header .sub { margin-top: 8px; }
+header .actions { align-items: center; }
+header .actions button, .more-menu summary { min-height: 40px; }
+
+.more-menu { position: relative; }
+.more-menu summary {
+  list-style: none; cursor: pointer;
+  font-size: 13px; padding: 9px 14px; border-radius: 999px;
+  background: var(--surface-2); color: var(--text-2); font-weight: 600;
+  display: inline-flex; align-items: center; user-select: none;
+}
+.more-menu summary::-webkit-details-marker { display: none; }
+.more-menu[open] summary { background: var(--surface-3); }
+.more-list {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 60;
+  min-width: 200px; padding: 6px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-md); box-shadow: var(--shadow-lg);
+  display: flex; flex-direction: column;
+}
+@media (max-width: 640px) { .more-list { right: auto; left: 0; } }
+header .actions .more-list button {
+  background: none; border-radius: 8px; text-align: left;
+  padding: 11px 12px; color: var(--text); font-weight: 600;
+}
+header .actions .more-list button:hover { background: var(--surface-2); }
+header .actions .more-list button.danger-text { color: var(--danger); }
+
+.inapp-banner {
+  display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  background: var(--warning-bg); color: var(--text);
+  border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 12px;
+  font-size: 13px; line-height: 1.55;
+}
+.inapp-banner[hidden] { display: none; }
+
+/* 처음 사용자 안내 */
+.guide-card {
+  background: linear-gradient(135deg, var(--accent-bg), var(--surface));
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--r-lg); padding: 18px 20px; margin-bottom: 12px;
+}
+.guide-card[hidden] { display: none; }
+.guide-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.guide-eyebrow { font-size: 12px; font-weight: 700; color: var(--accent); }
+.guide-card h2 { font-size: 18px; margin: 2px 0 10px; letter-spacing: -0.03em; }
+.guide-steps { list-style: none; padding: 0; margin: 0; counter-reset: gs; display: grid; gap: 8px; }
+@media (min-width: 640px) { .guide-steps { grid-template-columns: 1fr 1fr; } }
+.guide-steps li {
+  counter-increment: gs; position: relative;
+  background: var(--surface); border-radius: var(--r-md);
+  padding: 12px 12px 12px 42px; font-size: 13px; line-height: 1.55; color: var(--text-2);
+}
+.guide-steps li::before {
+  content: counter(gs); position: absolute; left: 12px; top: 12px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 11.5px; font-weight: 800;
+  display: grid; place-items: center;
+}
+.guide-steps b { display: block; color: var(--text); font-size: 13.5px; margin-bottom: 2px; }
+.guide-steps em { font-style: normal; font-weight: 700; color: var(--accent); }
+.guide-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.example-flag { font-size: 12.5px; color: var(--warning); font-weight: 600; }
+.example-flag[hidden] { display: none; }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: none; flex-shrink: 0;
+  background: var(--surface-2); color: var(--text-2); font-size: 15px; cursor: pointer;
+}
+.icon-btn:hover { background: var(--surface-3); }
+.card-hint { font-size: 11.5px; font-weight: 500; color: var(--text-3); margin-left: 4px; }
+
+/* 탭: 단계 번호 + 가로 스크롤 힌트 */
+.tab-step {
+  display: inline-grid; place-items: center;
+  width: 18px; height: 18px; border-radius: 50%; margin-right: 6px;
+  background: var(--surface-2); color: var(--text-3);
+  font-size: 11px; font-weight: 800; vertical-align: 1px;
+}
+.tab.active .tab-step { background: var(--accent); color: #fff; }
+.tab.done .tab-step { background: var(--success-bg); color: var(--success); }
+.tab-bar.can-scroll {
+  -webkit-mask-image: linear-gradient(to right, #000 85%, transparent);
+  mask-image: linear-gradient(to right, #000 85%, transparent);
+}
+
+/* 단계 소개·다음 단계 */
+.tab-intro {
+  padding: 4px 2px 14px; margin-bottom: 4px;
+}
+.ti-step { font-size: 12px; font-weight: 800; color: var(--accent); }
+.ti-q { font-size: 19px; font-weight: 800; letter-spacing: -0.03em; margin: 2px 0 6px; line-height: 1.4; }
+.ti-body { font-size: 13.5px; color: var(--text-2); margin: 0 0 6px; line-height: 1.65; }
+.ti-tip { font-size: 12.5px; color: var(--text-3); margin: 0; line-height: 1.6; }
+.ti-body b, .ti-tip b { color: var(--text); }
+.next-step {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin: 18px 0 8px; padding: 16px 18px;
+  background: var(--surface-2); border-radius: var(--r-lg);
+}
+.next-step .ns-text { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+.next-step .ns-text b { color: var(--text); display: block; font-size: 14px; }
+.link-btn.solid { background: var(--accent); color: #fff; }
+.link-btn.solid:hover { background: var(--accent-2); }
+
+/* 용어 도움말 */
+.term {
+  display: inline-grid; place-items: center;
+  width: 18px; height: 18px; padding: 0; margin-left: 2px;
+  border-radius: 50%; border: 1px solid var(--border-2);
+  background: var(--surface); color: var(--text-3);
+  font-size: 11px; font-weight: 800; font-family: inherit;
+  cursor: pointer; vertical-align: 1px; line-height: 1;
+  position: relative;
+}
+.term::after { content: ''; position: absolute; inset: -12px; } /* 터치 영역 44px 확보 */
+.term:hover, .term[aria-expanded="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.row label { white-space: normal; }
+.term-pop {
+  position: absolute; z-index: 90; width: min(320px, calc(100vw - 32px));
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border-2); border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg); padding: 14px 16px;
+  font-size: 13px; line-height: 1.65;
+}
+.term-pop[hidden] { display: none; }
+.tp-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+.tp-body { color: var(--text-2); }
+.tp-ex { margin-top: 6px; font-size: 12px; color: var(--text-3); background: var(--surface-2); border-radius: 8px; padding: 8px 10px; }
+.tp-ex:empty { display: none; }
+.tp-more { margin-top: 8px; background: none; border: none; padding: 4px 0; color: var(--accent); font-weight: 700; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+
+/* 숫자 입력: 한글 단위 보조 표기 */
+.num-hint { display: block; text-align: right; font-size: 12px; color: var(--text-3); font-weight: 600; margin: -6px 0 6px; min-height: 0; }
+.num-hint:empty { display: none; }
+
+/* 대화상자 */
+.modal {
+  border: none; padding: 0; border-radius: var(--r-lg);
+  background: var(--surface); color: var(--text);
+  width: min(420px, calc(100vw - 32px)); box-shadow: var(--shadow-lg);
+}
+.modal::backdrop { background: rgba(16, 24, 40, 0.5); }
+.modal-inner { padding: 20px; }
+.modal-title { font-size: 17px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.03em; }
+.modal-body { font-size: 13.5px; color: var(--text-2); line-height: 1.65; margin: 0 0 14px; white-space: pre-line; }
+.modal-input {
+  width: 100%; font-size: 15px; padding: 12px 14px; margin-bottom: 14px;
+  border: 2px solid var(--border); border-radius: var(--r-md);
+  background: var(--surface-2); color: var(--text); font-family: inherit; box-sizing: border-box;
+}
+.modal-input:focus { border-color: var(--accent); outline: none; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.modal.help { width: min(720px, calc(100vw - 24px)); max-height: calc(100vh - 32px); }
+.modal.help .modal-inner { padding: 0 20px 20px; }
+.help-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; position: sticky; top: 0; background: var(--surface); padding: 16px 0 10px; z-index: 1; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.help-head .modal-title { margin: 0; }
+.help-body { font-size: 13.5px; line-height: 1.7; color: var(--text-2); }
+.help-body h3 { font-size: 15px; color: var(--text); margin: 18px 0 8px; letter-spacing: -0.02em; }
+.help-body ol, .help-body ul { padding-left: 20px; margin: 0; }
+.help-body li { margin-bottom: 6px; }
+.help-body b { color: var(--text); }
+.gloss { display: grid; gap: 8px; }
+.gloss-item { background: var(--surface-2); border-radius: var(--r-md); padding: 10px 12px; scroll-margin-top: 60px; }
+.gloss-item.flash { outline: 2px solid var(--accent); }
+.gloss-item dt { font-weight: 800; color: var(--text); }
+.gloss-item dd { margin: 2px 0 0; }
+.gloss-item .ex { display: block; font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.faq dt { font-weight: 700; color: var(--text); margin-top: 10px; }
+.faq dd { margin: 2px 0 0; }
+
+.noscript { padding: 16px; margin: 16px; background: var(--danger-bg); color: var(--danger); border-radius: 12px; font-weight: 700; }
+
+/* 리포트 표지 로고 */
+.rep-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.rep-brand .rb-mark { width: 30px; height: 32px; }
+.rep-brand .rb-mark svg { width: 100%; height: 100%; display: block; }
+.rep-brand .rb-name { font-size: 12px; font-weight: 800; color: var(--brand-navy); letter-spacing: 0.04em; }
+@media (prefers-color-scheme: dark) { .rep-brand .rb-name { color: var(--text-2); } .rep-brand .rb-mark { background: #fff; border-radius: 6px; padding: 2px; box-sizing: border-box; } }
+.footer-brand { display: inline-flex; align-items: center; gap: 6px; }
+.footer-brand svg { width: 16px; height: 17px; }
+
+/* iOS 사파리는 16px 미만 입력칸에 초점이 가면 화면을 확대한다 → 모바일에서 16px 보장 */
+@media (max-width: 640px) {
+  .info-field input[type=text], .info-field input[type=date], .info-field select, .modal-input { font-size: 16px; }
+}
+
+/* =====================================================================
+   인쇄(PDF): 종합진단 요약 → 1~5단계를 빈 공간 없이 이어서 → 체크리스트(새 페이지)
+   ===================================================================== */
 @media print {
-  /* 다크모드 기기에서 인쇄해도 흰 바탕·검은 글씨가 되도록 라이트 토큰 강제 */
   :root {
     --bg: #FFFFFF; --bg-2: #F9FAFB;
     --surface: #FFFFFF; --surface-2: #F2F4F6; --surface-3: #E5E8EB;
     --text: #191F28; --text-2: #4E5968; --text-3: #6B7684; --text-4: #8B95A1;
     --border: #E5E8EB; --border-2: #D1D6DB;
     --accent: #2272EB; --accent-2: #1B64DA; --accent-bg: #EBF3FE; --accent-soft: #DCE9FE;
-    --success: #00A35E; --success-bg: #E6F9F0;
-    --danger: #D6303B; --danger-bg: #FFF1F1;
-    --warning: #B7790B; --warning-bg: #FFF8DC;
+    --success: #007A45; --success-bg: #E6F9F0;
+    --danger: #D11F2E; --danger-bg: #FFF1F1;
+    --warning: #9A5B00; --warning-bg: #FFF8DC;
   }
-  @page { size: A4; margin: 12mm; }
-  header { position: static; }
-  .wrap { padding: 0; }
-  .no-print, .autosave-hint, .link-bar, .toast, .scenario-card .slot-actions { display: none !important; }
-  .table-scroll { max-height: none; overflow: visible; border: none; }
-  .cf-table, .cmp-table { min-width: 0; font-size: 10.5px; }
-  .cf-table th, .cf-table td { padding: 4px 6px; }
-  .cf-table th, .cmp-table th { position: static; }
-  .status { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .metric, .kpi, .cost-bar, .fund-mix, .sens-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .row .num-input { font-size: 15px !important; padding: 2px 0 !important; }
-  .row { margin-bottom: 6px; padding-bottom: 6px; }
-  #sec-report .card { page-break-inside: auto; }
-  #sec-report .card.keep { page-break-inside: avoid; }
-  .score-table tr, .action-list li, .sens-row { page-break-inside: avoid; }
-  .gauge::before { background: #fff; }
-  #sec-costing::before { content: "1. 제조원가 계산"; }
-  #sec-pnl::before { content: "2. 손익계산서 · 민감도"; }
-  #sec-bep::before { content: "3. 손익분기점(BEP) 분석"; }
-  #sec-fund::before { content: "4. 자금소요·조달계획"; }
-  #sec-cash::before { content: "5. 24개월 현금흐름"; }
-  #sec-report::before { content: "종합 진단 요약 (Executive Summary)"; }
-  #sec-check::before { content: "6. 창업 체크리스트"; }
-  .scenario-card { page-break-before: always; }
-  .scenario-card .scenarios { display: none; }
+  @page {
+    size: A4; margin: 12mm 11mm 14mm;
+    @bottom-left { content: "BECONIC · 창업 재무분석 LAB"; font-size: 8pt; color: #8B95A1; font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; }
+    @bottom-right { content: counter(page) " / " counter(pages); font-size: 8pt; color: #8B95A1; font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; }
+  }
+  html, body { background: #fff !important; }
+  body { font-size: 12px; }
+  .wrap { padding: 0 !important; max-width: none; }
+  .brand-mark { background: none !important; padding: 0 !important; }
+
+  /* 화면 전용 요소 */
+  .no-print, .autosave-hint, .link-bar, .toast, .tab-intro, .next-step, .guide-card, .inapp-banner,
+  .term, .term-pop, .num-hint, .preset-bar, .tab-bar, .info-card, .modal,
+  .scenario-card .slot-actions, .scenario-card .scenarios { display: none !important; }
+
+  header {
+    position: static; margin: 0 0 6mm !important; padding: 0 0 4mm !important;
+    border: none !important; border-bottom: 1.5px solid var(--brand-navy) !important; border-radius: 0 !important;
+  }
+  header h1 { font-size: 18px !important; }
+  header .sub { display: none; }
+
+  /* 섹션: 강제 페이지 넘김 없이 이어서 흐르게 (부록인 체크리스트 앞만 넘김) */
+  .section { display: block !important; page-break-after: auto !important; break-after: auto !important; margin: 0; }
+  #sec-report { break-after: auto !important; page-break-after: auto !important; }
+  #sec-check { break-before: page !important; page-break-before: always !important; }
+  .section::before {
+    display: block; font-size: 14px !important; font-weight: 800 !important; color: var(--brand-navy);
+    margin: 4mm 0 3mm !important; padding: 0 0 2mm !important;
+    border-bottom: 1px solid var(--border-2) !important;
+    break-after: avoid; page-break-after: avoid;
+  }
+  #sec-report::before { margin-top: 0 !important; }
+  #sec-costing::before { content: "1. 제조원가 계산" !important; }
+  #sec-pnl::before { content: "2. 손익계산 · 민감도" !important; }
+  #sec-bep::before { content: "3. 손익분기점(BEP)" !important; }
+  #sec-fund::before { content: "4. 자금소요·조달 계획" !important; }
+  #sec-cash::before { content: "5. 24개월 현금흐름" !important; }
+  #sec-report::before { content: "종합 진단 요약 (Executive Summary)" !important; }
+  #sec-check::before { content: "6. 창업 준비 체크리스트" !important; }
+
+  /* 카드는 쪼개질 수 있게(빈 공간 방지), 작은 덩어리만 묶음 */
+  .card, .checklist-group, .benchmark-card {
+    break-inside: auto !important; page-break-inside: auto !important;
+    padding: 10px 12px !important; margin-bottom: 6px !important;
+    border: 1px solid var(--border-2) !important; border-radius: 8px !important; box-shadow: none !important;
+  }
+  .card-title { font-size: 13px !important; margin-bottom: 6px !important; break-after: avoid; page-break-after: avoid; }
+  .metric-grid, .fund-ratio-grid, .kpi-grid, .formula, .note, .chart-wrap, .status-stack,
+  .benchmark-row, .sens-row, .score-table tr, .action-list li, .checklist-item, .rep-score, .row,
+  .pnl-table tr, .fund-table tr, .cf-table tr, .cmp-table tr, .bar-legend, .cost-bar, .fund-mix {
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  .metric-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 4px !important; margin: 6px 0 !important; }
+  .fund-ratio-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 4px !important; margin: 6px 0 !important; }
+  .kpi-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 4px !important; }
+  .metric, .kpi { padding: 6px 8px !important; }
+  .metric .lbl, .kpi .k-lbl { font-size: 9.5px !important; margin-bottom: 1px !important; }
+  .metric .num, .metric.highlight .num, .kpi .k-num { font-size: 13px !important; }
+  .metric.highlight { grid-column: span 1 !important; }
+  .formula { font-size: 9.5px !important; line-height: 1.6 !important; padding: 6px 8px !important; margin-top: 4px !important; }
+  .note { font-size: 9.5px !important; line-height: 1.55 !important; padding: 6px 8px 6px 26px !important; margin-top: 4px !important; }
+  .note::before { left: 8px !important; top: 5px !important; font-size: 11px !important; }
+  .status { font-size: 10px !important; padding: 4px 8px !important; }
+  .chart-wrap { height: 200px !important; margin: 6px 0 !important; }
+
+  /* 입력 행: 슬라이더 숨기고 "항목 …… 값" 한 줄, 2단 배치 */
+  .card:has(> .row) { column-count: 2; column-gap: 8mm; }
+  .card:has(> .row) > .card-title, .card:has(> .row) > .note, .card:has(> .row) > .toggle-row { column-span: all; }
+  .row { margin: 0 !important; padding: 3px 0 !important; border-bottom: 1px dotted var(--border-2) !important; }
+  .row .row-head { margin: 0 !important; flex-wrap: nowrap !important; align-items: baseline; }
+  .row label { font-size: 10.5px !important; flex-basis: auto !important; color: var(--text-2) !important; white-space: normal !important; }
+  .row .num-input { font-size: 11.5px !important; padding: 0 !important; margin: 0 !important; }
+  .row .num-suffix { font-size: 10px !important; }
+  input[type=range] { display: none !important; }
+  .toggle-row { padding: 4px 8px !important; font-size: 10px !important; }
+
+  .pnl-table, .fund-table { font-size: 10.5px !important; margin: 4px 0 !important; }
+  .pnl-table td, .fund-table td { padding: 3px 4px !important; }
+  .pnl-table tr.total td { font-size: 12px !important; padding-top: 6px !important; }
+  .fund-summary { grid-template-columns: 1fr 1fr !important; gap: 8mm !important; margin: 4px 0 !important; }
+  .benchmark-row { padding: 3px 0 !important; font-size: 9.5px !important; }
+  .benchmark-row .biz .desc { display: none; }
+  .margin-guide { display: none !important; }
+  .sens-row { padding: 3px 0 !important; font-size: 10px !important; }
+  .table-scroll { max-height: none !important; overflow: visible !important; border: none !important; }
+  .cf-table, .cmp-table { min-width: 0 !important; font-size: 9px !important; }
+  .cf-table th, .cf-table td, .cmp-table th, .cmp-table td { padding: 2px 5px !important; }
+  .cf-table th, .cmp-table th { position: static !important; }
+
+  .score-table { font-size: 10.5px !important; }
+  .score-table td { padding: 5px 4px !important; }
+  .action-list li { padding: 7px 8px 7px 34px !important; font-size: 10.5px !important; margin-bottom: 4px !important; }
+  .action-list li::before { left: 8px !important; top: 7px !important; width: 18px !important; height: 18px !important; font-size: 10px !important; }
+  .gauge { width: 96px !important; height: 96px !important; }
+  .gauge::before { width: 74px !important; height: 74px !important; background: #fff !important; }
+  .gauge .g-num { font-size: 24px !important; }
+
+  .checklist-item { padding: 4px 0 !important; }
+  .checklist-item-desc { font-size: 9.5px !important; }
+  .checklist-item-name { font-size: 11px !important; }
+
+  .metric, .kpi, .status, .cost-bar, .fund-mix, .sens-bar, .light, .gauge, .tab-step, .action-list li::before {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .scenario-card { break-before: page; page-break-before: always; }
   .scenario-card.no-data { display: none !important; }
+  footer { margin-top: 6mm !important; padding: 8px !important; font-size: 9px !important; background: none !important; }
 }
 </style>
 </head>
@@ -1449,22 +1783,59 @@ body.printing .section { display: block !important; animation: none; }
 <div class="wrap">
 
 <header>
-  <div class="eyebrow">창업 재무분석 LAB · v2.0</div>
-  <h1>나만의 사업, 숫자로 검증하기</h1>
-  <div class="sub">제조원가 → 손익 → BEP → 자금 → 현금흐름 → 종합진단까지 한 번에</div>
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 107.0 112.0" aria-hidden="true" focusable="false"><path fill="#1b2c55" d="M56.15 96.28 L56.15 81.19 L56.15 54.90 L51.99 54.90 L50.34 54.90 L47.29 90.64 C49.95 92.48 52.89 94.36 56.14 96.29 C56.14 96.29 56.15 96.29 56.15 96.28"/><path fill="#1b2c55" d="M28.53 50.24 L28.53 40.46 L44.93 43.57 L44.93 47.12 M56.14 13.12 L23.93 13.12 L23.93 31.48 L23.93 33.59 L23.93 39.58 L23.93 51.11 L23.93 59.44 L23.93 60.53 L23.93 62.28 C23.93 65.50 24.88 68.64 26.64 71.33 C29.48 75.66 34.86 81.59 44.10 88.37 L47.69 54.90 L46.07 54.90 L43.77 50.30 L48.06 50.30 L48.06 38.93 L46.33 38.93 L46.33 36.13 L54.65 33.47 L54.65 30.27 L56.15 30.27 L57.64 30.27 L57.64 33.47 L65.97 36.13 L65.97 38.93 L65.72 38.93 L64.23 38.93 L59.81 38.93 L56.15 38.93 L52.49 38.93 L49.95 38.93 L49.95 39.86 L52.49 41.58 L52.49 50.30 L56.15 50.30 L59.81 50.30 L59.81 41.58 L64.23 41.58 L64.23 50.30 L68.52 50.30 L66.23 54.90 L64.61 54.90 L68.20 88.36 C77.43 81.59 82.80 75.66 85.64 71.33 C87.40 68.64 88.35 65.50 88.35 62.28 L88.35 51.12 L67.31 47.12 L67.31 43.57 L82.83 40.62 L88.35 39.58 L95.34 38.25 L95.34 62.26 C95.34 66.95 93.98 71.52 91.39 75.47 C87.41 81.54 78.79 91.09 60.34 102.04 L56.14 104.54 L51.94 102.04 C33.48 91.08 24.87 81.54 20.89 75.47 C18.30 71.52 16.93 66.95 16.93 62.26 L16.93 6.55 L18.40 6.29 L93.88 6.29 L95.34 6.55 L95.34 29.77 L88.35 31.27 L88.35 13.12 L56.14 13.12 M112.27 -0.37 L106.69 -0.37 L56.15 -0.37 L56.14 -0.37 L5.59 -0.37 L0.02 -0.37 L5.59 6.67 L5.59 62.26 C5.59 68.26 7.51 74.09 11.15 79.12 C15.96 85.79 26.21 96.16 47.76 107.77 L56.14 112.29 L64.52 107.77 C86.06 96.17 96.32 85.79 101.13 79.12 C104.77 74.09 106.69 68.26 106.69 62.26 L106.69 6.68 L112.27 -0.37"/><path fill="#e58d00" d="M28.53 40.45 L28.53 50.24 L44.93 47.12 L44.93 43.57 L28.53 40.45"/></svg></span>
+    <div class="brand-text">
+      <div class="eyebrow">BECONIC · 창업 재무분석 LAB <span class="ver" id="ver-badge"></span></div>
+      <h1>내 창업 아이템, 숫자로 검증하기</h1>
+    </div>
+  </div>
+  <div class="sub">제조원가 → 손익 → 손익분기점 → 자금 → 현금흐름 → 종합진단까지, 순서대로 숫자만 넣으면 됩니다</div>
   <div class="actions no-print">
+    <button type="button" id="btn-help">📖 사용법</button>
     <button type="button" id="btn-save">💾 시나리오 저장</button>
-    <button type="button" id="btn-export">⬇ 백업 파일</button>
-    <button type="button" id="btn-import">⬆ 백업 불러오기</button>
-    <button type="button" id="btn-reset">↺ 초기화</button>
     <button type="button" id="btn-print" class="primary">📄 PDF 리포트</button>
+    <details class="more-menu" id="more-menu">
+      <summary aria-label="더보기 메뉴">더보기 ▾</summary>
+      <div class="more-list" role="menu">
+        <button type="button" role="menuitem" id="btn-share">🔗 링크 공유하기</button>
+        <button type="button" role="menuitem" id="btn-export">⬇ 백업 파일 받기</button>
+        <button type="button" role="menuitem" id="btn-import">⬆ 백업 파일 불러오기</button>
+        <button type="button" role="menuitem" id="btn-reset" class="danger-text">↺ 처음부터 다시 하기</button>
+      </div>
+    </details>
     <input type="file" id="file-import" accept="application/json,.json" hidden>
   </div>
-  <div class="autosave-hint no-print" id="autosave-hint">입력값은 이 브라우저에 자동 저장됩니다</div>
+  <div class="autosave-hint no-print" id="autosave-hint">입력값은 이 기기 브라우저에 자동 저장됩니다</div>
 </header>
 
+<div class="inapp-banner no-print" id="inapp-banner" hidden>
+  <div><strong>카카오톡 등 앱 안에서 열렸어요.</strong> PDF 저장·백업 파일은 일반 브라우저(크롬·사파리)에서 잘 동작해요.</div>
+  <button type="button" class="link-btn" id="btn-open-external">브라우저로 열기</button>
+</div>
+
+<section class="guide-card no-print" id="guide-card" aria-labelledby="guide-title" hidden>
+  <div class="guide-head">
+    <div>
+      <div class="guide-eyebrow">처음 오셨나요? 3분이면 충분해요</div>
+      <h2 id="guide-title">이렇게 사용하세요</h2>
+    </div>
+    <button type="button" class="icon-btn" id="guide-close" aria-label="안내 닫기">✕</button>
+  </div>
+  <ol class="guide-steps">
+    <li><b>예시로 감 잡기</b><span>각 단계 위쪽의 <em>업종 예시</em> 버튼을 누르면 비슷한 업종 숫자가 채워져요.</span></li>
+    <li><b>내 숫자로 바꾸기</b><span>큰 숫자를 눌러 직접 입력하거나 막대를 밀어 보세요. <em>3000만</em>, <em>1억</em>처럼 한글 단위도 돼요.</span></li>
+    <li><b>단계 순서대로</b><span>1 제조원가 → 2 손익 → … → 6 종합진단. 단계 끝의 <em>다음 단계</em> 버튼을 따라가면 돼요.</span></li>
+    <li><b>결과 저장·공유</b><span><em>📄 PDF 리포트</em>로 사업계획서·상담 자료를 만들고, <em>💾 시나리오 저장</em>으로 여러 안을 비교하세요.</span></li>
+  </ol>
+  <div class="guide-foot">
+    <span class="example-flag" id="example-flag">지금 화면의 숫자는 <b>예시</b>예요 — 내 숫자로 바꿔 주세요</span>
+    <button type="button" class="link-btn ghost" id="guide-more">자세한 사용법·용어 사전</button>
+  </div>
+</section>
+
 <div class="info-card">
-  <div class="info-card-title">📋 기본 정보</div>
+  <div class="info-card-title">📋 기본 정보 <span class="card-hint">PDF 리포트 표지에 들어가요 (선택 입력)</span></div>
   <div class="info-grid">
     <div class="info-field">
       <label for="info-biz">업종·업태</label>
@@ -1494,20 +1865,27 @@ body.printing .section { display: block !important; animation: none; }
   <div class="field-hint" id="industry-hint">비교 업종은 손익 벤치마크와 종합진단의 영업이익률 기준으로 쓰입니다.</div>
 </div>
 
-<nav class="tab-bar" role="tablist" aria-label="분석 단계">
-  <button type="button" class="tab active" role="tab" id="tab-costing" data-tab="costing" aria-controls="sec-costing" aria-selected="true">📦 제조원가</button>
-  <button type="button" class="tab" role="tab" id="tab-pnl" data-tab="pnl" aria-controls="sec-pnl" aria-selected="false" tabindex="-1">📊 손익계산</button>
-  <button type="button" class="tab" role="tab" id="tab-bep" data-tab="bep" aria-controls="sec-bep" aria-selected="false" tabindex="-1">📈 BEP 분석</button>
-  <button type="button" class="tab" role="tab" id="tab-fund" data-tab="fund" aria-controls="sec-fund" aria-selected="false" tabindex="-1">💰 자금계획</button>
-  <button type="button" class="tab" role="tab" id="tab-cash" data-tab="cash" aria-controls="sec-cash" aria-selected="false" tabindex="-1">💵 현금흐름</button>
-  <button type="button" class="tab" role="tab" id="tab-report" data-tab="report" aria-controls="sec-report" aria-selected="false" tabindex="-1">🩺 종합진단</button>
-  <button type="button" class="tab" role="tab" id="tab-check" data-tab="check" aria-controls="sec-check" aria-selected="false" tabindex="-1">✅ 체크리스트</button>
+<nav class="tab-bar" role="tablist" aria-label="분석 단계 (1~7단계)">
+  <button type="button" class="tab active" role="tab" id="tab-costing" data-tab="costing" aria-controls="sec-costing" aria-selected="true"><span class="tab-step">1</span>제조원가</button>
+  <button type="button" class="tab" role="tab" id="tab-pnl" data-tab="pnl" aria-controls="sec-pnl" aria-selected="false" tabindex="-1"><span class="tab-step">2</span>손익계산</button>
+  <button type="button" class="tab" role="tab" id="tab-bep" data-tab="bep" aria-controls="sec-bep" aria-selected="false" tabindex="-1"><span class="tab-step">3</span>손익분기점</button>
+  <button type="button" class="tab" role="tab" id="tab-fund" data-tab="fund" aria-controls="sec-fund" aria-selected="false" tabindex="-1"><span class="tab-step">4</span>자금계획</button>
+  <button type="button" class="tab" role="tab" id="tab-cash" data-tab="cash" aria-controls="sec-cash" aria-selected="false" tabindex="-1"><span class="tab-step">5</span>현금흐름</button>
+  <button type="button" class="tab" role="tab" id="tab-report" data-tab="report" aria-controls="sec-report" aria-selected="false" tabindex="-1"><span class="tab-step">6</span>종합진단</button>
+  <button type="button" class="tab" role="tab" id="tab-check" data-tab="check" aria-controls="sec-check" aria-selected="false" tabindex="-1"><span class="tab-step">7</span>체크리스트</button>
 </nav>
 
 <main id="sections">
 
 <!-- ============== SECTION 1: COSTING ============== -->
 <section id="sec-costing" class="section active" role="tabpanel" aria-labelledby="tab-costing">
+
+  <div class="tab-intro no-print">
+    <div class="ti-step">1단계 · 제조원가</div>
+    <h2 class="ti-q">제품 1개를 만드는 데 얼마가 드나요?</h2>
+    <p class="ti-body">재료비·인건비·매장 고정비를 넣으면 1개당 원가와 <b>손해 보지 않는 최소 판매가</b>를 계산해요.</p>
+    <p class="ti-tip">💡 직접 만들지 않는 서비스·유통업이라면 이 단계는 건너뛰고 <b>2단계 손익계산</b>부터 시작해도 돼요.</p>
+  </div>
 
   <div class="preset-bar">
     <span class="preset-label">업종 예시:</span>
@@ -1528,13 +1906,13 @@ body.printing .section { display: block !important; animation: none; }
     <div class="card-title"><span class="num-badge">2</span> 직접노무비 (제조 인건비)</div>
     <div class="row"><label>시간당 인건비</label><input type="range" id="c-wage" min="10000" max="40000" step="500" value="13000"><span class="val">13,000원</span></div>
     <div class="row"><label>1개당 제조시간(분)</label><input type="range" id="c-time" min="1" max="120" step="1" value="8"><span class="val">8분</span></div>
-    <div class="note">2026년 최저시급은 <strong>10,320원</strong>이며, 주 15시간 이상 근무자는 주휴수당을 더하면 실질 시급이 약 <strong>12,400원</strong>입니다. 4대보험 사업주 부담분(약 10%)까지 감안하면 시간당 13,000~14,000원이 현실적인 하한선입니다.</div>
+    <div class="note"><span data-cfg="BASIS.year"></span>년 최저시급은 <strong><span data-cfg="BASIS.minWage" data-fmt="won"></span></strong>이며, 주 15시간 이상 근무자는 주휴수당을 더하면 실질 시급이 약 <strong><span data-cfg="BASIS.minWageWithHoliday" data-fmt="won"></span></strong>입니다. 4대보험 사업주 부담분(약 10%)까지 감안하면 시간당 13,000~14,000원이 현실적인 하한선입니다.</div>
   </div>
 
   <div class="card">
     <div class="card-title"><span class="num-badge">3</span> 제조간접비 (월 고정 ÷ 생산수량)</div>
     <div class="row"><label>월 임대료·공과금</label><input type="range" id="c-rent" min="0" max="8000000" step="100000" value="1500000"><span class="val">1,500,000원</span></div>
-    <div class="row"><label>월 설비 감가상각</label><input type="range" id="c-dep" min="0" max="3000000" step="50000" value="300000"><span class="val">300,000원</span></div>
+    <div class="row"><label>월 설비 감가상각 <button type="button" class="term" data-term="depreciation" aria-label="감가상각 뜻 보기">?</button></label><input type="range" id="c-dep" min="0" max="3000000" step="50000" value="300000"><span class="val">300,000원</span></div>
     <div class="row"><label>월 생산수량(개)</label><input type="range" id="c-qty" min="10" max="20000" step="50" value="2000"><span class="val">2,000개</span></div>
   </div>
 
@@ -1544,7 +1922,7 @@ body.printing .section { display: block !important; animation: none; }
       <div class="metric"><div class="lbl">① 직접재료비</div><div class="num" id="c-out-mat">-</div></div>
       <div class="metric"><div class="lbl">② 직접노무비</div><div class="num" id="c-out-lab">-</div></div>
       <div class="metric"><div class="lbl">③ 제조간접비</div><div class="num" id="c-out-oh">-</div></div>
-      <div class="metric highlight"><div class="lbl">단위 제조원가</div><div class="num" id="c-out-total">-</div></div>
+      <div class="metric highlight"><div class="lbl">단위 제조원가 <button type="button" class="term" data-term="unitCost" aria-label="단위 제조원가 뜻 보기">?</button></div><div class="num" id="c-out-total">-</div></div>
     </div>
     <div class="cost-bar" id="c-cost-bar" aria-hidden="true"></div>
     <div class="formula">
@@ -1556,7 +1934,7 @@ body.printing .section { display: block !important; animation: none; }
 
   <div class="card">
     <div class="card-title">권장 판매가 산정</div>
-    <div class="row"><label>목표 마진율(%)</label><input type="range" id="c-margin" min="10" max="300" step="5" value="60"><span class="val">60%</span></div>
+    <div class="row"><label>목표 마진율(%) <button type="button" class="term" data-term="markup" aria-label="마진율 뜻 보기">?</button></label><input type="range" id="c-margin" min="10" max="300" step="5" value="60"><span class="val">60%</span></div>
 
     <div class="margin-guide" id="margin-guide">
       <button type="button" class="margin-guide-header" id="margin-guide-toggle" aria-expanded="false" aria-controls="margin-guide-body">
@@ -1584,9 +1962,9 @@ body.printing .section { display: block !important; animation: none; }
 
     <div class="metric-grid">
       <div class="metric highlight"><div class="lbl">권장 판매가 (공급가액)</div><div class="num" id="c-price">-</div></div>
-      <div class="metric"><div class="lbl">부가세 포함 소비자가</div><div class="num" id="c-price-vat">-</div></div>
+      <div class="metric"><div class="lbl">부가세 포함 소비자가 <button type="button" class="term" data-term="vat" aria-label="부가세 뜻 보기">?</button></div><div class="num" id="c-price-vat">-</div></div>
       <div class="metric profit"><div class="lbl">개당 마진액</div><div class="num" id="c-margin-amt">-</div></div>
-      <div class="metric"><div class="lbl">매출총이익률</div><div class="num" id="c-gross-rate">-</div></div>
+      <div class="metric"><div class="lbl">매출총이익률 <button type="button" class="term" data-term="grossMargin" aria-label="매출총이익률 뜻 보기">?</button></div><div class="num" id="c-gross-rate">-</div></div>
     </div>
     <div class="note">실제 판매가는 (a) 시장 경쟁가, (b) 브랜드 포지셔닝, (c) 채널 수수료(배달앱 15~25%, 오픈마켓 10~15%), (d) 부가가치세 10%를 함께 고려해야 합니다. 위 권장가는 원가 기준 최저선으로 활용하세요.</div>
     <div class="link-bar no-print">
@@ -1598,6 +1976,13 @@ body.printing .section { display: block !important; animation: none; }
 
 <!-- ============== SECTION 2: PNL ============== -->
 <section id="sec-pnl" class="section" role="tabpanel" aria-labelledby="tab-pnl">
+
+  <div class="tab-intro no-print">
+    <div class="ti-step">2단계 · 손익계산</div>
+    <h2 class="ti-q">한 달 장사하면 얼마가 남나요?</h2>
+    <p class="ti-body">가격·판매량·비용을 넣으면 <b>월 영업이익</b>과 업종 평균 대비 내 위치, 이익을 가장 크게 흔드는 변수를 보여줘요.</p>
+    <p class="ti-tip">💡 대표님 본인 생활비도 <b>인건비</b>에 꼭 넣으세요. 안 넣으면 실제보다 이익이 부풀려져요.</p>
+  </div>
 
   <div class="preset-bar">
     <span class="preset-label">업종 예시:</span>
@@ -1619,13 +2004,13 @@ body.printing .section { display: block !important; animation: none; }
   </div>
 
   <div class="card">
-    <div class="card-title"><span class="num-badge">2</span> 변동비 (매출과 함께 증가)</div>
+    <div class="card-title"><span class="num-badge">2</span> 변동비 (매출과 함께 증가) <button type="button" class="term" data-term="variable" aria-label="변동비 뜻 보기">?</button></div>
     <div class="row"><label>재료·원가율(%)</label><input type="range" id="p-cogs" min="10" max="70" step="1" value="35"><span class="val">35%</span></div>
     <div class="row"><label>카드·배달 수수료(%)</label><input type="range" id="p-fee" min="0" max="30" step="0.5" value="5"><span class="val">5.0%</span></div>
   </div>
 
   <div class="card">
-    <div class="card-title"><span class="num-badge">3</span> 고정비 (매출과 무관, 매월 고정)</div>
+    <div class="card-title"><span class="num-badge">3</span> 고정비 (매출과 무관, 매월 고정) <button type="button" class="term" data-term="fixed" aria-label="고정비 뜻 보기">?</button></div>
     <div class="row"><label>월 임대료</label><input type="range" id="p-rent" min="0" max="10000000" step="100000" value="2000000"><span class="val">2,000,000원</span></div>
     <div class="row"><label>월 인건비</label><input type="range" id="p-labor" min="0" max="15000000" step="100000" value="3500000"><span class="val">3,500,000원</span></div>
     <div class="row"><label>월 기타 고정비</label><input type="range" id="p-etc" min="0" max="5000000" step="50000" value="800000"><span class="val">800,000원</span></div>
@@ -1638,7 +2023,7 @@ body.printing .section { display: block !important; animation: none; }
       <tr><td id="p-rev-label">매출액</td><td id="p-rev">-</td></tr>
       <tr class="indent"><td>(-) 재료비</td><td id="p-vc-cogs">-</td></tr>
       <tr class="indent"><td>(-) 카드·배달 수수료</td><td id="p-vc-fee">-</td></tr>
-      <tr class="subtotal"><td>공헌이익 (매출 − 변동비)</td><td id="p-cm">-</td></tr>
+      <tr class="subtotal"><td>공헌이익 (매출 − 변동비) <button type="button" class="term" data-term="cm" aria-label="공헌이익 뜻 보기">?</button></td><td id="p-cm">-</td></tr>
       <tr class="indent"><td>(-) 임대료</td><td id="p-fc-rent">-</td></tr>
       <tr class="indent"><td>(-) 인건비</td><td id="p-fc-labor">-</td></tr>
       <tr class="indent"><td>(-) 기타 고정비</td><td id="p-fc-etc">-</td></tr>
@@ -1650,10 +2035,10 @@ body.printing .section { display: block !important; animation: none; }
     <div id="p-status" class="status-stack" style="margin: 14px 0 4px"></div>
 
     <div class="metric-grid">
-      <div class="metric"><div class="lbl">BEP 월 매출</div><div class="num" id="p-bep-rev">-</div></div>
+      <div class="metric"><div class="lbl">BEP 월 매출 <button type="button" class="term" data-term="bep" aria-label="손익분기점 뜻 보기">?</button></div><div class="num" id="p-bep-rev">-</div></div>
       <div class="metric"><div class="lbl">BEP 일 판매수량</div><div class="num" id="p-bep-daily">-</div></div>
-      <div class="metric"><div class="lbl">임대료 비중 <span class="lbl-sub">(적정 10% 이하)</span></div><div class="num" id="p-rent-ratio">-</div></div>
-      <div class="metric"><div class="lbl">인건비 비중 <span class="lbl-sub">(적정 25% 이하)</span></div><div class="num" id="p-labor-ratio">-</div></div>
+      <div class="metric"><div class="lbl">임대료 비중 <span class="lbl-sub">(적정 <span data-cfg="RULES.rentRatio.good"></span>% 이하)</span></div><div class="num" id="p-rent-ratio">-</div></div>
+      <div class="metric"><div class="lbl">인건비 비중 <span class="lbl-sub">(적정 <span data-cfg="RULES.laborRatio.good"></span>% 이하)</span></div><div class="num" id="p-labor-ratio">-</div></div>
     </div>
 
     <div class="benchmark-card">
@@ -1682,7 +2067,7 @@ body.printing .section { display: block !important; animation: none; }
   </div>
 
   <div class="card">
-    <div class="card-title">🎯 민감도 분석 — 무엇이 이익을 가장 크게 흔드나?</div>
+    <div class="card-title">🎯 민감도 분석 — 무엇이 이익을 가장 크게 흔드나? <button type="button" class="term" data-term="dol" aria-label="영업레버리지 뜻 보기">?</button></div>
     <div class="sens-legend">각 항목이 <strong>10%</strong> 나빠질 때(왼쪽, 빨강)와 좋아질 때(오른쪽, 초록) 월 영업이익 변화액</div>
     <div id="p-sens"></div>
     <div id="p-sens-insight" class="status-stack" style="margin-top:12px"></div>
@@ -1692,6 +2077,13 @@ body.printing .section { display: block !important; animation: none; }
 
 <!-- ============== SECTION 3: BEP ============== -->
 <section id="sec-bep" class="section" role="tabpanel" aria-labelledby="tab-bep">
+
+  <div class="tab-intro no-print">
+    <div class="ti-step">3단계 · 손익분기점</div>
+    <h2 class="ti-q">최소 몇 개는 팔아야 손해가 안 나나요?</h2>
+    <p class="ti-body">손해도 이익도 없는 판매량(손익분기점)과 <b>목표 이익을 내려면 몇 개를 팔아야 하는지</b> 계산해요.</p>
+    <p class="ti-tip">💡 <b>손익계산 탭 값 불러오기</b>를 누르면 2단계 숫자가 그대로 들어와요.</p>
+  </div>
 
   <div class="card">
     <div class="card-title"><span class="num-badge">!</span> BEP 입력값</div>
@@ -1710,8 +2102,8 @@ body.printing .section { display: block !important; animation: none; }
     <div class="card-title">BEP 계산 결과</div>
     <div class="metric-grid">
       <div class="metric"><div class="lbl">개당 공헌이익</div><div class="num" id="b-cm">-</div></div>
-      <div class="metric"><div class="lbl">공헌이익률</div><div class="num" id="b-cmr">-</div></div>
-      <div class="metric highlight"><div class="lbl">BEP 판매수량</div><div class="num" id="b-bep-q">-</div></div>
+      <div class="metric"><div class="lbl">공헌이익률 <button type="button" class="term" data-term="cm" aria-label="공헌이익 뜻 보기">?</button></div><div class="num" id="b-cmr">-</div></div>
+      <div class="metric highlight"><div class="lbl">BEP 판매수량 <button type="button" class="term" data-term="bep" aria-label="손익분기점 뜻 보기">?</button></div><div class="num" id="b-bep-q">-</div></div>
       <div class="metric highlight"><div class="lbl">BEP 매출액</div><div class="num" id="b-bep-r">-</div></div>
       <div class="metric"><div class="lbl">목표이익 달성 수량</div><div class="num" id="b-target-q">-</div></div>
       <div class="metric"><div class="lbl">목표이익 달성 매출</div><div class="num" id="b-target-r">-</div></div>
@@ -1726,12 +2118,19 @@ body.printing .section { display: block !important; animation: none; }
       <span class="hi">목표이익 수량</span> = (고정비 + 목표이익) ÷ 개당 공헌이익<br>
       <span class="hi">안전한계율</span> = (현재매출 - BEP매출) ÷ 현재매출 × 100
     </div>
-    <div class="note">안전한계율 30% 이상이면 안정적, 10% 미만이면 매출 변동에 매우 취약합니다. 신규 창업 6개월 이내 BEP 도달이 목표선이며, 12개월 초과 시 사업모델 재점검이 필요합니다.</div>
+    <div class="note">안전한계율 <span data-cfg="RULES.safety.good"></span>% 이상이면 안정적, <span data-cfg="RULES.safety.warn"></span>% 미만이면 매출 변동에 매우 취약합니다. 신규 창업 <span data-cfg="RULES.profitMonth.good"></span>개월 이내 BEP 도달이 목표선이며, <span data-cfg="RULES.profitMonth.warn"></span>개월 초과 시 사업모델 재점검이 필요합니다.</div>
   </div>
 </section>
 
 <!-- ============== SECTION 4: FUND ============== -->
 <section id="sec-fund" class="section" role="tabpanel" aria-labelledby="tab-fund">
+
+  <div class="tab-intro no-print">
+    <div class="ti-step">4단계 · 자금계획</div>
+    <h2 class="ti-q">창업에 돈이 얼마나 필요하고, 어디서 마련하나요?</h2>
+    <p class="ti-body">보증금·인테리어 같은 <b>시설자금</b>과 매출이 자리 잡기 전까지 버틸 <b>운영자금</b>을 합쳐 필요한 돈을 계산하고, 자기돈·대출 구성이 안전한지 봐요.</p>
+    <p class="ti-tip">💡 대출이 있다면 아래 <b>상환 조건</b>까지 넣어야 매달 갚을 돈이 정확해져요.</p>
+  </div>
 
   <div class="preset-bar">
     <span class="preset-label">규모별 예시:</span>
@@ -1751,12 +2150,12 @@ body.printing .section { display: block !important; animation: none; }
 
   <div class="card">
     <div class="card-title"><span class="num-badge">B</span> 자금 소요 — 운영자금 (개업 후 N개월 운영비)</div>
-    <div class="row"><label>예비 운영기간(개월)</label><input type="range" id="f-runway" min="1" max="12" step="1" value="6"><span class="val">6개월</span></div>
+    <div class="row"><label>예비 운영기간(개월) <button type="button" class="term" data-term="runway" aria-label="예비 운영기간 뜻 보기">?</button></label><input type="range" id="f-runway" min="1" max="12" step="1" value="6"><span class="val">6개월</span></div>
     <div class="row"><label>월 인건비 (창업자 생계비 포함)</label><input type="range" id="f-op-labor" min="0" max="15000000" step="100000" value="3500000"><span class="val">3,500,000원</span></div>
     <div class="row"><label>월 임대료·관리비</label><input type="range" id="f-op-rent" min="0" max="10000000" step="100000" value="2000000"><span class="val">2,000,000원</span></div>
     <div class="row"><label>월 재료·매입 예상</label><input type="range" id="f-op-cogs" min="0" max="20000000" step="100000" value="3000000"><span class="val">3,000,000원</span></div>
     <div class="row"><label>월 마케팅·기타</label><input type="range" id="f-op-mkt" min="0" max="5000000" step="50000" value="500000"><span class="val">500,000원</span></div>
-    <div class="row"><label>예비비율(%)</label><input type="range" id="f-reserve" min="0" max="30" step="1" value="10"><span class="val">10%</span></div>
+    <div class="row"><label>예비비율(%) <button type="button" class="term" data-term="reserve" aria-label="예비비 뜻 보기">?</button></label><input type="range" id="f-reserve" min="0" max="30" step="1" value="10"><span class="val">10%</span></div>
     <div class="link-bar no-print" style="margin-top:0;margin-bottom:12px">
       <button type="button" class="link-btn ghost" id="f-from-pnl">↻ 손익계산 탭의 월 비용 불러오기</button>
     </div>
@@ -1775,8 +2174,8 @@ body.printing .section { display: block !important; animation: none; }
   <div class="card">
     <div class="card-title"><span class="num-badge">D</span> 차입 상환 조건</div>
     <div class="row"><label>평균 차입금리 (연%)</label><input type="range" id="f-rate" min="2" max="12" step="0.1" value="4.5"><span class="val">4.5%</span></div>
-    <div class="row"><label>상환기간 (개월, 거치 포함)</label><input type="range" id="f-term" min="12" max="120" step="6" value="60"><span class="val">60개월</span></div>
-    <div class="row"><label>거치기간 (개월)</label><input type="range" id="f-grace" min="0" max="36" step="1" value="12"><span class="val">12개월</span></div>
+    <div class="row"><label>상환기간 (개월, 거치 포함) <button type="button" class="term" data-term="amort" aria-label="원리금균등상환 뜻 보기">?</button></label><input type="range" id="f-term" min="12" max="120" step="6" value="60"><span class="val">60개월</span></div>
+    <div class="row"><label>거치기간 (개월) <button type="button" class="term" data-term="grace" aria-label="거치기간 뜻 보기">?</button></label><input type="range" id="f-grace" min="0" max="36" step="1" value="12"><span class="val">12개월</span></div>
     <div class="note">정책자금(소진공·중진공)은 통상 연 2~3.5%, 5년 만기, 거치 1~2년 조건입니다. 일반 은행대출은 연 4~7% 수준입니다. 거치기간 중에는 이자만 납부하고, 이후 남은 기간 동안 원리금을 균등 상환합니다. 가족·지인 차입은 무이자·만기 일시상환으로 가정해 상환 계산에서 제외합니다.</div>
   </div>
 
@@ -1817,11 +2216,11 @@ body.printing .section { display: block !important; animation: none; }
     <div id="f-balance-status" class="status-stack" style="margin: 16px 0 8px"></div>
 
     <div class="fund-ratio-grid">
-      <div class="metric"><div class="lbl">자기자본 비율</div><div class="num" id="f-r-equity-rate">-</div></div>
-      <div class="metric"><div class="lbl">부채 비율</div><div class="num" id="f-r-debt-rate">-</div></div>
+      <div class="metric"><div class="lbl">자기자본 비율 <button type="button" class="term" data-term="equityRate" aria-label="자기자본 비율 뜻 보기">?</button></div><div class="num" id="f-r-equity-rate">-</div></div>
+      <div class="metric"><div class="lbl">부채 비율 <button type="button" class="term" data-term="debtRatio" aria-label="부채 비율 뜻 보기">?</button></div><div class="num" id="f-r-debt-rate">-</div></div>
       <div class="metric"><div class="lbl">거치기간 월 이자</div><div class="num" id="f-r-interest">-</div></div>
       <div class="metric"><div class="lbl">거치 후 월 원리금</div><div class="num" id="f-r-repay">-</div></div>
-      <div class="metric"><div class="lbl">상환 여력 (DSCR)</div><div class="num" id="f-r-dscr">-</div></div>
+      <div class="metric"><div class="lbl">상환 여력 (DSCR) <button type="button" class="term" data-term="dscr" aria-label="DSCR 뜻 보기">?</button></div><div class="num" id="f-r-dscr">-</div></div>
       <div class="metric"><div class="lbl">총 이자비용</div><div class="num" id="f-r-total-interest">-</div></div>
     </div>
 
@@ -1829,9 +2228,9 @@ body.printing .section { display: block !important; animation: none; }
 
     <div class="formula">
       <span class="hi">총 소요자금</span> = 시설자금 + (월 운영비 × 개월수) × (1 + 예비비율)<br>
-      <span class="hi">자기자본 비율</span> = (자기자본+지원금) ÷ 총조달 × 100  (권장: 30% 이상)<br>
+      <span class="hi">자기자본 비율</span> = (자기자본+지원금) ÷ 총조달 × 100  (권장: <span data-cfg="RULES.equityRate.warn"></span>% 이상)<br>
       <span class="hi">월 원리금 상환액</span> = 원리금균등상환 공식 [P × r(1+r)^n ÷ ((1+r)^n - 1)], n = 상환기간 − 거치기간<br>
-      <span class="hi">DSCR</span> = 손익탭 월 영업이익 ÷ 거치 후 월 원리금  (권장: 1.5 이상)
+      <span class="hi">DSCR</span> = 손익탭 월 영업이익 ÷ 거치 후 월 원리금  (권장: <span data-cfg="RULES.dscr.good"></span> 이상)
     </div>
   </div>
 </section>
@@ -1839,20 +2238,27 @@ body.printing .section { display: block !important; animation: none; }
 <!-- ============== SECTION 5: CASH FLOW ============== -->
 <section id="sec-cash" class="section" role="tabpanel" aria-labelledby="tab-cash">
 
+  <div class="tab-intro no-print">
+    <div class="ti-step">5단계 · 현금흐름</div>
+    <h2 class="ti-q">통장 잔고가 바닥나는 달은 없나요?</h2>
+    <p class="ti-body">개업 초기엔 매출이 서서히 오르죠. 2·4단계 숫자로 <b>24개월 동안 매달 통장 잔고</b>를 시뮬레이션해요.</p>
+    <p class="ti-tip">💡 <b>최저 현금잔고</b>가 마이너스면 그 달에 돈이 모자란다는 뜻이에요. 운영자금을 늘리거나 오픈 마케팅으로 매출 정착을 앞당기세요.</p>
+  </div>
+
   <div class="card">
     <div class="card-title"><span class="num-badge">1</span> 개업 초기 매출 램프업 가정</div>
-    <div class="row"><label>첫 달 매출 수준 (정상 대비 %)</label><input type="range" id="cf-start" min="10" max="100" step="5" value="40"><span class="val">40%</span></div>
+    <div class="row"><label>첫 달 매출 수준 (정상 대비 %) <button type="button" class="term" data-term="ramp" aria-label="램프업 뜻 보기">?</button></label><input type="range" id="cf-start" min="10" max="100" step="5" value="40"><span class="val">40%</span></div>
     <div class="row"><label>정상 매출 도달 시점 (개월차)</label><input type="range" id="cf-ramp" min="1" max="24" step="1" value="6"><span class="val">6개월</span></div>
     <div class="note">정상 매출 = <strong>📊 손익계산</strong> 탭의 월 매출, 기초 현금·상환 조건 = <strong>💰 자금계획</strong> 탭 값입니다. 개업 직후에는 인지도가 낮아 매출이 서서히 오릅니다. 외식·소매는 3~6개월, 제조·B2B·온라인은 6~12개월을 가정해 보세요. 고정비와 차입 상환은 첫 달부터 전액 발생합니다.</div>
   </div>
 
   <div class="card">
-    <div class="card-title">24개월 현금흐름 시뮬레이션</div>
+    <div class="card-title" id="cf-title">24개월 현금흐름 시뮬레이션</div>
     <div class="metric-grid">
       <div class="metric"><div class="lbl">개업 시 운영 가용현금</div><div class="num" id="cf-open">-</div></div>
-      <div class="metric"><div class="lbl">최저 현금잔고</div><div class="num" id="cf-min">-</div></div>
+      <div class="metric"><div class="lbl">최저 현금잔고 <button type="button" class="term" data-term="netcf" aria-label="현금흐름 뜻 보기">?</button></div><div class="num" id="cf-min">-</div></div>
       <div class="metric"><div class="lbl">월 영업흑자 전환</div><div class="num" id="cf-profit-month">-</div></div>
-      <div class="metric"><div class="lbl">투자회수기간</div><div class="num" id="cf-payback">-</div></div>
+      <div class="metric"><div class="lbl">투자회수기간 <button type="button" class="term" data-term="payback" aria-label="투자회수기간 뜻 보기">?</button></div><div class="num" id="cf-payback">-</div></div>
     </div>
     <div id="cf-status" class="status-stack" style="margin: 10px 0 6px"></div>
     <div class="chart-wrap">
@@ -1873,11 +2279,25 @@ body.printing .section { display: block !important; animation: none; }
 
 <!-- ============== SECTION 6: REPORT ============== -->
 <section id="sec-report" class="section" role="tabpanel" aria-labelledby="tab-report">
+
+  <div class="tab-intro no-print">
+    <div class="ti-step">6단계 · 종합진단</div>
+    <h2 class="ti-q">내 사업, 몇 점일까요?</h2>
+    <p class="ti-body">앞 단계 숫자를 모아 <b>11개 지표를 신호등</b>으로 채점하고, 무엇부터 고칠지 금액으로 알려드려요.</p>
+    <p class="ti-tip">💡 <b>📄 PDF 리포트</b>를 누르면 이 진단이 맨 앞에 오는 보고서가 만들어져요.</p>
+  </div>
   <div id="report-root"></div>
 </section>
 
 <!-- ============== SECTION 7: CHECKLIST ============== -->
 <section id="sec-check" class="section" role="tabpanel" aria-labelledby="tab-check">
+
+  <div class="tab-intro no-print">
+    <div class="ti-step">7단계 · 체크리스트</div>
+    <h2 class="ti-q">창업 전에 무엇을 준비해야 하나요?</h2>
+    <p class="ti-body">점포 계약부터 사업자등록·4대보험·개업까지 6단계 <span id="check-total-intro">모든</span> 항목을 체크하며 준비하세요.</p>
+    <p class="ti-tip">💡 <b>필수</b> 표시 항목부터 챙기세요. 체크 상태는 이 기기에 저장돼요.</p>
+  </div>
 
   <div class="card" style="padding: 16px 22px;">
     <div class="check-head">
@@ -1894,7 +2314,7 @@ body.printing .section { display: block !important; animation: none; }
   <div id="checklist-container"></div>
 
   <div class="card">
-    <div class="card-title">참고 정보 · 2026년 기준</div>
+    <div class="card-title">참고 정보 · <span data-cfg="BASIS.year"></span>년 기준</div>
     <div class="ref-info">
       <strong>필수 신청 기한</strong><br>
       · 사업자등록: 사업개시일로부터 <strong>20일 이내</strong> (홈택스 또는 관할 세무서)<br>
@@ -1903,7 +2323,7 @@ body.printing .section { display: block !important; animation: none; }
       · 종합소득세 신고: 매년 <strong>5월</strong> (전년도 소득 기준)<br><br>
 
       <strong>2026년 주요 제도</strong><br>
-      · 최저임금 <strong>시급 10,320원</strong> (2026.01.01 적용, 월 209시간 기준 2,156,880원)<br>
+      · 최저임금 <strong>시급 <span data-cfg="BASIS.minWage" data-fmt="won"></span></strong> (<span data-cfg="BASIS.year"></span>.01.01 적용, 월 <span data-cfg="BASIS.monthlyHours"></span>시간 기준 <span data-cfg="BASIS.minMonthly" data-fmt="won"></span>)<br>
       · 중소기업창업 지원법 시행령 개정 (2026.01.01 시행) — 사후 사유 해소 시 창업기업 인정 가능<br>
       · 식품위생법 개정 (2026.10.08 시행) — 영업신고 기준 일부 개정, 세부 사항은 관할 시·군·구청 위생과 확인<br>
       · 청년창업세액감면 — 만 15~34세 청년이 수도권 과밀억제권역 외 지역 창업 시 5년간 100% 감면 (권역 내 50%)<br><br>
@@ -1916,7 +2336,7 @@ body.printing .section { display: block !important; animation: none; }
       · K-Startup (창업지원사업 통합포털): k-startup.go.kr
     </div>
     <div class="note" style="margin-top:14px;">
-      ※ 위 정보는 2026년 10월 기준이며, 정부 정책·법령 변경에 따라 일부 내용이 달라질 수 있습니다.
+      ※ 위 정보는 <span data-cfg="BASIS.asOf"></span> 기준이며, 정부 정책·법령 변경에 따라 일부 내용이 달라질 수 있습니다.
       구체적 신청 절차는 관할 기관 또는 세무사·행정사 등 전문가 자문을 권장합니다.
       업종별 인허가 종류는 약 750여 개에 달하므로 본인 업종에 맞는 정확한 절차는
       <strong>중소기업통합콜센터(1357)</strong> 또는 시·군·구청 일자리경제과에서 확인하세요.
@@ -1935,7 +2355,8 @@ body.printing .section { display: block !important; animation: none; }
 </div>
 
 <footer>
-  창업 재무분석 실습 도구 <span id="ver-info"></span> · 단독 실행 HTML · 인터넷 연결 불필요<br>
+  <span class="footer-brand"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 107.0 112.0" aria-hidden="true" focusable="false"><path fill="#1b2c55" d="M56.15 96.28 L56.15 81.19 L56.15 54.90 L51.99 54.90 L50.34 54.90 L47.29 90.64 C49.95 92.48 52.89 94.36 56.14 96.29 C56.14 96.29 56.15 96.29 56.15 96.28"/><path fill="#1b2c55" d="M28.53 50.24 L28.53 40.46 L44.93 43.57 L44.93 47.12 M56.14 13.12 L23.93 13.12 L23.93 31.48 L23.93 33.59 L23.93 39.58 L23.93 51.11 L23.93 59.44 L23.93 60.53 L23.93 62.28 C23.93 65.50 24.88 68.64 26.64 71.33 C29.48 75.66 34.86 81.59 44.10 88.37 L47.69 54.90 L46.07 54.90 L43.77 50.30 L48.06 50.30 L48.06 38.93 L46.33 38.93 L46.33 36.13 L54.65 33.47 L54.65 30.27 L56.15 30.27 L57.64 30.27 L57.64 33.47 L65.97 36.13 L65.97 38.93 L65.72 38.93 L64.23 38.93 L59.81 38.93 L56.15 38.93 L52.49 38.93 L49.95 38.93 L49.95 39.86 L52.49 41.58 L52.49 50.30 L56.15 50.30 L59.81 50.30 L59.81 41.58 L64.23 41.58 L64.23 50.30 L68.52 50.30 L66.23 54.90 L64.61 54.90 L68.20 88.36 C77.43 81.59 82.80 75.66 85.64 71.33 C87.40 68.64 88.35 65.50 88.35 62.28 L88.35 51.12 L67.31 47.12 L67.31 43.57 L82.83 40.62 L88.35 39.58 L95.34 38.25 L95.34 62.26 C95.34 66.95 93.98 71.52 91.39 75.47 C87.41 81.54 78.79 91.09 60.34 102.04 L56.14 104.54 L51.94 102.04 C33.48 91.08 24.87 81.54 20.89 75.47 C18.30 71.52 16.93 66.95 16.93 62.26 L16.93 6.55 L18.40 6.29 L93.88 6.29 L95.34 6.55 L95.34 29.77 L88.35 31.27 L88.35 13.12 L56.14 13.12 M112.27 -0.37 L106.69 -0.37 L56.15 -0.37 L56.14 -0.37 L5.59 -0.37 L0.02 -0.37 L5.59 6.67 L5.59 62.26 C5.59 68.26 7.51 74.09 11.15 79.12 C15.96 85.79 26.21 96.16 47.76 107.77 L56.14 112.29 L64.52 107.77 C86.06 96.17 96.32 85.79 101.13 79.12 C104.77 74.09 106.69 68.26 106.69 62.26 L106.69 6.68 L112.27 -0.37"/><path fill="#e58d00" d="M28.53 40.45 L28.53 50.24 L44.93 47.12 L44.93 43.57 L28.53 40.45"/></svg><strong>BECONIC</strong> · 창업 재무분석 LAB</span> <span id="ver-info"></span><br>
+  단독 실행 HTML · 입력값은 서버로 보내지 않고 이 기기에만 저장됩니다<br>
   본 도구는 교육·시뮬레이션 목적이며, 실제 사업 의사결정은 세무·회계 전문가 자문과 함께 진행하시기 바랍니다.
   <div class="copyright">© 2023~2026 GrowthVentures Co., Ltd. All rights reserved.</div>
 </footer>
@@ -1943,6 +2364,37 @@ body.printing .section { display: block !important; animation: none; }
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="term-pop" id="term-pop" role="dialog" aria-modal="false" aria-labelledby="term-pop-title" hidden>
+  <div class="tp-title" id="term-pop-title"></div>
+  <div class="tp-body" id="term-pop-body"></div>
+  <div class="tp-ex" id="term-pop-ex"></div>
+  <button type="button" class="tp-more" id="term-pop-more">용어 사전 전체 보기 →</button>
+</div>
+
+<dialog class="modal" id="ask-dialog" aria-labelledby="ask-title">
+  <form method="dialog" class="modal-inner">
+    <h2 class="modal-title" id="ask-title"></h2>
+    <p class="modal-body" id="ask-body"></p>
+    <input type="text" class="modal-input" id="ask-input" maxlength="30" autocomplete="off" hidden>
+    <div class="modal-actions">
+      <button type="submit" value="cancel" class="link-btn ghost" id="ask-cancel">취소</button>
+      <button type="submit" value="ok" class="link-btn solid" id="ask-ok">확인</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="modal help" id="help-dialog" aria-labelledby="help-title">
+  <div class="modal-inner">
+    <div class="help-head">
+      <h2 class="modal-title" id="help-title">📖 사용법 · 용어 사전</h2>
+      <button type="button" class="icon-btn" id="help-close" aria-label="닫기">✕</button>
+    </div>
+    <div class="help-body" id="help-body"></div>
+  </div>
+</dialog>
+
+<noscript><div class="noscript">이 도구는 자바스크립트가 필요해요. 브라우저 설정에서 자바스크립트를 켜 주세요.</div></noscript>
 
 
 <script>
@@ -1967,7 +2419,38 @@ body.printing .section { display: block !important; animation: none; }
 (function(){
   'use strict';
 
-  const APP = { name: '창업 재무분석 LAB', version: '2.0.0', updated: '2026-10-24' };
+  // =====================================================================
+  //  설정 — 화면·계산·진단에 쓰이는 기준값은 모두 여기서만 바꾼다
+  // =====================================================================
+  const SHIELD_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 107.0 112.0\" aria-hidden=\"true\" focusable=\"false\"><path fill=\"#1b2c55\" d=\"M56.15 96.28 L56.15 81.19 L56.15 54.90 L51.99 54.90 L50.34 54.90 L47.29 90.64 C49.95 92.48 52.89 94.36 56.14 96.29 C56.14 96.29 56.15 96.29 56.15 96.28\"/><path fill=\"#1b2c55\" d=\"M28.53 50.24 L28.53 40.46 L44.93 43.57 L44.93 47.12 M56.14 13.12 L23.93 13.12 L23.93 31.48 L23.93 33.59 L23.93 39.58 L23.93 51.11 L23.93 59.44 L23.93 60.53 L23.93 62.28 C23.93 65.50 24.88 68.64 26.64 71.33 C29.48 75.66 34.86 81.59 44.10 88.37 L47.69 54.90 L46.07 54.90 L43.77 50.30 L48.06 50.30 L48.06 38.93 L46.33 38.93 L46.33 36.13 L54.65 33.47 L54.65 30.27 L56.15 30.27 L57.64 30.27 L57.64 33.47 L65.97 36.13 L65.97 38.93 L65.72 38.93 L64.23 38.93 L59.81 38.93 L56.15 38.93 L52.49 38.93 L49.95 38.93 L49.95 39.86 L52.49 41.58 L52.49 50.30 L56.15 50.30 L59.81 50.30 L59.81 41.58 L64.23 41.58 L64.23 50.30 L68.52 50.30 L66.23 54.90 L64.61 54.90 L68.20 88.36 C77.43 81.59 82.80 75.66 85.64 71.33 C87.40 68.64 88.35 65.50 88.35 62.28 L88.35 51.12 L67.31 47.12 L67.31 43.57 L82.83 40.62 L88.35 39.58 L95.34 38.25 L95.34 62.26 C95.34 66.95 93.98 71.52 91.39 75.47 C87.41 81.54 78.79 91.09 60.34 102.04 L56.14 104.54 L51.94 102.04 C33.48 91.08 24.87 81.54 20.89 75.47 C18.30 71.52 16.93 66.95 16.93 62.26 L16.93 6.55 L18.40 6.29 L93.88 6.29 L95.34 6.55 L95.34 29.77 L88.35 31.27 L88.35 13.12 L56.14 13.12 M112.27 -0.37 L106.69 -0.37 L56.15 -0.37 L56.14 -0.37 L5.59 -0.37 L0.02 -0.37 L5.59 6.67 L5.59 62.26 C5.59 68.26 7.51 74.09 11.15 79.12 C15.96 85.79 26.21 96.16 47.76 107.77 L56.14 112.29 L64.52 107.77 C86.06 96.17 96.32 85.79 101.13 79.12 C104.77 74.09 106.69 68.26 106.69 62.26 L106.69 6.68 L112.27 -0.37\"/><path fill=\"#e58d00\" d=\"M28.53 40.45 L28.53 50.24 L44.93 47.12 L44.93 43.57 L28.53 40.45\"/></svg>";  // 그로스벤처스 방패 로고 (원본 .ai와 동일한 벡터)
+  const APP = { name: '창업 재무분석 LAB', brand: 'BECONIC', org: '그로스벤처스(주)', version: '2.1.0', updated: '2026-10-24' };
+  // 제도 기준 (매년 갱신)
+  const BASIS = { year: 2026, asOf: '2026년 10월', minWage: 10320, monthlyHours: 209 };
+  BASIS.minWageWithHoliday = Math.round(BASIS.minWage * 1.2);   // 주 15시간 이상: 주휴수당 포함 실질 시급
+  BASIS.minMonthly = BASIS.minWage * BASIS.monthlyHours;
+  const VAT_RATE = 0.1;          // 부가가치세율
+  const MAX_SLOTS = 3;           // 시나리오 저장 슬롯
+  const BALANCE_TOL = 100000;    // 소요·조달 '균형'으로 보는 오차(원)
+  const HORIZON = 24;            // 현금흐름 시뮬레이션 개월 수
+  const SENS_STEP = 0.1;         // 민감도 분석 변동폭(±10%)
+  // 진단 기준: good 이상(또는 이하)이면 양호, warn 까지 주의, 그 밖은 위험
+  const RULES = {
+    cmRate:      { good: 40,  warn: 25 },   // 공헌이익률 % (높을수록 좋음)
+    safety:      { good: 30,  warn: 10 },   // 안전한계율 %
+    rentRatio:   { good: 10,  warn: 15 },   // 임대료/매출 % (낮을수록 좋음)
+    laborRatio:  { good: 25,  warn: 35 },   // 인건비/매출 %
+    equityRate:  { good: 50,  warn: 30 },   // 자기자본 비율 %
+    dscr:        { good: 1.5, warn: 1.0 },  // 배
+    profitMonth: { good: 6,   warn: 12 },   // 월 영업흑자 전환 개월 (빠를수록 좋음)
+    payback:     { good: 24,  warn: 36 },   // 투자회수기간 개월
+    dol:         { warn: 3,   bad: 5 },     // 영업레버리지 배
+    fundGapWarn: 0.1,                       // 조달 부족이 소요의 10% 이내면 '주의'
+    riskScoreCap: 79,                       // 위험 지표가 있으면 점수 상한(A등급 불가)
+    grades: [[80, 'A'], [60, 'B'], [40, 'C'], [0, 'D']]
+  };
+  const atLeast = (v, r) => v >= r.good ? 'good' : v >= r.warn ? 'warn' : 'bad';
+  const atMost = (v, r) => v <= r.good ? 'good' : v <= r.warn ? 'warn' : 'bad';
+  const gradeOf = score => RULES.grades.find(([min]) => score >= min)[1];
 
   // ===== Formatters =====
   const $ = id => document.getElementById(id);
@@ -2014,6 +2497,37 @@ body.printing .section { display: block !important; animation: none; }
     el.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  // ===== 대화상자: 앱 안 브라우저(카카오톡 등)에서 막히는 prompt·confirm 대신 사용 =====
+  function ask(opts) {
+    const dlg = $('ask-dialog');
+    const input = $('ask-input');
+    if (!dlg || typeof dlg.showModal !== 'function') {
+      // <dialog> 미지원 브라우저: 기본 창으로 대체
+      if (opts.input) return Promise.resolve(window.prompt(opts.title + (opts.body ? '\n' + opts.body : ''), opts.value || ''));
+      return Promise.resolve(opts.alert ? (window.alert(opts.title + '\n' + (opts.body || '')), true) : window.confirm(opts.title + '\n' + (opts.body || '')));
+    }
+    $('ask-title').textContent = opts.title;
+    $('ask-body').textContent = opts.body || '';
+    $('ask-body').hidden = !opts.body;
+    input.hidden = !opts.input;
+    input.value = opts.value || '';
+    $('ask-ok').textContent = opts.ok || '확인';
+    $('ask-ok').classList.toggle('danger', !!opts.danger);
+    $('ask-cancel').hidden = !!opts.alert;
+    $('ask-cancel').textContent = opts.cancel || '취소';
+    return new Promise(resolve => {
+      const done = () => {
+        dlg.removeEventListener('close', done);
+        const ok = dlg.returnValue === 'ok';
+        resolve(opts.input ? (ok ? input.value.trim() : null) : ok);
+      };
+      dlg.returnValue = 'cancel';
+      dlg.addEventListener('close', done);
+      dlg.showModal();
+      if (opts.input) { input.focus(); input.select(); } else $('ask-ok').focus();
+    });
   }
 
   // ===== 슬라이더 범위 (다양한 업종·규모 커버) =====
@@ -2075,6 +2589,35 @@ body.printing .section { display: block !important; animation: none; }
     return String(Math.round(v));
   }
 
+  function parsePlain(str) {
+    const cleaned = String(str || '').replace(/[^\d.\-]/g, '');
+    if (cleaned === '' || cleaned === '-' || cleaned === '.') return null;
+    const v = parseFloat(cleaned);
+    return isNaN(v) ? null : v;
+  }
+  // "3000만", "1억 2천만", "1.5억" 같은 한글 금액도 이해한다
+  const KOR_UNIT = { '억': 1e8, '천만': 1e7, '백만': 1e6, '십만': 1e5, '만': 1e4, '천': 1e3, '백': 1e2 };
+  function parseKoreanAmount(str) {
+    const t = String(str || '').replace(/[,\s원]/g, '');
+    if (!/[억만천백]/.test(t)) return parsePlain(t);
+    let total = 0, matched = false;
+    t.replace(/(\d+(?:\.\d+)?)(억|천만|백만|십만|만|천|백)?/g, (m, n, u) => {
+      matched = true;
+      total += parseFloat(n) * (u ? KOR_UNIT[u] : 1);
+      return m;
+    });
+    return matched ? total : null;
+  }
+  // 30000000 → "3,000만원", 150000000 → "1억 5,000만원"
+  function koreanUnit(v) {
+    v = Math.round(v);
+    if (!fin(v) || Math.abs(v) < 10000) return '';
+    const eok = Math.floor(v / 1e8), man = Math.floor((v % 1e8) / 1e4), rest = v % 1e4;
+    let out = (eok ? eok.toLocaleString('ko-KR') + '억 ' : '') + (man ? man.toLocaleString('ko-KR') + '만' : '');
+    out = out.trim() + (rest ? ' ' + rest.toLocaleString('ko-KR') : '') + '원';
+    return '= ' + out;
+  }
+
   // 슬라이더 옆에 직접 입력 필드를 붙인다
   function upgradeSlider(id) {
     const slider = $(id);
@@ -2095,7 +2638,6 @@ body.printing .section { display: block !important; animation: none; }
     const valEl = row && row.querySelector('.val');
     if (!labelEl || !valEl || row.querySelector('.num-input')) return;
 
-    slider.setAttribute('aria-label', labelEl.textContent);
 
     const head = document.createElement('div');
     head.className = 'row-head';
@@ -2111,7 +2653,9 @@ body.printing .section { display: block !important; animation: none; }
     numInput.spellcheck = false;
     numInput.className = 'num-input';
     numInput.id = id + '-input';
-    numInput.setAttribute('aria-label', labelEl.textContent + ' 직접 입력 (' + cfg.suffix + ')');
+    const labelText = Array.from(labelEl.childNodes).filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim();
+    numInput.setAttribute('aria-label', labelText + ' 직접 입력 (' + cfg.suffix + (cfg.mode === 'won' ? ', 3000만·1억처럼 입력 가능' : '') + ')');
+    slider.setAttribute('aria-label', labelText);
     labelEl.htmlFor = numInput.id;
 
     const suffix = document.createElement('span');
@@ -2123,24 +2667,32 @@ body.printing .section { display: block !important; animation: none; }
     head.appendChild(inputWrap);
     valEl.remove();
     slider.before(head);  // 라벨·값 → 슬라이더 순서
+    let hint = null;
+    if (cfg.mode === 'won') {
+      hint = document.createElement('span');
+      hint.className = 'num-hint';
+      hint.id = id + '-hint';
+      slider.before(hint);
+      numInput.setAttribute('aria-describedby', hint.id);
+    }
+    const syncHint = () => { if (hint) hint.textContent = koreanUnit(+slider.value); };
 
     // 양방향 동기화: 사용자가 입력칸에 타이핑하는 동안엔 입력칸 값을 코드로 덮어쓰지 않는다
     let isUserTyping = false;
-    const parseRaw = str => {
-      const cleaned = String(str || '').replace(/[^\d.\-]/g, '');
-      if (cleaned === '' || cleaned === '-' || cleaned === '.') return null;
-      const v = parseFloat(cleaned);
-      return isNaN(v) ? null : v;
-    };
+    const parseRaw = str => (cfg.mode === 'won' ? parseKoreanAmount(str) : parsePlain(str));
     const clamp = v => Math.max(cfg.min, Math.min(cfg.max, v));
 
     slider.addEventListener('input', () => {
       if (!isUserTyping) numInput.value = formatFor(cfg, +slider.value);
+      syncHint();
     });
+    slider.addEventListener('sync', syncHint);
     numInput.addEventListener('focus', () => {
       isUserTyping = true;
       const raw = numInput.value.replace(/,/g, '');
       if (raw !== numInput.value) numInput.value = raw;
+      // 쉼표를 지우면 선택이 풀려 새 입력이 기존 숫자 뒤에 붙으므로, 전체를 다시 선택해 바로 덮어쓰게 한다
+      try { numInput.select(); } catch (e) {}
     });
     numInput.addEventListener('input', () => {
       const parsed = parseRaw(numInput.value);
@@ -2169,6 +2721,7 @@ body.printing .section { display: block !important; animation: none; }
     });
 
     numInput.value = formatFor(cfg, +slider.value);
+    syncHint();
   }
 
   // 프리셋·시나리오·연동 시 값 설정 (이벤트 없이 값과 입력칸만 갱신, 렌더는 호출 측에서 한 번)
@@ -2184,6 +2737,7 @@ body.printing .section { display: block !important; animation: none; }
     el.value = v;
     const numInp = $(id + '-input');
     if (numInp && cfg) numInp.value = formatFor(cfg, +el.value);
+    el.dispatchEvent(new Event('sync'));
   }
 
   // ===== 값 읽기: 화면(DOM) 또는 저장된 스냅샷에서 같은 방식으로 =====
@@ -2198,7 +2752,9 @@ body.printing .section { display: block !important; animation: none; }
   const snapGetter = snap => id => {
     if (snap && snap[id] != null && snap[id] !== '') {
       const v = snap[id] === true ? 1 : snap[id] === false ? 0 : +snap[id];
-      return fin(v) ? v : (DEFAULTS[id] || 0);
+      if (!fin(v)) return DEFAULTS[id] || 0;
+      const cfg = sliderConfig[id];
+      return cfg ? Math.max(cfg.min, Math.min(cfg.max, v)) : v;
     }
     return DEFAULTS[id] || 0;
   };
@@ -2208,16 +2764,16 @@ body.printing .section { display: block !important; animation: none; }
   // 출처: 농림축산식품부·KREI 2024년 외식업체 경영실태조사(외식 8.7%), 한국은행 2024년 기업경영분석(법인 5.4%),
   //       한국신용데이터 2024 4Q, 소상공인연합회 2026 신년조사 종합
   const pnlBenchmark = [
-    { name: '외식업 전체', desc: '8.7% (\'24, KREI)', min: -5, avg: 8.7, max: 18 },
-    { name: '카페·비알코올 음료', desc: '음료 마진 큼, 임대료 부담', min: -3, avg: 10, max: 22 },
-    { name: '한식·일반음식점', desc: '식재료비 40%대 부담', min: -5, avg: 7, max: 15 },
-    { name: '치킨·피자·배달중심', desc: '배달 수수료 흡수 한계', min: -8, avg: 5, max: 12 },
-    { name: '주점·호프·이자카야', desc: '주류 마진으로 보전', min: -2, avg: 12, max: 22 },
-    { name: '제과·베이커리', desc: '폐기율·재료비 부담', min: -5, avg: 6, max: 14 },
-    { name: '도소매·편의점', desc: '원가율 60~70%, 박리다매', min: 1, avg: 4, max: 9 },
-    { name: '온라인 쇼핑몰', desc: '수수료·물류 부담 큼', min: -3, avg: 6, max: 15 },
-    { name: '일반 제조업', desc: '한국은행 \'24년 평균 5.4%', min: 0, avg: 5.4, max: 13 },
-    { name: '개인서비스·미용', desc: '인건비 비중 매우 큼', min: 0, avg: 7, max: 18 }
+    { id: 'food', name: '외식업 전체', desc: '8.7% (\'24, KREI)', min: -5, avg: 8.7, max: 18 },
+    { id: 'cafe', name: '카페·비알코올 음료', desc: '음료 마진 큼, 임대료 부담', min: -3, avg: 10, max: 22 },
+    { id: 'korean', name: '한식·일반음식점', desc: '식재료비 40%대 부담', min: -5, avg: 7, max: 15 },
+    { id: 'delivery', name: '치킨·피자·배달중심', desc: '배달 수수료 흡수 한계', min: -8, avg: 5, max: 12 },
+    { id: 'pub', name: '주점·호프·이자카야', desc: '주류 마진으로 보전', min: -2, avg: 12, max: 22 },
+    { id: 'bakery', name: '제과·베이커리', desc: '폐기율·재료비 부담', min: -5, avg: 6, max: 14 },
+    { id: 'retail', name: '도소매·편의점', desc: '원가율 60~70%, 박리다매', min: 1, avg: 4, max: 9 },
+    { id: 'online', name: '온라인 쇼핑몰', desc: '수수료·물류 부담 큼', min: -3, avg: 6, max: 15 },
+    { id: 'mfg', name: '일반 제조업', desc: '한국은행 \'24년 평균 5.4%', min: 0, avg: 5.4, max: 13 },
+    { id: 'service', name: '개인서비스·미용', desc: '인건비 비중 매우 큼', min: 0, avg: 7, max: 18 }
   ];
 
   // 마진율 = 원가 대비 가산율 (Cost Markup). 매출총이익률이 아님.
@@ -2248,7 +2804,7 @@ body.printing .section { display: block !important; animation: none; }
     online:     {price:35000,qty:25,  days:30, cogs:45, fee:12, rent:400000,  labor:3500000, etc:1200000}
   };
   // 프리셋을 고르면 벤치마크 비교 업종도 같이 맞춘다
-  const pnlPresetIndustry = { cafe: 1, restaurant: 2, retail: 6, online: 7 };
+  const pnlPresetIndustry = { cafe: 'cafe', restaurant: 'korean', retail: 'retail', online: 'online' };
   const fundPresets = {
     small:  { deposit:10000000, premium:0,        interior:8000000,  equipment:5000000,  inventory:2000000,
               runway:6,  'op-labor':1500000, 'op-rent':800000,  'op-cogs':1500000, 'op-mkt':300000, reserve:10,
@@ -2280,7 +2836,7 @@ body.printing .section { display: block !important; animation: none; }
     return {
       mat, lab, oh, ohMonthly, qty, unit, price, marginAmt,
       grossRate: price > 0 ? marginAmt / price * 100 : 0,
-      priceVat: price * 1.1
+      priceVat: price * (1 + VAT_RATE)
     };
   }
 
@@ -2290,7 +2846,7 @@ body.printing .section { display: block !important; animation: none; }
     const rent = g('p-rent'), labor = g('p-labor'), etc = g('p-etc');
     const vat = !!g('p-vat');
     const units = qty * days;
-    const netPrice = vat ? price / 1.1 : price;
+    const netPrice = vat ? price / (1 + VAT_RATE) : price;
     const gross = price * units;            // 고객 결제금액 (수수료 부과 기준)
     const rev = netPrice * units;           // 매출액 (공급가액)
     const vatAmt = vat ? gross - rev : 0;
@@ -2376,7 +2932,6 @@ body.printing .section { display: block !important; animation: none; }
     };
   }
 
-  const HORIZON = 24;
   function calcCash(g, p, f) {
     const start = Math.max(0.1, Math.min(1, g('cf-start') / 100));
     const ramp = Math.max(1, Math.round(g('cf-ramp')));
@@ -2428,8 +2983,9 @@ body.printing .section { display: block !important; animation: none; }
   function calcSensitivity(g, base) {
     return sensDrivers.map(d => {
       const opAt = f => calcPnl(id => id === d.id ? g(id) * f : g(id)).op;
-      const better = opAt(d.good > 0 ? 1.1 : 0.9) - base.op;
-      const worse = opAt(d.good > 0 ? 0.9 : 1.1) - base.op;
+      const up = 1 + SENS_STEP, down = 1 - SENS_STEP;
+      const better = opAt(d.good > 0 ? up : down) - base.op;
+      const worse = opAt(d.good > 0 ? down : up) - base.op;
       return { ...d, better, worse, impact: Math.max(Math.abs(better), Math.abs(worse)) };
     }).sort((a, b) => b.impact - a.impact);
   }
@@ -2437,9 +2993,12 @@ body.printing .section { display: block !important; animation: none; }
   // =====================================================================
   //  종합 진단 (신호등 점수 + 개선과제)
   // =====================================================================
-  function industryOf(idx) {
-    const i = Math.round(+idx);
-    return pnlBenchmark[i >= 0 && i < pnlBenchmark.length ? i : 0];
+  // 저장값이 id(v2.1) 또는 순번(v2.0)이어도 같은 업종을 찾는다
+  function industryOf(key) {
+    const byId = pnlBenchmark.find(b => b.id === key);
+    if (byId) return byId;
+    const i = Math.round(+key);
+    return pnlBenchmark[key !== '' && i >= 0 && i < pnlBenchmark.length ? i : 0];
   }
 
   function diagnose(all, industryIdx, g) {
@@ -2456,31 +3015,31 @@ body.printing .section { display: block !important; animation: none; }
       p.rate >= bm.avg ? '업종 평균 이상으로, 수익구조가 경쟁력 있습니다.' :
       p.rate >= 0 ? '흑자이지만 업종 평균(' + bm.avg + '%)보다 ' + (Math.round((bm.avg - p.rate) * 10) / 10) + '%p 낮습니다.' :
       '월 ' + won(-p.op) + ' 적자 구조입니다.');
-    add('수익성', '공헌이익률', '일반 기준 40% 이상', pct(p.cmRate),
-      !hasRev ? 'na' : p.cmRate >= 40 ? 'good' : p.cmRate >= 25 ? 'warn' : 'bad',
-      !hasRev ? '-' : p.cmRate >= 40 ? '매출 1원당 남는 돈이 충분해 고정비 흡수력이 좋습니다.' :
+    add('수익성', '공헌이익률', '일반 기준 ' + RULES.cmRate.good + '% 이상', pct(p.cmRate),
+      !hasRev ? 'na' : atLeast(p.cmRate, RULES.cmRate),
+      !hasRev ? '-' : p.cmRate >= RULES.cmRate.good ? '매출 1원당 남는 돈이 충분해 고정비 흡수력이 좋습니다.' :
       '매출 1원당 ' + (Math.round(p.cmRate) / 100).toFixed(2) + '원만 고정비 회수에 쓰입니다. 원가율·수수료 점검이 필요합니다.');
 
     // --- 안정성
-    add('안정성', '안전한계율', '30% 이상 안정 · 10% 미만 취약', fin(p.safety) ? pct(p.safety) : '적자',
-      !hasRev ? 'na' : p.safety >= 30 ? 'good' : p.safety >= 10 ? 'warn' : 'bad',
+    add('안정성', '안전한계율', RULES.safety.good + '% 이상 안정 · ' + RULES.safety.warn + '% 미만 취약', fin(p.safety) ? pct(p.safety) : '적자',
+      !hasRev ? 'na' : atLeast(p.safety, RULES.safety),
       !hasRev ? '-' : fin(p.bepRev) ? 'BEP 월 매출 ' + compactWon(p.bepRev) + ' (일 ' + num(p.bepDaily) + '개) 대비 현재 매출 ' + compactWon(p.rev) + '.' : '공헌이익이 0 이하라 BEP에 도달할 수 없습니다.');
-    add('안정성', '임대료 비중', '매출 대비 10% 이하', fin(p.rentRatio) ? pct(p.rentRatio) : '-',
-      !hasRev ? 'na' : p.rentRatio <= 10 ? 'good' : p.rentRatio <= 15 ? 'warn' : 'bad',
-      !hasRev ? '-' : p.rentRatio <= 10 ? '입지 비용이 적정 범위입니다.' : '적정선(10%)을 맞추려면 월 매출 ' + compactWon(p.rent / 0.10) + '이 필요합니다.');
-    add('안정성', '인건비 비중', '매출 대비 25% 이하', fin(p.laborRatio) ? pct(p.laborRatio) : '-',
-      !hasRev ? 'na' : p.laborRatio <= 25 ? 'good' : p.laborRatio <= 35 ? 'warn' : 'bad',
-      !hasRev ? '-' : p.laborRatio <= 25 ? '인력 운영이 매출 규모에 맞습니다.' : '적정선(25%)을 맞추려면 월 매출 ' + compactWon(p.labor / 0.25) + '이 필요합니다.');
+    add('안정성', '임대료 비중', '매출 대비 ' + RULES.rentRatio.good + '% 이하', fin(p.rentRatio) ? pct(p.rentRatio) : '-',
+      !hasRev ? 'na' : atMost(p.rentRatio, RULES.rentRatio),
+      !hasRev ? '-' : p.rentRatio <= RULES.rentRatio.good ? '입지 비용이 적정 범위입니다.' : '적정선(' + RULES.rentRatio.good + '%)을 맞추려면 월 매출 ' + compactWon(p.rent / (RULES.rentRatio.good / 100)) + '이 필요합니다.');
+    add('안정성', '인건비 비중', '매출 대비 ' + RULES.laborRatio.good + '% 이하', fin(p.laborRatio) ? pct(p.laborRatio) : '-',
+      !hasRev ? 'na' : atMost(p.laborRatio, RULES.laborRatio),
+      !hasRev ? '-' : p.laborRatio <= RULES.laborRatio.good ? '인력 운영이 매출 규모에 맞습니다.' : '적정선(' + RULES.laborRatio.good + '%)을 맞추려면 월 매출 ' + compactWon(p.labor / (RULES.laborRatio.good / 100)) + '이 필요합니다.');
 
     // --- 자금
-    add('자금', '자금 균형', '조달 ≥ 소요', f.gap >= -100000 ? '충족' : '부족 ' + compactWon(-f.gap),
-      f.totalNeed <= 0 ? 'na' : f.gap >= -100000 ? 'good' : f.gap >= -f.totalNeed * 0.1 ? 'warn' : 'bad',
-      f.gap >= -100000 ? '총 소요자금 ' + compactWon(f.totalNeed) + ' 대비 조달 ' + compactWon(f.totalFund) + '.' : '소요 대비 ' + pct(-f.gap / f.totalNeed * 100) + ' 부족합니다.');
-    add('자금', '자기자본 비율', '30% 이상 (50% 이상 안정)', pct(f.equityRate),
-      f.totalFund <= 0 ? 'na' : f.equityRate >= 50 ? 'good' : f.equityRate >= 30 ? 'warn' : 'bad',
-      f.equityRate >= 30 ? '정책자금 심사 기준선(30%)을 충족합니다.' : '30% 미만은 정책자금 심사에서 불리합니다.');
-    add('자금', '상환 여력 (DSCR)', '1.5배 이상', f.dscr === null ? '차입 없음' : f.dscr <= 0 ? '상환재원 없음' : f.dscr.toFixed(2) + '배',
-      f.dscr === null ? 'good' : f.dscr >= 1.5 ? 'good' : f.dscr >= 1.0 ? 'warn' : 'bad',
+    add('자금', '자금 균형', '조달 ≥ 소요', f.gap >= -BALANCE_TOL ? '충족' : '부족 ' + compactWon(-f.gap),
+      f.totalNeed <= 0 ? 'na' : f.gap >= -BALANCE_TOL ? 'good' : f.gap >= -f.totalNeed * RULES.fundGapWarn ? 'warn' : 'bad',
+      f.gap >= -BALANCE_TOL ? '총 소요자금 ' + compactWon(f.totalNeed) + ' 대비 조달 ' + compactWon(f.totalFund) + '.' : '소요 대비 ' + pct(-f.gap / f.totalNeed * 100) + ' 부족합니다.');
+    add('자금', '자기자본 비율', RULES.equityRate.warn + '% 이상 (' + RULES.equityRate.good + '% 이상 안정)', pct(f.equityRate),
+      f.totalFund <= 0 ? 'na' : atLeast(f.equityRate, RULES.equityRate),
+      f.equityRate >= RULES.equityRate.warn ? '정책자금 심사 기준선(' + RULES.equityRate.warn + '%)을 충족합니다.' : RULES.equityRate.warn + '% 미만은 정책자금 심사에서 불리합니다.');
+    add('자금', '상환 여력 (DSCR)', RULES.dscr.good + '배 이상', f.dscr === null ? '차입 없음' : f.dscr <= 0 ? '상환재원 없음' : f.dscr.toFixed(2) + '배',
+      f.dscr === null ? 'good' : atLeast(f.dscr, RULES.dscr),
       f.dscr === null ? '이자부 차입이 없어 상환 부담이 없습니다.' : '거치 후 월 원리금 ' + won(f.annuity) + ' vs 월 영업이익 ' + won(p.op) + '.');
 
     // --- 현금흐름
@@ -2489,11 +3048,11 @@ body.printing .section { display: block !important; animation: none; }
       cf.minCash >= cushion ? 'good' : cf.minCash >= 0 ? 'warn' : 'bad',
       cf.minCash < 0 ? cf.cashOut + '개월차에 현금이 바닥납니다.' :
       cf.minMonth > 0 ? cf.minMonth + '개월차에 가장 적어집니다.' : '개업 시점이 최저점이며 이후 꾸준히 늘어납니다.');
-    add('현금흐름', '월 영업흑자 전환', '6개월 이내', cf.firstProfit ? cf.firstProfit + '개월차' : '24개월 내 미도달',
-      !hasRev ? 'na' : cf.firstProfit && cf.firstProfit <= 6 ? 'good' : cf.firstProfit && cf.firstProfit <= 12 ? 'warn' : 'bad',
+    add('현금흐름', '월 영업흑자 전환', RULES.profitMonth.good + '개월 이내', cf.firstProfit ? cf.firstProfit + '개월차' : HORIZON + '개월 내 미도달',
+      !hasRev ? 'na' : cf.firstProfit ? atMost(cf.firstProfit, RULES.profitMonth) : 'bad',
       cf.firstProfit ? '램프업 가정(첫 달 ' + Math.round(cf.start * 100) + '% → ' + cf.ramp + '개월차 정상) 기준입니다.' : '정상 매출에서도 적자이거나 램프업이 너무 깁니다.');
-    add('현금흐름', '투자회수기간', '24개월 이내 우수 · 36개월 이내 보통', months(cf.payback),
-      cf.invest <= 0 ? 'na' : cf.payback <= 24 ? 'good' : cf.payback <= 36 ? 'warn' : 'bad',
+    add('현금흐름', '투자회수기간', RULES.payback.good + '개월 이내 우수 · ' + RULES.payback.warn + '개월 이내 보통', months(cf.payback),
+      cf.invest <= 0 ? 'na' : atMost(cf.payback, RULES.payback),
       cf.invest <= 0 ? '회수할 시설투자가 없습니다.' : '회수대상 ' + compactWon(cf.invest) + ' (시설자금 − 보증금) 기준입니다.');
 
     const scored = items.filter(i => i.level !== 'na');
@@ -2502,16 +3061,17 @@ body.printing .section { display: block !important; animation: none; }
     const count = { good: 0, warn: 0, bad: 0 };
     scored.forEach(i => count[i.level]++);
     // 위험 지표가 하나라도 있으면 A등급(실행 가능) 판정을 내리지 않는다
-    if (count.bad > 0) score = Math.min(score, 79);
+    if (count.bad > 0) score = Math.min(score, RULES.riskScoreCap);
 
-    let grade, verdict, verdictBody, gaugeColor;
-    if (score >= 80) { grade = 'A'; verdict = '사업성 양호 — 실행 단계 진입 가능'; gaugeColor = 'var(--success)';
+    const grade = gradeOf(score);
+    let verdict, verdictBody, gaugeColor;
+    if (grade === 'A') { verdict = '사업성 양호 — 실행 단계 진입 가능'; gaugeColor = 'var(--success)';
       verdictBody = '수익성·자금·현금흐름 전반이 기준을 충족합니다. 실제 상권 데이터와 견적으로 입력값을 검증한 뒤 실행 계획을 확정하세요.'; }
-    else if (score >= 60) { grade = 'B'; verdict = '조건부 양호 — 핵심 리스크 보완 후 실행'; gaugeColor = 'var(--accent)';
+    else if (grade === 'B') { verdict = '조건부 양호 — 핵심 리스크 보완 후 실행'; gaugeColor = 'var(--accent)';
       verdictBody = '기본 구조는 성립하지만 일부 지표가 기준에 못 미칩니다. 아래 개선과제를 먼저 해결하면 실행 리스크가 크게 줄어듭니다.'; }
-    else if (score >= 40) { grade = 'C'; verdict = '보완 필요 — 수익구조 재설계 권장'; gaugeColor = 'var(--warning)';
+    else if (grade === 'C') { verdict = '보완 필요 — 수익구조 재설계 권장'; gaugeColor = 'var(--warning)';
       verdictBody = '현재 가정으로는 버티는 힘이 약합니다. 가격·원가·고정비 중 민감도가 큰 변수부터 다시 설계하세요.'; }
-    else { grade = 'D'; verdict = '재검토 필요 — 사업모델·자금계획 근본 점검'; gaugeColor = 'var(--danger)';
+    else { verdict = '재검토 필요 — 사업모델·자금계획 근본 점검'; gaugeColor = 'var(--danger)';
       verdictBody = '적자 또는 자금 부족 위험이 큽니다. 실행 전에 아이템·입지·규모 자체를 다시 검토하는 것을 권합니다.'; }
 
     return { bm, items, score, grade, verdict, verdictBody, gaugeColor, count, actions: g ? buildActions(all, bm, g) : [] };
@@ -2532,49 +3092,51 @@ body.printing .section { display: block !important; animation: none; }
       add('bad', '적자 해소: 월 ' + won(-p.op) + ' 개선 필요',
         fin(needRev) ? 'BEP까지 월 매출 ' + compactWon(needRev) + '을 더 올리거나(일 약 ' + num(Math.ceil(needDaily)) + '개 추가 판매), 고정비를 같은 금액만큼 줄여야 합니다.' :
         '판매가가 변동비(원가+수수료)보다 낮아 많이 팔수록 손해입니다.',
-        top ? '가장 효과 큰 레버: ' + top.name + ' 10% 개선 시 월 ' + signWon(top.better) : '');
+        top ? '가장 효과 큰 레버: ' + top.name + ' ' + Math.round(SENS_STEP * 100) + '% 개선 시 월 ' + signWon(top.better) : '');
     }
-    if (p.rev > 0 && p.op >= 0 && p.safety < 30) {
-      const targetRev = fin(p.bepRev) ? p.bepRev / 0.7 : Infinity;
-      add(p.safety < 10 ? 'bad' : 'warn', '안전한계율 ' + pct(p.safety) + ' → 30% 확보',
-        '매출이 ' + pct(p.safety) + '만 줄어도 적자로 돌아섭니다. 안정권(30%)에는 월 매출 ' + compactWon(targetRev) + '이 필요합니다(현재 대비 ' + signWon(targetRev - p.rev) + ').',
-        p.dol ? '영업레버리지 ' + p.dol.toFixed(1) + '배 — 매출 10% 감소 시 영업이익 ' + Math.round(p.dol * 10) + '% 감소' : '');
+    if (p.rev > 0 && p.op >= 0 && p.safety < RULES.safety.good) {
+      const targetRev = fin(p.bepRev) ? p.bepRev / (1 - RULES.safety.good / 100) : Infinity;
+      add(p.safety < RULES.safety.warn ? 'bad' : 'warn', '안전한계율 ' + pct(p.safety) + ' → ' + RULES.safety.good + '% 확보',
+        '매출이 ' + pct(p.safety) + '만 줄어도 적자로 돌아섭니다. 안정권(' + RULES.safety.good + '%)에는 월 매출 ' + compactWon(targetRev) + '이 필요합니다(현재 대비 ' + signWon(targetRev - p.rev) + ').',
+        p.dol ? '영업레버리지 ' + p.dol.toFixed(1) + '배 — 매출 ' + Math.round(SENS_STEP * 100) + '% 감소 시 영업이익 ' + Math.round(p.dol * SENS_STEP * 100) + '% 감소' : '');
     }
     if (p.rev > 0 && p.op >= 0 && p.rate < bm.avg) {
       const needOp = p.rev * bm.avg / 100 - p.op;
       add('warn', '업종 평균 이익률(' + bm.avg + '%)까지 월 ' + won(needOp) + ' 개선',
         '같은 매출에서 영업이익을 ' + won(needOp) + ' 더 남겨야 ' + bm.name + ' 평균 수준이 됩니다.',
-        top ? '민감도 1위 ' + top.name + ' 10% 개선만으로 ' + signWon(top.better) + (top.better >= needOp ? ' — 목표 달성 가능' : '') : '');
+        top ? '민감도 1위 ' + top.name + ' ' + Math.round(SENS_STEP * 100) + '% 개선만으로 ' + signWon(top.better) + (top.better >= needOp ? ' — 목표 달성 가능' : '') : '');
     }
-    if (p.rev > 0 && p.rentRatio > 15) {
+    if (p.rev > 0 && p.rentRatio > RULES.rentRatio.warn) {
       add('warn', '임대료 비중 ' + pct(p.rentRatio) + ' — 입지 비용 과다',
-        '임대료가 매출의 15%를 넘으면 매출 변동에 매우 취약합니다. 적정선(10%)에는 월 매출 ' + compactWon(p.rent / 0.1) + '이 필요합니다.',
+        '임대료가 매출의 ' + RULES.rentRatio.warn + '%를 넘으면 매출 변동에 매우 취약합니다. 적정선(' + RULES.rentRatio.good + '%)에는 월 매출 ' + compactWon(p.rent / (RULES.rentRatio.good / 100)) + '이 필요합니다.',
         '임대료 협상, 면적 축소, 배달·테이크아웃 비중 확대로 평당 매출을 올리는 방안을 검토하세요.');
     }
-    if (p.rev > 0 && p.laborRatio > 35) {
+    if (p.rev > 0 && p.laborRatio > RULES.laborRatio.warn) {
+      const lr = RULES.laborRatio.good / 100;
       add('warn', '인건비 비중 ' + pct(p.laborRatio) + ' — 인력 구조 점검',
-        '적정선(25%)에는 월 매출 ' + compactWon(p.labor / 0.25) + '이 필요하거나 인건비를 ' + won(p.labor - p.rev * 0.25) + ' 줄여야 합니다.',
+        '적정선(' + RULES.laborRatio.good + '%)에는 월 매출 ' + compactWon(p.labor / lr) + '이 필요하거나 인건비를 ' + won(p.labor - p.rev * lr) + ' 줄여야 합니다.',
         '피크타임 파트타임 전환, 키오스크·사전주문 도입, 두루누리 사회보험료 지원을 검토하세요.');
     }
-    if (f.gap < -100000) {
+    if (f.gap < -BALANCE_TOL) {
       add('bad', '자금 조달 부족 ' + won(-f.gap),
         '총 소요자금 ' + compactWon(f.totalNeed) + ' 중 ' + compactWon(-f.gap) + '이 비어 있습니다.',
         '정책자금(소진공·중진공)·창업지원사업 추가 확보, 또는 권리금·인테리어 등 시설 규모 축소');
     }
-    if (f.totalFund > 0 && f.equityRate < 30) {
-      const addEq = (0.3 * f.totalFund - f.own) / 0.7;
-      add('bad', '자기자본 비율 ' + pct(f.equityRate) + ' → 30% 확보',
+    if (f.totalFund > 0 && f.equityRate < RULES.equityRate.warn) {
+      const er = RULES.equityRate.warn / 100;
+      const addEq = (er * f.totalFund - f.own) / (1 - er);
+      add('bad', '자기자본 비율 ' + pct(f.equityRate) + ' → ' + RULES.equityRate.warn + '% 확보',
         '차입 의존도가 높아 정책자금 심사와 상환에 모두 불리합니다.',
-        '자기자본 ' + won(addEq) + ' 추가(또는 같은 금액만큼 차입 축소) 시 30% 도달');
+        '자기자본 ' + won(addEq) + ' 추가(또는 같은 금액만큼 차입 축소) 시 ' + RULES.equityRate.warn + '% 도달');
     }
     if (f.graceInvalid) {
       add('bad', '상환 조건 오류: 거치기간 ≥ 상환기간',
         '거치기간(' + f.graceRaw + '개월)이 상환기간(' + f.term + '개월)과 같거나 깁니다. 원금을 갚을 기간이 없어 계산이 왜곡됩니다.',
         '상환기간은 거치기간을 포함한 전체 기간으로 입력하세요.');
     }
-    if (f.dscr !== null && f.dscr < 1.5) {
-      const needOp = f.annuity * 1.5;
-      add(f.dscr < 1 ? 'bad' : 'warn', 'DSCR ' + (f.dscr > 0 ? f.dscr.toFixed(2) + '배' : '적자') + ' → 1.5배 확보',
+    if (f.dscr !== null && f.dscr < RULES.dscr.good) {
+      const needOp = f.annuity * RULES.dscr.good;
+      add(f.dscr < RULES.dscr.warn ? 'bad' : 'warn', 'DSCR ' + (f.dscr > 0 ? f.dscr.toFixed(2) + '배' : '적자') + ' → ' + RULES.dscr.good + '배 확보',
         '거치기간이 끝나면 월 ' + won(f.annuity) + '을 갚아야 합니다. 안전 상환에는 월 영업이익 ' + won(needOp) + '이 필요합니다(현재 ' + won(p.op) + ').',
         '상환기간 연장, 정책자금(저금리) 비중 확대, 또는 영업이익 ' + won(needOp - p.op) + ' 개선');
     }
@@ -2587,7 +3149,7 @@ body.printing .section { display: block !important; animation: none; }
         cf.minMonth + '개월차 잔고가 ' + won(cf.minCash) + '까지 내려갑니다. 예상 못한 지출 한 번에 자금난이 올 수 있습니다.',
         '예비비 ' + won(p.fc - cf.minCash) + ' 추가 확보 권장');
     }
-    if (cf.invest > 0 && cf.payback > 36) {
+    if (cf.invest > 0 && cf.payback > RULES.payback.warn) {
       add('warn', '투자회수기간 ' + months(cf.payback),
         '시설투자 ' + compactWon(cf.invest) + '을 회수하는 데 3년 이상 걸립니다. 임대차 계약기간 안에 회수 가능한지 확인하세요.',
         '권리금·인테리어 축소 또는 중고 설비 활용으로 초기 투자 절감');
@@ -2668,8 +3230,8 @@ body.printing .section { display: block !important; animation: none; }
     setText('p-bep-daily', fin(p.bepDaily) ? num(Math.ceil(p.bepDaily)) + '개' : '-');
     setText('p-rent-ratio', pct(p.rentRatio));
     setText('p-labor-ratio', pct(p.laborRatio));
-    setLevel('p-rent-ratio', !fin(p.rentRatio) ? null : p.rentRatio <= 10 ? 'good' : p.rentRatio <= 15 ? 'warn' : 'bad');
-    setLevel('p-labor-ratio', !fin(p.laborRatio) ? null : p.laborRatio <= 25 ? 'good' : p.laborRatio <= 35 ? 'warn' : 'bad');
+    setLevel('p-rent-ratio', !fin(p.rentRatio) ? null : atMost(p.rentRatio, RULES.rentRatio));
+    setLevel('p-labor-ratio', !fin(p.laborRatio) ? null : atMost(p.laborRatio, RULES.laborRatio));
 
     renderPnlBenchmark(p.rate, industryIdx);
     renderSensitivity(g, p);
@@ -2684,11 +3246,11 @@ body.printing .section { display: block !important; animation: none; }
 
     const SCALE_MIN = -10, SCALE_MAX = 25;
     const toPct = v => Math.max(0, Math.min(100, (v - SCALE_MIN) / (SCALE_MAX - SCALE_MIN) * 100));
-    const sel = Math.round(+industryIdx) || 0;
-    list.innerHTML = pnlBenchmark.map((b, i) => {
+    const sel = industryOf(industryIdx).id;
+    list.innerHTML = pnlBenchmark.map(b => {
       const fillLeft = toPct(b.min);
       const youClass = myRate < SCALE_MIN ? 'off-low' : myRate > SCALE_MAX ? 'off-high' : '';
-      return '<div class="benchmark-row' + (i === sel ? ' selected' : '') + '">' +
+      return '<div class="benchmark-row' + (b.id === sel ? ' selected' : '') + '">' +
         '<div class="biz">' + b.name + '<div class="desc">' + b.desc + '</div></div>' +
         '<div class="avg">' + b.avg.toFixed(1) + '%</div>' +
         '<div class="benchmark-bar">' +
@@ -2723,10 +3285,10 @@ body.printing .section { display: block !important; animation: none; }
       '</div>'
     ).join('');
     const top = rows[0];
-    const msgs = [statusHtml('ok', '가장 민감한 변수: ' + top.name + ' — 10% 개선 시 월 영업이익 ' + signWon(top.better))];
+    const msgs = [statusHtml('ok', '가장 민감한 변수: ' + top.name + ' — ' + Math.round(SENS_STEP * 100) + '% 개선 시 월 영업이익 ' + signWon(top.better))];
     if (p.dol) {
-      const lv = p.dol >= 5 ? 'bad' : p.dol >= 3 ? 'warn' : 'ok';
-      msgs.push(statusHtml(lv, '영업레버리지 ' + p.dol.toFixed(1) + '배 — 매출 10% 감소 시 영업이익 ' + Math.round(p.dol * 10) + '% 감소'));
+      const lv = p.dol >= RULES.dol.bad ? 'bad' : p.dol >= RULES.dol.warn ? 'warn' : 'ok';
+      msgs.push(statusHtml(lv, '영업레버리지 ' + p.dol.toFixed(1) + '배 — 매출 ' + Math.round(SENS_STEP * 100) + '% 감소 시 영업이익 ' + Math.round(p.dol * SENS_STEP * 100) + '% 감소'));
     } else if (p.op <= 0) {
       msgs.push(statusHtml('bad', '현재 적자 상태라 영업레버리지는 의미가 없습니다 — 위 변수로 흑자 전환부터'));
     }
@@ -2748,8 +3310,9 @@ body.printing .section { display: block !important; animation: none; }
     } else if (b.cur <= 0) {
       msgs.push(statusHtml('warn', '현재 월 판매수량을 입력하면 BEP 대비 위치를 알려드립니다'));
     } else if (b.cur >= b.bepQ) {
-      const tier = b.safety >= 30 ? 'ok' : b.safety >= 10 ? 'warn' : 'bad';
-      const msg = b.safety >= 30 ? '안정 구간' : b.safety >= 10 ? '주의 구간' : '취약 구간';
+      const lv = atLeast(b.safety, RULES.safety);
+      const tier = lv === 'good' ? 'ok' : lv;
+      const msg = { good: '안정 구간', warn: '주의 구간', bad: '취약 구간' }[lv];
       msgs.push(statusHtml(tier, (tier === 'ok' ? '✓' : '⚠') + ' BEP 초과 — 안전한계율 ' + pct(b.safety) + ' (' + msg + ') · 월 영업이익 ' + won(b.curOp)));
     } else {
       msgs.push(statusHtml('bad', '⚠ BEP 미달 — 월 ' + num(Math.ceil(b.bepQ - b.cur)) + '개 추가 판매 필요 (현재 BEP의 ' + pct(b.cur / b.bepQ * 100) + ' 수준)'));
@@ -2791,7 +3354,7 @@ body.printing .section { display: block !important; animation: none; }
     }
 
     const balanceEl = $('f-balance-status');
-    if (Math.abs(f.gap) < 100000) {
+    if (Math.abs(f.gap) < BALANCE_TOL) {
       balanceEl.innerHTML = statusHtml('ok', '✓ 균형: 소요자금 = 조달자금');
     } else if (f.gap > 0) {
       balanceEl.innerHTML = statusHtml('warn', '조달 초과 ' + won(f.gap) + ' — 차입금을 줄이거나 운영자금 여유분으로 활용');
@@ -2805,21 +3368,22 @@ body.printing .section { display: block !important; animation: none; }
     setText('f-r-repay', won(f.annuity));
     setText('f-r-dscr', f.dscr === null ? '차입 없음' : f.dscr <= 0 ? '상환재원 없음' : f.dscr.toFixed(2) + '배');
     setText('f-r-total-interest', won(f.totalInterest));
-    setLevel('f-r-equity-rate', f.totalFund <= 0 ? null : f.equityRate >= 50 ? 'good' : f.equityRate >= 30 ? 'warn' : 'bad');
-    setLevel('f-r-dscr', f.dscr === null ? 'good' : f.dscr >= 1.5 ? 'good' : f.dscr >= 1.0 ? 'warn' : 'bad');
+    setLevel('f-r-equity-rate', f.totalFund <= 0 ? null : atLeast(f.equityRate, RULES.equityRate));
+    setLevel('f-r-dscr', f.dscr === null ? 'good' : atLeast(f.dscr, RULES.dscr));
 
     const msgs = [];
     if (f.totalFund > 0) {
-      if (f.equityRate < 30) msgs.push(statusHtml('bad', '⚠ 자기자본 비율 ' + pct(f.equityRate) + ' — 30% 미만은 정책자금 심사 통과율이 급격히 낮아집니다'));
-      else if (f.equityRate >= 50) msgs.push(statusHtml('ok', '✓ 자기자본 비율 ' + pct(f.equityRate) + ' — 안정적 구조'));
-      else msgs.push(statusHtml('warn', '자기자본 비율 ' + pct(f.equityRate) + ' — 기준선(30%) 충족, 50% 이상이면 더 안정적'));
+      const er = RULES.equityRate;
+      if (f.equityRate < er.warn) msgs.push(statusHtml('bad', '⚠ 자기자본 비율 ' + pct(f.equityRate) + ' — ' + er.warn + '% 미만은 정책자금 심사 통과율이 급격히 낮아집니다'));
+      else if (f.equityRate >= er.good) msgs.push(statusHtml('ok', '✓ 자기자본 비율 ' + pct(f.equityRate) + ' — 안정적 구조'));
+      else msgs.push(statusHtml('warn', '자기자본 비율 ' + pct(f.equityRate) + ' — 기준선(' + er.warn + '%) 충족, ' + er.good + '% 이상이면 더 안정적'));
     }
     if (f.graceInvalid) {
       msgs.push(statusHtml('bad', '⚠ 거치기간(' + f.graceRaw + '개월)이 상환기간(' + f.term + '개월) 이상입니다 — 상환기간은 거치 포함 전체 기간으로 입력하세요 (계산은 거치 ' + f.grace + '개월로 보정)'));
     }
     if (f.P > 0 && p.op > 0) {
-      if (f.dscr < 1) msgs.push(statusHtml('bad', '⚠ 월 영업이익(' + won(p.op) + ') < 거치 후 월 상환액(' + won(f.annuity) + ') — 상환 불가 구조'));
-      else if (f.dscr < 1.5) msgs.push(statusHtml('warn', '⚠ DSCR ' + f.dscr.toFixed(2) + '배 — 매출 변동 시 상환 부담 위험'));
+      if (f.dscr < RULES.dscr.warn) msgs.push(statusHtml('bad', '⚠ 월 영업이익(' + won(p.op) + ') < 거치 후 월 상환액(' + won(f.annuity) + ') — 상환 불가 구조'));
+      else if (f.dscr < RULES.dscr.good) msgs.push(statusHtml('warn', '⚠ DSCR ' + f.dscr.toFixed(2) + '배 — 매출 변동 시 상환 부담 위험'));
       else msgs.push(statusHtml('ok', '✓ DSCR ' + f.dscr.toFixed(2) + '배 — 상환 여력 충분'));
     } else if (f.P > 0 && p.op <= 0) {
       msgs.push(statusHtml('bad', '⚠ 손익탭에서 적자 상태 — 차입금 상환 재원 부재. 사업모델 재검토 필요'));
@@ -2833,12 +3397,12 @@ body.printing .section { display: block !important; animation: none; }
   function renderCash(cf, p, f) {
     setText('cf-open', won(cf.opening));
     setText('cf-min', won(cf.minCash));
-    setText('cf-profit-month', cf.firstProfit ? cf.firstProfit + '개월차' : '24개월 내 미도달');
+    setText('cf-profit-month', cf.firstProfit ? cf.firstProfit + '개월차' : HORIZON + '개월 내 미도달');
     setText('cf-payback', cf.invest > 0 ? months(cf.payback) : '해당 없음');
     setLevel('cf-open', cf.opening < 0 ? 'bad' : null);
     setLevel('cf-min', cf.minCash >= p.fc ? 'good' : cf.minCash >= 0 ? 'warn' : 'bad');
-    setLevel('cf-profit-month', !cf.firstProfit ? 'bad' : cf.firstProfit <= 6 ? 'good' : cf.firstProfit <= 12 ? 'warn' : 'bad');
-    setLevel('cf-payback', cf.invest <= 0 ? null : cf.payback <= 24 ? 'good' : cf.payback <= 36 ? 'warn' : 'bad');
+    setLevel('cf-profit-month', !cf.firstProfit ? 'bad' : atMost(cf.firstProfit, RULES.profitMonth));
+    setLevel('cf-payback', cf.invest <= 0 ? null : atMost(cf.payback, RULES.payback));
 
     const msgs = [];
     if (cf.opening < 0) {
@@ -2849,7 +3413,7 @@ body.printing .section { display: block !important; animation: none; }
     } else if (cf.minCash < p.fc) {
       msgs.push(statusHtml('warn', '현금이 바닥나진 않지만 ' + cf.minMonth + '개월차 잔고(' + won(cf.minCash) + ')가 1개월 고정비(' + won(p.fc) + ')보다 적습니다'));
     } else {
-      msgs.push(statusHtml('ok', '✓ 24개월 동안 현금이 1개월 고정비 이상 유지됩니다 · 24개월차 잔고 ' + won(cf.endCash)));
+      msgs.push(statusHtml('ok', '✓ ' + HORIZON + '개월 동안 현금이 1개월 고정비 이상 유지됩니다 · ' + HORIZON + '개월차 잔고 ' + won(cf.endCash)));
     }
     const runwayCover = f.runway;
     if (cf.firstProfit && cf.firstProfit > runwayCover) {
@@ -2918,7 +3482,8 @@ body.printing .section { display: block !important; animation: none; }
 
     root.innerHTML =
       '<div class="card keep"><div class="rep-cover">' +
-        '<div class="rep-eyebrow">종합 진단 리포트 · ' + APP.name + '</div>' +
+        '<div class="rep-brand"><span class="rb-mark" aria-hidden="true">' + SHIELD_SVG + '</span><span class="rb-name">' + APP.brand + ' · ' + APP.name + '</span></div>' +
+        '<div class="rep-eyebrow">종합 진단 리포트</div>' +
         '<div class="rep-title">' + escapeHtml(item) + '</div>' +
         (meta ? '<div class="rep-meta">' + meta + '</div>' : '') +
       '</div></div>' +
@@ -3103,10 +3668,17 @@ body.printing .section { display: block !important; animation: none; }
       t.setAttribute('aria-selected', on ? 'true' : 'false');
       t.tabIndex = on ? 0 : -1;
       if (on && opts.focus) t.focus();
-      if (on) t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      if (on) {
+        // 탭바만 가로로 움직인다 (scrollIntoView는 페이지 전체를 세로로 움직여 첫 화면이 밀림)
+        const bar = t.parentElement, l = t.offsetLeft, r = l + t.offsetWidth;
+        if (l < bar.scrollLeft) bar.scrollLeft = Math.max(0, l - 16);
+        else if (r > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = r - bar.clientWidth + 16;
+      }
     });
     document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-' + name));
     try { history.replaceState(null, '', '#' + name); } catch (e) {}
+    markVisited(name);
+    closeTerm();
     // 숨겨져 있던 캔버스는 크기가 0이라, 탭이 보일 때 새로 그린다
     if (name === 'bep' || name === 'cash') requestAnimationFrame(() => drawVisibleCharts({ rebuild: true }));
     if (opts.scroll) {
@@ -3340,8 +3912,8 @@ body.printing .section { display: block !important; animation: none; }
       gEl.querySelector('.checklist-group-progress').textContent = gDone + ' / ' + items.length + ' (' + Math.round(gDone / items.length * 100) + '%)';
     });
   }
-  $('btn-check-reset').addEventListener('click', () => {
-    if (!confirm('체크리스트의 모든 체크를 해제할까요?')) return;
+  $('btn-check-reset').addEventListener('click', async () => {
+    if (!await ask({ title: '체크 모두 해제', body: '체크리스트의 모든 체크를 해제할까요?', ok: '해제', danger: true })) return;
     store.set(CHECKLIST_KEY, {});
     renderChecklist();
     scheduleRender();
@@ -3361,17 +3933,29 @@ body.printing .section { display: block !important; animation: none; }
     if (!snap || typeof snap !== 'object') return;
     Object.entries(snap).forEach(([id, val]) => {
       if (!INPUT_IDS.includes(id) && !INFO_IDS.includes(id)) return;
-      if (id === 'info-industry' && !pnlBenchmark[+val]) return;
+      if (id === 'info-industry') { setValue(id, industryOf(val).id); return; }
       setValue(id, val);
     });
     scheduleRender();
   }
 
   let saveTimer = null;
+  let savePending = false;
+  // 창을 닫거나 새로고침·앱 전환 직전에 남은 저장을 즉시 처리 (0.4초 지연 중 입력 유실 방지)
+  function flushSave() {
+    if (!savePending) return;
+    clearTimeout(saveTimer);
+    savePending = false;
+    store.set(WORK_KEY, { v: 2, savedAt: new Date().toISOString(), touched, snap: currentSnapshot() });
+  }
+  window.addEventListener('pagehide', flushSave);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushSave(); });
   function scheduleSave() {
     clearTimeout(saveTimer);
+    savePending = true;
     saveTimer = setTimeout(() => {
-      const ok = store.set(WORK_KEY, { v: 2, savedAt: new Date().toISOString(), snap: currentSnapshot() });
+      savePending = false;
+      const ok = store.set(WORK_KEY, { v: 2, savedAt: new Date().toISOString(), touched, snap: currentSnapshot() });
       const hint = $('autosave-hint');
       if (hint) {
         const t = new Date();
@@ -3387,7 +3971,10 @@ body.printing .section { display: block !important; animation: none; }
     const id = e.target && e.target.id;
     if (!id) return;
     const base = id.replace(/-input$/, '');
-    if (INPUT_IDS.includes(base) || INFO_IDS.includes(id)) { scheduleRender(); scheduleSave(); }
+    if (INPUT_IDS.includes(base) || INFO_IDS.includes(id)) {
+      if (INPUT_IDS.includes(base) && e.isTrusted) markTouched();
+      scheduleRender(); scheduleSave();
+    }
   });
   document.addEventListener('change', e => {
     const id = e.target && e.target.id;
@@ -3397,18 +3984,19 @@ body.printing .section { display: block !important; animation: none; }
   // ===== 시나리오 =====
   function readScenarios() {
     const arr = store.get(SLOT_KEY, []);
-    return Array.isArray(arr) ? arr.filter(s => s && typeof s === 'object' && s.snap) : [];
+    return Array.isArray(arr) ? sanitizeScenarios(arr) : [];
   }
-  function writeScenarios(arr) { store.set(SLOT_KEY, arr.slice(0, 3)); }
+  function writeScenarios(arr) { store.set(SLOT_KEY, arr.slice(0, MAX_SLOTS)); }
 
-  $('btn-save').addEventListener('click', () => {
+  $('btn-save').addEventListener('click', async () => {
     const arr = readScenarios();
-    if (arr.length >= 3) {
-      if (!confirm('시나리오는 최대 3개까지 저장됩니다. 가장 오래된 것을 삭제하고 저장할까요?')) return;
+    if (arr.length >= MAX_SLOTS) {
+      const ok = await ask({ title: '저장 칸이 가득 찼어요', body: '시나리오는 최대 ' + MAX_SLOTS + '개까지 저장돼요.\n가장 오래된 "' + arr[0].name + '"을(를) 지우고 저장할까요?', ok: '지우고 저장' });
+      if (!ok) return;
       arr.shift();
     }
     const suggestions = ['기본 시나리오', '보수적 시나리오', '낙관적 시나리오'];
-    const name = prompt('시나리오 이름을 입력하세요', suggestions[arr.length] || '시나리오 ' + (arr.length + 1));
+    const name = await ask({ title: '시나리오 이름', body: '지금 입력한 숫자 전체를 이 이름으로 저장해요. 나중에 불러오거나 다른 안과 나란히 비교할 수 있어요.', input: true, value: suggestions[arr.length] || '시나리오 ' + (arr.length + 1), ok: '저장' });
     if (name === null) return;
     const all = latest || calcAll(domGetter());
     arr.push({ name: name.trim() || '시나리오 ' + (arr.length + 1), date: new Date().toISOString().slice(0, 10), profit: all.p.op, snap: currentSnapshot() });
@@ -3421,7 +4009,7 @@ body.printing .section { display: block !important; animation: none; }
     const arr = readScenarios();
     const wrap = $('scenarios');
     wrap.innerHTML = '';
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < MAX_SLOTS; i++) {
       const s = arr[i];
       const div = document.createElement('div');
       div.className = 'scenario-slot' + (s ? '' : ' empty');
@@ -3442,19 +4030,19 @@ body.printing .section { display: block !important; animation: none; }
     }
     renderScenarioCompare();
   }
-  $('scenarios').addEventListener('click', e => {
+  $('scenarios').addEventListener('click', async e => {
     const b = e.target.closest('button[data-act]');
     if (!b) return;
     const idx = +b.dataset.idx;
     const arr = readScenarios();
     if (!arr[idx]) return;
     if (b.dataset.act === 'load') {
-      if (!confirm('"' + arr[idx].name + '" 시나리오를 불러올까요?\n지금 화면의 입력값은 이 시나리오 값으로 바뀝니다.')) return;
+      if (!await ask({ title: '"' + arr[idx].name + '" 불러오기', body: '지금 화면의 입력값이 이 시나리오 값으로 바뀌어요. 현재 값을 남기려면 먼저 시나리오로 저장하세요.', ok: '불러오기' })) return;
       applySnapshot(arr[idx].snap);
       scheduleSave();
       toast('"' + arr[idx].name + '" 시나리오를 불러왔습니다');
     } else if (b.dataset.act === 'del') {
-      if (!confirm('이 시나리오를 삭제할까요?')) return;
+      if (!await ask({ title: '시나리오 삭제', body: '"' + arr[idx].name + '"을(를) 삭제할까요? 되돌릴 수 없어요.', ok: '삭제', danger: true })) return;
       arr.splice(idx, 1);
       writeScenarios(arr);
       renderScenarios();
@@ -3471,7 +4059,7 @@ body.printing .section { display: block !important; animation: none; }
     const cols = arr.map(s => {
       const g = snapGetter(s.snap);
       const all = calcAll(g);
-      return { name: s.name, all, d: diagnose(all, s.snap['info-industry'] || 0, null) };
+      return { name: s.name, all, d: diagnose(all, s.snap['info-industry'], null) };
     });
     if (latest) cols.push({ name: '현재 입력', cur: true, all: latest, d: diagnose(latest, $('info-industry').value, null) });
 
@@ -3487,7 +4075,7 @@ body.printing .section { display: block !important; animation: none; }
       ['최저 현금잔고', x => x.all.cf.minCash, compactWon, 'max'],
       ['흑자 전환', x => x.all.cf.firstProfit || Infinity, v => fin(v) ? v + '개월차' : '미도달', 'min'],
       ['투자회수기간', x => x.all.cf.payback, months, 'min'],
-      ['종합 점수', x => x.d.score, v => v + '점 (' + (v >= 80 ? 'A' : v >= 60 ? 'B' : v >= 40 ? 'C' : 'D') + ')', 'max']
+      ['종합 점수', x => x.d.score, v => v + '점 (' + gradeOf(v) + ')', 'max']
     ];
     const head = '<tr><th>지표</th>' + cols.map(c => '<th' + (c.cur ? ' class="cur"' : '') + '>' + escapeHtml(c.name) + '</th>').join('') + '</tr>';
     const body = metrics.map(([label, get, fmt, better]) => {
@@ -3505,7 +4093,32 @@ body.printing .section { display: block !important; animation: none; }
   }
 
   // ===== 백업·복원 =====
-  $('btn-export').addEventListener('click', () => {
+  // 외부 파일은 신뢰하지 않는다: 알려진 키·형식만 남기고 길이를 제한
+  function sanitizeSnap(snap) {
+    const out = {};
+    if (!snap || typeof snap !== 'object') return out;
+    INPUT_IDS.concat(INFO_IDS).forEach(id => {
+      const v = snap[id];
+      if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') out[id] = String(v).slice(0, 100);
+    });
+    return out;
+  }
+  function sanitizeScenarios(list) {
+    return list.filter(x => x && typeof x === 'object' && x.snap && typeof x.snap === 'object').slice(0, MAX_SLOTS).map(x => ({
+      name: String(x.name || '시나리오').slice(0, 30),
+      date: /^\d{4}-\d{2}-\d{2}$/.test(x.date) ? x.date : new Date().toISOString().slice(0, 10),
+      profit: fin(+x.profit) ? +x.profit : 0,
+      snap: sanitizeSnap(x.snap)
+    }));
+  }
+  function sanitizeChecklist(obj) {
+    const ids = new Set(checklistData.reduce((a, gr) => a.concat(gr.items.map(it => it.id)), []));
+    const out = {};
+    Object.keys(obj).forEach(k => { if (ids.has(k) && obj[k] === true) out[k] = true; });
+    return out;
+  }
+  $('btn-export').addEventListener('click', async () => {
+    if (!await inAppGuard('파일 내려받기')) return;
     const data = {
       app: APP.name, version: APP.version, exportedAt: new Date().toISOString(),
       work: currentSnapshot(), scenarios: readScenarios(), checklist: store.get(CHECKLIST_KEY, {})
@@ -3528,14 +4141,14 @@ body.printing .section { display: block !important; animation: none; }
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) { toast('파일이 너무 큽니다 (2MB 이하)'); return; }
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       let data;
       try { data = JSON.parse(reader.result); } catch (err) { toast('백업 파일을 읽을 수 없습니다 (JSON 형식 아님)'); return; }
       if (!data || typeof data !== 'object' || (!data.work && !data.scenarios)) { toast('이 도구의 백업 파일이 아닙니다'); return; }
-      if (!confirm('백업 파일을 불러올까요?\n현재 입력값·시나리오·체크리스트가 파일 내용으로 바뀝니다.')) return;
-      if (data.work && typeof data.work === 'object') applySnapshot(data.work);
-      if (Array.isArray(data.scenarios)) writeScenarios(data.scenarios.filter(s => s && s.snap && typeof s.snap === 'object'));
-      if (data.checklist && typeof data.checklist === 'object') store.set(CHECKLIST_KEY, data.checklist);
+      if (!await ask({ title: '백업 파일 불러오기', body: '현재 입력값·시나리오·체크리스트가 파일 내용으로 바뀌어요.', ok: '불러오기' })) return;
+      if (data.work && typeof data.work === 'object' && !Array.isArray(data.work)) applySnapshot(sanitizeSnap(data.work));
+      if (Array.isArray(data.scenarios)) writeScenarios(sanitizeScenarios(data.scenarios));
+      if (data.checklist && typeof data.checklist === 'object' && !Array.isArray(data.checklist)) store.set(CHECKLIST_KEY, sanitizeChecklist(data.checklist));
       renderChecklist();
       renderScenarios();
       scheduleSave();
@@ -3545,10 +4158,12 @@ body.printing .section { display: block !important; animation: none; }
   });
 
   // ===== 초기화 =====
-  $('btn-reset').addEventListener('click', () => {
-    if (!confirm('모든 입력값을 기본값으로 초기화할까요?\n(저장된 시나리오와 체크리스트는 유지됩니다)')) return;
-    const alsoInfo = confirm('기본정보(업종·아이템·지역·실습자·일자)도 함께 지울까요?\n취소를 누르면 기본정보는 그대로 유지됩니다.');
+  $('btn-reset').addEventListener('click', async () => {
+    closeMore();
+    if (!await ask({ title: '처음부터 다시 하기', body: '모든 숫자를 예시값으로 되돌릴까요?\n저장한 시나리오와 체크리스트는 그대로 남아요.', ok: '되돌리기', danger: true })) return;
+    const alsoInfo = await ask({ title: '기본정보도 지울까요?', body: '업종·아이템·지역·실습자·일자도 함께 지울까요?\n"남겨두기"를 누르면 기본정보는 유지돼요.', ok: '함께 지우기', cancel: '남겨두기' });
     clearTimeout(saveTimer);
+    savePending = false;
     if (alsoInfo) {
       store.remove(WORK_KEY);
       store.remove(INFO_KEY);
@@ -3583,7 +4198,8 @@ body.printing .section { display: block !important; animation: none; }
   }
   window.addEventListener('beforeprint', preparePrint);
   window.addEventListener('afterprint', finishPrint);
-  $('btn-print').addEventListener('click', () => {
+  $('btn-print').addEventListener('click', async () => {
+    if (!await inAppGuard('PDF 저장')) return;
     preparePrint();
     // afterprint를 지원하지 않는 브라우저 대비
     setTimeout(() => { window.print(); setTimeout(finishPrint, 500); }, 60);
@@ -3597,9 +4213,244 @@ body.printing .section { display: block !important; animation: none; }
     else if (mq.addListener) mq.addListener(onTheme);
   }
 
+
+  // =====================================================================
+  //  초보자 안내: 용어 사전 · 사용법 · 첫 방문 안내 · 단계 이동
+  // =====================================================================
+  const GLOSSARY = {
+    unitCost:     ['단위 제조원가', '제품 1개를 만드는 데 드는 모든 비용이에요. 재료비 + 만드는 사람 인건비 + 임대료·감가상각 같은 월 고정비를 생산량으로 나눈 몫을 더해요.', '재료 1,600원 + 인건비 1,733원 + 고정비 몫 900원 = 4,233원'],
+    markup:       ['마진율 (원가 가산율)', '원가에 몇 %를 얹어서 파는지를 말해요. 판매가에서 이익이 차지하는 비율(매출총이익률)과는 다른 숫자예요.', '원가 1,000원에 마진율 60% → 판매가 1,600원'],
+    grossMargin:  ['매출총이익률', '판매가에서 원가를 빼고 남는 돈이 판매가의 몇 %인지예요.', '1,600원에 팔고 원가가 1,000원이면 600 ÷ 1,600 = 37.5%'],
+    vat:          ['부가세와 공급가액', '손님이 낸 돈에는 부가세 10%가 들어 있어요. 이건 내 매출이 아니라 나중에 나라에 내는 돈이라, 실제 매출은 공급가액(÷1.1)으로 봐야 해요.', '소비자가 11,000원 = 공급가액 10,000원 + 부가세 1,000원'],
+    variable:     ['변동비', '많이 팔수록 같이 늘어나는 비용이에요. 재료비, 포장재, 카드·배달 수수료가 대표적이에요.', '1개 팔면 재료비 1번, 100개 팔면 100번'],
+    fixed:        ['고정비', '하나도 못 팔아도 매달 나가는 비용이에요. 임대료, 직원 월급, 통신비, 보험료 등이에요.', '장사가 안 돼도 월세 200만원은 그대로'],
+    cm:           ['공헌이익', '매출에서 변동비를 빼고 남는 돈이에요. 이 돈으로 고정비를 갚고, 남는 만큼이 이익이 돼요. 매출 대비 비율이 공헌이익률이에요.', '매출 1,000만원 − 변동비 400만원 = 공헌이익 600만원(60%)'],
+    bep:          ['손익분기점 (BEP)', '손해도 이익도 없는 판매량·매출이에요. 이보다 많이 팔면 이익, 적게 팔면 손해예요.', '고정비 630만원 ÷ 공헌이익률 60% = 월 매출 1,050만원'],
+    safety:       ['안전한계율', '지금 매출이 몇 % 줄어도 버틸 수 있는지예요. 높을수록 불경기에 강해요.', '매출 1,500만원, BEP 1,050만원 → 30% 줄어도 손해 없음'],
+    dol:          ['영업레버리지 (DOL)', '매출이 1% 변할 때 이익이 몇 % 변하는지예요. 고정비가 클수록 커지고, 클수록 매출 감소에 위험해요.', 'DOL 3배 → 매출 10% 감소 시 이익 30% 감소'],
+    depreciation: ['감가상각', '비싼 설비 구입비를 쓰는 기간 동안 나눠서 비용으로 잡는 거예요. 원가에 꼭 넣어야 진짜 원가가 보여요.', '1,800만원 오븐을 5년(60개월) 쓰면 월 30만원'],
+    runway:       ['예비 운영기간', '매출이 자리 잡기 전까지 운영비를 대비해 둘 개월 수예요. 이 기간 운영비만큼 운영자금을 준비해요.', '음식점·소매 6개월, 제조·B2B 9~12개월 권장'],
+    reserve:      ['예비비', '인테리어 추가·설비 고장처럼 예상 못 한 지출에 대비해 운영자금에 더 얹는 여유분이에요.', '운영자금 5,400만원 × 10% = 540만원'],
+    grace:        ['거치기간', '대출 후 처음 일정 기간은 이자만 내는 기간이에요. 거치기간이 끝나면 원금까지 같이 갚아야 해서 월 납입액이 크게 늘어요.', '5천만원, 연 4.5% → 거치 중 월 18.75만원, 이후 월 114만원'],
+    amort:        ['원리금균등상환', '매달 같은 금액(원금+이자)을 갚는 방식이에요. 여기서 상환기간은 거치기간을 포함한 전체 대출기간이에요.', '60개월 중 거치 12개월 → 나머지 48개월 동안 균등 상환'],
+    dscr:         ['상환 여력 (DSCR)', '한 달 영업이익으로 한 달 대출 상환액을 몇 번 갚을 수 있는지예요. 1배 미만이면 버는 돈으로 대출을 못 갚는 상태예요.', '영업이익 300만원 ÷ 상환액 150만원 = 2.0배'],
+    equityRate:   ['자기자본 비율', '창업자금 중 갚지 않아도 되는 돈(내 돈 + 정부지원금)의 비율이에요. 정책자금 심사에서 중요하게 봐요.', '총 1억 중 내 돈 4천만원 → 40%'],
+    debtRatio:    ['부채 비율', '내 돈 대비 빌린 돈이 몇 % 인지예요. 100%면 내 돈만큼 빌렸다는 뜻이에요.', '내 돈 5천만원, 대출 5천만원 → 100%'],
+    ramp:         ['램프업', '개업 직후 매출이 정상 수준까지 서서히 올라가는 기간이에요. 이 기간에는 고정비는 다 나가는데 매출이 적어 돈이 빠져나가요.', '첫 달 40% → 6개월차 100%'],
+    netcf:        ['현금흐름 · 현금잔고', '이익이 나도 대출을 갚고 나면 통장에 남는 돈은 달라요. 매달 들어오고 나간 돈을 쌓아 본 통장 잔고가 마이너스가 되면 그 달에 돈이 모자라요.', '영업이익 100만원 − 대출 상환 150만원 = 통장 −50만원'],
+    payback:      ['투자회수기간', '권리금·인테리어·설비 등에 들인 돈을 영업이익으로 다 회수하는 데 걸리는 기간이에요. 보증금은 돌려받는 돈이라 빼고 계산해요.', '투자 6,500만원 ÷ 월 이익 600만원 ≈ 11개월'],
+    score:        ['종합 점수', '11개 지표를 신호등(양호 10점·주의 5점·위험 0점)으로 매겨 100점으로 바꾼 점수예요. 위험이 하나라도 있으면 최대 ' + RULES.riskScoreCap + '점이에요.', '80점 이상 A · 60점 이상 B · 40점 이상 C']
+  };
+
+  // --- 용어 팝오버
+  const pop = $('term-pop');
+  let popBtn = null;
+  function closeTerm() {
+    if (!pop || pop.hidden) return;
+    pop.hidden = true;
+    if (popBtn) { popBtn.setAttribute('aria-expanded', 'false'); popBtn = null; }
+  }
+  function openTerm(btn) {
+    const g = GLOSSARY[btn.dataset.term];
+    if (!g) return;
+    if (popBtn === btn) { closeTerm(); return; }
+    closeTerm();
+    $('term-pop-title').textContent = g[0];
+    $('term-pop-body').textContent = g[1];
+    $('term-pop-ex').textContent = g[2] ? '예) ' + g[2] : '';
+    $('term-pop-more').dataset.term = btn.dataset.term;
+    pop.hidden = false;
+    const r = btn.getBoundingClientRect();
+    const w = pop.offsetWidth;
+    const left = Math.max(16, Math.min(window.scrollX + r.left - 20, window.scrollX + document.documentElement.clientWidth - w - 16));
+    pop.style.left = left + 'px';
+    pop.style.top = (window.scrollY + r.bottom + 8) + 'px';
+    btn.setAttribute('aria-expanded', 'true');
+    popBtn = btn;
+  }
+  document.addEventListener('click', e => {
+    const t = e.target.closest('.term');
+    if (t) { e.preventDefault(); e.stopPropagation(); openTerm(t); return; }
+    if (pop && !pop.contains(e.target)) closeTerm();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeTerm(); closeMore(); } });
+  $('term-pop-more').addEventListener('click', () => { const k = $('term-pop-more').dataset.term; closeTerm(); openHelp(k); });
+
+  // --- 사용법·용어 사전 창
+  const STEP_HELP = [
+    ['1 제조원가', '제품 1개 원가와 손해 안 보는 최소 판매가. 직접 만들지 않으면 건너뛰어도 돼요.'],
+    ['2 손익계산', '한 달에 얼마 남는지, 업종 평균과 비교, 이익을 가장 흔드는 변수(민감도).'],
+    ['3 손익분기점', '최소 판매량과 목표 이익을 위한 판매량. 2단계 값을 버튼 하나로 불러와요.'],
+    ['4 자금계획', '필요한 창업자금(시설+운영)과 마련 방법(내 돈·지원금·대출), 대출 상환 부담.'],
+    ['5 현금흐름', '2·4단계 숫자로 24개월 통장 잔고를 미리 그려 봐요. 돈이 바닥나는 달을 찾아요.'],
+    ['6 종합진단', '11개 지표 신호등 점수와 우선 개선과제. PDF 리포트의 첫 페이지가 돼요.'],
+    ['7 체크리스트', '점포 계약부터 개업까지 준비 항목을 체크해요.']
+  ];
+  const FAQ = [
+    ['숫자를 잘 모르겠어요.', '각 단계의 <b>업종 예시</b> 버튼을 눌러 비슷한 업종 숫자로 시작한 뒤, 아는 것부터 하나씩 바꿔 보세요. 정확하지 않아도 괜찮아요 — 범위를 바꿔 보며 감을 잡는 게 목적이에요.'],
+    ['큰 금액은 어떻게 입력하나요?', '큰 숫자를 눌러 <b>3000만</b>, <b>1억 2천만</b>처럼 한글 단위로 입력해도 돼요. 입력칸 아래에 "= 3,000만원"처럼 읽기 쉬운 표기가 함께 나와요.'],
+    ['입력한 내용은 어디에 저장되나요?', '이 기기의 브라우저에만 자동 저장돼요. 서버로 보내지 않아요. 다른 기기로 옮기거나 보관하려면 <b>더보기 → 백업 파일 받기</b>를 쓰세요. 아이폰 사파리는 한동안(약 7일) 방문하지 않으면 저장값을 지울 수 있고, 시크릿 모드는 창을 닫으면 지워지니 중요한 작업은 꼭 백업해 두세요.'],
+    ['PDF는 어떻게 만드나요?', '<b>📄 PDF 리포트</b>를 누르고 인쇄 창에서 대상(프린터)을 <b>PDF로 저장</b>으로 고르세요. 카카오톡 안에서 열었다면 먼저 일반 브라우저로 열어 주세요.'],
+    ['여러 안을 비교하고 싶어요.', '숫자를 넣고 <b>💾 시나리오 저장</b> → 숫자를 바꾸고 다시 저장. 최대 ' + MAX_SLOTS + '개를 화면 아래 비교표에서 나란히 볼 수 있어요.'],
+    ['결과를 믿어도 되나요?', '교육·시뮬레이션용 계산기예요. 세금·감가상각·재고 변동은 단순화했어요. 실제 대출·투자 결정 전에는 세무사·전문 컨설턴트와 꼭 검토하세요.']
+  ];
+  function buildHelp() {
+    const body = $('help-body');
+    body.innerHTML =
+      '<h3>이렇게 쓰세요</h3><ol>' +
+        '<li><b>예시로 시작</b> — 각 단계 위쪽 <b>업종 예시</b> 버튼으로 비슷한 업종 숫자를 채워요.</li>' +
+        '<li><b>내 숫자로 바꾸기</b> — 큰 숫자를 눌러 직접 입력하거나 막대를 밀어요. 결과는 바로 바뀌어요.</li>' +
+        '<li><b>순서대로</b> — 1단계부터 단계 끝의 <b>다음 단계</b> 버튼을 따라가세요. 모르는 말은 <b>?</b>를 누르면 설명이 나와요.</li>' +
+        '<li><b>저장·공유</b> — <b>📄 PDF 리포트</b>로 보고서를, <b>💾 시나리오 저장</b>으로 여러 안을 만들어 비교해요.</li>' +
+      '</ol>' +
+      '<h3>단계별로 하는 일</h3><ul>' + STEP_HELP.map(x => '<li><b>' + x[0] + '</b> — ' + x[1] + '</li>').join('') + '</ul>' +
+      '<h3>용어 사전</h3><dl class="gloss">' + Object.keys(GLOSSARY).map(k =>
+        '<div class="gloss-item" id="gloss-' + k + '"><dt>' + GLOSSARY[k][0] + '</dt><dd>' + GLOSSARY[k][1] +
+        (GLOSSARY[k][2] ? '<span class="ex">예) ' + GLOSSARY[k][2] + '</span>' : '') + '</dd></div>').join('') + '</dl>' +
+      '<h3>자주 묻는 질문</h3><dl class="faq">' + FAQ.map(x => '<dt>Q. ' + x[0] + '</dt><dd>' + x[1] + '</dd>').join('') + '</dl>' +
+      '<h3>도움이 더 필요하면</h3><p>' + APP.org + ' · BECONIC 창업 컨설팅 — 사업계획·자금조달·BM 설계를 함께 검토해 드려요. (중소기업통합콜센터 ☎ 1357에서도 창업 상담을 받을 수 있어요)</p>';
+  }
+  function openHelp(term) {
+    const dlg = $('help-dialog');
+    if (!$('help-body').innerHTML) buildHelp();
+    if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+    if (term) {
+      const el = $('gloss-' + term);
+      if (el) { el.scrollIntoView({ block: 'center' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1600); }
+    } else { $('help-body').scrollTop = 0; dlg.querySelector('.modal-inner').scrollTop = 0; }
+  }
+  $('btn-help').addEventListener('click', () => openHelp());
+  $('help-close').addEventListener('click', () => { const d = $('help-dialog'); if (d.close) d.close(); else d.removeAttribute('open'); });
+  $('help-dialog').addEventListener('click', e => { if (e.target === $('help-dialog')) $('help-dialog').close(); });
+
+  // --- 첫 방문 안내 카드
+  const GUIDE_KEY = 'startup_finance_lab_guide_closed_v1';
+  const VISIT_KEY = 'startup_finance_lab_visited_v1';
+  function setupGuide() {
+    $('guide-card').hidden = !!store.get(GUIDE_KEY, false);
+    $('guide-close').addEventListener('click', () => { $('guide-card').hidden = true; store.set(GUIDE_KEY, true); toast('안내를 닫았어요. 📖 사용법에서 언제든 다시 볼 수 있어요'); });
+    $('guide-more').addEventListener('click', () => openHelp());
+  }
+  let touched = false;
+  function markTouched() {
+    if (touched) return;
+    touched = true;
+    $('example-flag').hidden = true;
+  }
+
+  // --- 단계 끝 "다음 단계" 버튼
+  const STEP_NAMES = { costing: '제조원가', pnl: '손익계산', bep: '손익분기점', fund: '자금계획', cash: '현금흐름', report: '종합진단', check: '체크리스트' };
+  const NEXT_TEXT = {
+    costing: '권장 판매가를 손익 탭으로 보내고 한 달 손익을 확인해요.',
+    pnl: '최소 몇 개를 팔아야 하는지 확인해요.',
+    bep: '창업에 필요한 돈과 마련 방법을 정리해요.',
+    fund: '24개월 통장 잔고를 미리 그려 봐요.',
+    cash: '지금까지 숫자로 사업성을 채점해요.',
+    report: 'PDF로 저장하고 창업 준비 항목을 체크해요.'
+  };
+  function setupNextSteps() {
+    TABS.forEach((name, i) => {
+      const next = TABS[i + 1];
+      if (!next) return;
+      const box = document.createElement('div');
+      box.className = 'next-step no-print';
+      box.innerHTML = '<div class="ns-text"><b>다음: ' + (i + 2) + '단계 ' + STEP_NAMES[next] + '</b>' + NEXT_TEXT[name] + '</div>' +
+        (name === 'report' ? '<button type="button" class="link-btn ghost" data-print>📄 PDF 리포트</button>' : '') +
+        '<button type="button" class="link-btn solid" data-goto="' + next + '">' + STEP_NAMES[next] + ' →</button>';
+      $('sec-' + name).appendChild(box);
+    });
+    document.addEventListener('click', e => {
+      const go = e.target.closest('[data-goto]');
+      if (go) { showTab(go.dataset.goto, { scroll: true, focus: true }); return; }
+      if (e.target.closest('[data-print]')) $('btn-print').click();
+    });
+  }
+  function markVisited(name) {
+    const v = store.get(VISIT_KEY, {});
+    if (!v || typeof v !== 'object') return;
+    v[name] = true;
+    store.set(VISIT_KEY, v);
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('done', !!v[t.dataset.tab] && t.dataset.tab !== name));
+  }
+  function updateTabScrollHint() {
+    const bar = document.querySelector('.tab-bar');
+    bar.classList.toggle('can-scroll', bar.scrollWidth - bar.clientWidth - bar.scrollLeft > 4);
+  }
+
+  // --- 더보기 메뉴
+  function closeMore() { const m = $('more-menu'); if (m && m.open) m.open = false; }
+  document.addEventListener('click', e => { const m = $('more-menu'); if (m && m.open && !m.contains(e.target)) m.open = false; });
+  $('more-menu').addEventListener('click', e => { if (e.target.closest('.more-list button')) setTimeout(closeMore, 0); });
+
+  // --- 앱 안 브라우저(카카오톡·인스타그램·네이버 등) 감지
+  const UA = navigator.userAgent || '';
+  const IN_APP = /KAKAOTALK|Instagram|FBAN|FBAV|NAVER\(inapp|Line\/|DaumApps|everytimeApp|BAND\//i.test(UA);
+  const IS_KAKAO = /KAKAOTALK/i.test(UA);
+  const IS_WEB = /^https?:$/.test(location.protocol);
+  function openExternal() {
+    if (IS_KAKAO) { location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.href); return; }
+    copyLink().then(ok => ask({ alert: true, title: ok ? '주소를 복사했어요' : '브라우저로 열어 주세요', body: '오른쪽 위(또는 아래) ⋯ 메뉴에서 "다른 브라우저로 열기"를 누르거나, 크롬·사파리에 주소를 붙여 넣어 주세요.' }));
+  }
+  function setupInApp() {
+    if (!IN_APP) return;
+    $('inapp-banner').hidden = false;
+    $('btn-open-external').addEventListener('click', openExternal);
+  }
+  async function inAppGuard(what) {
+    if (!IN_APP) return true;
+    const go = await ask({ title: what + '은(는) 일반 브라우저에서 해 주세요', body: '카카오톡 같은 앱 안 브라우저는 ' + what + '을(를) 막는 경우가 많아요. 크롬·사파리로 열면 입력한 숫자는 백업 파일로 옮길 수 있어요.', ok: '브라우저로 열기', cancel: '그래도 시도' });
+    if (go) { openExternal(); return false; }
+    return true;
+  }
+
+  // --- 링크 공유
+  function copyLink() {
+    const url = location.href.split('#')[0];
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(url).then(() => true, () => false);
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = url; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      return Promise.resolve(ok);
+    } catch (e) { return Promise.resolve(false); }
+  }
+  $('btn-share').addEventListener('click', async () => {
+    if (!IS_WEB) { toast('파일로 연 상태에서는 공유 링크가 없어요. 웹에 올린 주소에서 공유해 주세요'); return; }
+    const url = location.href.split('#')[0];
+    const data = { title: '창업 재무분석 LAB', text: '내 창업 아이템, 숫자로 검증해볼까요? 제조원가·손익·BEP·자금계획을 한 번에.', url };
+    if (navigator.share) { try { await navigator.share(data); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    toast(await copyLink() ? '링크를 복사했어요. 카카오톡에 붙여 넣어 공유하세요' : '링크 복사에 실패했어요: ' + url);
+  });
+  // 공유하는 건 도구 주소뿐 — 내가 입력한 숫자는 링크에 담기지 않는다
+
+  // --- 설정값을 화면 문구에 반영 (data-cfg="RULES.safety.good")
+  function fillConfigText() {
+    const roots = { RULES, BASIS, APP };
+    document.querySelectorAll('[data-cfg]').forEach(el => {
+      const v = el.dataset.cfg.split('.').reduce((o, k) => (o == null ? o : o[k]), roots);
+      if (v == null) return;
+      el.textContent = el.dataset.fmt === 'won' ? won(v) : typeof v === 'number' ? v.toLocaleString('ko-KR') : v;
+    });
+    setText('ver-badge', 'v' + APP.version);
+    setText('ver-info', 'v' + APP.version + ' (' + APP.updated + ')');
+    const total = checklistData.reduce((a, gr) => a + gr.items.length, 0);
+    setText('check-total-intro', total + '개');
+    setText('cf-title', HORIZON + '개월 현금흐름 시뮬레이션');
+  }
+
+  // --- 예기치 못한 오류도 사용자에게 알린다 (한 번만)
+  let errShown = false;
+  window.addEventListener('error', e => {
+    if (errShown || !e || !e.message || /ResizeObserver/.test(e.message)) return;
+    errShown = true;
+    toast('일시적인 오류가 생겼어요. 입력값은 저장돼 있으니 새로고침해 주세요');
+  });
+
   // ===== Init =====
   // 비교 업종 선택지
-  $('info-industry').innerHTML = pnlBenchmark.map((b, i) => '<option value="' + i + '">' + b.name + ' (평균 ' + b.avg + '%)</option>').join('');
+  $('info-industry').innerHTML = pnlBenchmark.map(b => '<option value="' + b.id + '">' + b.name + ' (평균 ' + b.avg + '%)</option>').join('');
 
   Object.keys(sliderConfig).forEach(upgradeSlider);
   INPUT_IDS.forEach(id => { DEFAULTS[id] = readDom(id); });
@@ -3610,14 +4461,15 @@ body.printing .section { display: block !important; animation: none; }
   // 저장된 작업 복원 (v2 → 없으면 v1 기본정보 키)
   const saved = store.get(WORK_KEY, null);
   if (saved && saved.snap) {
-    applySnapshot(saved.snap);
+    applySnapshot(sanitizeSnap(saved.snap));
+    if (saved.touched) markTouched();
     if (saved.savedAt) {
       const t = new Date(saved.savedAt);
       if (!isNaN(t)) setText('autosave-hint', '✓ 지난 작업을 불러왔습니다 · ' + (t.getMonth() + 1) + '/' + t.getDate() + ' ' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') + ' 저장분');
     }
   } else {
     const oldInfo = store.get(INFO_KEY, null);
-    if (oldInfo && typeof oldInfo === 'object') applySnapshot(oldInfo);
+    if (oldInfo && typeof oldInfo === 'object') applySnapshot(sanitizeSnap(oldInfo));
   }
   const dateEl = $('info-date');
   if (!dateEl.value) {
@@ -3625,7 +4477,13 @@ body.printing .section { display: block !important; animation: none; }
     dateEl.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
 
-  setText('ver-info', 'v' + APP.version);
+  fillConfigText();
+  setupGuide();
+  setupNextSteps();
+  setupInApp();
+  document.querySelector('.tab-bar').addEventListener('scroll', updateTabScrollHint, { passive: true });
+  window.addEventListener('resize', updateTabScrollHint);
+  updateTabScrollHint();
   renderScenarios();
   render();
   showTab((location.hash || '').replace('#', '') || 'costing');

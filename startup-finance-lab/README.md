@@ -1,9 +1,36 @@
-# 창업 재무분석 LAB (v2.0.0)
+# 창업 재무분석 LAB (v2.1.0)
 
-예비창업자·소상공인용 단일 HTML 재무 시뮬레이터. `index.html` 하나로 오프라인 실행(Chart.js 4.4.1 내장, 폰트만 CDN·실패 시 시스템 폰트).
+예비창업자·소상공인용 단일 HTML 재무 시뮬레이터 (BECONIC by 그로스벤처스).
+`index.html` 하나로 오프라인 실행(Chart.js 4.4.1·방패 로고 내장, 폰트만 CDN·실패 시 시스템 폰트). 웹에 올리면 카카오톡 미리보기·홈 화면 설치 지원.
+
+## 파일
+```text
+index.html            # 앱 전체 (화면·계산·차트·인쇄)
+manifest.webmanifest  # 홈 화면 설치(앱) 정보
+assets/               # OG 이미지(1200×630), 방패 로고 SVG, 앱 아이콘
+build.mjs             # dist/ 생성 + OG·canonical 주소를 실제 배포 주소로 치환
+netlify.toml          # 배포 설정·보안 헤더 (Base directory: startup-finance-lab)
+tests/qa.mjs          # 자동 점검 51항목 (계산·보안·인앱·접근성·인쇄)
+docs/SELF_AUDIT.md    # 자가부검·레드팀 점검 보고서
+```
+
+## 배포
+1. Netlify 새 사이트 → 이 저장소, **Base directory `startup-finance-lab`**, 사이트 이름 `beconic-startup-lab`
+2. 다른 도메인이면 환경변수 `SITE_URL=https://내도메인` (https 아니면 빌드 중단)
+3. 배포 후 [카카오 공유 디버거](https://developers.kakao.com/tool/debugger/sharing)에서 캐시 초기화
+
+## 기준값 바꾸기
+판정 기준은 `RULES`, 제도 기준(최저임금·연도)은 `BASIS`, 업종 데이터는 `pnlBenchmark`·`marginGuide` 한 곳만 고치면 화면·진단·안내 문구가 함께 바뀝니다.
 
 ## 구성 (7개 탭)
 제조원가 → 손익계산(+민감도) → BEP → 자금계획 → 24개월 현금흐름 → 종합진단 → 체크리스트
+
+## v2.1 변경 사항
+- 카카오톡·SNS 공유 미리보기(OG·트위터 카드), 방패 로고(헤더·리포트·파비콘·앱 아이콘), 홈 화면 설치
+- 하드코딩 정리: 판정 기준·부가세율·기간·슬롯 수·최저임금·버전을 설정 한 곳으로, 업종은 순번 대신 id
+- 초보자 안내: 첫 방문 카드, 단계 번호·소개·다음 단계 버튼, 용어 22개 ? 설명, 사용법·FAQ, 한글 금액 입력(3000만·1억)
+- PDF: 종합진단 요약 → 제조원가~현금흐름 빈 공간 없이 연속(25쪽 → 8쪽), 쪽 번호
+- 레드팀 수정: 자동저장 유실, 입력 덮어쓰기, 백업 파일 검증, 카카오톡 인앱 브라우저, 글자 대비, iOS 확대, 보안 헤더 — 상세는 `docs/SELF_AUDIT.md`
 
 ## v2.0 변경 사항 (v1 대비)
 

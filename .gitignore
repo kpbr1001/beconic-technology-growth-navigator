@@ -18,3 +18,7 @@ __pycache__/
 finance/tests/out/
 finance/node_modules/
 finance/dist/
+
+# 창업 재무분석 LAB QA 산출물
+startup-finance-lab/tests/out/
+startup-finance-lab/dist/

@@ -1,0 +1,17 @@
+{
+  "name": "창업 재무분석 LAB | BECONIC",
+  "short_name": "창업재무LAB",
+  "description": "제조원가·손익·BEP·자금계획·현금흐름·종합진단을 한 번에 — 예비·초기창업자용 재무 시뮬레이터",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1b2c55",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/gv-shield.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
