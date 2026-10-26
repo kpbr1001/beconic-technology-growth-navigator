@@ -19,7 +19,8 @@ const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, a
 const page = await ctx.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e)));
-page.on('console', (m) => { if (m.type() === 'error' && !/pretendard|jsdelivr|ERR_|Failed to load resource/i.test(m.text())) errors.push(m.text()); });
+// Netlify 미리보기(deploy-preview)에만 주입되는 검토 도구(app.netlify.com) 프레임 차단 경고는 앱 오류가 아님(운영 사이트에는 주입되지 않음)
+page.on('console', (m) => { if (m.type() === 'error' && !/pretendard|jsdelivr|ERR_|Failed to load resource|Framing 'https:\/\/app\.netlify\.com\//i.test(m.text())) errors.push(m.text()); });
 page.on('dialog', (d) => d.accept());
 await page.goto(BASE);
 
