@@ -89,12 +89,23 @@ jobs:
         run: node tests/e2e/flow-parity.mjs
       - name: A4 PDF 페이지별 검수 (7종)
         run: npm run test:pdf
+      - name: HR 진단 QA (규칙 엔진·플로우·모바일·레드팀 회귀·A4 PDF)
+        run: |
+          (cd hr && python3 -m http.server 8791 --bind 127.0.0.1 >/dev/null 2>&1 &)
+          sleep 1
+          node hr/tests/qa.mjs http://127.0.0.1:8791/
+      - name: HR 진단 AI 함수 계약 (모의 API·카나리 키)
+        run: |
+          (cd hr && npm run build)
+          node hr/tests/ai-contract.mjs
       - name: 검수 결과물 업로드
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: e2e-output
-          path: tests/e2e/out/
+          path: |
+            tests/e2e/out/
+            hr/tests/out/
           retention-days: 14
 
   db:
