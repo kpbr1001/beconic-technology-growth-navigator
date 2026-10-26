@@ -23,3 +23,5 @@ finance/dist/
 hr/tests/out/
 hr/node_modules/
 hr/dist/
+growth/tests/out/
+growth/dist/
