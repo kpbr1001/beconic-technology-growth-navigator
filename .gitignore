@@ -18,3 +18,8 @@ __pycache__/
 finance/tests/out/
 finance/node_modules/
 finance/dist/
+
+# HR 진단 QA 산출물
+hr/tests/out/
+hr/node_modules/
+hr/dist/
