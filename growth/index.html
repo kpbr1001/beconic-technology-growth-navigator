@@ -704,6 +704,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   /* 전문가 CTA 세로 정렬 */
   .expert-cta{flex-direction:column;align-items:flex-start;gap:16px;text-align:left;}
   .cta-top{flex-direction:column;align-items:stretch;padding:18px;}
+  .cta-top-body{flex:none;}
   .cta-top-btn{width:100%;}
   .expert-cta .btn{width:100%;}
   .kpi-table{display:none;}
@@ -774,9 +775,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   @page{
     size:A4; margin:14mm 11mm 13mm 11mm;
     @top-left{ content:"기업 성장활동 진단 보고서"; font-size:8pt; font-family:"Pretendard Variable",Pretendard,sans-serif; color:#8895ab; }
-    @top-right{ content:"그로스벤처스㈜ · Beconic"; font-size:8pt; font-family:"Pretendard Variable",Pretendard,sans-serif; color:#8895ab; }
     @bottom-center{ content:"— " counter(page) " —"; font-size:8.5pt; font-family:"Pretendard Variable",Pretendard,sans-serif; color:#66748c; }
-    @bottom-right{ content:"제2025-684호"; font-size:7.5pt; font-family:"Pretendard Variable",Pretendard,sans-serif; color:#aab6cc; }
   }
   @page cover{ margin:0; @top-left{content:none;} @top-right{content:none;}
     @bottom-center{content:none;} @bottom-right{content:none;} }
@@ -1008,6 +1007,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 .bar-exp{position:absolute;top:-3px;bottom:-3px;width:3px;border-radius:2px;background:var(--amber-deep);opacity:.9;transform:translateX(-1px);}
 .lvl-na{background:transparent;}
 .ev{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.ev-area-na{opacity:.75;}
+.ev-area-na .ev-now{margin-top:8px;}
 .ev-area{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;box-shadow:var(--sh-sm);break-inside:avoid;}
 .ev-h{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:9px;margin-bottom:4px;}
 .ev-h b{font-size:14px;font-weight:900;color:var(--navy);}
@@ -1112,10 +1113,10 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   <div class="wrap top-in">
     <a class="brand" href="#" onclick="GAN.go('home');return false;" aria-label="기업 성장활동 진단 내비게이터 홈">
       <span class="mk" aria-hidden="true"><img src="logo-mark.png" alt="" width="26" height="26"></span>
-      <span>성장활동 내비게이터<small>그로스벤처스 · Beconic</small></span>
+      <span>성장활동 내비게이터<small data-co="brandLine"></small></span>
     </a>
     <div class="cta-mini">
-      <span class="tag-cert">중기부 인증 중소기업상담회사 제2025-684호</span>
+      <span class="tag-cert" data-co="certShort"></span>
       <button class="btn btn-sm btn-primary no-print" onclick="GAN.go('diagnose')">진단 시작</button>
     </div>
   </div>
@@ -1125,7 +1126,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 <main id="v-home" class="view on">
   <section class="hero">
     <div class="wrap hero-in">
-      <span class="eyebrow">9개 영역 · 27문항 · 단계 기대수준 비교</span>
+      <span class="eyebrow"><span data-cnt="areas"></span>개 영역 · <span data-cnt="q"></span>문항 · 단계 기대수준 비교</span>
       <h1>지금 우리 회사가<br><span class="hl">무엇을 먼저</span> 해야 하는지<br>한눈에 확인하세요</h1>
       <p class="lede">회사 규모가 아니라 <b>지금 실제로 하고 있는 일</b>로 진단합니다. 행동 기준 문항에 답하면 업종·창업 연차의 기대수준과 비교해 먼저 할 과제, 90일 실행계획, 12개월 KPI 로드맵을 제시합니다.</p>
       <div class="hero-cta">
@@ -1138,7 +1139,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
         <button class="btn btn-sm btn-ghost" onclick="GAN.resumeDismiss();GAN.clearSaved();GAN.restart()">새로 시작</button>
       </div>
       <div class="hero-meta">
-        <span><i class="dot"></i>간이 <b>5분</b> · 표준 <b>12분</b></span>
+        <span><i class="dot"></i>간이 <b><span data-cnt="minQuick"></span>분</b> · 표준 <b><span data-cnt="minStd"></span>분</b></span>
         <span><i class="dot"></i>공개 산식 · <b>규칙 기반</b> 진단</span>
         <span><i class="dot"></i>설치·로그인 <b>없음</b></span>
         <span><i class="dot"></i>입력정보 <b>서버 전송·수집 없음</b></span>
@@ -1165,7 +1166,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
       <div class="sec-head" style="max-width:760px">
         <span class="eyebrow">성장활동 시각화</span>
         <h2>창업 단계가 바뀌면, 먼저 할 영역도 바뀝니다</h2>
-        <p>아래는 단계별로 <b>지금 집중해야 할 9개 영역의 상대적 우선도</b>(진단 엔진의 단계 적합도 계수)를 시각화한 것입니다. 예비창업은 창업기초·사업모델·고객에, 성숙기업은 인증·R&D·수출·디지털로 무게중심이 이동합니다. 단계를 눌러 비교해 보세요.</p>
+        <p>아래는 단계별로 <b>지금 집중해야 할 <span data-cnt="areas"></span>개 영역의 상대적 우선도</b>(진단 엔진의 단계 적합도 계수)를 시각화한 것입니다. 예비창업은 창업기초·사업모델·고객에, 성숙기업은 인증·R&D·수출·디지털로 무게중심이 이동합니다. 단계를 눌러 비교해 보세요.</p>
       </div>
 
       <div class="gv-card">
@@ -1203,7 +1204,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
           <div class="num">STEP 01</div>
           <h4>기본 정보 입력</h4>
-          <p>업종·창업연차·규모·고민을 고르고 진단 깊이(간이 9문항 / 표준 27문항)를 정합니다.</p>
+          <p>업종·창업연차·규모·고민을 고르고 진단 깊이(간이 <span data-cnt="qQuick"></span>문항 / 표준 <span data-cnt="q"></span>문항)를 정합니다.</p>
         </div>
         <div class="step">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#16C2A3" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
@@ -1235,9 +1236,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
         <p>같은 인증, 같은 지원제도라도 창업 연차와 업종에 따라 우선순위가 완전히 달라집니다. 내비게이터는 그 순서를 정리해 드립니다.</p>
       </div>
       <div class="trust">
-        <div class="t"><b>27<span class="u">개 문항</span></b><span>9개 영역 × 3문항, 4단계 행동 기준으로 진단</span></div>
-        <div class="t"><b>11<span class="u">개 업종</span></b><span>업종별 가중치·기대수준으로 우선순위 보정</span></div>
-        <div class="t"><b>39<span class="u">개 근거</span></b><span>학술·법령·표준·공공 출처를 문항·과제마다 표기</span></div>
+        <div class="t"><b><span data-cnt="q"></span><span class="u">개 문항</span></b><span><span data-cnt="areas"></span>개 영역 × <span data-cnt="qPer"></span>문항, <span data-cnt="lv"></span>단계 행동 기준으로 진단</span></div>
+        <div class="t"><b><span data-cnt="ind"></span><span class="u">개 업종</span></b><span>업종별 가중치·기대수준으로 우선순위 보정</span></div>
+        <div class="t"><b><span data-cnt="src"></span><span class="u">개 근거</span></b><span>학술·법령·표준·공공 출처를 문항·과제마다 표기</span></div>
       </div>
       <div class="aud">
         <span class="chip">예비창업자</span><span class="chip">1인기업</span><span class="chip">소상공인</span>
@@ -1431,7 +1432,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
       <div class="form-nav">
         <button class="btn btn-ghost" id="btnPrev" onclick="GAN.prevStep()">이전</button>
         <div class="nav-r">
-          <button class="btn btn-ghost" id="btnSkip" style="display:none" onclick="GAN.skipToResult()">결과 바로 보기</button>
+          <button class="btn btn-ghost" id="btnSkip" style="display:none" onclick="GAN.toConsult()">+ 컨설턴트 입력(상담용)</button>
           <button class="btn btn-primary" id="btnNext" onclick="GAN.nextStep()">다음 단계</button>
         </div>
       </div>
@@ -1501,15 +1502,15 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 <footer class="foot">
   <div class="wrap foot-in">
     <div>
-      <div class="brand"><span class="mk" aria-hidden="true"><img src="logo-mark.png" alt="" width="26" height="26"></span><span style="color:#fff">그로스벤처스 주식회사<small>기업 성장활동 진단 내비게이터</small></span></div>
+      <div class="brand"><span class="mk" aria-hidden="true"><img src="logo-mark.png" alt="" width="26" height="26"></span><span style="color:#fff"><span data-co="name"></span><small>기업 성장활동 진단 내비게이터</small></span></div>
       <div class="addr">
-        서울시 구로구 디지털로27길 24, 209호<br>
-        전화 <a href="tel:07041034177">070-4103-4177</a> &nbsp;·&nbsp; 이메일 start@gven.kr<br>
-        사이트 <a href="https://www.beconic.kr" target="_blank" rel="noopener">www.beconic.kr</a>
+        <span data-co="addr"></span><br>
+        전화 <a data-co="tel" data-tel></a> &nbsp;·&nbsp; 이메일 <span data-co="mail"></span><br>
+        사이트 <a data-co="web" data-web target="_blank" rel="noopener"></a>
       </div>
       <div class="cert">
-        <span class="badge">중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호</span>
-        <div class="copy">© 2023~2026 Copyright ⓒ growthventures Co., Ltd. All rights reserved.</div>
+        <span class="badge" data-co="certFull"></span>
+        <div class="copy">© <span data-co="years"></span> Copyright ⓒ <span data-co="en"></span> All rights reserved.</div>
         <div class="ver" id="appVer"></div>
       </div>
     </div>
@@ -1518,7 +1519,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
         <a href="#" onclick="GAN.go('home');return false;">홈으로</a>
         <a href="#" onclick="GAN.go('diagnose');return false;">진단 시작</a>
         <a href="#" onclick="GAN.loadSample();return false;">샘플 결과 보기</a>
-        <a href="tel:07041034177">전문가에게 전화 상담 070-4103-4177</a>
+        <a data-tel>전문가에게 전화 상담 <span data-co="tel"></span></a>
         <a href="#" onclick="GAN.clearSaved();return false;">이 브라우저의 임시 저장 지우기(공용 PC)</a>
       </div>
       <p class="mini-disc">본 서비스는 입력 정보 기반의 참고용 자가진단 도구입니다. 법률·세무·회계·노무·인증·정책자금·정부지원사업·투자유치·수출 가능성 등을 보장하지 않으며, 실제 의사결정 전 관련 기관의 최신 기준 확인과 전문가 검토가 필요합니다. 표시되는 점수는 자가 응답 기반 성숙도이며 절대평가가 아닙니다.</p>
@@ -1534,18 +1535,40 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.1.0";
+const APP_VERSION = "v6.2.0";
 const APP_UPDATED = "2026-10-26";
-const APP_BUILD   = "2026.10.26.3";  // 배포 빌드 식별자
+const APP_BUILD   = "2026.10.26.4";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
+const LEGAL_BASIS_DATE = "2026-10-26";  // 법령·제도 출처를 마지막으로 확인한 날(도구 버전 날짜와 별개)
+
+/* 회사·연락처 — 화면·보고서·인쇄 머리글/바닥글·메일이 모두 이 값을 읽는다(여기만 고치면 전체 반영) */
+const COMPANY = {
+  name:"그로스벤처스 주식회사", short:"그로스벤처스㈜", en:"growthventures Co., Ltd.", brand:"Beconic",
+  certNo:"제2025-684호", certLabel:"중소벤처기업부 공식 인증 중소기업상담회사",
+  tel:"070-4103-4177", mail:"start@gven.kr", web:"www.beconic.kr", addr:"서울시 구로구 디지털로27길 24, 209호",
+  since:2023, serviceUrl:"https://beconic-diagnosis-business-growth.netlify.app/"
+};
+const telHref = ()=>"tel:"+COMPANY.tel.replace(/[^0-9+]/g,"");
+const copyYears = ()=>{ const y=new Date().getFullYear(); return y>COMPANY.since ? `${COMPANY.since}~${y}` : String(COMPANY.since); };
+
+/* 산식 상수 — 엔진 계산과 '진단 방법·공개 산식' 설명문이 같은 값을 쓴다(설명과 계산이 어긋나지 않도록) */
+const RULES = {
+  minutes:{quick:5, standard:12},                // 화면 안내용 예상 소요 시간
+  expect:{indMin:0.6, indMax:1.2, cap:85},       // 기대수준 = 단계 기준값 × 업종 보정(indMin~indMax), 상한 cap
+  priority:{concern:15, unknownArea:10, gapToAct:0.15, focus:8, doneCut:100, halfCut:67, half:0.5,
+            relExclude:0.22, relFloor:0.6, nowGap:-15, nowRel:0.8, maxNow:3, acts:6, perArea:{early:3, other:2},
+            fillNext:12, fillKeep:6},
+  strong:{min:60, margin:10},                    // 강점 = max(min, 기대+margin) 이상
+  conf:{flagPenalty:8, straightCap:60, quickCap:70, straightMin:9, high:75, mid:50, minCoverage:0.5}
+};
 const STORE_KEY = "gan_state_v6";   // v5 이하 저장값(구조 다름)은 읽지 않음
 const FILE_SCHEMA = "beconic-growth/6";
 
 /* ---------- 1. 옵션 데이터 ---------- */
 const OPT = {
-  depth:[
-    {v:"quick",    t:"간이 진단 · 9문항 · 약 5분"},
-    {v:"standard", t:"표준 진단 · 27문항 · 약 12분"}
+  depth:[  // 문항 수는 QUESTIONS에서 계산해 init 때 채움(depthLabel)
+    {v:"quick",    t:"간이 진단"},
+    {v:"standard", t:"표준 진단"}
   ],
   stage:[
     {v:"pre",  t:"예비창업"},
@@ -1696,7 +1719,7 @@ const SRC = {
   P_UNIPASS:{k:"공공",s:"관세청 UNI-PASS",f:"관세청 UNI-PASS 품목분류(HS)·FTA 포털 — 품목분류·원산지 정보."},
   P_SMART:{k:"공공",s:"스마트제조혁신추진단",f:"스마트제조혁신추진단(smart-factory.kr) — 스마트공장 수준확인·지원사업."},
   P_KISA:{k:"공공",s:"KISA",f:"한국인터넷진흥원 KISA — 중소기업 정보보호·개인정보 보호 지원."},
-  B_RULE:{k:"실무",s:"BECONIC 실무기준 v6",f:"그로스벤처스(중기부 인증 중소기업상담회사 제2025-684호) 컨설팅 실무 기준 v6.0 — 단계 기대수준·적합도·권장 목표값. 통계 표본이 아닌 실무 판단 모델이며 실사용 데이터로 보정 예정."}
+  B_RULE:{k:"실무",s:"BECONIC 실무기준 v6",f:"그로스벤처스(중기부 인증 중소기업상담회사 "+COMPANY.certNo+") 컨설팅 실무 기준 v6.0 — 단계 기대수준·적합도·권장 목표값. 통계 표본이 아닌 실무 판단 모델이며 실사용 데이터로 보정 예정."}
 };
 function srcChips(ids){
   const list=(ids||[]).filter(id=>SRC[id]);
@@ -1847,8 +1870,9 @@ function relevanceOf(ind, area, stage){
 /* 기대수준 = 단계 기준값 × 업종 보정(업종 적합도를 0.6~1.2로 제한), 상한 85 */
 function expectedOf(stage, ind, area){
   const base = (EXPECT[stage]||EXPECT.y13)[area];
-  const m = Math.max(0.6, Math.min(1.2, (IND_RELEVANCE[ind]||{})[area] ?? 1.0));
-  return Math.min(85, Math.round(base*m));
+  const E = RULES.expect;
+  const m = Math.max(E.indMin, Math.min(E.indMax, (IND_RELEVANCE[ind]||{})[area] ?? 1.0));
+  return Math.min(E.cap, Math.round(base*m));
 }
 /* 고민 → 영역 (v5 오류 수정: 조직관리→디지털 ✕ → 경영체계(기초·체계) ○) */
 const CONCERN_AREA = {setup:"foundation",customer:"sales",revenue:"sales",cert:"cert",
@@ -2213,26 +2237,27 @@ function scoreEngine(d){
   // 신뢰도(점수와 분리): 응답률 − 응답 점검 플래그 − 일률 응답, 간이 진단은 상한 70
   const flags = consistencyFlags(d);
   const numeric = asked.map(q=>ans[q.id]).filter(v=>typeof v==="number");
-  const straight = numeric.length>=9 && numeric.every(v=>v===numeric[0]);
+  const C = RULES.conf;
+  const straight = numeric.length>=C.straightMin && numeric.every(v=>v===numeric[0]);
   const base = asked.length - nNa;
   const coverage = base>0 ? nAns/base : 0;
-  let cs = Math.round(coverage*100) - flags.length*8;
-  if(straight) cs = Math.min(cs, 60);                 // 전 문항 같은 단계는 실제 행동 재확인 전까지 '보통' 이하
-  if(d.depth==="quick") cs = Math.min(cs, 70);
+  let cs = Math.round(coverage*100) - flags.length*C.flagPenalty;
+  if(straight) cs = Math.min(cs, C.straightCap);      // 전 문항 같은 단계는 실제 행동 재확인 전까지 '보통' 이하
+  if(d.depth==="quick") cs = Math.min(cs, C.quickCap);
   cs = Math.max(0, Math.min(100, cs));
   const reasons=[];
   if(d.depth==="quick") reasons.push("간이 진단(영역별 1문항)");
   if(nUnk) reasons.push(`모름·미응답 ${nUnk}문항`);
-  if(coverage<0.5) reasons.push("응답률 50% 미만 — 성숙도 구간 판정 보류");
+  if(coverage<C.minCoverage) reasons.push(`응답률 ${C.minCoverage*100}% 미만 — 성숙도 구간 판정 보류`);
   if(flags.length) reasons.push(`응답·보유현황 불일치 ${flags.length}건`);
   if(straight) reasons.push("모든 문항을 같은 단계로 응답");
   let tier, label;
-  if(cs>=75){ tier="high"; label="높음"; } else if(cs>=50){ tier="mid"; label="보통"; } else { tier="low"; label="낮음"; }
+  if(cs>=C.high){ tier="high"; label="높음"; } else if(cs>=C.mid){ tier="mid"; label="보통"; } else { tier="low"; label="낮음"; }
   const desc = reasons.length ? reasons.join(" · ")+" — 해석 강도를 조절하세요." : "표준 문항을 모두 응답했고 응답 점검에서 불일치가 없습니다.";
   const confidence = {score:cs, tier, label, desc, reasons, coverage:Math.round(coverage*100), nAns, nUnk, nNa, asked:asked.length, straight, flags};
   const dataDepth = Math.round(coverage*100);
 
-  const held = total!=null && coverage<0.5;            // 일부 문항만 답해 점수가 부풀거나 줄 수 있음
+  const held = total!=null && coverage<C.minCoverage;            // 일부 문항만 답해 점수가 부풀거나 줄 수 있음
   return {w, areaScore, status, expected, gap, detail, total, expTotal, avg, filled, evidence, dataDepth, confidence,
           filledCnt:scored.length, held};
 }
@@ -2267,7 +2292,7 @@ function consistencyFlags(d){
 }
 
 function stageBand(total, held){
-  if(held) return {key:"bx",nm:"판정 보류(응답 부족)",desc:"응답률이 50% 미만이라 성숙도 구간을 판정하지 않았습니다"};
+  if(held) return {key:"bx",nm:"판정 보류(응답 부족)",desc:`응답률이 ${RULES.conf.minCoverage*100}% 미만이라 성숙도 구간을 판정하지 않았습니다`};
   if(total==null) return {key:"bx",nm:"판정 보류",desc:"응답이 부족해 성숙도 구간을 판정하지 않았습니다"};
   if(total<40) return {key:"b0",nm:"기초정비 단계",desc:"기본 인프라부터 정비가 필요한 구간"};
   if(total<60) return {key:"b1",nm:"성장 준비 단계",desc:"운영 기반을 다지는 구간"};
@@ -2286,18 +2311,19 @@ function gapCls(g){ return g==null?"gp-na":g>=0?"gp-ok":g>=-15?"gp-mid":"gp-bad"
 function areaPriority(d, sc, a){
   const rel = relevanceOf(d.industry, a, d.stage);
   const con = (d.concern||[]).some(c=>CONCERN_AREA[c]===a);
-  if(sc.areaScore[a]==null) return {p: sc.status[a]==="na"?0:(10*rel + (con?15:0)), rel, con, gap:null};
+  const P = RULES.priority, cb = con ? P.concern : 0;
+  if(sc.areaScore[a]==null) return {p: sc.status[a]==="na"?0:(P.unknownArea*rel + cb), rel, con, gap:null};
   const g = sc.gap[a];
-  return {p: Math.max(0,-g)*rel + (con?15:0), rel, con, gap:g};
+  return {p: Math.max(0,-g)*rel + cb, rel, con, gap:g};
 }
 function strengthsWeak(sc, d){
   const arr = AREA_KEYS.filter(a=>sc.areaScore[a]!=null).map(a=>{
     const ap = areaPriority(d, sc, a);
     return {a, s:sc.areaScore[a], e:sc.expected[a], gap:sc.gap[a], rel:ap.rel, con:ap.con, wp:ap.p, filled:true};
   });
-  const strong = arr.filter(x=> x.s>=Math.max(60, x.e+10)).sort((x,y)=>(y.s-y.e)-(x.s-x.e)).slice(0,3);
-  const REL_FLOOR = 0.6;
-  const weak = arr.filter(x=> (x.gap<0 && (x.rel>=REL_FLOOR || x.con)) || (x.con && x.s<67))
+  const S = RULES.strong, P = RULES.priority;
+  const strong = arr.filter(x=> x.s>=Math.max(S.min, x.e+S.margin)).sort((x,y)=>(y.s-y.e)-(x.s-x.e)).slice(0,3);
+  const weak = arr.filter(x=> (x.gap<0 && (x.rel>=P.relFloor || x.con)) || (x.con && x.s<P.halfCut))
                   .sort((x,y)=> y.wp-x.wp).slice(0,3);
   const weakAll = [...arr].sort((x,y)=> y.wp-x.wp || x.s-y.s);
   const nodata = AREA_KEYS.filter(a=>sc.status[a]==="nodata");
@@ -2331,6 +2357,7 @@ function pickActivities(d, sc){
     const vs=(ids||[]).filter(id=>asked.has(id) && typeof ans[id]==="number").map(id=>LV_SCORE[ans[id]]);
     return vs.length? Math.round(vs.reduce((s,x)=>s+x,0)/vs.length) : null;
   };
+  const P = RULES.priority;
   const cand = [];
   LIB.forEach(a=>{
     if(a.ind && !a.ind.includes(d.industry)) return;
@@ -2338,17 +2365,17 @@ function pickActivities(d, sc){
     if(sc.status[a.area]==="na") return;                              // 해당 없음 영역(예: 내수 전용 → 수출)
     const rel = relevanceOf(d.industry, a.area, st);
     const con = concernAreas.includes(a.area);
-    if(rel <= 0.22 && !con) return;
+    if(rel <= P.relExclude && !con) return;
     if(a.own && prep.has(a.own)) return;                              // 이미 보유
     const qs = qScoreOf(a.q);
-    if(qs===100) return;                                              // 이미 체계화
+    if(qs!=null && qs>=P.doneCut) return;                             // 이미 체계화
     const ap = areaPriority(d, sc, a.area);
     const areaSc = sc.areaScore[a.area];
-    let p = ap.p + (100-(qs!=null?qs:(areaSc!=null?areaSc:50)))*0.15*rel + (focus.includes(a.area)?8*rel:0);
-    if(qs!=null && qs>=67) p*=0.5;
+    let p = ap.p + (100-(qs!=null?qs:(areaSc!=null?areaSc:50)))*P.gapToAct*rel + (focus.includes(a.area)?P.focus*rel:0);
+    if(qs!=null && qs>=P.halfCut) p*=P.half;
     const g = sc.gap[a.area];
     let tag="plan";
-    if((g!=null && g<=-15 && rel>=0.8) || (con && (g==null || g<0))) tag="now";
+    if((g!=null && g<=P.nowGap && rel>=P.nowRel) || (con && (g==null || g<0))) tag="now";
     else if((g!=null && g<0) || focus.includes(a.area) || g==null) tag="soon";
     // 선정 근거(카드에 표시)
     const reasons=[];
@@ -2367,24 +2394,26 @@ function pickActivities(d, sc){
     const have=new Set(cand.map(c=>c.id));
     const extra=(filterFn, reason, base)=>LIB.forEach(a=>{
       if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own))) return;
-      const rel=relevanceOf(d.industry, a.area, st); if(rel<=0.22 || !filterFn(a)) return;
+      const rel=relevanceOf(d.industry, a.area, st); if(rel<=P.relExclude || !filterFn(a)) return;
       have.add(a.id);
       cand.push({...a, _p:base*rel, _tag:"plan", _areaSc:sc.areaScore[a.area], _qSc:qScoreOf(a.q), _rel:rel,
         _reasons:[`${AREA[a.area].short} ${sc.areaScore[a.area]==null?"응답 없음":sc.areaScore[a.area]+"점"} · 단계 기대 ${sc.expected[a.area]}점(${gapTxt(sc.gap[a.area])})`, reason]});
     });
-    if(nx!==st) extra(a=>a.stages && a.stages.includes(nx) && !a.stages.includes(st), `현 단계 기대수준 도달 — 다음 단계(${STAGE[nx].nm}) 준비 과제`, 12);
-    if(cand.length<3) extra(a=>a.stages && a.stages.includes(st), "관련 문항 '체계화' — 연 1회 유지·점검 과제", 6);
+    if(nx!==st) extra(a=>a.stages && a.stages.includes(nx) && !a.stages.includes(st), `현 단계 기대수준 도달 — 다음 단계(${STAGE[nx].nm}) 준비 과제`, P.fillNext);
+    if(cand.length<3) extra(a=>a.stages && a.stages.includes(st), "관련 문항 '체계화' — 연 1회 유지·점검 과제", P.fillKeep);
     cand.sort((x,y)=>y._p-x._p);
   }
-  const perAreaCap = (st==="pre"||st==="y1") ? 3 : 2;
+  const perAreaCap = (st==="pre"||st==="y1") ? P.perArea.early : P.perArea.other;
   const out=[]; const cnt={};
   for(const a of cand){
     cnt[a.area]=(cnt[a.area]||0);
     if(cnt[a.area]>=perAreaCap) continue;
     out.push(a); cnt[a.area]++;
-    if(out.length>=6) break;
+    if(out.length>=P.acts) break;
   }
-  if(out.length<6){ for(const a of cand){ if(!out.includes(a)){ out.push(a); if(out.length>=6)break; } } }
+  if(out.length<P.acts){ for(const a of cand){ if(!out.includes(a)){ out.push(a); if(out.length>=P.acts)break; } } }
+  // '지금 착수'는 우선도 상위 maxNow개까지만(전부 '지금'이면 우선순위가 보이지 않음) — 나머지는 '준비'
+  let nNow=0; out.forEach(a=>{ if(a._tag==="now"){ if(nNow<P.maxNow) nNow++; else a._tag="soon"; } });
   return out;
 }
 
@@ -2478,7 +2507,7 @@ function kpiBoard(d, sc){
     .filter(k=>sc.status[k.area]!=="na")
     .sort((x,y)=>(rank[x.area]??9)-(rank[y.area]??9));
   const libByName = {}; (KPI_LIB[d.stage]||[]).forEach(k=>{ libByName[k.name]=k; });
-  const kpiData = Array.isArray(memo.kpiData) ? memo.kpiData : null;
+  const kpiData = (memo.edited && Array.isArray(memo.kpiData)) ? memo.kpiData : null;   // 기본 체크만 두고 넘긴 경우 = 표준 KPI
   const std = k=>({name:k.name, cur:(k.eg||"예시값"), isReal:false, g3:k.g3, g3Real:false, g6:"", g6Real:false, g12:k.g12, how:k.how, cyc:k.cyc, basis:k.basis, custom:false});
   if(kpiData && kpiData.length){
     const out=[]; const used=new Set();
@@ -2559,13 +2588,13 @@ function svgRadar(areaScore, expected){
   let dots="";
   keys.forEach((k,i)=>{ const[x,y]=pt(i,R*(areaScore[k]||0)/100);
     dots+= areaScore[k]==null ? "" : `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" fill="#fff" stroke="#2563EB" stroke-width="2"/>`; });
-  return `<svg viewBox="-44 -6 408 350" role="img" aria-label="9개 영역 성숙도 레이더 차트(단계 기대수준 비교)">
+  return `<svg viewBox="-44 -6 408 350" role="img" aria-label="${AREA_KEYS.length}개 영역 성숙도 레이더 차트(단계 기대수준 비교)">
     <defs><linearGradient id="radG" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="rgba(22,194,163,.34)"/><stop offset="1" stop-color="rgba(37,99,235,.34)"/></linearGradient></defs>
     ${grid}${axes}${ticks}
     <polygon points="${dpts}" fill="url(#radG)" stroke="#2563EB" stroke-width="2.2"/>
     ${expPoly}${dots}${labels}
-    <text x="160" y="339" font-size="8" fill="#c8d2e0" font-weight="600" text-anchor="middle" opacity="0.8">자가진단 참고용 · 그로스벤처스 · beconic.kr</text></svg>`;
+    <text x="160" y="339" font-size="8" fill="#c8d2e0" font-weight="600" text-anchor="middle" opacity="0.8">자가진단 참고용 · ${esc(COMPANY.short)} · ${esc(COMPANY.web.replace(/^www\./,""))}</text></svg>`;
 }
 
 /* ---------- 10. 결과 데이터·서술 ---------- */
@@ -2584,7 +2613,7 @@ function buildDiagnosisData(d, isSample){
   const profile = {
     name:      d.name || "우리 회사",
     biztype:   d.biztype || "",
-    depth:     d.depth||"standard", depthNm: d.depth==="quick"?"간이 진단(9문항)":"표준 진단(27문항)",
+    depth:     d.depth||"standard", depthNm: `${d.depth==="quick"?"간이":"표준"} 진단(${askedQuestions(d.depth).length}문항)`,
     stage:     d.stage,      stageNm:   STAGE[d.stage] ? STAGE[d.stage].nm : "-",
     ctype:     d.ctype,      ctypeNm:   nmOf(OPT.ctype, d.ctype),
     industry:  d.industry,   industryNm:nmOf(OPT.industry, d.industry),
@@ -2642,7 +2671,7 @@ function buildDiagnosisNarrative(diag){
   const core = b0 ? (b0.gap<0
       ? `${b0.fullName} 영역이 ${p.stageNm} 기대수준보다 ${-b0.gap}점 낮아, 지금 가장 먼저 풀어야 할 병목입니다.`
       : `${b0.fullName} 영역은 기대수준(${b0.expected}점)에는 도달했지만, 가장 큰 고민으로 고른 영역이고 아직 정례화(67점) 전이라 먼저 보강할 대상입니다.`)
-                  : `9개 영역 모두 ${p.stageNm} 기대수준에 도달해, 다음 단계(${nextStageNm(p.stage)}) 기준으로 확장할 시점입니다.`;
+                  : `${AREA_KEYS.length}개 영역 모두 ${p.stageNm} 기대수준에 도달해, 다음 단계(${nextStageNm(p.stage)}) 기준으로 확장할 시점입니다.`;
   return { paragraphs:[para1, para2].filter(Boolean), oneLine:para1, core };
 }
 
@@ -2703,7 +2732,7 @@ function renderResult(d, isSample, baseline){
   const memoLines = s=>String(s||"").split(/\n+/).map(x=>x.replace(/^[-·•]\s*/,"").trim()).filter(Boolean);
   const memoTasks = memoLines(memo.tasks).slice(0,4);
   const memoKpis = memoLines(memo.kpi).slice(0,6);
-  const hasMemo = !!(memo.overview||memoTasks.length||memoKpis.length||memo.risk);
+  const hasMemo = !!(memo.overview || memo.risk || (memo.edited && (memoTasks.length||memoKpis.length)));
 
   const bottleneck = sw.weak;
   const tagTxt={now:"지금",soon:"준비",plan:"중장기"};
@@ -2726,11 +2755,12 @@ function renderResult(d, isSample, baseline){
   // 영역별 응답 근거와 다음 단계
   const evRows = AREA_KEYS.map(a=>{
     const det = sc.detail[a]; if(!det.length) return "";
+    if(sc.status[a]==="na") return `<div class="ev-area ev-area-na"><div class="ev-h"><b>${esc(AREA[a].nm)}</b><span>해당 없음</span></div><div class="ev-now"><span class="ev-lv ev-na">해당 없음</span><span>${esc(det[0].q.na||"해당 없음")} — 종합점수에서 제외</span></div></div>`;
     const rows = det.map(({q,v})=>{
       const lvTxt = v==="na" ? `<span class="ev-lv ev-na">해당 없음</span>` : v==="u" ? `<span class="ev-lv ev-u">모름</span>` : `<span class="ev-lv ev-l${v}">${v} · ${LV_NM[v]}</span>`;
       const now = typeof v==="number" ? q.lv[v] : (v==="na" ? (q.na||"해당 없음") : "현황 확인 필요");
       const next = typeof v==="number" ? (v<3 ? q.lv[v+1] : "현 수준 유지·점검") : (v==="na" ? "–" : "담당자와 현황 확인 후 다시 응답");
-      return `<div class="ev-row"><div class="ev-q"><b>${q.id}</b> ${esc(q.t)}</div><div class="ev-now">${lvTxt}<span>${esc(now)}</span></div><div class="ev-next"><i>다음 단계</i>${esc(next)}</div></div>`;
+      return `<div class="ev-row"><div class="ev-q"><b>${q.id}</b> ${esc(q.t)}</div><div class="ev-now">${lvTxt}<span>${esc(now)}</span></div>${v==="na"?"":`<div class="ev-next"><i>다음 단계</i>${esc(next)}</div>`}</div>`;
     }).join("");
     const s=sc.areaScore[a];
     return `<div class="ev-area"><div class="ev-h"><b>${esc(AREA[a].nm)}</b><span>${s==null?(sc.status[a]==="na"?"해당 없음":"응답 없음"):`${s}점 · 기대 ${sc.expected[a]}점 <em class="${gapCls(sc.gap[a])}">${gapTxt(sc.gap[a])}</em>`}</span></div>${rows}</div>`;
@@ -2754,7 +2784,7 @@ function renderResult(d, isSample, baseline){
       <div class="docs"><b>준비서류</b> · ${esc(a.docs)}</div>
       <div class="caution">${esc(a.caution)}</div>
       ${srcChips(a.src)}
-      ${a.expert?`<a class="expert expert-link no-print" href="tel:07041034177" onclick="try{GAN._track&&GAN._track('cta_expert')}catch(e){}">👤 전문가 검토 권장 · 상담 문의 →</a><div class="expert print-only">👤 전문가 검토 권장</div>`:""}
+      ${a.expert?`<a class="expert expert-link no-print" href="${telHref()}" onclick="try{GAN._track&&GAN._track('cta_expert')}catch(e){}">👤 전문가 검토 권장 · 상담 문의 →</a><div class="expert print-only">👤 전문가 검토 권장</div>`:""}
     </div>`;}).join("");
 
   // 우선순위 매트릭스: y=우선도 순위, x=실행 용이성(연결 문항의 현재 수준)
@@ -2825,13 +2855,13 @@ function renderResult(d, isSample, baseline){
 
   const lowBox = conf.tier!=="high" ? `<div class="lowdata lowdata-${conf.tier==="low"?"low":"mid"}"><div class="ld-ic">${conf.tier==="low"?"⚠":"ⓘ"}</div>
     <div class="ld-body"><b>진단 신뢰도 ${esc(conf.label)} — ${esc(conf.reasons.join(" · ")||"응답 보완 필요")}</b>
-    <p>점수는 응답한 문항으로만 계산합니다. ${d.depth==="quick"?"<b>표준 진단(27문항)</b>으로 바꾸면 영역별 근거가 3배로 늘어납니다. ":""}${conf.nUnk?`'모름'으로 둔 <b>${conf.nUnk}개 문항</b>의 현황을 확인하면 판정이 정확해집니다. `:""}${conf.flags.length?`보유 현황과 맞지 않는 응답 <b>${conf.flags.length}건</b>은 아래 '응답 점검'에서 확인하세요.`:""}</p>
+    <p>점수는 응답한 문항으로만 계산합니다. ${d.depth==="quick"?`<b>표준 진단(${QUESTIONS.length}문항)</b>으로 바꾸면 영역별 근거가 ${QUESTIONS.length/askedQuestions("quick").length}배로 늘어납니다. `:""}${conf.nUnk?`'모름'으로 둔 <b>${conf.nUnk}개 문항</b>의 현황을 확인하면 판정이 정확해집니다. `:""}${conf.flags.length?`보유 현황과 맞지 않는 응답 <b>${conf.flags.length}건</b>은 아래 '응답 점검'에서 확인하세요.`:""}</p>
     <button class="btn btn-sm btn-line no-print" onclick="GAN.go('diagnose')">응답 보완하러 가기 →</button></div></div>` : "";
 
   const html = `
   <div class="result-top">
     ${sampleTag}
-    <span class="rt-wm">자가진단 참고용 · ${esc(APP_VERSION)} · beconic.kr</span>
+    <span class="rt-wm">자가진단 참고용 · ${esc(APP_VERSION)} · ${esc(COMPANY.web.replace(/^www\./,""))}</span>
     <div class="rt-grid">
       <div class="score-ring">${svgRing(sc.total)}
         <div class="lab"><b>${totalTxt}<i>${sc.total==null?"":"점"}</i></b><span>종합 성숙도</span></div></div>
@@ -2844,7 +2874,7 @@ function renderResult(d, isSample, baseline){
         </div>
         <h2>${esc(d.name||"우리 회사")}</h2>
         <p class="co"><b>${esc(indNm)}</b> · <b>${esc(stageNm)}</b> · ${esc(ctypeNm)} · 주요고객 ${esc(custNm)} · ${esc(diag.profile.depthNm)}</p>
-        <p class="disc-note">점수는 9개 영역 성숙도 문항의 행동 단계로만 계산하며, 매출·인원·업력은 점수에 넣지 않고 <b>단계 기대수준</b> 비교에만 씁니다. <b>진단 신뢰도 ${esc(conf.label)}</b> — ${esc(conf.desc)}</p>
+        <p class="disc-note">점수는 ${AREA_KEYS.length}개 영역 성숙도 문항의 행동 단계로만 계산하며, 매출·인원·업력은 점수에 넣지 않고 <b>단계 기대수준</b> 비교에만 씁니다. <b>진단 신뢰도 ${esc(conf.label)}</b> — ${esc(conf.desc)}</p>
       </div>
     </div>
   </div>
@@ -2855,8 +2885,8 @@ function renderResult(d, isSample, baseline){
       <h3>${esc(cta.headline)}</h3>
       <p>${esc(cta.body)}</p>
     </div>
-    <a class="btn btn-amber cta-top-btn" href="tel:07041034177" onclick="try{GAN._track&&GAN._track('cta_top')}catch(e){}">
-      <span class="ph-ic">📞</span><span>전화 상담 <b>070-4103-4177</b></span></a>
+    <a class="btn btn-amber cta-top-btn" href="${telHref()}" onclick="try{GAN._track&&GAN._track('cta_top')}catch(e){}">
+      <span class="ph-ic">📞</span><span>전화 상담 <b>${esc(COMPANY.tel)}</b></span></a>
   </div>
 
   <div class="result-actions no-print">
@@ -2910,7 +2940,7 @@ function renderResult(d, isSample, baseline){
   ${cmpSec}
 
   <div class="r-sec pbreak pb-before corekeep">
-    <h3><span class="ix">2</span>9개 영역 진단 결과</h3>
+    <h3><span class="ix">2</span>${AREA_KEYS.length}개 영역 진단 결과</h3>
     <p class="sub">파란 영역은 우리 회사 성숙도, 주황 점선은 ${esc(indNm)} · ${esc(stageNm)} 기업의 <b>단계 기대수준</b>입니다. 막대 옆 숫자는 기대수준과의 차이입니다.</p>
     <div class="area-grid">
       <div class="radar-box">${svgRadar(sc.areaScore, sc.expected)}
@@ -2979,7 +3009,7 @@ function renderResult(d, isSample, baseline){
       <ol class="matrix-mlist">${sortedByP.map((a,i)=>{
         const cls=a._tag==="now"?"p-now":a._tag==="soon"?"p-soon":"p-plan";
         const tg={now:"지금 착수",soon:"준비 단계",plan:"중장기"}[a._tag];
-        return `<li class="${cls}"><span class="mr">${i+1}</span><div class="mtx"><b>${esc(a.title)}</b><small>${esc(AREA[a.area].short)} · ${tg} · 우선도 ${Math.round(a._p)}</small></div></li>`;
+        return `<li class="${cls}"><span class="mr">${i+1}</span><div class="mtx"><b>${esc(a.title)}</b><small>${esc(AREA[a.area].short)} · ${tg}</small></div></li>`;
       }).join("")}</ol>
     </div>
   </div>
@@ -3021,7 +3051,7 @@ function renderResult(d, isSample, baseline){
     </ul></div>
     <div class="risk-box" style="margin-top:14px"><h4>⚠ 진단 활용 시 유의사항</h4><ul>
       <li>법률·세무·노무·인증·지원사업 관련 내용은 단정이 아니며, 적용 전 전문가 검토가 필요합니다.</li>
-      <li>인증·정책자금·정부지원사업·수출 관련 기준은 시점·기관별로 달라 최신 공고·법령 확인이 필요합니다(법령 표기 기준일 ${APP_UPDATED}).</li>
+      <li>인증·정책자금·정부지원사업·수출 관련 기준은 시점·기관별로 달라 최신 공고·법령 확인이 필요합니다(법령 표기 기준일 ${LEGAL_BASIS_DATE}).</li>
       <li>단계 기대수준과 KPI 권장값은 BECONIC 실무 기준이며 통계 평균이 아닙니다. 점수는 자가 응답 기반으로, 동종업계 절대평가가 아닙니다.</li>
     </ul></div>
   </div>
@@ -3035,16 +3065,16 @@ function renderResult(d, isSample, baseline){
       <div class="cbody">
         <p>이 도구는 공개된 규칙으로만 계산합니다(규칙 기반 진단). 같은 입력에는 항상 같은 결과가 나오며, 입력값은 서버로 전송되지 않습니다.</p>
         <h5>1) 성숙도 점수</h5>
-        9개 영역 × 3문항(간이 진단은 영역별 1문항)에 대해 행동 기준 4단계로 응답합니다: <code>0 미착수=0</code> · <code>1 시작=33</code> · <code>2 정례화=67</code> · <code>3 체계화=100</code>. 영역점수 = 응답 문항 평균. <b>'모름'과 미응답은 0점이 아닌 결측</b>으로 계산에서 빼고 신뢰도에 반영하며, '해당 없음'(예: 내수 전용 사업의 수출)은 그 영역을 종합점수에서 제외합니다. <b>매출·인원·업력은 점수에 넣지 않습니다.</b>
+        ${AREA_KEYS.length}개 영역 × ${QUESTIONS.length/AREA_KEYS.length}문항(간이 진단은 영역별 1문항, 총 ${QUESTIONS.filter(q=>q.core).length}문항)에 대해 행동 기준 4단계로 응답합니다: ${LV_NM.map((n,i)=>`<code>${i} ${n}=${LV_SCORE[i]}</code>`).join(" · ")}. 영역점수 = 응답 문항 평균. <b>'모름'과 미응답은 0점이 아닌 결측</b>으로 계산에서 빼고 신뢰도에 반영하며, '해당 없음'(예: 내수 전용 사업의 수출)은 그 영역을 종합점수에서 제외합니다. <b>매출·인원·업력은 점수에 넣지 않습니다.</b>
         <h5>2) 종합점수</h5>
-        영역점수 × 업종 가중치(기본 배점 창업기초 10·사업모델 15·고객판로 15·나머지 각 10에 업종 배수 적용, 합 100)의 가중평균. 점수가 없는 영역은 빼고 가중치를 재정규화합니다.
+        영역점수 × 업종 가중치(기본 배점 ${AREA_KEYS.map(a=>`${AREA[a].short} ${BASE_W[a]}`).join("·")}에 업종 배수 적용, 합 100 — 현재 ${esc(indNm)}: ${AREA_KEYS.map(a=>`${AREA[a].short} <code>${sc.w[a]}</code>`).join(" · ")})의 가중평균. 점수가 없는 영역은 빼고 가중치를 재정규화합니다.
         <h5>3) 단계 기대수준</h5>
-        기대수준 = 단계 기준값 × 업종 보정(업종 적합도 0.6~1.2 범위), 상한 85. 현재 ${esc(stageNm)} · ${esc(indNm)} 기준: ${AREA_KEYS.map(a=>`${AREA[a].short} <code>${sc.expected[a]}</code>`).join(" · ")}. 통계 평균이 아닌 BECONIC 실무 기준이며, 실사용 데이터가 쌓이면 보정합니다.
+        기대수준 = 단계 기준값 × 업종 보정(업종 적합도 ${RULES.expect.indMin}~${RULES.expect.indMax} 범위), 상한 ${RULES.expect.cap}. 현재 ${esc(stageNm)} · ${esc(indNm)} 기준: ${AREA_KEYS.map(a=>`${AREA[a].short} <code>${sc.expected[a]}</code>`).join(" · ")}. 통계 평균이 아닌 BECONIC 실무 기준이며, 실사용 데이터가 쌓이면 보정합니다.
         <h5>4) 우선순위</h5>
-        영역 우선도 = max(0, 기대수준 − 점수) × 적합도(업종×단계) + 고민 선택 시 15. 활동 우선도 = 영역 우선도 + (100 − 관련 문항 점수) × 0.15 × 적합도 + 단계 핵심영역 8 × 적합도. 관련 문항이 '체계화'면 제외, '정례화' 이상이면 ×0.5, 이미 보유한 과제(보유 현황)는 제외합니다. <b>고민은 점수를 깎지 않고 우선순위에만 반영</b>합니다(조직관리 → 기초·체계 영역).
+        영역 우선도 = max(0, 기대수준 − 점수) × 적합도(업종×단계) + 고민 선택 시 ${RULES.priority.concern}. 활동 우선도 = 영역 우선도 + (100 − 관련 문항 점수) × ${RULES.priority.gapToAct} × 적합도 + 단계 핵심영역 ${RULES.priority.focus} × 적합도. 관련 문항이 '체계화'면 제외, '정례화' 이상이면 ×${RULES.priority.half}, 이미 보유한 과제(보유 현황)는 제외합니다. 우선도 상위 ${RULES.priority.acts}개를 추천하고, '지금 착수'는 그중 상위 ${RULES.priority.maxNow}개까지 표시합니다. <b>고민은 점수를 깎지 않고 우선순위에만 반영</b>합니다(조직관리 → 기초·체계 영역).
         <h5>5) 진단 신뢰도 (점수와 분리)</h5>
-        신뢰도 = 응답률(모름·미응답 제외) − 응답·보유현황 불일치 1건당 8. 일률 응답은 최대 60, 간이 진단은 최대 70이며, 응답률 50% 미만이면 성숙도 구간을 판정하지 않습니다. 75 이상 높음 · 50 이상 보통 · 그 미만 낮음. 보유 현황은 점수에 더하지 않고 이 교차 확인과 추천 제외에만 씁니다.
-        <h5>6) 근거·출처 (${esc(APP_UPDATED)} 기준)</h5>
+        신뢰도 = 응답률(모름·미응답 제외) − 응답·보유현황 불일치 1건당 ${RULES.conf.flagPenalty}. 일률 응답은 최대 ${RULES.conf.straightCap}, 간이 진단은 최대 ${RULES.conf.quickCap}이며, 응답률 ${RULES.conf.minCoverage*100}% 미만이면 성숙도 구간을 판정하지 않습니다. ${RULES.conf.high} 이상 높음 · ${RULES.conf.mid} 이상 보통 · 그 미만 낮음. 보유 현황은 점수에 더하지 않고 이 교차 확인과 추천 제외에만 씁니다.
+        <h5>6) 근거·출처 (${esc(LEGAL_BASIS_DATE)} 확인 기준)</h5>
         <ol class="src-list">${Object.keys(SRC).map(id=>`<li><span class="src-k">${esc(SRC[id].k)}</span>${esc(SRC[id].f)}</li>`).join("")}</ol>
         <h5>7) 향후 연동(현재 미연동)</h5>
         국세청 사업자상태, 기업마당, K-Startup, KIPRIS, 나라장터, 관세청 등 공공 데이터는 아직 연동하지 않았으며, 현재 버전은 실시간 데이터를 사용하지 않습니다.
@@ -3059,17 +3089,17 @@ function renderResult(d, isSample, baseline){
       <ul class="cta-benefits">
         ${cta.benefits.map(b=>`<li>${esc(b)}</li>`).join("")}
       </ul>
-      <p class="ph">전화 상담 · <b>070-4103-4177</b> · 상담료 없이 방향 안내</p>
+      <p class="ph">전화 상담 · <b>${esc(COMPANY.tel)}</b> · 상담료 없이 방향 안내</p>
     </div>
     <div class="cta-btns">
-      <a class="btn btn-amber" href="tel:07041034177">전문가 검토가 필요해요</a>
+      <a class="btn btn-amber" href="${telHref()}">전문가 검토가 필요해요</a>
       <a class="btn btn-line" href="${esc(mailtoHref(diag))}">✉ 결과 요약으로 상담 요청</a>
     </div>
   </div>
 
   <div class="print-foot">
-    그로스벤처스 주식회사 · 서울시 구로구 디지털로27길 24, 209호 · 070-4103-4177 · start@gven.kr · www.beconic.kr<br>
-    중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호 · © 2023~2026 growthventures Co., Ltd. · ${APP_VERSION} (${APP_UPDATED}) · 본 자료는 입력정보 기반 자가진단 참고자료이며 어떠한 선정·인증·투자 가능성도 보장하지 않습니다.
+    ${esc(COMPANY.name)} · ${esc(COMPANY.addr)} · ${esc(COMPANY.tel)} · ${esc(COMPANY.mail)} · ${esc(COMPANY.web)}<br>
+    ${esc(COMPANY.certLabel)} ${esc(COMPANY.certNo)} · © ${copyYears()} ${esc(COMPANY.en)} · ${APP_VERSION} (${APP_UPDATED}) · 본 자료는 입력정보 기반 자가진단 참고자료이며 어떠한 선정·인증·투자 가능성도 보장하지 않습니다.
   </div>
   `;
   document.getElementById("resultRoot").innerHTML = html;
@@ -3086,7 +3116,7 @@ function mailtoHref(diag){
     `우선과제: ${diag.activities.slice(0,3).map(a=>a.title).join(" / ")}`,
     "", "상담 희망 내용:", ""
   ];
-  return "mailto:start@gven.kr?subject="+encodeURIComponent("[성장진단] 결과 상담 요청")+"&body="+encodeURIComponent(lines.join("\n"));
+  return "mailto:"+COMPANY.mail+"?subject="+encodeURIComponent("[성장진단] 결과 상담 요청")+"&body="+encodeURIComponent(lines.join("\n"));
 }
 
 /* ---------- 11. 앱 컨트롤러 ---------- */
@@ -3165,7 +3195,10 @@ const GAN = (function(){
     box.querySelectorAll(".qa-opt,.qa-x").forEach(b=>b.addEventListener("click",()=>{
       const id=b.dataset.q, raw=b.dataset.v; const v = (raw==="u"||raw==="na") ? raw : +raw;
       state.data.ans[id]=v;
-      const card=b.closest(".qa-card"); card.classList.add("done"); card.classList.remove("miss");
+      const card=b.closest(".qa-card"); const first=!card.classList.contains("done");
+      card.classList.add("done"); card.classList.remove("miss");
+      if(first){ const nx=[...box.querySelectorAll(".qa-card:not(.done)")].find(c=>c.compareDocumentPosition(card)&Node.DOCUMENT_POSITION_PRECEDING);
+        if(nx) setTimeout(()=>nx.scrollIntoView({behavior:"smooth",block:"center"}),180); }
       card.querySelectorAll(".qa-opt,.qa-x").forEach(x=>{ const on = x.dataset.v===String(v); x.classList.toggle("on",on); x.setAttribute("aria-checked",on); });
       // 같은 영역 다른 문항에도 해당 없음을 바로 적용할지 제안하지 않음(문항별 판단)
       updateQCount(); save();
@@ -3221,14 +3254,17 @@ const GAN = (function(){
     $("#progNow").textContent=n; $("#progTot").textContent=state.totalSteps;
     $("#progFill").style.width=(n/state.totalSteps*100)+"%";
     $("#btnPrev").style.visibility = n===1?"hidden":"visible";
-    $("#btnNext").textContent = n===state.totalSteps?"진단 결과 보기": n===4 ? "다음: 컨설턴트 입력(선택)" : "다음 단계";
+    $("#btnNext").textContent = (n===state.totalSteps || n===4) ? "진단 결과 보기" : "다음 단계";
     const sk=$("#btnSkip"); if(sk) sk.style.display = n===4 ? "inline-flex" : "none";
     if(n===3) renderQuestions();
+    if(n===4){ const c=document.getElementById("col-1"), b=c&&c.querySelector(".collapse-b");
+      if(c && b && !c._ready){ c._ready=true; c.classList.add("open"); b.style.maxHeight=b.scrollHeight+40+"px"; } }
     window.scrollTo({top:0,behavior:"smooth"});
   }
 
   function nextStep(){
     if(!validateStep(state.step)) return;
+    if(state.step===4){ skipToResult(); return; }     // 4단계 주 버튼 = 결과 보기(컨설턴트 입력은 보조 버튼)
     if(state.step<state.totalSteps){
       const target=state.step+1;
       if(target===5){ collectBasics(); populateStep5(); }
@@ -3238,6 +3274,7 @@ const GAN = (function(){
   }
   function prevStep(){ if(state.step>1) showStep(state.step-1); }
   function skipToResult(){ collectBasics(); populateStep5(); runDiagnosis(); }
+  function toConsult(){ collectBasics(); populateStep5(); showStep(5); }
 
   function collectBasics(){
     state.data.name = ($("#f-name").value||"").trim() || state.data.name;
@@ -3372,7 +3409,9 @@ const GAN = (function(){
     });
     _picks.custKpis.forEach(t=>{ kpiLabels.push(t); kpiData.push(Object.assign({name:t, custom:true}, gv(t))); });
     // 컨설턴트가 STEP5를 건너뛰었거나 아무것도 고르지 않은 경우 = 메모 없음(표준 결과)
+    const vals = Object.values(_picks.kpiVals).some(o=>o && Object.values(o).some(x=>String(x||"").trim()));
     state.data.memo={
+      edited: !!(_picks._touchedT || _picks._touchedK || _picks.custTasks.length || _picks.custKpis.length || vals),
       overview:g("c-memo-overview"),
       tasks:taskLabels.slice(0,8).join("\n"),
       kpi:kpiLabels.slice(0,8).join("\n"),
@@ -3449,7 +3488,7 @@ const GAN = (function(){
   function fallbackCopy(text){ const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
     try{document.execCommand("copy"); toast("링크가 복사되었습니다");}catch(e){toast("복사를 지원하지 않는 환경입니다");} document.body.removeChild(ta); }
 
-  const SERVICE_URL = "https://beconic-diagnosis-business-growth.netlify.app/";
+  const SERVICE_URL = COMPANY.serviceUrl;
   function getBaseURL(){ try{ const o=location.origin; if(o&&o.startsWith("http")) return location.origin+location.pathname; }catch(e){} return SERVICE_URL; }
   function buildShareURL(includeName){
     try{
@@ -3578,7 +3617,7 @@ const GAN = (function(){
     const d=state.data;
     const indNm=nmOf(OPT.industry,d.industry), stageNm=(STAGE[d.stage]||{}).nm||"-";
     const sc=scoreEngine(d);
-    const toc=["핵심 요약 (Executive Summary)", state.baseline?"재진단 비교":null, "9개 영역 진단 결과 (단계 기대수준 비교)","영역별 응답 근거와 다음 단계","업종·단계 맞춤 추천활동","우선순위 매트릭스","90일 실행 계획","12개월 성장 로드맵","핵심 지표(KPI) 관리 대시보드","공공 지원·연계 진단","응답 점검 · 리스크 및 유의사항","진단 방법 · 공개 산식 · 근거 출처"].filter(Boolean);
+    const toc=["핵심 요약 (Executive Summary)", state.baseline?"재진단 비교":null, `${AREA_KEYS.length}개 영역 진단 결과 (단계 기대수준 비교)`,"영역별 응답 근거와 다음 단계","업종·단계 맞춤 추천활동","우선순위 매트릭스","90일 실행 계획","12개월 성장 로드맵","핵심 지표(KPI) 관리 대시보드","공공 지원·연계 진단","응답 점검 · 리스크 및 유의사항","진단 방법 · 공개 산식 · 근거 출처"].filter(Boolean);
     const shell=document.createElement("div");
     shell.id="reportShell"; shell.className="report-shell print-only-block";
     shell.innerHTML=`
@@ -3586,19 +3625,19 @@ const GAN = (function(){
         <div class="rp-cover-mid">
           <div class="rp-doctype">기업 성장활동 진단 보고서</div>
           <h1>${esc(ri.client)}</h1>
-          <p class="rp-subtitle">${esc(indNm)} · ${esc(stageNm)} · 9개 영역 성숙도 진단 결과</p>
+          <p class="rp-subtitle">${esc(indNm)} · ${esc(stageNm)} · ${AREA_KEYS.length}개 영역 성숙도 진단 결과</p>
           <div class="rp-score-line">종합 성숙도 <b>${sc.total==null?"판정 보류":sc.total+"점"}</b> · 단계 기대 ${sc.expTotal==null?"–":sc.expTotal}점 · 진단 신뢰도 ${esc(sc.confidence.label)}</div>
         </div>
         <div class="rp-cover-top">
           <div class="rp-logo-row"><span class="rp-logo"><img src="${esc(GAN_LOGO)}" alt=""></span>
-            <div><b>그로스벤처스 주식회사</b><small>중소벤처기업부 인증 중소기업상담회사 제2025-684호</small></div></div>
+            <div><b>${esc(COMPANY.name)}</b><small>${esc(COMPANY.certLabel.replace("공식 ",""))} ${esc(COMPANY.certNo)}</small></div></div>
           <div class="rp-confid">${esc(ri.confid)}</div>
         </div>
         <div class="rp-cover-bottom">
           <table class="rp-recv">
             <tr><th>수 신</th><td>${esc(ri.client)}${ri.dept?" / "+esc(ri.dept):""}</td></tr>
             ${ri.manager?`<tr><th>담당자</th><td>${esc(ri.manager)}</td></tr>`:""}
-            <tr><th>작성기관</th><td>그로스벤처스 주식회사 (Beconic)</td></tr>
+            <tr><th>작성기관</th><td>${esc(COMPANY.name)} (${esc(COMPANY.brand)})</td></tr>
             <tr><th>작성목적</th><td>${esc(ri.purpose)}</td></tr>
             <tr><th>작성일자</th><td>${esc(ri.date)}</td></tr>
             <tr><th>문서번호</th><td>${esc(ri.docNo)}</td></tr>
@@ -3608,7 +3647,7 @@ const GAN = (function(){
       <section class="rp-docinfo">
         <h2>문서 정보</h2>
         <table class="rp-info-table">
-          <tr><th>진단유형</th><td>기업 성장활동 자가진단 (규칙 기반)</td><th>진단깊이</th><td>${d.depth==="quick"?"간이 · 9문항":"표준 · 27문항"}</td></tr>
+          <tr><th>진단유형</th><td>기업 성장활동 자가진단 (규칙 기반)</td><th>진단깊이</th><td>${d.depth==="quick"?"간이":"표준"} · ${askedQuestions(d.depth).length}문항</td></tr>
           <tr><th>작성일</th><td>${esc(ri.date)}</td><th>기밀등급</th><td>${esc(ri.confid)}</td></tr>
           <tr><th>수신처</th><td>${esc(ri.client)}</td><th>도구 버전</th><td>${esc(APP_VERSION)} (${esc(APP_UPDATED)})</td></tr>
         </table>
@@ -3679,7 +3718,25 @@ const GAN = (function(){
     renderQuestions();
   }
 
+  /* COMPANY·RULES·문항 수를 정적 화면(data-co·data-cnt)과 인쇄 머리글/바닥글에 반영 */
+  function applyConfig(){
+    const co = {name:COMPANY.name, en:COMPANY.en, addr:COMPANY.addr, tel:COMPANY.tel, mail:COMPANY.mail, web:COMPANY.web,
+      years:copyYears(), brandLine:`${COMPANY.short.replace("㈜","")} · ${COMPANY.brand}`,
+      certShort:`중기부 인증 중소기업상담회사 ${COMPANY.certNo}`, certFull:`${COMPANY.certLabel} ${COMPANY.certNo}`};
+    const cnt = {areas:AREA_KEYS.length, q:QUESTIONS.length, qQuick:askedQuestions("quick").length, qPer:QUESTIONS.length/AREA_KEYS.length,
+      lv:LV_NM.length, ind:OPT.industry.length, src:Object.keys(SRC).length, minQuick:RULES.minutes.quick, minStd:RULES.minutes.standard};
+    $$("[data-co]").forEach(el=>{ const v=co[el.dataset.co]; if(v!=null) el.textContent=v; });
+    $$("[data-cnt]").forEach(el=>{ const v=cnt[el.dataset.cnt]; if(v!=null) el.textContent=v; });
+    $$("a[data-tel]").forEach(a=>{ a.href=telHref(); });
+    $$("a[data-web]").forEach(a=>{ a.href="https://"+COMPANY.web; });
+    OPT.depth.forEach(o=>{ const n=askedQuestions(o.v).length, m=RULES.minutes[o.v]; o.t=`${o.v==="quick"?"간이":"표준"} 진단 · ${n}문항 · 약 ${m}분`; });
+    const css = (s)=>String(s).replace(/["\\]/g,"");
+    let st=document.getElementById("pageMarginCfg"); if(!st){ st=document.createElement("style"); st.id="pageMarginCfg"; document.head.appendChild(st); }
+    st.textContent=`@media print{@page{@top-right{content:"${css(COMPANY.short)} · ${css(COMPANY.brand)}";font-size:8pt;font-family:"Pretendard Variable",Pretendard,sans-serif;color:#8895ab}@bottom-right{content:"${css(COMPANY.certNo)}";font-size:7.5pt;font-family:"Pretendard Variable",Pretendard,sans-serif;color:#aab6cc}}@page cover{@top-right{content:none}@bottom-right{content:none}}}`;
+  }
+
   function init(){
+    applyConfig();
     buildChips("c-depth",OPT.depth,"depth",false);
     buildChips("c-stage",OPT.stage,"stage",false);
     buildChips("c-ctype",OPT.ctype,"ctype",false);
@@ -3697,7 +3754,6 @@ const GAN = (function(){
     try{ const li=document.querySelector(".brand .mk img"); if(li){ GAN_LOGO=li.src||""; } }catch(e){}
     const vEl=document.getElementById("appVer");
     if(vEl) vEl.textContent=`버전 ${APP_VERSION} · 최종 업데이트 ${APP_UPDATED}`;
-    setTimeout(()=>toggleCol("col-1"),50);
     restoreUI();
     if(!tryLoadFromHash()){ load(); }
   }
@@ -3707,7 +3763,7 @@ const GAN = (function(){
   function getNarrative(){ return buildDiagnosisNarrative(getDiagnosisData()); }
   function _track(evt){ try{ if(window.console&&console.debug) console.debug("[cta]",evt); }catch(e){} }
   function resumeDismiss(){ const b=document.getElementById("resumeBar"); if(b) b.style.display="none"; }
-  return {init,go,nextStep,prevStep,skipToResult,toggleCol,setMode,share,printPDF,restart,loadSample,clearSaved,resumeDismiss,
+  return {init,go,nextStep,prevStep,skipToResult,toConsult,toggleCol,setMode,share,printPDF,restart,loadSample,clearSaved,resumeDismiss,
           exportFile,importFile,runDiagnosis,getDiagnosisData,getDiagnosisJSON,getNarrative,_track,openReportDialog,
           _state:()=>state, _sanitize:sanitize, _sanitizeSummary:sanitizeSummary, _buildShareURL:buildShareURL};
 })();

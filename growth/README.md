@@ -1,4 +1,4 @@
-# BECONIC 기업 성장활동 진단 내비게이터 (v6.1.0) — Tool 12
+# BECONIC 기업 성장활동 진단 내비게이터 (v6.2.0) — Tool 12
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-diagnosis-business-growth.netlify.app
@@ -26,14 +26,26 @@ growth/
 ├─ logo-mark.png           # 헤더·보고서 표지 로고
 ├─ og-business-growth.jpg  # 카카오톡·SNS 공유 이미지 1200×632
 ├─ netlify.toml · package.json
-├─ tests/qa.mjs            # Chromium QA 63항목(레드팀 회귀·웹폰트 포함 · 엔진 원칙·클릭 플로우·재진단·공유 링크 정제·모바일 375px·A4 PDF)
+├─ tests/qa.mjs            # Chromium QA 70항목(사용자 흐름·하드코딩·레드팀 회귀·웹폰트 포함 · 엔진 원칙·클릭 플로우·재진단·공유 링크 정제·모바일 375px·A4 PDF)
 ├─ tests/sweep.mjs         # 전수 조합 1,056개 렌더 점검(예외·깨진 문구·추천 부족)
 └─ docs/  CHANGELOG.md(개선 내역·27개 Tool 진단 대응표) · REDTEAM_2026-10-26.md(자가부검·레드팀)
 ```
 
+## 설정 고치는 곳 (index.html 스크립트 상단)
+
+| 바꿀 것 | 위치 |
+|---|---|
+| 회사명·전화·이메일·주소·인증번호·사이트 | `COMPANY` |
+| 산식 상수(가점·신뢰도 기준·기대수준 보정 범위·추천 개수) | `RULES` — 화면의 '진단 방법·공개 산식' 설명도 자동으로 바뀜 |
+| 단계 기대수준 | `EXPECT` · 업종/단계 적합도 `IND_RELEVANCE`·`STAGE_RELEVANCE` |
+| 문항 | `QUESTIONS` — 홈·진단 화면의 문항 수 표기 자동 반영 |
+| 출처 | `SRC` · 법령 확인일 `LEGAL_BASIS_DATE` |
+
+`<meta>` 설명문(SNS 미리보기)만은 정적 문구라 문항 수가 바뀌면 직접 고칩니다.
+
 ## Netlify 배포
 
-1. 기존 `beconic-diagnosis-business-growth` 사이트(드래그 배포)를 이 저장소에 연결 → **Base directory: `growth`**. 나머지는 `growth/netlify.toml`이 지정합니다(`npm run build`로 공개 파일 3개만 `dist/`에 복사).
+1. `beconic-diagnosis-business-growth` 사이트가 이 저장소 main에 연결되어 있습니다(**Base directory: `growth`**) — main에 병합하면 자동 배포. 나머지는 `growth/netlify.toml`이 지정합니다(`npm run build`로 공개 파일 3개만 `dist/`에 복사).
 2. 환경변수·서버 함수가 필요 없습니다. 외부에서 받는 것은 프리텐다드 웹폰트(jsdelivr, `pretendard@1.3.9` 가변·동적 서브셋)뿐이며, CSP는 폰트 CDN만 허용하고 데이터 전송은 모두 막습니다(`connect-src 'none'`).
 3. v5 공유 링크는 문항 구조가 달라 열리지 않고 안내 문구가 뜹니다. v5에서 브라우저에 임시 저장된 값도 읽지 않습니다(저장 키 변경).
 
