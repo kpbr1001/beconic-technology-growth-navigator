@@ -295,7 +295,27 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
 .src-list{margin-top:14px;font-size:12px;color:var(--ink2)}
 .src-list ol{padding-left:20px;margin-top:6px;line-height:1.65;font-size:11.5px}
 .src-k{font-size:10px;color:var(--ink3);background:#f0f3f8;padding:1px 5px;border-radius:4px}
+.gt-h{font-size:17px;font-weight:800;margin-bottom:14px;letter-spacing:-.3px}
+.gantt{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.g-head,.g-row{display:grid;grid-template-columns:minmax(220px,40%) 1fr}
+.g-head{background:#f7f9fc;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:800;color:var(--ink2)}
+.g-head .g-name{padding:9px 12px}
+.g-cols{display:grid;grid-template-columns:repeat(4,1fr);position:relative}
+.g-head .g-cols span{padding:7px 6px;border-left:1px solid var(--line);text-align:center;line-height:1.3}
+.g-head small{display:block;font-size:10px;font-weight:600;color:var(--ink3)}
+.g-row{border-bottom:1px solid #eef1f6}.g-row:last-child{border-bottom:none}
+.g-row .g-name{padding:9px 12px;font-size:12.5px;line-height:1.45}
+.g-row .g-name b{font-weight:700}.g-row .g-name em{font-style:normal;font-size:11px;color:var(--ink3);font-weight:600}
+.g-k{display:inline-block;font-size:10px;font-weight:800;color:#fff;padding:1px 6px;border-radius:4px;margin-right:5px;vertical-align:1px}
+.g-act{font-size:11.5px;color:var(--ink2);margin-top:2px}
+.g-meta{font-size:10.5px;color:var(--ink3);margin-top:3px}
+.g-track span{border-left:1px dashed #e2e8f0}
+.g-bar{position:absolute;top:50%;transform:translateY(-50%);height:22px;border-radius:6px;font-style:normal;font-size:10.5px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;opacity:.92}
+.rm-cont{font-size:11px;font-weight:700;color:var(--primary-d);background:#e7f0fe;padding:1px 6px;border-radius:4px}
 @media(max-width:720px){
+ .g-head,.g-row{grid-template-columns:1fr}
+ .g-head .g-name{display:none}
+ .g-row .g-cols{height:30px}
  .diff-grid,.gapg,.svc{grid-template-columns:1fr}
  .kpis{grid-template-columns:1fr 1fr}
  .dbar-name{width:92px;font-size:12px}
@@ -371,7 +391,10 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
 
 /* ===== PRINT CSS ===== */
 @media print{
- @page{size:A4 portrait;margin:0}
+ @page{size:A4 portrait;margin:10mm 0 13mm;
+  @bottom-left{content:"HR Health Navigator · 조직 건강 진단 보고서";font-size:8pt;color:#8a94a6;padding-left:13mm;font-family:"Pretendard Variable",Pretendard,"Noto Sans CJK KR",sans-serif}
+  @bottom-right{content:counter(page) " / " counter(pages);font-size:8pt;color:#8a94a6;padding-right:13mm;font-family:"Pretendard Variable",Pretendard,"Noto Sans CJK KR",sans-serif}}
+ @page:first{margin:0;@bottom-left{content:none}@bottom-right{content:none}}
  body{background:#fff}
  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
  .hd,.stepper,.btn-row,.pane .btn,.na-row,.no-print,.ai-prev{display:none!important}
@@ -387,15 +410,24 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
  .pdf-only{display:block!important}
  /* 본문은 표지 다음부터 좌우 여백 */
  #result,#roadmap,.wrap{padding-left:13mm;padding-right:13mm}
- #result,#roadmap{padding-top:12mm}
- .card{box-shadow:none;border:1px solid #dbe1ea;break-inside:avoid;page-break-inside:avoid;margin-bottom:11px;padding:20px 22px}
+ #result,#roadmap{padding-top:2mm}
+ #s5{break-before:page}
+ .card{box-shadow:none;border:1px solid #dbe1ea;break-inside:auto;page-break-inside:auto;margin-bottom:11px;padding:20px 22px}
+ .res-head,.exec,.warn-card,.gapc,.deep,.rm-item,.g-row,.sum-li,.kpi,.svc-i,.rec,.evid{break-inside:avoid;page-break-inside:avoid}
+ .gantt-card{break-inside:avoid;page-break-inside:avoid;break-after:page}
+ .g-head{break-after:avoid}
+ .g-head,.g-row{grid-template-columns:52% 1fr!important}
+ .g-row .g-name{padding:5px 10px;font-size:11px;line-height:1.35}
+ .g-act{font-size:10.5px;margin-top:0}
+ .g-meta{display:none}
+ .g-bar{height:18px;font-size:9.5px}
+ footer.ft{display:none!important}
  h3.sec,.dhead{page-break-after:avoid}
  .grid3{break-inside:avoid;display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:10px!important}
  .grid2{break-inside:avoid;display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
  .gapg{grid-template-columns:1fr 1fr!important}
- .card.meth,.card.rmc{break-inside:auto;page-break-inside:auto}
+ h3.sec,.kicker,.rm-h,.rm-sub{break-after:avoid;page-break-after:avoid}
  .dbar{break-inside:avoid}
- footer.ft{background:#1a2b4a!important;margin-top:0}
  [id^="ip_"]{display:none!important}
 }
 </style>
@@ -775,7 +807,7 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
    결과구조: 경영진 요약 → 문제정의 → 항목별 진단·해석 → 인사이트·노무 → 120일 로드맵
    점수·우선순위·로드맵 = 공개 규칙(결정론 코드). AI는 운영자가 켠 경우에만 '해석 초안'을 덧붙임.
    ============================================================ */
-const APP={ver:'v3.0.1', updated:'2026-10-26', qbank:'HRH-QB-3.0', lawBase:'2026-10-26'};
+const APP={ver:'v3.1.0', updated:'2026-10-26', qbank:'HRH-QB-3.0', lawBase:'2026-10-26'};
 /* 연계 Tool 주소 — 비어 있으면 링크 없이 'BECONIC 허브에서 이용' 안내만 표시 */
 const TOOL_LINKS={ceo:'', finance:'https://beconic-diagnosis-finance.netlify.app'};
 const CONTACT={tel:'070-4103-4177', mail:'start@gven.kr', web:'www.beconic.kr'};
@@ -1612,6 +1644,7 @@ function renderResult(R){
   </div>
   <p class="exec-note">점수·우선순위·로드맵은 공개된 규칙으로 계산했습니다(아래 '방법론'). 점수는 내부 비교용 환산지수이며 외부 벤치마크가 아닙니다.</p>
  </div>`;
+ h+=ganttCard(R);
 
  // 신뢰도 경고·응답 신호
  if(R.confidence.level!=='높음' || R.hrUnknown>=4 || R.signals.length){
@@ -1719,6 +1752,37 @@ function renderResult(R){
  if(S.ai&&S.ai.result) renderAI();
 }
 
+/* 120일 실행 로드맵 한눈에 — R.plan(규칙 배치)을 간트형 일정표로 */
+function planRows(R){
+ const P=R.plan,rows=[],ids=R.topDriverIds;
+ P[30].legal.forEach(f=>rows.push({kind:'legal',name:f.cat,act:(LRX[f.id]||{}).action||f.cat+' 점검',tag:f.status,owner:'대표·경영지원(노무사 확인)',kpi:(LRX[f.id]||{}).kpi||'점검 완료 여부',s:0,e:1}));
+ ids.forEach((id,i)=>{
+  if(i>3)return;
+  const d=R.drivers.find(x=>x.id===id),rx=RX[id];
+  const span=i===0?[0,2]:i===1?[1,2]:[2,3];
+  rows.push({kind:'driver',name:d.name,act:rx.action,tag:d.score!=null?`현재 ${d.score}점`:'',owner:rx.owner,kpi:rx.kpi,s:span[0],e:span[1],start:i===0});
+ });
+ P[90].legal.forEach(f=>rows.push({kind:f.isLegal?'legal':'ops',name:f.cat,act:(LRX[f.id]||{}).action||f.cat+' 보완',tag:f.status,owner:'대표·경영지원',kpi:(LRX[f.id]||{}).kpi||'보완 완료 여부',s:2,e:3}));
+ rows.push({kind:'rediag',name:'재진단·효과 측정',act:'같은 문항으로 재진단 → 저장한 결과 파일과 비교',tag:'',owner:'대표·HR',kpi:'우선 영역 다음 해석 구간 진입 여부',s:3,e:4});
+ return rows;
+}
+function ganttCard(R){
+ const rows=planRows(R);
+ const col={legal:'var(--bad)',ops:'#94a3b8',driver:'var(--primary)',rediag:'var(--gold)'};
+ const lab={legal:'노무',ops:'운영',driver:'조직',rediag:'재진단'};
+ return `<div class="card gantt-card">
+  <div class="kicker">ROADMAP · 120일 실행 로드맵 한눈에</div>
+  <h3 class="gt-h">무엇을, 언제까지, 누가 — ${rows.length-1}개 과제 + 재진단</h3>
+  <div class="gantt" role="table" aria-label="120일 실행 로드맵">
+   <div class="g-head" role="row"><div class="g-name" role="columnheader">과제</div><div class="g-cols" role="columnheader"><span>~30일<small>리스크 차단</small></span><span>~60일<small>핵심 실행</small></span><span>~90일<small>제도화</small></span><span>~120일<small>정착·재진단</small></span></div></div>
+   ${rows.map(r=>`<div class="g-row" role="row">
+    <div class="g-name" role="cell"><span class="g-k" style="background:${col[r.kind]}">${lab[r.kind]}</span><b>${r.name}</b>${r.tag?` <em>${r.tag}</em>`:''}<div class="g-act">${r.act}</div><div class="g-meta">👤 ${r.owner} · 📊 ${r.kpi}</div></div>
+    <div class="g-cols g-track" role="cell"><span></span><span></span><span></span><span></span>
+     <i class="g-bar ${r.kind==='rediag'?'g-ms':''}" style="left:calc(${r.s*25}% + 4px);width:calc(${(r.e-r.s)*25}% - 8px);background:${col[r.kind]}">${r.start?'착수 → 완료':r.kind==='rediag'?'◆ 재진단':''}</i></div></div>`).join('')}
+  </div>
+  <p class="note" style="margin:10px 0 0">배치 규칙: 법정 노무 미충족·미파악은 30일, 조직 우선순위 1위는 30일 착수·60일 완료, 2위는 60일, 3~4위와 제도 보완은 90일, 120일에 재진단. 과제별 실행 방법·기대효과는 'STEP 4 · 실행 로드맵'에 있습니다.</p>
+ </div>`;
+}
 function scoreBadge(label,val,g,prev){
  const col=g.c==='var(--good)'?'#4ade80':g.c==='var(--bad)'?'#fca5a5':g.c==='#f97316'?'#fdba74':g.c==='var(--warn)'?'#fcd34d':g.c==='var(--ink3)'?'#cbd5e1':'#93c5fd';
  return `<div class="sb">
@@ -1873,7 +1937,7 @@ function renderRoadmap(R){
    const d=R.drivers.find(x=>x.id===id),rx=RX[id];any=true;
    const quick=b.quick;
    h+=`<div class="rm-item" style="border-left-color:${b.c}">
-    <div class="rm-t">${d.name} ${d.score!=null?`<span class="rm-cur" style="color:${grade(d.score).c}">현재 ${d.score}점</span>`:''}</div>
+    <div class="rm-t">${d.name} ${d.score!=null?`<span class="rm-cur" style="color:${grade(d.score).c}">현재 ${d.score}점</span>`:''}${k===60&&P[30].drivers.includes(id)?' <span class="rm-cont">30일 착수분 · 60일까지 완료</span>':''}${quick?' <span class="rm-cont">60일까지 완료</span>':''}</div>
     <div class="rm-a">▸ ${quick?'착수: '+rx.how[0]:rx.action}</div>
     ${quick?`<div class="rm-how">이번 주 첫 행동 — 담당 지정 후 대상·일정 공지</div>`:`<div class="rm-how"><b>실행 방법</b><br>${rx.how.map(x=>`· ${x}`).join('<br>')}</div>
     <div class="rm-eff"><b>기대효과</b> — ${rx.effect}</div>`}

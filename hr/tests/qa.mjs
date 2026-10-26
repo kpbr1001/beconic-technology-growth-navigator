@@ -140,6 +140,9 @@ const run = (emp, hr, company) => page.evaluate(([e, h, c]) => { const R = compu
   check('예시: 가상 데이터 배너', res.includes('가상 예시 데이터'));
   check('예시: 이직 대체비용 1.4억원~5.8억원', res.includes('1.4억원~5.8억원'));
   check('예시: 취업규칙(24인) 전문가 검토 + 의무교육 미충족', res.includes('취업규칙') && res.includes('법정 의무교육'));
+  const g = await page.evaluate(() => { const P = S.result.plan, rows = document.querySelectorAll('#result .gantt .g-row'); const bar = rows[P[30].legal.length]?.querySelector('.g-bar'); return { rows: rows.length, expect: P[30].legal.length + Math.min(S.result.topDriverIds.length, 4) + P[90].legal.length + 1, top: bar?.getAttribute('style') || '', idx: [...document.querySelectorAll('#result > .card')].findIndex((c) => c.classList.contains('gantt-card')) }; });
+  check('결과 보고서에 120일 로드맵 한눈에(경영진 요약 바로 다음)', g.rows === g.expect && g.idx === 2, JSON.stringify(g));
+  check('로드맵 한눈에: 1순위 영역은 30일 착수·60일 완료 막대', g.top.includes('left:calc(0% + 4px)') && g.top.includes('width:calc(50% - 8px)'));
   check('예시: 가상 데이터는 AI 요청 차단', await page.locator('#btnAI').isDisabled());
   const dl = page.waitForEvent('download');
   await page.evaluate(() => exportJSON());
