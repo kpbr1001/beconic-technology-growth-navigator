@@ -216,6 +216,7 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   await page.evaluate(() => { window.print = () => {}; GAN.openReportDialog(); document.getElementById('repGenerate').click(); document.querySelectorAll('#v-result details').forEach((x) => (x.open = true)); });
   await page.waitForTimeout(100);
   await page.emulateMedia({ media: 'print' });
+  await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(300);
   const pdfPath = path.join(OUT, 'growth-report-sample.pdf');
   const pdf = await page.pdf({ path: pdfPath, format: 'A4', printBackground: true, preferCSSPageSize: true });
   const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
@@ -227,6 +228,13 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   check('PDF: 표지·응답 근거·공개 산식·근거 출처 포함', ['기업 성장활동 진단 보고서', '영역별 응답 근거와 다음 단계', '영역 우선도 = max(0', '근거·출처', 'Churchill'].every((s) => pdfTxt.includes(s)), py.status === 0 ? 'PDF 텍스트 검사' : 'DOM 대체 검사');
   check('PDF: AI 표기 없음', !/AI 사전 분석|AI 요약|AI 기반/.test(pdfTxt));
   await page.emulateMedia({ media: 'screen' });
+}
+
+// 9. 웹폰트: 프리텐다드가 실제로 로드되어 본문에 적용
+{
+  await page.goto(BASE);
+  const f = await page.evaluate(async () => { await document.fonts.ready; return { ok: [...document.fonts].some((x) => x.family.replace(/["']/g, '') === 'Pretendard Variable' && x.status === 'loaded'), fam: getComputedStyle(document.body).fontFamily }; });
+  check('웹폰트: Pretendard Variable 로드·본문 적용', f.ok && f.fam.startsWith('"Pretendard Variable"'), f.fam.slice(0, 40));
 }
 
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));

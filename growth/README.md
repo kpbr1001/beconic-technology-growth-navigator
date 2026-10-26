@@ -1,4 +1,4 @@
-# BECONIC 기업 성장활동 진단 내비게이터 (v6.0.0) — Tool 12
+# BECONIC 기업 성장활동 진단 내비게이터 (v6.0.1) — Tool 12
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-diagnosis-business-growth.netlify.app
@@ -26,14 +26,14 @@ growth/
 ├─ logo-mark.png           # 헤더·보고서 표지 로고
 ├─ og-business-growth.jpg  # 카카오톡·SNS 공유 이미지 1200×632
 ├─ netlify.toml · package.json
-├─ tests/qa.mjs            # Chromium QA 53항목(엔진 원칙·클릭 플로우·재진단·공유 링크 정제·모바일 375px·A4 PDF)
+├─ tests/qa.mjs            # Chromium QA 54항목(웹폰트 로드 포함 · 엔진 원칙·클릭 플로우·재진단·공유 링크 정제·모바일 375px·A4 PDF)
 └─ docs/CHANGELOG.md       # 개선 내역과 27개 Tool 진단 보고서 대응표
 ```
 
 ## Netlify 배포
 
 1. 기존 `beconic-diagnosis-business-growth` 사이트(드래그 배포)를 이 저장소에 연결 → **Base directory: `growth`**. 나머지는 `growth/netlify.toml`이 지정합니다(`npm run build`로 공개 파일 3개만 `dist/`에 복사).
-2. 환경변수·서버 함수가 필요 없습니다. CSP는 외부 연결을 모두 막습니다(`connect-src 'none'`).
+2. 환경변수·서버 함수가 필요 없습니다. 외부에서 받는 것은 프리텐다드 웹폰트(jsdelivr, `pretendard@1.3.9` 가변·동적 서브셋)뿐이며, CSP는 폰트 CDN만 허용하고 데이터 전송은 모두 막습니다(`connect-src 'none'`).
 3. v5 공유 링크는 문항 구조가 달라 열리지 않고 안내 문구가 뜹니다. v5에서 브라우저에 임시 저장된 값도 읽지 않습니다(저장 키 변경).
 
 ## 로컬 확인·QA

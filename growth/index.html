@@ -25,6 +25,8 @@
 <meta name="twitter:image:alt" content="기업 성장활동 진단 내비게이터 — 그로스벤처스">
 <meta name="theme-color" content="#2563EB">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 104'%3E%3Cpath d='M50 2 L93 11 Q94 11 94 13 L94 56 Q94 78 73 92 L52 101 Q50 102 48 101 L27 92 Q6 78 6 56 L6 13 Q6 11 7 11 Z' fill='%231f3a5f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <style>
 :root{
   --navy:#0B1B3B; --navy-2:#15294f; --ink:#0e1a30; --ink-soft:#3a4a66;
@@ -39,8 +41,6 @@
   --maxw:1080px;
   --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
 }
-@font-face{font-family:"Pretendard Variable";font-weight:45 920;font-style:normal;font-display:swap;
-  src:local("Pretendard Variable");}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html{scroll-behavior:smooth;}
 body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);
@@ -773,10 +773,10 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 @media print{
   @page{
     size:A4; margin:14mm 11mm 13mm 11mm;
-    @top-left{ content:"기업 성장활동 진단 보고서"; font-size:8pt; color:#8895ab; }
-    @top-right{ content:"그로스벤처스㈜ · Beconic"; font-size:8pt; color:#8895ab; }
-    @bottom-center{ content:"— " counter(page) " —"; font-size:8.5pt; color:#66748c; }
-    @bottom-right{ content:"제2025-684호"; font-size:7.5pt; color:#aab6cc; }
+    @top-left{ content:"기업 성장활동 진단 보고서"; font-size:8pt; font-family:"Pretendard Variable",Pretendard,sans-serif; color:#8895ab; }
+    @top-right{ content:"그로스벤처스㈜ · Beconic"; font-size:8pt; font-family:"Pretendard Variable",Pretendard,sans-serif; color:#8895ab; }
+    @bottom-center{ content:"— " counter(page) " —"; font-size:8.5pt; font-family:"Pretendard Variable",Pretendard,sans-serif; color:#66748c; }
+    @bottom-right{ content:"제2025-684호"; font-size:7.5pt; font-family:"Pretendard Variable",Pretendard,sans-serif; color:#aab6cc; }
   }
   @page cover{ margin:0; @top-left{content:none;} @top-right{content:none;}
     @bottom-center{content:none;} @bottom-right{content:none;} }
@@ -1534,9 +1534,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.0.0";
+const APP_VERSION = "v6.0.1";
 const APP_UPDATED = "2026-10-26";
-const APP_BUILD   = "2026.10.26.1";  // 배포 빌드 식별자
+const APP_BUILD   = "2026.10.26.2";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
 const STORE_KEY = "gan_state_v6";   // v5 이하 저장값(구조 다름)은 읽지 않음
 const FILE_SCHEMA = "beconic-growth/6";
