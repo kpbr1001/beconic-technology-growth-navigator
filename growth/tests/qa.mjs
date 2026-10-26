@@ -1,4 +1,4 @@
-/* global scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB, buildDiagnosisData, buildDiagnosisNarrative, buildCTA, Q_BY_ID, ACT_METRIC -- page.evaluate 안에서 앱 전역을 호출 */
+/* global COMPANY, RULES, OPT, renderResult, scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB, buildDiagnosisData, buildDiagnosisNarrative, buildCTA, Q_BY_ID, ACT_METRIC -- page.evaluate 안에서 앱 전역을 호출 */
 // BECONIC 성장진단(12번) QA — 실제 Chromium으로 규칙 엔진 원칙·사용자 플로우·모바일·재진단·A4 PDF를 확인한다.
 // 실행: (growth 폴더를 정적 서버로 띄운 뒤) node growth/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -130,8 +130,9 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   check('STEP4 보유 현황: "점수에 더하지 않습니다" 안내', (await page.locator('#fstep-4').innerText()).includes('점수에 더하지 않습니다'));
   await page.click('#col-3 .collapse-h'); await page.waitForTimeout(450);
   await page.click('.tg[data-v="website"]');
-  check('STEP4: 결과 바로 보기 버튼 표시', await page.locator('#btnSkip').isVisible());
-  await page.click('#btnNext');
+  check('STEP4: 주 버튼 = 진단 결과 보기, 보조 = 컨설턴트 입력', (await page.locator('#btnNext').innerText()).includes('진단 결과 보기') && (await page.locator('#btnSkip').innerText()).includes('컨설턴트'));
+  check('STEP4: 첫 보유 현황 섹션이 펼쳐져 있음', (await page.locator('#col-1.open').count()) === 1 && (await page.locator('#col-1 .tg').first().isVisible()));
+  await page.click('#btnSkip');
   check('STEP5: 규칙 기반 사전 분석 표기', (await page.locator('#c-presum').innerText()).includes('규칙 기반 사전 분석'));
   await page.click('#btnNext');
   await page.waitForSelector('#v-result.on');
@@ -280,6 +281,29 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   check('R1 조작한 결과 파일 불러와도 스크립트 미실행', !fired && (await page.locator('#resultRoot img[src="x"]').count()) === 0);
   page.off('dialog', onDlg);
   await page.evaluate(() => GAN.restart());
+}
+
+// 11. 사용자 흐름·하드코딩 회귀 (v6.2.0)
+{
+  await page.goto(BASE);
+  const cfg = await page.evaluate(() => ({ tel: COMPANY.tel, cert: COMPANY.certNo, q: QUESTIONS.length, src: Object.keys(SRC).length, ind: OPT.industry.length,
+    body: document.body.innerText, empty: [...document.querySelectorAll('[data-co],[data-cnt]')].filter((e) => !e.textContent.trim()).length,
+    telHref: [...document.querySelectorAll('a[data-tel]')].every((a) => a.getAttribute('href') === 'tel:' + COMPANY.tel.replace(/[^0-9+]/g, '')),
+    depth: [...document.querySelectorAll('#c-depth .chip-btn')].map((b) => b.textContent) }));
+  check('설정값 반영: 빈 data-co·data-cnt 없음, 전화 링크 = COMPANY.tel', cfg.empty === 0 && cfg.telHref && cfg.body.includes(cfg.tel) && cfg.body.includes(cfg.cert));
+  check('화면 숫자 = 실제 값(문항·근거·업종·진단 깊이)', cfg.body.includes(`${cfg.q}개 문항`) && cfg.body.includes(`${cfg.src}개 근거`) && cfg.body.includes(`${cfg.ind}개 업종`) && cfg.depth[1].includes(`${cfg.q}문항`), cfg.depth.join(' / '));
+  const crit = await page.evaluate(() => { GAN.loadSample(); return document.querySelector('.criteria .cbody').textContent; });
+  const rules = await page.evaluate(() => RULES);
+  check('공개 산식 설명 = RULES 상수', crit.includes(`고민 선택 시 ${rules.priority.concern}`) && crit.includes(`최대 ${rules.conf.straightCap}`) && crit.includes(`상한 ${rules.expect.cap}`));
+  const now = await page.evaluate(() => { const x = { name: 'X', depth: 'standard', stage: 'y1', ctype: 'sosang', industry: 'food', revenue: 'r15', emp: 'e24', customer: 'b2c', concern: ['customer', 'mkt', 'fund'], prep: [], ans: Object.fromEntries(QUESTIONS.map((q) => [q.id, q.na ? 'na' : 1])) }; return pickActivities(x, scoreEngine(x)).filter((a) => a._tag === 'now').length; });
+  check("'지금 착수' 태그는 상위 3개까지", now <= 3, `${now}개`);
+  const memo = await page.evaluate(() => { const d = { ...GAN._state().data, memo: { overview: '', risk: '', tasks: '첫 고객', kpi: '월 고객 문의', kpiData: [{ name: '월 고객 문의' }], edited: false } }; renderResult(d, false); return document.getElementById('resultRoot').innerText.includes('컨설턴트 진단 의견'); });
+  check('컨설턴트가 손대지 않은 기본 선택만 있으면 컨설턴트 의견 섹션 없음', !memo);
+  const m = await browser.newPage({ viewport: { width: 375, height: 800 } });
+  await m.goto(BASE); await m.evaluate(() => GAN.loadSample()); await m.waitForTimeout(300);
+  const ctaH = await m.evaluate(() => document.querySelector('.cta-top').getBoundingClientRect().height);
+  check('모바일 상담 박스: 빈 공간 없음(높이 360px 이하)', ctaH <= 360, `${Math.round(ctaH)}px`);
+  await m.close();
 }
 
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));
