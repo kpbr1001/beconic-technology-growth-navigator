@@ -26,7 +26,10 @@ export const Input = z
     signals: z.array(z.object({ id: z.string().regex(/^[A-Z]{2,6}$/), note: z.string().max(200) }).strict()).max(10),
     problem: z.string().max(160),
   })
-  .strict();
+  .strict()
+  // 영역 id는 D01~D10·O01~O04가 정확히 한 번씩 (중복·위조 id로 근거를 꾸미지 못하게)
+  .refine((v) => v.drivers.map((d) => d.id).sort().join() === 'D01,D02,D03,D04,D05,D06,D07,D08,D09,D10', { message: 'driver ids' })
+  .refine((v) => v.outcomes.map((o) => o.id).sort().join() === 'O01,O02,O03,O04', { message: 'outcome ids' });
 
 // ── 출력 스키마 (구조화 출력) ──
 const TIMELINES = ['30일', '60일', '90일', '120일'];

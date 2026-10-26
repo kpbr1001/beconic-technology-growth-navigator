@@ -1,4 +1,4 @@
-/* global computeScores, loadSample, S, DRIVERS, HR_ITEMS, OUTCOMES, exportJSON, aiPayload, allowedNumbers, checkText, renderResult, fillCover -- page.evaluate 안에서 앱 전역 함수를 호출 */
+/* global renderRoadmap, redactPII, goHome, computeScores, loadSample, S, DRIVERS, HR_ITEMS, OUTCOMES, exportJSON, aiPayload, allowedNumbers, checkText, renderResult, fillCover -- page.evaluate 안에서 앱 전역 함수를 호출 */
 // BECONIC HR 진단 QA — 실제 Chromium으로 규칙 엔진·사용자 플로우·모바일·AI 화면 계약·A4 PDF를 확인한다.
 // 실행: (hr 폴더를 정적 서버로 띄운 뒤) node hr/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -236,6 +236,52 @@ const run = (emp, hr, company) => page.evaluate(([e, h, c]) => { const R = compu
   const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
   check('A4 PDF 생성(표지+요약+본문)', pages >= 6 && pages <= 20, `${pages}쪽`);
   await page.emulateMedia({ media: 'screen' });
+}
+
+// 8. 레드팀 회귀 (2026-10-26 자가부검에서 찾은 결함)
+{
+  await page.goto(BASE);
+  const fz = await page.evaluate(() => {
+    let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647; const pick = (a) => a[Math.floor(rnd() * a.length)];
+    const bad = [];
+    for (let t = 0; t < 300; t++) {
+      const emp = {}; DRIVERS.forEach((d) => d.q.forEach((_, i) => { if (rnd() > 0.15) emp[`${d.id}_${i}`] = 1 + Math.floor(rnd() * 5); }));
+      OUTCOMES.forEach((o) => { if (rnd() > 0.3) emp[o.id] = 1 + Math.floor(rnd() * 5); });
+      const hr = {}; HR_ITEMS.forEach((h) => { if (rnd() > 0.2) hr[h.id] = 1 + Math.floor(rnd() * 4); });
+      const hc = pick([1, 4, 5, 9, 10, 29, 30, 300]);
+      const c = { name: 'F', industry: 'IT', worktype: '원격', headcount: hc, turnover: pick(['', 0, 3, hc * 3]), hires: pick(['', 4]), early: pick(['', 1]), leave: pick(['', 40]), ot: pick(['', 13]), salary: pick(['', 3000]) };
+      try {
+        const R = computeScores(emp, hr, c, {});
+        if ([R.ohi, R.outcomeIndex, R.hrMaturity, ...R.drivers.map((d) => d.score)].some((v) => v != null && (!Number.isInteger(v) || v < 0 || v > 100))) bad.push('range' + t);
+        Object.assign(S, { result: R, company: c, emp, hr, sample: false, prev: null, ai: null });
+        renderResult(R); renderRoadmap(R); document.getElementById('aiPreview')?.remove();
+        const txt = document.getElementById('result').innerText + document.getElementById('roadmap').innerText;
+        if (/NaN|undefined|Infinity|\bnull\b|\[object/.test(txt)) bad.push('text' + t);
+      } catch (e) { bad.push('throw' + t + e.message); }
+    }
+    return bad;
+  });
+  check('퍼징 300건: 예외·범위 이탈·NaN/null 표시 없음', fz.length === 0, fz.slice(0, 3).join(','));
+  const top = await page.evaluate(() => { const e = {}; DRIVERS.forEach((d, k) => d.q.forEach((_, i) => (e[`${d.id}_${i}`] = (k + i) % 2 ? 5 : 4))); const hr = {}; HR_ITEMS.forEach((h) => (hr[h.id] = 4)); const R = computeScores(e, hr, { name: 'S', industry: 'IT', worktype: '원격', headcount: 20 }, {}); S.result = R; S.sample = false; renderResult(R); return document.querySelectorAll('.exec-row').length; });
+  check('전 영역 안정 회사: 경영진 요약 과제 빈칸 없음(강화 과제)', top >= 1, String(top));
+  await page.evaluate(() => localStorage.setItem('hrh-draft-v3', JSON.stringify({ at: Date.now(), company: { name: '진짜회사', headcount: 12 }, emp: { D01_0: 3 }, hr: {}, texts: {} })));
+  await page.evaluate(() => { loadSample(); goHome(); });
+  check('예시 결과 → 처음으로: 작성 중이던 임시 저장 보존', await page.evaluate(() => !!localStorage.getItem('hrh-draft-v3')));
+  const fb = await page.evaluate(() => { loadSample(); S.sample = false; const al = allowedNumbers(aiPayload(S.result)); return ['근로기준법 제93조에 따라 점검하세요.', '10~29명 규모에서는 대표가 직접 하세요.', '상시 5인 이상이면 적용됩니다.'].map((x) => checkText(x, al)); });
+  check('AI 수치 대조: 법 조문·규모 구간·기준 인원은 오탐 없음', fb.every((x) => x === null), JSON.stringify(fb));
+  const pii = await page.evaluate(() => ['남궁민수 과장이', '팀장 김철수가', '팀장 회의가 길다', '대표 이사가 결정', '팀장 이번에'].map(redactPII));
+  check('PII: 복성·직함 앞 이름 제거, 일반 단어는 유지', !pii[0].includes('민수') && !pii[1].includes('철수') && pii[2] === '팀장 회의가 길다' && pii[3] === '대표 이사가 결정' && pii[4] === '팀장 이번에', JSON.stringify(pii));
+  const tr = await page.evaluate(() => { const e = {}; DRIVERS.forEach((d) => d.q.forEach((_, i) => (e[`${d.id}_${i}`] = 1 + (i % 5)))); return computeScores(e, {}, { name: 'T', industry: 'IT', worktype: '원격', headcount: 5, turnover: 40 }, {}).signals.map((x) => x.id); });
+  check('퇴사인원 > 현재 인원 → 입력 확인 신호', tr.includes('TRX'));
+  await page.goto(BASE);
+  await page.click('.btn-hx >> nth=0');
+  await page.evaluate(() => { document.getElementById('c_name').value = '가'.repeat(200); });
+  await page.selectOption('#c_industry', '제조'); await page.fill('#c_headcount', '10'); await page.click('#c_worktype .chip >> nth=0');
+  await page.click('text=다음: 조직 진단 →');
+  check('회사명 60자 초과 거부(프로그램 입력 포함)', await page.locator('#s1').isVisible());
+  await page.fill('#c_name', '정상㈜'); await page.fill('#c_turnover', '2.5');
+  await page.click('text=다음: 조직 진단 →');
+  check('퇴사인원 소수(2.5명) 거부', await page.locator('#s1').isVisible());
 }
 
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));

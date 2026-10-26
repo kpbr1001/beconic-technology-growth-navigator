@@ -647,7 +647,7 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
    <option>제조</option><option>IT·소프트웨어</option><option>서비스</option><option>도소매·유통</option>
    <option>건설</option><option>바이오·헬스케어</option><option>F&B·외식</option><option>콘텐츠·미디어</option><option>금융·핀테크</option><option>기타</option></select></div>
   <div class="field"><label for="c_year">설립연도 <span class="opt">선택</span></label><input id="c_year" type="number" inputmode="numeric" placeholder="예: 2021"></div>
-  <div class="field"><label for="c_headcount">현재 인원수 (상시근로자)</label><input id="c_headcount" type="number" inputmode="numeric" min="1" placeholder="예: 24" oninput="showBand()"><div id="c_band" class="band-note"></div></div>
+  <div class="field"><label for="c_headcount">현재 인원수 (상시근로자)</label><input id="c_headcount" type="number" inputmode="numeric" min="1" placeholder="예: 24" oninput="showBand()"><div class="obj-note" style="margin:5px 0 0">대표 제외, 단시간 근로자 포함. 정확한 산정은 근로기준법 시행령 제7조의2(최근 1개월 연인원 ÷ 가동일수)</div><div id="c_band" class="band-note"></div></div>
  </div>
  <h3 class="sec">근무 형태 (필수)</h3>
  <div class="chip-row" id="c_worktype">
@@ -775,7 +775,7 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
    결과구조: 경영진 요약 → 문제정의 → 항목별 진단·해석 → 인사이트·노무 → 120일 로드맵
    점수·우선순위·로드맵 = 공개 규칙(결정론 코드). AI는 운영자가 켠 경우에만 '해석 초안'을 덧붙임.
    ============================================================ */
-const APP={ver:'v3.0.0', updated:'2026-10-26', qbank:'HRH-QB-3.0', lawBase:'2026-10-26'};
+const APP={ver:'v3.0.1', updated:'2026-10-26', qbank:'HRH-QB-3.0', lawBase:'2026-10-26'};
 /* 연계 Tool 주소 — 비어 있으면 링크 없이 'BECONIC 허브에서 이용' 안내만 표시 */
 const TOOL_LINKS={ceo:'', finance:'https://beconic-diagnosis-finance.netlify.app'};
 const CONTACT={tel:'070-4103-4177', mail:'start@gven.kr', web:'www.beconic.kr'};
@@ -972,7 +972,7 @@ const HR_ITEMS=[
  {id:'H02',cat:'근로시간·휴게',q:'근로시간·연장근로를 기록하고, 휴게·주휴일이 보장된다',legal:'근로기준법 제53·54·55조(연장근로 한도·가산수당은 상시 5인 이상)',from:1,risk:'high',map:'D02'},
  {id:'H03',cat:'임금·퇴직급여',q:'최저임금 준수, 임금명세서 교부, 퇴직급여 제도가 운영된다',legal:'최저임금법 제6조 · 근로기준법 제48조(임금명세서) · 근로자퇴직급여 보장법 제4조',from:1,risk:'high',map:'D08'},
  {id:'H04',cat:'취업규칙',q:'취업규칙(복무·징계·휴가 등 인사 규정)을 문서화하고 신고했다',legal:'근로기준법 제93조(상시 10인 이상 작성·신고)',from:10,risk:'high',map:'D01'},
- {id:'H05',cat:'채용·온보딩',q:'채용 절차와 신규 입사자 온보딩(교육·멘토·적응 점검)이 문서화되어 있다',legal:'채용절차의 공정화에 관한 법률(상시 30인 이상) · 그 외 운영 권고',from:30,risk:'med',map:'D01'},
+ {id:'H05',cat:'채용·온보딩',q:'채용 절차와 신규 입사자 온보딩(교육·멘토·적응 점검)이 문서화되어 있다',legal:'HR 운영(권고) · 상시 30인 이상은 채용절차법(채용일정 고지·채용서류 반환 등) 별도 확인',from:null,risk:'med',map:'D01'},
  {id:'H06',cat:'목표·성과·평가',q:'성과목표·평가 기준과 절차가 문서로 마련되어 구성원에게 공유된다',legal:'HR 운영(권고)',from:null,risk:'med',map:'D08'},
  {id:'H07',cat:'교육·경력개발',q:'교육·역량개발 계획이나 예산이 있다',legal:'HR 운영(권고)',from:null,risk:'low',map:'D09'},
  {id:'H08',cat:'괴롭힘·성희롱 대응',q:'직장 내 괴롭힘·성희롱 신고 창구와 조사·조치 절차가 정해져 있다',legal:'근로기준법 제76조의2·3(괴롭힘, 상시 5인 이상) · 남녀고용평등법 제14조(성희롱 발생 시 조치)',from:1,risk:'high',map:'D06'},
@@ -1164,7 +1164,9 @@ function responseSignals(emp,hr,R){
   else if(sd<0.6) S_.push({id:'LOWVAR',kind:'pattern',sev:1,note:`응답 편차가 작아(표준편차 ${r1(sd)}) 영역 간 차이가 실제보다 작게 보일 수 있습니다.`});
   if(top>=0.8) S_.push({id:'HIGH',kind:'pattern',sev:1,note:`응답의 ${Math.round(top*100)}%가 최고점(5)입니다. 경영자 단독 응답의 관대화 가능성이 있어 구성원 확인을 권장합니다.`});
  }
- const O=R.objective, ans=k=>emp[k]||0, o2=R.outcomes.find(o=>o.id==='O02')?.score;
+ const O=R.objective, ans=k=>emp[k]||0;
+ if(O.turnoverRate!=null&&O.turnoverRate>100) S_.push({id:'TRX',kind:'input',sev:0,note:`퇴사인원(${O.turnover}명)이 현재 인원(${O.headcount}명)보다 많아 이직률이 ${O.turnoverRate}%로 계산됐습니다. 입력값을 확인하고, 인원이 크게 줄었다면 연평균 인원 기준으로 해석하세요.`});
+ const o2=R.outcomes.find(o=>o.id==='O02')?.score;
  if(O.turnoverRate!=null&&O.turnoverRate>=20&&o2!=null&&o2>=75) S_.push({id:'TOV',kind:'cross',sev:1,note:`재직 의도는 높게 응답했으나 최근 1년 이직률이 ${O.turnoverRate}%입니다. 이탈 원인을 퇴사자 면담으로 확인하세요.`});
  if(O.weeklyOT!=null&&O.weeklyOT>12&&ans('D02_2')>=4) S_.push({id:'OTX',kind:'cross',sev:1,note:`'초과근무 없이 정상 근무' 문항은 높게 응답했으나 주 평균 연장근로를 ${O.weeklyOT}시간으로 입력했습니다.`});
  if(O.leaveUse!=null&&O.leaveUse<50&&ans('D10_0')>=4) S_.push({id:'LVX',kind:'cross',sev:1,note:`회복 여유는 높게 응답했으나 연차 사용률이 ${O.leaveUse}%입니다.`});
@@ -1280,7 +1282,8 @@ function redactPII(t){
   .replace(/01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}/g,'[연락처 삭제]')
   .replace(/0\d{1,2}[-\s.]?\d{3,4}[-\s.]?\d{4}/g,'[연락처 삭제]')
   .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g,'[이메일 삭제]')
-  .replace(/([김이박최정강조윤장임한오서신권황안송류전홍고문양손배백허유남심노하곽성차주우구원])[가-힣]{1,2}\s?(님|씨|과장|대리|부장|팀장|이사|차장|사원|주임|대표|사장|본부장|실장|센터장)/g,'[이름 삭제]');
+  .replace(/(남궁|황보|제갈|선우|독고|사공|서문|[김이박최정강조윤장임한오서신권황안송류전홍고문양손배백허유남심노하곽성차주우구원])[가-힣]{1,2}\s?(님|씨|과장|대리|부장|팀장|이사|차장|사원|주임|대표|사장|본부장|실장|센터장|매니저|선임|책임|수석)/g,'[이름 삭제]')
+  .replace(/(과장|대리|부장|팀장|이사|차장|사원|주임|대표|사장|본부장|실장|센터장|매니저|선임|책임|수석)\s?(?!이번|이사|이후|이상|이전|이제|이미|이유|정도|정말|정리|전체|전부|전혀|조금|주로|우리|우선|구성|구조|고객|고민|성과|성장|최근|최대|서로|유지|원래|차이|신규|안내|문제|강조|노력|배려|심리|한번|장기|하루|오늘)(남궁|황보|제갈|선우|독고|사공|서문|[김이박최정강조윤장임한오서신권황안송류전홍고문양손배백허유남심노하곽성차주우구원])[가-힣]{2}(?=(?:이|가|은|는|을|를|의|에게|께서|님|씨|도|와|과|랑)?(?![가-힣]))/g,'$1 [이름 삭제]');
 }
 </script>
 <script>
@@ -1329,14 +1332,15 @@ function submitCompany(){
  const g=id=>$(id).value.trim();
  const wt=document.querySelector('#c_worktype .chip.on');
  if(!g('c_name')||!g('c_industry')||!g('c_headcount')||!wt){alert('필수 항목(회사명·업종·인원수·근무 형태)을 모두 입력해 주세요.');return;}
+ if(g('c_name').length>60){alert('회사명은 60자 이내로 입력해 주세요.');return;}
  const hc=+g('c_headcount');
  if(!Number.isInteger(hc)||hc<1||hc>100000){alert('현재 인원수는 1 이상의 정수로 입력해 주세요.');return;}
  const y=g('c_year'); const thisYear=new Date().getFullYear();
  if(y&&(!/^\d{4}$/.test(y)||+y<1900||+y>thisYear)){alert(`설립연도는 1900~${thisYear} 사이로 입력해 주세요.`);return;}
- const num=(id,min,max,label)=>{const v=g(id);if(v==='')return '';const x=+v;if(!Number.isFinite(x)||x<min||x>max)throw new Error(`${label}은(는) ${min}~${max} 범위로 입력해 주세요.`);return x;};
+ const num=(id,min,max,label,int)=>{const v=g(id);if(v==='')return '';const x=+v;if(!Number.isFinite(x)||x<min||x>max)throw new Error(`${label}은(는) ${min}~${max} 범위로 입력해 주세요.`);if(int&&!Number.isInteger(x))throw new Error(`${label}은(는) 정수(명)로 입력해 주세요.`);return x;};
  let obj;
  try{
-  obj={turnover:num('c_turnover',0,100000,'최근 1년 퇴사인원'),hires:num('c_hires',0,100000,'최근 1년 입사인원'),early:num('c_early',0,100000,'입사 1년 내 퇴사인원'),
+  obj={turnover:num('c_turnover',0,100000,'최근 1년 퇴사인원',1),hires:num('c_hires',0,100000,'최근 1년 입사인원',1),early:num('c_early',0,100000,'입사 1년 내 퇴사인원',1),
    leave:num('c_leave',0,100,'연차 사용률(%)'),ot:num('c_ot',0,52,'주 평균 연장근로(시간)'),salary:num('c_salary',500,100000,'평균 연봉(만원)')};
   if(obj.early!==''&&obj.hires!==''&&obj.early>obj.hires)throw new Error('입사 1년 내 퇴사인원이 입사인원보다 많습니다.');
   if(obj.early!==''&&obj.hires==='')throw new Error('조기 퇴사율을 계산하려면 최근 1년 입사인원도 입력해 주세요.');
@@ -1497,7 +1501,6 @@ function goHome(){
   if(!confirm('처음 화면으로 돌아갑니다. 작성 중인 응답은 이 브라우저에 임시 저장되어 나중에 이어서 할 수 있습니다. 계속할까요?')) return;
  }
  if(hasProgress&&(atResult||S.sample)){ // 결과 확인 후 귀환 → 새 진단 준비
-  if(S.sample)clearDraft();
   S.company={};S.emp={};S.hr={};S.texts={};S.empIdx=0;S.result=null;S.sample=false;S.prev=null;S.ai=null;
   fillCompanyForm({});
   $('empBar').style.width='0%';$('hrBar').style.width='0%';
@@ -1592,7 +1595,7 @@ function renderResult(R){
  const legalN=R.riskFlags.filter(f=>f.isLegal).length, expertN=R.riskFlags.filter(f=>f.level==='expert').length;
  // 노무 2건 + 조직 1건 이상을 섞어 보여준다(법정 리스크만으로 채워지지 않게)
  const elig=R.priorities.filter(p=>p.eligible);
- const rk=elig.filter(p=>p.type==='risk'),dr=elig.filter(p=>p.type==='driver'&&R.topDriverIds.includes(p.ref));
+ const rk=elig.filter(p=>p.type==='risk'),dr=R.priorities.filter(p=>p.type==='driver'&&R.topDriverIds.includes(p.ref)); // 전 영역 안정이면 '강화' 과제
  const top3=[...rk.slice(0,dr.length?2:3),...dr.slice(0,3)].slice(0,3).sort((a,b)=>b.score-a.score);
  const when=p=>p.type==='risk'?(p.level==='expert'||p.level==='unknown'?'30일':'90일'):(R.topDriverIds.indexOf(p.ref)<1?'30일 착수':R.topDriverIds.indexOf(p.ref)<2?'60일':'90일');
  h+=`<div class="card exec">
@@ -1605,7 +1608,7 @@ function renderResult(R){
    <div class="kpi"><div class="kpi-l">이직 대체비용 추정</div><div class="kpi-v kpi-sm">${O.costLow!=null?`${fmtWon(O.costLow)}~${fmtWon(O.costHigh)}`:'-'}</div><div class="kpi-s">${O.costLow!=null?'연봉 0.5~2배 (Gallup, 2019)':'퇴사인원·평균연봉 입력 시'}</div></div>
   </div>
   <div class="exec-top"><div class="exec-tt">최우선 과제 3</div>
-   ${top3.map((p,i)=>`<div class="exec-row"><span class="er-n ${p.type==='risk'?'er-r':''}">${i+1}</span><b>${p.type==='risk'?LRX[p.ref]?.action||p.name:RX[p.ref].action}</b><span class="er-w">${p.type==='risk'?'노무':'조직'} · ${when(p)}</span></div>`).join('')}
+   ${top3.length?'':'<div class="note">개선이 시급한 과제가 없습니다.</div>'}${top3.map((p,i)=>`<div class="exec-row"><span class="er-n ${p.type==='risk'?'er-r':''}">${i+1}</span><b>${p.type==='risk'?LRX[p.ref]?.action||p.name:RX[p.ref].action}</b><span class="er-w">${p.type==='risk'?'노무':p.eligible?'조직':'조직 강화'} · ${when(p)}</span></div>`).join('')}
   </div>
   <p class="exec-note">점수·우선순위·로드맵은 공개된 규칙으로 계산했습니다(아래 '방법론'). 점수는 내부 비교용 환산지수이며 외부 벤치마크가 아닙니다.</p>
  </div>`;
@@ -1615,7 +1618,7 @@ function renderResult(R){
   h+=`<div class="card warn-card">
    <div class="wc-t">⚠ ${R.confidence.level==='높음'?'해석 참고 — 확인할 신호':'해석 유의 — 응답 신뢰도 '+R.confidence.level}</div>
    <p>${R.confidence.note}</p>
-   ${R.signals.map(s=>`<div class="sig"><span class="sig-k">${s.kind==='cross'?'지표 불일치':'응답 패턴'}</span>${esc(s.note)}</div>`).join('')}
+   ${R.signals.map(s=>`<div class="sig"><span class="sig-k">${s.kind==='cross'?'지표 불일치':s.kind==='input'?'입력 확인':'응답 패턴'}</span>${esc(s.note)}</div>`).join('')}
    ${R.hrUnknown>=4?`<div class="sig"><span class="sig-k">제도 미파악</span>제도 문항 ${R.hrUnknown}건이 '모름'입니다. 성숙도 계산에서 제외했으며 담당자 확인이 필요합니다.</div>`:''}
    <p class="wc-foot">객관 지표 불일치 기준(이직률 20%·연차 사용률 50%·조기 퇴사율 30%)은 응답을 다시 확인하라는 내부 점검 기준이며 외부 평균이 아닙니다. 주 12시간은 근로기준법 제53조 한도입니다.</p></div>`;
  }
@@ -1706,8 +1709,11 @@ function renderResult(R){
    <button class="btn btn-ghost" type="button" onclick="exportJSON()">💾 결과 파일 저장</button>
    <label class="btn btn-ghost file-btn">📂 이전 결과 불러와 비교<input type="file" accept="application/json,.json" onchange="importJSON(this,'compare')"></label>
    ${S.prev?`<button class="btn btn-ghost" type="button" onclick="S.prev=null;renderResult(S.result);renderRoadmap(S.result)">비교 해제</button>`:''}
+   <button class="btn btn-ghost" type="button" onclick="clearDraft();this.textContent='✓ 임시 저장 삭제됨';this.disabled=true">🧹 이 기기의 임시 저장 삭제</button>
   </div>
-  ${S.prev?compareTable(R):''}</div>`;
+  <p class="note" style="margin:10px 0 0">작성 중 응답은 이어하기를 위해 이 브라우저에 임시 저장됩니다. 공용 PC라면 결과 파일을 저장한 뒤 임시 저장을 삭제하세요.</p>
+  </div>`;
+ if(S.prev) h+=`<div class="card"><h3 class="sec" style="margin-top:0">재진단 비교 <span class="sec-tag">이전 ${esc(S.prev.date)} → 이번</span></h3>${compareTable(R)}</div>`;
 
  $('result').innerHTML=h;
  if(S.ai&&S.ai.result) renderAI();
@@ -2022,6 +2028,10 @@ function allowedNumbers(p){
  p.drivers.forEach(d=>add(d.score));p.outcomes.forEach(o=>add(o.score));p.gaps.forEach(g=>{add(g.exp);add(g.sys);if(g.exp!=null&&g.sys!=null)add(Math.abs(g.exp-g.sys));});
  p.objective.forEach(o=>add(o.value));
  p.signals.forEach(s=>(s.note.match(/\d+(\.\d+)?/g)||[]).forEach(n=>add(+n)));
+ p.risks.forEach(r=>(r.legal.match(/\d+/g)||[]).forEach(n=>add(+n)));           // 법 조문 번호(제93조 등)·적용 인원
+ (p.sizeBand.match(/\d+/g)||[]).forEach(n=>add(+n));                              // 규모 구간(10~29명)
+ HR_ITEMS.forEach(h=>{if(h.from!=null)add(h.from);});                             // 법정 의무 기준 인원(5·10·30인)
+ add(5);
  [35,50,65,80,100,120,52,20,30].forEach(add);
  return set;
 }
