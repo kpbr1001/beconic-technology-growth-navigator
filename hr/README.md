@@ -18,7 +18,7 @@ hr/
 ├─ lib/ai-core.mjs                    # AI 입력·출력 스키마, 금지 표현, Claude 호출
 ├─ netlify.toml · package.json · .env.example
 ├─ tests/qa.mjs                       # Chromium QA 64항목(규칙 엔진·플로우·모바일·AI 화면·레드팀 회귀·A4 PDF)
-├─ tests/ai-contract.mjs              # AI 서버 함수 계약·키 노출 테스트 46항목(모의 API·카나리 키)
+├─ tests/ai-contract.mjs              # AI 서버 함수 계약·키 노출 테스트 49항목(모의 API·카나리 키)
 ├─ docs/CHANGELOG.md                  # 개선 내역과 27개 Tool 진단 보고서 대응표
 └─ docs/REDTEAM_2026-10-26.md         # 자가부검·레드팀 점검 결과
 ```

@@ -142,6 +142,14 @@ const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
   process.env.BECONIC_ACCESS_CODE = 'short'; r = await call(INPUT); check('짧은 승인 코드 설정 → 503', r.st === 503); process.env.BECONIC_ACCESS_CODE = CODE;
   process.env.BECONIC_AI_ENABLED = 'false'; r = await call(INPUT); check('스위치 꺼짐(기본값) → 503', r.st === 503); process.env.BECONIC_AI_ENABLED = 'true';
   const g = await handler(new Request('http://x/api/hr-insights', { method: 'DELETE' }), { ip: '1.1.1.1' }); check('DELETE → 405', g.status === 405);
+  // 출처 검사: 운영 URL만 환경 변수에 있고 미리보기 주소는 없는 실제 Netlify 상황을 재현
+  process.env.URL = 'https://beconic-diagnosis-hr.netlify.app';
+  const viaOrigin = async (site, origin) => (await handler(new Request(site + '/api/hr-insights', { method: 'POST', headers: { 'content-type': 'application/json', 'x-beconic-access': CODE, origin }, body: JSON.stringify(INPUT) }), { ip: '10.9.9.9' })).status;
+  const pv = 'https://deploy-preview-36--beconic-diagnosis-hr.netlify.app';
+  check('출처: 미리보기 사이트에서 자기 자신 호출 → 허용(실서비스 403 원인)', (await viaOrigin(pv, pv)) === 202);
+  check('출처: 운영 사이트 자기 호출 → 허용', (await viaOrigin(process.env.URL, process.env.URL)) === 202);
+  check('출처: 다른 사이트에서 호출 → 403', (await viaOrigin(process.env.URL, 'https://evil.example')) === 403 && (await viaOrigin(pv, 'https://deploy-preview-36--beconic-diagnosis-hr.netlify.app.evil.example')) === 403);
+  process.env.URL = '';
 }
 // 3b. 작업 조회·백그라운드 경로
 {
