@@ -1,10 +1,10 @@
-# BECONIC HR Health Navigator (v3.0.1)
+# BECONIC HR Health Navigator (v3.1.0)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-diagnosis-hr.netlify.app
 
 대표·인사담당자가 15분 동안 **조직 상태(10영역 30문항) · 성과지표(4) · HR 제도·노무(14영역)**를 응답하고, 선택으로 이직률·연장근로 같은 **객관 지표**를 넣으면
-경영진 요약 → 문제정의 → 항목별 해석 → 경험×제도 갭 매트릭스 → 법정 노무 점검 → 120일 로드맵 → A4 보고서까지 만드는 **단일 HTML 웹앱**입니다.
+경영진 요약 → 문제정의 → 항목별 해석 → 경험×제도 갭 매트릭스 → 법정 노무 점검 → 120일 로드맵(간트형 한눈에 + 상세) → A4 보고서까지 만드는 **단일 HTML 웹앱**입니다.
 점수·우선순위·로드맵은 공개된 규칙으로 계산하고, AI 해석은 운영자가 켠 경우에만 동의 후 초안으로 덧붙입니다.
 
 ## 구성
@@ -17,7 +17,7 @@ hr/
 ├─ netlify/functions/hr-insights-background.mjs  # AI 처리(백그라운드, 최대 15분)
 ├─ lib/ai-core.mjs                    # AI 입력·출력 스키마, 금지 표현, Claude 호출
 ├─ netlify.toml · package.json · .env.example
-├─ tests/qa.mjs                       # Chromium QA 62항목(규칙 엔진·플로우·모바일·AI 화면·레드팀 회귀·A4 PDF)
+├─ tests/qa.mjs                       # Chromium QA 64항목(규칙 엔진·플로우·모바일·AI 화면·레드팀 회귀·A4 PDF)
 ├─ tests/ai-contract.mjs              # AI 서버 함수 계약·키 노출 테스트 45항목(모의 API·카나리 키)
 ├─ docs/CHANGELOG.md                  # 개선 내역과 27개 Tool 진단 보고서 대응표
 └─ docs/REDTEAM_2026-10-26.md         # 자가부검·레드팀 점검 결과
