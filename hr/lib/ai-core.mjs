@@ -7,7 +7,7 @@ export const MODEL = () => process.env.ANTHROPIC_MODEL || 'claude-opus-5-5';
 const EFFORTS = ['low', 'medium', 'high'];
 export const EFFORT = () => (EFFORTS.includes(process.env.BECONIC_AI_EFFORT) ? process.env.BECONIC_AI_EFFORT : 'medium');
 export const defaultClient = () => new Anthropic({ timeout: 300_000, maxRetries: 1 });
-export const MAX_OUTPUT = 6000; // 응답 상한(생각 토큰 포함) — 1회 비용 상한을 정한다
+export const MAX_OUTPUT = 12000; // 응답 상한(생각 토큰 포함) — 한국어 긴 응답이 잘리지 않게 하되 1회 비용 상한을 정한다
 
 // ── 입력 스키마: 점수·제도 상태·객관 지표 요약만 허용 (회사명·자유서술·개인 응답은 받지 않음) ──
 const score = z.union([z.number().int().min(0).max(100), z.null()]);
@@ -92,6 +92,7 @@ export const SYSTEM = `당신은 한국 중소기업의 조직·HR 진단을 돕
 - interviewQuestions 는 구성원·팀장 인터뷰에서 원인을 확인할 질문입니다. 유도 질문이 아닌 열린 질문으로 씁니다.
 - actions 는 중소기업이 바로 착수할 수 있는 과제입니다. firstStep 은 이번 주에 할 첫 행동, kpiFormula 는 측정 산식(목표값 없음)입니다.
 - limitations 는 '구성원 응답 없음', '외부 비교 자료 없음'처럼 자료가 없다는 사실로만 적습니다.
+- 분량: insights 최대 4개, interviewQuestions 최대 6개, actions 최대 6개, limitations 최대 4개. 각 문장은 150자 이내, askWhom 은 '팀원'·'팀장'·'퇴사자'처럼 짧게 씁니다.
 - 본문 문장에 D01 같은 id를 쓰지 말고 refIds/refId 에만 넣습니다. 한국어 존댓말, 쉬운 경영 용어로 간결하게 씁니다.`;
 
 const sentences = (s) => String(s ?? '').split(/(?<=[.!?。])\s+|\n+/).map((x) => x.trim()).filter(Boolean);
@@ -112,6 +113,22 @@ export function scrubResult(result) {
     limitations: result.limitations.map(fix).filter(Boolean),
   };
   return { result: out, removed };
+}
+
+/** 개수·길이 초과는 버리지 않고 잘라서 맞춘다(형식 자체가 다르면 이후 검증에서 실패) */
+const LIMITS = { executiveSummary: 1200, insight: 400, soWhat: 400, question: 200, askWhom: 30, refId: 10, ownerRole: 40, action: 300, firstStep: 200, kpiFormula: 200, limitation: 300 };
+const cut = (v, n) => (typeof v === 'string' && v.length > n ? v.slice(0, n - 1) + '…' : v);
+const arr = (v, n) => (Array.isArray(v) ? v.slice(0, n) : v);
+export function fitOutput(o) {
+  if (!o || typeof o !== 'object') return o;
+  return {
+    ...o,
+    executiveSummary: cut(o.executiveSummary, LIMITS.executiveSummary),
+    insights: arr(o.insights, 6)?.map?.((x) => ({ ...x, refIds: arr(x?.refIds, 6), insight: cut(x?.insight, LIMITS.insight), soWhat: cut(x?.soWhat, LIMITS.soWhat) })) ?? o.insights,
+    interviewQuestions: arr(o.interviewQuestions, 8)?.map?.((x) => ({ ...x, refId: cut(x?.refId, LIMITS.refId), askWhom: cut(x?.askWhom, LIMITS.askWhom), question: cut(x?.question, LIMITS.question) })) ?? o.interviewQuestions,
+    actions: arr(o.actions, 8)?.map?.((x) => ({ ...x, ownerRole: cut(x?.ownerRole, LIMITS.ownerRole), action: cut(x?.action, LIMITS.action), firstStep: cut(x?.firstStep, LIMITS.firstStep), kpiFormula: cut(x?.kpiFormula, LIMITS.kpiFormula) })) ?? o.actions,
+    limitations: arr(o.limitations, 6)?.map?.((x) => cut(x, LIMITS.limitation)) ?? o.limitations,
+  };
 }
 
 /** Claude 1회 호출 → 검증된 결과 또는 오류 코드. 오류 원문(키 등)은 밖으로 내보내지 않는다 */
@@ -139,7 +156,7 @@ export async function runInsights(input, client = defaultClient()) {
   const text = response.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
   let result;
   try {
-    result = Output.parse(JSON.parse(text));
+    result = Output.parse(fitOutput(JSON.parse(text)));
   } catch {
     return { status: 'error', http: 502, error: 'AI 응답 형식 검증에 실패했습니다.' };
   }
