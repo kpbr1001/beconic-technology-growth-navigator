@@ -1,0 +1,31 @@
+# BECONIC 기업 성장활동 진단 내비게이터(12번) — Netlify 배포 설정
+# 사이트: https://beconic-diagnosis-business-growth.netlify.app
+# Netlify 사이트 설정에서 Base directory 를 `growth` 로 지정하면 이 파일이 적용됩니다.
+# 화면은 index.html 하나(정적, 계산은 브라우저 안에서). 서버 함수·외부 호출 없음.
+
+# 공개 파일만 dist/ 로 복사해 배포한다(문서·테스트는 공개 URL에 올리지 않음).
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net data:; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/og-business-growth.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

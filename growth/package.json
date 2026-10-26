@@ -1,0 +1,11 @@
+{
+  "name": "beconic-growth-diagnosis",
+  "version": "6.0.1",
+  "private": true,
+  "type": "module",
+  "description": "BECONIC 기업 성장활동 진단 내비게이터 — 단일 HTML 웹앱(규칙 기반, 서버 전송 없음)",
+  "scripts": {
+    "build": "rm -rf dist && mkdir -p dist && cp index.html logo-mark.png og-business-growth.jpg dist/",
+    "qa": "node tests/qa.mjs"
+  }
+}
