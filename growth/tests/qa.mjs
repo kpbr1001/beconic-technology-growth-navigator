@@ -1,4 +1,4 @@
-/* global scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB -- page.evaluate 안에서 앱 전역을 호출 */
+/* global scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB, buildDiagnosisData, buildDiagnosisNarrative, buildCTA, Q_BY_ID, ACT_METRIC -- page.evaluate 안에서 앱 전역을 호출 */
 // BECONIC 성장진단(12번) QA — 실제 Chromium으로 규칙 엔진 원칙·사용자 플로우·모바일·재진단·A4 PDF를 확인한다.
 // 실행: (growth 폴더를 정적 서버로 띄운 뒤) node growth/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -235,6 +235,51 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   await page.goto(BASE);
   const f = await page.evaluate(async () => { await document.fonts.ready; return { ok: [...document.fonts].some((x) => x.family.replace(/["']/g, '') === 'Pretendard Variable' && x.status === 'loaded'), fam: getComputedStyle(document.body).fontFamily }; });
   check('웹폰트: Pretendard Variable 로드·본문 적용', f.ok && f.fam.startsWith('"Pretendard Variable"'), f.fam.slice(0, 40));
+}
+
+// 10. 레드팀 회귀 (docs/REDTEAM_2026-10-26.md 결함 번호)
+{
+  await page.goto(BASE);
+  const r = await page.evaluate((b) => {
+    const A = (v) => Object.fromEntries(QUESTIONS.map((q) => [q.id, v]));
+    const out = {};
+    // R1: 재진단 파일 요약값 주입 차단
+    out.r1 = GAN._sanitizeSummary({ total: '<img>', expected: 50, areas: { foundation: '<b>', bm: 70, sales: 101 }, date: '<x>2026' });
+    // R2: 기대수준 이상인 고민 영역을 '낮다'고 쓰지 않음
+    let d = { ...b, concern: ['cert'], ans: { ...A(2), C1: 1, C2: 2, C3: 1 } };
+    let g = buildDiagnosisData(d); out.r2 = { core: buildDiagnosisNarrative(g).core, cta: buildCTA(g).body };
+    // R3: 응답률 50% 미만 → 판정 보류
+    const few = A('u'); few.B1 = 3; few.S1 = 3; few.M2 = 3;
+    g = buildDiagnosisData({ ...b, ans: few }); out.r3 = { band: g.score.band, conf: g.score.confidence.tier };
+    // R4: 일률 응답 → 신뢰도 '높음' 불가
+    out.r4 = [0, 1, 2, 3].map((v) => scoreEngine({ ...b, ans: A(v) }).confidence.tier);
+    // R5: 전 문항 체계화여도 추천 과제 3개 이상
+    out.r5 = ['pre', 'y13', 'y7'].map((st) => { const x = { ...b, stage: st, ans: A(3) }; return pickActivities(x, scoreEngine(x)).length; });
+    // R6: 모순 응답 탐지
+    out.r6 = consistencyFlags({ ...b, customer: 'global', concern: ['export'], prep: ['export_rec'], ans: { ...A(2), E1: 'na', E2: 'na', E3: 'na', S3: 'na', F2: 'na' } }).map((f) => f.id);
+    // R7·R8: 문구·정의
+    out.r7 = Q_BY_ID.E3.lv[0];
+    out.r8 = Object.values(ACT_METRIC).filter((m) => /\d+개 항목 중|필수 \d+개 항목 작성 비율|필수 페이지 구축/.test(m.measure)).length;
+    return out;
+  }, base);
+  check('R1 재진단 파일: 요약값은 0~100 숫자만(HTML 주입 차단)', r.r1.total === null && r.r1.areas.foundation === null && r.r1.areas.bm === 70 && r.r1.areas.sales === null && !/[<>]/.test(r.r1.date));
+  check('R2 기대수준 이상 고민 영역: "낮다" 표현 없음', !/낮아|낮게/.test(r.r2.core + r.r2.cta) && r.r2.core.includes('도달'), r.r2.core.slice(0, 40));
+  check('R3 응답률 50% 미만 → 성숙도 판정 보류', r.r3.band.includes('판정 보류') && r.r3.conf === 'low');
+  check('R4 일률 응답 → 신뢰도 높음 불가', r.r4.every((x) => x !== 'high'), r.r4.join(','));
+  check('R5 전 문항 체계화 → 추천 과제 3개 이상(다음 단계·유지 점검)', r.r5.every((n) => n >= 3), r.r5.join(','));
+  check('R6 모순 응답 탐지(해외 고객·수출 고민·수출실적 vs 수출 해당 없음, 매출 vs 고객·거래 없음)', ['X15', 'X16', 'X17', 'X18', 'X19'].every((id) => r.r6.includes(id)), r.r6.join(','));
+  check("R7 E3 0단계 문구가 '모름' 버튼과 겹치지 않음", r.r7 !== '모름');
+  check('R8 산출물 측정에 정의 없는 체크리스트 없음', r.r8 === 0);
+  // R1 실제 경로: 조작 파일을 불러와도 스크립트 미실행
+  let fired = false; const onDlg = (dl) => { fired = true; dl.dismiss(); };
+  page.on('dialog', onDlg);
+  const evil = path.join(OUT, 'evil.json');
+  writeFileSync(evil, JSON.stringify({ schema: 'beconic-growth/6', data: { name: 'E', stage: 'y13', ctype: 'small', industry: 'mfg', revenue: 'r15', emp: 'e59', customer: 'b2b', concern: ['org'], ans: { F1: 1 } }, summary: { total: '<img src=x onerror=alert(1)>', areas: { foundation: '<img src=x onerror=alert(2)>' }, date: '<img src=x onerror=alert(3)>' } }));
+  await page.setInputFiles('.sample-banner .file-in', evil); await page.waitForTimeout(300);
+  await page.evaluate(() => GAN.skipToResult()); await page.waitForTimeout(400);
+  check('R1 조작한 결과 파일 불러와도 스크립트 미실행', !fired && (await page.locator('#resultRoot img[src="x"]').count()) === 0);
+  page.off('dialog', onDlg);
+  await page.evaluate(() => GAN.restart());
 }
 
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));

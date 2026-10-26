@@ -98,12 +98,13 @@ jobs:
         run: |
           (cd hr && npm run build)
           node hr/tests/ai-contract.mjs
-      - name: 성장진단(12번) QA (규칙 엔진 원칙·플로우·재진단·모바일·A4 PDF)
+      - name: 성장진단(12번) QA (규칙 엔진 원칙·플로우·재진단·모바일·A4 PDF·레드팀 회귀·전수 조합)
         run: |
           (cd growth && npm run build)
           (cd growth/dist && python3 -m http.server 8792 --bind 127.0.0.1 >/dev/null 2>&1 &)
           sleep 1
           node growth/tests/qa.mjs http://127.0.0.1:8792/
+          node growth/tests/sweep.mjs http://127.0.0.1:8792/
       - name: 검수 결과물 업로드
         if: always()
         uses: actions/upload-artifact@v4
