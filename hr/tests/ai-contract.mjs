@@ -35,6 +35,7 @@ const mock = http.createServer((req, res) => {
     if (mode === 'forbid') return send(200, msg(JSON.stringify({ ...GOOD, executiveSummary: '제도화가 우선입니다. 업종 평균보다 이직이 많습니다.', insights: [{ refIds: ['D09'], insight: '취업규칙 미신고는 법 위반입니다.', soWhat: '확인' }, ...GOOD.insights] })));
     if (mode === 'limit') return send(200, msg(JSON.stringify({ ...GOOD, limitations: ['업종 평균 자료가 없어 비교하지 않았습니다.', '법 위반 여부는 단정하지 않았습니다.'] })));
     if (mode === 'allbad') return send(200, msg(JSON.stringify({ ...GOOD, executiveSummary: '업계 평균보다 나쁩니다.', actions: GOOD.actions.map((a) => ({ ...a, action: '저성과자를 해고하세요.' })) })));
+    if (mode === 'oversize') return send(200, msg(JSON.stringify({ ...GOOD, interviewQuestions: Array.from({ length: 10 }, (_, i) => ({ refId: 'D0' + (i % 9 + 1), askWhom: '입사 1년 미만 구성원과 그 팀의 팀장 및 인사 담당자', question: '질문' + i + ' ' + '가'.repeat(260) })), actions: Array.from({ length: 9 }, () => GOOD.actions[0]), insights: Array.from({ length: 7 }, () => GOOD.insights[0]) })));
     if (mode === 'badjson') return send(200, msg('이건 JSON이 아님'));
     if (mode === 'refusal') return send(200, msg('', 'refusal'));
     if (mode === 'auth') return send(401, JSON.stringify({ type: 'error', error: { type: 'authentication_error', message: `invalid x-api-key ${CANARY}` } }));
@@ -94,7 +95,7 @@ const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
   const r = await call(INPUT);
   const q = seen.at(-1);
   check('정상: 200 + 구조화 결과', r.st === 200 && r.json.result?.actions?.length === 1, `${r.st}`);
-  check('요청: 응답 상한 6,000 토큰', q.body.max_tokens === 6000);
+  check('요청: 응답 상한 12,000 토큰(한국어 긴 응답 잘림 방지)', q.body.max_tokens === 12000);
   check('요청: 모델 claude-opus-5-5', q.body.model === 'claude-opus-5-5');
   check('요청: 구조화 출력(json_schema)·effort', q.body.output_config?.format?.type === 'json_schema' && q.body.output_config.effort === 'medium');
   check('요청: 거절 시 대체 모델(fallbacks + 베타 헤더)', q.body.fallbacks === 'default' && String(q.headers['anthropic-beta']).includes('server-side-fallback-2026-07-01'));
@@ -111,6 +112,8 @@ const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
   check('금지 표현(업종 평균·법 위반 단정) 문장만 제거', r.st === 200 && r.json.removed === 2 && !/업종 평균|법 위반입니다/.test(r.text) && r.json.result.executiveSummary === '제도화가 우선입니다.', `${r.st} removed=${r.json.removed}`);
   mode = 'limit'; r = await call(INPUT, { ip: '10.0.0.2' }); check('한계 설명 문장은 유지', r.st === 200 && r.json.removed === 0 && r.json.result.limitations.length === 2);
   mode = 'allbad'; r = await call(INPUT, { ip: '10.0.0.2' }); check('해고 권고·외부 평균만 있으면 422', r.st === 422);
+  mode = 'oversize'; r = await call(INPUT, { ip: '10.0.0.2' });
+  check('개수·길이 초과 응답 → 버리지 않고 잘라서 200 (실서비스 502 원인)', r.st === 200 && r.json.result.interviewQuestions.length === 8 && r.json.result.actions.length === 8 && r.json.result.insights.length === 6 && r.json.result.interviewQuestions[0].question.length <= 200 && r.json.result.interviewQuestions[0].askWhom.length <= 30, `${r.st} ${r.text.slice(0, 80)}`);
   mode = 'badjson'; r = await call(INPUT, { ip: '10.0.0.2' }); check('형식 깨진 응답 → 502', r.st === 502);
   mode = 'refusal'; r = await call(INPUT, { ip: '10.0.0.2' }); check('AI 거절 → 422 안내', r.st === 422);
   mode = 'auth'; r = await call(INPUT, { ip: '10.0.0.2' }); check('제공자 인증 실패 → 502, 오류 원문(키) 미노출', r.st === 502 && !r.text.includes('CANARY') && !r.text.includes('x-api-key'), r.json.error);
@@ -139,6 +142,14 @@ const call = async (body, { code = CODE, ip = '10.0.0.1' } = {}) => {
   process.env.BECONIC_ACCESS_CODE = 'short'; r = await call(INPUT); check('짧은 승인 코드 설정 → 503', r.st === 503); process.env.BECONIC_ACCESS_CODE = CODE;
   process.env.BECONIC_AI_ENABLED = 'false'; r = await call(INPUT); check('스위치 꺼짐(기본값) → 503', r.st === 503); process.env.BECONIC_AI_ENABLED = 'true';
   const g = await handler(new Request('http://x/api/hr-insights', { method: 'DELETE' }), { ip: '1.1.1.1' }); check('DELETE → 405', g.status === 405);
+  // 출처 검사: 운영 URL만 환경 변수에 있고 미리보기 주소는 없는 실제 Netlify 상황을 재현
+  process.env.URL = 'https://beconic-diagnosis-hr.netlify.app';
+  const viaOrigin = async (site, origin) => (await handler(new Request(site + '/api/hr-insights', { method: 'POST', headers: { 'content-type': 'application/json', 'x-beconic-access': CODE, origin }, body: JSON.stringify(INPUT) }), { ip: '10.9.9.9' })).status;
+  const pv = 'https://deploy-preview-36--beconic-diagnosis-hr.netlify.app';
+  check('출처: 미리보기 사이트에서 자기 자신 호출 → 허용(실서비스 403 원인)', (await viaOrigin(pv, pv)) === 202);
+  check('출처: 운영 사이트 자기 호출 → 허용', (await viaOrigin(process.env.URL, process.env.URL)) === 202);
+  check('출처: 다른 사이트에서 호출 → 403', (await viaOrigin(process.env.URL, 'https://evil.example')) === 403 && (await viaOrigin(pv, 'https://deploy-preview-36--beconic-diagnosis-hr.netlify.app.evil.example')) === 403);
+  process.env.URL = '';
 }
 // 3b. 작업 조회·백그라운드 경로
 {

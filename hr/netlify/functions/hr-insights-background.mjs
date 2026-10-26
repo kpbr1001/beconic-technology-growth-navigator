@@ -22,7 +22,7 @@ export function createBackground({ jobs: jobsFactory = () => getStore('hr-ai-job
       result = { status: 'error', http: 502, error: 'AI 처리 중 오류가 발생했습니다.' };
     }
     if (result.status === 'ok') console.log('hr-insights ok', JSON.stringify({ model: result.model, removed: result.removed || 0 }));
-    else console.error('hr-insights 실패', result.http);
+    else console.error('hr-insights 실패', result.http, result.error); // 오류 문구는 우리가 만든 고정 문장(키·원문 미포함)
     await jobs.setJSON(id, { status: 'done', createdAt: job.createdAt, result });
     return new Response(null, { status: 202 });
   };

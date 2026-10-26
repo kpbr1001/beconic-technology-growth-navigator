@@ -1,6 +1,6 @@
 {
   "name": "beconic-hr-diagnosis",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "private": true,
   "type": "module",
   "description": "BECONIC HR Health Navigator — 단일 HTML 웹앱 + AI 해석 초안 서버 함수(선택)",

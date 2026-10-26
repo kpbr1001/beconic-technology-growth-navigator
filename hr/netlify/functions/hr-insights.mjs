@@ -59,7 +59,14 @@ export function createHandler({
     const code = process.env.BECONIC_ACCESS_CODE;
     if (!code || code.length < 8) return json(503, { error: '승인 코드가 설정되지 않아 AI 기능을 열 수 없습니다.' });
     const origin = req.headers.get('origin');
-    if (origin && process.env.URL && origin !== process.env.URL && origin !== process.env.DEPLOY_PRIME_URL) return json(403, { error: '허용되지 않은 출처입니다.' });
+    // 같은 사이트(요청을 받은 바로 그 주소)에서 온 요청만 허용 — 운영·미리보기(deploy-preview-N--) 모두 통과, 다른 사이트는 차단.
+    // 미리보기 주소는 함수 실행 환경 변수에 없을 수 있어 요청 주소와 직접 비교한다.
+    if (origin) {
+      let self = '';
+      try { self = new URL(req.url).origin; } catch { /* 비교 불가 시 아래 환경 변수로만 판단 */ }
+      const allowed = [self, process.env.URL, process.env.DEPLOY_PRIME_URL, process.env.DEPLOY_URL].filter(Boolean);
+      if (process.env.URL && !allowed.includes(origin)) return json(403, { error: '허용되지 않은 출처입니다.' });
+    }
 
     const ipKey = ipKeyOf(clientIp(req, context));
     let store, u, jobs;
