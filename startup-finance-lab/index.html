@@ -1655,6 +1655,87 @@ header .actions .more-list button.danger-text { color: var(--danger); }
 }
 
 /* =====================================================================
+   v2.2 모바일 안정화 — 좁은 화면·안드로이드 글꼴 확대(130~150%)에서도 카드 밖으로 넘치지 않게
+   ===================================================================== */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+@supports (overflow: clip) { body { overflow-x: clip; } }
+/* 격자 칸이 내용의 최소 너비(입력칸 기본 폭 등)보다 좁아질 수 있게 minmax(0, 1fr) 사용 */
+.info-grid { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) { .info-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.metric-grid, .fund-ratio-grid, .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 640px) {
+  .metric-grid, .fund-ratio-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+  .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.scenarios, .fund-summary { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) {
+  .scenarios { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fund-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.guide-steps { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) { .guide-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.info-field, .metric, .kpi, .fund-col, .scenario-slot, .guide-steps li, .check-head > * { min-width: 0; }
+.info-field input[type=text], .info-field input[type=date], .info-field select {
+  width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;
+}
+.info-field input[type=date] { -webkit-appearance: none; appearance: none; min-height: 48px; }
+/* 긴 숫자·문구는 줄을 바꿔서라도 칸 안에 */
+.metric .num, .kpi .k-num, .fund-table td, .pnl-table td, .score-table td, .rep-meta, .status, .slot-val, .slot-name,
+.benchmark-row .biz, .checklist-item-desc, .tp-body, .modal-body, .ti-body, .ti-tip { overflow-wrap: anywhere; word-break: keep-all; }
+.metric .num { font-size: clamp(15px, 4.6vw, 18px); }
+.metric.highlight .num { font-size: clamp(18px, 5.6vw, 24px); }
+.pnl-table td:first-child, .fund-table td:first-child { padding-right: 8px; }
+.pnl-table td:last-child, .fund-table td:last-child { white-space: nowrap; }
+/* 입력 행: 라벨이 길거나 글꼴이 커도 입력칸이 밀려나지 않게 */
+.row .row-head { min-width: 0; }
+.row .num-input-wrap { min-width: 0; }
+.row .num-input { min-width: 0; }
+/* 업종 벤치마크·민감도 표: 고정 px 열 대신 비율 */
+.benchmark-row { grid-template-columns: minmax(0, 1.25fr) auto minmax(0, 1.5fr); }
+.sens-row { grid-template-columns: minmax(64px, 0.9fr) auto minmax(40px, 1.4fr) auto; }
+.sens-row .s-val { font-size: 11px; }
+@media (max-width: 400px) {
+  .sens-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "name name" "neg pos" "track track"; row-gap: 4px; }
+  .sens-row .s-name { grid-area: name; }
+  .sens-row .s-val.neg { grid-area: neg; text-align: left; }
+  .sens-row .s-val.pos { grid-area: pos; text-align: right; }
+  .sens-row .sens-track { grid-area: track; }
+}
+.benchmark-title { flex-wrap: wrap; gap: 4px 10px; }
+.check-head { flex-wrap: wrap; }
+.checklist-group-header { flex-wrap: wrap; row-gap: 6px; }
+.checklist-group-title { min-width: 0; flex-wrap: wrap; }
+.check-bar { min-width: 120px; }
+/* 탭바·예시 버튼은 가로 스크롤 영역 안에서만 움직이게 */
+.tab-bar, .preset-bar { max-width: 100vw; overscroll-behavior-x: contain; }
+/* 안전영역(노치·제스처 바) 아래 토스트·팝업이 가리지 않게 */
+.toast { bottom: calc(20px + env(safe-area-inset-bottom)); }
+.term-pop { max-width: calc(100vw - 24px); }
+.modal { max-height: calc(100dvh - 32px); overflow: auto; }
+
+/* 자주 바뀌는 영역은 그 안에서만 다시 배치되도록 묶는다 (저가형 휴대폰 성능) */
+.table-scroll, .chart-wrap, .sens-track, .benchmark-bar, .cost-bar, .fund-mix { contain: layout paint; }
+.metric, .kpi { contain: layout; }
+
+/* 슬라이더: 겉모양(4px 막대)은 그대로, 실제 터치 영역은 32px 높이로 */
+input[type=range] { height: 32px; margin: 0; background: transparent; cursor: pointer; touch-action: pan-y; }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; background: var(--surface-3); border-radius: 2px; }
+input[type=range]::-webkit-slider-thumb { margin-top: -12px; }
+input[type=range]::-moz-range-track { height: 4px; background: var(--surface-3); border-radius: 2px; }
+input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+/* 기본정보 접기 */
+details.info-card > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: -10px 0; padding: 10px 0; min-height: 44px; }
+details.info-card > summary::-webkit-details-marker { display: none; }
+details.info-card > summary::after { content: '▾'; margin-left: auto; color: var(--text-3); font-size: 13px; transition: transform .15s; }
+details.info-card:not([open]) > summary::after { transform: rotate(-90deg); }
+details.info-card[open] > summary { margin-bottom: 4px; }
+details.info-card .card-hint { margin-left: 0; }
+.info-summary { flex-basis: 100%; font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+.info-summary:empty, details.info-card[open] .info-summary { display: none; }
+
+/* =====================================================================
    인쇄(PDF): 종합진단 요약 → 1~5단계를 빈 공간 없이 이어서 → 체크리스트(새 페이지)
    ===================================================================== */
 @media print {
@@ -1674,6 +1755,9 @@ header .actions .more-list button.danger-text { color: var(--danger); }
     @bottom-right { content: counter(page) " / " counter(pages); font-size: 8pt; color: #8B95A1; font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; }
   }
   html, body { background: #fff !important; }
+  /* 화면 성능용 격리(contain)는 인쇄 때 쪽 나눔을 막아 빈 공간을 만들므로 끈다 */
+  .table-scroll, .chart-wrap, .sens-track, .benchmark-bar, .cost-bar, .fund-mix, .metric, .kpi { contain: none !important; }
+  body { overflow: visible !important; }
   body { font-size: 12px; }
   .wrap { padding: 0 !important; max-width: none; }
   .brand-mark { background: none !important; padding: 0 !important; }
@@ -1824,7 +1908,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   </div>
   <ol class="guide-steps">
     <li><b>예시로 감 잡기</b><span>각 단계 위쪽의 <em>업종 예시</em> 버튼을 누르면 비슷한 업종 숫자가 채워져요.</span></li>
-    <li><b>내 숫자로 바꾸기</b><span>큰 숫자를 눌러 직접 입력하거나 막대를 밀어 보세요. <em>3000만</em>, <em>1억</em>처럼 한글 단위도 돼요.</span></li>
+    <li><b>내 숫자로 바꾸기</b><span>큰 숫자를 눌러 직접 입력하거나 막대를 밀어 보세요. 입력칸 아래에 <em>= 3,000만원</em>처럼 읽기 쉽게 표시돼요.</span></li>
     <li><b>단계 순서대로</b><span>1 제조원가 → 2 손익 → … → 6 종합진단. 단계 끝의 <em>다음 단계</em> 버튼을 따라가면 돼요.</span></li>
     <li><b>결과 저장·공유</b><span><em>📄 PDF 리포트</em>로 사업계획서·상담 자료를 만들고, <em>💾 시나리오 저장</em>으로 여러 안을 비교하세요.</span></li>
   </ol>
@@ -1834,8 +1918,8 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   </div>
 </section>
 
-<div class="info-card">
-  <div class="info-card-title">📋 기본 정보 <span class="card-hint">PDF 리포트 표지에 들어가요 (선택 입력)</span></div>
+<details class="info-card" id="info-card" open>
+  <summary class="info-card-title"><span>📋 기본 정보</span><span class="card-hint">PDF 표지용 · 선택 입력</span><span class="info-summary" id="info-summary"></span></summary>
   <div class="info-grid">
     <div class="info-field">
       <label for="info-biz">업종·업태</label>
@@ -1863,7 +1947,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
     </div>
   </div>
   <div class="field-hint" id="industry-hint">비교 업종은 손익 벤치마크와 종합진단의 영업이익률 기준으로 쓰입니다.</div>
-</div>
+</details>
 
 <nav class="tab-bar" role="tablist" aria-label="분석 단계 (1~7단계)">
   <button type="button" class="tab active" role="tab" id="tab-costing" data-tab="costing" aria-controls="sec-costing" aria-selected="true"><span class="tab-step">1</span>제조원가</button>
@@ -2423,7 +2507,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   //  설정 — 화면·계산·진단에 쓰이는 기준값은 모두 여기서만 바꾼다
   // =====================================================================
   const SHIELD_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 107.0 112.0\" aria-hidden=\"true\" focusable=\"false\"><path fill=\"#1b2c55\" d=\"M56.15 96.28 L56.15 81.19 L56.15 54.90 L51.99 54.90 L50.34 54.90 L47.29 90.64 C49.95 92.48 52.89 94.36 56.14 96.29 C56.14 96.29 56.15 96.29 56.15 96.28\"/><path fill=\"#1b2c55\" d=\"M28.53 50.24 L28.53 40.46 L44.93 43.57 L44.93 47.12 M56.14 13.12 L23.93 13.12 L23.93 31.48 L23.93 33.59 L23.93 39.58 L23.93 51.11 L23.93 59.44 L23.93 60.53 L23.93 62.28 C23.93 65.50 24.88 68.64 26.64 71.33 C29.48 75.66 34.86 81.59 44.10 88.37 L47.69 54.90 L46.07 54.90 L43.77 50.30 L48.06 50.30 L48.06 38.93 L46.33 38.93 L46.33 36.13 L54.65 33.47 L54.65 30.27 L56.15 30.27 L57.64 30.27 L57.64 33.47 L65.97 36.13 L65.97 38.93 L65.72 38.93 L64.23 38.93 L59.81 38.93 L56.15 38.93 L52.49 38.93 L49.95 38.93 L49.95 39.86 L52.49 41.58 L52.49 50.30 L56.15 50.30 L59.81 50.30 L59.81 41.58 L64.23 41.58 L64.23 50.30 L68.52 50.30 L66.23 54.90 L64.61 54.90 L68.20 88.36 C77.43 81.59 82.80 75.66 85.64 71.33 C87.40 68.64 88.35 65.50 88.35 62.28 L88.35 51.12 L67.31 47.12 L67.31 43.57 L82.83 40.62 L88.35 39.58 L95.34 38.25 L95.34 62.26 C95.34 66.95 93.98 71.52 91.39 75.47 C87.41 81.54 78.79 91.09 60.34 102.04 L56.14 104.54 L51.94 102.04 C33.48 91.08 24.87 81.54 20.89 75.47 C18.30 71.52 16.93 66.95 16.93 62.26 L16.93 6.55 L18.40 6.29 L93.88 6.29 L95.34 6.55 L95.34 29.77 L88.35 31.27 L88.35 13.12 L56.14 13.12 M112.27 -0.37 L106.69 -0.37 L56.15 -0.37 L56.14 -0.37 L5.59 -0.37 L0.02 -0.37 L5.59 6.67 L5.59 62.26 C5.59 68.26 7.51 74.09 11.15 79.12 C15.96 85.79 26.21 96.16 47.76 107.77 L56.14 112.29 L64.52 107.77 C86.06 96.17 96.32 85.79 101.13 79.12 C104.77 74.09 106.69 68.26 106.69 62.26 L106.69 6.68 L112.27 -0.37\"/><path fill=\"#e58d00\" d=\"M28.53 40.45 L28.53 50.24 L44.93 47.12 L44.93 43.57 L28.53 40.45\"/></svg>";  // 그로스벤처스 방패 로고 (원본 .ai와 동일한 벡터)
-  const APP = { name: '창업 재무분석 LAB', brand: 'BECONIC', org: '그로스벤처스(주)', version: '2.1.0', updated: '2026-10-24' };
+  const APP = { name: '창업 재무분석 LAB', brand: 'BECONIC', org: '그로스벤처스(주)', version: '2.2.0', updated: '2026-10-26' };
   // 제도 기준 (매년 갱신)
   const BASIS = { year: 2026, asOf: '2026년 10월', minWage: 10320, monthlyHours: 209 };
   BASIS.minWageWithHoliday = Math.round(BASIS.minWage * 1.2);   // 주 15시간 이상: 주휴수당 포함 실질 시급
@@ -2453,21 +2537,25 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   const gradeOf = score => RULES.grades.find(([min]) => score >= min)[1];
 
   // ===== Formatters =====
+  // Intl 형식기는 한 번만 만들어 재사용 (toLocaleString을 매번 부르면 저가형 휴대폰에서 눈에 띄게 느림)
+  const NF0 = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 0 });
+  const NF2 = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 2 });
+  const fmt0 = n => NF0.format(n);
   const $ = id => document.getElementById(id);
   const fin = n => typeof n === 'number' && isFinite(n);
-  const won = n => fin(n) ? Math.round(n).toLocaleString('ko-KR') + '원' : '-';
-  const num = n => fin(n) ? Math.round(n).toLocaleString('ko-KR') : '-';
+  const won = n => fin(n) ? fmt0(Math.round(n)) + '원' : '-';
+  const num = n => fin(n) ? fmt0(Math.round(n)) : '-';
   const pct = n => fin(n) ? (Math.round(n * 10) / 10).toFixed(1) + '%' : '-';
-  const signWon = n => fin(n) ? (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(Math.round(n)).toLocaleString('ko-KR') + '원' : '-';
+  const signWon = n => fin(n) ? (n > 0 ? '+' : n < 0 ? '−' : '') + fmt0(Math.abs(Math.round(n))) + '원' : '-';
   // 큰 금액은 억·만 단위로 (리포트·비교표용)
   function compactWon(n) {
     if (!fin(n)) return '-';
     const a = Math.abs(n), s = n < 0 ? '−' : '';
-    if (a >= 1e8) return s + (Math.round(a / 1e6) / 100).toLocaleString('ko-KR') + '억원';
-    if (a >= 1e4) return s + Math.round(a / 1e4).toLocaleString('ko-KR') + '만원';
-    return s + Math.round(a).toLocaleString('ko-KR') + '원';
+    if (a >= 1e8) return s + NF2.format(Math.round(a / 1e6) / 100) + '억원';
+    if (a >= 1e4) return s + fmt0(Math.round(a / 1e4)) + '만원';
+    return s + fmt0(Math.round(a)) + '원';
   }
-  const months = n => !fin(n) ? '회수 불가' : n <= 0 ? '즉시' : (Math.round(n * 10) / 10).toLocaleString('ko-KR') + '개월';
+  const months = n => !fin(n) ? '회수 불가' : n <= 0 ? '즉시' : NF2.format(Math.round(n * 10) / 10) + '개월';
   function escapeHtml(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
@@ -2584,7 +2672,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   const INFO_IDS = ['info-biz', 'info-item', 'info-region', 'info-name', 'info-date', 'info-industry'];
 
   function formatFor(cfg, v) {
-    if (cfg.mode === 'won' || cfg.mode === 'count') return Math.round(v).toLocaleString('ko-KR');
+    if (cfg.mode === 'won' || cfg.mode === 'count') return fmt0(Math.round(v));
     if (cfg.mode === 'pct') return (Math.round(v * 10) / 10).toString();
     return String(Math.round(v));
   }
@@ -2613,8 +2701,8 @@ header .actions .more-list button.danger-text { color: var(--danger); }
     v = Math.round(v);
     if (!fin(v) || Math.abs(v) < 10000) return '';
     const eok = Math.floor(v / 1e8), man = Math.floor((v % 1e8) / 1e4), rest = v % 1e4;
-    let out = (eok ? eok.toLocaleString('ko-KR') + '억 ' : '') + (man ? man.toLocaleString('ko-KR') + '만' : '');
-    out = out.trim() + (rest ? ' ' + rest.toLocaleString('ko-KR') : '') + '원';
+    let out = (eok ? fmt0(eok) + '억 ' : '') + (man ? fmt0(man) + '만' : '');
+    out = out.trim() + (rest ? ' ' + fmt0(rest) : '') + '원';
     return '= ' + out;
   }
 
@@ -3161,7 +3249,9 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   // =====================================================================
   //  화면 렌더링
   // =====================================================================
-  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  // 색상 토큰은 테마가 바뀔 때만 다시 읽는다
+  let cssCache = {};
+  const css = name => (name in cssCache ? cssCache[name] : (cssCache[name] = getComputedStyle(document.documentElement).getPropertyValue(name).trim()));
   const setText = (id, t) => { const el = $(id); if (el) el.textContent = t; };
   const setLevel = (id, level) => {
     const el = $(id);
@@ -3532,7 +3622,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
       muted: css('--text-4') || '#B0B8C1'
     };
   }
-  const axisWon = v => Math.abs(v) >= 1e8 ? (v / 1e8).toFixed(1) + '억' : Math.round(v / 1e4).toLocaleString('ko-KR') + '만';
+  const axisWon = v => Math.abs(v) >= 1e8 ? (v / 1e8).toFixed(1) + '억' : fmt0(Math.round(v / 1e4)) + '만';
 
   function drawBepChart(b, opts) {
     const canvas = $('b-chart');
@@ -3629,28 +3719,51 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   // ===== 전체 렌더 (입력 → 계산 → 모든 탭 갱신, 차트는 보이는 탭만) =====
   let latest = null;
   let renderQueued = false;
-  function render() {
-    const g = domGetter();
-    const all = calcAll(g);
-    latest = all;
-    const industryIdx = $('info-industry').value;
-    renderCosting(all.c);
-    renderPnl(all.p, industryIdx, g);
-    renderBep(all.b);
-    renderFund(all.f, all.p);
-    renderCash(all.cf, all.p, all.f);
-    renderReport(all, g);
+  // 계산은 전부 하되(가벼움), 화면은 지금 보는 탭만 그린다. 나머지 탭은 열 때 그린다.
+  // (모든 탭을 매번 다시 그리면 저가형 휴대폰에서 슬라이더 1회당 0.1초 이상 걸려 끊김)
+  let latestG = null;
+  const dirty = new Set();
+  function renderTab(name) {
+    if (!latest) return;
+    const all = latest, g = latestG, industryIdx = $('info-industry').value;
+    if (name === 'costing') renderCosting(all.c);
+    else if (name === 'pnl') renderPnl(all.p, industryIdx, g);
+    else if (name === 'bep') renderBep(all.b);
+    else if (name === 'fund') renderFund(all.f, all.p);
+    else if (name === 'cash') renderCash(all.cf, all.p, all.f);
+    else if (name === 'report') renderReport(all, g);
+    dirty.delete(name);
+  }
+  function render(opts) {
+    latestG = domGetter();
+    latest = calcAll(latestG);
+    TABS.forEach(t => dirty.add(t));
+    (opts && opts.all ? TABS : [activeTab]).forEach(renderTab);
     drawVisibleCharts();
-    renderScenarioCompare();
+    scheduleCompare();
+  }
+  // 시나리오 비교표는 입력이 잠시 멈췄을 때 한 번만 갱신
+  let compareTimer = null;
+  function scheduleCompare() {
+    clearTimeout(compareTimer);
+    compareTimer = setTimeout(renderScenarioCompare, 350);
   }
   function scheduleRender() {
     if (renderQueued) return;
     renderQueued = true;
     requestAnimationFrame(() => { renderQueued = false; render(); });
   }
+  // 슬라이더를 연속으로 움직이는 동안 차트는 0.12초에 한 번만 다시 그린다 (숫자·표는 즉시 갱신)
+  let chartTimer = null, lastChartAt = 0;
   function drawVisibleCharts(opts) {
     opts = opts || {};
     if (!latest) return;
+    if (!opts.rebuild && !opts.all && !opts.print) {
+      const now = performance.now();
+      clearTimeout(chartTimer);
+      if (now - lastChartAt < 120) { chartTimer = setTimeout(() => drawVisibleCharts({ force: true }), 120); return; }
+      lastChartAt = now;
+    }
     if (opts.all || activeTab === 'bep') drawBepChart(latest.b, opts);
     if (opts.all || activeTab === 'cash') drawCashChart(latest.cf, opts);
   }
@@ -3682,6 +3795,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
     markVisited(name);
     closeTerm();
     // 숨겨져 있던 캔버스는 크기가 0이라, 탭이 보일 때 새로 그린다
+    if (dirty.has(name)) renderTab(name);
     if (name === 'bep' || name === 'cash') requestAnimationFrame(() => drawVisibleCharts({ rebuild: true }));
     if (opts.scroll) {
       const bar = document.querySelector('.tab-bar');
@@ -4186,7 +4300,8 @@ header .actions .more-list button.danger-text { color: var(--danger); }
     document.body.classList.add('printing');
     const host = $('sections');
     host.insertBefore($('sec-report'), host.firstChild);  // 리포트를 맨 앞(요약 페이지)으로
-    render();
+    render({ all: true });
+    renderScenarioCompare();
     drawVisibleCharts({ all: true, rebuild: true, print: true });
   }
   function finishPrint() {
@@ -4210,7 +4325,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   // 다크/라이트 전환 시 차트 색 다시 그리기
   if (window.matchMedia) {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const onTheme = () => { destroyCharts(); render(); };
+    const onTheme = () => { cssCache = {}; destroyCharts(); render(); };
     if (mq.addEventListener) mq.addEventListener('change', onTheme);
     else if (mq.addListener) mq.addListener(onTheme);
   }
@@ -4290,7 +4405,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   ];
   const FAQ = [
     ['숫자를 잘 모르겠어요.', '각 단계의 <b>업종 예시</b> 버튼을 눌러 비슷한 업종 숫자로 시작한 뒤, 아는 것부터 하나씩 바꿔 보세요. 정확하지 않아도 괜찮아요 — 범위를 바꿔 보며 감을 잡는 게 목적이에요.'],
-    ['큰 금액은 어떻게 입력하나요?', '큰 숫자를 눌러 <b>3000만</b>, <b>1억 2천만</b>처럼 한글 단위로 입력해도 돼요. 입력칸 아래에 "= 3,000만원"처럼 읽기 쉬운 표기가 함께 나와요.'],
+    ['큰 금액은 어떻게 입력하나요?', '큰 숫자를 누르면 기존 값이 선택돼 바로 새 숫자로 덮어써요. 입력칸 아래에 "= 3,000만원"처럼 읽기 쉬운 표기가 함께 나와요. PC 키보드에서는 <b>3000만</b>, <b>1억 2천만</b>처럼 한글 단위로 입력해도 돼요.'],
     ['입력한 내용은 어디에 저장되나요?', '이 기기의 브라우저에만 자동 저장돼요. 서버로 보내지 않아요. 다른 기기로 옮기거나 보관하려면 <b>더보기 → 백업 파일 받기</b>를 쓰세요. 아이폰 사파리는 한동안(약 7일) 방문하지 않으면 저장값을 지울 수 있고, 시크릿 모드는 창을 닫으면 지워지니 중요한 작업은 꼭 백업해 두세요.'],
     ['PDF는 어떻게 만드나요?', '<b>📄 PDF 리포트</b>를 누르고 인쇄 창에서 대상(프린터)을 <b>PDF로 저장</b>으로 고르세요. 카카오톡 안에서 열었다면 먼저 일반 브라우저로 열어 주세요.'],
     ['여러 안을 비교하고 싶어요.', '숫자를 넣고 <b>💾 시나리오 저장</b> → 숫자를 바꾸고 다시 저장. 최대 ' + MAX_SLOTS + '개를 화면 아래 비교표에서 나란히 볼 수 있어요.'],
@@ -4301,7 +4416,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
     body.innerHTML =
       '<h3>이렇게 쓰세요</h3><ol>' +
         '<li><b>예시로 시작</b> — 각 단계 위쪽 <b>업종 예시</b> 버튼으로 비슷한 업종 숫자를 채워요.</li>' +
-        '<li><b>내 숫자로 바꾸기</b> — 큰 숫자를 눌러 직접 입력하거나 막대를 밀어요. 결과는 바로 바뀌어요.</li>' +
+        '<li><b>내 숫자로 바꾸기</b> — 큰 숫자를 눌러 직접 입력하거나 막대를 밀어요. 결과는 바로 바뀌어요. 휴대폰은 막대로 대략 맞춘 뒤 숫자를 눌러 정확히 입력하면 편해요.</li>' +
         '<li><b>순서대로</b> — 1단계부터 단계 끝의 <b>다음 단계</b> 버튼을 따라가세요. 모르는 말은 <b>?</b>를 누르면 설명이 나와요.</li>' +
         '<li><b>저장·공유</b> — <b>📄 PDF 리포트</b>로 보고서를, <b>💾 시나리오 저장</b>으로 여러 안을 만들어 비교해요.</li>' +
       '</ol>' +
@@ -4379,6 +4494,18 @@ header .actions .more-list button.danger-text { color: var(--danger); }
     bar.classList.toggle('can-scroll', bar.scrollWidth - bar.clientWidth - bar.scrollLeft > 4);
   }
 
+  // --- 기본정보 카드: 휴대폰에서 비어 있으면 접어 두어 계산기까지 스크롤을 줄인다
+  function infoSummary() {
+    const parts = ['info-item', 'info-region', 'info-name'].map(id => $(id).value.trim()).filter(Boolean);
+    setText('info-summary', parts.length ? parts.join(' · ') : '');
+  }
+  function setupInfoCard() {
+    const filled = ['info-biz', 'info-item', 'info-region', 'info-name'].some(id => $(id).value.trim());
+    if (window.matchMedia && window.matchMedia('(max-width: 640px)').matches && !filled) $('info-card').open = false;
+    infoSummary();
+    ['info-item', 'info-region', 'info-name'].forEach(id => $(id).addEventListener('input', infoSummary));
+  }
+
   // --- 더보기 메뉴
   function closeMore() { const m = $('more-menu'); if (m && m.open) m.open = false; }
   document.addEventListener('click', e => { const m = $('more-menu'); if (m && m.open && !m.contains(e.target)) m.open = false; });
@@ -4433,7 +4560,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
     document.querySelectorAll('[data-cfg]').forEach(el => {
       const v = el.dataset.cfg.split('.').reduce((o, k) => (o == null ? o : o[k]), roots);
       if (v == null) return;
-      el.textContent = el.dataset.fmt === 'won' ? won(v) : typeof v === 'number' ? v.toLocaleString('ko-KR') : v;
+      el.textContent = el.dataset.fmt === 'won' ? won(v) : typeof v === 'number' ? NF2.format(v) : v;
     });
     setText('ver-badge', 'v' + APP.version);
     setText('ver-info', 'v' + APP.version + ' (' + APP.updated + ')');
@@ -4444,8 +4571,12 @@ header .actions .more-list button.danger-text { color: var(--danger); }
 
   // --- 예기치 못한 오류도 사용자에게 알린다 (한 번만)
   let errShown = false;
+  const PAGE_URL = location.href.split('#')[0];
   window.addEventListener('error', e => {
-    if (errShown || !e || !e.message || /ResizeObserver/.test(e.message)) return;
+    if (errShown || !e || !e.message || /ResizeObserver|Script error/i.test(e.message)) return;
+    // 삼성 인터넷·카카오톡 등 브라우저가 끼워 넣은 스크립트나 확장 프로그램 오류는 우리 오류가 아니다
+    if (e.filename && e.filename.split('#')[0] !== PAGE_URL) return;
+    if (!e.error || !/\n?\s*at |@/.test(String(e.error.stack || ''))) return;
     errShown = true;
     toast('일시적인 오류가 생겼어요. 입력값은 저장돼 있으니 새로고침해 주세요');
   });
@@ -4480,6 +4611,7 @@ header .actions .more-list button.danger-text { color: var(--danger); }
   }
 
   fillConfigText();
+  setupInfoCard();
   setupGuide();
   setupNextSteps();
   setupInApp();

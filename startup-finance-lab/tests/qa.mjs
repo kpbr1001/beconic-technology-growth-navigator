@@ -26,6 +26,8 @@ async function open(opts = {}) {
   page.on('dialog', d => { errors.push('native dialog: ' + d.type()); d.dismiss(); });
   await page.goto(FILE);
   await page.waitForTimeout(300);
+  page.collapsedInfo = await page.evaluate(() => !document.getElementById('info-card').open);
+  await page.evaluate(() => { document.getElementById('info-card').open = true; });  // 기본정보 입력 시험을 위해 펼침
   return { ctx, page, errors };
 }
 const text = (page, id) => page.textContent('#' + id);
@@ -38,6 +40,7 @@ async function typeNum(page, id, value) {
 // ---------------------------------------------------------------- 1. 기본 동작·계산
 {
   const { ctx, page, errors } = await open();
+  check('휴대폰에서 비어 있는 기본정보는 접혀 있음', page.collapsedInfo);
   check('첫 화면 주소에 #가 붙지 않음 (카톡 공유용)', !new URL(page.url()).hash, page.url());
   await page.click('.tab[data-tab="pnl"]');
   const pnlHash = new URL(page.url()).hash;
@@ -52,7 +55,12 @@ async function typeNum(page, id, value) {
     'c-out-total': '4,233원', 'p-op': '8,676,000원', 'p-bep-rev': '10,500,000원',
     'f-r-total-need': '154,400,000원', 'f-r-repay': '1,140,174원', 'cf-min': '4,502,900원'
   };
-  for (const [id, want] of Object.entries(golden)) check(`계산 검증 ${id}`, (await text(page, id)) === want, `${await text(page, id)} (기대 ${want})`);
+  for (const [id, want] of Object.entries(golden)) {
+    // 화면은 보이는 탭만 그리므로 값이 있는 탭을 열고 확인
+    const tab = await page.evaluate(id => document.getElementById(id).closest('.section').id.replace('sec-', ''), id);
+    await page.click(`.tab[data-tab="${tab}"]`);
+    check(`계산 검증 ${id}`, (await text(page, id)) === want, `${await text(page, id)} (기대 ${want})`);
+  }
 
   await page.click('.tab[data-tab="fund"]');
   for (const [input, want] of [['1억 2천만', '120,000,000'], ['3000만', '30,000,000'], ['1.5억', '150,000,000'], ['99억', '500,000,000']]) {
@@ -178,6 +186,42 @@ async function typeNum(page, id, value) {
   }
   check('가로 넘침 없음 (320·360·390px, 주요 탭)', !results.some(r => r.name.startsWith('가로 넘침 없음 3') && !r.ok));
   await ctx.close();
+}
+
+// ---------------------------------------------------------------- 4-1. 모바일: 좁은 화면 + 안드로이드 글꼴 확대
+{
+  const UA = 'Mozilla/5.0 (Linux; Android 14; SM-S921N) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/26.0 Chrome/122.0.0.0 Mobile Safari/537.36';
+  const bad = [];
+  for (const w of [320, 360, 412]) for (const scale of [1, 1.3, 1.5]) {
+    const { ctx, page, errors } = await open({ viewport: { width: w, height: 800 }, userAgent: UA, isMobile: true, hasTouch: true });
+    for (const t of ['costing', 'pnl', 'bep', 'fund', 'cash', 'report', 'check']) {
+      await page.evaluate(t => document.querySelector(`.tab[data-tab="${t}"]`).click(), t);
+      await page.evaluate(() => { const d = document.getElementById('info-card'); if (d) d.open = true; });
+      await page.evaluate(s => {
+        if (s === 1) return;
+        const els = [...document.querySelectorAll('body *')];
+        const fs = els.map(e => parseFloat(getComputedStyle(e).fontSize));
+        els.forEach((e, i) => e.style.setProperty('font-size', fs[i] * s + 'px', 'important'));
+      }, scale);
+      const over = await page.evaluate(() => {
+        const out = [];
+        document.querySelectorAll('main .section.active *, header *, .info-card *, .guide-card *').forEach(el => {
+          if (el.closest('.tab-bar, .preset-bar, .table-scroll, .more-list, dialog, canvas') || !el.offsetParent) return;
+          const r = el.getBoundingClientRect(); if (!r.width) return;
+          const card = el.closest('.card, .info-card, .guide-card, .checklist-group');
+          const lim = (card && card !== el ? card.getBoundingClientRect().right : document.documentElement.clientWidth) + 0.5;
+          if (r.right > lim) out.push(el.id || el.className || el.tagName);
+        });
+        return out.slice(0, 3);
+      });
+      if (over.length) bad.push(`${w}px×${scale} ${t}: ${over.join(', ')}`);
+      await page.reload();
+      await page.waitForTimeout(100);
+    }
+    if (errors.length) bad.push(`${w}px×${scale} 오류: ${errors.join(' | ')}`);
+    await ctx.close();
+  }
+  check('모바일 320·360·412px × 글꼴 100·130·150%: 카드 밖 넘침 없음', bad.length === 0, bad.slice(0, 4).join(' / '));
 }
 
 // ---------------------------------------------------------------- 5. 인쇄(PDF)
