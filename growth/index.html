@@ -1,0 +1,3253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기업 성장활동 진단 내비게이터 | 그로스벤처스</title>
+<meta name="description" content="업종·업태·창업연차·기업유형을 반영해 지금 가장 먼저 해야 할 핵심활동과 KPI를 제시하는 룰 기반 자가진단 도구입니다. (참고용)">
+<!-- Open Graph / 카카오톡 · 페이스북 공유 -->
+<meta property="og:title" content="기업 성장활동 진단 내비게이터">
+<meta property="og:description" content="진단에서 실행까지 — 데이터 기반 진단으로 우리 회사의 강점·기회를 찾고, 90일 실행계획과 12개월 로드맵을 제안합니다. 자가진단 참고용입니다.">
+<meta property="og:image" content="https://beconic-diagnosis-business-growth.netlify.app/og-business-growth.jpg?v=1">
+<meta property="og:image:secure_url" content="https://beconic-diagnosis-business-growth.netlify.app/og-business-growth.jpg?v=1">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="632">
+<meta property="og:image:alt" content="기업 성장활동 진단 내비게이터 — 그로스벤처스">
+<meta property="og:url" content="https://beconic-diagnosis-business-growth.netlify.app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="그로스벤처스 · Beconic">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="기업 성장활동 진단 내비게이터">
+<meta name="twitter:description" content="진단에서 실행까지 — 데이터 기반 진단으로 우리 회사의 강점·기회를 찾고, 90일 실행계획과 12개월 로드맵을 제안합니다. 자가진단 참고용입니다.">
+<meta name="twitter:image" content="https://beconic-diagnosis-business-growth.netlify.app/og-business-growth.jpg?v=1">
+<meta name="twitter:image:alt" content="기업 성장활동 진단 내비게이터 — 그로스벤처스">
+<meta name="theme-color" content="#2563EB">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 104'%3E%3Cpath d='M50 2 L93 11 Q94 11 94 13 L94 56 Q94 78 73 92 L52 101 Q50 102 48 101 L27 92 Q6 78 6 56 L6 13 Q6 11 7 11 Z' fill='%231f3a5f'/%3E%3C/svg%3E">
+<style>
+:root{
+  --navy:#0B1B3B; --navy-2:#15294f; --ink:#0e1a30; --ink-soft:#3a4a66;
+  --blue:#2563EB; --blue-soft:#5b8cff; --mint:#16C2A3; --mint-soft:#7be3d2;
+  --amber:#F5B731; --amber-deep:#d99a12;
+  --bg:#f5f7fb; --bg-2:#eef2f9; --card:#ffffff; --line:#e3e9f3; --line-2:#d3dcec;
+  --muted:#6b7890; --good:#16a34a; --warn:#e0892a; --bad:#dc4f4f;
+  --r-lg:22px; --r-md:16px; --r-sm:11px;
+  --sh-sm:0 1px 3px rgba(11,27,59,.06),0 1px 2px rgba(11,27,59,.04);
+  --sh-md:0 6px 20px rgba(11,27,59,.08),0 2px 6px rgba(11,27,59,.05);
+  --sh-lg:0 18px 50px rgba(11,27,59,.14);
+  --maxw:1080px;
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@font-face{font-family:"Pretendard Variable";font-weight:45 920;font-style:normal;font-display:swap;
+  src:local("Pretendard Variable");}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);
+  font-size:16px;line-height:1.62;letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+img{max-width:100%;display:block;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+a{color:inherit;text-decoration:none;}
+h1,h2,h3,h4{margin:0;line-height:1.25;letter-spacing:-.025em;font-weight:800;}
+p{margin:0;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px;}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+:focus-visible{outline:3px solid var(--blue-soft);outline-offset:2px;border-radius:6px;}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important;}}
+/* ===== 공통 컴포넌트 ===== */
+.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;
+  letter-spacing:.06em;color:var(--blue);text-transform:uppercase;}
+.eyebrow::before{content:"";width:22px;height:2px;background:linear-gradient(90deg,var(--blue),var(--mint));border-radius:2px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;
+  min-height:52px;padding:0 26px;border-radius:14px;font-weight:800;font-size:16px;
+  letter-spacing:-.01em;transition:transform .15s ease,box-shadow .2s ease,background .2s;}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:linear-gradient(135deg,var(--blue) 0%,#1e54d4 60%,var(--navy-2) 130%);
+  color:#fff;box-shadow:0 8px 22px rgba(37,99,235,.32);}
+.btn-primary:hover{box-shadow:0 12px 30px rgba(37,99,235,.42);}
+.btn-amber{background:linear-gradient(135deg,var(--amber),var(--amber-deep));color:#3a2c05;
+  box-shadow:0 8px 22px rgba(245,183,49,.36);}
+.btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line-2);box-shadow:var(--sh-sm);}
+.btn-ghost:hover{border-color:var(--blue-soft);color:var(--blue);}
+.btn-line{background:#fff;color:var(--navy);border:1.5px solid var(--line-2);box-shadow:var(--sh-sm);}
+.btn-line:hover{background:#f5f8fd;border-color:var(--blue-soft);}
+.btn-sm{min-height:44px;padding:0 18px;font-size:14.5px;border-radius:12px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-sm);}
+
+/* ===== 헤더 ===== */
+.top{position:sticky;top:0;z-index:40;background:rgba(245,247,251,.86);
+  -webkit-backdrop-filter:saturate(160%) blur(14px);backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--line);}
+.top-in{display:flex;align-items:center;justify-content:space-between;height:62px;}
+.brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:-.03em;font-size:17px;color:var(--navy);}
+.brand .mk{width:36px;height:36px;border-radius:10px;background:#fff;
+  display:flex;align-items:center;justify-content:center;flex:none;
+  box-shadow:0 3px 10px rgba(11,27,59,.22);border:1px solid rgba(11,27,59,.06);overflow:hidden;}
+.brand .mk img{width:26px;height:26px;display:block;object-fit:contain;}
+.brand small{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0;margin-top:-2px;}
+.top .cta-mini{display:flex;gap:8px;align-items:center;}
+.tag-cert{font-size:11.5px;font-weight:700;color:var(--ink-soft);background:#fff;border:1px solid var(--line);
+  padding:5px 11px;border-radius:999px;white-space:nowrap;}
+
+/* ===== 뷰 전환 ===== */
+.view{display:none;animation:fade .4s ease both;}
+.view.on{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* ===== HERO (라이트) ===== */
+.hero{position:relative;overflow:hidden;background:
+  radial-gradient(120% 90% at 88% -10%, rgba(37,99,235,.10) 0%, transparent 55%),
+  radial-gradient(90% 80% at 4% 110%, rgba(22,194,163,.12) 0%, transparent 52%),
+  linear-gradient(165deg,#fbfdff 0%,#eef3fb 100%);color:var(--ink);
+  border-bottom:1px solid var(--line);}
+.hero::after{content:"";position:absolute;inset:0;opacity:.6;pointer-events:none;
+  background-image:radial-gradient(rgba(37,99,235,.06) 1px,transparent 1.4px);background-size:26px 26px;
+  -webkit-mask:linear-gradient(180deg,#000,transparent 78%);mask:linear-gradient(180deg,#000,transparent 78%);}
+.hero-in{position:relative;z-index:2;padding:60px 0 70px;}
+.hero .eyebrow{color:var(--blue);}
+.hero .eyebrow::before{background:linear-gradient(90deg,var(--blue),var(--mint));}
+.hero h1{font-size:clamp(30px,5.4vw,52px);font-weight:900;letter-spacing:-.035em;margin:18px 0 0;color:var(--navy);}
+.hero h1 .hl{background:linear-gradient(100deg,var(--blue) 0%,var(--mint) 95%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero .lede{margin-top:20px;max-width:580px;font-size:clamp(16px,2.1vw,19px);color:var(--ink-soft);font-weight:500;}
+.hero-cta{display:flex;flex-wrap:wrap;gap:13px;margin-top:34px;align-items:center;}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:30px;font-size:14px;color:var(--ink-soft);}
+.hero-meta span{display:inline-flex;align-items:center;gap:7px;}
+.hero-meta b{color:var(--navy);font-weight:800;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 4px rgba(22,194,163,.18);flex:none;}
+
+/* 시그니처: 항해 트랙(연차 단계) — 라이트 */
+.track{position:relative;z-index:2;margin-top:50px;padding:26px 0 4px;}
+.track-line{position:relative;height:3px;border-radius:3px;
+  background:linear-gradient(90deg,var(--mint) 0%,var(--blue-soft) 50%,var(--amber) 100%);opacity:.9;}
+.track-nodes{display:grid;grid-template-columns:repeat(6,1fr);margin-top:-9px;}
+.tnode{text-align:center;position:relative;}
+.tnode .pin{width:15px;height:15px;border-radius:50%;background:#fff;border:3px solid var(--mint);
+  margin:0 auto;box-shadow:0 0 0 4px #eef3fb,0 2px 6px rgba(11,27,59,.12);transition:transform .2s;}
+.tnode:nth-child(n+4) .pin{border-color:var(--blue);}
+.tnode:last-child .pin{border-color:var(--amber-deep);}
+.tnode small{display:block;margin-top:11px;font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:-.02em;}
+.tnode b{display:block;font-size:12.5px;color:var(--navy);font-weight:800;margin-top:1px;}
+
+/* ===== 섹션 일반 ===== */
+section.block{padding:60px 0;}
+.sec-head{max-width:720px;}
+
+/* ===== 성장 시각화 ===== */
+.growth-viz{background:linear-gradient(180deg,#fff 0%,#f4f8fd 100%);}
+.gv-card{margin-top:26px;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--sh-md);padding:24px;}
+.gv-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
+.gv-tab{padding:9px 16px;border-radius:999px;border:1.5px solid var(--line-2);background:#fff;
+  font-size:13.5px;font-weight:800;color:var(--ink-soft);transition:all .16s;}
+.gv-tab:hover{border-color:var(--blue-soft);}
+.gv-tab.on{background:linear-gradient(135deg,var(--blue),#1e54d4);color:#fff;border-color:transparent;
+  box-shadow:0 4px 12px rgba(37,99,235,.28);}
+.gv-body{display:grid;grid-template-columns:minmax(0,360px) 1fr;gap:30px;align-items:center;}
+.gv-radar{text-align:center;}
+.gv-radar svg{width:100%;max-width:340px;height:auto;}
+.gv-cap{font-size:12.5px;color:var(--muted);font-weight:700;margin-top:6px;display:flex;
+  align-items:center;justify-content:center;gap:7px;}
+.gv-cap b,.gv-cap #gvStageNm{color:var(--navy);}
+.gv-dot{width:11px;height:3px;border-radius:2px;background:var(--blue);display:inline-block;}
+.gv-focus{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.gv-focus .ff{font-size:12.5px;font-weight:800;padding:6px 12px;border-radius:9px;
+  background:linear-gradient(135deg,#eef4ff,#eafaf4);color:var(--navy);border:1px solid #d6e6f7;}
+.gv-focus .ff small{color:var(--blue);font-weight:900;margin-right:5px;}
+.gv-barlist{display:flex;flex-direction:column;gap:9px;}
+.gv-bar{display:grid;grid-template-columns:88px 1fr 34px;align-items:center;gap:11px;}
+.gv-bar .bn{font-size:12.5px;font-weight:700;color:var(--ink-soft);text-align:right;}
+.gv-bar .bt{height:11px;border-radius:6px;background:#eef2f8;overflow:hidden;position:relative;}
+.gv-bar .bf{height:100%;border-radius:6px;transition:width .5s cubic-bezier(.2,.8,.2,1);}
+.gv-bar .bv{font-size:12px;font-weight:900;color:var(--navy);text-align:right;}
+.gv-bar.hot .bn{color:var(--navy);font-weight:900;}
+.gv-note{font-size:11.5px;color:var(--muted);margin-top:20px;line-height:1.6;border-top:1px dashed var(--line);padding-top:14px;}
+.sec-head h2{font-size:clamp(23px,3.4vw,33px);font-weight:900;letter-spacing:-.03em;margin-top:13px;}
+.sec-head p{margin-top:13px;color:var(--ink-soft);font-size:16.5px;}
+
+/* 프로세스 인포그래픽 */
+.proc{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:34px;}
+.proc .step{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:22px 18px;
+  position:relative;box-shadow:var(--sh-sm);}
+.proc .num{font-size:13px;font-weight:900;color:var(--blue);letter-spacing:.04em;}
+.proc .step h4{font-size:16px;margin:9px 0 6px;font-weight:800;}
+.proc .step p{font-size:13.5px;color:var(--muted);line-height:1.55;}
+.proc .step .ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  background:linear-gradient(140deg,#eaf1ff,#e3fbf4);margin-bottom:12px;}
+.proc .step .ic svg{width:20px;height:20px;}
+
+/* 신뢰 배지/대상 */
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px;}
+.trust .t{background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--line);border-radius:var(--r-md);padding:20px;box-shadow:var(--sh-sm);}
+.trust .t b{display:block;font-size:26px;font-weight:900;color:var(--navy);letter-spacing:-.04em;}
+.trust .t b .u{font-size:14px;color:var(--blue);margin-left:3px;}
+.trust .t span{font-size:13.5px;color:var(--muted);font-weight:600;}
+.aud{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px;}
+.aud .chip{font-size:13px;font-weight:700;color:var(--ink-soft);background:#fff;border:1px solid var(--line);
+  padding:8px 13px;border-radius:999px;}
+
+/* 샘플 배너 */
+.sample-banner{margin-top:30px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;
+  background:linear-gradient(120deg,#0e2350,#143a6e);color:#fff;border-radius:var(--r-lg);padding:24px 26px;
+  box-shadow:var(--sh-md);}
+.sample-banner h3{font-size:18px;font-weight:800;}
+.sample-banner p{color:#bcd0f0;font-size:14px;margin-top:5px;}
+/* ===== 진단 입력 폼 ===== */
+.form-shell{max-width:760px;margin:0 auto;}
+.prog{position:sticky;top:62px;z-index:30;background:var(--bg);padding:16px 0 14px;}
+.prog-bar{height:7px;background:var(--bg-2);border-radius:7px;overflow:hidden;border:1px solid var(--line);}
+.prog-fill{height:100%;width:0;border-radius:7px;background:linear-gradient(90deg,var(--blue),var(--mint));transition:width .35s ease;}
+.prog-meta{display:flex;justify-content:space-between;margin-top:9px;font-size:13px;font-weight:700;color:var(--muted);}
+.prog-meta b{color:var(--blue);}
+.step-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:30px 26px;
+  box-shadow:var(--sh-md);margin-bottom:18px;}
+.step-card .q-no{font-size:12.5px;font-weight:900;color:var(--blue);letter-spacing:.05em;}
+.step-card h3{font-size:21px;font-weight:800;margin:8px 0 4px;letter-spacing:-.025em;}
+.step-card .help{font-size:14px;color:var(--muted);margin-bottom:18px;}
+.field{margin-bottom:22px;}
+.field>label{display:block;font-size:15px;font-weight:800;margin-bottom:10px;color:var(--ink);}
+.field .req{color:var(--bad);font-weight:900;margin-left:3px;}
+.field .opt{font-size:11.5px;font-weight:700;color:var(--muted);background:var(--bg-2);
+  padding:2px 8px;border-radius:6px;margin-left:6px;}
+input[type=text],input[type=number],textarea,select{width:100%;font-family:inherit;font-size:16px;
+  padding:14px 15px;border:1.5px solid var(--line-2);border-radius:12px;background:#fff;color:var(--ink);
+  transition:border .15s,box-shadow .15s;}
+textarea{min-height:84px;resize:vertical;line-height:1.55;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12);}
+.chips{display:flex;flex-wrap:wrap;gap:9px;}
+.chip-btn{min-height:46px;padding:0 16px;border:1.5px solid var(--line-2);border-radius:12px;background:#fff;
+  font-size:14.5px;font-weight:700;color:var(--ink-soft);transition:all .14s;display:inline-flex;align-items:center;gap:7px;}
+.chip-btn:hover{border-color:var(--blue-soft);color:var(--blue);}
+.chip-btn.sel{background:linear-gradient(135deg,#eaf1ff,#e6fbf5);border-color:var(--blue);color:var(--navy);
+  box-shadow:0 2px 8px rgba(37,99,235,.16);font-weight:800;}
+.chip-btn.sel::after{content:"✓";font-weight:900;color:var(--blue);font-size:13px;}
+.chip-btn.amber.sel{background:linear-gradient(135deg,#fff5e0,#fde8c2);border-color:var(--amber-deep);color:#6b4e09;}
+.chip-btn.amber.sel::after{color:var(--amber-deep);}
+.toggle-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;border:1.5px solid var(--line-2);
+  border-radius:12px;background:#fff;font-size:14px;font-weight:700;color:var(--ink-soft);transition:all .14s;}
+.tg:hover{border-color:var(--blue-soft);}
+.tg.on{background:linear-gradient(135deg,#eef4ff,#e9fcf6);border-color:var(--blue);color:var(--navy);}
+.tg .sw{width:42px;height:24px;border-radius:999px;background:var(--line-2);position:relative;flex:none;transition:background .18s;}
+.tg.on .sw{background:var(--blue);}
+.tg .sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s;}
+.tg.on .sw::after{transform:translateX(18px);}
+
+/* ===== STEP4 동적: AI 사전분석 + 픽 리스트 ===== */
+.presum{background:linear-gradient(135deg,#f1f6ff,#eafaf5);border:1px solid #d4e6f7;border-radius:14px;
+  padding:16px 18px;margin:4px 0 20px;}
+.presum .ps-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.presum .ps-ai{font-size:11.5px;font-weight:900;color:#fff;background:linear-gradient(135deg,var(--blue),#1e54d4);
+  padding:4px 10px;border-radius:999px;letter-spacing:.02em;}
+.presum .ps-band{font-size:13px;font-weight:800;color:var(--navy);}
+.presum .ps-line{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px;line-height:1.55;}
+.presum .ps-weak{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.presum .ps-chip{font-size:12.5px;font-weight:700;color:var(--ink);background:#fff;border:1px solid #e2ad6f;
+  border-radius:8px;padding:4px 10px;}
+.presum .ps-chip b{color:var(--amber-deep);margin-left:2px;}
+.presum .ps-note{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5;}
+
+.pick-list{display:flex;flex-direction:column;gap:8px;}
+.pickwrap{display:flex;flex-direction:column;}
+.pickwrap.on{background:#f6faff;border-radius:12px;padding-bottom:2px;}
+.pickwrap .pick{width:100%;}
+.pval3{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:10px;padding:10px 16px 13px 46px;align-items:end;}
+.pval3 .vcol{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.pval3 .vl{font-size:11.5px;font-weight:800;color:var(--ink-soft);}
+.pval3 .vcol:first-child .vl{color:#0d9b82;}
+.pval3 .vin{display:flex;align-items:center;gap:5px;}
+.pval3 .vinput{width:100%;min-width:0;font-size:13.5px;padding:8px 10px;border:1.5px solid #bcd3f0;
+  border-radius:8px;background:#fff;}
+.pval3 .vcol:first-child .vinput{border-color:#aee0cd;}
+.pval3 .vinput:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+.pval3 .vu{font-size:11.5px;font-weight:800;color:var(--muted);flex:none;}
+.pval3 .vref{align-self:stretch;justify-content:flex-end;}
+.pval3 .vstd{font-size:13px;font-weight:800;color:var(--muted);background:#f1f5fb;border:1px solid var(--line);
+  border-radius:8px;padding:7px 11px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;line-height:1.2;}
+.pval3 .vstd small{font-size:9.5px;font-weight:700;color:#9fb1d6;margin-top:1px;}
+.kwarn{padding:0 16px 0 46px;}
+.kwarn .kw{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;font-weight:700;color:#c8641a;
+  background:#fdf3ec;border:1px solid #f0cba6;border-radius:8px;padding:6px 10px;margin-top:2px;line-height:1.4;}
+.kwarn .kw i{font-style:normal;flex:none;}
+.kwarn .kw small{font-weight:700;opacity:.7;font-size:10.5px;}
+/* 결과 KPI 표 — 컨설턴트 제시목표 강조 */
+.kpi-table td.goal.gset{color:var(--blue);}
+.kpi-table td.goal .gtag{display:inline-block;font-size:9.5px;font-weight:800;color:#fff;background:var(--blue);
+  border-radius:4px;padding:0 5px;margin-left:5px;vertical-align:middle;}
+.kpi-table td.goal.gmute{color:var(--line-2);font-weight:700;}
+.pick{display:flex;align-items:flex-start;gap:11px;width:100%;text-align:left;padding:12px 14px;
+  border:1.5px solid var(--line-2);border-radius:12px;background:#fff;transition:all .14s;}
+.pick:hover{border-color:var(--blue-soft);background:#fbfdff;}
+.pick.on{border-color:var(--blue);background:linear-gradient(135deg,#eef4ff,#eafaf4);}
+.pick .pchk{flex:none;width:21px;height:21px;border-radius:7px;border:2px solid var(--line-2);margin-top:1px;
+  position:relative;transition:all .14s;background:#fff;}
+.pick.on .pchk{background:var(--blue);border-color:var(--blue);}
+.pick.on .pchk::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+  border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);}
+.pick .ptx{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.pick .ptx b{font-size:14px;font-weight:700;color:var(--ink);line-height:1.4;}
+.pick .ptx small{font-size:11.5px;color:var(--muted);font-weight:600;}
+.pick.custom{border-style:dashed;border-color:#9fc0ef;}
+.pick.custom.on{background:linear-gradient(135deg,#eaf2ff,#f4f9ff);}
+.addrow{display:flex;gap:8px;margin-top:10px;}
+.addrow .addinput{flex:1;font-size:14.5px;padding:11px 13px;}
+.addrow .btn{flex:none;white-space:nowrap;}
+.collapse-h{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:16px 18px;
+  background:linear-gradient(180deg,#fff,#f9fbff);border:1px solid var(--line);border-radius:14px;margin-bottom:0;}
+.collapse-h h4{font-size:15.5px;font-weight:800;}
+.collapse-h small{color:var(--muted);font-weight:600;font-size:13px;}
+.collapse-h .arr{transition:transform .25s;color:var(--blue);font-weight:900;}
+.collapse-b{max-height:0;overflow:hidden;transition:max-height .35s ease;border:1px solid var(--line);border-top:none;border-radius:0 0 14px 14px;}
+.collapse.open .collapse-h{border-radius:14px 14px 0 0;}
+.collapse.open .arr{transform:rotate(180deg);}
+.collapse-b .inner{padding:20px 18px;}
+.form-nav{display:flex;gap:12px;justify-content:space-between;margin-top:6px;}
+.err-tip{font-size:13px;color:var(--bad);font-weight:700;margin-top:8px;display:none;align-items:center;gap:6px;}
+.err-tip.on{display:flex;}
+.field.invalid input,.field.invalid select,.field.invalid .chips{}
+.field.invalid .chips{outline:1.5px dashed var(--bad);outline-offset:6px;border-radius:12px;}
+
+/* ===== 결과 화면 ===== */
+.result-top{background:linear-gradient(150deg,#eef4ff 0%,#eafaf5 100%);color:var(--ink);border-radius:var(--r-lg);
+  padding:30px;box-shadow:var(--sh-md);position:relative;overflow:hidden;border:1px solid #dce8f7;}
+.rt-wm{position:absolute;right:16px;bottom:12px;z-index:3;font-size:10px;font-weight:700;
+  color:rgba(11,27,59,.28);letter-spacing:.01em;pointer-events:none;}
+.lowdata{display:flex;gap:14px;align-items:flex-start;margin-top:18px;padding:16px 18px;border-radius:14px;border:1px solid;}
+.lowdata-low{background:#fdf3ec;border-color:#f0cba6;}
+.lowdata-mid{background:#eef4ff;border-color:#bcd3f0;}
+.lowdata .ld-ic{font-size:20px;flex:none;line-height:1;margin-top:1px;}
+.lowdata-low .ld-ic{color:#c8641a;}
+.lowdata-mid .ld-ic{color:var(--blue);}
+.lowdata .ld-body{min-width:0;}
+.lowdata .ld-body>b{font-size:14.5px;font-weight:900;color:var(--navy);display:block;margin-bottom:4px;}
+.lowdata .ld-body p{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin:0 0 12px;}
+.lowdata .ld-body p b{color:var(--navy);}
+.lowdata .btn{min-height:40px;}
+.result-top::after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle,rgba(22,194,163,.18),transparent 70%);}
+.rt-grid{display:grid;grid-template-columns:auto 1fr;gap:30px;align-items:center;position:relative;z-index:2;}
+.score-ring{position:relative;width:172px;height:172px;flex:none;}
+.score-ring .lab{position:absolute;inset:0;display:grid;place-content:center;text-align:center;}
+.score-ring .lab b{font-size:46px;font-weight:900;letter-spacing:-.04em;line-height:1;color:var(--navy);}
+.score-ring .lab b i{font-size:18px;font-style:normal;color:var(--muted);font-weight:700;}
+.score-ring .lab span{font-size:12px;color:var(--muted);font-weight:700;margin-top:5px;display:block;}
+.rt-info .stage-badge{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;
+  background:#fff;color:var(--amber-deep);border:1px solid #efc98a;
+  padding:7px 14px;border-radius:999px;}
+.rt-badges{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.conf-badge{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;
+  padding:7px 13px;border-radius:999px;border:1px solid;cursor:help;}
+.conf-badge b{font-weight:900;}
+.conf-badge small{font-size:11px;font-weight:700;opacity:.75;margin-left:1px;}
+.conf-badge .cf-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+.conf-badge.conf-high{background:#eafaf4;color:#0d8f76;border-color:#a9e2d1;}
+.conf-badge.conf-high .cf-dot{background:#16C2A3;}
+.conf-badge.conf-mid{background:#eef4ff;color:#2158c9;border-color:#bcd3f0;}
+.conf-badge.conf-mid .cf-dot{background:var(--blue);}
+.conf-badge.conf-low{background:#fdf3ec;color:#c8641a;border-color:#f0cba6;}
+.conf-badge.conf-low .cf-dot{background:#e8930c;}
+.rt-info h2{font-size:clamp(22px,3.4vw,30px);font-weight:900;margin:14px 0 6px;letter-spacing:-.03em;color:var(--navy);}
+.rt-info .co{font-size:14.5px;color:var(--ink-soft);}
+.rt-info .co b{color:var(--navy);}
+.disc-note{font-size:12px;color:var(--muted);margin-top:14px;border-top:1px solid #d6e3f3;padding-top:12px;}
+
+.result-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 4px;}
+.view-toggle{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px;box-shadow:var(--sh-sm);}
+.view-toggle button{padding:9px 15px;border-radius:9px;font-size:13.5px;font-weight:800;color:var(--muted);transition:all .15s;}
+.view-toggle button.on{background:linear-gradient(135deg,var(--blue),#1e54d4);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.3);}
+
+.r-sec{margin-top:34px;}
+.r-sec>h3{font-size:20px;font-weight:900;letter-spacing:-.03em;display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.r-sec>h3 .ix{width:30px;height:30px;border-radius:9px;background:linear-gradient(140deg,var(--navy),var(--blue));
+  color:#fff;display:grid;place-items:center;font-size:13px;font-weight:900;flex:none;}
+.r-sec>h3 .ix.ix-c{background:linear-gradient(140deg,#0d8f76,#16C2A3);font-size:15px;}
+.r-sec>.sub{color:var(--muted);font-size:14px;margin:0 0 18px 40px;}
+
+/* Executive summary */
+.ai-summary{background:linear-gradient(135deg,#f1f6ff,#eafaf4);border:1px solid #d4e6f7;border-radius:14px;
+  padding:18px 20px;margin:4px 0 20px;position:relative;}
+.ai-summary .ai-sum-lab{display:inline-block;font-size:11px;font-weight:900;color:#fff;
+  background:linear-gradient(135deg,var(--blue),#1e54d4);padding:3px 10px;border-radius:999px;margin-bottom:10px;
+  letter-spacing:.02em;}
+.ai-summary .ai-sum-src{font-size:9.5px;font-weight:700;opacity:.85;margin-left:4px;}
+.ai-summary p{font-size:14.5px;line-height:1.7;color:var(--ink-soft);margin:0 0 8px;}
+.ai-summary p:last-child{margin-bottom:0;}
+.ai-summary p b{color:var(--navy);}
+.exec{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.exec .col{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:22px;box-shadow:var(--sh-sm);}
+.exec .col h4{font-size:15px;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.exec .col h4 .pl{width:9px;height:9px;border-radius:3px;}
+.bottleneck h4 .pl{background:var(--bad);}
+.priority h4 .pl{background:var(--amber-deep);}
+.kpi5 h4 .pl{background:var(--mint);}
+.info h4 .pl{background:var(--blue);}
+.exec ol,.exec ul{margin:0;padding-left:0;list-style:none;}
+.exec li{display:flex;gap:11px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14.5px;line-height:1.5;}
+.exec li:last-child{border-bottom:none;}
+.exec li .n{flex:none;width:22px;height:22px;border-radius:7px;background:var(--bg-2);color:var(--ink-soft);
+  font-size:12px;font-weight:900;display:grid;place-items:center;margin-top:1px;}
+.bottleneck li .n{background:#fdeaea;color:var(--bad);}
+.priority li .n{background:#fdf3df;color:var(--amber-deep);}
+.kpi5 li .n{background:#e3fbf4;color:#0d9b82;}
+.info-table{display:grid;grid-template-columns:auto 1fr;gap:0;}
+.info-table .k{font-size:13px;color:var(--muted);font-weight:700;padding:8px 14px 8px 0;border-bottom:1px dashed var(--line);}
+.info-table .v{font-size:14px;font-weight:700;color:var(--ink);padding:8px 0;border-bottom:1px dashed var(--line);text-align:right;}
+/* 영역 점수 차트 (레이더 + 막대 fallback 통합) */
+.area-grid{display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start;}
+.radar-box{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:20px;box-shadow:var(--sh-sm);}
+.radar-box svg{width:100%;height:auto;display:block;}
+.bars{display:flex;flex-direction:column;gap:11px;}
+.bar-row{display:grid;grid-template-columns:118px 1fr 42px;gap:12px;align-items:center;}
+.bar-row .nm{font-size:13.5px;font-weight:700;color:var(--ink-soft);}
+.bar-track{height:11px;background:var(--bg-2);border-radius:7px;overflow:hidden;border:1px solid var(--line);}
+.bar-fill{height:100%;border-radius:7px;transition:width .8s cubic-bezier(.2,.8,.2,1);}
+.bar-row .pct{font-size:13px;font-weight:900;text-align:right;color:var(--navy);}
+.lvl-good{background:linear-gradient(90deg,var(--mint),#0fb597);}
+.lvl-mid{background:linear-gradient(90deg,var(--blue-soft),var(--blue));}
+.lvl-low{background:linear-gradient(90deg,#f3a05a,var(--amber-deep));}
+.lvl-crit{background:linear-gradient(90deg,#f08a8a,var(--bad));}
+.swot{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;}
+.swot .b{border-radius:14px;padding:18px;border:1px solid var(--line);}
+.swot .strong{background:linear-gradient(180deg,#effbf7,#fff);border-color:#bdeede;}
+.swot .weak{background:linear-gradient(180deg,#fff3e6,#fff);border:1.5px solid #f0c088;
+  box-shadow:0 2px 10px rgba(216,120,20,.08);}
+.swot .weak::before{content:"우선 보완";position:absolute;top:-9px;left:16px;font-size:9.5px;font-weight:900;
+  color:#fff;background:var(--amber-deep);padding:2px 9px;border-radius:999px;-webkit-print-color-adjust:exact;}
+.swot .b{position:relative;}
+.swot h5{font-size:13.5px;font-weight:900;margin-bottom:11px;display:flex;align-items:center;gap:7px;}
+.swot .strong h5{color:#0d9b82;}
+.swot .weak h5{color:var(--amber-deep);}
+.swot ul{margin:0;padding-left:0;list-style:none;}
+.swot li{font-size:13.5px;padding:5px 0;display:flex;gap:8px;color:var(--ink-soft);line-height:1.45;}
+.swot li::before{content:"";flex:none;width:6px;height:6px;border-radius:2px;margin-top:7px;}
+.swot .strong li::before{background:var(--mint);}
+.swot .weak li::before{background:var(--amber);}
+
+/* 추천활동 카드 */
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.act{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:20px;box-shadow:var(--sh-sm);
+  position:relative;break-inside:avoid;}
+.act .head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:11px;}
+.act .head h4{font-size:16.5px;font-weight:800;letter-spacing:-.02em;}
+.act .badge{flex:none;font-size:11px;font-weight:900;padding:4px 9px;border-radius:7px;white-space:nowrap;}
+.bd-now{background:#fdeaea;color:var(--bad);}
+.bd-soon{background:#fdf3df;color:var(--amber-deep);}
+.bd-plan{background:#eaf1ff;color:var(--blue);}
+.act .why{font-size:13.8px;color:var(--ink-soft);line-height:1.55;margin-bottom:13px;}
+.act .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;border-top:1px dashed var(--line);padding-top:13px;}
+.act .meta .m{font-size:12.5px;}
+.act .meta .m .lab{display:block;color:var(--muted);font-weight:700;font-size:11.5px;margin-bottom:2px;}
+.act .meta .m .val{color:var(--ink);font-weight:700;}
+.act .docs{margin-top:11px;font-size:12.5px;color:var(--ink-soft);background:var(--bg);border:1px solid var(--line);
+  border-radius:10px;padding:10px 12px;}
+/* 컨설턴트 진단 의견 */
+.r-sec>h3 .ix{}
+.consult-box{background:linear-gradient(180deg,#f7f9fd,#fff);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:22px 24px;box-shadow:var(--sh-sm);display:flex;flex-direction:column;gap:18px;}
+.cb-block{}
+.cb-lab{font-size:13.5px;font-weight:900;color:var(--navy);margin-bottom:9px;letter-spacing:-.01em;}
+.cb-block.risk .cb-lab{color:var(--amber-deep);}
+.cb-text{font-size:14px;color:var(--ink-soft);line-height:1.65;white-space:pre-wrap;}
+.cb-list{margin:0;padding:0;list-style:none;}
+.cb-list li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink-soft);line-height:1.55;padding:5px 0;}
+.cb-n{flex:none;width:22px;height:22px;border-radius:7px;background:#eef4ff;color:var(--blue);font-size:12px;font-weight:900;
+  display:grid;place-items:center;margin-top:1px;}
+.cb-list.kpi li{padding:4px 0;}
+.cb-dot{flex:none;width:7px;height:7px;border-radius:2px;background:var(--mint);margin-top:8px;}
+.cb-block.risk{background:linear-gradient(180deg,#fffaf0,#fff);border:1px solid #f6e2b6;border-radius:12px;padding:16px 18px;margin-top:0;}
+.act .target-box{margin-top:11px;background:linear-gradient(180deg,#f0f6ff,#fff);border:1px solid #d8e6fb;
+  border-radius:10px;padding:10px 12px;}
+.act .tg-row{display:flex;gap:9px;font-size:12.5px;line-height:1.45;padding:2px 0;}
+.act .tg-row+.tg-row{border-top:1px dashed #dde9fb;margin-top:3px;padding-top:5px;}
+.act .tg-lab{flex:none;width:54px;font-weight:800;color:var(--blue);font-size:11.5px;}
+.act .tg-val{color:var(--ink);font-weight:700;}
+.act .tg-val.muted{color:var(--muted);font-weight:600;}
+.act .docs b{color:var(--navy);font-weight:800;}
+.act .caution{margin-top:10px;font-size:12px;color:var(--warn);display:flex;gap:7px;line-height:1.45;}
+.act .caution::before{content:"⚠";flex:none;}
+.act .expert{margin-top:10px;font-size:11.5px;font-weight:800;color:var(--blue);background:#eef4ff;border-radius:8px;
+  padding:6px 10px;display:inline-flex;gap:6px;}
+.act .expert-link{text-decoration:none;transition:all .14s;cursor:pointer;}
+.act .expert-link:hover{background:var(--blue);color:#fff;}
+.print-only{display:none;}
+.cta-top{margin-top:18px;background:linear-gradient(120deg,#fff8ee,#fef2e2);border:1px solid #f0d8b0;
+  border-radius:16px;padding:20px 24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;
+  justify-content:space-between;box-shadow:var(--sh-sm);}
+.cta-top-body{min-width:0;flex:1 1 340px;}
+.cta-top-lab{display:inline-block;font-size:11px;font-weight:900;color:#fff;background:var(--amber-deep);
+  padding:3px 10px;border-radius:999px;margin-bottom:8px;letter-spacing:.02em;}
+.cta-top h3{font-size:18px;font-weight:900;color:var(--navy);margin:0 0 6px;letter-spacing:-.02em;line-height:1.35;}
+.cta-top p{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin:0;}
+.cta-top-btn{flex:none;text-decoration:none;white-space:nowrap;}
+.cta-top-btn .ph-ic{font-size:16px;}
+.cta-top-btn b{font-weight:900;margin-left:2px;}
+.cta-benefits{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:7px;max-width:460px;}
+.cta-benefits li{font-size:13px;color:#dbe7fb;padding-left:22px;position:relative;line-height:1.5;}
+.cta-benefits li::before{content:"✓";position:absolute;left:0;top:0;color:var(--amber);font-weight:900;}
+
+/* 우선순위 매트릭스 */
+.matrix-wrap{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:22px;box-shadow:var(--sh-sm);}
+.matrix{position:relative;aspect-ratio:1.9/1;background:
+  linear-gradient(180deg,transparent calc(50% - .5px),var(--line-2) calc(50% - .5px) calc(50% + .5px),transparent calc(50% + .5px)),
+  linear-gradient(90deg,transparent calc(50% - .5px),var(--line-2) calc(50% - .5px) calc(50% + .5px),transparent calc(50% + .5px)),
+  repeating-linear-gradient(90deg,transparent 0 24.8%,rgba(11,27,59,.05) 24.8% 25.2%,transparent 25.2%),
+  repeating-linear-gradient(180deg,transparent 0 24.8%,rgba(11,27,59,.05) 24.8% 25.2%,transparent 25.2%),
+  linear-gradient(135deg,#fef9ee 0%,#fff 42%,#eef6ff 100%);
+  border:1px solid var(--line);border-radius:14px;overflow:visible;min-height:360px;}
+.matrix .qlab{position:absolute;font-size:11px;font-weight:800;color:var(--muted);padding:6px 9px;z-index:1;}
+.matrix .qlab.tl{top:6px;left:8px;color:var(--bad);}
+.matrix .qlab.tr{top:6px;right:8px;color:var(--amber-deep);}
+.matrix .qlab.bl{bottom:6px;left:8px;}
+.matrix .qlab.br{bottom:6px;right:8px;color:var(--blue);}
+.matrix .axis-x{position:absolute;bottom:-22px;width:100%;text-align:center;font-size:11.5px;font-weight:800;color:var(--ink-soft);}
+.matrix .axis-y{position:absolute;left:-34px;top:50%;transform:translateY(-50%) rotate(-90deg);font-size:11.5px;font-weight:800;color:var(--ink-soft);white-space:nowrap;}
+.mpt{position:absolute;transform:translate(-50%,50%);z-index:3;}
+.mpt .pp{width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(11,27,59,.3);}
+.mpt .tt{position:absolute;left:17px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:800;
+  white-space:nowrap;background:#fff;border:1px solid var(--line);border-radius:7px;padding:3px 8px;box-shadow:var(--sh-sm);color:var(--ink);max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+/* 오른쪽 절반의 점은 라벨을 왼쪽으로 */
+.mpt.flip .tt{left:auto;right:17px;}
+.mpt.p-now .pp{background:var(--bad);}
+.mpt.p-soon .pp{background:var(--amber-deep);}
+.mpt.p-plan .pp{background:var(--blue);}
+.matrix-note{margin-top:30px;font-size:12.5px;color:var(--muted);}
+.matrix-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12px;font-weight:700;color:var(--ink-soft);}
+.matrix-legend span{display:inline-flex;align-items:center;gap:6px;}
+.matrix-legend i{width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+/* 모바일 우선순위 리스트(데스크톱 숨김) */
+.matrix-mlist{display:none;list-style:none;margin:0;padding:0;counter-reset:none;}
+.matrix-mlist li{display:flex;align-items:flex-start;gap:12px;padding:13px 4px;border-bottom:1px dashed var(--line);}
+.matrix-mlist li:last-child{border-bottom:none;}
+.matrix-mlist .mr{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+  font-size:13px;font-weight:900;color:#fff;}
+.matrix-mlist li.p-now .mr{background:var(--bad);}
+.matrix-mlist li.p-soon .mr{background:var(--amber-deep);}
+.matrix-mlist li.p-plan .mr{background:var(--blue);}
+.matrix-mlist .mtx b{display:block;font-size:14.5px;font-weight:800;color:var(--ink);line-height:1.4;}
+.matrix-mlist .mtx small{font-size:12px;color:var(--muted);font-weight:600;}
+
+/* 90일 실행계획 */
+.plan90{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.phase{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:20px;box-shadow:var(--sh-sm);position:relative;}
+.phase .ph-top{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.phase .badge-d{font-size:12px;font-weight:900;color:#fff;padding:5px 11px;border-radius:8px;}
+.phase:nth-child(1) .badge-d{background:linear-gradient(135deg,var(--mint),#0fb597);}
+.phase:nth-child(2) .badge-d{background:linear-gradient(135deg,var(--blue-soft),var(--blue));}
+.phase:nth-child(3) .badge-d{background:linear-gradient(135deg,var(--amber),var(--amber-deep));}
+.phase .ph-top h4{font-size:15px;font-weight:800;}
+.phase ul{margin:0;padding-left:0;list-style:none;}
+.phase li{font-size:13.8px;padding:8px 0;display:flex;gap:9px;border-bottom:1px dashed var(--line);color:var(--ink-soft);line-height:1.5;}
+.phase li:last-child{border-bottom:none;}
+.phase li .ck{flex:none;width:18px;height:18px;border-radius:6px;border:1.5px solid var(--line-2);margin-top:1px;}
+
+/* 12개월 로드맵 */
+.road{position:relative;margin-top:8px;}
+.road-track{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;}
+.road-track::before{content:"";position:absolute;left:7%;right:7%;top:19px;height:3px;
+  background:linear-gradient(90deg,var(--mint),var(--blue-soft),var(--amber));border-radius:3px;z-index:0;}
+.rq{position:relative;z-index:1;text-align:center;padding:0 8px;}
+.rq .qd{width:40px;height:40px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;
+  font-size:13px;font-weight:900;color:#fff;background:var(--navy);border:3px solid #fff;box-shadow:0 4px 12px rgba(11,27,59,.2);}
+.rq:nth-child(1) .qd{background:linear-gradient(135deg,var(--mint),#0fb597);}
+.rq:nth-child(2) .qd{background:linear-gradient(135deg,var(--blue-soft),var(--blue));}
+.rq:nth-child(3) .qd{background:linear-gradient(135deg,#4f8af0,#2563eb);}
+.rq:nth-child(4) .qd{background:linear-gradient(135deg,var(--amber),var(--amber-deep));}
+.rq h5{font-size:14.5px;font-weight:900;margin-bottom:4px;}
+.rq .theme{font-size:12px;font-weight:800;color:var(--blue);margin-bottom:9px;}
+.rq ul{margin:0;padding:0;list-style:none;text-align:left;background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:12px;box-shadow:var(--sh-sm);}
+.rq li{font-size:12.5px;color:var(--ink-soft);padding:4px 0;display:flex;gap:7px;line-height:1.4;}
+.rq li::before{content:"·";color:var(--blue);font-weight:900;}
+/* KPI 대시보드 */
+.kpi-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);
+  border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sh-sm);}
+.kpi-table th{font-size:12px;font-weight:800;color:var(--muted);text-align:left;padding:14px 16px;
+  background:var(--bg);border-bottom:1px solid var(--line);letter-spacing:-.01em;white-space:nowrap;}
+.kpi-table td{font-size:13.8px;padding:14px 16px;border-bottom:1px dashed var(--line);vertical-align:top;color:var(--ink-soft);}
+.kpi-table tr:last-child td{border-bottom:none;}
+.kpi-table td.knm{font-weight:800;color:var(--ink);}
+.kpi-cur{display:inline-block;font-style:italic;color:var(--muted);font-weight:600;background:var(--bg);
+  border:1px dashed var(--line);border-radius:6px;padding:2px 8px;font-size:12.5px;}
+.kpi-cur.real{font-style:normal;color:var(--ink);font-weight:800;background:#eef9f4;border:1px solid #bfe9d8;}
+.kpi-table td .goal{font-weight:800;color:var(--blue);}
+.kpi-table td .cyc{display:inline-block;font-size:11.5px;font-weight:800;background:#eef4ff;color:var(--blue);
+  padding:2px 8px;border-radius:6px;}
+.kpi-cards{display:none;}
+
+/* 리스크 박스 */
+.risk-box{background:linear-gradient(180deg,#fffaf0,#fff);border:1px solid #f6e2b6;border-radius:var(--r-md);
+  padding:22px 24px;box-shadow:var(--sh-sm);}
+.risk-box h4{font-size:15px;font-weight:900;color:var(--amber-deep);display:flex;align-items:center;gap:9px;margin-bottom:14px;}
+.risk-box ul{margin:0;padding-left:0;list-style:none;}
+.risk-box li{font-size:13.8px;color:var(--ink-soft);padding:7px 0;display:flex;gap:10px;line-height:1.5;}
+.risk-box li::before{content:"!";flex:none;width:19px;height:19px;border-radius:6px;background:#fdeecb;color:var(--amber-deep);
+  font-weight:900;font-size:12px;display:grid;place-items:center;margin-top:1px;}
+
+/* 면책 */
+.disclaimer{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin-top:24px;}
+.disclaimer p{font-size:12.5px;color:var(--muted);line-height:1.7;}
+.disclaimer b{color:var(--ink-soft);font-weight:800;}
+
+/* 진단기준 공개 */
+.criteria details{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:0;box-shadow:var(--sh-sm);overflow:hidden;}
+.criteria summary{padding:16px 20px;font-weight:800;font-size:14.5px;cursor:pointer;list-style:none;display:flex;
+  justify-content:space-between;align-items:center;color:var(--navy);}
+.criteria summary::-webkit-details-marker{display:none;}
+.criteria summary::after{content:"펼치기 ▾";font-size:12px;color:var(--blue);font-weight:800;}
+.criteria details[open] summary::after{content:"접기 ▴";}
+.criteria .cbody{padding:0 20px 20px;font-size:13px;color:var(--ink-soft);line-height:1.7;}
+.criteria .cbody h5{font-size:13.5px;color:var(--navy);margin:14px 0 6px;font-weight:900;}
+.criteria .cbody code{background:var(--bg-2);padding:1px 6px;border-radius:5px;font-size:12px;color:var(--blue);font-family:ui-monospace,monospace;}
+
+/* 전문가 CTA */
+.expert-cta{margin-top:34px;background:linear-gradient(125deg,#0e2350,#16407a);color:#fff;border-radius:var(--r-lg);
+  padding:30px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;box-shadow:var(--sh-md);}
+.expert-cta h3{font-size:19px;font-weight:800;}
+.expert-cta p{color:#bcd0f0;font-size:14px;margin-top:6px;max-width:460px;}
+.expert-cta .ph{font-size:13px;color:#9fb1d6;margin-top:9px;}
+.expert-cta .ph b{color:var(--amber);font-size:16px;letter-spacing:.01em;}
+
+/* 토스트 */
+.share-ov{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+  background:rgba(11,27,59,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);padding:20px;}
+.share-ov.on{display:flex;}
+.share-modal{background:#fff;border-radius:18px;padding:26px;max-width:400px;width:100%;
+  box-shadow:0 24px 60px rgba(11,27,59,.35);}
+.share-modal h4{font-size:18px;font-weight:900;color:var(--navy);margin:0 0 8px;}
+.share-modal .sm-note{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin:0 0 18px;}
+.share-modal .sm-note b{color:var(--navy);}
+.sm-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.sm-opt{text-align:left;padding:14px 16px;border:1.5px solid var(--line-2);border-radius:12px;background:#fff;
+  transition:all .14s;display:flex;flex-direction:column;gap:3px;}
+.sm-opt:hover{border-color:var(--blue);background:#f5f9ff;}
+.sm-opt b{font-size:14.5px;font-weight:800;color:var(--ink);}
+.sm-opt small{font-size:12px;color:var(--muted);font-weight:600;}
+.sm-opt:first-child{border-color:#a9e2d1;background:#f4fcf9;}
+.sm-opt:first-child:hover{border-color:#16C2A3;}
+.sm-cancel{width:100%;padding:11px;border:none;background:transparent;color:var(--muted);
+  font-size:13.5px;font-weight:700;border-radius:10px;}
+.sm-cancel:hover{background:#f2f5fa;}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:90;
+  background:var(--navy);color:#fff;font-size:14px;font-weight:700;padding:13px 22px;border-radius:12px;
+  box-shadow:var(--sh-lg);opacity:0;pointer-events:none;transition:all .3s;display:flex;align-items:center;gap:9px;}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast .ic{color:var(--mint);font-weight:900;}
+
+/* 푸터 */
+.foot{background:var(--navy);color:#aebede;padding:40px 0 30px;margin-top:64px;}
+.foot-in{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;}
+.foot .brand{color:#fff;margin-bottom:14px;}
+.foot .brand small{color:#8ea4c9;}
+.foot .addr{font-size:13px;line-height:1.85;}
+.foot .addr a{color:var(--mint-soft);}
+.foot .cert{font-size:12.5px;color:#8ea4c9;border-top:1px solid rgba(255,255,255,.12);margin-top:22px;padding-top:18px;}
+.foot .cert .badge{display:inline-block;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+  padding:5px 12px;border-radius:999px;font-weight:700;color:#cdd9ef;margin-bottom:9px;}
+.foot .copy{font-size:11.5px;color:#7287a8;margin-top:8px;}
+.foot .ver{font-size:11px;margin-top:4px;font-variant-numeric:tabular-nums;letter-spacing:.01em;color:#6b80a3;}
+.foot .links{display:flex;flex-direction:column;gap:8px;font-size:13.5px;}
+.foot .links a{color:#cdd9ef;font-weight:600;}
+.foot .links a:hover{color:#fff;}
+.mini-disc{font-size:11.5px;color:#7287a8;line-height:1.65;margin-top:16px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px;}
+
+/* ===== 반응형 ===== */
+@media(max-width:880px){
+  .proc{grid-template-columns:1fr 1fr;}
+  .exec{grid-template-columns:1fr;}
+  .area-grid{grid-template-columns:1fr;}
+  .act-grid{grid-template-columns:1fr;}
+  .plan90{grid-template-columns:1fr;}
+  .road-track{grid-template-columns:1fr;gap:14px;}
+  .road-track::before{display:none;}
+  .rq{display:grid;grid-template-columns:auto 1fr;gap:14px;text-align:left;align-items:start;}
+  .rq .qd{margin:0;}
+  .rq ul{margin-top:0;}
+  .trust{grid-template-columns:1fr;}
+  .foot-in{grid-template-columns:1fr;}
+}
+@media(max-width:640px){
+  body{font-size:15.5px;}
+  .wrap{padding:0 16px;}
+  .top .tag-cert{display:none;}
+  .top-in{height:56px;}
+  .brand{font-size:15.5px;gap:9px;min-width:0;}
+  .brand>span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .brand .mk{width:32px;height:32px;}
+  .top .cta-mini .btn{min-height:42px;padding:0 16px;font-size:14px;}
+  .hero-in{padding:42px 0 52px;}
+  .hero h1{font-size:clamp(27px,7.6vw,40px);margin-top:14px;}
+  .hero .lede{margin-top:16px;font-size:15.5px;}
+  /* 히어로 CTA: 전체폭 세로 정렬 */
+  .hero-cta{flex-direction:column;align-items:stretch;gap:10px;margin-top:26px;}
+  .hero-cta .btn{width:100%;}
+  .hero-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:22px;font-size:13px;}
+  .track{margin-top:36px;}
+  .track-nodes{grid-template-columns:repeat(3,1fr);gap:18px 0;}
+  section.block{padding:44px 0;}
+  .sec-head h2{font-size:clamp(21px,5.6vw,27px);}
+  .sec-head p{font-size:15px;}
+  .proc{grid-template-columns:1fr;}
+  .rt-grid{grid-template-columns:1fr;gap:20px;text-align:center;}
+  .score-ring{margin:0 auto;}
+  .rt-info .stage-badge{margin:0;}
+  .rt-badges{justify-content:center;}
+  .rt-info h2{font-size:23px;}
+  .swot{grid-template-columns:1fr;}
+  .toggle-grid{grid-template-columns:1fr;}
+  .step-card{padding:22px 16px;}
+  /* 결과 액션 바: 줄바꿈 + 토글 전체폭 */
+  .result-actions{gap:8px;}
+  .result-actions .btn{flex:1 1 calc(50% - 4px);}
+  .view-toggle{flex:1 1 100%;justify-content:center;}
+  .view-toggle button{flex:1;}
+  /* 전문가 CTA 세로 정렬 */
+  .expert-cta{flex-direction:column;align-items:flex-start;gap:16px;text-align:left;}
+  .cta-top{flex-direction:column;align-items:stretch;padding:18px;}
+  .cta-top-btn{width:100%;}
+  .expert-cta .btn{width:100%;}
+  .kpi-table{display:none;}
+  .kpi-cards{display:grid;gap:12px;}
+  .kpi-c{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--sh-sm);}
+  .kpi-c .knm{font-size:15px;font-weight:900;margin-bottom:10px;}
+  .kpi-c .row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line);gap:10px;}
+  .kpi-c .row:last-child{border-bottom:none;}
+  .kpi-c .row .k{color:var(--muted);font-weight:700;flex:none;}
+  .kpi-c .row .v{font-weight:800;color:var(--ink);text-align:right;}
+  .matrix .mpt .tt{font-size:10px;padding:2px 5px;}
+  .btn{font-size:15px;}
+  .matrix-wrap{padding:18px 14px;}
+  /* 우선순위 매트릭스: 모바일은 스캐터 대신 순위 리스트 */
+  .matrix,.matrix-wrap .axis-x,.matrix-wrap .matrix-legend{display:none;}
+  .matrix-mlist{display:block;}
+  /* STEP4 추가입력: 좁은 화면 줄바꿈 */
+  .addrow{flex-direction:column;align-items:stretch;}
+  .pval3{grid-template-columns:1fr 1fr;gap:9px;padding:10px 12px 13px 14px;}
+  .kwarn{padding:0 12px 0 14px;}
+  .pval3 .vref{grid-column:span 2;}
+  .pval3 .vstd{flex-direction:row;gap:5px;justify-content:center;}
+  .addrow .btn{width:100%;}
+  .pick{padding:11px 12px;}
+  .pick .ptx b{font-size:13.5px;}
+  .presum{padding:14px 15px;}
+  .result-top{padding:22px 18px;}
+  .r-sec{margin-top:26px;}
+  .r-sec>h3{font-size:19px;}
+  .exec{grid-template-columns:1fr;}
+  .area-grid{grid-template-columns:1fr;}
+  .act-grid{grid-template-columns:1fr;}
+  .plan90{grid-template-columns:1fr;}
+  .chips{gap:8px;}
+  .chip-btn{font-size:14px;padding:0 13px;}
+  .share-modal{padding:22px 18px;}
+  .rep-row{grid-template-columns:1fr;}
+  .rep-actions{flex-direction:column;}
+  .rep-actions .btn{width:100%;}
+  .lowdata{flex-direction:column;gap:10px;padding:14px 15px;}
+  .ai-summary{padding:15px 16px;}
+  .ai-summary p{font-size:13.8px;}
+  .gv-card{padding:18px 14px;}
+  .gv-body{grid-template-columns:1fr;gap:22px;}
+  .gv-radar svg{max-width:300px;}
+  .gv-bar{grid-template-columns:74px 1fr 30px;gap:9px;}
+  .gv-tabs{gap:6px;}
+  .gv-tab{padding:8px 13px;font-size:12.5px;}
+  .info-table{font-size:13px;}
+  .disclaimer{font-size:12px;padding:16px;}
+}
+@media(max-width:400px){
+  .wrap{padding:0 13px;}
+  .hero h1{font-size:25px;}
+  .hero .eyebrow{font-size:11.5px;}
+  .track-nodes{grid-template-columns:repeat(2,1fr);gap:16px 0;}
+  .rt-info h2{font-size:21px;}
+  .pval3{grid-template-columns:1fr;}
+  .pval3 .vref{grid-column:span 1;}
+  .gv-bar{grid-template-columns:66px 1fr 28px;gap:7px;}
+  .gv-bar .bn{font-size:11.5px;}
+  .result-actions .btn{flex:1 1 100%;}
+  .score-ring{width:148px;height:148px;}
+}
+
+/* ===== 인쇄(A4) ===== */
+@media print{
+  @page{
+    size:A4; margin:20mm 16mm 18mm 16mm;
+    @top-left{ content:"기업 성장활동 진단 보고서"; font-size:8pt; color:#8895ab; }
+    @top-right{ content:"그로스벤처스㈜ · Beconic"; font-size:8pt; color:#8895ab; }
+    @bottom-center{ content:"— " counter(page) " —"; font-size:8.5pt; color:#66748c; }
+    @bottom-right{ content:"제2025-684호"; font-size:7.5pt; color:#aab6cc; }
+  }
+  @page cover{ margin:0; @top-left{content:none;} @top-right{content:none;}
+    @bottom-center{content:none;} @bottom-right{content:none;} }
+  body{background:#fff;font-size:11pt;color:#000;}
+  .top,.foot,.result-actions,.view-toggle,.expert-cta .btn,.no-print,.toast,
+  .hero,.criteria summary::after{display:none!important;}
+  .view{display:none!important;}
+  .print-only{display:inline-flex!important;}
+  #v-result.view{display:block!important;animation:none;}
+  .wrap{max-width:100%;padding:0;}
+  .result-top{background:#eef4ff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#0e1a30;
+    box-shadow:none;border-radius:12px;border:1px solid #cfe0f3;}
+  .card,.act,.phase,.exec .col,.radar-box,.matrix-wrap,.kpi-table,.risk-box,.rq ul,
+  .swot .b,.kpi-c,.target-box{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;}
+  .r-sec{break-inside:auto;box-shadow:none!important;}
+  .r-sec{margin-top:16px;}
+  .kpi-cards{display:none!important;}
+  .matrix-mlist{display:none!important;}
+  .matrix{display:block!important;}
+  .matrix-wrap .axis-x,.matrix-wrap .matrix-legend{display:block!important;}
+  .kpi-table{display:table!important;}
+  .act-grid,.exec{grid-template-columns:1fr 1fr!important;}
+  .plan90{grid-template-columns:repeat(3,1fr)!important;}
+  .road-track{grid-template-columns:repeat(4,1fr)!important;}
+  .road-track::before{display:block!important;-webkit-print-color-adjust:exact;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .print-foot{display:block!important;margin-top:14px;padding-top:10px;border-top:1px solid #ccc;
+    font-size:8.5pt;color:#444;line-height:1.5;}
+
+  /* ===== 컨설팅 보고서: 표지·문서정보·목차 ===== */
+  .report-shell{display:block!important;}
+  /* P1: 표지 — 첫 페이지 전체 강제. named page 대신 여백 흡수 방식 */
+  .rp-cover{
+    box-sizing:border-box; width:100%; height:100vh; min-height:100vh; max-height:100vh;
+    padding:32mm 22mm 26mm; margin:0; page:cover;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    page-break-after:always; break-after:page;
+    background:#fff; color:#0e2350;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+    position:relative; overflow:hidden;}
+  /* 외곽 프레임 — 표지 영역 전체를 절대위치로 채움(항상 밑단까지) */
+  .rp-cover::before{content:"";position:absolute;left:8mm;top:8mm;right:8mm;bottom:8mm;
+    border:1.5px solid #cdd8e8;border-radius:4px;pointer-events:none;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  /* 상단 강조 바 */
+  .rp-cover::after{content:"";position:absolute;left:0;top:0;right:0;height:6px;
+    background:linear-gradient(90deg,#0e2350,#1e54d4 60%,#ffd98a);
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .rp-cover *{text-align:center;}
+  /* 제목 블록 — 상단 */
+  .rp-cover-mid{margin-top:8mm;margin-bottom:auto;display:flex;flex-direction:column;align-items:center;}
+  /* 로고 블록 — 하단부(수신처 바로 위)로 이동 */
+  .rp-cover-top{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;
+    margin-top:0;margin-bottom:10mm;padding-top:22px;border-top:1px solid #e2e9f2;max-width:150mm;}
+  .rp-logo-row{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .rp-logo-row b{font-size:15pt;font-weight:900;display:block;color:#0e2350;letter-spacing:-.01em;}
+  .rp-logo-row small{font-size:8.5pt;color:#6b7d97;display:block;margin-top:1px;}
+  .rp-logo{width:58px;height:58px;border-radius:0;overflow:visible;
+    display:inline-flex;align-items:center;justify-content:center;flex:none;
+    background:transparent!important;}
+  .rp-logo img{width:58px;height:58px;object-fit:contain;}
+  .rp-confid{display:inline-block;border:1px solid #cdd8e8;border-radius:999px;padding:5px 16px;font-size:8.5pt;
+    font-weight:700;color:#5a6a82;margin-top:6px;}
+  .rp-doctype{font-size:11pt;font-weight:800;color:#1e54d4!important;letter-spacing:.14em;margin-bottom:20px;}
+  .rp-cover-mid h1{font-size:34pt;font-weight:900;line-height:1.18;margin:0 0 18px;letter-spacing:-.025em;color:#0e2350!important;
+    max-width:150mm;}
+  .rp-subtitle{font-size:12.5pt;color:#5a6a82!important;margin:0 auto 36px;font-weight:500;
+    padding-bottom:26px;border-bottom:2px solid #ffd98a;-webkit-print-color-adjust:exact;display:inline-block;}
+  .rp-score-line{display:inline-block;background:#f2f7fd!important;-webkit-print-color-adjust:exact;border:1px solid #d4e3f5;
+    border-radius:999px;padding:11px 24px;font-size:11.5pt;font-weight:600;color:#33415c!important;}
+  .rp-score-line b{color:#c8641a!important;font-weight:900;font-size:13pt;}
+  .rp-cover-bottom{margin-top:0;width:100%;display:flex;justify-content:center;}
+  .rp-recv{border-collapse:collapse;width:100%;max-width:420px;background:#f7f9fc!important;
+    -webkit-print-color-adjust:exact;border-radius:10px;overflow:hidden;border:1px solid #e2e9f2;}
+  .rp-recv th,.rp-recv td{text-align:left;padding:10px 16px;font-size:10pt;border-bottom:1px solid #e8eef6;}
+  .rp-recv th{width:82px;color:#7183a0!important;font-weight:700;background:#eef3fa!important;-webkit-print-color-adjust:exact;}
+  .rp-recv td{color:#1a2438!important;font-weight:600;}
+  .rp-recv tr:last-child th,.rp-recv tr:last-child td{border-bottom:none;}
+
+  /* P7: 문서정보 + 목차를 한 페이지(2p)에, 본문은 3p부터 */
+  .rp-docinfo{padding-top:2mm;page-break-inside:avoid;margin-bottom:9mm;}
+  .rp-docinfo h2,.rp-toc h2{font-size:15pt;font-weight:900;color:#0e2350!important;margin:0 0 12px;
+    padding-bottom:8px;border-bottom:2.5px solid #0e2350;}
+  .rp-info-table{width:100%;border-collapse:collapse;margin-bottom:14px;}
+  .rp-info-table th,.rp-info-table td{border:1px solid #cfd9e8;padding:9px 12px;font-size:10pt;text-align:left;}
+  .rp-info-table th{background:#eef3fa!important;-webkit-print-color-adjust:exact;color:#33415c!important;font-weight:700;width:80px;}
+  .rp-info-table td{color:#1a2438!important;}
+  .rp-disclaimer{font-size:8.5pt;color:#555!important;line-height:1.6;background:#f7f9fc!important;-webkit-print-color-adjust:exact;
+    border-left:3px solid #c8d4e6;padding:10px 14px;border-radius:0 6px 6px 0;}
+  .rp-toc{page-break-inside:avoid;page-break-after:always;break-after:page;}
+  .rp-toc-list{list-style:none;counter-reset:toc;margin:0;padding:0;}
+  /* P4: 목차 페이지번호 (dot leader) */
+  .rp-toc-list li{counter-increment:toc;display:flex;align-items:baseline;gap:0;padding:11px 4px;
+    font-size:11pt;color:#1a2438!important;font-weight:600;}
+  .rp-toc-list li::before{content:counter(toc,decimal-leading-zero);font-weight:900;color:#1e54d4!important;
+    font-size:12pt;flex:none;width:34px;}
+  .rp-toc-list li .toc-t{flex:none;}
+  .rp-toc-list li .toc-dots{flex:1;border-bottom:1px dotted #b8c6db;margin:0 8px;transform:translateY(-3px);}
+  .rp-toc-list li .toc-p{flex:none;font-weight:800;color:#33415c!important;font-variant-numeric:tabular-nums;}
+
+  /* 결과 본문: 표지 뒤부터. 스마트 흐름 — 섹션 강제 페이지나눔 제거, 자연 흐름 */
+  #v-result.view{display:block!important;animation:none;}
+  .r-sec{break-inside:auto;}
+  /* 섹션 헤더 + 소제목 + 바로 뒤 첫 요소가 함께 붙어 시작(외톨이 방지) */
+  .r-sec>h3{break-after:avoid!important;page-break-after:avoid!important;}
+  /* P6: 큰 블록만 쪼개짐 방지 (섹션 전체 avoid는 빈 페이지 유발 → 개별 카드만) */
+  .card,.act,.phase,.radar-box,.matrix-wrap,.risk-box,.rq ul,.swot .b,.kpi-c,
+  .exec .col,.target-box,.road,.road-track,.bars,.consult-box,.lowdata,
+  .area-grid>div{break-inside:avoid;page-break-inside:avoid;}
+  /* Q2: 막대 끝 반원 조각 방지 — 막대 컨테이너 오버플로 클립 */
+  .bars,.bar-row,.bar-track{overflow:hidden;}
+  .radar-box{overflow:visible;}
+  /* 표 행 잘림 방지 */
+  .kpi-table tr,.rp-recv tr,.rp-info-table tr{break-inside:avoid;page-break-inside:avoid;}
+  /* KPI 표 헤더는 페이지 넘어가도 반복 (표가 길 때) */
+  .kpi-table thead{display:table-header-group;}
+
+  /* ===== 컨설팅 펌 레이아웃 정론 (여백·타이포·섹션구분) ===== */
+  #v-result .wrap,#resultRoot{max-width:100%!important;width:100%!important;margin:0!important;padding:0!important;}
+  .r-sec{margin-top:0;padding-top:2mm;}
+  .r-sec>h3{font-size:16pt!important;font-weight:900;color:#0e2350!important;
+    margin:0 0 3px;padding-bottom:9px;border-bottom:2px solid #0e2350;
+    display:flex;align-items:center;gap:11px;letter-spacing:-.01em;
+    break-after:avoid!important;page-break-after:avoid!important;}
+  /* 헤더 바로 뒤에 소제목 없이 콘텐츠가 오면 여백 확보 (예: 리스크 섹션) */
+  .r-sec>h3 + .risk-box,.r-sec>h3 + .kpi-table,.r-sec>h3 + .matrix-wrap,
+  .r-sec>h3 + div:not(.sub){margin-top:16px!important;}
+  .r-sec>h3 .ix{width:26px!important;height:26px!important;border-radius:7px;font-size:12pt!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .r-sec>.sub{color:#5a6a82!important;font-size:9.5pt!important;margin:9px 0 18px 0!important;
+    line-height:1.55;font-weight:500;break-after:avoid!important;page-break-after:avoid!important;}
+  .act-grid,.exec{grid-template-columns:1fr 1fr!important;gap:14px!important;width:100%!important;}
+  .exec .col{padding:16px 18px!important;}
+  .ai-summary{background:#f2f7fd!important;-webkit-print-color-adjust:exact;border:1px solid #d4e3f5!important;
+    padding:16px 18px!important;margin-bottom:16px!important;}
+  .ai-summary p{font-size:10pt!important;line-height:1.65!important;color:#2a3a52!important;}
+  .swot{grid-template-columns:1fr 1fr!important;gap:14px!important;width:100%!important;}
+  .swot .b{padding:16px 18px!important;}
+  .radar-box{max-width:150mm;margin:0 auto 6mm!important;padding:14px!important;}
+  .area-grid{grid-template-columns:1fr!important;gap:16px!important;}
+  .kpi-table{width:100%!important;font-size:9pt!important;}
+  .kpi-table th,.kpi-table td{padding:8px 9px!important;}
+  .act{padding:15px 16px!important;}
+  .act h4{font-size:11pt!important;}
+  .kpi-table thead th,.matrix-legend,.phase-head{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .r-sec + .r-sec{margin-top:11mm!important;}
+  /* 섹션 헤더가 페이지 최하단에 오면 통째로 다음 페이지로 (헤더+첫 콘텐츠 결속) */
+  .r-sec>h3{break-inside:avoid;}
+  /* M3/Q1: 보고서 모드에서는 표지가 점수·프로파일을 담으므로 본문 상단 점수카드·CTA 생략 */
+  .reportmode .result-top{display:none!important;}
+  .reportmode .cta-top,.reportmode .result-actions{display:none!important;}
+}
+/* 시각화 진입 애니메이션 */
+@keyframes gaugeFill{from{stroke-dashoffset:100;}to{stroke-dashoffset:0;}}
+@keyframes barGrow{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+@keyframes radarPop{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
+.bar-fill{transform-origin:left center;animation:barGrow .9s cubic-bezier(.2,.8,.2,1) both;}
+.radar-box svg polygon[fill^="url"]{animation:radarPop .8s cubic-bezier(.2,.8,.2,1) .1s both;transform-origin:center;}
+.bar-bench{position:absolute;top:-3px;bottom:-3px;width:2px;background:repeating-linear-gradient(180deg,var(--ink-soft) 0 3px,transparent 3px 6px);opacity:.45;}
+.bar-track{position:relative;}
+@media print{.bar-fill,.radar-box svg polygon,.score-ring path{animation:none!important;}
+  .score-ring path[style*="gaugeFill"]{stroke-dashoffset:0!important;}}
+.print-foot,.print-head{display:none;}
+.print-only-block,.report-shell{display:none;}
+/* 보고서 정보 다이얼로그 */
+.report-modal{max-width:460px;}
+.rep-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
+.rep-fields label{font-size:12.5px;font-weight:800;color:var(--ink);display:flex;flex-direction:column;gap:5px;}
+.rep-fields .ropt{font-weight:600;color:var(--muted);font-size:11px;}
+.rep-fields input,.rep-fields select{font-size:14px;padding:10px 12px;border:1.5px solid var(--line-2);
+  border-radius:9px;background:#fff;color:var(--ink);font-weight:600;font-family:inherit;}
+.rep-fields input:focus,.rep-fields select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12);outline:none;}
+.rep-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end;}
+.rep-row label{height:100%;justify-content:flex-end;}
+.rep-actions{display:flex;gap:10px;align-items:center;}
+.rep-actions .btn{flex:1;}
+</style>
+</head>
+<body>
+<!-- ===== 헤더 ===== -->
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#" onclick="GAN.go('home');return false;" aria-label="기업 성장활동 진단 내비게이터 홈">
+      <span class="mk" aria-hidden="true"><img src="logo-mark.png" alt="" width="26" height="26"></span>
+      <span>성장활동 내비게이터<small>그로스벤처스 · Beconic</small></span>
+    </a>
+    <div class="cta-mini">
+      <span class="tag-cert">중기부 인증 중소기업상담회사 제2025-684호</span>
+      <button class="btn btn-sm btn-primary no-print" onclick="GAN.go('diagnose')">진단 시작</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== 홈 ===== -->
+<main id="v-home" class="view on">
+  <section class="hero">
+    <div class="wrap hero-in">
+      <span class="eyebrow">업종 · 업태 · 창업연차 기반 성장진단</span>
+      <h1>지금 우리 회사가<br><span class="hl">무엇을 먼저</span> 해야 하는지<br>한눈에 확인하세요</h1>
+      <p class="lede">복잡한 컨설팅 보고서를 5분 진단으로. 업종과 창업 연차에 맞춰 핵심활동의 우선순위, 90일 실행계획, 12개월 KPI 로드맵을 제시합니다.</p>
+      <div class="hero-cta">
+        <button class="btn btn-amber" onclick="GAN.go('diagnose')">무료로 성장활동 진단하기</button>
+        <button class="btn btn-line no-print" onclick="GAN.loadSample()">샘플 결과 보기</button>
+      </div>
+      <div class="hero-meta">
+        <span><i class="dot"></i><b>3~5분</b> 소요</span>
+        <span><i class="dot"></i>9개 영역 · <b>룰 기반</b> 진단</span>
+        <span><i class="dot"></i>설치·로그인 <b>없음</b></span>
+        <span><i class="dot"></i>입력정보 <b>서버 전송·수집 없음</b></span>
+      </div>
+
+      <!-- 시그니처: 연차 항해 트랙 -->
+      <div class="track" aria-hidden="true">
+        <div class="track-line"></div>
+        <div class="track-nodes">
+          <div class="tnode"><div class="pin"></div><small>착수 전</small><b>예비창업</b></div>
+          <div class="tnode"><div class="pin"></div><small>기반 구축</small><b>1년 미만</b></div>
+          <div class="tnode"><div class="pin"></div><small>뼈대 세우기</small><b>1~3년</b></div>
+          <div class="tnode"><div class="pin"></div><small>성장기반 확장</small><b>3~5년</b></div>
+          <div class="tnode"><div class="pin"></div><small>스케일업</small><b>5~7년</b></div>
+          <div class="tnode"><div class="pin"></div><small>재도약·혁신</small><b>7년 이상</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 성장 시각화: 단계별 우선영역 프로파일 ===== -->
+  <section class="block growth-viz">
+    <div class="wrap">
+      <div class="sec-head" style="max-width:760px">
+        <span class="eyebrow">성장활동 시각화</span>
+        <h2>창업 단계가 바뀌면, 먼저 할 영역도 바뀝니다</h2>
+        <p>아래는 단계별로 <b>지금 집중해야 할 9개 영역의 상대적 우선도</b>를 시각화한 것입니다. 예비창업은 창업기초·사업모델·고객에, 성숙기업은 인증·R&D·수출·디지털로 무게중심이 이동합니다. 단계를 눌러 비교해 보세요.</p>
+      </div>
+
+      <div class="gv-card">
+        <div class="gv-tabs" id="gvTabs">
+          <button class="gv-tab on" data-st="pre">예비창업</button>
+          <button class="gv-tab" data-st="y1">1년 미만</button>
+          <button class="gv-tab" data-st="y13">1~3년</button>
+          <button class="gv-tab" data-st="y35">3~5년</button>
+          <button class="gv-tab" data-st="y57">5~7년</button>
+          <button class="gv-tab" data-st="y7">7년 이상</button>
+        </div>
+        <div class="gv-body">
+          <div class="gv-radar"><div id="gvRadar"></div>
+            <p class="gv-cap"><span class="gv-dot"></span><span id="gvStageNm">예비창업</span> 단계의 영역별 우선도</p>
+          </div>
+          <div class="gv-bars">
+            <div class="gv-focus" id="gvFocus"></div>
+            <div class="gv-barlist" id="gvBars"></div>
+          </div>
+        </div>
+        <p class="gv-note">※ 위 그래프는 <b>단계별 표준 우선도(룰 기반)</b>를 보여주는 예시이며, 실제 진단 점수는 입력값에 따라 산출되는 자가진단 참고점수입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">진단 흐름</span>
+        <h2>입력은 간단하게, 결과는 컨설팅 보고서처럼</h2>
+        <p>네 단계만 거치면 우리 회사의 현재 위치와 다음 행동이 정리됩니다.</p>
+      </div>
+      <div class="proc">
+        <div class="step">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          <div class="num">STEP 01</div>
+          <h4>기본 정보 입력</h4>
+          <p>업종·업태·창업연차·현재 고민을 칩 버튼으로 빠르게 선택합니다.</p>
+        </div>
+        <div class="step">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#16C2A3" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div class="num">STEP 02</div>
+          <h4>성장단계 진단</h4>
+          <p>9개 영역을 업종 가중치로 분석해 현재 성장단계를 판정합니다.</p>
+        </div>
+        <div class="step">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></div>
+          <div class="num">STEP 03</div>
+          <h4>우선순위·KPI 확인</h4>
+          <p>지금 해야 할 활동, 90일 실행계획, 12개월 KPI를 받아봅니다.</p>
+        </div>
+        <div class="step">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#16C2A3" stroke-width="2"><path d="M12 17V3"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg></div>
+          <div class="num">STEP 04</div>
+          <h4>저장·공유</h4>
+          <p>결과를 PDF로 저장하거나 링크로 공유합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0;">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">왜 필요한가</span>
+        <h2>성장 단계마다 '먼저 할 일'은 다릅니다</h2>
+        <p>같은 인증, 같은 지원제도라도 창업 연차와 업종에 따라 우선순위가 완전히 달라집니다. 내비게이터는 그 순서를 정리해 드립니다.</p>
+      </div>
+      <div class="trust">
+        <div class="t"><b>9<span class="u">개 영역</span></b><span>창업기초부터 디지털전환·AI까지 진단</span></div>
+        <div class="t"><b>11<span class="u">개 업종</span></b><span>업종별 가중치로 추천활동 자동 보정</span></div>
+        <div class="t"><b>6<span class="u">개 단계</span></b><span>예비창업~7년 이상 연차별 플레이북</span></div>
+      </div>
+      <div class="aud">
+        <span class="chip">예비창업자</span><span class="chip">1인기업</span><span class="chip">소상공인</span>
+        <span class="chip">중소기업</span><span class="chip">스타트업</span><span class="chip">제조업</span>
+        <span class="chip">서비스업</span><span class="chip">유통·도소매</span><span class="chip">외식·프랜차이즈</span>
+        <span class="chip">IT/SW·플랫폼</span><span class="chip">콘텐츠·교육</span><span class="chip">수출 준비 기업</span>
+        <span class="chip">R&D·인증·자금 준비 기업</span>
+      </div>
+
+      <div class="sample-banner">
+        <div>
+          <h3>입력 없이 먼저 둘러보고 싶다면</h3>
+          <p>가상 예시 기업 '그로스샘플 제조'의 진단 결과를 바로 확인할 수 있습니다.</p>
+        </div>
+        <button class="btn btn-amber no-print" onclick="GAN.loadSample()">샘플 결과 보기</button>
+      </div>
+
+      <div class="disclaimer">
+        <p><b>안내</b> &nbsp;본 서비스는 사용자가 입력한 정보를 바탕으로 기업 성장활동의 방향성과 우선순위를 제시하는 참고용 자가진단 도구입니다. 법률, 세무, 회계, 노무, 인증, 정책자금, 정부지원사업, 투자유치, 수출 가능성 등을 보장하지 않으며, 실제 의사결정 전에는 관련 기관의 최신 기준과 전문가 검토가 필요합니다.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- ===== 진단 입력 ===== -->
+<main id="v-diagnose" class="view">
+  <div class="wrap">
+    <div class="prog">
+      <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+      <div class="prog-meta"><span>진단 입력</span><span><b id="progNow">1</b> / <span id="progTot">3</span>단계</span></div>
+    </div>
+
+    <div class="form-shell">
+      <!-- STEP 1: 필수 기본정보 -->
+      <div class="step-card" id="fstep-1">
+        <div class="q-no">STEP 01 · 기본 정보</div>
+        <h3>회사를 알려주세요</h3>
+        <p class="help">필수 항목만 채워도 진단할 수 있어요. 입력값은 이 브라우저 안에서만 사용되고 외부로 전송되지 않습니다.</p>
+
+        <div class="field" data-k="name">
+          <label>기업명 또는 예비창업자명<span class="req">*</span></label>
+          <input type="text" id="f-name" placeholder="예: 그로스벤처스 주식회사" maxlength="40" autocomplete="off">
+          <div class="err-tip">⚠ 기업명(또는 성함)을 입력해 주세요.</div>
+        </div>
+
+        <div class="field" data-k="stage">
+          <label>창업 상태<span class="req">*</span></label>
+          <div class="chips" id="c-stage"></div>
+          <div class="err-tip">⚠ 창업 상태를 선택해 주세요.</div>
+        </div>
+
+        <div class="field" data-k="ctype">
+          <label>기업 유형<span class="req">*</span></label>
+          <div class="chips" id="c-ctype"></div>
+          <div class="err-tip">⚠ 기업 유형을 선택해 주세요.</div>
+        </div>
+
+        <div class="field" data-k="industry">
+          <label>업종 대분류<span class="req">*</span></label>
+          <div class="chips" id="c-industry"></div>
+          <div class="err-tip">⚠ 업종을 선택해 주세요.</div>
+        </div>
+
+        <div class="field" data-k="biztype">
+          <label>업태 또는 세부 사업내용<span class="opt">선택</span></label>
+          <input type="text" id="f-biztype" placeholder="예: 정밀부품 가공, 온라인 식품 판매, B2B SaaS 등" maxlength="60" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- STEP 2: 규모·고객·고민 -->
+      <div class="step-card" id="fstep-2" style="display:none;">
+        <div class="q-no">STEP 02 · 규모와 고민</div>
+        <h3>현재 상황을 알려주세요</h3>
+        <p class="help">규모와 가장 큰 고민에 따라 추천활동의 우선순위가 달라집니다.</p>
+
+        <div class="field" data-k="revenue">
+          <label>현재 매출 구간<span class="req">*</span></label>
+          <div class="chips" id="c-revenue"></div>
+          <div class="err-tip">⚠ 매출 구간을 선택해 주세요.</div>
+        </div>
+
+        <div class="field" data-k="emp">
+          <label>현재 직원 수<span class="req">*</span></label>
+          <div class="chips" id="c-emp"></div>
+          <div class="err-tip">⚠ 직원 수를 선택해 주세요.</div>
+        </div>
+
+        <div class="field" data-k="customer">
+          <label>주요 고객<span class="req">*</span></label>
+          <div class="chips" id="c-customer"></div>
+          <div class="err-tip">⚠ 주요 고객을 선택해 주세요.</div>
+        </div>
+
+        <div class="field" data-k="concern">
+          <label>현재 가장 큰 고민 <span class="opt">최대 3개</span><span class="req">*</span></label>
+          <div class="chips" id="c-concern"></div>
+          <div class="err-tip">⚠ 가장 큰 고민을 1개 이상 선택해 주세요.</div>
+        </div>
+      </div>
+
+      <!-- STEP 3: 선택(준비현황) -->
+      <div class="step-card" id="fstep-3" style="display:none;">
+        <div class="q-no">STEP 03 · 준비 현황 <span class="opt" style="vertical-align:middle;">선택 입력</span></div>
+        <h3>지금까지 갖춘 것들을 체크해 주세요</h3>
+        <p class="help">체크한 항목은 진단 점수에 가점으로 반영됩니다. 비워 두면 창업연차·매출·규모 기반 추정값이 사용되며, 더 채울수록 정밀도가 올라갑니다.</p>
+
+        <div class="collapse open" id="col-1">
+          <div class="collapse-h" onclick="GAN.toggleCol('col-1')">
+            <div><h4>사업자·법인·기본 등록</h4><small>창업기초 영역에 반영</small></div>
+            <span class="arr">▾</span>
+          </div>
+          <div class="collapse-b"><div class="inner"><div class="toggle-grid" id="t-group-basic"></div></div></div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="collapse" id="col-2">
+          <div class="collapse-h" onclick="GAN.toggleCol('col-2')">
+            <div><h4>지식재산·R&D·인증</h4><small>R&D·인증 영역에 반영</small></div>
+            <span class="arr">▾</span>
+          </div>
+          <div class="collapse-b"><div class="inner"><div class="toggle-grid" id="t-group-rnd"></div></div></div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="collapse" id="col-3">
+          <div class="collapse-h" onclick="GAN.toggleCol('col-3')">
+            <div><h4>마케팅·판로·디지털·자금</h4><small>마케팅·판로·디지털·자금 영역에 반영</small></div>
+            <span class="arr">▾</span>
+          </div>
+          <div class="collapse-b"><div class="inner"><div class="toggle-grid" id="t-group-ops"></div></div></div>
+        </div>
+      </div>
+
+      <!-- STEP 4: 컨설턴트 입력 (선택) -->
+      <div class="step-card" id="fstep-4" style="display:none;">
+        <div class="q-no">STEP 04 · 컨설턴트 진단 입력 <span class="opt" style="vertical-align:middle;">선택 · 상담 시 작성</span></div>
+        <h3>사전 분석 결과를 확인하고, 우선과제·KPI를 선택·보완하세요</h3>
+        <p class="help">앞 단계 입력을 바탕으로 <b>지금 화면에서 즉시 분석</b>한 결과입니다. 아래 추천 과제·KPI를 체크해 채택하고, 표준 항목에 없는 내용은 직접 추가하세요. 선택·작성한 내용은 결과보고서의 <b>'컨설턴트 진단 의견'</b>과 <b>'KPI 대시보드'</b>에 반영됩니다.</p>
+
+        <!-- AI 사전 분석 요약 -->
+        <div class="presum" id="c-presum"><!-- JS 렌더 --></div>
+
+        <!-- ① 추천 우선과제 체크리스트 (동적) -->
+        <div class="field">
+          <label>① 추천 우선과제 <span class="opt">분석 기반 · 체크해서 채택 · 자유 추가</span></label>
+          <p class="help" style="margin:-2px 0 10px">아래는 입력값 기반으로 제안된 우선과제입니다. 채택할 과제를 체크하고, 없는 내용은 맨 아래에 직접 추가하세요. 체크·추가한 항목이 보고서 '추가 우선 과제'로 반영됩니다.</p>
+          <div class="pick-list" id="c-task-pick"><!-- JS 렌더 --></div>
+          <div class="addrow">
+            <input type="text" id="c-task-add" class="addinput" placeholder="추가 우선과제를 입력하고 Enter 또는 +추가" maxlength="60">
+            <button type="button" class="btn btn-sm btn-ghost" id="c-task-addbtn">+ 추가</button>
+          </div>
+        </div>
+
+        <!-- ② 추천 핵심 KPI 체크리스트 (동적) -->
+        <div class="field">
+          <label>② 관리할 핵심 KPI <span class="opt">단계 표준 KPI · 체크 시 현재값 입력칸 생성</span></label>
+          <p class="help" style="margin:-2px 0 10px">관리할 지표를 체크하면 <b>현재값·3개월·6개월 목표 입력칸</b>이 생깁니다. 현재값에 실제 수치를 적으면 결과에 <b style="color:#0d9b82">초록색 실제값</b>으로, 3·6개월 목표를 적으면 <b style="color:var(--blue)">컨설턴트 제시 목표</b>로 반영됩니다(비우면 표준 목표 유지). 별도 지표는 직접 추가하세요.</p>
+          <div class="pick-list" id="c-kpi-pick"><!-- JS 렌더 --></div>
+          <div class="addrow">
+            <input type="text" id="c-kpi-add" class="addinput" placeholder="추가 KPI를 입력하고 Enter 또는 +추가" maxlength="40">
+            <button type="button" class="btn btn-sm btn-ghost" id="c-kpi-addbtn">+ 추가</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>③ 종합 진단 의견 <span class="opt">자유 서술</span></label>
+          <textarea id="c-memo-overview" placeholder="예: 컨설팅 전문성은 높으나 고객 발굴이 대표 개인 네트워크에 집중되어 있어, 영업 자산화와 디지털 채널 구축이 시급함." maxlength="600"></textarea>
+        </div>
+        <div class="field">
+          <label>④ 특이사항·리스크 메모 <span class="opt">자유 서술</span></label>
+          <textarea id="c-memo-risk" placeholder="예: 특정 대기업 고객 매출 의존도 60% → 고객 분산 필요. 대표 부재 시 사업 연속성 리스크 존재." maxlength="400"></textarea>
+        </div>
+      </div>
+
+      <div class="form-nav">
+        <button class="btn btn-ghost" id="btnPrev" onclick="GAN.prevStep()">이전</button>
+        <button class="btn btn-primary" id="btnNext" onclick="GAN.nextStep()">다음 단계</button>
+      </div>
+      <div style="height:40px"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== 결과 ===== -->
+<main id="v-result" class="view">
+  <div class="wrap" id="resultRoot"><!-- JS 렌더 --></div>
+</main>
+
+<div class="toast" id="toast"><span class="ic">✓</span><span id="toastMsg">복사되었습니다</span></div>
+
+<!-- R2: 공유 옵션 다이얼로그 -->
+<div class="share-ov" id="shareOv" aria-hidden="true">
+  <div class="share-modal" role="dialog" aria-label="결과 공유 옵션">
+    <h4>결과 링크 공유</h4>
+    <p class="sm-note">공유 링크에는 진단 입력정보(업종·규모 등)가 포함됩니다. <b>기업명 포함 여부</b>를 선택하세요.</p>
+    <div class="sm-opts">
+      <button type="button" class="sm-opt" data-name="0">
+        <b>기업명 제외</b><small>업종·규모·점수만 공유 · 권장</small></button>
+      <button type="button" class="sm-opt" data-name="1">
+        <b>기업명 포함</b><small>"우리 회사" 대신 실제 기업명 표시</small></button>
+    </div>
+    <button type="button" class="sm-cancel" id="shareCancel">취소</button>
+  </div>
+</div>
+
+<!-- 보고서 정보 입력 다이얼로그 (컨설팅 보고서 표지 반영) -->
+<div class="share-ov" id="reportOv" aria-hidden="true">
+  <div class="share-modal report-modal" role="dialog" aria-label="보고서 정보 입력">
+    <h4>보고서 PDF 생성</h4>
+    <p class="sm-note">기업·기관 제출용 보고서 표지에 반영할 정보를 입력하세요. 비워두면 진단 입력값으로 자동 채워집니다.</p>
+    <div class="rep-fields">
+      <label>수신 기업/기관명
+        <input type="text" id="rep-client" maxlength="40" placeholder="예: 대한정밀 주식회사"></label>
+      <label>수신 담당자 <span class="ropt">선택</span>
+        <input type="text" id="rep-manager" maxlength="30" placeholder="예: 홍길동 대표이사"></label>
+      <label>수신 부서/기관 <span class="ropt">선택</span>
+        <input type="text" id="rep-dept" maxlength="40" placeholder="예: 경영기획팀 / ○○기술보증기금"></label>
+      <div class="rep-row">
+        <label>문서 기밀등급
+          <select id="rep-confid">
+            <option value="대외 참고용">대외 참고용</option>
+            <option value="관계자 외 열람 제한">관계자 외 열람 제한</option>
+            <option value="일반">일반</option>
+          </select></label>
+        <label>작성 목적 <span class="ropt">선택</span>
+          <select id="rep-purpose">
+            <option value="경영 진단 참고">경영 진단 참고</option>
+            <option value="정부지원사업 신청 참고">정부지원사업 신청 참고</option>
+            <option value="투자·보증 검토 참고">투자·보증 검토 참고</option>
+            <option value="내부 검토용">내부 검토용</option>
+          </select></label>
+      </div>
+    </div>
+    <div class="rep-actions">
+      <button type="button" class="btn btn-sm btn-primary" id="repGenerate">보고서 생성 →</button>
+      <button type="button" class="sm-cancel" id="reportCancel">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 푸터 ===== -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div>
+      <div class="brand"><span class="mk" aria-hidden="true"><img src="logo-mark.png" alt="" width="26" height="26"></span><span style="color:#fff">그로스벤처스 주식회사<small>기업 성장활동 진단 내비게이터</small></span></div>
+      <div class="addr">
+        서울시 구로구 디지털로27길 24, 209호<br>
+        전화 <a href="tel:07041034177">070-4103-4177</a> &nbsp;·&nbsp; 이메일 start@gven.kr<br>
+        사이트 <a href="https://www.beconic.kr" target="_blank" rel="noopener">www.beconic.kr</a>
+      </div>
+      <div class="cert">
+        <span class="badge">중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호</span>
+        <div class="copy">© 2023~2026 Copyright ⓒ growthventures Co., Ltd. All rights reserved.</div>
+        <div class="ver" id="appVer"></div>
+      </div>
+    </div>
+    <div>
+      <div class="links no-print">
+        <a href="#" onclick="GAN.go('home');return false;">홈으로</a>
+        <a href="#" onclick="GAN.go('diagnose');return false;">진단 시작</a>
+        <a href="#" onclick="GAN.loadSample();return false;">샘플 결과 보기</a>
+        <a href="tel:07041034177">전문가에게 전화 상담 070-4103-4177</a>
+      </div>
+      <p class="mini-disc">본 서비스는 입력 정보 기반의 참고용 자가진단 도구입니다. 법률·세무·회계·노무·인증·정책자금·정부지원사업·투자유치·수출 가능성 등을 보장하지 않으며, 실제 의사결정 전 관련 기관의 최신 기준 확인과 전문가 검토가 필요합니다. 표시되는 점수는 절대평가가 아닌 자가진단 참고점수입니다.</p>
+    </div>
+  </div>
+</footer>
+<script>
+/* =======================================================================
+   기업 성장활동 진단 내비게이터 — 룰 기반 진단 엔진 (단일 파일, 외부 의존 없음)
+   설계원칙: 입력되지 않은 정보는 추정하지 않음 / 단정형 표현 금지 /
+            점수는 자가진단 참고점수 / 모든 추천은 참고용 방향 제시
+   ======================================================================= */
+"use strict";
+
+/* ---------- 버전 정보 ---------- */
+const APP_VERSION = "v5.4";
+const APP_UPDATED = "2026-09-08";
+const APP_BUILD   = "2026.09.08.1";  // 배포 빌드 식별자
+let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
+
+/* ---------- 1. 옵션 데이터 ---------- */
+const OPT = {
+  stage:[
+    {v:"pre",  t:"예비창업"},
+    {v:"y1",   t:"창업 1년 미만"},
+    {v:"y13",  t:"1~3년차"},
+    {v:"y35",  t:"3~5년차"},
+    {v:"y57",  t:"5~7년차"},
+    {v:"y7",   t:"7년 이상"}
+  ],
+  ctype:[
+    {v:"solo", t:"1인기업"},{v:"sosang",t:"소상인"},{v:"sogong",t:"소공인"},
+    {v:"small",t:"소기업"},{v:"sme",t:"중기업"},{v:"etc",t:"기타"}
+  ],
+  industry:[
+    {v:"mfg",t:"제조"},{v:"svc",t:"서비스"},{v:"retail",t:"유통·도소매"},
+    {v:"food",t:"외식·프랜차이즈"},{v:"it",t:"IT/SW"},{v:"platform",t:"플랫폼"},
+    {v:"content",t:"콘텐츠"},{v:"edu",t:"교육"},{v:"pro",t:"전문서비스"},
+    {v:"trade",t:"수출입"},{v:"etc",t:"기타"}
+  ],
+  revenue:[
+    {v:"r0",t:"매출 없음"},{v:"r1",t:"1억 미만"},{v:"r15",t:"1억~5억"},
+    {v:"r510",t:"5억~10억"},{v:"r1030",t:"10억~30억"},{v:"r30100",t:"30억~100억"},{v:"r100",t:"100억 이상"}
+  ],
+  emp:[
+    {v:"e1",t:"1명(대표만)"},{v:"e24",t:"2~4명"},{v:"e59",t:"5~9명"},
+    {v:"e1029",t:"10~29명"},{v:"e3049",t:"30~49명"},{v:"e50",t:"50명 이상"}
+  ],
+  customer:[
+    {v:"b2c",t:"B2C 일반소비자"},{v:"b2b",t:"B2B 기업"},{v:"b2g",t:"B2G 공공"},
+    {v:"global",t:"해외"},{v:"mix",t:"혼합"}
+  ],
+  concern:[
+    {v:"setup",t:"사업자등록·법인설립"},{v:"customer",t:"고객발굴"},{v:"revenue",t:"매출확대"},
+    {v:"cert",t:"인증"},{v:"fund",t:"자금"},{v:"rnd",t:"R&D"},{v:"export",t:"수출"},
+    {v:"mkt",t:"마케팅·브랜딩"},{v:"org",t:"조직관리"},{v:"fin",t:"재무관리"},{v:"dx",t:"디지털전환·AI"}
+  ]
+};
+
+/* 선택입력(준비현황) — 체크 시 해당 영역 가점. 매핑: area→영역, w→가중치 */
+const PREP = {
+  basic:[
+    {v:"biz_reg",  t:"사업자등록 완료", area:"foundation", w:3},
+    {v:"corp",     t:"법인 설립", area:"foundation", w:2},
+    {v:"ecom_reg", t:"통신판매업 신고", area:"foundation", w:2, ind:["retail","food","content","platform"]},
+    {v:"contracts",t:"표준 계약서·견적서 보유", area:"foundation", w:2},
+    {v:"bizplan",  t:"사업계획서 보유", area:"bm", w:3},
+    {v:"introdoc", t:"제품·서비스 소개서 보유", area:"sales", w:2}
+  ],
+  rnd:[
+    {v:"patent",   t:"특허·상표 보유", area:"rnd", w:3},
+    {v:"rnd_lab",  t:"기업부설연구소/연구개발전담부서", area:"rnd", w:3},
+    {v:"iso",      t:"ISO 등 인증 보유", area:"cert", w:3},
+    {v:"venture",  t:"벤처기업확인", area:"cert", w:3},
+    {v:"women",    t:"여성기업확인", area:"cert", w:2},
+    {v:"direct",   t:"직접생산확인", area:"cert", w:2, ind:["mfg"]},
+    {v:"gov_exp",  t:"정부지원사업 수행 경험", area:"finance", w:2}
+  ],
+  ops:[
+    {v:"website",  t:"홈페이지/쇼핑몰 운영", area:"marketing", w:3},
+    {v:"sns",      t:"SNS 채널 운영", area:"marketing", w:2},
+    {v:"channel",  t:"공공/온라인 판로 보유", area:"sales", w:3},
+    {v:"export_rec",t:"수출실적 보유", area:"export", w:4},
+    {v:"fund_exp", t:"정책자금·보증 이용 경험", area:"finance", w:3},
+    {v:"crm_erp",  t:"CRM/ERP/회계관리 사용", area:"digital", w:4}
+  ]
+};
+
+/* ---------- 2. 9개 영역 메타 ---------- */
+const AREA_KEYS = ["foundation","bm","sales","marketing","rnd","cert","finance","export","digital"];
+const AREA = {
+  foundation:{nm:"창업기초·사업자 정비", short:"창업기초"},
+  bm:{nm:"사업모델·고객가치", short:"사업모델"},
+  sales:{nm:"고객발굴·판로", short:"고객·판로"},
+  marketing:{nm:"마케팅·브랜딩", short:"마케팅"},
+  rnd:{nm:"기술·제품개발·R&D", short:"R&D"},
+  cert:{nm:"인증·규격·품질", short:"인증·품질"},
+  finance:{nm:"자금·재무·정책지원", short:"자금·재무"},
+  export:{nm:"수출·글로벌", short:"수출·글로벌"},
+  digital:{nm:"디지털전환·AI 활용", short:"디지털·AI"}
+};
+const BASE_W = {foundation:10,bm:15,sales:15,marketing:10,rnd:10,cert:10,finance:10,export:10,digital:10};
+
+/* 업종별 가중치 배수 */
+const IND_MULT = {
+  mfg:   {rnd:1.6,cert:1.6,export:1.5,foundation:1.1},
+  svc:   {marketing:1.5,sales:1.3,digital:1.3,bm:1.2},
+  retail:{sales:1.5,digital:1.4,marketing:1.2,finance:1.2},
+  food:  {foundation:1.5,marketing:1.4,sales:1.3,cert:1.2},
+  it:    {bm:1.5,rnd:1.4,digital:1.5,sales:1.2},
+  platform:{bm:1.5,digital:1.5,rnd:1.3,finance:1.2},
+  content:{marketing:1.5,bm:1.3,digital:1.3,sales:1.2},
+  edu:   {marketing:1.4,bm:1.3,sales:1.2,digital:1.2},
+  pro:   {bm:1.4,sales:1.3,marketing:1.1,finance:1.2},
+  trade: {export:1.8,cert:1.3,sales:1.2,finance:1.1},
+  etc:   {}
+};
+function industryWeights(ind){
+  const mult = IND_MULT[ind]||{}; const raw={}; let sum=0;
+  AREA_KEYS.forEach(a=>{ raw[a]=BASE_W[a]*(mult[a]||1); sum+=raw[a]; });
+  const w={}; let acc=0;
+  AREA_KEYS.forEach((a,i)=>{
+    if(i<AREA_KEYS.length-1){ w[a]=Math.round(raw[a]/sum*100); acc+=w[a]; }
+    else w[a]=100-acc;
+  });
+  return w;
+}
+/* ---------- 3. 창업 연차별 플레이북 ---------- */
+const STAGE = {
+  pre:{nm:"예비창업",dir:"사업 착수 전 구조 설계",
+    focus:["foundation","bm","sales"],
+    kpi:["고객 인터뷰 수","사업계획서 완성도","시장검증 횟수","초기 판매 테스트 수","창업 준비 체크리스트 완료율"]},
+  y1:{nm:"창업 1년 미만",dir:"사업 운영 기반 구축",
+    focus:["foundation","sales","marketing"],
+    kpi:["첫 매출 발생 여부","월별 고객문의 수","월별 신규고객 수","홈페이지/SNS 구축 여부","기본서류 준비율"]},
+  y13:{nm:"창업 1~3년차",dir:"사업의 뼈대를 세우는 시기",
+    focus:["bm","sales","rnd","cert"],
+    kpi:["월 매출 성장률","반복구매율","신규고객 수","인증 준비율","정부지원사업 신청 건수"]},
+  y35:{nm:"창업 3~5년차",dir:"성장기반 확장과 외부자원 활용",
+    focus:["cert","finance","rnd","export"],
+    kpi:["매출 성장률","영업이익률","정책자금 검토 건수","R&D 과제 신청 건수","신규 채널 매출 비중"]},
+  y57:{nm:"창업 5~7년차",dir:"도약·스케일업·수출·시스템화",
+    focus:["export","digital","finance","rnd"],
+    kpi:["수출 매출 비중","생산성 개선율","고객 유지율","영업이익률","신제품 출시 수"]},
+  y7:{nm:"창업 7년 이상",dir:"재도약·구조혁신·사업 다각화",
+    focus:["digital","export","finance","bm"],
+    kpi:["사업부별 손익","신규사업 매출 비중","자동화율","고객생애가치","해외매출 비중"]}
+};
+
+/* ---------- 4. 추천활동 라이브러리 ----------
+   각 활동: area, title, why, when(권장시점), docs(준비서류), dur(소요),
+            kpi(관리KPI), caution(유의), expert(전문가검토 필요), ind(해당업종 제한, 없으면 전체)
+   tag: 'now'(즉시), 'soon'(준비), 'plan'(중장기) — 연차/취약영역에 따라 동적 조정 */
+const LIB = [
+  // foundation
+  {id:"f1",area:"foundation",title:"사업자등록·업종/업태 적합성 점검",
+   why:"업종·업태 선택이 세제·지원사업·인허가 범위를 좌우합니다. 착수 전 구조를 맞춰 두면 이후 비용을 줄일 수 있어요.",
+   when:"착수 전 ~ 창업 직후",docs:"사업자등록 신청서, 임대차계약서(해당 시)",dur:"1~2주",
+   kpi:"창업 준비 체크리스트 완료율",caution:"업종코드·인허가 요건은 지역·시점별로 다를 수 있어 관할 기관 확인이 필요합니다.",expert:false,
+   stages:["pre","y1"]},
+  {id:"f2",area:"foundation",title:"법인 전환/법인 설립 검토",
+   why:"거래 신뢰도와 자금조달·투자 유치 측면에서 법인이 유리한 국면이 있습니다. 전환 시점은 손익과 절세를 함께 따져야 합니다.",
+   when:"매출·거래 확대 시점",docs:"정관(안), 주주명부(안), 재무 추정자료",dur:"2~4주",
+   kpi:"전환 후 거래·자금 조건 변화",caution:"전환 손익·세무 효과는 개별 상황에 따라 달라 세무 전문가 검토가 필요합니다.",expert:true,
+   stages:["y13","y35"]},
+  {id:"f3",area:"foundation",title:"표준 계약서·견적서·거래서류 정비",
+   why:"분쟁을 예방하고 거래를 빠르게 만드는 기본 인프라입니다. 초기에 갖춰 두면 영업 속도가 붙습니다.",
+   when:"첫 거래 준비기",docs:"표준 계약서·견적서·거래명세 양식",dur:"1~2주",
+   kpi:"표준서류 정비율",caution:"계약 조항의 법적 효력은 사안별 검토가 필요합니다.",expert:false,
+   stages:["pre","y1","y13"]},
+  // bm
+  {id:"b1",area:"bm",title:"목표고객·문제정의·수익모델 구체화",
+   why:"누구의 어떤 문제를, 어떻게 돈을 받고 푸는지가 흐릿하면 이후 모든 활동이 비효율적이 됩니다.",
+   when:"착수 전 ~ 초기",docs:"고객 정의서, 수익모델 캔버스",dur:"2~3주",
+   kpi:"고객 인터뷰 수 / 시장검증 횟수",caution:"가설은 실제 고객 검증으로 보완해야 합니다.",expert:false,
+   stages:["pre","y1","y13"]},
+  {id:"b4",area:"bm",title:"최소기능제품(MVP)·시장검증 설계",
+   why:"크게 만들기 전에 핵심 가치만 담은 최소 버전으로 시장 반응을 확인하면 시행착오 비용을 크게 줄일 수 있습니다.",
+   when:"착수 전 ~ 초기",docs:"가설 검증 시나리오, 간이 테스트 자료",dur:"3~4주",
+   kpi:"시장검증 횟수 / 초기 반응 지표",caution:"검증 결과는 표본·방법의 한계를 함께 기록해 해석하세요.",expert:false,
+   stages:["pre","y1"]},
+  {id:"b2",area:"bm",title:"사업계획서 고도화",
+   why:"지원사업·투자·금융 모든 접점에서 회사를 설명하는 핵심 문서입니다. 단계가 오를수록 정교함이 필요합니다.",
+   when:"분기 단위 갱신 권장",docs:"기존 사업계획서, 최신 재무·실적 자료",dur:"2~4주",
+   kpi:"사업계획서 완성도",caution:"수치·전망은 근거 자료와 일치해야 신뢰를 얻습니다.",expert:false,
+   stages:["y13","y35","y57"]},
+  {id:"b3",area:"bm",title:"사업 포트폴리오 진단·재정비",
+   why:"7년 이상이면 수익성 낮은 사업 정리와 고부가가치 전환이 다음 성장의 핵심입니다.",
+   when:"연 1회 정기 점검",docs:"사업부별 손익자료",dur:"4~6주",
+   kpi:"사업부별 손익 / 신규사업 매출 비중",caution:"사업 정리·전환은 조직·고용 영향이 커 신중한 검토가 필요합니다.",expert:true,
+   stages:["y57","y7"]},
+  // sales
+  {id:"s1",area:"sales",title:"첫 고객 확보·판매 테스트",
+   why:"작게라도 실제 판매를 만들어 봐야 가설이 검증되고 다음 의사결정의 근거가 생깁니다.",
+   when:"초기 3~6개월",docs:"소개서, 견적 양식",dur:"진행형",
+   kpi:"초기 판매 테스트 수 / 첫 매출 발생 여부",caution:"초기 단가·조건은 무리한 약속을 피하세요.",expert:false,
+   stages:["pre","y1"]},
+  {id:"s2",area:"sales",title:"공공판로(조달) 진입 검토",
+   why:"B2G는 안정적 매출처가 될 수 있지만 등록·인증 요건이 선행됩니다. 준비 순서를 맞추는 게 중요합니다.",
+   when:"인증 기반 마련 후",docs:"직접생산확인·인증 관련 서류(해당 시)",dur:"검토 4~8주",
+   kpi:"공공/기업 제안 건수",caution:"조달 등록·심사 기준은 최신 공고 확인이 필요합니다.",expert:false,
+   stages:["y13","y35","y57"]},
+  {id:"s3",area:"sales",title:"영업 제안서·레퍼런스 체계화",
+   why:"반복 가능한 영업 자산이 있어야 사람에 의존하지 않고 매출이 확장됩니다.",
+   when:"상시",docs:"제안서 템플릿, 고객 레퍼런스",dur:"2~3주",
+   kpi:"영업제안 건수 / 신규고객 수",caution:"레퍼런스 활용은 고객 동의 범위를 확인하세요.",expert:false,
+   stages:["y13","y35"]},
+  // marketing
+  {id:"m1",area:"marketing",title:"홈페이지·소개 페이지 구축",
+   why:"검색·거래·지원사업에서 회사를 확인하는 첫 창구입니다. 없으면 신뢰 형성이 늦어집니다.",
+   when:"창업 초기",docs:"회사 소개 자료, 제품 이미지",dur:"2~4주",
+   kpi:"홈페이지 구축 여부",caution:"개인정보 수집 시 관련 고지·동의 절차가 필요합니다.",expert:false,
+   stages:["pre","y1","y13"]},
+  {id:"m0",area:"marketing",title:"브랜드 기초·네이밍·핵심 메시지 정리",
+   why:"제품이 나오기 전에 이름·한 줄 소개·전달할 핵심 가치를 정리해 두면 이후 채널·콘텐츠 제작이 일관되고 빨라집니다.",
+   when:"착수 전 ~ 초기",docs:"네이밍 후보, 한 줄 소개, 톤앤매너 메모",dur:"1~2주",
+   kpi:"핵심 메시지·소개문 확정 여부",caution:"표현은 과장·단정 광고 규정을 확인하세요.",expert:false,
+   stages:["pre","y1"]},
+  {id:"m2",area:"marketing",title:"상표 등록 검토·검색",
+   why:"브랜드가 알려지기 시작하면 분쟁 위험이 커집니다. 초기에 선점·검토해 두는 편이 안전합니다.",
+   when:"브랜드 노출 시작 전",docs:"상표명(안), 지정상품 분류",dur:"검색 1~2주",
+   kpi:"지식재산권 검토 건수",caution:"등록 가능성은 선행상표 검토 결과에 따라 달라집니다.",expert:false,
+   stages:["y1","y13","y35"]},
+  {id:"m3",area:"marketing",title:"SNS·검색 노출·콘텐츠 체계 구축",
+   why:"고객이 검색하는 곳에 회사가 보여야 합니다. 채널을 분산하지 말고 핵심 1~2개부터 운영하세요.",
+   when:"상시",docs:"콘텐츠 캘린더",dur:"진행형",
+   kpi:"월별 고객문의 수",caution:"표현은 과장·단정 광고 규정을 확인하세요.",expert:false,
+   stages:["y1","y13","y35"]},
+  // rnd
+  {id:"r1",area:"rnd",title:"기업부설연구소/연구개발전담부서 검토",
+   why:"R&D 인력·세제·과제 참여의 기반이 됩니다. 요건을 갖추면 이후 R&D 활동의 출발점이 됩니다.",
+   when:"R&D 인력 확보 시",docs:"연구인력·연구공간 요건 자료",dur:"검토 2~4주",
+   kpi:"R&D 과제 준비율",caution:"설립 요건·인정 기준은 관할 기관 최신 기준 확인이 필요합니다.",expert:false,
+   stages:["y13","y35"]},
+  {id:"r2",area:"rnd",title:"특허·실용신안·디자인 출원 검토",
+   why:"제품·기술 차별성을 권리로 확보하면 거래·투자·지원사업에서 근거가 됩니다.",
+   when:"제품·기술 확정기",docs:"기술 설명자료, 선행기술 검토",dur:"검토 2~4주",
+   kpi:"지식재산권 검토 건수",caution:"권리화 가능성·범위는 변리사 검토가 필요합니다.",expert:true,
+   stages:["y13","y35","y57"]},
+  {id:"r3",area:"rnd",title:"정부 R&D 과제기획 준비",
+   why:"기술개발 자금을 외부에서 조달하는 통로입니다. 과제기획·실적이 미리 준비돼야 신청이 수월합니다.",
+   when:"공고 시즌 전",docs:"연구개발계획(안), 수행실적",dur:"기획 4~8주",
+   kpi:"R&D 과제 신청 건수",caution:"선정을 보장하지 않으며 공고별 요건 확인이 필요합니다.",expert:false,
+   stages:["y35","y57"]},
+  // cert
+  {id:"c1",area:"cert",title:"ISO 9001/14001/45001 등 인증 검토",
+   why:"품질·환경·안전보건 체계를 갖추면 거래·입찰에서 신뢰 근거가 됩니다.",
+   when:"거래 확대·입찰 준비기",docs:"기존 사내 절차·기록",dur:"준비 8~16주",
+   kpi:"인증 취득 진행률",caution:"인증 적합성·범위는 인증기관 기준 확인이 필요합니다.",expert:false,
+   stages:["y13","y35"]},
+  {id:"c2",area:"cert",title:"벤처기업확인·이노비즈/메인비즈 검토",
+   why:"기술·경영 혁신성을 공인받으면 자금·세제·판로에서 활용 폭이 넓어집니다.",
+   when:"3~5년차 전후",docs:"기술·재무·경영 관련 자료",dur:"검토 2~4주",
+   kpi:"인증 준비율",caution:"확인 요건·평가 기준은 최신 기준 확인이 필요합니다.",expert:false,
+   stages:["y35","y57"]},
+  {id:"c3",area:"cert",title:"직접생산확인 검토",
+   why:"공공조달 직접생산 요건 충족에 필요한 절차입니다. 제조 판로 확장의 전제가 됩니다.",
+   when:"공공판로 진입 전",docs:"생산설비·인력 현황",dur:"검토 3~6주",
+   kpi:"인증 취득 진행률",caution:"품목별 기준·실태조사 요건 확인이 필요합니다.",expert:false,ind:["mfg"],
+   stages:["y35","y57"]},
+  // finance
+  {id:"fi1",area:"finance",title:"손익·현금흐름 관리체계 구축",
+   why:"숫자를 정기적으로 보는 회사가 위기에 강합니다. 관리회계 기반이 의사결정의 토대가 됩니다.",
+   when:"상시",docs:"월별 손익·자금 현황",dur:"체계화 3~6주",
+   kpi:"영업이익률",caution:"세무상 손익과 관리회계 손익은 다를 수 있습니다.",expert:false,
+   stages:["y13","y35","y57","y7"]},
+  {id:"fi2",area:"finance",title:"정책자금·보증 검토",
+   why:"성장 자금을 합리적 조건으로 조달하는 통로입니다. 신용·재무 상태에 따라 가능 범위가 달라집니다.",
+   when:"자금 소요 시점",docs:"재무제표, 사업계획서",dur:"검토 2~4주",
+   kpi:"정책자금 검토 건수",caution:"한도·금리·심사 결과는 보장되지 않으며 기관별 기준 확인이 필요합니다.",expert:true,
+   stages:["y13","y35","y57"]},
+  // export
+  {id:"e1",area:"export",title:"수출 준비도 점검·HS코드 검토",
+   why:"해외 진출의 출발점입니다. 품목분류·서류 기준을 먼저 잡아야 시행착오를 줄입니다.",
+   when:"해외 검토 시작기",docs:"제품 사양, HS코드(안)",dur:"검토 2~4주",
+   kpi:"수출 준비 진행률",caution:"품목분류·관세 기준은 관세청·전문가 확인이 필요합니다.",expert:false,
+   stages:["y35","y57"]},
+  {id:"e2",area:"export",title:"FTA 활용·원산지 검토",
+   why:"관세 혜택은 원산지 요건 충족 여부에 달려 있습니다. 사전 검토로 가격 경쟁력을 확보합니다.",
+   when:"수출 본격화기",docs:"원산지(포괄)확인서 관련 자료",dur:"검토 2~5주",
+   kpi:"FTA 활용 건수",caution:"협정별 원산지 기준이 달라 정밀 검토가 필요합니다.",expert:true,
+   stages:["y35","y57","y7"]},
+  {id:"e3",area:"export",title:"해외 바이어 발굴·수출바우처 검토",
+   why:"전시·매칭·마케팅 비용을 지원받아 해외 판로를 넓히는 통로입니다.",
+   when:"수출 확대기",docs:"영문 소개자료, 수출계획",dur:"검토 2~4주",
+   kpi:"수출 매출 비중",caution:"지원 가능 여부·범위는 공고 기준 확인이 필요합니다.",expert:false,
+   stages:["y57","y7"]},
+  // digital
+  {id:"d1",area:"digital",title:"CRM/ERP/회계관리 도입 검토",
+   why:"데이터가 쌓여야 자동화·의사결정이 가능해집니다. 규모가 커질수록 수기 운영은 한계가 옵니다.",
+   when:"인원·거래 증가기",docs:"현재 업무 프로세스 정리",dur:"검토 3~6주",
+   kpi:"데이터 관리율",caution:"도구 선택은 업무 적합성 검증이 필요합니다.",expert:false,
+   stages:["y35","y57","y7"]},
+  {id:"d2",area:"digital",title:"스마트공장·공정 데이터화 검토",
+   why:"생산성·품질 개선의 토대입니다. 데이터 기반 운영이 원가 경쟁력으로 이어집니다.",
+   when:"생산 규모 확대기",docs:"공정 현황, 설비 목록",dur:"검토 4~8주",
+   kpi:"생산성 개선율",caution:"수준·범위는 진단 결과에 따라 달라지며 보장되지 않습니다.",expert:false,ind:["mfg"],
+   stages:["y35","y57","y7"]},
+  {id:"d3",area:"digital",title:"AI 활용·업무 자동화 검토",
+   why:"반복업무를 줄이고 데이터를 활용해 의사결정 속도를 높입니다. 작은 영역부터 적용하는 게 안전합니다.",
+   when:"상시",docs:"자동화 후보 업무 목록",dur:"검토 2~4주",
+   kpi:"자동화율",caution:"데이터 보안·개인정보 처리 기준 확인이 필요합니다.",expert:false,
+   stages:["y57","y7"]},
+  {id:"d4",area:"digital",title:"온라인 판매·기본 디지털 도구 세팅",
+   why:"초기에도 온라인 채널·간편결제·기본 협업 도구를 갖추면 거래·운영 속도가 빨라집니다.",
+   when:"창업 초기 ~ 성장기",docs:"판매 채널 후보, 결제수단 목록",dur:"1~3주",
+   kpi:"온라인 채널·결제 세팅 여부",caution:"결제·개인정보 처리 시 관련 고지·약관이 필요합니다.",expert:false,
+   stages:["y1","y13"]},
+  {id:"d5",area:"digital",title:"데이터 보호·정보보안 기초 점검",
+   why:"고객·거래 데이터가 쌓일수록 유출 리스크가 커집니다. 기본 보안 수칙과 백업 체계는 신뢰의 토대입니다.",
+   when:"데이터 축적기",docs:"보유 데이터 목록, 접근권한 현황",dur:"2~4주",
+   kpi:"기본 보안 체크리스트 이행률",caution:"개인정보보호법 등 관련 법령 준수 여부는 전문가 확인이 필요합니다.",expert:false,
+   stages:["y13","y35","y57","y7"]},
+  // 초기 재무 기초
+  {id:"fi3",area:"finance",title:"기초 자금·비용 관리 체계 잡기",
+   why:"초기에 매출·비용·현금을 단순하게라도 기록하면 자금 부족을 미리 감지하고 의사결정 근거가 생깁니다.",
+   when:"창업 직후 ~ 초기",docs:"간이 수입·지출 기록, 통장 거래내역",dur:"1~2주",
+   kpi:"월 단위 수입·지출 기록 여부",caution:"세무 신고 기준은 업종·형태별로 달라 확인이 필요합니다.",expert:false,
+   stages:["y1","y13"]},
+  {id:"fi4",area:"finance",title:"자금 소요·손익분기 추정",
+   why:"언제 흑자로 돌아서는지, 얼마의 운전자금이 필요한지 추정해 두면 자금조달 시점을 놓치지 않습니다.",
+   when:"성장 준비기",docs:"매출·비용 추정 자료",dur:"2~3주",
+   kpi:"손익분기·자금소요 추정서 작성 여부",caution:"추정치는 가정에 따라 달라지며 실제 결과를 보장하지 않습니다.",expert:false,
+   stages:["y13","y35"]},
+  {id:"fi5",area:"finance",title:"투자유치·IR 자료 준비 검토",
+   why:"외부 투자가 필요한 국면이라면 사업·재무를 투자자 관점으로 정리한 IR 자료가 출발점입니다.",
+   when:"성장·확장 자금 필요기",docs:"사업계획, 재무 추정, 시장 자료",dur:"검토 3~6주",
+   kpi:"IR 자료·투자 타당성 검토 여부",caution:"투자유치 성사 여부는 시장·심사 상황에 따라 달라지며 보장되지 않습니다.",expert:true,
+   stages:["y35","y57"]},
+  // 성숙기 지속 활동 (y57/y7)
+  {id:"o1",area:"foundation",title:"조직체계·직무·권한 정비",
+   why:"인원이 늘면 대표 중심 운영이 한계에 옵니다. 직무·권한·프로세스를 정리해야 대표 부재에도 사업이 돌아갑니다.",
+   when:"조직 확대기",docs:"조직도(안), 직무기술 초안",dur:"4~8주",
+   kpi:"핵심 직무·권한 문서화율",caution:"근로·인사 관련 사항은 노무 전문가 검토가 필요합니다.",expert:false,
+   stages:["y35","y57","y7"]},
+  {id:"o2",area:"foundation",title:"사업 다각화·신사업 검토",
+   why:"주력 사업이 성숙기에 접어들면 인접 영역으로 확장이 다음 성장동력이 됩니다. 기존 역량과의 연결이 관건입니다.",
+   when:"성숙·정체기",docs:"기존 역량 목록, 인접시장 자료",dur:"검토 6~10주",
+   kpi:"신사업 후보 검토·타당성 분석 여부",caution:"신사업 성과는 시장 상황에 따라 달라지며 보장되지 않습니다.",expert:true,
+   stages:["y57","y7"]},
+  {id:"o3",area:"foundation",title:"가업승계·지분구조 사전 검토",
+   why:"장수기업으로 가려면 승계·지분 구조를 미리 설계해야 세제·경영권 리스크를 줄일 수 있습니다.",
+   when:"성숙기",docs:"주주 현황, 자산 구조 자료",dur:"검토 4~8주",
+   kpi:"승계·지분 구조 검토서 작성 여부",caution:"승계·증여 세제는 매우 복잡해 세무·법률 전문가 검토가 반드시 필요합니다.",expert:true,
+   stages:["y7"]},
+  {id:"s6",area:"sales",title:"핵심고객 관리·재구매 체계화",
+   why:"신규 확보보다 기존 고객 유지·확대가 성숙기 수익성의 핵심입니다. 이탈 신호를 관리하는 체계가 필요합니다.",
+   when:"고객 기반 확보 후",docs:"고객 거래 이력, 이탈 현황",dur:"3~6주",
+   kpi:"재구매율 / 핵심고객 이탈률",caution:"고객 데이터 활용 시 개인정보 처리 기준을 확인하세요.",expert:false,
+   stages:["y35","y57","y7"]},
+  {id:"m7",area:"marketing",title:"브랜드 리포지셔닝·고도화",
+   why:"성장 단계가 바뀌면 초기 브랜드가 현재 사업과 맞지 않을 수 있습니다. 포지셔닝을 재정비하면 프리미엄·확장 여력이 생깁니다.",
+   when:"성장·성숙기",docs:"현재 브랜드 자산, 고객 인식 자료",dur:"6~10주",
+   kpi:"브랜드 인지도·포지셔닝 정비 여부",caution:"브랜드 성과는 시장 반응에 따라 달라집니다.",expert:false,
+   stages:["y57","y7"]},
+  {id:"m8",area:"marketing",title:"콘텐츠·퍼포먼스 마케팅 체계화",
+   why:"채널별 성과를 측정하고 반복 가능한 마케팅 루틴을 만들면, 광고비가 자산으로 축적됩니다.",
+   when:"매출 확대기",docs:"채널별 성과 데이터",dur:"4~8주",
+   kpi:"채널별 전환율 / 고객획득비용(CAC)",caution:"광고 표현은 과장·부당광고 규정을 확인하세요.",expert:false,
+   stages:["y13","y35","y57"]},
+  {id:"r6",area:"rnd",title:"기술 로드맵·차기 제품 기획",
+   why:"성숙기에도 다음 제품·기술 파이프라인이 없으면 성장이 정체됩니다. 로드맵으로 R&D 투자를 체계화합니다.",
+   when:"제품 성숙기",docs:"기술 현황, 시장 트렌드 자료",dur:"6~10주",
+   kpi:"기술 로드맵·차기 제품 기획서 여부",caution:"기술 개발 성과는 불확실성이 있어 보장되지 않습니다.",expert:false,
+   stages:["y57","y7"]},
+  {id:"c8",area:"cert",title:"ESG·지속가능경영 대응 검토",
+   why:"대기업 협력사·공공조달·수출에서 ESG 요건이 늘고 있습니다. 기초 수준부터 대응하면 거래 기회를 넓힐 수 있습니다.",
+   when:"거래 확대·수출기",docs:"현재 환경·안전·지배구조 현황",dur:"검토 4~8주",
+   kpi:"ESG 자가진단·대응 항목 이행률",caution:"ESG 기준은 산업·거래처별로 달라 요구 사항 확인이 필요합니다.",expert:false,
+   stages:["y35","y57","y7"]},
+  {id:"e4",area:"export",title:"해외 인증·규격 대응 검토",
+   why:"수출 대상국의 인증·규격(CE, FDA 등)을 갖추지 못하면 진입 자체가 막힙니다. 타깃 시장 기준을 먼저 확인해야 합니다.",
+   when:"수출 준비기",docs:"타깃 시장, 제품 스펙 자료",dur:"검토 4~10주",
+   kpi:"타깃국 인증·규격 요건 파악률",caution:"해외 인증 요건은 국가·품목별로 달라 관계 기관 확인이 필요합니다.",expert:true,
+   stages:["y57","y7"]}
+];
+
+/* 활동별 정량 KPI 목표 & 준비율/취득율 측정 방식 */
+const ACT_METRIC = {
+  f1:{target:"사업자 정비 항목 100% 완료",measure:"업종·인허가 체크 8개 항목 중 완료 수 / 8"},
+  f2:{target:"법인 전환 타당성 검토서 1건",measure:"전환 손익·세무 검토 완료=100%"},
+  f3:{target:"표준서류 3종(계약·견적·거래) 완비",measure:"보유 서식 수 / 3"},
+  b1:{target:"수익모델 캔버스 + 고객정의서 완성",measure:"필수 9블록 작성 수 / 9"},
+  b4:{target:"MVP 정의서 + 검증 3회 이상",measure:"검증 실행 횟수 집계"},
+  b2:{target:"사업계획서 완성도 90% 이상",measure:"필수 12개 항목 작성 비율"},
+  b3:{target:"사업부별 손익표 + 정리 후보 도출",measure:"전 사업부 손익 산출 완료율"},
+  s1:{target:"유료 판매 테스트 5건 이상",measure:"실제 결제 전환 건수 집계"},
+  s2:{target:"조달 등록 + 공공 제안 2건 이상",measure:"등록 요건 충족 항목 / 전체"},
+  s3:{target:"제안서 템플릿 + 레퍼런스 3건",measure:"확보 레퍼런스 수 집계"},
+  m1:{target:"홈페이지 오픈 + 핵심페이지 5종",measure:"필수 페이지 구축 수 / 5"},
+  m0:{target:"네이밍 확정 + 한 줄 소개·핵심 메시지",measure:"브랜드 기초 3종 확정 여부"},
+  m2:{target:"상표 출원 1건 / 선행검색 완료",measure:"출원 진행 단계(검색→출원→등록)"},
+  m3:{target:"핵심 채널 1~2개 주 1회 발행",measure:"월 콘텐츠 발행 수 / 목표"},
+  r1:{target:"연구소/전담부서 요건 충족",measure:"인력·공간 요건 항목 충족률"},
+  r2:{target:"지식재산 출원 1건 이상",measure:"출원 단계(검토→출원→등록)"},
+  r3:{target:"R&D 과제계획서 1건 준비",measure:"기획서 필수 항목 작성률"},
+  c1:{target:"ISO 인증 1종 취득 추진",measure:"취득율 = 심사 단계(문서화→내부심사→인증) / 3"},
+  c2:{target:"벤처/이노비즈/메인비즈 1건 신청",measure:"신청요건 충족 항목 / 전체"},
+  c3:{target:"직접생산확인 신청 준비 완료",measure:"품목 요건 충족률"},
+  fi1:{target:"월별 손익·자금표 정례화",measure:"월 마감 완료 개월 수 / 12"},
+  fi2:{target:"정책자금·보증 검토 2건 이상",measure:"검토·신청 건수 집계"},
+  e1:{target:"HS코드 확정 + 수출 준비도 점검",measure:"수출 준비 체크 항목 충족률"},
+  e2:{target:"원산지(포괄)확인서 발급 검토",measure:"FTA 활용 가능 품목 검토율"},
+  e3:{target:"바이어 발굴 + 수출바우처 검토",measure:"발굴 바이어 수 / 컨택 건수"},
+  d1:{target:"CRM 또는 ERP 1종 도입",measure:"도입 단계(선정→도입→정착) / 3"},
+  d2:{target:"스마트공장 수준 진단 1회",measure:"공정 데이터화 항목 충족률"},
+  d3:{target:"자동화 대상 업무 2개 적용",measure:"자동화 적용 업무 수 집계"},
+  d4:{target:"온라인 채널·결제 세팅 완료",measure:"판매 채널·결제 세팅 항목 이행률"},
+  d5:{target:"기본 보안 체크리스트 100% 이행",measure:"보안 점검 항목 중 이행 수 / 전체"},
+  fi3:{target:"월 수입·지출 기록 정착",measure:"월 단위 기록 지속 개월 수"},
+  fi4:{target:"손익분기·자금소요 추정서 1건",measure:"추정 시나리오 작성 완료=100%"},
+  fi5:{target:"IR 자료 초안 + 투자 타당성 검토",measure:"IR 필수 항목 작성률"},
+  o1:{target:"핵심 직무·권한 문서화",measure:"문서화된 직무 수 / 전체 핵심 직무"},
+  o2:{target:"신사업 후보 3건 타당성 검토",measure:"검토 완료 후보 수"},
+  o3:{target:"승계·지분 구조 검토서 1건",measure:"검토 항목 작성 완료=100%"},
+  s6:{target:"재구매율·핵심고객 이탈률 관리 시작",measure:"핵심고객 지표 측정 여부"},
+  m7:{target:"브랜드 포지셔닝 정비안 1건",measure:"포지셔닝·메시지 재정의 완료=100%"},
+  m8:{target:"채널별 CAC·전환율 측정 체계 구축",measure:"성과 측정 채널 수"},
+  r6:{target:"기술 로드맵 + 차기 제품 기획 1건",measure:"로드맵·기획서 작성 완료=100%"},
+  c8:{target:"ESG 자가진단 + 우선 대응 항목 도출",measure:"ESG 점검 항목 이행률"},
+  e4:{target:"타깃국 인증·규격 요건 정리",measure:"요건 파악 완료 항목 수"}
+};
+/* ---------- 5. 점수 엔진 ----------
+   원칙: 체크된 준비현황만 가점. 미입력은 추정하지 않고 0 처리(=정보 부족).
+   영역점수 = min(100, 기반점 + 준비현황 가점 + 단계/매출 신호 보정)
+   종합점수 = Σ(영역점수 × 업종가중치/100) → 자가진단 참고점수 */
+function scoreEngine(d){
+  const w = industryWeights(d.industry);
+
+  /* ── 1) BASELINE: 창업연차·매출·규모로 영역별 기본 기대수준 부여 ──
+     입력이 적어도 현실적 점수가 나오도록. 연차가 쌓이고 매출이 클수록 운영 기반이 형성됐다고 봄. */
+  const stIdx = {pre:0,y1:1,y13:2,y35:3,y57:4,y7:5}[d.stage] ?? 0;   // 0~5
+  const revIdx = Math.max(0, OPT.revenue.findIndex(o=>o.v===d.revenue));// 0~6 (매출없음=0)
+  const empIdx = Math.max(0, OPT.emp.findIndex(o=>o.v===d.emp));        // 0~5
+
+  // 영역별 baseline 가중(연차·매출·규모가 어느 영역의 기대치를 얼마나 끌어올리는가)
+  const BL = {
+    foundation:{base:30, st:6.0, rev:2.0, emp:1.0},  // 연차 들수록 사업자 정비는 됐을 것
+    bm:        {base:28, st:3.5, rev:4.0, emp:1.0},  // 매출 있으면 BM은 어느정도 검증됨
+    sales:     {base:26, st:3.0, rev:4.5, emp:1.5},  // 매출=판로 작동 증거
+    marketing: {base:22, st:3.0, rev:2.5, emp:1.0},
+    rnd:       {base:18, st:3.5, rev:2.0, emp:1.5},
+    cert:      {base:16, st:4.0, rev:1.5, emp:2.0},  // 인증은 연차·규모 영향 큼
+    finance:   {base:22, st:3.5, rev:3.5, emp:1.5},
+    export:    {base:12, st:2.5, rev:2.5, emp:1.5},  // 수출은 기본 기대 낮음
+    digital:   {base:20, st:3.0, rev:2.5, emp:2.5}   // 규모 클수록 시스템 필요
+  };
+  const baseline = {};
+  AREA_KEYS.forEach(a=>{
+    const b = BL[a];
+    baseline[a] = Math.min(72, Math.round(b.base + b.st*stIdx + b.rev*revIdx + b.emp*empIdx));
+  });
+  // 단계 부적합 영역 baseline 감쇠: 예비/초기 단계에서 수출·인증·R&D·재무가 단계상 의미가 약하면 기대치도 낮춤
+  const BL_STAGE_DAMP = {
+    pre: {export:.45,cert:.55,rnd:.7,finance:.75},
+    y1:  {export:.55,cert:.7,rnd:.8,finance:.85}
+  };
+  const damp = BL_STAGE_DAMP[d.stage];
+  if(damp){ AREA_KEYS.forEach(a=>{ if(damp[a]!=null) baseline[a]=Math.round(baseline[a]*damp[a]); }); }
+
+  /* ── 2) 선택입력(준비 현황) 가점: 보유=취득율 반영 ── */
+  const add = {}; const evidence = {};   // evidence: 직접 입력 신호가 있었던 영역
+  AREA_KEYS.forEach(a=>{ add[a]=0; evidence[a]=false; });
+  const allPrep = [...PREP.basic,...PREP.rnd,...PREP.ops];
+  (d.prep||[]).forEach(v=>{
+    const item = allPrep.find(p=>p.v===v);
+    if(item){ add[item.area]+=item.w; evidence[item.area]=true; }
+  });
+
+  // 고객 다양성 → 판로/수출 신호
+  if(["mix","b2b","b2g","global"].includes(d.customer)){ add.sales+=1; evidence.sales=true; }
+  if(d.customer==="global"){ add.export+=3; evidence.export=true; }
+  if(["b2g"].includes(d.customer)){ add.sales+=1; }
+
+  // 고민으로 지목한 영역은 "아직 약하다"는 자기신고 → 해당 영역 baseline 소폭 하향(현실 반영)
+  const concernAreasRaw = (d.concern||[]).map(c=>CONCERN_AREA[c]).filter(Boolean);
+
+  /* ── 3) 영역 점수 = baseline + 선택입력 가점(취득율 반영) − 고민 페널티 ── */
+  const areaScore = {}; const filled = {};
+  AREA_KEYS.forEach(a=>{
+    let s = baseline[a] + add[a]*5.5;
+    if(concernAreasRaw.includes(a)) s -= 6;           // 본인이 약점으로 꼽음
+    s = Math.max(3, Math.min(100, Math.round(s)));
+    areaScore[a]=s;
+    // '정보 부족' 판정: baseline 자체가 낮고(수출 등) 직접 신호도 전혀 없을 때만
+    filled[a] = evidence[a] || baseline[a] >= 24;
+  });
+
+  /* ── 4) 종합 = 업종가중 평균 ── */
+  let total=0;
+  AREA_KEYS.forEach(a=>{ total += areaScore[a]*w[a]/100; });
+  total = Math.round(total);
+
+  // 영역 평균(차트 기준선용)
+  const avg = Math.round(AREA_KEYS.reduce((s,a)=>s+areaScore[a],0)/AREA_KEYS.length);
+
+  // 정보 충실도: 직접 입력(evidence) 비율 — 선택입력을 얼마나 채웠는지
+  const evCnt = AREA_KEYS.filter(a=>evidence[a]).length;
+  const dataDepth = Math.round((( (d.prep||[]).length ) / 19) * 100); // 19개 선택항목 기준
+  const filledCnt = AREA_KEYS.filter(a=>filled[a]).length;
+
+  // R1: 진단 신뢰도 등급 — 직접입력(evidence)이 많을수록↑, 추정 의존도가 낮을수록↑
+  //   evScore: 9개 영역 중 직접 신호가 있는 영역 비율(0~1)
+  const evScore = evCnt / AREA_KEYS.length;
+  //   준비현황 체크 수(0~19)도 신뢰도에 직접 반영 — 몇 개라도 채우면 추정 의존도 감소
+  const prepCnt = (d.prep||[]).length;
+  const prepScore = Math.min(1, prepCnt/8);  // 8개 이상이면 만점
+  const confScore = Math.round((evScore*0.45 + prepScore*0.55) * 100); // 0~100
+  let confTier, confLabel, confDesc;
+  if(confScore >= 50){ confTier="high"; confLabel="높음";
+    confDesc="선택 입력이 충분해 추정 의존도가 낮습니다."; }
+  else if(confScore >= 20){ confTier="mid"; confLabel="보통";
+    confDesc="일부 실데이터가 반영되었습니다. 더 입력하면 정밀도가 올라갑니다."; }
+  else { confTier="low"; confLabel="낮음";
+    confDesc="대부분 창업연차·매출·규모 기반 추정값입니다. 준비 현황을 입력하면 신뢰도가 올라갑니다."; }
+  const confidence = {score:confScore, tier:confTier, label:confLabel, desc:confDesc, evCnt};
+
+  return {w, areaScore, baseline, total, avg, filled, evidence, dataDepth, filledCnt, confidence};
+}
+
+function stageBand(total){
+  if(total<40) return {key:"b0",nm:"기초정비 단계",desc:"기본 인프라부터 정비가 필요한 구간"};
+  if(total<60) return {key:"b1",nm:"성장 준비 단계",desc:"운영 기반을 다지는 구간"};
+  if(total<75) return {key:"b2",nm:"실행 가속 단계",desc:"핵심활동을 본격 실행하는 구간"};
+  if(total<90) return {key:"b3",nm:"확장 가능 단계",desc:"외부자원·판로로 확장하는 구간"};
+  return {key:"b4",nm:"고도화·스케일업 단계",desc:"시스템화·글로벌 도약 구간"};
+}
+function lvlClass(s){ return s>=75?"lvl-good":s>=55?"lvl-mid":s>=35?"lvl-low":"lvl-crit"; }
+
+/* ---------- 6. 추천활동 선정 ----------
+   - 연차 플레이북 focus 영역 + 점수 취약 영역 + 고민 키워드를 종합
+   - 업종 제한(ind) 통과한 활동만
+   - tag: 취약영역(점수<45)이면 'now', 연차 focus면 'soon', 그 외 'plan'
+   - 점수 높을수록(이미 갖춤) 후순위 */
+const CONCERN_AREA = {setup:"foundation",customer:"sales",revenue:"sales",cert:"cert",
+  fund:"finance",rnd:"rnd",export:"export",mkt:"marketing",org:"digital",fin:"finance",dx:"digital"};
+
+/* 업종별 활동 영역 적합도(relevance) 배수 ──
+   1.0=보통, >1=우선 추천, <1=후순위, 0.2 이하=사실상 비추천.
+   예: 전문서비스/콘텐츠/교육은 수출·인증 우선도 낮음, 제조·무역은 수출·인증 높음. */
+const IND_RELEVANCE = {
+  mfg:   {rnd:1.4,cert:1.4,export:1.2,foundation:1.1,digital:1.1,marketing:.8},
+  svc:   {marketing:1.4,sales:1.3,digital:1.2,bm:1.2,cert:.7,export:.3,rnd:.7},
+  retail:{sales:1.4,digital:1.3,marketing:1.2,finance:1.1,export:.5,rnd:.5,cert:.7},
+  food:  {foundation:1.4,marketing:1.3,sales:1.2,cert:1.0,export:.3,rnd:.4},
+  it:    {bm:1.4,rnd:1.3,digital:1.4,sales:1.1,export:.6,cert:.8},
+  platform:{bm:1.4,digital:1.4,rnd:1.2,finance:1.1,export:.5,cert:.7},
+  content:{marketing:1.4,bm:1.3,digital:1.2,sales:1.1,export:.3,cert:.4,rnd:.6},
+  edu:   {marketing:1.3,bm:1.2,sales:1.2,digital:1.1,export:.3,cert:.5,rnd:.6},
+  pro:   {bm:1.3,sales:1.3,marketing:1.2,finance:1.1,digital:1.0,export:.2,cert:.6,rnd:.7}, // 전문서비스: 수출 거의 비추천
+  trade: {export:1.6,cert:1.2,sales:1.2,finance:1.1,foundation:1.0,rnd:.7},
+  etc:   {}
+};
+/* 창업연차별 영역 적합도(relevance) 배수 ──
+   업종 적합도와 곱해져 최종 추천 우선도에 반영.
+   예비/초기: 창업기초·BM·고객·마케팅↑, 수출·인증·R&D·재무는 강하게 억제(아직 단계 아님).
+   성장/성숙: 인증·재무·R&D·수출 적합도 점진 상향. */
+const STAGE_RELEVANCE = {
+  pre: {foundation:1.5,bm:1.5,sales:1.3,marketing:1.1,digital:.9,finance:.45,cert:.3,rnd:.5,export:.15},
+  y1:  {foundation:1.4,bm:1.3,sales:1.4,marketing:1.3,digital:1.0,finance:.6,cert:.45,rnd:.6,export:.2},
+  y13: {foundation:1.0,bm:1.1,sales:1.3,marketing:1.2,digital:1.1,finance:.9,cert:.85,rnd:.9,export:.45},
+  y35: {foundation:.85,bm:1.0,sales:1.1,marketing:1.0,digital:1.1,finance:1.2,cert:1.1,rnd:1.1,export:.8},
+  y57: {foundation:.8,bm:.95,sales:1.0,marketing:.95,digital:1.1,finance:1.2,cert:1.15,rnd:1.15,export:1.1},
+  y7:  {foundation:.8,bm:1.0,sales:.95,marketing:.9,digital:1.15,finance:1.15,cert:1.1,rnd:1.15,export:1.2}
+};
+function stageRelevanceOf(stage, area){
+  const m = STAGE_RELEVANCE[stage]||{};
+  return m[area] ?? 1.0;
+}
+/* 최종 적합도 = 업종 × 단계 */
+function relevanceOf(ind, area, stage){
+  const mi = IND_RELEVANCE[ind]||{};
+  const indRel = mi[area] ?? 1.0;
+  if(stage===undefined) return indRel;
+  return indRel * stageRelevanceOf(stage, area);
+}
+
+function pickActivities(d, sc){
+  const st = d.stage;
+  const focus = STAGE[st].focus;
+  const concernAreas = (d.concern||[]).map(c=>CONCERN_AREA[c]).filter(Boolean);
+
+  const cand = LIB.filter(a=>{
+    if(a.ind && !a.ind.includes(d.industry)) return false;   // 업종 전용 제한
+    if(a.stages && !a.stages.includes(st)) return false;     // 연차 적합
+    const rel = relevanceOf(d.industry, a.area, st);
+    if(rel <= 0.22 && !concernAreas.includes(a.area)) return false; // 업종·단계 부적합 활동 제외(본인 고민이면 유지)
+    return true;
+  }).map(a=>{
+    const areaSc = sc.areaScore[a.area];
+    const rel = relevanceOf(d.industry, a.area, st);
+    let priority = 0;
+    let tag = "plan";
+    // 취약영역 가점 (단, 업종 적합도로 스케일 → 부적합 영역은 취약해도 덜 올라옴)
+    if(areaSc<45){ priority += 40*rel; }
+    else if(areaSc<65){ priority += 20*rel; }
+    if(focus.includes(a.area)){ priority += 25*rel; }
+    if(concernAreas.includes(a.area)){ priority += 30; }   // 본인 고민은 적합도 무관 우선
+    priority += (100-areaSc)*0.15*rel;
+    priority *= (0.5 + rel*0.5);   // 전체에 적합도 반영(부적합 활동 전반 하향)
+    // 태그: 적합도와 점수 종합
+    if(priority>=50 || (concernAreas.includes(a.area)&&areaSc<60)) tag="now";
+    else if(priority>=28 || focus.includes(a.area)) tag="soon";
+    return {...a, _p:priority, _tag:tag, _areaSc:areaSc, _rel:rel};
+  });
+
+  cand.sort((x,y)=>y._p-x._p);
+  // 영역 편중 방지: 같은 영역 기본 2개(예비/초기 단계는 후보가 적어 3개까지 허용)
+  const perAreaCap = (st==="pre"||st==="y1") ? 3 : 2;
+  const out=[]; const cnt={};
+  for(const a of cand){
+    cnt[a.area]=(cnt[a.area]||0);
+    if(cnt[a.area]>=perAreaCap) continue;
+    out.push(a); cnt[a.area]++;
+    if(out.length>=6) break;
+  }
+  if(out.length<6){
+    for(const a of cand){ if(!out.includes(a)){ out.push(a); if(out.length>=6)break; } }
+  }
+  return out;
+}
+
+/* ---------- 7. 90일 / 12개월 / KPI 생성 ---------- */
+function plan90(acts, d){
+  // 추천활동을 우선순위 순으로 3구간에 분배(중복 없이)
+  const sorted = [...acts].sort((a,b)=>b._p-a._p);
+  const phase = [[],[],[]];
+  sorted.forEach((a,i)=>{ phase[Math.min(2, Math.floor(i/Math.ceil(sorted.length/3)))].push(a.title); });
+  // 빈 구간 방지용 보조 작업
+  const aux = [
+    ["현황 자료·서류 정비","우선순위 1·2순위 착수 준비"],
+    ["1순위 활동 실행·중간 점검","초기 성과 지표 기록 시작"],
+    ["다음 분기 계획 수립","KPI 측정 체계 정착"]
+  ];
+  return [
+    {d:"0~30일",t:"착수·기반 정비",items: phase[0].length?phase[0]:aux[0]},
+    {d:"31~60일",t:"핵심활동 실행",items: phase[1].length?phase[1]:aux[1]},
+    {d:"61~90일",t:"확장·성과 점검",items: phase[2].length?phase[2]:aux[2]}
+  ];
+}
+// 연차별 정량 KPI 라이브러리 (현재값은 사용자가 채울 자리, 목표는 단계 표준 방향값)
+const KPI_LIB = {
+  pre:[
+    {name:"고객 인터뷰 누적",unit:"건",g3:"15건+",g12:"40건+",how:"인터뷰 기록 수 집계",eg:"예: 8건",cyc:"월간"},
+    {name:"사업계획서 완성도",unit:"%",g3:"70%",g12:"90%+",how:"필수 항목 작성 비율",eg:"예: 50%",cyc:"월간"},
+    {name:"시장 검증(설문·테스트)",unit:"회",g3:"3회+",g12:"8회+",how:"검증 실행 횟수",eg:"예: 1회",cyc:"월간"},
+    {name:"초기 판매 테스트",unit:"건",g3:"5건+",g12:"20건+",how:"유료 전환 건수",eg:"예: 2건",cyc:"월간"},
+    {name:"창업 준비 체크리스트",unit:"%",g3:"60%",g12:"100%",how:"완료 항목/전체",eg:"예: 40%",cyc:"월간"}
+  ],
+  y1:[
+    {name:"첫 매출 발생",unit:"",g3:"발생",g12:"월 매출 안정화",how:"세금계산서·매출기록",eg:"예: 미발생",cyc:"월간"},
+    {name:"월 고객 문의",unit:"건",g3:"10건+",g12:"30건+",how:"문의 채널 합산",eg:"예: 5건",cyc:"월간"},
+    {name:"월 신규고객",unit:"명",g3:"3명+",g12:"10명+",how:"신규 거래처 수",eg:"예: 1명",cyc:"월간"},
+    {name:"온라인 채널 구축",unit:"개",g3:"홈페이지+1",g12:"3개 채널",how:"운영 채널 수",eg:"예: 0개",cyc:"분기"},
+    {name:"기본서류 준비율",unit:"%",g3:"70%",g12:"100%",how:"표준서류 보유율",eg:"예: 50%",cyc:"분기"}
+  ],
+  y13:[
+    {name:"월 매출 성장률",unit:"%",g3:"전분기 +5%",g12:"전년 +20%",how:"(당월−전월)/전월",eg:"예: +2%",cyc:"월간"},
+    {name:"반복구매율",unit:"%",g3:"15%+",g12:"30%+",how:"재구매 고객/전체",eg:"예: 10%",cyc:"분기"},
+    {name:"월 신규고객",unit:"명",g3:"8명+",g12:"20명+",how:"신규 거래처 수",eg:"예: 4명",cyc:"월간"},
+    {name:"지식재산·인증 검토",unit:"건",g3:"2건+",g12:"4건+",how:"출원·신청 건수",eg:"예: 0건",cyc:"분기"},
+    {name:"정부지원·제안 신청",unit:"건",g3:"2건+",g12:"6건+",how:"신청 건수",eg:"예: 1건",cyc:"분기"}
+  ],
+  y35:[
+    {name:"연 매출 성장률",unit:"%",g3:"+8%",g12:"+25%",how:"(당기−전기)/전기",eg:"예: +5%",cyc:"분기"},
+    {name:"영업이익률",unit:"%",g3:"+2%p",g12:"업종 평균 이상",how:"영업이익/매출",eg:"예: 5%",cyc:"분기"},
+    {name:"정책자금·보증 검토",unit:"건",g3:"2건+",g12:"4건+",how:"검토·신청 건수",eg:"예: 0건",cyc:"분기"},
+    {name:"R&D 과제 신청",unit:"건",g3:"1건+",g12:"3건+",how:"과제 신청 수",eg:"예: 0건",cyc:"반기"},
+    {name:"신규 채널 매출 비중",unit:"%",g3:"10%+",g12:"25%+",how:"신규채널/총매출",eg:"예: 5%",cyc:"분기"}
+  ],
+  y57:[
+    {name:"수출 매출 비중",unit:"%",g3:"5%+",g12:"15%+",how:"수출액/총매출",eg:"예: 0%",cyc:"분기"},
+    {name:"생산성 개선율",unit:"%",g3:"+5%",g12:"+15%",how:"산출/투입 비교",eg:"예: 측정 전",cyc:"분기"},
+    {name:"고객 유지율",unit:"%",g3:"80%+",g12:"88%+",how:"유지고객/전체",eg:"예: 70%",cyc:"분기"},
+    {name:"영업이익률",unit:"%",g3:"+2%p",g12:"+5%p",how:"영업이익/매출",eg:"예: 5%",cyc:"분기"},
+    {name:"신제품·서비스 출시",unit:"건",g3:"1건+",g12:"3건+",how:"출시 건수",eg:"예: 0건",cyc:"반기"}
+  ],
+  y7:[
+    {name:"신규사업 매출 비중",unit:"%",g3:"5%+",g12:"15%+",how:"신규사업/총매출",eg:"예: 3%",cyc:"분기"},
+    {name:"사업부별 영업이익",unit:"",g3:"전부서 흑자화",g12:"핵심부서 +",how:"부서별 손익",eg:"예: 일부 적자",cyc:"분기"},
+    {name:"업무 자동화율",unit:"%",g3:"+10%",g12:"+30%",how:"자동화 업무 비율",eg:"예: 20%",cyc:"분기"},
+    {name:"고객생애가치(LTV)",unit:"",g3:"기준 측정",g12:"+20%",how:"평균 거래액×기간",eg:"예: 미측정",cyc:"반기"},
+    {name:"해외매출 비중",unit:"%",g3:"8%+",g12:"20%+",how:"해외/총매출",eg:"예: 0%",cyc:"분기"}
+  ]
+};
+function roadmap(d, sc){
+  const f = STAGE[d.stage].focus;
+  const nm = a=>AREA[a].short;
+  return [
+    {q:"Q1",span:"1~3개월",theme:"정비",sub:"현황 점검과 기반 정리",items:["기본 서류·데이터 정비", nm(f[0])+" 기반 점검","현황 진단 및 우선순위 확정"]},
+    {q:"Q2",span:"4~6개월",theme:"실행",sub:"핵심활동 본격 착수",items:[nm(f[1]||f[0])+" 핵심활동 착수","90일 실행계획 1차 완료","초기 성과 지표 측정 시작"]},
+    {q:"Q3",span:"7~9개월",theme:"확장",sub:"외부자원·채널 확장",items:[nm(f[2]||f[1]||f[0])+" 확장","외부자원(지원·판로) 검토","채널·고객 다변화"]},
+    {q:"Q4",span:"10~12개월",theme:"고도화",sub:"성과 점검과 시스템화",items:[nm(f[3]||f[0])+" 고도화","연간 성과 점검·차년도 계획","시스템·인증 정비 마무리"]}
+  ];
+}
+function kpiBoard(d, sc){
+  const memo = d.memo||{};
+  const lib = (KPI_LIB[d.stage]||KPI_LIB.y13);
+  const libByName = {}; lib.forEach(k=>{ libByName[k.name]=k; });
+  const kpiData = Array.isArray(memo.kpiData) ? memo.kpiData : null;
+
+  const out = [];
+  const usedNames = new Set();
+
+  if(kpiData && kpiData.length){
+    // 컨설턴트가 STEP4에서 선택/입력한 KPI를 그대로 사용 (이름매칭 없음 = 신뢰성↑)
+    kpiData.forEach(item=>{
+      const k = libByName[item.name];           // 표준 KPI면 목표·산식 채움
+      const hasReal = !!(item.cur && item.cur.length);
+      const m3 = (item.m3&&item.m3.length)? item.m3 : (k? k.g3 : "상담 시 협의");
+      const m3Real = !!(item.m3 && item.m3.length);
+      const m6 = (item.m6&&item.m6.length)? item.m6 : "";   // 6M은 컨설턴트 입력시에만 표시
+      const m6Real = !!(item.m6 && item.m6.length);
+      if(k){
+        out.push({name:k.name, cur: hasReal? item.cur : (k.eg||"예시값"), isReal:hasReal,
+                  g3:m3, g3Real:m3Real, g6:m6, g6Real:m6Real, g12:k.g12, how:k.how, cyc:k.cyc, custom:false});
+      } else {
+        out.push({name:item.name, cur: hasReal? item.cur : "현재값 미입력", isReal:hasReal,
+                  g3:m3, g3Real:m3Real, g6:m6, g6Real:m6Real, g12:"상담 시 협의", how:"내부 데이터·기록", cyc:"분기", custom:true});
+      }
+      usedNames.add(item.name);
+    });
+    // 표준 KPI 중 선택 안 된 것도 참고용으로 보강(최대 6개 채움)
+    lib.forEach(k=>{
+      if(out.length>=6) return;
+      if(usedNames.has(k.name)) return;
+      out.push({name:k.name, cur:(k.eg||"예시값"), isReal:false, g3:k.g3, g3Real:false, g6:"", g6Real:false, g12:k.g12, how:k.how, cyc:k.cyc, custom:false, ref:true});
+    });
+    return out;
+  }
+
+  // 폴백(샘플·공유링크 등 memo.kpiData 없을 때): 표준 단계 KPI 예시값
+  return lib.map(k=>({name:k.name, cur:(k.eg||"예시값"), isReal:false,
+            g3:k.g3, g3Real:false, g6:"", g6Real:false, g12:k.g12, how:k.how, cyc:k.cyc, custom:false}));
+}
+/* ---------- 8. SVG 차트 (순수 SVG, 외부 라이브러리 없음) ---------- */
+function svgRing(total){
+  // 270° 게이지(아래 90° 비움) + 5단계 구간 틱 + 진행 호
+  const cx=86, cy=86, r=68, sw=13;
+  const START=135, SWEEP=270;                 // 시작각/총 스윕(시계방향)
+  const a2r=a=>(a)*Math.PI/180;
+  const pt=(ang,rad)=>[cx+Math.cos(a2r(ang))*rad, cy+Math.sin(a2r(ang))*rad];
+  const arc=(rad,a0,a1)=>{
+    const[x0,y0]=pt(a0,rad),[x1,y1]=pt(a1,rad);
+    const large=(a1-a0)>180?1:0;
+    return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${rad} ${rad} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+  };
+  const trackPath=arc(r,START,START+SWEEP);
+  const valAng=START+SWEEP*(Math.max(0,Math.min(100,total))/100);
+  const fillPath=arc(r,START,valAng);
+  // 단계 경계 틱(40/60/75/90)
+  const ticks=[40,60,75,90].map(v=>{
+    const ang=START+SWEEP*v/100;
+    const[x0,y0]=pt(ang,r-sw/2-1),[x1,y1]=pt(ang,r+sw/2+1);
+    return `<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="rgba(11,27,59,.55)" stroke-width="2"/>`;
+  }).join("");
+  // 끝점 마커
+  const[mx,my]=pt(valAng,r);
+  const len=Math.PI*2*r;  // 근사 dash 길이용
+  return `<svg viewBox="0 0 172 172" role="img" aria-label="종합 참고점수 ${total}점">
+    <defs><linearGradient id="ringG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#16C2A3"/><stop offset=".55" stop-color="#5b8cff"/><stop offset="1" stop-color="#F5B731"/></linearGradient></defs>
+    <path d="${trackPath}" fill="none" stroke="rgba(11,27,59,.10)" stroke-width="${sw}" stroke-linecap="round"/>
+    <path d="${fillPath}" fill="none" stroke="url(#ringG)" stroke-width="${sw}" stroke-linecap="round"
+      pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"
+      style="animation:gaugeFill 1.1s cubic-bezier(.2,.8,.2,1) .15s forwards"/>
+    ${ticks}
+    <circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="6" fill="#fff" stroke="url(#ringG)" stroke-width="2.5"/>
+  </svg>`;
+}
+function svgRadar(areaScore, avg){
+  const keys=AREA_KEYS, n=keys.length, cx=160, cy=158, R=104;
+  const ang=i=>(-90 + i*360/n)*Math.PI/180;
+  const pt=(i,rad)=>[cx+Math.cos(ang(i))*rad, cy+Math.sin(ang(i))*rad];
+  let grid="",ticks="";
+  [0.2,0.4,0.6,0.8,1].forEach(g=>{
+    const pts=keys.map((_,i)=>pt(i,R*g).map(v=>v.toFixed(1)).join(",")).join(" ");
+    grid+=`<polygon points="${pts}" fill="none" stroke="#dbe4f2" stroke-width="${g===1?1.3:1}" opacity="${g===1?.9:.5}"/>`;
+    ticks+=`<text x="${cx+4}" y="${(cy-R*g+4).toFixed(0)}" font-size="9" fill="#aab6cc" font-weight="600">${Math.round(g*100)}</text>`;
+  });
+  // 평균선(점선 다각형)
+  let avgPoly="";
+  if(typeof avg==="number"){
+    const ap=keys.map((_,i)=>pt(i,R*avg/100).map(v=>v.toFixed(1)).join(",")).join(" ");
+    avgPoly=`<polygon points="${ap}" fill="none" stroke="#94a3bf" stroke-width="1.4" stroke-dasharray="4 3" opacity=".8"/>`;
+  }
+  let axes="",labels="";
+  keys.forEach((k,i)=>{
+    const [x,y]=pt(i,R);
+    axes+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#eef2f9" stroke-width="1"/>`;
+    const [lx,ly]=pt(i,R+24); const a=ang(i);
+    const anc = Math.cos(a)>0.25?"start":(Math.cos(a)<-0.25?"end":"middle");
+    let dy=0; if(Math.sin(a)<-0.6)dy=-3; else if(Math.sin(a)>0.6)dy=9;
+    const s=areaScore[k];
+    const sc = s>=70?"#0d9b82":(s>=50?"#2563EB":"#d99a12");
+    labels+=`<text x="${lx.toFixed(1)}" y="${(ly+dy).toFixed(1)}" font-size="11" font-weight="700" fill="#3a4a66" text-anchor="${anc}">${AREA[k].short}</text>`;
+    labels+=`<text x="${lx.toFixed(1)}" y="${(ly+dy+14).toFixed(1)}" font-size="11.5" font-weight="900" fill="${sc}" text-anchor="${anc}">${s}</text>`;
+  });
+  const dpts=keys.map((k,i)=>pt(i,R*areaScore[k]/100).map(v=>v.toFixed(1)).join(",")).join(" ");
+  let dots="";
+  keys.forEach((k,i)=>{ const[x,y]=pt(i,R*areaScore[k]/100); dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" fill="#fff" stroke="#2563EB" stroke-width="2"/>`; });
+  return `<svg viewBox="-44 -6 408 350" role="img" aria-label="9개 영역 점수 레이더 차트">
+    <defs><linearGradient id="radG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="rgba(22,194,163,.34)"/><stop offset="1" stop-color="rgba(37,99,235,.34)"/></linearGradient></defs>
+    ${grid}${axes}${ticks}
+    <polygon points="${dpts}" fill="url(#radG)" stroke="#2563EB" stroke-width="2.2"/>
+    ${avgPoly}${dots}${labels}
+    <text x="160" y="339" font-size="8" fill="#c8d2e0" font-weight="600" text-anchor="middle" opacity="0.8">자가진단 참고용 · 그로스벤처스 · beconic.kr</text></svg>`;
+}
+
+/* ---------- 9. 강·약점 도출 ---------- */
+function strengthsWeak(sc, d){
+  // 단계·업종 적합도 주입(d 없으면 1.0 — 하위호환)
+  const rel = a => d ? relevanceOf(d.industry, a, d.stage) : 1.0;
+  const arr = AREA_KEYS.map(a=>({
+    a, s:sc.areaScore[a], filled:sc.filled[a], gap:sc.areaScore[a]-sc.avg, rel:rel(a)
+  }));
+
+  /* ── 강점: 점수 높고, 지금 단계에서 의미 있는(적합도≥0.8) 영역 ── */
+  const strong = arr
+    .filter(x=> x.s>=Math.max(50,sc.avg) && x.rel>=0.8)
+    .sort((x,y)=> (y.s*y.rel)-(x.s*x.rel))
+    .slice(0,3);
+
+  /* ── 보완 우선도: (점수가 낮을수록) × (지금 단계 적합도가 높을수록) 크게 ──
+     적합도 0.6 미만 영역은 "지금 단계엔 우선과제가 아님"으로 보고 병목에서 제외.
+     예: 예비창업의 수출(0.07)·인증(0.21)은 점수가 낮아도 병목 아님. */
+  const REL_FLOOR = 0.6;
+  const cand = arr.filter(x=> x.rel>=REL_FLOOR);
+  cand.forEach(x=>{ x.wp = (100 - x.s) * x.rel; });   // 보완 우선도
+  const weakSorted = [...cand].sort((x,y)=> y.wp - x.wp);
+  // 평균 미만이거나 적합도 높은데 취약한 영역만 '보완 필요'로
+  const weak = weakSorted.filter(x=> x.s < Math.max(50, sc.avg)).slice(0,3);
+
+  // weakAll: 병목 폴백용(적합도 가중 정렬, 적합도 낮은 영역은 뒤로)
+  const weakAll = [...arr]
+    .map(x=>({...x, wp:(100-x.s)*Math.max(x.rel,0.15)}))
+    .sort((x,y)=> y.wp - x.wp);
+
+  return {strong, weak, weakAll};
+}
+// 강·약점 코멘트 생성 (평균 대비 정량 + 행동 방향)
+function areaComment(a, s, avg, isStrong){
+  const gap = s-avg;
+  const tips = {
+    foundation:["사업자·계약 기반이 잘 잡혀 있어 거래 확장의 토대가 됩니다.","사업자 정비·표준서류부터 갖추면 이후 활동이 빨라집니다."],
+    bm:["수익모델·고객가치가 비교적 명확해 확장 여력이 있습니다.","목표고객·수익모델을 구체화하면 다른 영역도 함께 올라갑니다."],
+    sales:["판로가 작동하고 있어 채널 다변화로 매출을 늘릴 단계입니다.","고객발굴·판로 채널 확보가 가장 시급합니다."],
+    marketing:["브랜드·온라인 노출 기반이 있어 레퍼런스를 쌓기 좋습니다.","홈페이지·검색노출 등 기본 마케팅 인프라부터 갖추세요."],
+    rnd:["기술·제품 차별성이 강점이라 IP·R&D로 연결할 수 있습니다.","제품 차별성·지식재산 검토가 보완되면 경쟁력이 올라갑니다."],
+    cert:["인증 기반이 있어 거래·입찰 신뢰도가 높습니다.","해당 업종 인증 취득률이 낮아 우선 검토가 필요합니다."],
+    finance:["손익·자금 관리 체계가 잡혀 성장 자금 조달에 유리합니다.","손익관리·정책자금 검토로 자금 기반을 다질 시점입니다."],
+    export:["수출 기반이 형성돼 글로벌 확장을 노릴 수 있습니다.","수출 준비도가 낮아 HS코드·바이어 발굴부터 검토하세요."],
+    digital:["데이터·시스템 활용도가 높아 자동화로 효율을 높이기 좋습니다.","CRM·ERP 등 디지털 기반이 약해 수기 운영의 한계가 옵니다."]
+  };
+  const txt = (tips[a]||["",""])[isStrong?0:1];
+  const tag = gap>=0 ? `평균(${avg}점) +${gap}` : `평균(${avg}점) ${gap}`;
+  return {txt, tag};
+}
+
+/* ---------- 10. 결과 보고서 렌더 ---------- */
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]));}
+
+/* ==========================================================================
+   P1. 데이터 레이어 — 진단 결과를 구조화 JSON으로 추출 (렌더/API/내보내기 공용)
+   renderResult는 이 객체를 소비하도록 하고, 향후 Claude API 프롬프트도 이 객체를 입력으로 사용.
+   ========================================================================== */
+function buildDiagnosisData(d, isSample){
+  const sc   = scoreEngine(d);
+  const band = stageBand(sc.total);
+  const acts = pickActivities(d, sc);
+  const sw   = strengthsWeak(sc, d);
+  const p90  = plan90(acts, d);
+  const road = roadmap(d, sc);
+  const kpis = kpiBoard(d, sc);
+
+  const nmOf = (arr,v)=> (arr.find(o=>o.v===v)||{}).t || "-";
+  const profile = {
+    name:      d.name || "우리 회사",
+    biztype:   d.biztype || "",
+    stage:     d.stage,      stageNm:   STAGE[d.stage] ? STAGE[d.stage].nm : "-",
+    ctype:     d.ctype,      ctypeNm:   nmOf(OPT.ctype, d.ctype),
+    industry:  d.industry,   industryNm:nmOf(OPT.industry, d.industry),
+    revenue:   d.revenue,    revenueNm: nmOf(OPT.revenue, d.revenue),
+    emp:       d.emp,        empNm:     nmOf(OPT.emp, d.emp),
+    customer:  d.customer,   customerNm:nmOf(OPT.customer, d.customer),
+    concern:   (d.concern||[]),
+    concernNms:(d.concern||[]).map(c=>nmOf(OPT.concern,c)).filter(Boolean),
+    prepCount: (d.prep||[]).length
+  };
+
+  const areas = AREA_KEYS.map(a=>({
+    key:a, name:AREA[a].short, fullName:AREA[a].nm,
+    score:sc.areaScore[a],
+    vsAvg:sc.areaScore[a]-sc.avg,
+    estimated: (!sc.evidence[a] && sc.baseline[a] < 24)   // 추정 기반 여부
+  }));
+
+  const bottleneckSrc = sw.weak.length ? sw.weak : sw.weakAll.slice(0,3);
+
+  return {
+    meta:{ version:(typeof APP_VERSION!=="undefined"?APP_VERSION:""),
+           generatedAt:new Date().toISOString(), isSample:!!isSample },
+    profile,
+    score:{ total:sc.total, avg:sc.avg, band:band.nm, bandKey:band.key, bandDesc:band.desc,
+            dataDepth:sc.dataDepth, confidence:sc.confidence },
+    areas,
+    strengths:  sw.strong.map(x=>({key:x.a, name:AREA[x.a].short, score:x.s})),
+    bottlenecks:bottleneckSrc.map(x=>({key:x.a, name:AREA[x.a].short, fullName:AREA[x.a].nm,
+                score:x.s, estimated:!sc.filled[x.a]})),
+    activities: acts.map(a=>({ id:a.id, title:a.title, area:a.area, areaName:AREA[a.area].short,
+                timing:a._tag, areaScore:a._areaSc, priority:Math.round(a._p),
+                why:a.why, kpi:a.kpi })),
+    plan90:  p90,
+    roadmap: road,
+    kpis,
+    consultantMemo: d.memo || null,
+    _internal:{ sc, band, acts, sw }   // 렌더 재사용용(직렬화 시 제외 권장)
+  };
+}
+
+/* P4. 룰 기반 서술 요약 — 향후 API가 '다듬을' 초안이자, API 실패 시 폴백 텍스트.
+   점수/병목/강약점을 자연어 1~2문단으로 결정론적으로 생성(할루시네이션 없음). */
+function buildDiagnosisNarrative(diag){
+  const p=diag.profile, s=diag.score;
+  const strongTxt = diag.strengths.length
+    ? diag.strengths.map(x=>x.name).join("·")+" 영역이 상대적으로 앞서 있고"
+    : "아직 두드러진 강점 영역은 나타나지 않았으며";
+  const botTxt = diag.bottlenecks.map(b=>`${b.name}(${b.score}점)`).join(", ");
+  const confTxt = { high:"선택 입력이 충분해 이 진단의 신뢰도는 높은 편",
+                    mid:"일부 실데이터가 반영되어 신뢰도는 보통 수준",
+                    low:"대부분 추정값 기반이라 신뢰도가 낮은 편이므로 참고 강도를 낮춰 해석해야" }[s.confidence.tier];
+
+  const para1 = `${p.industryNm} · ${p.stageNm} · ${p.ctypeNm} 프로파일 기준으로 종합 자가진단 참고점수는 ${s.total}점(${s.band})입니다. `
+    + `${strongTxt}, 지금 단계에서 먼저 보완할 병목은 ${botTxt} 순으로 나타납니다. `
+    + `${confTxt} 합니다.`;
+
+  const first = diag.activities[0];
+  const para2 = first
+    ? `우선 착수할 활동은 '${first.title}'(${first.areaName})이며, ${first.why} `
+      + `이후 90일 동안 착수→실행→점검 순으로 진행하고, 12개월에 걸쳐 ${diag.roadmap.map(r=>r.theme).join("→")}의 흐름으로 확장하는 것을 권장합니다.`
+    : "";
+
+  return { paragraphs:[para1, para2].filter(Boolean), oneLine:para1 };
+}
+
+/* F2/F5. 진단 맥락 기반 상담 CTA 메시지 생성 (균형 강도: 자연스러운 유도) */
+function buildCTA(diag){
+  const p=diag.profile, s=diag.score;
+  const topBot = diag.bottlenecks[0];
+  const expertActs = diag.activities.filter(a=>{
+    const lib=(typeof LIB!=="undefined")?LIB.find(x=>x.id===a.id):null; return lib&&lib.expert;
+  });
+  // 헤드라인: 단계·병목 반영
+  let headline, body;
+  if(s.confidence.tier==="low"){
+    headline = "진단 결과를 실행으로 옮기려면";
+    body = `이 진단은 기본 정보 기반의 방향 제시입니다. ${p.industryNm} ${p.stageNm} 기업의 실제 상황에 맞는 우선순위와 실행 방법은 전문가와 함께 구체화할 수 있습니다.`;
+  } else if(topBot){
+    headline = `'${topBot.name}' 보완, 어떻게 시작할지 막막하다면`;
+    body = `진단 결과 ${topBot.name}(${topBot.score}점)이 지금 단계의 핵심 병목으로 나타났습니다. 무엇을 먼저, 어떤 순서로 실행할지 중기부 인증 상담회사가 함께 정리해 드립니다.`;
+  } else {
+    headline = "이 결과, 실행 계획으로 바꾸고 싶다면";
+    body = `${p.stageNm} 단계에 맞는 우선순위와 90일 실행 계획을 전문가와 함께 구체화할 수 있습니다.`;
+  }
+  // 상담에서 얻는 것(F5) — 진단 맥락 반영
+  const benefits = [
+    `${topBot?topBot.name+" 등 ":""}우선 과제의 구체적 실행 순서`,
+    "우리 기업에 맞는 정부지원사업·인증 방향 검토",
+    expertActs.length? `전문가 검토가 필요한 ${expertActs.length}개 과제 상담` : "90일 실행계획 점검"
+  ];
+  return {headline, body, benefits, hasExpert:expertActs.length};
+}
+
+function renderResult(d, isSample){
+  // 데이터 레이어에서 단일 소스로 산출 (렌더/서술/API 동일 데이터 사용)
+  const diag = buildDiagnosisData(d, isSample);
+  const sc = diag._internal.sc;
+  const band = diag._internal.band;
+  const acts = diag._internal.acts;
+  const sw = diag._internal.sw;
+  const p90 = plan90(acts, d);
+  const road = roadmap(d, sc);
+  const kpis = kpiBoard(d, sc);
+  const narrative = buildDiagnosisNarrative(diag);   // P4: AI 요약 초안(폴백 텍스트)
+  const cta = buildCTA(diag);                         // F2/F5: 맥락 상담 CTA
+
+  const stageNm = diag.profile.stageNm;
+  const indNm = diag.profile.industryNm;
+  const ctypeNm = diag.profile.ctypeNm;
+  const revNm = diag.profile.revenueNm;
+  const empNm = diag.profile.empNm;
+  const custNm = diag.profile.customerNm;
+  const concernNms = diag.profile.concernNms.join(", ")||"-";
+
+  // 컨설턴트 메모 처리
+  const memo = d.memo||{overview:"",tasks:"",kpi:"",risk:""};
+  const memoLines = s=>String(s||"").split(/\n+/).map(x=>x.replace(/^[-·•]\s*/,"").trim()).filter(Boolean);
+  const memoTasks = memoLines(memo.tasks).slice(0,4);
+  const memoKpis = memoLines(memo.kpi).slice(0,6);
+  const hasMemo = !!(memo.overview||memoTasks.length||memoKpis.length||memo.risk);
+
+  // 핵심 병목 3개 = 약점 영역
+  const bottleneck = sw.weak.length?sw.weak:sw.weakAll.slice(0,3);
+  const dataWarn = sc.confidence.tier!=="high";
+  const prepMissing = Math.max(0, 19 - (d.prep||[]).length);
+
+  const tagTxt={now:"지금",soon:"준비",plan:"중장기"};
+  const tagCls={now:"bd-now",soon:"bd-soon",plan:"bd-plan"};
+
+  const sampleTag = isSample
+    ? `<div class="stage-badge" style="background:rgba(91,140,255,.18);color:#9fb1d6;border-color:rgba(91,140,255,.35);margin-bottom:12px">⌾ 가상 예시 — 실제 기업이 아닙니다</div>` : "";
+
+  // 영역 막대
+  // 막대 벤치마크 = 9개 영역 평균선(차트 전체 공통 기준)
+  const bars = AREA_KEYS.map(a=>{
+    const s=sc.areaScore[a]; const cls=lvlClass(s);
+    const lowInfo = !sc.evidence[a] && sc.baseline[a] < 24;  // 정말 근거가 약한 영역만
+    const fl = lowInfo?` <span style="font-size:11px;color:var(--muted);font-weight:700">· 추정 기반</span>`:"";
+    return `<div class="bar-row"><div class="nm">${AREA[a].short}${fl}</div>
+      <div class="bar-track"><div class="bar-fill ${cls}" style="width:${s}%"></div><span class="bar-bench" style="left:${sc.avg}%" title="9개 영역 평균 ${sc.avg}점"></span></div>
+      <div class="pct">${s}</div></div>`;
+  }).join("");
+
+  // 추천활동 카드
+  const actCards = acts.map(a=>{
+    const mt = ACT_METRIC[a.id]||{target:a.kpi,measure:"내부 기록 기반 진척 관리"};
+    return `
+    <div class="act">
+      <div class="head"><h4>${esc(a.title)}</h4><span class="badge ${tagCls[a._tag]}">${tagTxt[a._tag]}</span></div>
+      <p class="why">${esc(a.why)}</p>
+      <div class="meta">
+        <div class="m"><span class="lab">권장 시점</span><span class="val">${esc(a.when)}</span></div>
+        <div class="m"><span class="lab">예상 소요</span><span class="val">${esc(a.dur)}</span></div>
+        <div class="m"><span class="lab">관리 KPI</span><span class="val">${esc(a.kpi)}</span></div>
+        <div class="m"><span class="lab">현재 영역점수</span><span class="val">${a._areaSc}점</span></div>
+      </div>
+      <div class="target-box"><div class="tg-row"><span class="tg-lab">정량 목표</span><span class="tg-val">${esc(mt.target)}</span></div><div class="tg-row"><span class="tg-lab">진척 측정</span><span class="tg-val muted">${esc(mt.measure)}</span></div></div>
+      <div class="docs"><b>준비서류</b> · ${esc(a.docs)}</div>
+      <div class="caution">${esc(a.caution)}</div>
+      ${a.expert?`<a class="expert expert-link no-print" href="tel:07041034177" onclick="try{GAN._track&&GAN._track('cta_expert')}catch(e){}">👤 전문가 검토 권장 · 상담 문의 →</a><div class="expert print-only">👤 전문가 검토 권장</div>`:""}
+    </div>`;}).join("");
+
+  // 우선순위 매트릭스: x=실행용이성(영역점수), y=중요도(우선순위 순서로 균등 분산)
+  // 라벨 겹침 방지를 위해 y를 순위 슬롯으로 배치(위=가장 중요)
+  const sortedByP = [...acts].sort((a,b)=>b._p-a._p);
+  const rankMap = new Map(sortedByP.map((a,idx)=>[a,idx]));
+  const N = acts.length;
+  const mpts = acts.map((a,i)=>{
+    const rank = rankMap.get(a);
+    // y: 1순위가 위(88%)부터 균등 하강, 최소 14%
+    const y = N>1 ? 88 - rank*(74/(N-1)) : 60;
+    // x: 영역점수 기반(실행 용이성), 12~88%
+    let x = 12 + (a._areaSc/100)*76;
+    // 같은 행 근처 x충돌 미세조정(같은 점수대면 살짝 벌림)
+    const cls = a._tag==="now"?"p-now":a._tag==="soon"?"p-soon":"p-plan";
+    const flip = x>52 ? " flip" : "";          // 오른쪽이면 라벨 왼쪽으로
+    return `<div class="mpt ${cls}${flip}" style="left:${x.toFixed(1)}%;bottom:${y.toFixed(1)}%">
+      <div class="pp"></div><div class="tt">${esc(a.title.length>18?a.title.slice(0,17)+"…":a.title)}</div></div>`;
+  }).join("");
+
+  // 90일
+  const phases = p90.map(ph=>`
+    <div class="phase">
+      <div class="ph-top"><span class="badge-d">${ph.d}</span><h4>${esc(ph.t)}</h4></div>
+      <ul>${ph.items.map(t=>`<li><span class="ck"></span>${esc(t)}</li>`).join("")||"<li>해당 단계 권장활동 없음</li>"}</ul>
+    </div>`).join("");
+
+  // 12개월
+  const rq = road.map(r=>`
+    <div class="rq"><div class="qd">${r.q}</div>
+      <div><h5>${r.q} · ${esc(r.theme)} <span style="font-size:11px;color:var(--blue);font-weight:800">(${esc(r.span)})</span></h5><div class="theme">${esc(r.sub)}</div>
+      <ul>${r.items.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div></div>`).join("");
+
+  // KPI 테이블 + 모바일 카드
+  const goalCell=(val,real)=> val&&val.length ? `<td class="goal${real?' gset':''}">${esc(val)}${real?'<span class="gtag">제시</span>':''}</td>` : `<td class="goal gmute">–</td>`;
+  const kpiRows = kpis.map(k=>`<tr${k.custom?' style="background:#f7fbff"':''}>
+    <td class="knm">${esc(k.name)}${k.custom?' <span style="font-size:10.5px;font-weight:800;color:var(--blue);background:#eef4ff;padding:1px 6px;border-radius:5px">컨설턴트</span>':''}</td><td><span class="kpi-cur${k.isReal?' real':''}">${esc(k.cur)}</span></td>
+    ${goalCell(k.g3,k.g3Real)}${goalCell(k.g6,k.g6Real)}<td class="goal">${esc(k.g12)}</td>
+    <td>${esc(k.how)}</td><td><span class="cyc">${esc(k.cyc)}</span></td></tr>`).join("");
+  const goalRow=(lab,val,real)=> val&&val.length ? `<div class="row"><span class="k">${lab}</span><span class="v">${esc(val)}${real?' <span style="font-size:10px;font-weight:800;color:var(--blue)">제시</span>':''}</span></div>` : "";
+  const kpiCardsM = kpis.map(k=>`<div class="kpi-c"><div class="knm">${esc(k.name)}${k.custom?' <span style="font-size:10px;font-weight:800;color:var(--blue)">· 컨설턴트</span>':''}</div>
+    <div class="row"><span class="k">현재값${k.isReal?'':'(예시)'}</span><span class="v"><span class="kpi-cur${k.isReal?' real':''}">${esc(k.cur)}</span></span></div>
+    ${goalRow("3개월 목표",k.g3,k.g3Real)}${goalRow("6개월 목표",k.g6,k.g6Real)}
+    <div class="row"><span class="k">12개월 목표</span><span class="v">${esc(k.g12)}</span></div>
+    <div class="row"><span class="k">측정·점검</span><span class="v">${esc(k.how)} · ${esc(k.cyc)}</span></div></div>`).join("");
+  // ===== 최종 HTML 조립 =====
+  const html = `
+  <div class="result-top">
+    ${sampleTag}
+    <span class="rt-wm">자가진단 참고용 · ${esc((typeof APP_VERSION!=="undefined"?APP_VERSION:""))} · beconic.kr</span>
+    <div class="rt-grid">
+      <div class="score-ring">${svgRing(sc.total)}
+        <div class="lab"><b>${sc.total}<i>점</i></b><span>자가진단 참고점수</span></div></div>
+      <div class="rt-info">
+        <div class="rt-badges">
+          <span class="stage-badge">◆ ${esc(band.nm)}</span>
+          <span class="conf-badge conf-${sc.confidence.tier}" title="${esc(sc.confidence.desc)}">
+            <i class="cf-dot"></i>진단 신뢰도 <b>${sc.confidence.label}</b><small>선택입력 ${sc.dataDepth}%</small></span>
+        </div>
+        <h2>${esc(d.name||"우리 회사")}</h2>
+        <p class="co"><b>${esc(indNm)}</b> · <b>${esc(stageNm)}</b> · ${esc(ctypeNm)} · 주요고객 ${esc(custNm)}</p>
+        <p class="disc-note">표시 점수는 절대평가가 아닌 창업연차·매출·규모 기반의 자가진단 참고점수입니다. <b>진단 신뢰도 ${esc(sc.confidence.label)}</b> — ${esc(sc.confidence.desc)}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- F1: 결과 직후 맥락 상담 CTA (관심 최고점) -->
+  <div class="cta-top no-print">
+    <div class="cta-top-body">
+      <div class="cta-top-lab">전문가 상담</div>
+      <h3>${esc(cta.headline)}</h3>
+      <p>${esc(cta.body)}</p>
+    </div>
+    <a class="btn btn-amber cta-top-btn" href="tel:07041034177" onclick="try{GAN._track&&GAN._track('cta_top')}catch(e){}">
+      <span class="ph-ic">📞</span><span>전화 상담 <b>070-4103-4177</b></span></a>
+  </div>
+
+  <div class="result-actions no-print">
+    <button class="btn btn-sm btn-ghost" onclick="GAN.openReportDialog()">📄 보고서 PDF</button>
+    <button class="btn btn-sm btn-ghost" onclick="GAN.share()">🔗 공유하기</button>
+    <button class="btn btn-sm btn-ghost" onclick="GAN.restart()">↻ 다시 진단하기</button>
+    <div class="view-toggle" id="viewToggle">
+      <button class="on" data-mode="all" onclick="GAN.setMode('all')">전체</button>
+      <button data-mode="core" onclick="GAN.setMode('core')">핵심만</button>
+    </div>
+  </div>
+
+  ${dataWarn?`<div class="lowdata lowdata-${sc.confidence.tier}"><div class="ld-ic">${sc.confidence.tier==="low"?"⚠":"ⓘ"}</div>
+    <div class="ld-body"><b>진단 신뢰도 ${esc(sc.confidence.label)} — 정밀도를 높일 수 있습니다</b>
+    <p>이 진단은 창업연차·매출·규모 기반 <b>추정 비중이 ${sc.confidence.tier==="low"?"큽니다":"일부 있습니다"}</b>. 보유 인증·홈페이지·특허 등 '준비 현황' ${prepMissing>0?`<b>${prepMissing}개 항목</b>을 `:""}추가로 체크하면 추정 의존도가 줄고 결과가 더 정확해집니다.</p>
+    <button class="btn btn-sm btn-line no-print" onclick="GAN.go('diagnose')">선택 입력 채우러 가기 →</button></div></div>`:""}
+
+  <!-- 1. Executive Summary -->
+  <div class="r-sec corekeep">
+    <h3><span class="ix">1</span>핵심 요약 (Executive Summary)</h3>
+    <p class="sub">지금 가장 먼저 봐야 할 것들을 한 페이지로 정리했습니다.</p>
+    <div class="ai-summary">
+      <div class="ai-sum-lab">진단 요약 <span class="ai-sum-src">룰 기반 자동 생성</span></div>
+      ${narrative.paragraphs.map(t=>`<p>${esc(t)}</p>`).join("")}
+    </div>
+    <div class="exec">
+      <div class="col bottleneck"><h4><span class="pl"></span>핵심 병목 3가지</h4><ol>
+        ${bottleneck.map((b,i)=>`<li><span class="n">${i+1}</span><div>${esc(AREA[b.a].nm)} <b style="color:var(--bad)">(${b.s}점)</b>${sc.filled[b.a]?"":" · 추정 기반"}</div></li>`).join("")}
+      </ol></div>
+      <div class="col priority"><h4><span class="pl"></span>90일 우선과제 5가지</h4><ol>
+        ${acts.slice(0,5).map((a,i)=>`<li><span class="n">${i+1}</span><div>${esc(a.title)} <span style="font-size:11.5px;color:var(--muted)">· ${tagTxt[a._tag]}</span></div></li>`).join("")}
+      </ol></div>
+      <div class="col kpi5"><h4><span class="pl"></span>12개월 핵심 KPI 5가지</h4><ol>
+        ${kpis.map((k,i)=>`<li><span class="n">${i+1}</span><div>${esc(k.name)} <span style="font-size:11.5px;color:var(--blue);font-weight:800">→ ${esc(k.g12)}</span></div></li>`).join("")}
+      </ol></div>
+      <div class="col info"><h4><span class="pl"></span>기업 기본정보</h4>
+        <div class="info-table">
+          <div class="k">기업명</div><div class="v">${esc(d.name||"-")}</div>
+          <div class="k">업종/업태</div><div class="v">${esc(indNm)}${d.biztype?" · "+esc(d.biztype):""}</div>
+          <div class="k">창업연차</div><div class="v">${esc(stageNm)}</div>
+          <div class="k">기업유형</div><div class="v">${esc(ctypeNm)}</div>
+          <div class="k">매출구간</div><div class="v">${esc(revNm)}</div>
+          <div class="k">직원 수</div><div class="v">${esc(empNm)}</div>
+          <div class="k">주요 고객</div><div class="v">${esc(custNm)}</div>
+          <div class="k">가장 큰 고민</div><div class="v">${esc(concernNms)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 영역별 진단 -->
+  <div class="r-sec pbreak corekeep">
+    <h3><span class="ix">2</span>9개 영역 진단 결과</h3>
+    <p class="sub">업종(${esc(indNm)}) 가중치를 적용해 9개 영역을 분석했습니다. 점수는 창업연차·매출·규모 기반의 자가진단 참고값이며, 선택 입력(준비 현황)을 추가하면 정밀도가 올라갑니다.</p>
+    <div class="area-grid">
+      <div class="radar-box">${svgRadar(sc.areaScore, sc.avg)}
+        <p style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:6px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;height:3px;background:#2563EB;display:inline-block;border-radius:2px"></span>우리 회사</span>
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;height:0;border-top:2px dashed #94a3bf;display:inline-block"></span>전체 평균 ${sc.avg}점</span>
+        </p></div>
+      <div>
+        <div class="bars">${bars}</div>
+        <p style="font-size:11.5px;color:var(--muted);margin:12px 0 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:18px;height:8px;border-radius:4px;background:linear-gradient(90deg,#7be3d2,#0fb597);display:inline-block"></span>영역 점수</span>
+          <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:2px;height:13px;background:repeating-linear-gradient(180deg,var(--ink-soft) 0 3px,transparent 3px 6px);display:inline-block"></span>9개 영역 평균선(${sc.avg}점)</span>
+        </p>
+        <div class="swot">
+          <div class="b strong"><h5>◆ 상대적 강점</h5><ul>
+            ${sw.strong.length?sw.strong.map(x=>{const c=areaComment(x.a,x.s,sc.avg,true);return `<li><div><b style="color:var(--ink)">${esc(AREA[x.a].nm)} <span style="color:#0d9b82">${x.s}점</span></b> <span style="font-size:11px;color:var(--muted)">· ${c.tag}</span><br><span style="font-size:12.5px;color:var(--ink-soft)">${esc(c.txt)}</span></div></li>`;}).join(""):"<li>현재 두드러진 강점 영역이 없습니다. 선택 입력을 추가하면 강점이 드러날 수 있습니다.</li>"}
+          </ul></div>
+          <div class="b weak"><h5>◆ 보완 필요 (우선순위순)</h5><ul>
+            ${sw.weak.length?sw.weak.map(x=>{const c=areaComment(x.a,x.s,sc.avg,false);return `<li><div><b style="color:var(--ink)">${esc(AREA[x.a].nm)} <span style="color:var(--amber-deep)">${x.s}점</span></b> <span style="font-size:11px;color:var(--muted)">· ${c.tag}</span><br><span style="font-size:12.5px;color:var(--ink-soft)">${esc(c.txt)}</span></div></li>`;}).join(""):"<li>전반적으로 평균 이상으로 균형 잡혀 있습니다.</li>"}
+          </ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 추천활동 -->
+  <div class="r-sec pbreak corekeep">
+    <h3><span class="ix">3</span>${esc(indNm)} · ${esc(stageNm)} 추천활동</h3>
+    <p class="sub">아래는 참고용 방향 제시입니다. 실제 신청·도입 전에는 최신 공고·기준 확인과 전문가 검토가 필요합니다.</p>
+    <div class="act-grid">${actCards}</div>
+  </div>
+
+  ${hasMemo?`<!-- 3.5 컨설턴트 진단 의견 -->
+  <div class="r-sec corekeep">
+    <h3><span class="ix ix-c">✎</span>컨설턴트 진단 의견</h3>
+    <p class="sub">표준 진단 항목에 더해, 상담을 진행한 컨설턴트(또는 대표)가 직접 작성한 맞춤 의견입니다.</p>
+    <div class="consult-box">
+      ${memo.overview?`<div class="cb-block"><div class="cb-lab">◆ 종합 진단 의견</div><p class="cb-text">${esc(memo.overview)}</p></div>`:""}
+      ${memoTasks.length?`<div class="cb-block"><div class="cb-lab">◆ 추가 우선 과제</div><ul class="cb-list">${memoTasks.map((t,i)=>`<li><span class="cb-n">${i+1}</span>${esc(t)}</li>`).join("")}</ul></div>`:""}
+      ${memoKpis.length?`<div class="cb-block"><div class="cb-lab">◆ 별도 관리 KPI</div><ul class="cb-list kpi">${memoKpis.map(t=>`<li><span class="cb-dot"></span>${esc(t)}</li>`).join("")}</ul></div>`:""}
+      ${memo.risk?`<div class="cb-block risk"><div class="cb-lab">⚠ 특이사항·리스크</div><p class="cb-text">${esc(memo.risk)}</p></div>`:""}
+    </div>
+  </div>`:""}
+  <div class="r-sec pbreak">
+    <h3><span class="ix">4</span>우선순위 매트릭스</h3>
+    <p class="sub">세로축은 중요도(긴급도 포함), 가로축은 실행 용이성입니다. 왼쪽 위일수록 먼저 다뤄야 할 과제입니다.</p>
+    <div class="matrix-wrap">
+      <div class="matrix">
+        <span class="qlab tl">◤ 먼저 집중</span><span class="qlab tr">빠른 성과 ◥</span>
+        <span class="qlab bl">◣ 여력 생길 때</span><span class="qlab br">상시 관리 ◢</span>
+        ${mpts}
+        <span class="axis-y">중요·긴급도 →</span>
+      </div>
+      <div class="axis-x">실행 용이성(현재 준비 수준 높을수록 오른쪽) →</div>
+      <div class="matrix-legend">
+        <span><i style="background:var(--bad)"></i>지금 착수</span>
+        <span><i style="background:var(--amber-deep)"></i>준비 단계</span>
+        <span><i style="background:var(--blue)"></i>중장기</span>
+        <span style="color:var(--muted);font-weight:600">· 점은 추천활동, 격자는 25점 구간</span>
+      </div>
+      <!-- 모바일: 순위 리스트로 대체 -->
+      <ol class="matrix-mlist">${sortedByP.map((a,i)=>{
+        const cls=a._tag==="now"?"p-now":a._tag==="soon"?"p-soon":"p-plan";
+        const tg={now:"지금 착수",soon:"준비 단계",plan:"중장기"}[a._tag];
+        return `<li class="${cls}"><span class="mr">${i+1}</span><div class="mtx"><b>${esc(a.title)}</b><small>${esc(AREA[a.area].short)} · ${tg} · 영역점수 ${a._areaSc}점</small></div></li>`;
+      }).join("")}</ol>
+    </div>
+  </div>
+
+  <!-- 5. 90일 -->
+  <div class="r-sec pbreak">
+    <h3><span class="ix">5</span>90일 실행계획</h3>
+    <p class="sub">30·60·90일 단위로 끊어 부담 없이 실행할 수 있게 구성했습니다.</p>
+    <div class="plan90">${phases}</div>
+  </div>
+
+  <!-- 6. 12개월 -->
+  <div class="r-sec pbreak">
+    <h3><span class="ix">6</span>12개월 성장 로드맵</h3>
+    <p class="sub">분기별 테마: Q1 정비(1~3개월) → Q2 실행(4~6개월) → Q3 확장(7~9개월) → Q4 고도화(10~12개월)</p>
+    <div class="road"><div class="road-track">${rq}</div></div>
+  </div>
+
+  <!-- 7. KPI -->
+  <div class="r-sec pbreak">
+    <h3><span class="ix">7</span>KPI 대시보드</h3>
+    <p class="sub">'현재값'은 ${esc(stageNm)} 단계 기업의 <b>통상적인 예시 수치</b>이며, STEP 4에서 실제 수치를 입력하면 <b style="color:#0d9b82">초록색 실제값</b>으로 대체됩니다. <b>현재 → 3개월 → 6개월 → 12개월</b> 진행축으로 관리하며, <b style="color:var(--blue)">'제시'</b> 표시가 붙은 목표는 컨설턴트가 직접 설정한 값입니다. 모든 '목표'는 권장 방향값이며 보장 수치가 아닙니다.</p>
+    <table class="kpi-table"><thead><tr>
+      <th>핵심 지표(KPI)</th><th>현재값</th><th>3개월 목표</th><th>6개월 목표</th><th>12개월 목표</th><th>측정방법(산식)</th><th>점검주기</th>
+    </tr></thead><tbody>${kpiRows}</tbody></table>
+    <div class="kpi-cards">${kpiCardsM}</div>
+  </div>
+
+  <!-- 8. 리스크 -->
+  <div class="r-sec pbreak">
+    <h3><span class="ix">8</span>리스크 및 유의사항</h3>
+    <div class="risk-box"><h4>⚠ 진단 활용 시 유의사항</h4><ul>
+      <li>법률·세무·노무·인증·지원사업 관련 내용은 단정이 아니며, 적용 전 전문가 검토가 필요합니다.</li>
+      <li>인증·정책자금·정부지원사업·수출 관련 기준은 시점·기관별로 달라 최신 공고·법령 확인이 필요합니다.</li>
+      <li>이 진단은 입력값과 단계 기준에 따른 참고용이며, 선택 입력이 적을수록 추정 비중이 커집니다(현재 선택 입력 반영 ${sc.dataDepth}%).</li>
+      <li>표시 점수는 자가진단 참고점수이며, 동종업계 절대평가가 아닙니다.</li>
+    </ul></div>
+  </div>
+
+  <!-- 9. 면책 -->
+  <div class="disclaimer">
+    <p><b>면책조항</b> &nbsp;본 진단 결과는 사용자가 입력한 정보를 바탕으로 한 자가진단 및 방향 제시용 참고자료입니다. 법률, 세무, 회계, 노무, 인증, 정책자금, 정부지원사업 선정 가능성 또는 투자유치 가능성을 보장하지 않습니다. 실제 의사결정 및 신청 전에는 관련 기관의 최신 공고, 법령, 지침을 확인하고 전문가의 검토를 받으시기 바랍니다.</p>
+  </div>
+
+  <!-- 진단기준 공개 -->
+  <div class="r-sec criteria no-print">
+    <details><summary>📐 진단 기준 보기 (점수 산정 방식 공개)</summary>
+      <div class="cbody">
+        <p>이 도구는 정적 룰 기반으로 동작하며, AI가 사실을 추정하거나 실시간 데이터를 가장하지 않습니다.</p>
+        <h5>0) 계수 설계 근거 (방법론)</h5>
+        배점·업종가중치·연차별 적합도 계수는 <b>중기부 인증 중소기업상담회사의 컨설팅 사례와 전문가 경험칙</b>을 바탕으로 설계한 것으로, 특정 통계 표본의 평균이 아닌 <b>실무 우선순위 판단 모델</b>입니다. 예컨대 예비창업 단계에서 수출·인증 가중치를 낮춘 것은 "해당 단계에서 우선순위가 아니다"라는 실무 판단을 반영한 것입니다. 계수는 도구 개선에 따라 갱신될 수 있으며(버전 표기 참조), 절대적·확정적 기준이 아닌 <b>참고용 방향 모델</b>로 이해하시기 바랍니다.
+        <h5>1) 9개 영역 기본 배점(100점)</h5>
+        창업기초 <code>10</code> · 사업모델 <code>15</code> · 고객·판로 <code>15</code> · 마케팅 <code>10</code> · R&D <code>10</code> · 인증·품질 <code>10</code> · 자금·재무 <code>10</code> · 수출·글로벌 <code>10</code> · 디지털·AI <code>10</code>
+        <h5>2) 업종 가중치 보정</h5>
+        업종(${esc(indNm)})에 따라 영역별 가중치를 보정한 뒤 합이 100이 되도록 재정규화합니다. 예: 제조업은 R&D·인증·수출 비중↑, IT/SW는 사업모델·디지털 비중↑.
+        <h5>3) 영역 점수 산정 (baseline + 입력 보정)</h5>
+        각 영역은 <b>창업연차·매출구간·기업규모</b>로 산출한 기본 기대수준(baseline)에서 출발합니다. 여기에 체크한 '준비 현황'(보유 인증·홈페이지·특허 등)을 가점하고, 본인이 '가장 큰 고민'으로 꼽은 영역은 소폭 하향해 현실을 반영합니다. <b>선택 입력을 추가할수록 baseline 추정 의존도가 줄고 정밀도가 올라갑니다.</b> 인증·수출처럼 baseline이 낮고 직접 신호도 없는 영역은 '추정 기반'으로 표시됩니다.
+        <h5>4) 종합 점수 & 평균선</h5>
+        영역점수 × 업종가중치의 가중평균으로 종합 <b>자가진단 참고점수</b>를 산출합니다. 레이더·막대 차트의 점선은 9개 영역 평균선으로, 어느 영역이 평균보다 강하고 약한지 비교용입니다.
+        <h5>5) 진단 신뢰도 산정</h5>
+        결과 상단의 <b>진단 신뢰도</b>는 선택 입력을 얼마나 채웠는지로 산출합니다. 9개 영역 중 직접 신호(준비 현황)가 있는 영역 비율과 준비 현황 체크 수를 종합해 <b>낮음·보통·높음</b> 3등급으로 표시합니다. 선택 입력이 적으면 대부분 창업연차·매출·규모 기반 추정값이므로 신뢰도가 '낮음'으로 표시되며, 이때는 참고 강도를 낮춰 해석하시기 바랍니다.
+        <h5>6) 향후 연동(현재 미연동)</h5>
+        국세청 사업자상태, 공공데이터포털, 중소벤처24, K-Startup, 기업마당, KIPRIS, DART, 나라장터, 관세청, NTIS 등은 향후 연동 대상이며, 현재 버전은 실시간 데이터를 사용하지 않습니다.
+      </div>
+    </details>
+  </div>
+
+  <!-- 전문가 CTA -->
+  <div class="expert-cta no-print">
+    <div>
+      <h3>이 결과, 전문가와 함께 실행 계획으로</h3>
+      <p>진단 결과를 바탕으로 상담하면 다음을 함께 정리합니다. 중기부 인증 중소기업상담회사가 함께합니다.</p>
+      <ul class="cta-benefits">
+        ${cta.benefits.map(b=>`<li>${esc(b)}</li>`).join("")}
+      </ul>
+      <p class="ph">전화 상담 · <b>070-4103-4177</b> · 상담료 없이 방향 안내</p>
+    </div>
+    <a class="btn btn-amber" href="tel:07041034177">전문가 검토가 필요해요</a>
+  </div>
+
+  <div class="print-foot">
+    그로스벤처스 주식회사 · 서울시 구로구 디지털로27길 24, 209호 · 070-4103-4177 · start@gven.kr · www.beconic.kr<br>
+    중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호 · © 2023~2026 growthventures Co., Ltd. · ${APP_VERSION} (${APP_UPDATED}) · 본 자료는 입력정보 기반 자가진단 참고자료이며 어떠한 선정·인증·투자 가능성도 보장하지 않습니다.
+  </div>
+  `;
+  document.getElementById("resultRoot").innerHTML = html;
+}
+/* ---------- 11. 앱 컨트롤러 ---------- */
+const GAN = (function(){
+  let state = {step:1, totalSteps:4, data:{stage:null,ctype:null,industry:null,revenue:null,emp:null,customer:null,concern:[],prep:[],memo:{overview:"",risk:"",kpiData:[]}}, isShared:false, mode:"all", reportInfo:null};
+  const $ = s=>document.querySelector(s);
+  const $$ = s=>document.querySelectorAll(s);
+
+  /* 칩 빌드 */
+  function buildChips(id, opts, key, multi, amber){
+    const box = document.getElementById(id);
+    box.innerHTML = opts.map(o=>`<button type="button" class="chip-btn${amber?' amber':''}" data-v="${o.v}">${o.t}</button>`).join("");
+    box.querySelectorAll(".chip-btn").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const v=btn.dataset.v;
+        if(multi){
+          let arr=state.data[key];
+          if(arr.includes(v)){ arr=arr.filter(x=>x!==v); }
+          else { if(key==="concern" && arr.length>=3){ toast("고민은 최대 3개까지 선택할 수 있어요"); return;} arr=[...arr,v]; }
+          state.data[key]=arr;
+          btn.classList.toggle("sel");
+        } else {
+          state.data[key]=v;
+          box.querySelectorAll(".chip-btn").forEach(b=>b.classList.remove("sel"));
+          btn.classList.add("sel");
+        }
+        clearErr(box);
+        save();
+      });
+    });
+  }
+  /* 토글(준비현황) 빌드 */
+  function buildToggles(){
+    const map={basic:"t-group-basic",rnd:"t-group-rnd",ops:"t-group-ops"};
+    Object.keys(map).forEach(g=>{
+      document.getElementById(map[g]).innerHTML = PREP[g].map(p=>{
+        const indNote = p.ind?` <span style="font-size:10.5px;color:var(--muted)">(해당 업종)</span>`:"";
+        return `<button type="button" class="tg" data-v="${p.v}"><span>${p.t}${indNote}</span><span class="sw"></span></button>`;
+      }).join("");
+    });
+    $$(".tg").forEach(tg=>{
+      tg.addEventListener("click",()=>{
+        const v=tg.dataset.v; let arr=state.data.prep;
+        if(arr.includes(v)) arr=arr.filter(x=>x!==v); else arr=[...arr,v];
+        state.data.prep=arr; tg.classList.toggle("on"); save();
+      });
+    });
+  }
+
+  function clearErr(box){ const f=box.closest(".field"); if(f){f.classList.remove("invalid"); const e=f.querySelector(".err-tip"); if(e)e.classList.remove("on");} }
+  function showErr(key){ const f=document.querySelector(`.field[data-k="${key}"]`); if(f){f.classList.add("invalid"); const e=f.querySelector(".err-tip"); if(e)e.classList.add("on"); f.scrollIntoView({behavior:"smooth",block:"center"});} }
+
+  /* 단계 검증 */
+  function validateStep(n){
+    if(n===1){
+      const name=$("#f-name").value.trim();
+      if(!name){ showErr("name"); return false; } state.data.name=name;
+      state.data.biztype=$("#f-biztype").value.trim();
+      if(!state.data.stage){ showErr("stage"); return false; }
+      if(!state.data.ctype){ showErr("ctype"); return false; }
+      if(!state.data.industry){ showErr("industry"); return false; }
+    }
+    if(n===2){
+      if(!state.data.revenue){ showErr("revenue"); return false; }
+      if(!state.data.emp){ showErr("emp"); return false; }
+      if(!state.data.customer){ showErr("customer"); return false; }
+      if(!state.data.concern.length){ showErr("concern"); return false; }
+    }
+    return true;
+  }
+
+  function showStep(n){
+    state.step=n;
+    [1,2,3,4].forEach(i=>{ const el=document.getElementById("fstep-"+i); if(el) el.style.display = i===n?"block":"none"; });
+    $("#progNow").textContent=n; $("#progTot").textContent=state.totalSteps;
+    $("#progFill").style.width=(n/state.totalSteps*100)+"%";
+    $("#btnPrev").style.visibility = n===1?"hidden":"visible";
+    $("#btnNext").textContent = n===state.totalSteps?"진단 결과 보기":"다음 단계";
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function nextStep(){
+    if(!validateStep(state.step)) return;
+    if(state.step<state.totalSteps){
+      const target=state.step+1;
+      if(target===4){ collectBasics(); populateStep4(); }
+      showStep(target);
+    }
+    else { runDiagnosis(); }
+  }
+  function prevStep(){ if(state.step>1) showStep(state.step-1); }
+
+  /* STEP1~3 입력을 state.data에 반영(이름·업태) — STEP4 분석 전 보장 */
+  function collectBasics(){
+    state.data.name = ($("#f-name").value||"").trim() || state.data.name;
+    state.data.biztype = ($("#f-biztype").value||"").trim();
+  }
+
+  /* ── STEP4 동적 체크리스트: 즉석 진단으로 추천 우선과제·KPI 생성 ── */
+  let _picks = {tasks:new Set(), kpis:new Set(), custTasks:[], custKpis:[], kpiVals:{}};
+  function populateStep4(){
+    const d=state.data;
+    let sc, acts;
+    try{ sc=scoreEngine(d); acts=pickActivities(d,sc); }
+    catch(e){ return; }
+    const band=stageBand(sc.total);
+    const sw=strengthsWeak(sc, d);
+    const indNm=(OPT.industry.find(o=>o.v===d.industry)||{}).t||"-";
+    const stageNm=STAGE[d.stage].nm;
+
+    // 사전 분석 요약 패널
+    const weakTop=(sw.weak.length?sw.weak:sw.weakAll.slice(0,3)).slice(0,3);
+    const presum=document.getElementById("c-presum");
+    if(presum){
+      presum.innerHTML=`
+        <div class="ps-head"><span class="ps-ai">AI 사전 분석</span><span class="ps-band">◆ ${esc(band.nm)} · 참고점수 ${sc.total}점</span></div>
+        <p class="ps-line">${esc(indNm)} · ${esc(stageNm)} 기준으로 분석한 결과, 지금 단계에서 가장 먼저 보완할 영역은 다음과 같습니다.</p>
+        <div class="ps-weak">${weakTop.map(w=>`<span class="ps-chip">${esc(AREA[w.a].short)} <b>${w.s}점</b></span>`).join("")}</div>
+        <p class="ps-note">아래 추천 과제·KPI는 위 분석을 반영해 자동 제안된 항목입니다. 상담 맥락에 맞게 선택·보완하세요.</p>`;
+    }
+
+    // 추천 우선과제: 추천활동 상위 + 약점영역 보완문구
+    const taskCands = acts.slice(0,6).map(a=>({
+      key:"act:"+a.id, label:a.title, sub:`${AREA[a.area].short} · ${({now:"지금 착수",soon:"준비 단계",plan:"중장기"})[a._tag]}`
+    }));
+    // 기본 채택: 상위 3개 자동 체크
+    if(_picks.tasks.size===0 && !_picks._touchedT){ taskCands.slice(0,3).forEach(t=>_picks.tasks.add(t.key)); }
+    renderPick("c-task-pick", taskCands, _picks.tasks, _picks.custTasks, "task");
+
+    // 추천 KPI: 단계 표준 KPI
+    const kpiLib=(KPI_LIB[d.stage]||KPI_LIB.y13);
+    const kpiCands=kpiLib.map(k=>({key:"kpi:"+k.name, label:k.name, sub:`12개월 목표 ${k.g12} · ${k.cyc}`}));
+    // KPI별 입력 메타(단위·예시) — 인라인 현재값 입력칸 placeholder용
+    const kpiMeta={}; kpiLib.forEach(k=>{ kpiMeta[k.name]={unit:k.unit||"", eg:(k.eg||"").replace(/^예:\s*/,""), g12:k.g12||""}; });
+    if(_picks.kpis.size===0 && !_picks._touchedK){ kpiCands.slice(0,4).forEach(k=>_picks.kpis.add(k.key)); }
+    renderPick("c-kpi-pick", kpiCands, _picks.kpis, _picks.custKpis, "kpi", kpiMeta);
+
+    // 추가 입력 핸들러 1회 바인딩
+    bindAdd("c-task-add","c-task-addbtn",_picks.custTasks,()=>renderPick("c-task-pick",taskCands,_picks.tasks,_picks.custTasks,"task"));
+    bindAdd("c-kpi-add","c-kpi-addbtn",_picks.custKpis,()=>renderPick("c-kpi-pick",kpiCands,_picks.kpis,_picks.custKpis,"kpi",kpiMeta));
+  }
+  function renderPick(containerId, cands, selSet, customArr, kind, meta){
+    const box=document.getElementById(containerId); if(!box) return;
+    meta=meta||{};
+    const valInput=(label)=>{
+      if(kind!=="kpi") return "";
+      const m=meta[label]||{};
+      const ph=m.eg?esc(m.eg):"현재값";
+      const unit=m.unit?`<span class="vu">${esc(m.unit)}</span>`:"";
+      const v=_picks.kpiVals[label]||{};
+      const g12=m.g12?esc(m.g12):"";
+      const fld=(stg,lab,phh)=>`<div class="vcol"><span class="vl">${lab}</span>
+        <div class="vin"><input type="text" class="vinput" data-kpi="${esc(label)}" data-stg="${stg}" value="${v[stg]!=null?esc(v[stg]):""}" placeholder="${phh}" maxlength="20">${unit}</div></div>`;
+      return `<div class="pval3">
+        ${fld("cur","현재값",ph)}
+        ${fld("m3","3개월","목표(선택)")}
+        ${fld("m6","6개월","목표(선택)")}
+        ${g12?`<div class="vcol vref"><span class="vl">12개월</span><div class="vstd">${g12}<small>표준</small></div></div>`:""}
+      </div>
+      <div class="kwarn" data-kwarn="${esc(label)}">${kpiWarnHTML(label)}</div>`;
+    };
+    const items=cands.map(c=>{
+      const on=selSet.has(c.key);
+      return `<div class="pickwrap${on?' on':''}">
+        <button type="button" class="pick${on?' on':''}" data-k="${esc(c.key)}">
+        <span class="pchk"></span><span class="ptx"><b>${esc(c.label)}</b><small>${esc(c.sub||"")}</small></span></button>
+        ${on?valInput(c.label):""}</div>`;
+    }).join("");
+    const customs=customArr.map((t,i)=>`<div class="pickwrap on">
+      <button type="button" class="pick on custom" data-ci="${i}" data-kind="${kind}">
+      <span class="pchk"></span><span class="ptx"><b>${esc(t)}</b><small>직접 추가 · 다시 누르면 삭제</small></span></button>
+      ${valInput(t)}</div>`).join("");
+    box.innerHTML=items+customs;
+    box.querySelectorAll(".pick:not(.custom)").forEach(btn=>btn.addEventListener("click",()=>{
+      const k=btn.dataset.k;
+      if(selSet.has(k)) selSet.delete(k); else selSet.add(k);
+      if(kind==="task") _picks._touchedT=true; else _picks._touchedK=true;
+      _refreshPicks(); save();
+    }));
+    box.querySelectorAll(".pick.custom").forEach(btn=>btn.addEventListener("click",()=>{
+      const i=+btn.dataset.ci; const removed=customArr[i]; customArr.splice(i,1);
+      if(kind==="kpi" && removed!=null) delete _picks.kpiVals[removed];
+      _refreshPicks(); save();
+    }));
+    // KPI 현재값/목표 입력 바인딩 (+ R4 과도목표 경고 실시간 갱신)
+    box.querySelectorAll(".vinput").forEach(inp=>{
+      inp.addEventListener("input",()=>{
+        const k=inp.dataset.kpi, stg=inp.dataset.stg;
+        if(!_picks.kpiVals[k]) _picks.kpiVals[k]={};
+        _picks.kpiVals[k][stg]=inp.value.trim();
+        const warnEl=box.querySelector(`.kwarn[data-kwarn="${cssEsc(k)}"]`);
+        if(warnEl) warnEl.innerHTML=kpiWarnHTML(k);
+        save();
+      });
+    });
+  }
+  // 문자열 앞부분 숫자 추출 ("+120%"→120, "21일"→21, "1,200건"→1200)
+  function numOf(str){
+    if(str==null) return null;
+    const m=String(str).replace(/,/g,"").match(/-?\d+(\.\d+)?/);
+    return m? parseFloat(m[0]) : null;
+  }
+  function cssEsc(s){ return String(s).replace(/["\\]/g,"\\$&"); }
+  // R4: 현재값 대비 3M/6M 목표가 과도(≥3배)하면 경고 문구 반환
+  function kpiWarnHTML(label){
+    const v=_picks.kpiVals[label]||{};
+    const cur=numOf(v.cur);
+    if(cur==null || cur===0) return "";   // 현재값 없거나 0이면 비교 불가
+    const checks=[["m3","3개월"],["m6","6개월"]];
+    const hot=[];
+    checks.forEach(([stg,lab])=>{
+      const t=numOf(v[stg]);
+      if(t!=null && cur>0 && t >= cur*3){
+        hot.push(`${lab} 목표가 현재값의 ${(t/cur).toFixed(1)}배`);
+      }
+    });
+    if(!hot.length) return "";
+    return `<span class="kw"><i>⚠</i>${esc(hot.join(", "))} — 단기간 과도한 목표일 수 있습니다. 근거를 함께 확인하세요. <small>(보장 아님)</small></span>`;
+  }
+  // 전체 픽 리스트 재렌더(체크/추가/삭제 후 입력칸 동기화)
+  function _refreshPicks(){ if(state.step===4) populateStep4(); }
+  function bindAdd(inputId, btnId, arr, after){
+    const inp=document.getElementById(inputId), btn=document.getElementById(btnId);
+    if(!inp||!btn||inp._bound) return; inp._bound=true;
+    const add=()=>{ const v=inp.value.trim(); if(!v) return; if(arr.length>=6){ toast("최대 6개까지 추가할 수 있어요"); return; }
+      if(!arr.includes(v)) arr.push(v); inp.value=""; after(); save(); };
+    btn.addEventListener("click",add);
+    inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); add(); } });
+  }
+
+  function collectMemo(){
+    const g=id=>{const e=document.getElementById(id);return e?e.value.trim():"";};
+    // 추천 우선과제: 체크된 표준 과제 라벨 + 직접추가
+    const taskLabels=[];
+    document.querySelectorAll("#c-task-pick .pick.on:not(.custom)").forEach(b=>{
+      const t=b.querySelector(".ptx b"); if(t) taskLabels.push(t.textContent.trim());
+    });
+    _picks.custTasks.forEach(t=>taskLabels.push(t));
+    // 추천 KPI: 체크된 표준 KPI + 직접추가, 각 KPI의 현재/3M/6M 값까지 함께 수집
+    const kpiLabels=[]; const kpiData=[];
+    const gv=nm=>{ const o=_picks.kpiVals[nm]||{}; return {cur:(o.cur||"").trim(), m3:(o.m3||"").trim(), m6:(o.m6||"").trim()}; };
+    document.querySelectorAll("#c-kpi-pick .pick.on:not(.custom)").forEach(b=>{
+      const t=b.querySelector(".ptx b"); if(t){ const nm=t.textContent.trim(); kpiLabels.push(nm);
+        kpiData.push(Object.assign({name:nm, custom:false}, gv(nm))); }
+    });
+    _picks.custKpis.forEach(t=>{ kpiLabels.push(t); kpiData.push(Object.assign({name:t, custom:true}, gv(t))); });
+    state.data.memo={
+      overview:g("c-memo-overview"),
+      tasks:taskLabels.slice(0,8).join("\n"),
+      kpi:kpiLabels.slice(0,8).join("\n"),
+      kpiData:kpiData.slice(0,8),
+      risk:g("c-memo-risk")
+    };
+  }
+  function runDiagnosis(){
+    state.isShared=false;
+    collectMemo();
+    renderResult(state.data, false);
+    go("result"); applyMode();
+  }
+
+  /* 뷰 전환 */
+  function go(view){
+    $$(".view").forEach(v=>v.classList.remove("on"));
+    const map={home:"v-home",diagnose:"v-diagnose",result:"v-result"};
+    const el=document.getElementById(map[view]); if(el) el.classList.add("on");
+    if(view==="diagnose"){ showStep(state.isShared?1:state.step); state.isShared=false; }
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function toggleCol(id){ document.getElementById(id).classList.toggle("open");
+    const b=document.querySelector("#"+id+" .collapse-b");
+    if(b){ b.style.maxHeight = document.getElementById(id).classList.contains("open")? b.scrollHeight+40+"px":"0"; }
+  }
+
+  /* 핵심만/전체 보기 */
+  function setMode(m){ state.mode=m;
+    document.querySelectorAll("#viewToggle button").forEach(b=>b.classList.toggle("on", b.dataset.mode===m));
+    applyMode();
+  }
+  function applyMode(){
+    const core = state.mode==="core";
+    document.querySelectorAll("#v-result .r-sec").forEach(s=>{
+      if(core){ s.style.display = s.classList.contains("corekeep")?"block":"none"; }
+      else s.style.display="block";
+    });
+  }
+
+  /* 토스트 */
+  let tT;
+  function toast(msg){ const t=$("#toast"); $("#toastMsg").textContent=msg; t.classList.add("on");
+    clearTimeout(tT); tT=setTimeout(()=>t.classList.remove("on"),2200); }
+
+  /* 공유: Web Share → URL 복사 */
+  function share(){
+    // R2: 기업명 포함 여부를 먼저 선택
+    const ov=document.getElementById("shareOv");
+    if(!ov){ doShare(false); return; }
+    ov.classList.add("on"); ov.setAttribute("aria-hidden","false");
+  }
+  function doShare(includeName){
+    const ov=document.getElementById("shareOv");
+    if(ov){ ov.classList.remove("on"); ov.setAttribute("aria-hidden","true"); }
+    const url=buildShareURL(includeName);
+    const payload={title:"기업 성장활동 진단 내비게이터", text:"성장활동 진단 결과를 확인해 보세요.", url};
+    if(navigator.share){ navigator.share(payload).catch(()=>{}); }
+    else { copy(url); }
+  }
+  function bindShareDialog(){
+    const ov=document.getElementById("shareOv"); if(!ov||ov._bound) return; ov._bound=true;
+    ov.querySelectorAll(".sm-opt").forEach(b=>b.addEventListener("click",()=>doShare(b.dataset.name==="1")));
+    const c=document.getElementById("shareCancel");
+    if(c) c.addEventListener("click",()=>{ ov.classList.remove("on"); ov.setAttribute("aria-hidden","true"); });
+    ov.addEventListener("click",e=>{ if(e.target===ov){ ov.classList.remove("on"); ov.setAttribute("aria-hidden","true"); } });
+  }
+  function copy(text){
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(()=>toast("링크 복사됨 · 링크에 입력정보가 포함됩니다")).catch(()=>fallbackCopy(text)); }
+    else fallbackCopy(text);
+  }
+  function fallbackCopy(text){ const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
+    try{document.execCommand("copy"); toast("링크가 복사되었습니다");}catch(e){toast("복사를 지원하지 않는 환경입니다");} document.body.removeChild(ta); }
+
+  const SERVICE_URL = "https://beconic-diagnosis-business-growth.netlify.app/";
+  function getBaseURL(){ try{ const o=location.origin; if(o&&o.startsWith("http")) return location.origin+location.pathname; }catch(e){} return SERVICE_URL; }
+  function buildShareURL(includeName){
+    try{
+      const d=state.data;
+      const payload={s:d.stage,c:d.ctype,i:d.industry,bt:d.biztype,r:d.revenue,e:d.emp,cu:d.customer,co:d.concern,p:d.prep};
+      if(includeName && d.name) payload.n=d.name;   // R2: 기업명은 명시적 동의 시에만 포함
+      const enc=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+      return getBaseURL()+"#r="+enc;
+    }catch(e){ return getBaseURL(); }
+  }
+  function tryLoadFromHash(){
+    if(!location.hash.startsWith("#r=")) return false;
+    try{
+      const raw=decodeURIComponent(location.hash.slice(3));
+      const p=JSON.parse(decodeURIComponent(escape(atob(raw))));
+      state.data={name:p.n,stage:p.s,ctype:p.c,industry:p.i,biztype:p.bt||"",revenue:p.r,emp:p.e,customer:p.cu,concern:p.co||[],prep:p.p||[]};
+      state.isShared=true;
+      if(!state.data.stage||!state.data.industry||!state.data.revenue) return false;
+      renderResult(state.data,false); go("result"); applyMode();
+      return true;
+    }catch(e){ return false; }
+  }
+
+  /* PDF 보고서 */
+  function openReportDialog(){
+    const ov=document.getElementById("reportOv");
+    if(!ov){ printPDF(); return; }
+    // 진단 기업명으로 프리필
+    const cl=document.getElementById("rep-client");
+    if(cl && !cl.value && state.data.name) cl.value=state.data.name;
+    ov.classList.add("on"); ov.setAttribute("aria-hidden","false");
+  }
+  function collectReportInfo(){
+    const g=id=>{const e=document.getElementById(id);return e?e.value.trim():"";};
+    const client=g("rep-client")||state.data.name||"수신처 미지정";
+    return {
+      client, manager:g("rep-manager"), dept:g("rep-dept"),
+      confid:g("rep-confid")||"대외 참고용", purpose:g("rep-purpose")||"경영 진단 참고",
+      docNo: makeDocNo(), date: fmtDate(new Date())
+    };
+  }
+  function makeDocNo(){
+    const d=new Date(); const y=d.getFullYear();
+    const seq=String(Math.floor(d.getTime()/1000)%10000).padStart(4,"0");
+    return `GVEN-${y}-${seq}`;
+  }
+  function fmtDate(d){ return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`; }
+  function bindReportDialog(){
+    const ov=document.getElementById("reportOv"); if(!ov||ov._bound) return; ov._bound=true;
+    const close=()=>{ ov.classList.remove("on"); ov.setAttribute("aria-hidden","true"); };
+    const gen=document.getElementById("repGenerate");
+    if(gen) gen.addEventListener("click",()=>{ state.reportInfo=collectReportInfo(); close();
+      try{GAN._track&&GAN._track('report_pdf')}catch(e){}
+      buildReportShell(); printPDF(); });
+    const c=document.getElementById("reportCancel");
+    if(c) c.addEventListener("click",close);
+    ov.addEventListener("click",e=>{ if(e.target===ov) close(); });
+  }
+  // 인쇄 전용 표지·문서정보·목차를 결과 앞에 주입
+  function buildReportShell(){
+    const root=document.getElementById("resultRoot"); if(!root) return;
+    if(!GAN_LOGO){ try{ const li=document.querySelector(".brand .mk img"); if(li) GAN_LOGO=li.getAttribute("src")||li.src||""; }catch(e){} }
+    const old=document.getElementById("reportShell"); if(old) old.remove();
+    const ri=state.reportInfo||collectReportInfo();
+    const d=state.data;
+    const nmOf=(arr,v)=>{const o=(arr||[]).find(x=>x.v===v);return o?o.t:"-";};
+    const indNm=nmOf(OPT.industry,d.industry), stageNm=(STAGE[d.stage]||{}).nm||"-";
+    const sc=scoreEngine(d);
+    const shell=document.createElement("div");
+    shell.id="reportShell"; shell.className="report-shell print-only-block";
+    shell.innerHTML=`
+      <!-- 표지 -->
+      <section class="rp-cover">
+        <div class="rp-cover-mid">
+          <div class="rp-doctype">기업 성장활동 진단 보고서</div>
+          <h1>${esc(ri.client)}</h1>
+          <p class="rp-subtitle">${esc(indNm)} · ${esc(stageNm)} · 9개 영역 성장활동 진단 결과</p>
+          <div class="rp-score-line">종합 자가진단 참고점수 <b>${sc.total}점</b> · 진단 신뢰도 ${esc(sc.confidence.label)}</div>
+        </div>
+        <div class="rp-cover-top">
+          <div class="rp-logo-row"><span class="rp-logo"><img src="${GAN_LOGO}" alt=""></span>
+            <div><b>그로스벤처스 주식회사</b><small>중소벤처기업부 인증 중소기업상담회사 제2025-684호</small></div></div>
+          <div class="rp-confid">${esc(ri.confid)}</div>
+        </div>
+        <div class="rp-cover-bottom">
+          <table class="rp-recv">
+            <tr><th>수 신</th><td>${esc(ri.client)}${ri.dept?" / "+esc(ri.dept):""}</td></tr>
+            ${ri.manager?`<tr><th>담당자</th><td>${esc(ri.manager)}</td></tr>`:""}
+            <tr><th>작성기관</th><td>그로스벤처스 주식회사 (Beconic)</td></tr>
+            <tr><th>작성목적</th><td>${esc(ri.purpose)}</td></tr>
+            <tr><th>작성일자</th><td>${esc(ri.date)}</td></tr>
+          </table>
+        </div>
+      </section>
+      <!-- 문서 정보 -->
+      <section class="rp-docinfo">
+        <h2>문서 정보</h2>
+        <table class="rp-info-table">
+          <tr><th>진단유형</th><td>기업 성장활동 자가진단</td><th>진단영역</th><td>9개 영역 종합</td></tr>
+          <tr><th>작성일</th><td>${esc(ri.date)}</td><th>기밀등급</th><td>${esc(ri.confid)}</td></tr>
+          <tr><th>수신처</th><td>${esc(ri.client)}</td><th>작성기관</th><td>그로스벤처스㈜</td></tr>
+        </table>
+        <p class="rp-disclaimer">본 보고서는 사용자 입력정보를 기반으로 한 자가진단 참고자료입니다. 표시된 점수·목표·추천은 절대평가나 확정된 결과가 아니며, 어떠한 선정·인증·투자·보증 가능성도 보장하지 않습니다. 실제 의사결정 전 관계 기관의 최신 공고·법령 및 전문가 검토를 받으시기 바랍니다.</p>
+      </section>
+      <!-- 목차 -->
+      <section class="rp-toc">
+        <h2>목 차</h2>
+        <ol class="rp-toc-list">
+          <li><span class="toc-t">핵심 요약 (Executive Summary)</span><span class="toc-dots"></span><span class="toc-p">3</span></li>
+          <li><span class="toc-t">9개 영역 진단 결과</span><span class="toc-dots"></span><span class="toc-p">4</span></li>
+          <li><span class="toc-t">업종·단계 맞춤 추천활동</span><span class="toc-dots"></span><span class="toc-p">6</span></li>
+          <li><span class="toc-t">우선순위 매트릭스</span><span class="toc-dots"></span><span class="toc-p">7</span></li>
+          <li><span class="toc-t">90일 실행 계획</span><span class="toc-dots"></span><span class="toc-p">8</span></li>
+          <li><span class="toc-t">12개월 성장 로드맵</span><span class="toc-dots"></span><span class="toc-p">9</span></li>
+          <li><span class="toc-t">핵심 지표(KPI) 관리 대시보드</span><span class="toc-dots"></span><span class="toc-p">10</span></li>
+          <li><span class="toc-t">리스크 및 유의사항</span><span class="toc-dots"></span><span class="toc-p">11</span></li>
+        </ol>
+        <p class="rp-toc-note">※ 페이지 번호는 표준 구성 기준이며, 입력 내용에 따라 일부 달라질 수 있습니다.</p>
+      </section>`;
+    root.insertBefore(shell, root.firstChild);
+    document.body.classList.add("reportmode");
+  }
+
+  function printPDF(){ const m=state.mode; state.mode="all"; applyMode(); setTimeout(()=>{ window.print(); state.mode=m; applyMode(); document.body.classList.remove("reportmode"); },200); }
+
+  /* 다시 진단 */
+  function restart(){
+    state.step=1; state.isShared=false;
+    state.data={stage:null,ctype:null,industry:null,revenue:null,emp:null,customer:null,concern:[],prep:[],memo:{overview:"",risk:"",kpiData:[]}};
+    $("#f-name").value=""; $("#f-biztype").value="";
+    ["c-memo-overview","c-memo-risk"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
+    _picks={tasks:new Set(),kpis:new Set(),custTasks:[],custKpis:[],kpiVals:{},_touchedT:false,_touchedK:false};
+    ["c-task-pick","c-kpi-pick","c-presum"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML="";});
+    $$(".chip-btn.sel").forEach(b=>b.classList.remove("sel"));
+    $$(".tg.on").forEach(b=>b.classList.remove("on"));
+    try{ history.replaceState(null,"",location.pathname); }catch(e){}
+    try{ localStorage.removeItem("gan_state"); }catch(e){}
+    go("diagnose");
+  }
+
+  /* 샘플 (가상 예시) */
+  function loadSample(){
+    const s={name:"그로스샘플 제조 (가상 예시)",stage:"y13",ctype:"sme",industry:"mfg",biztype:"정밀부품 가공·조립",
+      revenue:"r15",emp:"e59",customer:"b2b",concern:["cert","customer","rnd"],
+      prep:["biz_reg","corp","contracts","bizplan","introdoc","website"]};
+    state.data=s; state.isShared=false;
+    renderResult(s,true); go("result"); applyMode();
+  }
+
+  /* 로컬 자동저장 */
+  function save(){ try{ localStorage.setItem("gan_state",JSON.stringify({data:state.data,step:state.step})); }catch(e){} }
+  function load(){ try{ const r=localStorage.getItem("gan_state"); if(!r)return; const o=JSON.parse(r);
+    if(o&&o.data){ state.data=Object.assign(state.data,o.data); restoreUI(); } }catch(e){} }
+  function restoreUI(){
+    const d=state.data;
+    if(d.name)$("#f-name").value=d.name; if(d.biztype)$("#f-biztype").value=d.biztype;
+    [["stage","c-stage"],["ctype","c-ctype"],["industry","c-industry"],["revenue","c-revenue"],["emp","c-emp"],["customer","c-customer"]].forEach(([k,id])=>{
+      if(d[k]){ const b=document.querySelector(`#${id} .chip-btn[data-v="${d[k]}"]`); if(b)b.classList.add("sel"); }
+    });
+    (d.concern||[]).forEach(v=>{ const b=document.querySelector(`#c-concern .chip-btn[data-v="${v}"]`); if(b)b.classList.add("sel"); });
+    (d.prep||[]).forEach(v=>{ const b=document.querySelector(`.tg[data-v="${v}"]`); if(b)b.classList.add("on"); });
+  }
+
+  function init(){
+    buildChips("c-stage",OPT.stage,"stage",false);
+    buildChips("c-ctype",OPT.ctype,"ctype",false);
+    buildChips("c-industry",OPT.industry,"industry",false);
+    buildChips("c-revenue",OPT.revenue,"revenue",false);
+    buildChips("c-emp",OPT.emp,"emp",false);
+    buildChips("c-customer",OPT.customer,"customer",false);
+    buildChips("c-concern",OPT.concern,"concern",true,true);
+    buildToggles();
+    bindShareDialog();
+    bindReportDialog();
+    try{ const li=document.querySelector(".brand .mk img"); if(li){ GAN_LOGO=li.getAttribute("src")||li.src||""; } }catch(e){}
+    const vEl=document.getElementById("appVer");
+    if(vEl) vEl.textContent=`버전 ${APP_VERSION} · 최종 업데이트 ${APP_UPDATED}`;
+    setTimeout(()=>toggleCol("col-1"),50);
+    if(!tryLoadFromHash()){ load(); }
+  }
+
+  // 데이터 레이어 공개 API: 현재 진단을 구조화 JSON/서술로 추출 (API 연동·내보내기용)
+  function getDiagnosisData(){ return buildDiagnosisData(state.data, state.isShared); }
+  function getDiagnosisJSON(){
+    const dd=getDiagnosisData(); const {_internal, ...clean}=dd; return JSON.stringify(clean,null,2);
+  }
+  function getNarrative(){ return buildDiagnosisNarrative(getDiagnosisData()); }
+  // F: 전환 이벤트 훅(로컬 전용 — 외부 전송 없음). 향후 분석 연동 시 이 지점 활용.
+  function _track(evt){ try{ if(window.console&&console.debug) console.debug("[cta]",evt); }catch(e){} }
+  return {init,go,nextStep,prevStep,toggleCol,setMode,share,printPDF,restart,loadSample,
+          runDiagnosis,getDiagnosisData,getDiagnosisJSON,getNarrative,_track,openReportDialog,_state:()=>state};
+})();
+window.GAN = GAN;
+
+/* ===== 메인 성장 시각화 (단계별 우선영역 프로파일) ===== */
+const GVIZ = (function(){
+  const STAGE_NM={pre:"예비창업",y1:"1년 미만",y13:"1~3년",y35:"3~5년",y57:"5~7년",y7:"7년 이상"};
+  // 단계별 영역 우선도 = STAGE_RELEVANCE(단계 고유 우선도 신호)를 0~100 정규화
+  // BASE_W를 곱하지 않는 이유: 사업모델·고객 base가 높아 단계별 차이가 가려짐. 단계 고유 형태를 그대로 보여줌.
+  function profile(st){
+    const rel=STAGE_RELEVANCE[st]||{};
+    const raw={}; let max=0;
+    AREA_KEYS.forEach(a=>{ raw[a]=(rel[a]??1); if(raw[a]>max)max=raw[a]; });
+    const out={}; AREA_KEYS.forEach(a=>{ out[a]=Math.round(raw[a]/max*100); });
+    return out;
+  }
+  function radar(prof){
+    const cx=160,cy=160,R=120,n=AREA_KEYS.length;
+    const ang=i=>-Math.PI/2+2*Math.PI*i/n;
+    const pt=(i,r)=>[cx+Math.cos(ang(i))*r, cy+Math.sin(ang(i))*r];
+    let grid="";
+    [0.25,0.5,0.75,1].forEach(f=>{
+      const p=AREA_KEYS.map((_,i)=>pt(i,R*f).map(v=>v.toFixed(1)).join(",")).join(" ");
+      grid+=`<polygon points="${p}" fill="none" stroke="#e2e9f2" stroke-width="1"/>`;
+    });
+    let axes="",labels="";
+    AREA_KEYS.forEach((a,i)=>{
+      const[x,y]=pt(i,R);
+      axes+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#e8eef6" stroke-width="1"/>`;
+      const[lx,ly]=pt(i,R+19);
+      const anc=Math.abs(lx-cx)<8?"middle":(lx>cx?"start":"end");
+      labels+=`<text x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" font-size="10.5" font-weight="800" fill="#5a6a86" text-anchor="${anc}">${AREA[a].short}</text>`;
+    });
+    const dpts=AREA_KEYS.map((a,i)=>pt(i,R*prof[a]/100).map(v=>v.toFixed(1)).join(",")).join(" ");
+    let dots="";
+    AREA_KEYS.forEach((a,i)=>{const[x,y]=pt(i,R*prof[a]/100);dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#fff" stroke="#2563EB" stroke-width="2"/>`;});
+    return `<svg viewBox="0 0 320 320" role="img" aria-label="단계별 영역 우선도 레이더">
+      <defs><linearGradient id="gvG" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="rgba(22,194,163,.30)"/><stop offset="1" stop-color="rgba(37,99,235,.30)"/></linearGradient></defs>
+      ${grid}${axes}
+      <polygon points="${dpts}" fill="url(#gvG)" stroke="#2563EB" stroke-width="2.2"/>
+      ${dots}${labels}</svg>`;
+  }
+  function barColor(v){ return v>=75?"linear-gradient(90deg,#16C2A3,#0fb597)":v>=50?"linear-gradient(90deg,#5b8cff,#2563EB)":v>=30?"linear-gradient(90deg,#f3a05a,#E8930C)":"linear-gradient(90deg,#cdd7e6,#aab8cd)"; }
+  function render(st){
+    const prof=profile(st);
+    const rd=document.getElementById("gvRadar"); if(rd) rd.innerHTML=radar(prof);
+    const nm=document.getElementById("gvStageNm"); if(nm) nm.textContent=STAGE_NM[st];
+    // focus(상위 3영역)
+    const sorted=AREA_KEYS.map(a=>({a,v:prof[a]})).sort((x,y)=>y.v-x.v);
+    const top3=sorted.slice(0,3);
+    const ff=document.getElementById("gvFocus");
+    if(ff) ff.innerHTML=`<span style="font-size:12px;font-weight:800;color:var(--muted);align-self:center">지금 집중 영역 →</span>`+
+      top3.map((x,i)=>`<span class="ff"><small>${i+1}</small>${AREA[x.a].short}</span>`).join("");
+    // bars (전체 9영역, 우선도순)
+    const bars=document.getElementById("gvBars");
+    if(bars) bars.innerHTML=sorted.map((x,i)=>`<div class="gv-bar${i<3?' hot':''}">
+      <div class="bn">${AREA[x.a].short}</div>
+      <div class="bt"><div class="bf" style="width:${x.v}%;background:${barColor(x.v)}"></div></div>
+      <div class="bv">${x.v}</div></div>`).join("");
+  }
+  function init(){
+    const tabs=document.getElementById("gvTabs"); if(!tabs) return;
+    tabs.querySelectorAll(".gv-tab").forEach(b=>b.addEventListener("click",()=>{
+      tabs.querySelectorAll(".gv-tab").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on"); render(b.dataset.st);
+    }));
+    render("pre");
+  }
+  return {init,render};
+})();
+window.GVIZ = GVIZ;
+window.OPT = OPT; window.scoreEngine = scoreEngine; window.industryWeights = industryWeights;
+window.pickActivities = pickActivities; window.renderResult = renderResult;
+if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",()=>{GAN.init();GVIZ.init();}); }
+else { GAN.init(); GVIZ.init(); }
+</script>
+</body>
+</html>
