@@ -306,6 +306,30 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   await m.close();
 }
 
+// 12. 결과 유익성·레이더 회귀 (v6.3.0)
+{
+  await page.goto(BASE);
+  const svc = { name: 'S', depth: 'standard', stage: 'y7', industry: 'svc', ctype: 'small', revenue: 'r1030', emp: 'e1029', customer: 'b2b', concern: ['customer', 'dx'], prep: [], memo: {}, ans: { F1: 2, F2: 1, F3: 1, B1: 2, B2: 2, B3: 1, S1: 1, S2: 1, S3: 1, M2: 1, M1: 2, M3: 1, R1: 1, R2: 0, R3: 'na', C1: 1, C2: 1, C3: 0, I1: 2, I2: 1, I3: 1, E1: 1, E2: 0, E3: 0, D1: 1, D2: 1, D3: 1 } };
+  const r = await page.evaluate((d) => {
+    const sc = scoreEngine(d); const sw = strengthsWeak(sc, d); const acts = pickActivities(d, sc);
+    renderResult(d, false); GAN.go('result');
+    const pre = { ...d, stage: 'pre', industry: 'it', ans: { ...d.ans, B1: 1, B2: 0, B3: 1 } }; const pa = pickActivities(pre, scoreEngine(pre)).map((a) => a.id);
+    return { maxExp: Math.max(...Object.values(sc.expected)), ahead: sw.ahead.map((x) => x.a), dev: acts.filter((a) => a.needsDev).length,
+      order: [pa.indexOf('b1'), pa.indexOf('b5')], html: document.getElementById('resultRoot').innerText,
+      midColor: getComputedStyle(Object.assign(document.body.appendChild(document.createElement('span')), { className: 'gp-mid' })).color };
+  }, svc);
+  await page.waitForTimeout(400);
+  const rw = await page.evaluate(() => Math.round(document.querySelector('.radar-box svg').getBoundingClientRect().width));
+  check('레이더: 데스크톱 폭 420px 이상(기존 약 260px)', rw >= 420, `${rw}px`);
+  check('기대수준 상한 75(업종 보정으로 80점대가 되던 문제)', r.maxExp <= 75, `최대 ${r.maxExp}`);
+  check("강점이 없으면 '상대적으로 앞선 영역' + 잘하고 있는 응답 표시", r.ahead.length > 0 && r.html.includes('상대적으로 앞선 영역') && r.html.includes('잘하고 있는 것'), r.ahead.join(','));
+  check("보완 영역마다 '한 단계 올리기' 행동 표시", (r.html.match(/한 단계 올리기/g) || []).length >= 2);
+  check("'제품·기술 개발 필요 없음'이면 개발 체계 과제 미추천", r.dev === 0);
+  check('같은 영역 안 실행 순서: 목표고객 정의(b1) → 가격 구조(b5)', r.order[0] >= 0 && (r.order[1] < 0 || r.order[0] < r.order[1]), r.order.join('→'));
+  check('점수 의미 범례(0 미착수 · 33 시작 · 67 정례화 · 100 체계화)', r.html.includes('33 시작') && r.html.includes('67 정례화'));
+  check('기대 미달 차이 색 = 주황(파란색 아님)', !/rgb\(37, 99, 235\)/.test(r.midColor), r.midColor);
+}
+
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));
 await browser.close();
 const fail = results.filter((r) => !r.pass);
