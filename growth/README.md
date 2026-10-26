@@ -1,4 +1,4 @@
-# BECONIC 기업 성장활동 진단 내비게이터 (v6.2.0) — Tool 12
+# BECONIC 기업 성장활동 진단 내비게이터 (v6.3.0) — Tool 12
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-diagnosis-business-growth.netlify.app
@@ -26,7 +26,7 @@ growth/
 ├─ logo-mark.png           # 헤더·보고서 표지 로고
 ├─ og-business-growth.jpg  # 카카오톡·SNS 공유 이미지 1200×632
 ├─ netlify.toml · package.json
-├─ tests/qa.mjs            # Chromium QA 70항목(사용자 흐름·하드코딩·레드팀 회귀·웹폰트 포함 · 엔진 원칙·클릭 플로우·재진단·공유 링크 정제·모바일 375px·A4 PDF)
+├─ tests/qa.mjs            # Chromium QA 78항목(결과 유익성·사용자 흐름·하드코딩·레드팀 회귀·웹폰트 포함 · 엔진 원칙·클릭 플로우·재진단·공유 링크 정제·모바일 375px·A4 PDF)
 ├─ tests/sweep.mjs         # 전수 조합 1,056개 렌더 점검(예외·깨진 문구·추천 부족)
 └─ docs/  CHANGELOG.md(개선 내역·27개 Tool 진단 대응표) · REDTEAM_2026-10-26.md(자가부검·레드팀)
 ```

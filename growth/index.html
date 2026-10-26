@@ -394,7 +394,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 .info-table .k{font-size:13px;color:var(--muted);font-weight:700;padding:8px 14px 8px 0;border-bottom:1px dashed var(--line);}
 .info-table .v{font-size:14px;font-weight:700;color:var(--ink);padding:8px 0;border-bottom:1px dashed var(--line);text-align:right;}
 /* 영역 점수 차트 (레이더 + 막대 fallback 통합) */
-.area-grid{display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start;}
+.area-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:26px;align-items:start;}
 .radar-box{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:20px;box-shadow:var(--sh-sm);}
 .radar-box svg{width:100%;height:auto;display:block;}
 .bars{display:flex;flex-direction:column;gap:11px;}
@@ -408,6 +408,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 .lvl-low{background:linear-gradient(90deg,#f3a05a,var(--amber-deep));}
 .lvl-crit{background:linear-gradient(90deg,#f08a8a,var(--bad));}
 .swot{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;}
+.swot-full{margin-top:22px;}
 .swot .b{border-radius:14px;padding:18px;border:1px solid var(--line);}
 .swot .strong{background:linear-gradient(180deg,#effbf7,#fff);border-color:#bdeede;}
 .swot .weak{background:linear-gradient(180deg,#fff3e6,#fff);border:1.5px solid #f0c088;
@@ -997,7 +998,12 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 .src-prac{color:#5a6a86;background:#f3f6fa;border-color:#dde4ee;}
 .exp-badge{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;padding:7px 13px;border-radius:999px;
   background:#fff;border:1px solid #efc98a;color:var(--ink-soft);}
-.gp-ok{color:#0d9b82!important;} .gp-mid{color:var(--blue)!important;} .gp-bad{color:var(--bad)!important;} .gp-na{color:var(--muted)!important;}
+.gp-ok{color:#0d9b82!important;} .gp-mid{color:var(--amber-deep)!important;} .gp-bad{color:var(--bad)!important;} .gp-na{color:var(--muted)!important;}
+.sw-note{font-size:12px;color:var(--muted);margin:-4px 0 8px;line-height:1.5;}
+.sw-ev{display:block;margin-top:5px;font-size:12px;color:var(--ink-soft);background:#f2fbf7;border-radius:7px;padding:5px 8px;line-height:1.45;}
+.sw-ev b{color:#0d9b82;font-weight:900;margin-right:4px;font-size:11px;}
+.sw-next{background:#fff6ea;} .sw-next b{color:var(--amber-deep);}
+.lv-legend{font-size:11px;color:var(--muted);} .lv-legend b{color:var(--ink-soft);}
 .core-line{display:flex;gap:12px;align-items:baseline;background:#fff;border:1px solid var(--line);border-left:4px solid var(--bad);
   border-radius:12px;padding:13px 16px;margin:4px 0 14px;box-shadow:var(--sh-sm);}
 .core-line span{flex:none;font-size:11.5px;font-weight:900;color:var(--bad);letter-spacing:.02em;}
@@ -1088,9 +1094,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   .rq{display:block!important;text-align:center!important;padding:0 6px!important;}
   .rq .qd{margin:0 auto 10px!important;}
   .rq ul{text-align:left!important;}
-  .area-grid{grid-template-columns:86mm 1fr!important;align-items:start!important;}
-  .radar-box{margin:0!important;padding:8px!important;width:86mm!important;max-width:86mm!important;}
-  .radar-box svg{width:100%!important;height:auto!important;min-height:74mm;}
+  .area-grid{grid-template-columns:96mm 1fr!important;align-items:start!important;}
+  .radar-box{margin:0!important;padding:6px!important;width:96mm!important;max-width:96mm!important;}
+  .radar-box svg{width:100%!important;height:auto!important;min-height:82mm;}
   .exec .col{padding:12px 14px!important;}
   .exec li{padding:6px 0!important;font-size:9.5pt!important;}
   .ev-area,.pub,.cmp,.tool-rec,.core-line{box-shadow:none!important;break-inside:avoid;}
@@ -1535,9 +1541,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.2.0";
+const APP_VERSION = "v6.3.0";
 const APP_UPDATED = "2026-10-26";
-const APP_BUILD   = "2026.10.26.4";  // 배포 빌드 식별자
+const APP_BUILD   = "2026.10.26.5";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
 const LEGAL_BASIS_DATE = "2026-10-26";  // 법령·제도 출처를 마지막으로 확인한 날(도구 버전 날짜와 별개)
 
@@ -1554,7 +1560,7 @@ const copyYears = ()=>{ const y=new Date().getFullYear(); return y>COMPANY.since
 /* 산식 상수 — 엔진 계산과 '진단 방법·공개 산식' 설명문이 같은 값을 쓴다(설명과 계산이 어긋나지 않도록) */
 const RULES = {
   minutes:{quick:5, standard:12},                // 화면 안내용 예상 소요 시간
-  expect:{indMin:0.6, indMax:1.2, cap:85},       // 기대수준 = 단계 기준값 × 업종 보정(indMin~indMax), 상한 cap
+  expect:{indMin:0.6, indMax:1.1, cap:75},       // 기대수준 = 단계 기준값 × 업종 보정(indMin~indMax), 상한 cap(정례화 67~체계화 사이)
   priority:{concern:15, unknownArea:10, gapToAct:0.15, focus:8, doneCut:100, halfCut:67, half:0.5,
             relExclude:0.22, relFloor:0.6, nowGap:-15, nowRel:0.8, maxNow:3, acts:6, perArea:{early:3, other:2},
             fillNext:12, fillKeep:6},
@@ -1977,7 +1983,7 @@ const LIB = [
    when:"매출 확대기",docs:"채널별 성과 데이터",dur:"4~8주",
    kpi:"채널별 전환율 / 고객획득비용(CAC)",caution:"광고 표현은 과장·부당광고 규정을 확인하세요.",expert:false,
    stages:["y13","y35","y57"]},
-  {id:"r1",area:"rnd",q:["R3"],own:"rnd_lab",src:["L_RND","P_KOITA"],title:"기업부설연구소/연구개발전담부서 검토",
+  {id:"r1",area:"rnd",needsDev:true,q:["R3"],own:"rnd_lab",src:["L_RND","P_KOITA"],title:"기업부설연구소/연구개발전담부서 검토",
    why:"R&D 인력·세제·과제 참여의 기반이 됩니다. 요건을 갖추면 이후 R&D 활동의 출발점이 됩니다.",
    when:"R&D 인력 확보 시",docs:"연구인력·연구공간 요건 자료",dur:"검토 2~4주",
    kpi:"R&D 과제 준비율",caution:"설립 요건·인정 기준은 관할 기관 최신 기준 확인이 필요합니다.",expert:false,
@@ -1992,12 +1998,12 @@ const LIB = [
    when:"제품 출시 전후",docs:"경쟁 제품 목록, 성능·가격 비교 데이터",dur:"2~3주",
    kpi:"근거가 있는 차별점 수",caution:"비교 광고 시 사실 확인과 표현 규정을 지켜야 합니다.",expert:false,
    stages:["pre","y1","y13"]},
-  {id:"r3",area:"rnd",q:["R3"],own:"",src:["P_IRIS"],title:"정부 R&D 과제기획 준비",
+  {id:"r3",area:"rnd",needsDev:true,q:["R3"],own:"",src:["P_IRIS"],title:"정부 R&D 과제기획 준비",
    why:"기술개발 자금을 외부에서 조달하는 통로입니다. 과제기획·실적이 미리 준비돼야 신청이 수월합니다.",
    when:"공고 시즌 전",docs:"연구개발계획(안), 수행실적",dur:"기획 4~8주",
    kpi:"R&D 과제 신청 건수",caution:"선정을 보장하지 않으며 공고별 요건 확인이 필요합니다.",expert:false,
    stages:["y35","y57"]},
-  {id:"r6",area:"rnd",q:["R1"],own:"",src:["B_RULE"],title:"기술 로드맵·차기 제품 기획",
+  {id:"r6",area:"rnd",needsDev:true,q:["R1"],own:"",src:["B_RULE"],title:"기술 로드맵·차기 제품 기획",
    why:"성숙기에도 다음 제품·기술 파이프라인이 없으면 성장이 정체됩니다. 로드맵으로 R&D 투자를 체계화합니다.",
    when:"제품 성숙기",docs:"기술 현황, 시장 트렌드 자료",dur:"6~10주",
    kpi:"기술 로드맵·차기 제품 기획서 여부",caution:"기술 개발 성과는 불확실성이 있어 보장되지 않습니다.",expert:false,
@@ -2301,6 +2307,14 @@ function stageBand(total, held){
   return {key:"b4",nm:"고도화·스케일업 단계",desc:"시스템화·글로벌 도약 구간"};
 }
 function lvlClass(s){ return s==null?"lvl-na":s>=75?"lvl-good":s>=55?"lvl-mid":s>=35?"lvl-low":"lvl-crit"; }
+/* 영역 안에서 가장 높은/낮은 응답 문항 — 강점·보완 문구를 회사 응답에서 만든다 */
+function answerEdge(sc, a, which){
+  const rows = (sc.detail[a]||[]).filter(r=>typeof r.v==="number");
+  if(!rows.length) return null;
+  const r = rows.reduce((m,x)=> (which==="best" ? x.v>m.v : x.v<m.v) ? x : m, rows[0]);
+  return {q:r.q, v:r.v, now:r.q.lv[r.v], next: r.v<3 ? r.q.lv[r.v+1] : null};
+}
+function lvlWord(s){ return s==null?"–":s<17?LV_NM[0]:s<50?LV_NM[1]:s<84?LV_NM[2]:LV_NM[3]; }
 function gapTxt(g){ return g==null?"–":(g>=0?"+"+g:String(g)); }
 function gapCls(g){ return g==null?"gp-na":g>=0?"gp-ok":g>=-15?"gp-mid":"gp-bad"; }
 
@@ -2327,7 +2341,12 @@ function strengthsWeak(sc, d){
                   .sort((x,y)=> y.wp-x.wp).slice(0,3);
   const weakAll = [...arr].sort((x,y)=> y.wp-x.wp || x.s-y.s);
   const nodata = AREA_KEYS.filter(a=>sc.status[a]==="nodata");
-  return {strong, weak, weakAll, nodata};
+  // 강점이 없으면 '기대 대비 차이가 가장 작은' 영역 2개를 상대적 우위로 보여 줌(0점 영역 제외)
+  // 강점이 없으면 점수가 높은 영역 중 '정례화' 이상 응답이 있는 곳을 우선(없으면 점수순) — 약점 목록·0점 제외
+  const bestLv = a=>Math.max(-1, ...(sc.detail[a]||[]).filter(r=>typeof r.v==="number").map(r=>r.v));
+  const ahead = strong.length ? [] : arr.filter(x=>x.s>0 && !weak.some(w=>w.a===x.a))
+    .sort((x,y)=> (bestLv(y.a)>=2)-(bestLv(x.a)>=2) || y.s-x.s || (y.s-y.e)-(x.s-x.e)).slice(0,2);
+  return {strong, weak, weakAll, nodata, ahead};
 }
 function areaComment(a, s, e, isStrong){
   const tips = {
@@ -2363,6 +2382,7 @@ function pickActivities(d, sc){
     if(a.ind && !a.ind.includes(d.industry)) return;
     if(a.stages && !a.stages.includes(st)) return;
     if(sc.status[a.area]==="na") return;                              // 해당 없음 영역(예: 내수 전용 → 수출)
+    if(a.needsDev && ans.R3==="na") return;                           // '제품·기술 개발이 필요 없는 사업'이면 개발 체계 과제 제외
     const rel = relevanceOf(d.industry, a.area, st);
     const con = concernAreas.includes(a.area);
     if(rel <= P.relExclude && !con) return;
@@ -2393,7 +2413,7 @@ function pickActivities(d, sc){
     const KEYS=["pre","y1","y13","y35","y57","y7"]; const nx=KEYS[Math.min(5,KEYS.indexOf(st)+1)];
     const have=new Set(cand.map(c=>c.id));
     const extra=(filterFn, reason, base)=>LIB.forEach(a=>{
-      if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own))) return;
+      if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own)) || (a.needsDev && ans.R3==="na")) return;
       const rel=relevanceOf(d.industry, a.area, st); if(rel<=P.relExclude || !filterFn(a)) return;
       have.add(a.id);
       cand.push({...a, _p:base*rel, _tag:"plan", _areaSc:sc.areaScore[a.area], _qSc:qScoreOf(a.q), _rel:rel,
@@ -2412,6 +2432,10 @@ function pickActivities(d, sc){
     if(out.length>=P.acts) break;
   }
   if(out.length<P.acts){ for(const a of cand){ if(!out.includes(a)){ out.push(a); if(out.length>=P.acts)break; } } }
+  // 영역 순서는 우선도대로, 같은 영역 안에서는 라이브러리의 실행 순서(예: 목표고객 정의 → MVP 검증 → 가격 구조)
+  const areaRank=[]; out.forEach(a=>{ if(!areaRank.includes(a.area)) areaRank.push(a.area); });
+  const libIdx = id=>LIB.findIndex(x=>x.id===id);
+  out.sort((x,y)=> areaRank.indexOf(x.area)-areaRank.indexOf(y.area) || libIdx(x.id)-libIdx(y.id));
   // '지금 착수'는 우선도 상위 maxNow개까지만(전부 '지금'이면 우선순위가 보이지 않음) — 나머지는 '준비'
   let nNow=0; out.forEach(a=>{ if(a._tag==="now"){ if(nNow<P.maxNow) nNow++; else a._tag="soon"; } });
   return out;
@@ -2419,7 +2443,7 @@ function pickActivities(d, sc){
 
 /* ---------- 8. 90일 / 12개월 / KPI ---------- */
 function plan90(acts){
-  const sorted = [...acts].sort((a,b)=>b._p-a._p);
+  const sorted = [...acts];                       // pickActivities가 정한 실행 순서 그대로
   const item = a=>({t:a.title, sub:`산출물: ${(ACT_METRIC[a.id]||{target:a.kpi}).target}`});
   const ph = [sorted.slice(0,2).map(item), sorted.slice(2,4).map(item), sorted.slice(4,6).map(item)];
   ph[2].push({t:"같은 문항으로 중간 재진단 · KPI 기록 점검", sub:"산출물: 영역별 점수 변화표(재진단 비교)"});
@@ -2581,14 +2605,14 @@ function svgRadar(areaScore, expected){
     let dy=0; if(Math.sin(a)<-0.6)dy=-3; else if(Math.sin(a)>0.6)dy=9;
     const s=areaScore[k];
     const sc = s==null?"#aab6cc":(s>=(expected[k]||0)?"#0d9b82":(s>=(expected[k]||0)-15?"#2563EB":"#d99a12"));
-    labels+=`<text x="${lx.toFixed(1)}" y="${(ly+dy).toFixed(1)}" font-size="11" font-weight="700" fill="#3a4a66" text-anchor="${anc}">${AREA[k].short}</text>`;
-    labels+=`<text x="${lx.toFixed(1)}" y="${(ly+dy+14).toFixed(1)}" font-size="11.5" font-weight="900" fill="${sc}" text-anchor="${anc}">${s==null?"–":s}</text>`;
+    labels+=`<text x="${lx.toFixed(1)}" y="${(ly+dy).toFixed(1)}" font-size="13" font-weight="800" fill="#3a4a66" text-anchor="${anc}">${AREA[k].short}</text>`;
+    labels+=`<text x="${lx.toFixed(1)}" y="${(ly+dy+16).toFixed(1)}" font-size="14" font-weight="900" fill="${sc}" text-anchor="${anc}">${s==null?"–":s}<tspan font-size="10.5" font-weight="700" fill="#9aa7bd"> / ${expected[k]||0}</tspan></text>`;
   });
   const dpts=keys.map((k,i)=>pt(i,R*(areaScore[k]||0)/100).map(v=>v.toFixed(1)).join(",")).join(" ");
   let dots="";
   keys.forEach((k,i)=>{ const[x,y]=pt(i,R*(areaScore[k]||0)/100);
     dots+= areaScore[k]==null ? "" : `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" fill="#fff" stroke="#2563EB" stroke-width="2"/>`; });
-  return `<svg viewBox="-44 -6 408 350" role="img" aria-label="${AREA_KEYS.length}개 영역 성숙도 레이더 차트(단계 기대수준 비교)">
+  return `<svg viewBox="-58 -14 436 362" role="img" aria-label="${AREA_KEYS.length}개 영역 성숙도 레이더 차트(단계 기대수준 비교)">
     <defs><linearGradient id="radG" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="rgba(22,194,163,.34)"/><stop offset="1" stop-color="rgba(37,99,235,.34)"/></linearGradient></defs>
     ${grid}${axes}${ticks}
@@ -2661,7 +2685,7 @@ function buildDiagnosisNarrative(diag){
   const confTxt = { high:"응답이 충분하고 불일치가 없어 이 진단의 신뢰도는 높은 편입니다.",
                     mid:"신뢰도는 보통이므로, 아래 '응답 점검' 항목을 확인하면 정확도가 올라갑니다.",
                     low:"신뢰도가 낮아(" + s.confidence.reasons.join(", ") + ") 방향 참고용으로만 해석하시기 바랍니다." }[s.confidence.tier];
-  const para1 = `${p.industryNm} · ${p.stageNm} · ${p.ctypeNm} 기준으로 종합 성숙도는 ${s.total}점으로, ${lvl} 수준(기대 ${s.expected}점, ${gapTxt(diff)})입니다. `
+  const para1 = `${p.industryNm} · ${p.stageNm} · ${p.ctypeNm} 기준으로 종합 성숙도는 ${s.total}점(전반적으로 '${lvlWord(s.total)}' 단계)으로, ${lvl} 수준(기대 ${s.expected}점, ${gapTxt(diff)})입니다. `
     + `${strongTxt}, ${botTxt}. ${confTxt}`;
   const first = diag.activities[0];
   const para2 = first
@@ -2953,17 +2977,20 @@ function renderResult(d, isSample, baseline){
         <p style="font-size:11.5px;color:var(--muted);margin:12px 0 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:18px;height:8px;border-radius:4px;background:linear-gradient(90deg,#7be3d2,#0fb597);display:inline-block"></span>영역 성숙도</span>
           <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:3px;height:13px;background:#d99a12;display:inline-block;border-radius:2px"></span>단계 기대수준</span>
+          <span class="lv-legend">${LV_NM.map((n,i)=>`<b>${LV_SCORE[i]}</b> ${n}`).join(" · ")}</span>
         </p>
-        <div class="swot">
-          <div class="b strong"><h5>◆ 상대적 강점</h5><ul>
-            ${sw.strong.length?sw.strong.map(x=>{const c=areaComment(x.a,x.s,x.e,true);return `<li><div><b style="color:var(--ink)">${esc(AREA[x.a].nm)} <span style="color:#0d9b82">${x.s}점</span></b> <span style="font-size:11px;color:var(--muted)">· ${c.tag}</span><br><span style="font-size:12.5px;color:var(--ink-soft)">${esc(c.txt)}</span></div></li>`;}).join(""):"<li>기대수준을 10점 이상 넘는 영역은 아직 없습니다.</li>"}
-          </ul></div>
-          <div class="b weak"><h5>◆ 보완 필요 (우선순위순)</h5><ul>
-            ${sw.weak.length?sw.weak.map(x=>{const c=areaComment(x.a,x.s,x.e,false);return `<li><div><b style="color:var(--ink)">${esc(AREA[x.a].nm)} <span style="color:var(--amber-deep)">${x.s}점</span></b> <span style="font-size:11px;color:var(--muted)">· ${c.tag}</span><br><span style="font-size:12.5px;color:var(--ink-soft)">${esc(c.txt)}</span></div></li>`;}).join(""):"<li>모든 영역이 단계 기대수준에 도달했습니다.</li>"}
-          </ul></div>
-        </div>
       </div>
     </div>
+    <div class="swot swot-full">
+          <div class="b strong"><h5>◆ ${sw.strong.length?"상대적 강점":"상대적으로 앞선 영역"}</h5>${sw.strong.length?"":`<p class="sw-note">기대수준을 넘는 영역은 아직 없지만, 다른 영역보다 앞서 있는 곳입니다. 이 영역에서 해 온 방식을 약한 영역에 옮겨 쓰세요.</p>`}<ul>
+            ${(sw.strong.length?sw.strong:sw.ahead).map(x=>{const c=areaComment(x.a,x.s,x.e,true); const b=answerEdge(sc,x.a,"best");
+              return `<li><div><b style="color:var(--ink)">${esc(AREA[x.a].nm)} <span style="color:#0d9b82">${x.s}점</span></b> <span style="font-size:11px;color:var(--muted)">· ${c.tag}</span><br>${b&&b.v>=2?`<span class="sw-ev"><b>잘하고 있는 것</b> ${esc(b.q.id)} ${esc(b.now)}</span>`: sw.strong.length?`<span style="font-size:12.5px;color:var(--ink-soft)">${esc(c.txt)}</span>`: b?`<span class="sw-ev"><b>가장 높은 응답</b> ${esc(b.q.id)} ${b.v}·${esc(LV_NM[b.v])} — ${esc(b.now)}</span>`:""}</div></li>`;}).join("")||"<li>응답한 영역이 부족해 비교하지 않았습니다.</li>"}
+          </ul></div>
+          <div class="b weak"><h5>◆ 보완 필요 (우선순위순)</h5><ul>
+            ${sw.weak.length?sw.weak.map(x=>{const c=areaComment(x.a,x.s,x.e,false); const w=answerEdge(sc,x.a,"worst");
+              return `<li><div><b style="color:var(--ink)">${esc(AREA[x.a].nm)} <span style="color:var(--amber-deep)">${x.s}점</span></b> <span style="font-size:11px;color:var(--muted)">· ${c.tag}</span><br><span style="font-size:12.5px;color:var(--ink-soft)">${esc(c.txt)}</span>${w&&w.next?`<span class="sw-ev sw-next"><b>한 단계 올리기 · ${esc(w.q.id)} ${w.v}→${w.v+1}</b> ${esc(w.next)}</span>`:""}</div></li>`;}).join(""):"<li>모든 영역이 단계 기대수준에 도달했습니다.</li>"}
+          </ul></div>
+        </div>
   </div>
 
   <div class="r-sec pbreak pb-before corekeep">
