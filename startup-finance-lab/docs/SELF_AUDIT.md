@@ -83,7 +83,7 @@
 
 ## 5. 배포 전 할 일 (대표님 확인 필요)
 
-1. **배포 주소 확정** — 기본값은 `https://beconic-startup-lab.netlify.app`. Netlify에서 사이트 이름을 `beconic-startup-lab`, Base directory를 `startup-finance-lab`으로 만들면 그대로 동작합니다. 다른 도메인이면 Netlify 환경변수 `SITE_URL`만 지정하면 빌드 때 자동으로 바뀝니다.
+1. **배포 주소** — `https://beconic-diagnosis-startup-finance.netlify.app` (Netlify 계정에서 확인). `npm run build`로 만든 `dist/` 폴더를 **통째로** 올려야 합니다. `index.html`만 올리면 미리보기 이미지가 빠져 카카오톡 미리보기가 뜨지 않습니다(2026-10-24 배포가 이 경우: 파일 1개만 업로드됨). 다른 도메인이면 환경변수 `SITE_URL`만 지정하면 됩니다.
 2. **카카오 미리보기 캐시** — 배포 후 [카카오 공유 디버거](https://developers.kakao.com/tool/debugger/sharing)에 주소를 넣고 "캐시 초기화"를 한 번 눌러 주세요. 이미지를 바꿀 때는 파일명도 바꾸는 것이 안전합니다.
 3. **제도 정보 연 1회 갱신** — `BASIS`(최저임금·기준연도)와 체크리스트 법령 항목.
 4. **벤치마크 출처 재확인** — 업종별 영업이익률·마진율은 공개 통계와 업계 관행을 종합한 참고치입니다.

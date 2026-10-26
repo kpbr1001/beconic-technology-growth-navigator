@@ -14,10 +14,14 @@ tests/qa.mjs          # 자동 점검 51항목 (계산·보안·인앱·접근�
 docs/SELF_AUDIT.md    # 자가부검·레드팀 점검 보고서
 ```
 
-## 배포
-1. Netlify 새 사이트 → 이 저장소, **Base directory `startup-finance-lab`**, 사이트 이름 `beconic-startup-lab`
-2. 다른 도메인이면 환경변수 `SITE_URL=https://내도메인` (https 아니면 빌드 중단)
-3. 배포 후 [카카오 공유 디버거](https://developers.kakao.com/tool/debugger/sharing)에서 캐시 초기화
+## 배포 (https://beconic-diagnosis-startup-finance.netlify.app)
+**드래그&드롭 (현재 방식)**
+1. `npm run build` → `dist/` 폴더 생성 (index.html · assets/ · manifest · _headers)
+2. Netlify → `beconic-diagnosis-startup-finance` → Deploys → **`dist` 폴더를 통째로** 끌어다 놓기
+   - ⚠ `index.html` 파일 하나만 올리면 미리보기 이미지(`assets/og-startup-finance.jpg`)가 없어 카카오톡 미리보기가 안 뜹니다.
+3. [카카오 공유 디버거](https://developers.kakao.com/tool/debugger/sharing)에 주소 입력 → **캐시 초기화**
+
+**Git 연동**: Base directory `startup-finance-lab`. 다른 도메인이면 환경변수 `SITE_URL=https://…` (https 아니면 빌드 중단)
 
 ## 기준값 바꾸기
 판정 기준은 `RULES`, 제도 기준(최저임금·연도)은 `BASIS`, 업종 데이터는 `pnlBenchmark`·`marginGuide` 한 곳만 고치면 화면·진단·안내 문구가 함께 바뀝니다.

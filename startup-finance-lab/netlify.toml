@@ -1,5 +1,7 @@
 # BECONIC 창업 재무분석 LAB — Netlify 배포 설정
-# Netlify 사이트 설정에서 Base directory 를 `startup-finance-lab` 으로 지정하면 이 파일이 적용됩니다.
+# 사이트: https://beconic-diagnosis-startup-finance.netlify.app
+# Git 연동 시 Base directory 를 `startup-finance-lab` 으로 지정하면 이 파일이 적용됩니다.
+# 드래그&드롭 배포는 `npm run build` 로 만든 dist/ 폴더(_headers 포함)를 통째로 올리세요.
 # 화면은 index.html 하나(정적)이며 서버로 보내는 데이터가 없습니다.
 [build]
   publish = "dist"
