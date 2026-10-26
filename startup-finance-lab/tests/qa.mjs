@@ -38,6 +38,12 @@ async function typeNum(page, id, value) {
 // ---------------------------------------------------------------- 1. 기본 동작·계산
 {
   const { ctx, page, errors } = await open();
+  check('첫 화면 주소에 #가 붙지 않음 (카톡 공유용)', !new URL(page.url()).hash, page.url());
+  await page.click('.tab[data-tab="pnl"]');
+  const pnlHash = new URL(page.url()).hash;
+  await page.click('.tab[data-tab="costing"]');
+  check('다른 단계는 #로 이동, 1단계로 오면 # 제거', pnlHash === '#pnl' && !new URL(page.url()).hash, pnlHash + ' → ' + page.url());
+
   const drift = await page.evaluate(() => [...document.querySelectorAll('input[type=range]')]
     .filter(e => +e.value !== +e.getAttribute('value')).map(e => `${e.id}:${e.getAttribute('value')}→${e.value}`));
   check('슬라이더 기본값이 범위 확장 후에도 그대로', drift.length === 0, drift.join(', '));

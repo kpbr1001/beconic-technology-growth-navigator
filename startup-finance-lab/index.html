@@ -3676,7 +3676,9 @@ header .actions .more-list button.danger-text { color: var(--danger); }
       }
     });
     document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-' + name));
-    try { history.replaceState(null, '', '#' + name); } catch (e) {}
+    // 첫 단계(제조원가)는 주소에 #를 붙이지 않는다 — 주소창을 그대로 복사해 카톡에 공유해도
+    // 카카오 미리보기가 같은 주소로 인식되도록 (#costing 이 붙으면 별개 주소로 취급돼 미리보기 오류)
+    try { history.replaceState(null, '', name === TABS[0] ? location.pathname + location.search : '#' + name); } catch (e) {}
     markVisited(name);
     closeTerm();
     // 숨겨져 있던 캔버스는 크기가 0이라, 탭이 보일 때 새로 그린다
