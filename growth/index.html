@@ -1534,9 +1534,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.0.1";
+const APP_VERSION = "v6.1.0";
 const APP_UPDATED = "2026-10-26";
-const APP_BUILD   = "2026.10.26.2";  // 배포 빌드 식별자
+const APP_BUILD   = "2026.10.26.3";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
 const STORE_KEY = "gan_state_v6";   // v5 이하 저장값(구조 다름)은 읽지 않음
 const FILE_SCHEMA = "beconic-growth/6";
@@ -1780,7 +1780,7 @@ const QUESTIONS = [
    lv:["없음","영문 소개서만 있음","바이어 발굴 활동(전시회·매칭·플랫폼)을 함","수출 실적이 있고 계약·결제·물류 절차가 정해져 있음"],
    na:"국내 시장 전용 사업(수출 계획 없음)", src:["P_VOUCHER"]},
   {id:"E3",area:"export",t:"FTA 원산지·통관 요건을 관리하나요?",
-   lv:["모름","알아본 정도","원산지 판정·증빙 서류를 준비","원산지 관리 체계를 갖추고 FTA 특혜를 활용"],
+   lv:["원산지·통관 요건을 확인한 적 없음","알아본 정도","원산지 판정·증빙 서류를 준비","원산지 관리 체계를 갖추고 FTA 특혜를 활용"],
    na:"국내 시장 전용 사업(수출 계획 없음)", src:["L_FTA"]},
   {id:"D1",area:"digital",core:true,t:"고객·거래·업무 데이터를 어떻게 관리하나요?",
    lv:["종이·기억에 의존","엑셀 등 개인 파일로 관리","공유 도구(클라우드·회계 프로그램)로 한곳에 관리","CRM·ERP 등 시스템으로 관리하고 현황판을 봄"],
@@ -2092,20 +2092,20 @@ const LIB = [
 
 /* 활동별 정량 산출물 & 진척 측정 방식 */
 const ACT_METRIC = {
-  f1:{target:"사업자 정비 항목 100% 완료",measure:"업종·인허가 체크 8개 항목 중 완료 수 / 8"},
+  f1:{target:"업종코드·인허가·신고 확인 완료",measure:"확인 완료 수 / 4(업종코드·업태, 필수 인허가, 업종별 신고, 사업장 요건)"},
   f2:{target:"법인 전환 타당성 검토서 1건",measure:"전환 손익·세무 검토 완료=100%"},
   f3:{target:"표준서류 3종(계약·견적·거래) 완비",measure:"보유 서식 수 / 3"},
   b1:{target:"수익모델 캔버스 + 고객정의서 완성",measure:"필수 9블록 작성 수 / 9"},
   b4:{target:"MVP 정의서 + 검증 3회 이상",measure:"검증 실행 횟수 집계"},
   b5:{target:"제품별 건당 공헌이익표 + 가격 정책 1건",measure:"원가·마진 산출 완료 제품 수 / 전체"},
-  b2:{target:"사업계획서 완성도 90% 이상",measure:"필수 12개 항목 작성 비율"},
+  b2:{target:"사업계획서 필수 8개 항목 작성",measure:"작성 항목 수 / 8(문제·해결책·시장·경쟁·수익모델·팀·재무추정·자금계획)"},
   b3:{target:"사업부별 손익표 + 정리 후보 도출",measure:"전 사업부 손익 산출 완료율"},
   s1:{target:"유료 판매 테스트 5건 이상",measure:"실제 결제 전환 건수 집계"},
   s4:{target:"반복 채널 2개 + 채널별 전환율 측정",measure:"운영 채널 수 · 문의→계약 전환율"},
   s2:{target:"조달 등록 + 공공 제안 2건 이상",measure:"등록 요건 충족 항목 / 전체"},
   s3:{target:"제안서 템플릿 + 레퍼런스 3건",measure:"확보 레퍼런스 수 집계"},
   s6:{target:"재구매율·핵심고객 이탈률 관리 시작",measure:"핵심고객 지표 측정 여부"},
-  m1:{target:"홈페이지 오픈 + 핵심페이지 5종",measure:"필수 페이지 구축 수 / 5"},
+  m1:{target:"홈페이지 오픈 + 핵심 페이지 5종",measure:"구축 수 / 5(회사소개·제품/서비스·사례·문의·개인정보 처리방침)"},
   m0:{target:"네이밍 확정 + 한 줄 소개·핵심 메시지",measure:"브랜드 기초 3종 확정 여부"},
   m2:{target:"상표 출원 1건 / 선행검색 완료",measure:"출원 진행 단계(검색→출원→등록)"},
   m3:{target:"핵심 채널 1~2개 주 1회 발행",measure:"월 콘텐츠 발행 수 / 목표"},
@@ -2216,12 +2216,14 @@ function scoreEngine(d){
   const straight = numeric.length>=9 && numeric.every(v=>v===numeric[0]);
   const base = asked.length - nNa;
   const coverage = base>0 ? nAns/base : 0;
-  let cs = Math.round(coverage*100) - flags.length*8 - (straight?15:0);
+  let cs = Math.round(coverage*100) - flags.length*8;
+  if(straight) cs = Math.min(cs, 60);                 // 전 문항 같은 단계는 실제 행동 재확인 전까지 '보통' 이하
   if(d.depth==="quick") cs = Math.min(cs, 70);
   cs = Math.max(0, Math.min(100, cs));
   const reasons=[];
   if(d.depth==="quick") reasons.push("간이 진단(영역별 1문항)");
   if(nUnk) reasons.push(`모름·미응답 ${nUnk}문항`);
+  if(coverage<0.5) reasons.push("응답률 50% 미만 — 성숙도 구간 판정 보류");
   if(flags.length) reasons.push(`응답·보유현황 불일치 ${flags.length}건`);
   if(straight) reasons.push("모든 문항을 같은 단계로 응답");
   let tier, label;
@@ -2230,8 +2232,9 @@ function scoreEngine(d){
   const confidence = {score:cs, tier, label, desc, reasons, coverage:Math.round(coverage*100), nAns, nUnk, nNa, asked:asked.length, straight, flags};
   const dataDepth = Math.round(coverage*100);
 
+  const held = total!=null && coverage<0.5;            // 일부 문항만 답해 점수가 부풀거나 줄 수 있음
   return {w, areaScore, status, expected, gap, detail, total, expTotal, avg, filled, evidence, dataDepth, confidence,
-          filledCnt:scored.length};
+          filledCnt:scored.length, held};
 }
 
 /* 응답 점검: 성숙도 응답 ↔ 보유 현황·기본 정보가 서로 맞지 않으면 신뢰도에 반영하고 확인 항목으로 표시 */
@@ -2253,11 +2256,18 @@ function consistencyFlags(d){
   if(v("C3")===3 && !p.has("venture")) f("X11","C3","기업 인증을 보유한다고 응답했지만 보유 현황의 '벤처기업확인'은 체크되지 않음(이노비즈·메인비즈만 보유라면 무시해도 됩니다)");
   if(p.has("contracts") && v("F2")!=null && v("F2")<=1) f("X12","F2","표준 계약서 보유로 체크했지만 거래서류는 일부 거래만 쓴다고 응답");
   if(d.revenue==="r0" && v("S3")!=null && v("S3")>=2) f("X13","S3","매출이 없다고 했지만 기존 고객 관리는 정기 연락 이상으로 응답");
+  const exNA = ["E1","E2","E3"].filter(id=>asked.has(id)).every(id=>a[id]==="na") && ["E1","E2","E3"].some(id=>asked.has(id));
+  if(exNA && d.customer==="global") f("X15","E1","주요 고객을 '해외'로 골랐지만 수출을 '해당 없음(국내 전용)'으로 응답");
+  if(exNA && (d.concern||[]).includes("export")) f("X16","E1","가장 큰 고민으로 '수출'을 골랐지만 수출을 '해당 없음'으로 응답");
+  if(exNA && p.has("export_rec")) f("X17","E1","수출실적 보유로 체크했지만 수출을 '해당 없음'으로 응답");
+  if(a.S3==="na" && asked.has("S3") && d.revenue && d.revenue!=="r0") f("X18","S3","매출이 있는데 기존 고객 관리를 '아직 고객이 없음'으로 응답");
+  if(a.F2==="na" && asked.has("F2") && d.revenue && d.revenue!=="r0") f("X19","F2","매출이 있는데 거래서류를 '아직 거래 전'으로 응답");
   if(d.stage!=="pre" && !p.has("biz_reg") && v("F1")!=null && v("F1")>=2 && (d.prep||[]).length>0) f("X14","F1","인허가를 모두 갖췄다고 응답했지만 보유 현황의 '사업자등록'은 체크되지 않음");
   return out;
 }
 
-function stageBand(total){
+function stageBand(total, held){
+  if(held) return {key:"bx",nm:"판정 보류(응답 부족)",desc:"응답률이 50% 미만이라 성숙도 구간을 판정하지 않았습니다"};
   if(total==null) return {key:"bx",nm:"판정 보류",desc:"응답이 부족해 성숙도 구간을 판정하지 않았습니다"};
   if(total<40) return {key:"b0",nm:"기초정비 단계",desc:"기본 인프라부터 정비가 필요한 구간"};
   if(total<60) return {key:"b1",nm:"성장 준비 단계",desc:"운영 기반을 다지는 구간"};
@@ -2351,6 +2361,21 @@ function pickActivities(d, sc){
     cand.push({...a, _p:p, _tag:tag, _areaSc:areaSc, _qSc:qs, _rel:rel, _reasons:reasons});
   });
   cand.sort((x,y)=>y._p-x._p);
+  // 후보가 3개 미만(대부분 '체계화')이면 보고서가 비지 않도록 ① 다음 단계 준비 과제 ② 유지·점검 과제로 보충
+  if(cand.length<3){
+    const KEYS=["pre","y1","y13","y35","y57","y7"]; const nx=KEYS[Math.min(5,KEYS.indexOf(st)+1)];
+    const have=new Set(cand.map(c=>c.id));
+    const extra=(filterFn, reason, base)=>LIB.forEach(a=>{
+      if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own))) return;
+      const rel=relevanceOf(d.industry, a.area, st); if(rel<=0.22 || !filterFn(a)) return;
+      have.add(a.id);
+      cand.push({...a, _p:base*rel, _tag:"plan", _areaSc:sc.areaScore[a.area], _qSc:qScoreOf(a.q), _rel:rel,
+        _reasons:[`${AREA[a.area].short} ${sc.areaScore[a.area]==null?"응답 없음":sc.areaScore[a.area]+"점"} · 단계 기대 ${sc.expected[a.area]}점(${gapTxt(sc.gap[a.area])})`, reason]});
+    });
+    if(nx!==st) extra(a=>a.stages && a.stages.includes(nx) && !a.stages.includes(st), `현 단계 기대수준 도달 — 다음 단계(${STAGE[nx].nm}) 준비 과제`, 12);
+    if(cand.length<3) extra(a=>a.stages && a.stages.includes(st), "관련 문항 '체계화' — 연 1회 유지·점검 과제", 6);
+    cand.sort((x,y)=>y._p-x._p);
+  }
   const perAreaCap = (st==="pre"||st==="y1") ? 3 : 2;
   const out=[]; const cnt={};
   for(const a of cand){
@@ -2405,7 +2430,7 @@ const KPI_LIB = {
     {name:"고객 인터뷰 누적",area:"bm",unit:"건",g3:"15건+",g12:"40건+",how:"인터뷰 기록 수 집계",eg:"예: 8건",cyc:"월간",basis:"실무 권장"},
     {name:"시장 검증(설문·테스트)",area:"bm",unit:"회",g3:"3회+",g12:"8회+",how:"검증 실행 횟수",eg:"예: 1회",cyc:"월간",basis:"실무 권장"},
     {name:"초기 판매 테스트",area:"sales",unit:"건",g3:"5건+",g12:"20건+",how:"유료 전환 건수",eg:"예: 2건",cyc:"월간",basis:"실무 권장"},
-    {name:"사업계획서 완성도",area:"bm",unit:"%",g3:"70%",g12:"90%+",how:"필수 12개 항목 작성 비율",eg:"예: 50%",cyc:"월간",basis:"실무 권장"},
+    {name:"사업계획서 완성도",area:"bm",unit:"%",g3:"70%",g12:"90%+",how:"필수 8개 항목(문제·해결·시장·경쟁·수익모델·팀·재무·자금) 작성 비율",eg:"예: 50%",cyc:"월간",basis:"실무 권장"},
     {name:"창업 준비 체크리스트",area:"foundation",unit:"%",g3:"60%",g12:"100%",how:"완료 항목/전체",eg:"예: 40%",cyc:"월간",basis:"실무 권장"}
   ],
   y1:[
@@ -2550,7 +2575,7 @@ const nmOf = (arr,v)=> (arr.find(o=>o.v===v)||{}).t || "-";
 /* 데이터 레이어 — 진단 결과를 구조화 JSON으로 추출 (렌더·파일 저장·재진단 비교 공용) */
 function buildDiagnosisData(d, isSample){
   const sc   = scoreEngine(d);
-  const band = stageBand(sc.total);
+  const band = stageBand(sc.total, sc.held);
   const acts = pickActivities(d, sc);
   const sw   = strengthsWeak(sc, d);
   const p90  = plan90(acts);
@@ -2614,7 +2639,9 @@ function buildDiagnosisNarrative(diag){
     ? `우선 착수할 활동은 '${first.title}'(${first.areaName})입니다. ${first.why} 90일 동안 착수→실행→점검 순으로 진행하고, 12개월에 걸쳐 ${diag.roadmap.map(r=>r.theme).join("→")} 흐름으로 확장한 뒤 같은 문항으로 재진단해 변화를 확인하는 것을 권장합니다.`
     : "";
   const b0 = diag.bottlenecks[0];
-  const core = b0 ? `${b0.fullName} 영역이 ${p.stageNm} 기대수준보다 ${-b0.gap}점 낮아, 지금 가장 먼저 풀어야 할 병목입니다.`
+  const core = b0 ? (b0.gap<0
+      ? `${b0.fullName} 영역이 ${p.stageNm} 기대수준보다 ${-b0.gap}점 낮아, 지금 가장 먼저 풀어야 할 병목입니다.`
+      : `${b0.fullName} 영역은 기대수준(${b0.expected}점)에는 도달했지만, 가장 큰 고민으로 고른 영역이고 아직 정례화(67점) 전이라 먼저 보강할 대상입니다.`)
                   : `9개 영역 모두 ${p.stageNm} 기대수준에 도달해, 다음 단계(${nextStageNm(p.stage)}) 기준으로 확장할 시점입니다.`;
   return { paragraphs:[para1, para2].filter(Boolean), oneLine:para1, core };
 }
@@ -2630,7 +2657,10 @@ function buildCTA(diag){
     body = `응답이 부족하거나 점검이 필요한 문항이 있습니다. ${p.industryNm} ${p.stageNm} 기업의 실제 현황을 함께 확인하면 우선순위가 더 정확해집니다.`;
   } else if(topBot){
     headline = `'${topBot.name}' 보완, 어떻게 시작할지 막막하다면`;
-    body = `${topBot.name}(${topBot.score}점)이 ${p.stageNm} 기대수준(${topBot.expected}점)보다 낮게 나타났습니다. 무엇을 먼저, 어떤 순서로 실행할지 중기부 인증 상담회사가 함께 정리해 드립니다.`;
+    body = (topBot.gap<0
+      ? `${topBot.name}(${topBot.score}점)이 ${p.stageNm} 기대수준(${topBot.expected}점)보다 낮게 나타났습니다. `
+      : `${topBot.name}(${topBot.score}점)은 기대수준에는 도달했지만 가장 큰 고민으로 고른 영역입니다. `)
+      + "무엇을 먼저, 어떤 순서로 실행할지 중기부 인증 상담회사가 함께 정리해 드립니다.";
   } else {
     headline = "이 결과, 실행 계획으로 바꾸고 싶다면";
     body = `${p.stageNm} 단계에 맞는 우선순위와 90일 실행 계획을 전문가와 함께 구체화할 수 있습니다.`;
@@ -2780,15 +2810,16 @@ function renderResult(d, isSample, baseline){
   let cmpSec = "";
   if(baseline && baseline.areas){
     const rows = AREA_KEYS.map(a=>{
-      const prev = baseline.areas[a], now = sc.areaScore[a];
+      const pv = baseline.areas[a]; const prev = typeof pv==="number" ? pv : null, now = sc.areaScore[a];
       const dlt = (prev==null||now==null) ? null : now-prev;
       const arrow = dlt==null?"–":dlt>0?`▲ ${dlt}`:dlt<0?`▼ ${-dlt}`:"＝ 0";
       return `<div class="cmp-row"><div>${esc(AREA[a].short)}</div><div>${prev==null?"–":prev}</div><div>${now==null?"–":now}</div><div class="${dlt==null?"":dlt>0?"up":dlt<0?"down":""}">${arrow}</div></div>`;
     }).join("");
-    const tdl = (baseline.total==null||sc.total==null)?null:sc.total-baseline.total;
+    const bt = typeof baseline.total==="number" ? baseline.total : null;
+    const tdl = (bt==null||sc.total==null)?null:sc.total-bt;
     cmpSec = `<div class="r-sec corekeep">
     <h3><span class="ix ix-c">↻</span>재진단 비교</h3>
-    <p class="sub">기준 진단(${esc(baseline.date||"이전 결과")}) 대비 같은 문항 기준 변화입니다. 종합 ${baseline.total==null?"–":baseline.total}점 → ${totalTxt}점 ${tdl==null?"":tdl>0?`(▲ ${tdl})`:tdl<0?`(▼ ${-tdl})`:"(변화 없음)"}${baseline.depth && baseline.depth!==(d.depth||"standard")?" · 진단 깊이가 달라 문항 수가 다릅니다":""}</p>
+    <p class="sub">기준 진단(${esc(baseline.date||"이전 결과")}) 대비 같은 문항 기준 변화입니다. 종합 ${bt==null?"–":bt}점 → ${totalTxt}점 ${tdl==null?"":tdl>0?`(▲ ${tdl})`:tdl<0?`(▼ ${-tdl})`:"(변화 없음)"}${baseline.depth && baseline.depth!==(d.depth||"standard")?" · 진단 깊이가 달라 문항 수가 다릅니다":""}</p>
     <div class="cmp"><div class="cmp-row cmp-h"><div>영역</div><div>기준</div><div>이번</div><div>변화</div></div>${rows}</div></div>`;
   }
 
@@ -3012,7 +3043,7 @@ function renderResult(d, isSample, baseline){
         <h5>4) 우선순위</h5>
         영역 우선도 = max(0, 기대수준 − 점수) × 적합도(업종×단계) + 고민 선택 시 15. 활동 우선도 = 영역 우선도 + (100 − 관련 문항 점수) × 0.15 × 적합도 + 단계 핵심영역 8 × 적합도. 관련 문항이 '체계화'면 제외, '정례화' 이상이면 ×0.5, 이미 보유한 과제(보유 현황)는 제외합니다. <b>고민은 점수를 깎지 않고 우선순위에만 반영</b>합니다(조직관리 → 기초·체계 영역).
         <h5>5) 진단 신뢰도 (점수와 분리)</h5>
-        신뢰도 = 응답률(모름·미응답 제외) − 응답·보유현황 불일치 1건당 8 − 일률 응답 15, 간이 진단은 최대 70. 75 이상 높음 · 50 이상 보통 · 그 미만 낮음. 보유 현황은 점수에 더하지 않고 이 교차 확인과 추천 제외에만 씁니다.
+        신뢰도 = 응답률(모름·미응답 제외) − 응답·보유현황 불일치 1건당 8. 일률 응답은 최대 60, 간이 진단은 최대 70이며, 응답률 50% 미만이면 성숙도 구간을 판정하지 않습니다. 75 이상 높음 · 50 이상 보통 · 그 미만 낮음. 보유 현황은 점수에 더하지 않고 이 교차 확인과 추천 제외에만 씁니다.
         <h5>6) 근거·출처 (${esc(APP_UPDATED)} 기준)</h5>
         <ol class="src-list">${Object.keys(SRC).map(id=>`<li><span class="src-k">${esc(SRC[id].k)}</span>${esc(SRC[id].f)}</li>`).join("")}</ol>
         <h5>7) 향후 연동(현재 미연동)</h5>
@@ -3220,7 +3251,7 @@ const GAN = (function(){
     let sc, acts;
     try{ sc=scoreEngine(d); acts=pickActivities(d,sc); }
     catch(e){ return; }
-    const band=stageBand(sc.total);
+    const band=stageBand(sc.total, sc.held);
     const sw=strengthsWeak(sc, d);
     const indNm=nmOf(OPT.industry,d.industry);
     const stageNm=STAGE[d.stage].nm;
@@ -3449,6 +3480,14 @@ const GAN = (function(){
       ans, memo:{overview:"",risk:"",kpiData:[]}
     };
   }
+  /* 재진단 기준 요약 정제 — 파일·임시저장에서 온 값은 0~100 정수와 짧은 날짜 문자열만 허용(화면 주입 차단) */
+  function sanitizeSummary(s){
+    if(!s || typeof s!=="object" || !s.areas || typeof s.areas!=="object") return null;
+    const num = v => (typeof v==="number" && isFinite(v) && v>=0 && v<=100) ? Math.round(v) : null;
+    const areas={}; AREA_KEYS.forEach(a=>{ areas[a]=num(s.areas[a]); });
+    return {total:num(s.total), expected:num(s.expected), areas, depth:s.depth==="quick"?"quick":"standard",
+            date: typeof s.date==="string" ? s.date.replace(/[<>&"']/g,"").slice(0,20) : ""};
+  }
   function tryLoadFromHash(){
     if(!location.hash.startsWith("#r=")) return false;
     try{
@@ -3489,7 +3528,7 @@ const GAN = (function(){
         if(!o || o.schema!==FILE_SCHEMA || !o.data){ toast("BECONIC 성장진단 v6 결과 파일이 아닙니다"); return; }
         const d=sanitize(o.data);
         state.data=d; state.isSample=false; state.isShared=false;
-        state.baseline = o.summary && o.summary.areas ? o.summary : summaryOf(d);
+        state.baseline = sanitizeSummary(o.summary) || summaryOf(d);
         _picks={tasks:new Set(),kpis:new Set(),custTasks:[],custKpis:[],kpiVals:{},_touchedT:false,_touchedK:false};
         restoreUI(); state.step=1; save();
         go("diagnose");
@@ -3625,7 +3664,7 @@ const GAN = (function(){
   /* 로컬 자동저장(이 브라우저에만) — 가상 예시·공유 링크 열람 중에는 저장하지 않음 */
   function save(){ if(state.isSample||state.isShared) return; try{ localStorage.setItem(STORE_KEY,JSON.stringify({data:state.data,step:Math.min(state.step,4),baseline:state.baseline})); }catch(e){} }
   function load(){ try{ const r=localStorage.getItem(STORE_KEY); if(!r)return; const o=JSON.parse(r);
-    if(o&&o.data){ state.data=Object.assign(emptyData(), sanitize(o.data)); state.baseline=o.baseline||null; restoreUI();
+    if(o&&o.data){ state.data=Object.assign(emptyData(), sanitize(o.data)); state.baseline=sanitizeSummary(o.baseline); restoreUI();
       const n=Object.keys(state.data.ans).length; if(state.data.stage||n){ const b=document.getElementById("resumeBar"); if(b){ b.style.display="flex"; const t=b.querySelector(".rs-t"); if(t) t.textContent=`이전에 입력하던 진단이 있습니다(${state.data.name||"이름 없음"} · 문항 ${n}개 응답).`; } } } }catch(e){} }
   function restoreUI(){
     const d=state.data;
@@ -3670,7 +3709,7 @@ const GAN = (function(){
   function resumeDismiss(){ const b=document.getElementById("resumeBar"); if(b) b.style.display="none"; }
   return {init,go,nextStep,prevStep,skipToResult,toggleCol,setMode,share,printPDF,restart,loadSample,clearSaved,resumeDismiss,
           exportFile,importFile,runDiagnosis,getDiagnosisData,getDiagnosisJSON,getNarrative,_track,openReportDialog,
-          _state:()=>state, _sanitize:sanitize, _buildShareURL:buildShareURL};
+          _state:()=>state, _sanitize:sanitize, _sanitizeSummary:sanitizeSummary, _buildShareURL:buildShareURL};
 })();
 window.GAN = GAN;
 
