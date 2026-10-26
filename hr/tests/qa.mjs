@@ -237,7 +237,12 @@ const run = (emp, hr, company) => page.evaluate(([e, h, c]) => { const R = compu
   await page.emulateMedia({ media: 'print' });
   const pdf = await page.pdf({ path: path.join(OUT, 'HR_Health_Navigator_v3_sample.pdf'), format: 'A4', printBackground: true, preferCSSPageSize: true });
   const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
-  check('A4 PDF 생성(표지+요약+본문)', pages >= 6 && pages <= 20, `${pages}쪽`);
+  // A4 인쇄 영역 폭(210mm − 좌우 11mm ≈ 711px)으로 맞춰 본문이 그 폭을 거의 다 쓰는지 확인
+  await page.setViewportSize({ width: 711, height: 1000 });
+  const pw = await page.evaluate(() => ({ r: Math.round(document.getElementById('result').getBoundingClientRect().width), c: Math.round(document.querySelector('#result .exec').getBoundingClientRect().width) }));
+  check('인쇄: 본문이 A4 인쇄 영역을 꽉 채움(이중 여백 없음, 95% 이상)', pw.r >= 675 && pw.c >= 675, JSON.stringify(pw));
+  await page.setViewportSize({ width: 1440, height: 900 });
+  check('A4 PDF 생성(표지+요약+본문, 12쪽 이하)', pages >= 6 && pages <= 12, `${pages}쪽`);
   await page.emulateMedia({ media: 'screen' });
 }
 

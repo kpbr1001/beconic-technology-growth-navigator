@@ -311,8 +311,20 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
 .g-meta{font-size:10.5px;color:var(--ink3);margin-top:3px}
 .g-track span{border-left:1px dashed #e2e8f0}
 .g-bar{position:absolute;top:50%;transform:translateY(-50%);height:22px;border-radius:6px;font-style:normal;font-size:10.5px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;opacity:.92}
+@media screen{body.wide main.wrap{max-width:1200px}body.wide .card{padding:28px 30px}}
+@media screen and (min-width:1100px){body.wide .gapg{grid-template-columns:repeat(3,1fr)}body.wide .svc{grid-template-columns:repeat(3,1fr)}}
+.snap{display:grid;grid-template-columns:1fr 1fr;gap:18px;border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.snap-row{display:grid;grid-template-columns:118px 1fr 28px;align-items:center;gap:8px;font-size:12px;padding:3px 0}
+.snap-n{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snap-t{height:7px;background:#eef2f8;border-radius:10px;overflow:hidden;display:block}.snap-t i{display:block;height:100%;border-radius:10px}
+.snap-row b{text-align:right;font-size:12px}
+.snap-legal{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;color:var(--ink2);margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
+.snap-legal i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+.snap-q{font-size:11.5px;color:var(--ink2);margin-top:8px}.snap-q span{display:inline-block;font-weight:800;color:var(--ink);background:#f0f3f8;border-radius:4px;padding:1px 6px;margin:0 3px}
+.snap-q small{display:block;color:var(--ink3);font-size:10.5px;margin-top:3px}
 .rm-cont{font-size:11px;font-weight:700;color:var(--primary-d);background:#e7f0fe;padding:1px 6px;border-radius:4px}
 @media(max-width:720px){
+ .snap{grid-template-columns:1fr}
  .g-head,.g-row{grid-template-columns:1fr}
  .g-head .g-name{display:none}
  .g-row .g-cols{height:30px}
@@ -391,44 +403,128 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
 
 /* ===== PRINT CSS ===== */
 @media print{
- @page{size:A4 portrait;margin:10mm 0 13mm;
-  @bottom-left{content:"HR Health Navigator · 조직 건강 진단 보고서";font-size:8pt;color:#8a94a6;padding-left:13mm;font-family:"Pretendard Variable",Pretendard,"Noto Sans CJK KR",sans-serif}
-  @bottom-right{content:counter(page) " / " counter(pages);font-size:8pt;color:#8a94a6;padding-right:13mm;font-family:"Pretendard Variable",Pretendard,"Noto Sans CJK KR",sans-serif}}
- @page:first{margin:0;@bottom-left{content:none}@bottom-right{content:none}}
- body{background:#fff}
+ /* ===== 인쇄(PDF) — 컨설팅 보고서 레이아웃 =====
+    본문 폭 = A4 210mm − 좌우 11mm. 카드 테두리·그림자·이중 여백 없이 구분선·여백으로 단락을 나눈다. */
+ @page{size:A4 portrait;margin:15mm 11mm 14mm;
+  @top-left{content:"HR HEALTH NAVIGATOR  |  조직 건강 진단 보고서";font-size:7.5pt;letter-spacing:.6pt;color:#1a2b4a;font-weight:700;vertical-align:bottom;padding-bottom:3mm;font-family:"Pretendard Variable",Pretendard,"Noto Sans CJK KR",sans-serif}
+  @top-right{content:"CONFIDENTIAL";font-size:7pt;letter-spacing:1.5pt;color:#b08d1e;font-weight:800;vertical-align:bottom;padding-bottom:3mm;font-family:"Pretendard Variable",Pretendard,"Noto Sans CJK KR",sans-serif}
+  @bottom-left{content:"그로스벤처스 주식회사 · BECONIC   본 보고서는 참고용 진단이며 법률·노무 판단이 아닙니다";font-size:7pt;color:#8a94a6;vertical-align:top;padding-top:3mm;font-family:"Pretendard Variable",Pretendard,"Noto Sans CJK KR",sans-serif}
+  @bottom-right{content:counter(page) " / " counter(pages);font-size:8pt;font-weight:700;color:#1a2b4a;vertical-align:top;padding-top:3mm;font-family:"Pretendard Variable",Pretendard,"Noto Sans CJK KR",sans-serif}}
+ @page:first{margin:0;@top-left{content:none}@top-right{content:none}@bottom-left{content:none}@bottom-right{content:none}}
+ html,body{background:#fff}
+ body{font-size:12.5px;line-height:1.55}
  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
- .hd,.stepper,.btn-row,.pane .btn,.na-row,.no-print,.ai-prev{display:none!important}
- .exec{break-after:page;page-break-after:always}
+ .hd,.stepper,.btn-row,.pane .btn,.na-row,.no-print,.ai-prev,footer.ft,[id^="ip_"]{display:none!important}
  .ai-card:not(.has-ai){display:none!important}
- .rm-h,.rm-sub{break-after:avoid;page-break-after:avoid}
- .matrix{max-width:150mm}
- .rmc,.deep,.risk-row,.pri-row,.tbl tr{break-inside:avoid;page-break-inside:avoid}
  #s0,#s1,#s2,#s3{display:none!important}
  .pane.hidden{display:none!important}
  #s4,#s5{display:block!important}
- main{padding:0}
  .pdf-only{display:block!important}
- /* 본문은 표지 다음부터 좌우 여백 */
- #result,#roadmap,.wrap{padding-left:13mm;padding-right:13mm}
- #result,#roadmap{padding-top:2mm}
- #s5{break-before:page}
- .card{box-shadow:none;border:1px solid #dbe1ea;break-inside:auto;page-break-inside:auto;margin-bottom:11px;padding:20px 22px}
- .res-head,.exec,.warn-card,.gapc,.deep,.rm-item,.g-row,.sum-li,.kpi,.svc-i,.rec,.evid{break-inside:avoid;page-break-inside:avoid}
- .gantt-card{break-inside:avoid;page-break-inside:avoid;break-after:page}
- .g-head{break-after:avoid}
- .g-head,.g-row{grid-template-columns:52% 1fr!important}
- .g-row .g-name{padding:5px 10px;font-size:11px;line-height:1.35}
- .g-act{font-size:10.5px;margin-top:0}
- .g-meta{display:none}
- .g-bar{height:18px;font-size:9.5px}
- footer.ft{display:none!important}
- h3.sec,.dhead{page-break-after:avoid}
- .grid3{break-inside:avoid;display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:10px!important}
- .grid2{break-inside:avoid;display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
- .gapg{grid-template-columns:1fr 1fr!important}
- h3.sec,.kicker,.rm-h,.rm-sub{break-after:avoid;page-break-after:avoid}
- .dbar{break-inside:avoid}
- [id^="ip_"]{display:none!important}
+ #pdfCover{height:296mm}
+ /* 이중 여백 제거: 페이지 여백만 사용 */
+ main,main.wrap,.wrap,#result,#roadmap{max-width:none!important;padding:0!important;margin:0!important}
+
+ /* 카드 → 평면 섹션 (구분선·여백) */
+ .card{background:transparent;border:0;border-radius:0;box-shadow:none;padding:0 0 1mm;margin:0 0 6.5mm;break-inside:auto}
+ .card h2{font-size:17px;margin-bottom:2px}
+ .card .sub{font-size:11.5px;margin-bottom:3mm}
+ .kicker{font-size:9.5px;letter-spacing:1.6px;color:#3182F6;margin-bottom:1.5mm}
+ h3.sec{font-size:14px;font-weight:800;color:#1a2b4a;border-left:0;padding:0 0 1.6mm;margin:0 0 3mm;border-bottom:1.6px solid #1a2b4a}
+ h3.sec .sec-tag{font-size:10px;font-weight:600;margin-left:4px}
+ .note{font-size:10.5px;margin-bottom:2.5mm;line-height:1.5}
+ h3.sec,.kicker,.rm-h,.rm-sub,.g-head,.dhead{break-after:avoid;page-break-after:avoid}
+
+ /* 결과 머리·경영진 요약(1쪽) */
+ .banner-sample{font-size:10.5px;padding:2mm 3mm;margin-bottom:3mm;border-radius:6px}
+ .res-head{background:linear-gradient(135deg,#1a2b4a,#22345a)!important;border-radius:10px;padding:6mm 7mm!important;margin-bottom:4mm!important}
+ .res-head h2{font-size:21px}.rh-sub{font-size:10.5px}.rh-pill{font-size:10px;padding:3px 9px}
+ .sb{padding:3mm 4mm;min-width:24mm}.sb-v{font-size:28px}.sb-l,.sb-g{font-size:10px}
+ .exec{border:0;border-top:3px solid #1a2b4a;padding-top:4mm;break-after:page;page-break-after:always}
+ .exec-h{font-size:18px;margin-bottom:4mm}
+ .kpis{gap:3mm;margin-bottom:4mm}.kpi{padding:3mm 3.5mm;border-radius:6px;border-top:2.5px solid #3182F6}
+ .kpi-v{font-size:22px}.kpi-sm{font-size:14px}.kpi-l,.kpi-s{font-size:9.5px}
+ .exec-row{font-size:12px;padding:2mm 0}.exec-note{font-size:9.5px}
+ .snap{gap:7mm;margin-top:4mm;padding-top:3.5mm}.snap-row{grid-template-columns:36mm 1fr 8mm;font-size:11px;padding:.9mm 0}
+ .snap-legal,.snap-q{font-size:10.5px}
+
+ /* 로드맵 한눈에(1쪽) */
+ .gantt-card{break-inside:avoid;page-break-inside:avoid}
+ .gt-h{font-size:16px;margin-bottom:3mm}
+ .gantt{border-radius:6px;border-color:#cfd7e3}
+ .g-head{background:#1a2b4a!important;color:#fff}.g-head small{color:#b9c6dc}
+ .g-head .g-cols span{border-left-color:rgba(255,255,255,.18)}
+ .g-head,.g-row{grid-template-columns:50% 1fr!important}
+ .g-row:nth-child(odd){background:#f8fafc}
+ .g-row .g-name{padding:2.2mm 3mm;font-size:11px;line-height:1.35}
+ .g-act{font-size:10px;margin-top:0}.g-meta{display:none}
+ .g-bar{height:16px;font-size:9px;border-radius:4px}
+
+ /* 경고·문제정의 */
+ .warn-card{background:#fffbf3!important;border-left:3px solid #f59e0b!important;padding:3.5mm 4.5mm!important;border-radius:0}
+ .wc-t{font-size:12.5px}.warn-card p,.sig{font-size:10.5px}
+ .card[style*="border-left:5px solid var(--navy)"]{border-left:0!important;border-top:3px solid #1a2b4a;padding-top:4mm}
+ .prob-h{font-size:17px;margin-bottom:3mm}.prob-b{font-size:12px;margin-bottom:3.5mm}
+ .evid{padding:3mm 4mm;border-radius:6px}.evid-i{font-size:11px;padding:1mm 0 1mm 14px}
+ .grid3{display:grid!important;grid-template-columns:1fr 1fr 1fr!important;gap:3.5mm!important;margin-bottom:6mm;break-inside:avoid}
+ .grid3>.card{border:1px solid #dbe2ec;border-radius:6px;padding:3.5mm 4mm;margin:0}
+ .grid2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:3mm!important;break-inside:avoid}
+
+ /* 항목별 막대 */
+ .dbar{margin-bottom:1.6mm!important;break-inside:avoid}
+ .card:has(> .drv-k){break-inside:avoid;page-break-inside:avoid}
+ #roadmap>.card:first-child{break-before:auto}
+ .dbar-name{width:44mm;font-size:11.5px}.dbar-track{height:5.5mm}.dbar-fill span{font-size:10px}
+ .dbar-grade{width:26mm;font-size:10px}.caret{display:none}
+
+ /* 심층 해석 */
+ .deep{border:0;border-left:3px solid;border-radius:0;padding:0 0 0 4mm;margin:0 0 4.5mm;break-inside:avoid}
+ .deep-h b{font-size:13px}.deep-ans{font-size:10.5px;padding:2mm 3mm;margin-bottom:2mm}
+ .deep-b{font-size:11px;line-height:1.55}.deep-risk{padding:2mm 3mm}
+
+ /* 갭 매트릭스·카드 */
+ .matrix{max-width:150mm;margin:0 auto 4mm}
+ .gapg{grid-template-columns:1fr 1fr 1fr!important;gap:3mm}
+ .gapc{padding:3mm 3.5mm;border-radius:6px;break-inside:avoid}
+ .gapc-h b{font-size:12px}.gapc-h span{font-size:8.5px;padding:2px 6px}.gapc-d{font-size:10px;margin-top:2mm}
+
+ /* 표: 남색 머리행 + 줄무늬 */
+ .tbl{font-size:10.5px}
+ .tbl th{background:#1a2b4a!important;color:#fff;font-size:10px;padding:2mm 2.5mm;border-bottom:0}
+ .tbl td{padding:1.8mm 2.5mm;border-bottom:1px solid #e3e8ef}
+ .tbl tbody tr:nth-child(even) td{background:#f6f8fb}
+ .tbl tr{break-inside:avoid}
+
+ /* 노무 스크리닝 */
+ .risk-row{padding:2.2mm 0;gap:3mm;break-inside:avoid}.risk-tag{font-size:9.5px;padding:3px 7px}
+ .risk-q{font-size:11.5px}.risk-l{font-size:9.5px}.risk-grp{font-size:10.5px;margin:2mm 0 0}
+ .disc{font-size:9.5px;padding:2mm 3mm;margin-top:3mm}
+
+ /* 우선순위·로드맵 상세 */
+ .pri-row{padding:2.2mm 0;gap:3mm;break-inside:avoid}.pri-main b{font-size:12px}.pri-basis{font-size:9.5px}
+ .pri-score{width:30mm}.pri-n{width:6mm;height:6mm;font-size:11px}
+ .rmc{break-inside:auto}
+ .rm-h h3{font-size:14px}.rm-sub{font-size:10.5px;margin:0 0 2.5mm 5mm}
+ .rm-item{padding:2mm 0 2mm 4mm;margin-bottom:3mm;break-inside:avoid}
+ .rm-t{font-size:12px}.rm-a{font-size:11.5px;margin-bottom:1.5mm}.rm-how{font-size:10.5px;margin-bottom:1.5mm;line-height:1.5}
+ .rm-eff{font-size:10.5px;padding:1.5mm 3mm;margin-bottom:1.5mm}
+ .chips{font-size:9.5px;gap:4px}.chips span{padding:2px 6px}
+
+ /* 연계·컨설팅·방법론 */
+ .rec{padding:2mm 0;break-inside:avoid}.rec p{font-size:10.5px}
+ .cta-card{border:0;border-top:3px solid #c9a227;padding-top:4mm;break-inside:avoid}
+ .svc{grid-template-columns:repeat(5,1fr);gap:2mm;margin-bottom:2.5mm}.svc-i{padding:2mm 2.3mm;break-inside:avoid}
+ .svc-t{font-size:11px}.svc-d{font-size:9.5px}.cta-box{padding:2.5mm;border-radius:6px}
+ .cta-card .note{font-size:10.5px!important;margin-bottom:2.5mm}.cta-co{font-size:11.5px;margin-bottom:1mm}.cta-ct{font-size:10.5px;margin-bottom:0}
+ .rec-no{width:8mm;height:8mm;font-size:11px}.rec b{font-size:12px}
+ .meth p{font-size:10px;line-height:1.55;column-count:2;column-gap:7mm}
+ .src-list{font-size:10px;margin-top:2.5mm}.src-list ol{column-count:3;column-gap:5mm;font-size:8.4px;line-height:1.4;margin-top:1.5mm;padding-left:4mm}
+ .src-list li{break-inside:avoid}
+ .quote{font-size:11.5px}
+ .ai-out{font-size:11px}
+ /* 면책 안내(본문 뒤) */
+ body>.wrap>.card{border-top:1px solid #cfd7e3;padding-top:2.5mm;margin-top:2mm;break-inside:avoid}
+ body>.wrap>.card h4{font-size:11px!important;margin-bottom:1mm!important}
+ body>.wrap>.card p{font-size:8.8px!important;line-height:1.5!important}
 }
 </style>
 <style>
@@ -807,7 +903,7 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
    결과구조: 경영진 요약 → 문제정의 → 항목별 진단·해석 → 인사이트·노무 → 120일 로드맵
    점수·우선순위·로드맵 = 공개 규칙(결정론 코드). AI는 운영자가 켠 경우에만 '해석 초안'을 덧붙임.
    ============================================================ */
-const APP={ver:'v3.1.1', updated:'2026-10-26', qbank:'HRH-QB-3.0', lawBase:'2026-10-26'};
+const APP={ver:'v3.2.0', updated:'2026-10-26', qbank:'HRH-QB-3.0', lawBase:'2026-10-26'};
 /* 연계 Tool 주소 — 비어 있으면 링크 없이 'BECONIC 허브에서 이용' 안내만 표시 */
 const TOOL_LINKS={ceo:'', finance:'https://beconic-diagnosis-finance.netlify.app'};
 const CONTACT={tel:'070-4103-4177', mail:'start@gven.kr', web:'www.beconic.kr'};
@@ -1327,6 +1423,7 @@ const $=id=>document.getElementById(id);
 
 function go(n){
  S.step=n;
+ document.body.classList.toggle('wide',n>=4); // 결과·로드맵은 넓은 화면을 끝까지 활용
  document.querySelectorAll('.pane').forEach((p,i)=>p.classList.toggle('hidden',i!==n));
  document.querySelectorAll('.step').forEach(s=>{const d=+s.dataset.step;
   s.classList.toggle('active',d===n);s.classList.toggle('done',d<n);});
@@ -1642,6 +1739,16 @@ function renderResult(R){
   <div class="exec-top"><div class="exec-tt">최우선 과제 3</div>
    ${top3.length?'':'<div class="note">개선이 시급한 과제가 없습니다.</div>'}${top3.map((p,i)=>`<div class="exec-row"><span class="er-n ${p.type==='risk'?'er-r':''}">${i+1}</span><b>${p.type==='risk'?LRX[p.ref]?.action||p.name:RX[p.ref].action}</b><span class="er-w">${p.type==='risk'?'노무':p.eligible?'조직':'조직 강화'} · ${when(p)}</span></div>`).join('')}
   </div>
+  <div class="snap">
+   <div class="snap-col"><div class="exec-tt">10개 영역 점수 한눈에</div>
+    ${R.drivers.map(d=>{const gg=grade(d.score);return `<div class="snap-row"><span class="snap-n">${d.name}</span><span class="snap-t"><i style="width:${d.score??0}%;background:${gg.c}"></i></span><b style="color:${gg.c}">${d.score??'-'}</b></div>`;}).join('')}
+   </div>
+   <div class="snap-col"><div class="exec-tt">성과지표 · 제도·노무</div>
+    ${R.outcomes.map(o=>{const gg=grade(o.score);return `<div class="snap-row"><span class="snap-n">${o.name}</span><span class="snap-t"><i style="width:${o.score??0}%;background:${gg.c}"></i></span><b style="color:${gg.c}">${o.score??'-'}</b></div>`;}).join('')}
+    <div class="snap-legal">${[['expert','전문가 검토 필요','var(--bad)'],['unknown','확인 필요','var(--warn)'],['partial','보완 권고','#f97316'],['improve','운영 개선 권고','var(--ink3)']].map(([k,t,c])=>`<span><i style="background:${c}"></i>${t} <b>${R.riskFlags.filter(f=>f.level===k).length}</b></span>`).join('')}</div>
+    <div class="snap-q">경험 × 제도: ${['A','B','C','D'].map(k=>`<span>${k} ${R.gaps.filter(g=>g.quad&&g.quad.k===k).length}</span>`).join('')}<small>(A 제도적 강점 · B 실행 격차 · C 문화 의존 · D 구조적 리스크)</small></div>
+   </div>
+  </div>
   <p class="exec-note">점수·우선순위·로드맵은 공개된 규칙으로 계산했습니다(아래 '방법론'). 점수는 내부 비교용 환산지수이며 외부 벤치마크가 아닙니다.</p>
  </div>`;
  h+=ganttCard(R);
@@ -1674,7 +1781,7 @@ function renderResult(R){
 
  /* === ② 항목별 진단 및 해석 === */
  h+=`<div class="card">
-  <div class="kicker">STEP 2 · 항목별 진단 및 해석</div>
+  <div class="kicker drv-k">STEP 2 · 항목별 진단 및 해석</div>
   <h3 class="sec" style="margin-top:8px;border:none;padding:0">10개 조직건강 드라이버${S.prev?` <small class="cmp-note">이전 진단(${esc(S.prev.date)}) 대비</small>`:''}</h3>
   <p class="note">1~5 응답을 0~100 환산지수로 변환(1=0, 3=50, 5=100). 구간: 80↑ 강점 · 65↑ 안정 · 50↑ 관찰 · 35↑ 개선 · 35↓ 집중(내부 해석 기준). 영역을 누르면 해석이 펼쳐집니다.</p>
   ${R.drivers.map(d=>driverBar(d)).join('')}
