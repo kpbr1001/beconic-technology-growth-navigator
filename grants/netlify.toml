@@ -1,0 +1,21 @@
+# BECONIC 지원사업 MATCH — Netlify 설정
+# 실제 API 키는 여기 작성하지 않는다. Netlify Environment Variables에서만 관리.
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# SPA 단일 HTML: 404를 index로
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
