@@ -5,12 +5,12 @@
 // - 동시에 두 번 돌지 않도록 잠금(LOCK_MS). 반복 호출해도 잠금·분석 완료 공고는 건너뜀
 // - 결과는 programs 응답 시점에 병합(applyDoc)되므로 다음 정기 수집을 기다리지 않는다
 // ============================================================================
-import { readSnapshot, namedStore, isPreview } from './collect.mjs';
-import { analyzeDocText, sections } from './doc-rules.mjs';
+import { readSnapshot, namedStore } from './collect.mjs';
+import { analyzeDocText } from './doc-rules.mjs';
 
 export const LIMIT = 80;
 // 분석 규칙 버전 — 규칙을 바꾸면 올려서 기존 공고문을 다시 분석한다
-export const DOC_VER = 2;
+export const DOC_VER = 3;
 const CONCURRENCY = 4;
 const DL_TIMEOUT_MS = 20000;
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -48,10 +48,7 @@ async function analyzeOne(p, { fetchImpl, textImpl }) {
     if (bytes.subarray(0, 4).toString('latin1') !== '%PDF') return { ...base, status: 'notpdf' };
     const text = await textImpl(bytes);
     if (text.replace(/\s/g, '').length < 150) return { ...base, status: 'notext', textLen: text.length }; // 포스터·스캔 이미지
-    const r = { ...base, status: 'ok', ...analyzeDocText(text, { regions: p.targetRegions }) };
-    // [진단·임시] 미리보기에서만 제목 줄·앞부분을 남겨 절 인식률 점검
-    if (isPreview()) { r._heads = sections(text).map((s) => s.head).slice(0, 15); r._head = text.slice(0, 1200); }
-    return r;
+    return { ...base, status: 'ok', ...analyzeDocText(text, { regions: p.targetRegionsInferred ? null : p.targetRegions }) };
   } catch (e) {
     return { ...base, status: 'error', error: String(e.message || e).slice(0, 120) };
   }

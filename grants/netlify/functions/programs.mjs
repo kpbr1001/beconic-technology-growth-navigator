@@ -70,9 +70,9 @@ export default async (req) => {
       setDeployHost(u.host);
       const idx = await readDocIndex();
       const all = Object.entries(idx).filter(([, d]) => d.status === 'ok');
-      const summary = { ok: all.length, sectionFound: all.filter(([, d]) => d.sectionFound).length, withFields: all.filter(([, d]) => d.fields).length, withDistricts: all.filter(([, d]) => d.districts).length };
+      const summary = { ok: all.length, sectionFound: all.filter(([, d]) => d.sectionFound).length, withFields: all.filter(([, d]) => d.fields).length, withDistricts: all.filter(([, d]) => d.districts).length, withRegions: all.filter(([, d]) => d.regions).length, preStartup: all.filter(([, d]) => d.preStartupAllowed != null).length, any: all.filter(([, d]) => d.fields || d.regions || d.districts || d.preStartupAllowed != null || d.amount).length };
       const pick = all.filter(([, d]) => !d.sectionFound).slice(0, 8).concat(all.filter(([, d]) => d.sectionFound && !d.fields).slice(0, 6));
-      return new Response(JSON.stringify({ summary, samples: pick.map(([id, d]) => ({ id, sectionFound: d.sectionFound, heads: d._heads, head: d._head })) }), { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
+      return new Response(JSON.stringify({ summary, samples: pick.map(([id, d]) => ({ id, sectionFound: d.sectionFound })) }), { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
     }
   } catch { /* 일반 응답으로 */ }
   try {

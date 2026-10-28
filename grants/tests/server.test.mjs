@@ -386,3 +386,35 @@ test('health: 키 값은 반환하지 않음', async () => {
     assert.equal(JSON.parse(res.body).claude, 'ready');
   } finally { process.env = saved; }
 });
+
+test('공고문 분석(실제 공고 앞부분): 라벨 글머리 줄, 소재 시·도, 예비창업자 허용', async () => {
+  const fs = await import('node:fs');
+  // 기업마당 공고문 PDF 5건에서 뽑은 텍스트 앞부분(미리보기 배포에서 수집)
+  const f = JSON.parse(fs.readFileSync(new URL('./fixtures/notice-heads.json', import.meta.url), 'utf8'));
+  const a = (id) => analyzeDocText(f[`PBLN_000000000${id}`]);
+  assert.deepEqual(a(127259).regions, ['충북']);
+  assert.equal(a(127259).preStartupAllowed, true);
+  assert.deepEqual(a(127256).regions, ['전남'], "'舊 전라남도 지역'은 전남만");
+  assert.deepEqual(a(127322).regions, ['광주', '전남']);
+  assert.deepEqual(a(127316).regions, ['강원']);
+  assert.equal(a(127257).regions, undefined, '응모자격에 소재지 없음');
+  assert.equal(a(127257).sectionFound, true, "'ㅇ (응모자격) …' 글머리 줄 인식");
+  // 라벨 아닌 줄('지원 제외 대상', '지원대상 사업')은 자격으로 읽지 않음
+  const r = analyzeDocText('❍ 지원 제외 대상 : 서울 소재 기업\n❍ 지원대상 사업 : 창업 3년 이내');
+  assert.equal(r.regions, undefined);
+  assert.equal(r.fields, undefined);
+  const neg = analyzeDocText('❍ 신청자격 : 중소기업\n- 예비창업자는 신청 불가');
+  assert.equal(neg.preStartupAllowed, false);
+});
+
+test('공고문 병합: 전국 간주 공고만 소재 시·도로 바로잡고 예비창업자 허용 반영', () => {
+  const doc = { status: 'ok', regions: ['충북'], regionEvidence: '충북 소재', preStartupAllowed: true, preStartupEvidence: '또는 예비창업자' };
+  const q = applyDoc({ targetRegions: ['전국'], targetRegionsInferred: true, targetBusinessType: ['법인', '개인사업자'], targetBusinessTypeInferred: true, eligibilityDepth: 'listing' }, doc);
+  assert.deepEqual(q.targetRegions, ['충북']);
+  assert.equal(q.targetRegionsInferred, false);
+  assert.equal(q.preStartupAllowed, true);
+  assert.ok(q.targetBusinessType.includes('예비창업자'));
+  assert.equal(q.eligibilityDepth, 'doc');
+  const kept = applyDoc({ targetRegions: ['전국'], targetRegionsInferred: false }, doc);
+  assert.deepEqual(kept.targetRegions, ['전국'], '전국으로 명시된 공고는 유지');
+});

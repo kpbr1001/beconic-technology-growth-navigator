@@ -1321,7 +1321,7 @@ const App = (function(){
         <div><b>${esc(c.label)}</b>${c.evidence?`<span class="cond-ev">${esc(c.evidence)}</span>`:''}</div></div>`;
     }).join('') || '<p class="muted">판정할 자격 항목이 공고에 없습니다.</p>';
     const pref=(p.preferenceConditions||[]).map(x=>`<span class="pref">우대 ${esc(x)}</span>`).join('');
-    const EV_LABEL={businessAgeMax:'업력 상한',businessAgeMin:'업력 하한',employeeMax:'근로자 상한',employeeMin:'근로자 하한',revenueMax:'매출 상한',revenueMin:'매출 하한',representativeAgeMax:'대표자 연령 상한',representativeAgeMin:'대표자 연령 하한',targetDistricts:'대상 시·군·구',targetIndustries:'대상 업종',excludedIndustries:'제외 업종',specialRequirements:'필수 자격',requiresNoTaxArrears:'체납 제한',supportAmountMax:'지원금'};
+    const EV_LABEL={businessAgeMax:'업력 상한',businessAgeMin:'업력 하한',employeeMax:'근로자 상한',employeeMin:'근로자 하한',revenueMax:'매출 상한',revenueMin:'매출 하한',representativeAgeMax:'대표자 연령 상한',representativeAgeMin:'대표자 연령 하한',targetRegions:'대상 지역',targetDistricts:'대상 시·군·구',preStartupAllowed:'예비창업자 신청',targetIndustries:'대상 업종',excludedIndustries:'제외 업종',specialRequirements:'필수 자격',requiresNoTaxArrears:'체납 제한',supportAmountMax:'지원금'};
     const evObj = Object.assign({}, p._ruleEvidence||{}, p._docEvidence||{}, p._eligibilityEvidence||{});
     const ev = Object.entries(evObj).filter(([,v])=>typeof v==='string').slice(0,8).map(([k,v])=>`<li><b>${esc(EV_LABEL[k]||k)}</b> “${esc(v)}”</li>`).join('');
     const depth = p._aiEnriched ? 'AI 본문 분석(근거 문구 대조)' : p.eligibilityDepth==='doc' ? '공고문(PDF) 신청자격 분석' : p.eligibilityDepth==='rule' ? '공고 본문 정형 문구 분석' : p.eligibilityDepth==='listing' ? '공고 목록 정보(본문 미분석)' : ProgramProvider.lastMode==='live' ? '공고 정보' : 'DEMO 예시 데이터';
