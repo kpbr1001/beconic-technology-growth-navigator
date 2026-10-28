@@ -2,7 +2,7 @@
 import { refreshSnapshot } from '../lib/collect.mjs';
 
 export default async () => {
-  await refreshSnapshot(process.env, { sourceTimeoutMs: 20000, aiStartBudgetMs: 15000 });
+  await refreshSnapshot(process.env, { sourceTimeoutMs: 25000, aiStartBudgetMs: 15000 });
   return new Response(null, { status: 204 });
 };
 

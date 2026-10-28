@@ -9,7 +9,7 @@ import { collectKstartup } from './kstartup.mjs';
 import { extractEligibility, mergeEligibility } from './eligibility-ai.mjs';
 import { dedupe, isPastKst } from './normalize.mjs';
 
-const BIZINFO_MAX = 500;
+const BIZINFO_MAX = 2000;           // 운영에서 500건 상한에 정확히 걸림(접수 공고가 더 있음) → 상향
 const KSTARTUP_MAX = 500;
 const ENRICH_COUNT = 12;
 const DESC_MAX = 500;               // 응답 크기 제한(Netlify 6MB) — 본문은 요약만 내려보낸다
