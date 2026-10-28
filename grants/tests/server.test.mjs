@@ -7,7 +7,7 @@ import { normalizeBizinfo, parsePeriod } from '../netlify/lib/bizinfo.mjs';
 import { mapBusinessAge, mapAge, normalizeKstartup } from '../netlify/lib/kstartup.mjs';
 import { mergeEligibility, safeParse } from '../netlify/lib/eligibility-ai.mjs';
 import programsHandler, { getPrograms, _resetCache } from '../netlify/functions/programs.mjs';
-import { isAlive, refreshSnapshot, readSnapshot, _setStore, enrichLocal } from '../netlify/lib/collect.mjs';
+import { isAlive, refreshSnapshot, readSnapshot, _setStore, enrichLocal, storeName } from '../netlify/lib/collect.mjs';
 import { extractRules } from '../netlify/lib/rule-extract.mjs';
 import { detectCities } from '../netlify/lib/normalize.mjs';
 import { handler as health } from '../netlify/functions/health.mjs';
@@ -134,6 +134,12 @@ test('시·군 기관 공고: 대상 시·군 인식(접두·정식명), 남양�
   assert.equal(p.eligibilityDepth, 'rule');
   const q = enrichLocal({ programName: 'X', executingAgency: '성남산업진흥원', targetRegions: ['전국'], targetRegionsInferred: false });
   assert.equal(q.targetDistricts, undefined, '전국으로 명시된 공고는 그대로');
+});
+
+test('Blobs 저장소: 미리보기 배포는 운영 스냅샷과 분리', () => {
+  assert.equal(storeName('production'), 'grant-programs');
+  assert.equal(storeName('deploy-preview'), 'grant-programs-preview');
+  assert.equal(storeName('branch-deploy'), 'grant-programs-preview');
 });
 
 test('stripTags: 태그 제거·엔티티 복원', () => {

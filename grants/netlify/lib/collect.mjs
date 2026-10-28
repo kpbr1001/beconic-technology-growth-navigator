@@ -114,11 +114,15 @@ export async function build(env, { now = Date.now(), sourceTimeoutMs = 7000, aiT
 
 // ---- 스냅샷 저장소(Netlify Blobs). 테스트는 _setStore로 메모리 저장소를 넣는다 ----
 let storeOverride = null;
+/** 운영 외(미리보기·브랜치) 배포는 별도 저장소 — 미리보기 코드가 운영 스냅샷을 덮어쓰지 않게 */
+export function storeName(ctx = globalThis.Netlify?.context?.deploy?.context || process.env.CONTEXT) {
+  return ctx && ctx !== 'production' ? 'grant-programs-preview' : 'grant-programs';
+}
 export function _setStore(s) { storeOverride = s; }
 async function store() {
   if (storeOverride) return storeOverride;
   const { getStore } = await import('@netlify/blobs');
-  return getStore({ name: 'grant-programs', consistency: 'strong' });
+  return getStore({ name: storeName(), consistency: 'strong' });
 }
 export async function readSnapshot() {
   try { return (await (await store()).get(SNAPSHOT_KEY, { type: 'json' })) || null; } catch { return null; }
