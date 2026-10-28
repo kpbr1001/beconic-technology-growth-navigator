@@ -65,6 +65,8 @@ jobs:
       - run: npm test
       - name: 로드맵 파서·공개 색인 무결성 (원문 PDF 불필요)
         run: npm run test:roadmap
+      - name: 지원사업 MATCH 서버 함수 (정규화·중복제거·마감·캐시·AI 근거 대조, fetch 스텁)
+        run: node --test grants/tests/server.test.mjs
 
   e2e:
     name: E2E · 사용자 플로우 · PDF QA
@@ -105,6 +107,12 @@ jobs:
           sleep 1
           node growth/tests/qa.mjs http://127.0.0.1:8792/
           node growth/tests/sweep.mjs http://127.0.0.1:8792/
+      - name: 지원사업 MATCH QA (판정 엔진·플로우·레드팀 회귀·실시간 모의·모바일·PDF·데모 단일본)
+        run: |
+          (cd grants && npm run build && npm run build:demo)
+          (cd grants/dist && python3 -m http.server 8793 --bind 127.0.0.1 >/dev/null 2>&1 &)
+          sleep 1
+          node grants/tests/qa.mjs http://127.0.0.1:8793/
       - name: 검수 결과물 업로드
         if: always()
         uses: actions/upload-artifact@v4
@@ -114,6 +122,7 @@ jobs:
             tests/e2e/out/
             hr/tests/out/
             growth/tests/out/
+            grants/tests/out/
           retention-days: 14
 
   db:

@@ -1,0 +1,13 @@
+{
+  "name": "BECONIC 지원사업 MATCH",
+  "short_name": "지원사업 MATCH",
+  "description": "우리 기업에 맞는 정부·공공 지원사업 매칭",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a2a56",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-180.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

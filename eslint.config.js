@@ -5,11 +5,17 @@ import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'reference/**', 'tests/e2e/out/**', 'src/app/legacy-ui.ts', 'finance/vendor/**', 'finance/tests/out/**', 'finance/dist/**', 'hr/dist/**', 'hr/tests/out/**', 'growth/dist/**', 'growth/tests/out/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'reference/**', 'tests/e2e/out/**', 'src/app/legacy-ui.ts', 'finance/vendor/**', 'finance/tests/out/**', 'finance/dist/**', 'hr/dist/**', 'hr/tests/out/**', 'growth/dist/**', 'growth/tests/out/**', 'grants/dist/**', 'grants/dist-demo/**', 'grants/tests/out/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
     files: ['**/*.{ts,js,mjs}'],
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
+  },
+  // 지원사업 MATCH 화면 스크립트: 모듈이 아닌 일반 <script>(전역 App을 HTML onclick에서 호출)
+  {
+    files: ['grants/app.js', 'grants/data.js'],
+    languageOptions: { sourceType: 'script' },
+    rules: { '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^App$' }] },
   },
 );
