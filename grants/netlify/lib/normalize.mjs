@@ -72,6 +72,30 @@ function hasFullName(s, name) {
   return false;
 }
 
+// 광역시 자치구: 이름이 여러 광역시에 겹치므로(중구·서구 등) 공고의 광역시가 하나로 정해졌을 때만 찾는다.
+export const GUS = {
+  '서울': ['강남구', '강동구', '강북구', '강서구', '관악구', '광진구', '구로구', '금천구', '노원구', '도봉구', '동대문구', '동작구', '마포구', '서대문구', '서초구', '성동구', '성북구', '송파구', '양천구', '영등포구', '용산구', '은평구', '종로구', '중구', '중랑구'],
+  '인천': ['중구', '동구', '미추홀구', '연수구', '남동구', '부평구', '계양구', '서구'],
+  '부산': ['중구', '서구', '동구', '영도구', '부산진구', '동래구', '남구', '북구', '해운대구', '사하구', '금정구', '강서구', '연제구', '수영구', '사상구'],
+  '대구': ['중구', '동구', '서구', '남구', '북구', '수성구', '달서구'],
+  '광주': ['동구', '서구', '남구', '북구', '광산구'],
+  '대전': ['동구', '중구', '서구', '유성구', '대덕구'],
+  '울산': ['중구', '남구', '동구', '북구'],
+};
+
+/** 광역시가 하나로 정해진 공고에서 자치구 찾기: '구로구'(정식명) 또는 '[서울] 구로'(광역시 표기 + 약칭) */
+export function detectGus({ programName = '', agency = '', executingAgency = '' }, sido) {
+  const list = GUS[sido];
+  if (!list) return [];
+  const texts = [programName, agency, executingAgency].map((t) => String(t || ''));
+  return list.filter((name) => {
+    if (texts.some((t) => hasFullName(t, name))) return true;
+    const base = name.slice(0, -1);
+    if (base.length < 2) return false;
+    return new RegExp(`\\[${sido}\\]\\s*${base}(?:구)?(?![가-힣])`).test(programName);
+  });
+}
+
 /** 공고명·기관명에서 대상 시·군 찾기. regions(시·도)가 정해져 있으면 그 안의 시·군만. */
 export function detectCities({ programName = '', agency = '', executingAgency = '' }, regions = null) {
   const found = [];
@@ -90,9 +114,18 @@ export function detectCities({ programName = '', agency = '', executingAgency = 
 // ---- 지원금액 추출 ----
 // 공고 본문의 첫 '억'을 그대로 쓰면 '매출 100억 이하'·'총 예산 50억'이 기업당 지원금으로 잡힌다.
 // 기업당 한도를 뜻하는 말(최대·한도·이내·기업당 등)이 붙은 금액만 쓰고, 매출·예산·사업비 문맥은 버린다.
-const AMOUNT_RE = /(\d+(?:\.\d+)?)\s*억(?:\s*(\d+)\s*천\s*만?)?(?:\s*원)?|(\d+(?:\.\d+)?)\s*천\s*만\s*원?|(\d[\d,]*)\s*백\s*만\s*원|(\d[\d,]*)\s*만\s*원/g;
-const PER_COMPANY = /최대|한도|이내|기업당|업체당|개사당|팀당|과제당|당\s|지원금|지원액|지원\s*규모|까지/;
-const NOT_SUPPORT = /매출|예산|총\s*사업비|사업비\s*총|총\s*\d|자산|자본금|투자\s*유치|투자\s*실적|수출액|수출\s*실적|부채/;
+// 숫자는 쉼표 포함 전체를 읽는다(v3.9까지 '1,395억'에서 '395억'만 읽어 기업당 395억으로 잡힘)
+const NUM = '(\\d{1,3}(?:,\\d{3})+|\\d+(?:\\.\\d+)?)';
+const AMOUNT_RE = new RegExp(`${NUM}\\s*억(?:\\s*(\\d+)\\s*천\\s*만?)?(?:\\s*원)?|${NUM}\\s*천\\s*만\\s*원?|${NUM}\\s*백\\s*만\\s*원|${NUM}\\s*만\\s*원`, 'g');
+const PER_UNIT = /(?:기업|업체|개사|팀|과제|건|사업장|프로젝트|기관|개소|인)\s*당|기업별|업체별/; // 기업당 한도가 명시된 금액
+const LIMIT = /최대|한도|이내|지원금|지원액|까지/;
+// 사업 전체 규모·기업 실적 문맥(예산 규모 1,395억, 총 180억, 융자 지원규모 3,300억, 매출 100억 이하)
+const NOT_SUPPORT = /매출|예산|규모|총\s*사업비|사업비\s*총|총\s*$|총액|기금\s*조성|자산|자본금|투자\s*유치|투자\s*실적|수출액|수출\s*실적|부채/;
+const num = (x) => parseFloat(String(x).replace(/,/g, ''));
+export function wonText(won) {
+  if (won >= 1e8) { const e = won / 1e8; return `${Number.isInteger(e) ? e : e.toFixed(1)}억원`; }
+  return `${Math.round(won / 1e4).toLocaleString('ko-KR')}만원`;
+}
 
 export function extractAmount(text) {
   if (!text) return { max: null, text: null };
@@ -100,20 +133,23 @@ export function extractAmount(text) {
   let best = null;
   for (const m of s.matchAll(AMOUNT_RE)) {
     let won = null;
-    if (m[1] != null) won = Math.round(parseFloat(m[1]) * 1e8 + (m[2] ? parseInt(m[2], 10) * 1e7 : 0));
-    else if (m[3] != null) won = Math.round(parseFloat(m[3]) * 1e7);
-    else if (m[4] != null) won = parseInt(m[4].replace(/,/g, ''), 10) * 1e6;
-    else if (m[5] != null) won = parseInt(m[5].replace(/,/g, ''), 10) * 1e4;
+    if (m[1] != null) won = Math.round(num(m[1]) * 1e8 + (m[2] ? parseInt(m[2], 10) * 1e7 : 0));
+    else if (m[3] != null) won = Math.round(num(m[3]) * 1e7);
+    else if (m[4] != null) won = num(m[4]) * 1e6;
+    else if (m[5] != null) won = num(m[5]) * 1e4;
     if (!won) continue;
-    // 바로 앞 구절만 본다(쉼표·마침표 앞의 '총 예산 50억'이 뒤 금액을 막지 않게)
-    const before = s.slice(Math.max(0, m.index - 18), m.index).split(/[,.;·\n]/).pop();
+    // 바로 앞 구절만 본다(구분: 마침표·세미콜론·가운뎃점·줄바꿈·'쉼표+공백'·괄호 시작)
+    const before = s.slice(Math.max(0, m.index - 24), m.index).split(/[.;·\n(（]|,\s/).pop();
     const after = s.slice(m.index + m[0].length, m.index + m[0].length + 10);
     if (NOT_SUPPORT.test(before)) continue;
-    if (!PER_COMPANY.test(before) && !PER_COMPANY.test(after)) continue;
+    const perUnit = PER_UNIT.test(before);
+    if (!perUnit && !LIMIT.test(before) && !LIMIT.test(after)) continue;
     if (won < 1e5 || won > 1e11) continue; // 10만 원 미만·1,000억 초과는 기업당 한도로 보기 어려움
-    if (!best || won > best.won) best = { won, raw: m[0].trim() };
+    // '업체당'처럼 단위가 명시된 금액을 우선, 같은 등급이면 큰 값
+    const rank = perUnit ? 2 : 1;
+    if (!best || rank > best.rank || (rank === best.rank && won > best.won)) best = { won, rank, raw: m[0].trim() };
   }
-  return best ? { max: best.won, text: `최대 ${best.raw.replace(/\s+/g, '')}` } : { max: null, text: null };
+  return best ? { max: best.won, text: `최대 ${wonText(best.won)}` } : { max: null, text: null };
 }
 
 // ---- 공고명 정규화(중복 판정) ----

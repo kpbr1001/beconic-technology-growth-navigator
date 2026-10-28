@@ -6,7 +6,7 @@
 // 2) 스냅샷이 오래됐거나 없으면 백그라운드 수집을 요청하고, 없을 때만 짧은 제한으로 직접 수집
 // 쿼리 파라미터로 수집량·AI 호출 수를 늘릴 수 없다.
 // ============================================================================
-import { build, readSnapshot, writeSnapshot, snapshotAge, isAlive } from '../lib/collect.mjs';
+import { build, readSnapshot, writeSnapshot, snapshotAge, isAlive, setDeployHost } from '../lib/collect.mjs';
 
 const MEMO_MS = 5 * 60 * 1000;
 const STALE_MS = 45 * 60 * 1000;  // 예약 수집(30분)이 한 번 빠져도 버티는 시간
@@ -56,7 +56,7 @@ export function _resetCache() { memo = null; inflight = null; }
 export default async (req) => {
   try {
     let origin = null;
-    try { origin = new URL(req.url).origin; } catch { /* 주소 없음 → env.URL */ }
+    try { const u = new URL(req.url); origin = u.origin; setDeployHost(u.host); } catch { setDeployHost(null); }
     const body = await getPrograms(process.env, { origin });
     // 일부 소스가 실패한 결과는 CDN에 오래 두지 않는다
     const complete = body.mode === 'live' && !Object.keys(body.errors || {}).length;

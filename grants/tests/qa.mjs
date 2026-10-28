@@ -17,6 +17,14 @@ const check = (name, pass, detail = '') => { results.push({ name, pass: !!pass, 
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
 const errors = [];
 // 결과 화면 대기: 실패하면 그때까지의 페이지 오류를 함께 출력(CI에서 원인 파악용)
+// 선택 단계는 건너뛰며 결과 화면까지 '다음'을 누른다
+async function toResults(page) {
+  for (let i = 0; i < 6 && await page.locator('#view-form:not(.hidden)').count(); i++) {
+    await page.locator('#nextBtn').click();
+    await page.waitForTimeout(50);
+  }
+  await waitResults(page);
+}
 async function waitResults(page) {
   try { await page.waitForSelector('#view-results:not(.hidden)', { timeout: 15000 }); }
   catch (e) { console.error('결과 화면 대기 실패. 페이지 오류:', errors.slice(-5)); throw e; }
@@ -68,6 +76,12 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
       yesterday: deadlineState(P({ applicationEnd: plus(-1) })).state,
       d3: deadlineState(P({ applicationEnd: plus(3) })).dday,
       upcoming: deadlineState(P({ applicationStart: plus(5), applicationEnd: plus(20) })),
+      investExcluded: (() => { const m = runMatching([P({ programName: '딥테크 기술사업화 유망기업 투자 대상 모집', supportDescription: '직접투자를 추진', supportAmountMax: 5e8, applicationEnd: plus(30), businessAgeMax: 9 })], C(sme)); return [m[0].state, buildDashboard(m).grantSum]; })(),
+      recOnlySum: (() => { const m = runMatching([P({ programName: '조건부 사업', supportAmountMax: 3e8, applicationEnd: plus(30), eligibilityDepth: 'listing' }), P({ programName: '추천 사업', supportAmountMax: 5e7, applicationEnd: plus(30), businessAgeMax: 9 })], C(sme)); const d = buildDashboard(m); return [m.map((x) => x.state).join(','), d.grantSum]; })(),
+      guDist: runMatching([P({ targetRegions: ['서울'], targetDistricts: ['구로구'] })], C({ ...sme, region: '서울', district: '구로구' }))[0].regionTier,
+      guOther: cond({ targetRegions: ['서울'], targetDistricts: ['구로구'] }, { ...sme, region: '서울', district: '강남구' }, '사업장 소재지').result,
+      women: [cond({ specialRequirements: ['여성기업'] }, { ...sme, representativeGender: '여성' }, '여성기업 확인').result, cond({ specialRequirements: ['여성기업'] }, { ...sme, representativeGender: '남성' }, '여성기업 확인').result],
+      innobiz: cond({ specialRequirements: ['이노비즈'] }, { ...sme, innobiz: false, ventureCertified: true }, '이노비즈 확인').result,
       loanSplit: (() => { const m = runMatching([P({ programName: 'A 정책자금 융자', supportAmountMax: 1e9, category: '금융', applicationEnd: plus(30) }), P({ programName: 'B 바우처', supportAmountMax: 5e7, applicationEnd: plus(30) })], C(sme)); const d = buildDashboard(m); return [d.grantSum, d.loanSum]; })(),
       distNo: cond({ targetRegions: ['경기'], targetDistricts: ['성남시'] }, { ...sme, region: '경기', district: '남양주시' }, '사업장 소재지').result,
       distYes: runMatching([P({ targetRegions: ['경기'], targetDistricts: ['성남시'] })], C({ ...sme, region: '경기', district: '성남시' }))[0].regionTier,
@@ -95,6 +109,11 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('마감 당일 = 오늘 마감(D-0), 어제 마감 = 마감됨', r.today.state === 'CLOSING_SOON' && r.today.dday === 0 && r.yesterday === 'CLOSED');
   check('D-day는 달력 날짜 기준(3일 후 = D-3)', r.d3 === 3, String(r.d3));
   check('접수 시작 전 = 접수 예정 D-5', r.upcoming.state === 'UPCOMING' && r.upcoming.dday === 5);
+  check('지분 투자 사업은 지원금 합계에서 제외', r.investExcluded[0] === '추천' && r.investExcluded[1] === 0, JSON.stringify(r.investExcluded));
+  check('지원금 합계는 추천만(조건부 3억 제외, 추천 5천만)', r.recOnlySum[0] === '조건부 추천,추천' && r.recOnlySum[1] === 5e7, JSON.stringify(r.recOnlySum));
+  check('광역시 자치구 공고: 구로구 기업 내 지역(2), 강남구 기업 미충족', r.guDist === 2 && r.guOther === 'fail');
+  check('여성기업 전용: 여성 대표 충족, 남성 대표 미충족', r.women[0] === 'pass' && r.women[1] === 'fail');
+  check('이노비즈 요건: 미보유 응답 시 미충족', r.innobiz === 'fail');
   check('대시보드: 보조금과 융자 한도 분리 합산', r.loanSplit[0] === 5e7 && r.loanSplit[1] === 1e9, JSON.stringify(r.loanSplit));
   check('시·군 기관 공고: 다른 시·군 미충족·같은 시·군 내 지역(2)·시·군 미입력 확인 필요', r.distNo === 'fail' && r.distYes === 2 && r.distUnknown === 'unknown', `${r.distNo}/${r.distYes}/${r.distUnknown}`);
   check('설립 연·월: 7년 경계 월은 확인 필요, 6년 몇 개월은 충족, 8년은 미충족', r.monthAge[0] === 'unknown' && r.monthAge[1] === 'pass' && r.monthAge[2] === 'fail', r.monthAge.join('/'));
@@ -120,7 +139,10 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.selectOption('#f-industry', 'AI·빅데이터');
   await page.locator('.opt', { hasText: '30대' }).click();
   await page.locator('#nextBtn').click();
-  await waitResults(page);
+  check('선택 단계: 대표자 성별 입력(예비창업자는 인증 질문 없음)', await page.locator('.opt', { hasText: '여성' }).count() === 1 && await page.locator('.opt', { hasText: '이노비즈' }).count() === 0);
+  await page.locator('.opt', { hasText: '여성' }).click();
+  await toResults(page);
+  check('여성 대표 입력 → 여성기업 사업 충족', await page.evaluate(() => App.matched.find((m) => /여성기업/.test(m.program.programName)).elig.conds.find((c) => c.label === '여성기업 확인').result === 'pass'));
   const cards = await page.locator('#cards .rcard').count();
   check('결과: 카드 표시', cards > 0, `${cards}장`);
   check('결과: 카드마다 판정 상태 배지', await page.locator('#cards .rcard .rc-state').count() === cards);
@@ -170,7 +192,9 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.locator('#nextBtn').click();
   check('규모 단계(선택): 다음 버튼 활성', !(await page.locator('#nextBtn').isDisabled()));
   await page.locator('#nextBtn').click();
-  await waitResults(page);
+  await page.locator('.opt', { hasText: '이노비즈' }).click();
+  check('인증 하나 선택 → 나머지 없음(false)', await page.evaluate(() => { const c = App.company(); return c.innobiz === true && c.ventureCertified === false && c.mainbiz === false; }));
+  await toResults(page);
   check('남양주 특례보증: 내 시군구 배지', await page.locator('.rcard', { hasText: '남양주시' }).locator('.rgn-badge.t2').count() === 1);
   const hero = await page.locator('.dash-hero').innerText();
   check('대시보드: 합계 성격(단순 합계·실제 수령액과 다름) 명시', /단순 합계/.test(hero) && /실제/.test(hero), hero.replace(/\s+/g, ' ').slice(0, 120));
@@ -207,8 +231,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.locator('.persona-card.founder').click();
   await page.selectOption('#f-region', '서울');
   await page.selectOption('#f-industry', 'AI·빅데이터');
-  await page.locator('#nextBtn').click();
-  await waitResults(page);
+  await toResults(page);
   await page.locator('#cards .rcard .btn-primary').first().click();
   await page.waitForTimeout(100);
   const modalOpenHidden = await page.locator('#modalOpenLink.hidden').count();
@@ -248,8 +271,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.locator('.persona-card.founder').click();
   await page.selectOption('#f-region', '부산');
   await page.selectOption('#f-industry', '제조업');
-  await page.locator('#nextBtn').click();
-  await waitResults(page);
+  await toResults(page);
   check('실시간: 헤더 배지 "실시간 공고"', (await page.locator('.badge-demo').innerText()) === '실시간 공고');
   check('실시간: 안내에 본문 자격요건 미분석 명시', /세부 자격요건/.test(await page.locator('.data-notice').innerText()));
   const st = await page.locator('#cards .rc-state').allInnerTexts();
@@ -280,9 +302,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.selectOption('#f-region', '서울');
   await page.fill('#f-year', '2019');
   await page.selectOption('#f-industry', '제조업');
-  await page.locator('#nextBtn').click();
-  await page.locator('#nextBtn').click();
-  await waitResults(page);
+  await toResults(page);
   check('모바일 결과: 가로 넘침 없음(필터 줄바꿈)', (await overflow()) <= 0, `${await overflow()}px`);
   await page.screenshot({ path: path.join(OUT, 'mobile-results.png'), fullPage: false });
   await page.context().close();
@@ -297,8 +317,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.selectOption('#f-region', '서울');
   await page.fill('#f-year', '2023');
   await page.selectOption('#f-industry', '음식점업(F&B)');
-  await page.locator('#nextBtn').click();
-  await waitResults(page);
+  await toResults(page);
   await page.emulateMedia({ media: 'print' });
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
   const f = path.join(OUT, 'report-demo.pdf');
@@ -317,12 +336,11 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
     const page = await newPage();
     const req = [];
     page.on('request', (r) => { if (!/^(data|file):/.test(r.url()) && !/jsdelivr/.test(r.url())) req.push(r.url()); });
-    await page.goto(pathToFileURL(path.join(demoDir, file)).href);
+    await page.goto(pathToFileURL(path.join(demoDir, file)).href, { waitUntil: 'domcontentloaded' }); // 웹폰트 CDN 지연과 무관하게
     await page.locator('.persona-card.founder').click();
     await page.selectOption('#f-region', '대전');
     await page.selectOption('#f-industry', '바이오·제약');
-    await page.locator('#nextBtn').click();
-    await waitResults(page);
+    await toResults(page);
     check('데모 단일본: 파일로 열어 결과까지 동작', await page.locator('#cards .rcard').count() > 0);
     check('데모 단일본: 외부 데이터 요청 없음(폰트 제외)', req.length === 0, req.join(','));
     check('데모 단일본: 예시 날짜가 오늘 기준으로 이동(대부분 접수 중)', await page.evaluate(() => App.dash.active >= App.matched.length - 1), String(await page.evaluate(() => `${App.dash.active}/${App.matched.length}`)));

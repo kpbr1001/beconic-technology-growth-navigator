@@ -18,6 +18,7 @@ if (process.argv.includes('--demo')) {
   const b64 = (f) => `data:image/png;base64,${readFileSync(path.join(root, 'assets', f)).toString('base64')}`;
   const inline = (f) => `<script>\n${read(f).replace(/<\/script/gi, '<\\/script')}\n</script>`;
   const demo = html
+    .replace(/<link rel="manifest"[^>]*>\n?/, '') // 파일로 열면 매니페스트를 읽을 수 없음
     .replace(`<script src="data.js?v=${version}"></script>`, () => inline('data.js'))
     .replace(`<script src="app.js?v=${version}"></script>`, () => inline('app.js'))
     .replaceAll('href="assets/icon-32.png"', `href="${b64('icon-32.png')}"`)
