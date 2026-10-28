@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.10.0',
+  version: 'v3.11.0',
   updated: '2026-10-28',
   changelog: [
+    { v:'v3.11.0', d:'2026-10-28', note:'공고문(PDF) 신청자격 분석: 기업마당 본문출력 PDF에서 자격 절을 추출해 업력·근로자·매출·대표자 연령·소재 시군구 판정, 공고별 결과 캐시' },
     { v:'v3.10.0', d:'2026-10-28', note:'지원금 합계는 추천 사업만, 금액 추출 오류(쉼표 숫자·사업 총액) 수정, 광역시 자치구 공고 매칭, 선택 입력(대표자 성별·연령·인증, 소상인·소공인 규모) 추가, 여성기업 전용 공고 판정' },
     { v:'v3.9.0', d:'2026-10-28', note:'매칭 정확도: 공고 본문 정형 문구(업력·매출·근로자·대표자 연령) 규칙 추출, 시·군 기관 공고를 해당 시·군으로 제한, 설립 연·월 입력으로 업력 경계 판정' },
     { v:'v3.8.1', d:'2026-10-28', note:'실시간 공고 수집 정상화: 기업마당 시간 초과(0건)·K-Startup 페이지 파라미터 오류(10건) 수정, 수집을 백그라운드·예약 함수 + Netlify Blobs 스냅샷으로 분리' },
@@ -1256,7 +1257,7 @@ const App = (function(){
       <div class="rc-line1">
         <span class="rc-state ${ST_CLS[m.state]}">${esc(m.state)}</span>
         ${regionBadge(m)}
-        ${p._aiEnriched?`<span class="ai-badge" title="공고 본문에서 자격조건을 AI로 추출(근거 문구 대조)한 사업">🤖 AI 본문분석</span>`:p.eligibilityDepth==='rule'?`<span class="ai-badge" title="공고 본문의 업력·매출·근로자·연령 문구를 읽어 판정한 사업">📄 본문분석</span>`:''}
+        ${p._aiEnriched?`<span class="ai-badge" title="공고 본문에서 자격조건을 AI로 추출(근거 문구 대조)한 사업">🤖 AI 본문분석</span>`:p.eligibilityDepth==='doc'?`<span class="ai-badge" title="공고문(PDF)의 신청자격 절을 읽어 판정한 사업">📑 공고문분석</span>`:p.eligibilityDepth==='rule'?`<span class="ai-badge" title="공고 본문의 업력·매출·근로자·연령 문구를 읽어 판정한 사업">📄 본문분석</span>`:''}
         <span class="rc-dl ${dl.cls}">${dl.icon} ${esc(dl.txt)}</span>
       </div>
       <h3>${esc(p.programName)}</h3>
@@ -1320,10 +1321,10 @@ const App = (function(){
         <div><b>${esc(c.label)}</b>${c.evidence?`<span class="cond-ev">${esc(c.evidence)}</span>`:''}</div></div>`;
     }).join('') || '<p class="muted">판정할 자격 항목이 공고에 없습니다.</p>';
     const pref=(p.preferenceConditions||[]).map(x=>`<span class="pref">우대 ${esc(x)}</span>`).join('');
-    const EV_LABEL={businessAgeMax:'업력 상한',businessAgeMin:'업력 하한',employeeMax:'근로자 상한',employeeMin:'근로자 하한',revenueMax:'매출 상한',revenueMin:'매출 하한',representativeAgeMax:'대표자 연령 상한',representativeAgeMin:'대표자 연령 하한',targetIndustries:'대상 업종',excludedIndustries:'제외 업종',specialRequirements:'필수 자격',requiresNoTaxArrears:'체납 제한',supportAmountMax:'지원금'};
-    const evObj = Object.assign({}, p._ruleEvidence||{}, p._eligibilityEvidence||{});
+    const EV_LABEL={businessAgeMax:'업력 상한',businessAgeMin:'업력 하한',employeeMax:'근로자 상한',employeeMin:'근로자 하한',revenueMax:'매출 상한',revenueMin:'매출 하한',representativeAgeMax:'대표자 연령 상한',representativeAgeMin:'대표자 연령 하한',targetDistricts:'대상 시·군·구',targetIndustries:'대상 업종',excludedIndustries:'제외 업종',specialRequirements:'필수 자격',requiresNoTaxArrears:'체납 제한',supportAmountMax:'지원금'};
+    const evObj = Object.assign({}, p._ruleEvidence||{}, p._docEvidence||{}, p._eligibilityEvidence||{});
     const ev = Object.entries(evObj).filter(([,v])=>typeof v==='string').slice(0,8).map(([k,v])=>`<li><b>${esc(EV_LABEL[k]||k)}</b> “${esc(v)}”</li>`).join('');
-    const depth = p._aiEnriched ? 'AI 본문 분석(근거 문구 대조)' : p.eligibilityDepth==='rule' ? '공고 본문 정형 문구 분석' : p.eligibilityDepth==='listing' ? '공고 목록 정보(본문 미분석)' : ProgramProvider.lastMode==='live' ? '공고 정보' : 'DEMO 예시 데이터';
+    const depth = p._aiEnriched ? 'AI 본문 분석(근거 문구 대조)' : p.eligibilityDepth==='doc' ? '공고문(PDF) 신청자격 분석' : p.eligibilityDepth==='rule' ? '공고 본문 정형 문구 분석' : p.eligibilityDepth==='listing' ? '공고 목록 정보(본문 미분석)' : ProgramProvider.lastMode==='live' ? '공고 정보' : 'DEMO 예시 데이터';
     const period = (p.applicationStart||p.applicationEnd) ? `${p.applicationStart||'—'} ~ ${p.applicationEnd||'—'}` : periodText(p, m.dl);
     document.getElementById('modalBody').innerHTML=`
       <span class="rc-state ${ST_CLS[m.state]}" style="align-self:flex-start">${esc(m.state)}</span>

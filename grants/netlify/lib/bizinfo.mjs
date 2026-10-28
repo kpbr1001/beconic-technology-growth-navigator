@@ -51,6 +51,15 @@ function mapPurposes(lclasNm, hashtags) {
   return [...out];
 }
 
+/** 공고문 PDF 주소: 본문출력 파일 우선, 없으면 첨부 중 첫 PDF(첨부는 '@'로 구분) */
+export function docUrlOf(item) {
+  const ok = (u, n) => /^https:\/\/www\.bizinfo\.go\.kr\//.test(u || '') && /\.pdf$/i.test(String(n || '').trim());
+  if (ok(item.printFlpthNm, item.printFileNm)) return item.printFlpthNm;
+  const urls = String(item.flpthNm || '').split('@'), names = String(item.fileNm || '').split('@');
+  const i = names.findIndex((n, k) => ok(urls[k], n));
+  return i >= 0 ? urls[i] : null;
+}
+
 export function normalizeBizinfo(item) {
   const period = parsePeriod(item.reqstBeginEndDe);
   const body = stripTags(item.bsnsSumryCn);
@@ -83,8 +92,8 @@ export function normalizeBizinfo(item) {
     registeredDate: item.creatPnttm || '',
     eligibilityDepth: 'listing', // 목록 정보만. 본문 자격요건은 AI 추출 시 'ai'
     rawSummary: body,
-    // [진단·임시] 첨부·본문출력 파일 관련 원본 필드(필드명이 문서마다 달라 패턴으로 수집)
-    _docRaw: Object.fromEntries(Object.entries(item).filter(([k, v]) => /fl.*pth|file|atch|print/i.test(k) && typeof v === 'string' && v.trim()).map(([k, v]) => [k, v.slice(0, 600)])),
+    // 공고문 PDF(기업마당 '본문출력 파일'). 운영 확인: 1,467건 중 1,435건 제공, Netlify에서 내려받기 가능
+    docUrl: docUrlOf(item),
   };
 }
 

@@ -76,6 +76,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
       yesterday: deadlineState(P({ applicationEnd: plus(-1) })).state,
       d3: deadlineState(P({ applicationEnd: plus(3) })).dday,
       upcoming: deadlineState(P({ applicationStart: plus(5), applicationEnd: plus(20) })),
+      docDepth: runMatching([P({ eligibilityDepth: 'doc', businessAgeMax: 9, supportAmountMax: 3e7, applicationEnd: plus(30) })], C(sme))[0].state,
       investExcluded: (() => { const m = runMatching([P({ programName: '딥테크 기술사업화 유망기업 투자 대상 모집', supportDescription: '직접투자를 추진', supportAmountMax: 5e8, applicationEnd: plus(30), businessAgeMax: 9 })], C(sme)); return [m[0].state, buildDashboard(m).grantSum]; })(),
       recOnlySum: (() => { const m = runMatching([P({ programName: '조건부 사업', supportAmountMax: 3e8, applicationEnd: plus(30), eligibilityDepth: 'listing' }), P({ programName: '추천 사업', supportAmountMax: 5e7, applicationEnd: plus(30), businessAgeMax: 9 })], C(sme)); const d = buildDashboard(m); return [m.map((x) => x.state).join(','), d.grantSum]; })(),
       guDist: runMatching([P({ targetRegions: ['서울'], targetDistricts: ['구로구'] })], C({ ...sme, region: '서울', district: '구로구' }))[0].regionTier,
@@ -109,6 +110,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('마감 당일 = 오늘 마감(D-0), 어제 마감 = 마감됨', r.today.state === 'CLOSING_SOON' && r.today.dday === 0 && r.yesterday === 'CLOSED');
   check('D-day는 달력 날짜 기준(3일 후 = D-3)', r.d3 === 3, String(r.d3));
   check('접수 시작 전 = 접수 예정 D-5', r.upcoming.state === 'UPCOMING' && r.upcoming.dday === 5);
+  check('공고문 분석(doc) 공고는 세부 자격 미분석 표시 없이 추천 가능', r.docDepth === '추천', r.docDepth);
   check('지분 투자 사업은 지원금 합계에서 제외', r.investExcluded[0] === '추천' && r.investExcluded[1] === 0, JSON.stringify(r.investExcluded));
   check('지원금 합계는 추천만(조건부 3억 제외, 추천 5천만)', r.recOnlySum[0] === '조건부 추천,추천' && r.recOnlySum[1] === 5e7, JSON.stringify(r.recOnlySum));
   check('광역시 자치구 공고: 구로구 기업 내 지역(2), 강남구 기업 미충족', r.guDist === 2 && r.guOther === 'fail');

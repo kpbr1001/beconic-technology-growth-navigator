@@ -133,16 +133,19 @@ let storeOverride = null;
  * 미리보기·브랜치·배포 고유 주소는 'deploy-preview-45--사이트', 'main--사이트'처럼 '--'를 포함한다. */
 let deployHost = null;
 export function setDeployHost(host) { deployHost = host || null; }
-export function storeName(host = deployHost, ctx = globalThis.Netlify?.context?.deploy?.context || process.env.CONTEXT) {
-  if (host && host.includes('--')) return 'grant-programs-preview';
-  return ctx && ctx !== 'production' ? 'grant-programs-preview' : 'grant-programs';
+export function isPreview(host = deployHost, ctx = globalThis.Netlify?.context?.deploy?.context || process.env.CONTEXT) {
+  if (host && host.includes('--')) return true;
+  return !!(ctx && ctx !== 'production');
 }
+export function storeName(host = deployHost, ctx) { return isPreview(host, ctx) ? 'grant-programs-preview' : 'grant-programs'; }
 export function _setStore(s) { storeOverride = s; }
-async function store() {
+/** base 이름의 Blobs 저장소(미리보기는 '-preview'). 테스트는 _setStore로 하나의 메모리 저장소를 공유 */
+export async function namedStore(base) {
   if (storeOverride) return storeOverride;
   const { getStore } = await import('@netlify/blobs');
-  return getStore({ name: storeName(), consistency: 'strong' });
+  return getStore({ name: isPreview() ? `${base}-preview` : base, consistency: 'strong' });
 }
+const store = () => namedStore('grant-programs');
 export async function readSnapshot() {
   try { return (await (await store()).get(SNAPSHOT_KEY, { type: 'json' })) || null; } catch { return null; }
 }
@@ -155,32 +158,6 @@ export const snapshotAge = (snap, now = Date.now()) => (snap && snap.fetchedAt ?
  * 스냅샷 갱신(백그라운드·예약 함수용). 최근 스냅샷이 오류 없이 MIN_REFRESH_MS 안이면 건너뜀.
  * 새 결과가 이전보다 크게 줄었는데 소스 오류가 있으면(일시 장애) 이전 스냅샷을 유지한다.
  */
-// [진단·임시] 기업마당 상세 페이지·첨부 파일 접근 가능 여부와 링크 형식 확인
-async function probeDocs(programs) {
-  const out = [];
-  const sample = programs.filter((p) => p.source === 'bizinfo').slice(0, 3);
-  for (const p of sample) {
-    const r = { id: p.sourceProgramId, docRaw: p._docRaw || null };
-    try {
-      const res = await fetch(p.originalUrl, { signal: AbortSignal.timeout(8000), headers: { 'user-agent': 'Mozilla/5.0' } });
-      const html = await res.text();
-      r.page = { status: res.status, len: html.length };
-      r.links = [...new Set([...html.matchAll(/(?:href|onclick)\s*=\s*["']([^"']*(?:down|file|atch|\.hwp|\.pdf)[^"']*)["']/gi)].map((m) => m[1].slice(0, 160)))].slice(0, 15);
-      r.fileNames = [...new Set([...html.matchAll(/[^\s"'<>]{2,80}\.(?:hwpx?|pdf)/gi)].map((m) => m[0]))].slice(0, 10);
-    } catch (e) { r.pageError = String(e.message || e); }
-    const firstUrl = Object.values(p._docRaw || {}).join('@').match(/https?:\/\/[^@\s"]+/);
-    if (firstUrl) {
-      try {
-        const res = await fetch(firstUrl[0], { signal: AbortSignal.timeout(8000) });
-        const buf = Buffer.from(await res.arrayBuffer());
-        r.file = { url: firstUrl[0].slice(0, 200), status: res.status, type: res.headers.get('content-type'), disp: res.headers.get('content-disposition'), size: buf.length, magic: buf.subarray(0, 8).toString('hex') };
-      } catch (e) { r.fileError = String(e.message || e); }
-    }
-    out.push(r);
-  }
-  return out;
-}
-
 export async function refreshSnapshot(env, { now = Date.now(), sourceTimeoutMs = 20000, aiStartBudgetMs = 15000 } = {}) {
   const prev = await readSnapshot();
   // 일부 소스 오류가 있던 스냅샷은 5분 뒤 재시도, 정상 스냅샷은 20분 동안 재수집 안 함(어느 쪽이든 반복 호출로 쿼터를 쓰지 못함)
@@ -190,7 +167,6 @@ export async function refreshSnapshot(env, { now = Date.now(), sourceTimeoutMs =
   if (body.mode !== 'live') return { skipped: true, reason: body.mode };
   const degraded = Object.keys(body.errors).length && prev && prev.count && body.count < prev.count * 0.5;
   if (degraded) return { skipped: true, reason: 'degraded', errors: body.errors };
-  if (deployHost && deployHost.includes('--')) body.docProbe = await probeDocs(body.programs); // [진단·임시] 미리보기에서만
   await writeSnapshot(body);
   return { written: true, count: body.count, sourceCounts: body.sourceCounts, errors: body.errors };
 }

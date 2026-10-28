@@ -7,6 +7,8 @@
 // 쿼리 파라미터로 수집량·AI 호출 수를 늘릴 수 없다.
 // ============================================================================
 import { build, readSnapshot, writeSnapshot, snapshotAge, isAlive, setDeployHost } from '../lib/collect.mjs';
+import { readDocIndex } from '../lib/docs.mjs';
+import { applyDoc } from '../lib/doc-rules.mjs';
 
 const MEMO_MS = 5 * 60 * 1000;
 const STALE_MS = 45 * 60 * 1000;  // 예약 수집(30분)이 한 번 빠져도 버티는 시간
@@ -23,22 +25,29 @@ async function requestRefresh(env, origin) {
   } catch { /* 다음 요청·예약 수집에서 다시 시도 */ }
 }
 
-function serve(snap, now) {
-  const programs = (snap.programs || []).filter((p) => isAlive(p, now));
-  return { ...snap, programs, count: programs.length, aliveCount: programs.length };
+// 공고문 분석 결과 병합 + 내부 필드(공고문 주소) 제거
+function finish(p, docs) {
+  const q = applyDoc(p, docs[p.sourceProgramId]);
+  delete q.docUrl;
+  return q;
+}
+function serve(snap, now, docs = {}) {
+  const programs = (snap.programs || []).filter((p) => isAlive(p, now)).map((p) => finish(p, docs));
+  const docStats = Object.values(docs).reduce((a, d) => { a[d.status] = (a[d.status] || 0) + 1; return a; }, {});
+  return { ...snap, programs, count: programs.length, aliveCount: programs.length, docStats };
 }
 
 async function load(env, now, triggerRefresh, origin) {
-  const snap = await readSnapshot();
+  const [snap, docs] = await Promise.all([readSnapshot(), readDocIndex()]);
   if (snap && snap.mode === 'live') {
     if (snapshotAge(snap, now) > STALE_MS || Object.keys(snap.errors || {}).length) await triggerRefresh(env, origin);
-    return serve(snap, now);
+    return serve(snap, now, docs);
   }
   // 스냅샷 없음(첫 배포 직후): 백그라운드 수집을 걸어 두고, 이번 응답은 짧은 제한으로 직접 수집
   await triggerRefresh(env, origin);
   const body = await build(env, { now });
   if (body.mode === 'live' && !Object.keys(body.errors).length) await writeSnapshot(body);
-  return body;
+  return body.mode === 'live' ? serve(body, now, docs) : body;
 }
 
 export async function getPrograms(env = process.env, { now = Date.now(), fresh = false, triggerRefresh = requestRefresh, origin = null } = {}) {

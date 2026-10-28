@@ -25,9 +25,11 @@ function collect(text, re, toValue, { ctx, notCtx } = {}) {
   for (const m of text.matchAll(re)) {
     const clause = clauseAround(text, m.index, m[0].length);
     if (PREF.test(clause)) continue;
-    const before = text.slice(Math.max(0, m.index - 20), m.index);
-    if (ctx && !ctx.test(before + m[0])) continue;
-    if (notCtx && notCtx.test(clause)) continue;
+    // 문맥은 같은 항목(쉼표·글머리표 사이) 안에서만 본다: '상시근로자 50인 미만, 대표자 만 39세 이하'에서 근로자는 다른 항목
+    const near = text.slice(Math.max(0, m.index - 20), m.index).split(/[,，○ㅇ◦·•-]/).pop();
+    const tail = text.slice(m.index + m[0].length, m.index + m[0].length + 8);
+    if (ctx && !ctx.test(near + m[0] + tail)) continue;
+    if (notCtx && notCtx.test(near + m[0] + tail)) continue;
     const v = toValue(m);
     if (v) found.push({ ...v, evidence: m[0].replace(/\s+/g, ' ').trim() });
   }
