@@ -83,6 +83,8 @@ export function normalizeBizinfo(item) {
     registeredDate: item.creatPnttm || '',
     eligibilityDepth: 'listing', // 목록 정보만. 본문 자격요건은 AI 추출 시 'ai'
     rawSummary: body,
+    // [진단·임시] 첨부·본문출력 파일 관련 원본 필드(필드명이 문서마다 달라 패턴으로 수집)
+    _docRaw: Object.fromEntries(Object.entries(item).filter(([k, v]) => /fl.*pth|file|atch|print/i.test(k) && typeof v === 'string' && v.trim()).map(([k, v]) => [k, v.slice(0, 600)])),
   };
 }
 
