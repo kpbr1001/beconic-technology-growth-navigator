@@ -14,6 +14,7 @@ const KSTARTUP_MAX = 500;
 const ENRICH_COUNT = 12;
 const DESC_MAX = 500;               // 응답 크기 제한(Netlify 6MB) — 본문은 요약만 내려보낸다
 export const MIN_REFRESH_MS = 20 * 60 * 1000;  // 이보다 최근 스냅샷이면 다시 수집하지 않음(쿼터 보호)
+const RETRY_PARTIAL_MS = 5 * 60 * 1000;          // 일부 소스가 실패한 스냅샷의 재시도 간격
 const SNAPSHOT_KEY = 'latest';
 
 export function isAlive(p, now = Date.now()) {
@@ -118,7 +119,9 @@ export const snapshotAge = (snap, now = Date.now()) => (snap && snap.fetchedAt ?
  */
 export async function refreshSnapshot(env, { now = Date.now(), sourceTimeoutMs = 20000, aiStartBudgetMs = 15000 } = {}) {
   const prev = await readSnapshot();
-  if (prev && snapshotAge(prev, now) < MIN_REFRESH_MS && !Object.keys(prev.errors || {}).length) return { skipped: true, reason: 'fresh' };
+  // 일부 소스 오류가 있던 스냅샷은 5분 뒤 재시도, 정상 스냅샷은 20분 동안 재수집 안 함(어느 쪽이든 반복 호출로 쿼터를 쓰지 못함)
+  const minGap = Object.keys((prev && prev.errors) || {}).length ? RETRY_PARTIAL_MS : MIN_REFRESH_MS;
+  if (prev && snapshotAge(prev, now) < minGap) return { skipped: true, reason: 'fresh' };
   const body = await build(env, { now, sourceTimeoutMs, aiStartBudgetMs });
   if (body.mode !== 'live') return { skipped: true, reason: body.mode };
   const degraded = Object.keys(body.errors).length && prev && prev.count && body.count < prev.count * 0.5;

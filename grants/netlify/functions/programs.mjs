@@ -43,7 +43,7 @@ export async function getPrograms(env = process.env, { now = Date.now(), fresh =
   if (!fresh && memo && now - memo.at < MEMO_MS) return memo.body;
   if (!inflight) {
     inflight = load(env, now, triggerRefresh)
-      .then((body) => { if (body.mode === 'live') memo = { at: now, body }; return body; })
+      .then((body) => { if (body.mode === 'live' && !Object.keys(body.errors || {}).length) memo = { at: now, body }; return body; })
       .finally(() => { inflight = null; });
   }
   return inflight;
