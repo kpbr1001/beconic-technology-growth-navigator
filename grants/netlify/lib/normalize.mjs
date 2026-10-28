@@ -45,6 +45,48 @@ export function isPastKst(ymd, now = Date.now()) {
   return endUtc < now;
 }
 
+// ---- 시·군 기관 공고 ----
+// 시·군 산업진흥원·시청 등이 낸 공고는 그 시·군 기업 대상인 경우가 대부분이다(운영 데이터: 시흥·부천·창원·성남·평택·용인·김해 등).
+// v3.8까지는 도 전체 공고로 처리해 다른 시·군 기업에도 '충족'이 나왔다. (구 단위는 이름이 여러 시·도에 겹쳐 제외)
+export const CITIES = {
+  '경기': ['수원시', '성남시', '고양시', '용인시', '부천시', '안산시', '안양시', '남양주시', '화성시', '평택시', '의정부시', '시흥시', '파주시', '광명시', '김포시', '군포시', '광주시', '이천시', '양주시', '오산시', '구리시', '안성시', '포천시', '의왕시', '하남시', '여주시', '동두천시', '과천시', '가평군', '연천군', '양평군'],
+  '인천': ['강화군', '옹진군'],
+  '부산': ['기장군'],
+  '대구': ['달성군', '군위군'],
+  '울산': ['울주군'],
+  '강원': ['춘천시', '원주시', '강릉시', '동해시', '태백시', '속초시', '삼척시', '홍천군', '횡성군', '영월군', '평창군', '정선군', '철원군', '화천군', '양구군', '인제군', '고성군', '양양군'],
+  '충북': ['청주시', '충주시', '제천시', '보은군', '옥천군', '영동군', '증평군', '진천군', '괴산군', '음성군', '단양군'],
+  '충남': ['천안시', '공주시', '보령시', '아산시', '서산시', '논산시', '계룡시', '당진시', '금산군', '부여군', '서천군', '청양군', '홍성군', '예산군', '태안군'],
+  '전북': ['전주시', '군산시', '익산시', '정읍시', '남원시', '김제시', '완주군', '진안군', '무주군', '장수군', '임실군', '순창군', '고창군', '부안군'],
+  '전남': ['목포시', '여수시', '순천시', '나주시', '광양시', '담양군', '곡성군', '구례군', '고흥군', '보성군', '화순군', '장흥군', '강진군', '해남군', '영암군', '무안군', '함평군', '영광군', '장성군', '완도군', '진도군', '신안군'],
+  '경북': ['포항시', '경주시', '김천시', '안동시', '구미시', '영주시', '영천시', '상주시', '문경시', '경산시', '의성군', '청송군', '영양군', '영덕군', '청도군', '고령군', '성주군', '칠곡군', '예천군', '봉화군', '울진군', '울릉군'],
+  '경남': ['창원시', '진주시', '통영시', '사천시', '김해시', '밀양시', '거제시', '양산시', '의령군', '함안군', '창녕군', '고성군', '남해군', '하동군', '산청군', '함양군', '거창군', '합천군'],
+  '제주': ['제주시', '서귀포시'],
+};
+
+const CITY_LIST = Object.entries(CITIES).flatMap(([sido, list]) => list.map((name) => ({ sido, name, base: name.replace(/[시군]$/, '') })));
+const notHangulBefore = (s, i) => i === 0 || !/[가-힣]/.test(s[i - 1]);
+function hasFullName(s, name) {
+  let i = s.indexOf(name);
+  while (i >= 0) { if (notHangulBefore(s, i)) return true; i = s.indexOf(name, i + 1); }
+  return false;
+}
+
+/** 공고명·기관명에서 대상 시·군 찾기. regions(시·도)가 정해져 있으면 그 안의 시·군만. */
+export function detectCities({ programName = '', agency = '', executingAgency = '' }, regions = null) {
+  const found = [];
+  for (const c of CITY_LIST) {
+    const baseOk = c.base.length >= 2 && !SIDO.includes(c.base);
+    const byAgency = [agency, executingAgency].some((a) => a && (hasFullName(a, c.name) || (baseOk && String(a).startsWith(c.base))));
+    const byName = hasFullName(programName, c.name) || (baseOk && programName.includes(`[${c.base}]`));
+    if (byAgency || byName) found.push(c);
+  }
+  const inRegion = regions && !regions.includes('전국') ? found.filter((c) => regions.includes(c.sido)) : found;
+  // 같은 이름이 여러 시·도에 있으면(고성군) 시·도가 정해진 경우만 인정
+  const names = inRegion.map((c) => c.name);
+  return inRegion.filter((c) => names.filter((n) => n === c.name).length === 1);
+}
+
 // ---- 지원금액 추출 ----
 // 공고 본문의 첫 '억'을 그대로 쓰면 '매출 100억 이하'·'총 예산 50억'이 기업당 지원금으로 잡힌다.
 // 기업당 한도를 뜻하는 말(최대·한도·이내·기업당 등)이 붙은 금액만 쓰고, 매출·예산·사업비 문맥은 버린다.

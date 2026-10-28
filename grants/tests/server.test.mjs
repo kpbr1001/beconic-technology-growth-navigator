@@ -7,7 +7,9 @@ import { normalizeBizinfo, parsePeriod } from '../netlify/lib/bizinfo.mjs';
 import { mapBusinessAge, mapAge, normalizeKstartup } from '../netlify/lib/kstartup.mjs';
 import { mergeEligibility, safeParse } from '../netlify/lib/eligibility-ai.mjs';
 import programsHandler, { getPrograms, _resetCache } from '../netlify/functions/programs.mjs';
-import { isAlive, refreshSnapshot, readSnapshot, _setStore } from '../netlify/lib/collect.mjs';
+import { isAlive, refreshSnapshot, readSnapshot, _setStore, enrichLocal, storeName } from '../netlify/lib/collect.mjs';
+import { extractRules } from '../netlify/lib/rule-extract.mjs';
+import { detectCities } from '../netlify/lib/normalize.mjs';
 import { handler as health } from '../netlify/functions/health.mjs';
 
 test('지역: 정식 명칭(경상남도·전라북도 등)도 약칭으로 인식, 없으면 null', () => {
@@ -105,6 +107,41 @@ test('AI 병합: 본문에 없는 근거·범위 밖 숫자는 버리고, 우대
   assert.equal(safeParse('[1,2]'), null);
 });
 
+test('본문 규칙 추출: 업력·근로자·매출·대표자 연령, 우대·충돌·고령 근로자 문맥은 제외', () => {
+  const r = extractRules('신청자격: 창업 7년 이내 기업으로 상시근로자 10인 미만, 연매출액 10억원 이하. 대표자 만 39세 이하(청년). 수출기업 우대.');
+  assert.equal(r.fields.businessAgeMax, 7);
+  assert.equal(r.fields.businessAgeMaxExclusive, false);
+  assert.equal(r.fields.employeeMax, 9);
+  assert.equal(r.fields.revenueMax, 1e9);
+  assert.equal(r.fields.representativeAgeMax, 39);
+  assert.equal(r.evidence.employeeMax, '상시근로자 10인 미만');
+  assert.equal(extractRules('업력 3년 미만 기업 우대'), null, '우대 조건은 필수 아님');
+  assert.equal(extractRules('일반 창업 7년 이내, 신산업 창업 10년 이내 기업'), null, '값이 엇갈리면 단정 안 함');
+  assert.equal(extractRules('만 60세 이상 고령자 채용 시 인건비 지원'), null, '근로자 연령은 대표자 조건 아님');
+  assert.equal(extractRules('업력 7년 이상 중소기업').fields.businessAgeMin, 7);
+});
+
+test('시·군 기관 공고: 대상 시·군 인식(접두·정식명), 남양주≠양주, 겹치는 이름은 시·도 확인', () => {
+  assert.deepEqual(detectCities({ executingAgency: '성남산업진흥원' }).map((c) => c.name), ['성남시']);
+  assert.deepEqual(detectCities({ programName: '[경기] 남양주시 소상공인 지원' }).map((c) => c.name), ['남양주시']);
+  assert.deepEqual(detectCities({ programName: '고성군 모범음식점' }), [], '강원·경남 둘 다 있어 시·도 없이는 판단 안 함');
+  assert.deepEqual(detectCities({ programName: '고성군 모범음식점' }, ['강원']).map((c) => c.sido), ['강원']);
+  assert.deepEqual(detectCities({ agency: '광주경제진흥상생일자리재단' }), [], '광역시 이름과 같은 경기 광주시는 접두로 판단 안 함');
+  const p = enrichLocal({ programName: '2026 창업 지원', agency: '경기도', executingAgency: '시흥산업진흥원', targetRegions: ['전국'], targetRegionsInferred: true, rawSummary: '창업 3년 이내 기업', eligibilityDepth: 'listing' });
+  assert.deepEqual(p.targetRegions, ['경기']);
+  assert.deepEqual(p.targetDistricts, ['시흥시']);
+  assert.equal(p.businessAgeMax, 3);
+  assert.equal(p.eligibilityDepth, 'rule');
+  const q = enrichLocal({ programName: 'X', executingAgency: '성남산업진흥원', targetRegions: ['전국'], targetRegionsInferred: false });
+  assert.equal(q.targetDistricts, undefined, '전국으로 명시된 공고는 그대로');
+});
+
+test('Blobs 저장소: 미리보기 배포는 운영 스냅샷과 분리', () => {
+  assert.equal(storeName('production'), 'grant-programs');
+  assert.equal(storeName('deploy-preview'), 'grant-programs-preview');
+  assert.equal(storeName('branch-deploy'), 'grant-programs-preview');
+});
+
 test('stripTags: 태그 제거·엔티티 복원', () => {
   assert.equal(stripTags('<b>a&nbsp;&amp;&lt;b</b>'), 'a &<b');
 });
@@ -160,7 +197,9 @@ test('programs: 스냅샷 없으면 직접 수집·저장, 마감 제외·본문
   const calls = stubFetch({ bizinfo: BIZ, kstartup: KS });
   let refreshReq = 0;
   const env = { BIZINFO_API_KEY: 'b', KSTARTUP_API_KEY: 'k' };
-  const r = await getPrograms(env, { fresh: true, triggerRefresh: async () => { refreshReq++; } });
+  let refreshOrigin = null;
+  const r = await getPrograms(env, { fresh: true, origin: 'https://deploy-preview-1--x.netlify.app', triggerRefresh: async (_e, o) => { refreshReq++; refreshOrigin = o; } });
+  assert.equal(refreshOrigin, 'https://deploy-preview-1--x.netlify.app', '요청이 들어온 배포 주소로 수집 요청');
   assert.equal(r.mode, 'live');
   assert.equal(r.totalCollected, 3);
   assert.deepEqual(r.programs.map((p) => p.sourceProgramId).sort(), ['KS_9', 'P1']);
