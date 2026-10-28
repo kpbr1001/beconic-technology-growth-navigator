@@ -17,6 +17,7 @@ test('지역: 정식 명칭(경상남도·전라북도 등)도 약칭으로 인�
   assert.deepEqual(regionsFromText('충청남도·충청북도 공동'), ['충북', '충남']);
   assert.deepEqual(regionsFromText('[서울] 소상공인'), ['서울']);
   assert.equal(regionsFromText('2026 중소기업 정책자금'), null);
+  assert.deepEqual(regionsFromText('서울,부산,대구,인천,광주,대전,울산,세종,경기,강원,충북,충남,전북,전남,경북,경남,제주'), ['전국']);
 });
 
 test('지원금액: 기업당 한도만 추출, 매출·예산 문구는 무시', () => {
