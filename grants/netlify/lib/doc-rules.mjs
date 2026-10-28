@@ -67,7 +67,7 @@ function sidosIn(elig) {
   for (const line of String(elig || '').split('\n')) {
     for (const m of line.matchAll(LOC)) {
       const win = line.slice(Math.max(0, m.index - 30), m.index + m[0].length + 30);
-      if (/제외|아닌|이외|외\s*지역|제한\s*없/.test(win)) continue;
+      if (/제외|아닌|이외|외\s*지역|타\s*지역|전국|제한\s*없/.test(win)) continue;
       const old = win.match(OLD_DO);
       const r = regionsFromText(old ? old[1] : win);
       if (r && !r.includes('전국') && r.length <= 3) return { regions: r, evidence: win.trim() };
@@ -135,8 +135,10 @@ export function applyDoc(p, doc) {
     if (k === 'businessAgeMax') q.businessAgeMaxExclusive = !!doc.fields.businessAgeMaxExclusive;
     ev[k] = `공고문: ${doc.evidence?.[k] || ''}`.trim();
   }
-  // 목록에 지역 표기가 없어 '전국'으로 간주한 공고만 공고문의 소재 시·도로 바로잡는다
-  if (doc.regions?.length && q.targetRegionsInferred) {
+  // 목록상 '전국'(지역 표기 없음, 또는 해시태그에 시·도 전부 나열) 공고만 공고문의 소재 시·도로 바로잡는다
+  // 미리보기 실측: 공고문 소재지 156건 중 목록 지역과 일치 143, 충돌 0, '전국' 13(대부분 실제 지역 한정 공고)
+  const tr = q.targetRegions || [];
+  if (doc.regions?.length && (q.targetRegionsInferred || !tr.length || (tr.length === 1 && tr[0] === '전국'))) {
     q.targetRegions = doc.regions;
     q.targetRegionsInferred = false;
     ev.targetRegions = `공고문: ${doc.regionEvidence}`;

@@ -403,6 +403,8 @@ test('공고문 분석(실제 공고 앞부분): 라벨 글머리 줄, 소재 �
   const r = analyzeDocText('❍ 지원 제외 대상 : 서울 소재 기업\n❍ 지원대상 사업 : 창업 3년 이내');
   assert.equal(r.regions, undefined);
   assert.equal(r.fields, undefined);
+  assert.equal(analyzeDocText('❍ 신청자격 : 경상북도 소재 제조기업과 전국소재 서비스기업').regions, undefined);
+  assert.equal(analyzeDocText('❍ 신청자격 : 중소기업\n※ 타 지역 소재 기업도 참여 가능하나, 충북 내 본사 이전 필요').regions, undefined);
   const neg = analyzeDocText('❍ 신청자격 : 중소기업\n- 예비창업자는 신청 불가');
   assert.equal(neg.preStartupAllowed, false);
 });
@@ -415,6 +417,6 @@ test('공고문 병합: 전국 간주 공고만 소재 시·도로 바로잡고 
   assert.equal(q.preStartupAllowed, true);
   assert.ok(q.targetBusinessType.includes('예비창업자'));
   assert.equal(q.eligibilityDepth, 'doc');
-  const kept = applyDoc({ targetRegions: ['전국'], targetRegionsInferred: false }, doc);
-  assert.deepEqual(kept.targetRegions, ['전국'], '전국으로 명시된 공고는 유지');
+  assert.deepEqual(applyDoc({ targetRegions: ['전국'], targetRegionsInferred: false }, doc).targetRegions, ['충북'], '해시태그 전국 공고도 공고문 소재지로');
+  assert.deepEqual(applyDoc({ targetRegions: ['서울'], targetRegionsInferred: false }, doc).targetRegions, ['서울'], '목록에 지역이 있으면 유지');
 });

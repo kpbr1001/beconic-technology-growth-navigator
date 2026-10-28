@@ -63,18 +63,6 @@ export async function getPrograms(env = process.env, { now = Date.now(), fresh =
 export function _resetCache() { memo = null; inflight = null; }
 
 export default async (req) => {
-  // [진단·임시] 미리보기 전용: 공고문 분석 샘플
-  try {
-    const u = new URL(req.url);
-    if (u.host.includes('--') && u.searchParams.get('debug') === 'docs') {
-      setDeployHost(u.host);
-      const idx = await readDocIndex();
-      const all = Object.entries(idx).filter(([, d]) => d.status === 'ok');
-      const summary = { ok: all.length, sectionFound: all.filter(([, d]) => d.sectionFound).length, withFields: all.filter(([, d]) => d.fields).length, withDistricts: all.filter(([, d]) => d.districts).length, withRegions: all.filter(([, d]) => d.regions).length, preStartup: all.filter(([, d]) => d.preStartupAllowed != null).length, any: all.filter(([, d]) => d.fields || d.regions || d.districts || d.preStartupAllowed != null || d.amount).length };
-      const pick = all.filter(([, d]) => !d.sectionFound).slice(0, 8).concat(all.filter(([, d]) => d.sectionFound && !d.fields).slice(0, 6));
-      return new Response(JSON.stringify({ summary, samples: pick.map(([id, d]) => ({ id, sectionFound: d.sectionFound })), regions: all.filter(([, d]) => d.regions).map(([id, d]) => ({ id, r: d.regions, e: d.regionEvidence })) }), { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
-    }
-  } catch { /* 일반 응답으로 */ }
   try {
     let origin = null;
     try { const u = new URL(req.url); origin = u.origin; setDeployHost(u.host); } catch { setDeployHost(null); }
