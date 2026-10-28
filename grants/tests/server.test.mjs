@@ -150,6 +150,8 @@ test('Blobs 저장소: 미리보기 배포는 운영 스냅샷과 분리', () =>
   assert.equal(storeName('deploy-preview-45--beconic-grant-matching.netlify.app', undefined), 'grant-programs-preview', '배포 맥락 값이 없어도 주소로 구분');
   assert.equal(storeName(null, 'deploy-preview'), 'grant-programs-preview');
   assert.equal(storeName(null, undefined), 'grant-programs');
+  assert.equal(storeName('main--beconic-grant-matching.netlify.app', 'production'), 'grant-programs', '운영 브랜치 주소(main--)라도 배포 맥락이 운영이면 운영 저장소');
+  assert.equal(storeName('beconic-grant-matching.netlify.app', 'deploy-preview'), 'grant-programs-preview');
 });
 
 test('광역시 자치구·여성기업 공고명', () => {

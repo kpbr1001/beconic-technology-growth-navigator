@@ -6,7 +6,7 @@
 // 2) 스냅샷이 오래됐거나 없으면 백그라운드 수집을 요청하고, 없을 때만 짧은 제한으로 직접 수집
 // 쿼리 파라미터로 수집량·AI 호출 수를 늘릴 수 없다.
 // ============================================================================
-import { build, readSnapshot, writeSnapshot, snapshotAge, isAlive, setDeployHost } from '../lib/collect.mjs';
+import { build, readSnapshot, writeSnapshot, snapshotAge, isAlive, setDeployHost, isPreview } from '../lib/collect.mjs';
 import { readDocIndex } from '../lib/docs.mjs';
 import { applyDoc } from '../lib/doc-rules.mjs';
 
@@ -62,14 +62,15 @@ export async function getPrograms(env = process.env, { now = Date.now(), fresh =
 
 export function _resetCache() { memo = null; inflight = null; }
 
-export default async (req) => {
+export default async (req, context) => {
   try {
     let origin = null;
-    try { const u = new URL(req.url); origin = u.origin; setDeployHost(u.host); } catch { setDeployHost(null); }
+    try { const u = new URL(req.url); origin = u.origin; setDeployHost(u.host, context?.deploy?.context); } catch { setDeployHost(null, context?.deploy?.context); }
     const body = await getPrograms(process.env, { origin });
     // 일부 소스가 실패한 결과는 CDN에 오래 두지 않는다
     const complete = body.mode === 'live' && !Object.keys(body.errors || {}).length;
-    return new Response(JSON.stringify(body), {
+    // store: 어느 저장소(운영·미리보기)를 읽었는지 — 배포 후 분리 확인용
+    return new Response(JSON.stringify({ ...body, store: isPreview() ? 'preview' : 'production' }), {
       headers: {
         'content-type': 'application/json; charset=utf-8',
         'cache-control': complete ? 'public, max-age=300' : 'no-store',

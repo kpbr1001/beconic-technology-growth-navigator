@@ -3,9 +3,9 @@
 import { setDeployHost } from '../lib/collect.mjs';
 import { analyzeDocs } from '../lib/docs.mjs';
 
-export default async (req) => {
+export default async (req, context) => {
   let origin = null;
-  try { const u = new URL(req.url); origin = u.origin; setDeployHost(u.host); } catch { setDeployHost(null); }
+  try { const u = new URL(req.url); origin = u.origin; setDeployHost(u.host, context?.deploy?.context); } catch { setDeployHost(null, context?.deploy?.context); }
   const r = await analyzeDocs();
   console.log('analyze-docs', JSON.stringify(r)); // Netlify 함수 로그에서 진행 확인
   if (origin && r.processed > 0 && r.remaining > 0) {
