@@ -9,6 +9,8 @@ import { readSnapshot, namedStore, isPreview } from './collect.mjs';
 import { analyzeDocText, sections } from './doc-rules.mjs';
 
 export const LIMIT = 80;
+// 분석 규칙 버전 — 규칙을 바꾸면 올려서 기존 공고문을 다시 분석한다
+export const DOC_VER = 2;
 const CONCURRENCY = 4;
 const DL_TIMEOUT_MS = 20000;
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -35,7 +37,7 @@ export async function pdfText(bytes) {
 }
 
 async function analyzeOne(p, { fetchImpl, textImpl }) {
-  const base = { url: p.docUrl, at: new Date().toISOString() };
+  const base = { url: p.docUrl, at: new Date().toISOString(), v: DOC_VER };
   try {
     const res = await fetchImpl(p.docUrl, { signal: AbortSignal.timeout(DL_TIMEOUT_MS) });
     if (!res.ok) return { ...base, status: 'error', error: `HTTP ${res.status}` };
@@ -74,7 +76,7 @@ export async function analyzeDocs({ limit = LIMIT, now = Date.now(), fetchImpl =
     for (const id of Object.keys(idx)) if (!live.has(id)) delete idx[id];
     const needs = (p) => {
       const d = idx[p.sourceProgramId];
-      if (!d || d.url !== p.docUrl) return true;
+      if (!d || d.url !== p.docUrl || d.v !== DOC_VER) return true;
       return d.status === 'error' && now - Date.parse(d.at) > RETRY_ERROR_MS;
     };
     const todo = programs.filter(needs)
