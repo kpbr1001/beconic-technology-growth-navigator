@@ -7,7 +7,7 @@
 # PART 1. API 인증키 발급 (먼저 준비)
 
 ## 1-A. 기업마당 API 키
-대표님은 이미 발급받으셨습니다(작동 확인됨). **채팅에 노출됐으니 재발급 권장**:
+이미 발급받은 키가 채팅·문서 등에 노출된 적이 있으면 재발급을 권장합니다:
 1. https://www.bizinfo.go.kr 로그인
 2. 상단 **활용정보 → 정책정보 개방**
 3. 지원사업정보 API에서 **활용신청** (또는 기존 키 재발급)
@@ -36,26 +36,19 @@
 
 # PART 2. Netlify 배포
 
-Netlify 함수(서버)가 필요하므로 **전체 폴더**를 올려야 합니다. 방법 2가지 중 편한 걸 고르세요.
+Netlify 함수(서버)가 필요하고, v3.8부터는 빌드(`npm run build`)로 공개 파일만 `dist/`에 담아 배포합니다.
+(v3.7까지의 '폴더 통째로 드래그' 방식은 `docs/`·서버 함수 소스가 공개 URL로 열려 더 이상 쓰지 않습니다.)
 
-## 방법 A. 드래그앤드롭 (가장 쉬움, GitHub 불필요)
+## GitHub 연동 (권장)
 
-1. https://app.netlify.com 로그인 (없으면 무료 가입)
-2. 상단 **Sites** 탭 → 화면 아래쪽 **"Want to deploy a new site without connecting to Git? Drag and drop your site output folder here"** 영역
-3. `배포_v2.5-라이브전체` **폴더를 통째로** 그 영역에 드래그
-4. 잠시 후 배포 완료 → `랜덤이름.netlify.app` 주소 생성됨
-5. (선택) **Site configuration → Change site name**에서 원하는 주소로 변경
-   (예: beconic-grant-matching → https://beconic-grant-matching.netlify.app)
+1. Netlify → **Add new site → Import an existing project → GitHub** → `beconic-technology-growth-navigator` 저장소 선택
+   (기존 `beconic-grant-matching` 사이트라면 **Site configuration → Build & deploy → Link repository**)
+2. **Base directory: `grants`** 만 입력 — 빌드 명령·공개 폴더·함수 폴더는 `grants/netlify.toml`이 지정
+3. main에 병합할 때마다 자동 재배포
 
-> 드래그 방식은 함수도 함께 올라갑니다(netlify/functions 폴더 포함되어 있음).
-> 코드 수정 시마다 다시 드래그하면 됩니다.
+## 수동 배포가 꼭 필요할 때
 
-## 방법 B. GitHub 연동 (자동 배포, 추천)
-
-1. GitHub에 새 저장소 만들고 `배포_v2.5-라이브전체` 폴더 내용을 push
-2. Netlify → **Add new site → Import an existing project → GitHub**
-3. 저장소 선택 → 빌드 설정은 netlify.toml이 자동 처리 → **Deploy**
-4. 이후 GitHub에 push할 때마다 자동 재배포
+로컬에서 `cd grants && npm run build` 후 Netlify CLI로 `netlify deploy --prod --dir=dist --functions=netlify/functions`.
 
 ---
 
@@ -64,69 +57,63 @@ Netlify 함수(서버)가 필요하므로 **전체 폴더**를 올려야 합니�
 배포가 끝났으면, 이제 키를 넣습니다. **코드가 아니라 Netlify 설정에만** 넣습니다.
 
 1. Netlify 대시보드 → 해당 사이트 클릭
-2. **Site configuration**(또는 Site settings) → 좌측 **Environment variables**
+2. **Site configuration** → 좌측 **Environment variables**
 3. **Add a variable → Add a single variable** 로 아래를 하나씩 추가:
 
 | Key (이름) | Value (값) | 필수? |
 |---|---|---|
 | `BIZINFO_API_KEY` | 기업마당 crtfcKey | 권장 |
 | `KSTARTUP_API_KEY` | K-Startup 디코딩 인증키 | 권장 |
-| `ANTHROPIC_API_KEY` | sk-ant-... | 선택 |
+| `ANTHROPIC_API_KEY` | sk-ant-... | 선택(본문 자격조건 추출) |
 
-   - Key에 변수명(대문자 그대로), Value에 키 값을 붙여넣기
-   - Scopes는 기본값(All) 그대로 두면 됩니다
-4. 다 넣었으면 **재배포 필요**: **Deploys 탭 → Trigger deploy → Deploy site**
-   (환경변수는 재배포해야 함수에 반영됩니다)
+4. 다 넣었으면 **Deploys 탭 → Trigger deploy → Deploy site** (환경변수는 재배포해야 함수에 반영)
 
 ---
 
 # PART 4. 작동 확인
 
-## 4-A. 함수가 키를 읽는지 (브라우저 주소창)
-아래 3개를 각각 열어봅니다 (`내사이트주소`를 실제 주소로 교체):
+## 4-A. 함수 상태 (브라우저 주소창)
 
 ```
-https://내사이트주소/.netlify/functions/bizinfo
-https://내사이트주소/.netlify/functions/kstartup
-https://내사이트주소/.netlify/functions/programs
+https://내사이트주소/.netlify/functions/health     → 키 설정 여부(ready / not_configured)
+https://내사이트주소/.netlify/functions/programs   → 실제 수집 결과
 ```
 
-- `{"status":"READY","count":50,...}` → ✅ 정상 (공고를 가져옴)
-- `{"status":"NOT_CONFIGURED"}` → 키 미등록 (환경변수 이름 오타 확인 + 재배포)
-- `{"status":"ERROR","message":"..."}` → 키는 있는데 호출 실패 (아래 문제해결)
+`programs` 응답 읽는 법:
+- `"mode":"live"` + `"sourceCounts":{"bizinfo":N,"kstartup":M}` → ✅ 정상. `aliveCount`는 접수 중·예정 공고 수, `enriched`는 AI 추출 건수
+- `"mode":"not_configured"` → 키 미등록(이름 오타·재배포 누락 확인)
+- `"errors":{"kstartup":"..."}` → 해당 소스만 실패(나머지 소스로 동작)
+- 결과는 30분 캐시됩니다. 키를 바꾼 직후에는 재배포하면 새로 수집합니다.
 
-`programs`는 병합 결과라 `{"mode":"live","sourceCounts":{"bizinfo":50,"kstartup":50}}` 형태로 소스별 건수를 보여줍니다.
+v3.7의 `/bizinfo`·`/kstartup`·`/ai-analysis` 주소는 쿼터·비용 보호를 위해 삭제했습니다(404가 정상).
 
 ## 4-B. 실제 화면에서
-1. 사이트 접속 → 아무 유형이나 선택해 분석 실행
-2. 결과 화면 상단 배지가 **"실시간 공고"(초록)** → 라이브 성공
-3. **"DEMO 데이터"(주황)** → 함수가 데이터를 못 받아 mock으로 폴백된 것 (4-A로 원인 확인)
+1. 사이트 접속 → 유형 선택 → 분석 실행
+2. 헤더 배지 **"실시간 공고"(초록)** → 라이브 성공
+3. **"DEMO 데이터"(주황)** → 함수가 데이터를 못 받아 예시 데이터로 폴백(4-A로 원인 확인)
 
 ---
 
 # PART 5. 자주 나는 문제 (해결법)
 
 **Q. 배지가 계속 "DEMO 데이터"예요**
-→ 함수 3개 URL을 직접 열어 상태 확인. NOT_CONFIGURED면 환경변수 이름 오타(대소문자, 언더스코어) 또는 재배포 안 함.
+→ `/health`에서 not_configured면 환경변수 이름 오타(대소문자·언더스코어) 또는 재배포 안 함. ready인데 DEMO면 `/programs`의 `errors` 확인.
 
-**Q. kstartup이 ERROR로 나와요**
-→ 대부분 키 문제입니다. ①Decoding 키를 썼는지 확인(Encoding 키는 이중인코딩 오류). ②공공데이터포털에서 활용신청이 승인됐는지(마이페이지). ③트래픽 한도(개발계정 일 10,000회) 초과 여부.
+**Q. kstartup이 errors에 나와요**
+→ ①Decoding 키를 썼는지(Encoding 키는 이중 인코딩 오류) ②공공데이터포털 활용신청 승인 여부 ③트래픽 한도(개발계정 일 10,000회). v3.8은 30분 캐시라 정상 운영 시 한도에 닿지 않습니다.
 
-**Q. bizinfo는 되는데 kstartup만 안 돼요 (또는 반대)**
-→ 괜찮습니다. 한쪽만 있어도 그 소스로 동작합니다. 나중에 나머지 키만 채우면 됩니다.
+**Q. 실시간 공고가 대부분 '조건부'·'확인 필요'예요**
+→ 정상입니다. 기업마당 목록 API는 업력·매출 조건을 주지 않아 '세부 자격요건(공고문 확인)'이 남습니다. `ANTHROPIC_API_KEY`를 등록하면 본문을 분석한 공고부터 '추천'까지 올라갑니다(docs/AI_ELIGIBILITY.md).
 
-**Q. 공고가 너무 적거나/지역이 안 맞아요**
-→ K-Startup은 지역 서버필터가 부정확한 사례가 있어, 우리 코드가 클라이언트에서 다시 거릅니다. 초기엔 표시 건수를 보며 조정하면 됩니다.
-
-**Q. AI 자격추출(정밀매칭)을 켜고 싶어요**
-→ `ANTHROPIC_API_KEY` 등록 후, `app2.js` 안의 `AI_ENRICH: false` → `true`, `AI_MODE: 'mock'` → `'live'`로 바꿔 재배포. (비용 발생하니 먼저 목록 라이브부터 확인 권장)
+**Q. 함수가 시간 초과(10초)로 실패해요**
+→ 소스별 7초·AI 6초 제한이 있어 보통 10초 안에 끝납니다. 계속 실패하면 Netlify 함수 제한 시간을 26초로 늘리거나(Site configuration → Functions), `programs.mjs`의 `BIZINFO_MAX`를 줄입니다.
 
 ---
 
 # 요약 체크리스트
-- [ ] 기업마당 키 재발급, K-Startup 디코딩 키 발급
-- [ ] `배포_v2.5-라이브전체` 폴더 Netlify에 드래그(또는 GitHub 연동)
-- [ ] 환경변수 `BIZINFO_API_KEY`, `KSTARTUP_API_KEY` 등록
+- [ ] 기업마당 키(필요 시 재발급), K-Startup 디코딩 키 발급
+- [ ] Netlify 사이트에 저장소 연결, Base directory `grants`
+- [ ] 환경변수 `BIZINFO_API_KEY`, `KSTARTUP_API_KEY` 등록 (+선택 `ANTHROPIC_API_KEY`)
 - [ ] Trigger deploy로 재배포
-- [ ] 함수 3개 URL로 READY 확인
+- [ ] `/health`·`/programs`로 확인
 - [ ] 사이트에서 "실시간 공고" 배지 확인

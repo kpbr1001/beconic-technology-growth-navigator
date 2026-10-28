@@ -1,21 +1,40 @@
-# BECONIC 지원사업 MATCH — Netlify 설정
-# 실제 API 키는 여기 작성하지 않는다. Netlify Environment Variables에서만 관리.
+# BECONIC 지원사업 MATCH — Netlify 배포 설정
+# 사이트: https://beconic-grant-matching.netlify.app
+# 저장소 연결 시 Netlify 사이트 설정에서 Base directory 를 `grants` 로 지정하면 이 파일이 적용됩니다.
+# 실제 API 키는 여기 작성하지 않는다. Netlify Environment Variables에서만 관리(BIZINFO_API_KEY·KSTARTUP_API_KEY·ANTHROPIC_API_KEY).
+
+# 공개 파일만 dist/ 로 복사해 배포한다(v3.7은 publish="."라 docs/·서버 함수 소스가 공개 URL로 열렸음).
 [build]
-  publish = "."
-  functions = "netlify/functions"
+  publish = "dist"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
 
 [functions]
+  directory = "netlify/functions"
   node_bundler = "esbuild"
 
 [[headers]]
   for = "/*"
   [headers.values]
+    X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
-    X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net data:; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; frame-ancestors 'none'"
 
-# SPA 단일 HTML: 404를 index로
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
