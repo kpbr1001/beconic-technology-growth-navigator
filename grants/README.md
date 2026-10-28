@@ -1,4 +1,4 @@
-# BECONIC 지원사업 MATCH (v3.8.1)
+# BECONIC 지원사업 MATCH (v3.9.0)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-grant-matching.netlify.app
@@ -22,10 +22,10 @@
 grants/
 ├─ index.html · app.js · data.js(DEMO 16건) · assets/   # 공개 파일 (dist/로 복사)
 ├─ netlify/functions/  programs.mjs(스냅샷 응답) · refresh-programs-scheduled.mjs(30분 수집) · refresh-programs-background.mjs(필요 시 수집) · health.mjs
-├─ netlify/lib/        collect.mjs(수집·Blobs 스냅샷) · bizinfo.mjs · kstartup.mjs · normalize.mjs · eligibility-ai.mjs
+├─ netlify/lib/        collect.mjs(수집·Blobs 스냅샷·규칙 보강) · rule-extract.mjs(본문 정형 문구) · bizinfo.mjs · kstartup.mjs · normalize.mjs · eligibility-ai.mjs
 ├─ scripts/build.mjs   # dist/ 배포본, --demo 로 단일 HTML(dist-demo/)
-├─ tests/server.test.mjs  # 서버 단위 17개(fetch·Blobs 스텁)
-├─ tests/qa.mjs           # Chromium QA 68개(엔진·흐름·레드팀 회귀·실시간 모의·모바일·PDF·데모 단일본)
+├─ tests/server.test.mjs  # 서버 단위 19개(fetch·Blobs 스텁)
+├─ tests/qa.mjs           # Chromium QA 70개(엔진·흐름·레드팀 회귀·실시간 모의·모바일·PDF·데모 단일본)
 └─ docs/  CHANGELOG.md · REDTEAM_2026-10-28.md · DEPLOY_GUIDE.md · AI_ELIGIBILITY.md
 ```
 

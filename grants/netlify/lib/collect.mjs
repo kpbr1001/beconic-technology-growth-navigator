@@ -7,7 +7,8 @@
 import { collectBizinfo } from './bizinfo.mjs';
 import { collectKstartup } from './kstartup.mjs';
 import { extractEligibility, mergeEligibility } from './eligibility-ai.mjs';
-import { dedupe, isPastKst } from './normalize.mjs';
+import { dedupe, isPastKst, detectCities } from './normalize.mjs';
+import { applyRules } from './rule-extract.mjs';
 
 const BIZINFO_MAX = 2000;           // 운영에서 500건 상한에 정확히 걸림(접수 공고가 더 있음) → 상향
 const KSTARTUP_MAX = 500;
@@ -21,6 +22,20 @@ export function isAlive(p, now = Date.now()) {
   if (p.recruitInProgress === false) return false;
   if (p.applicationEnd && isPastKst(p.applicationEnd, now)) return false;
   return true;
+}
+
+/** AI 없이 하는 보강: 본문 규칙 추출 + 시·군 기관 공고의 대상 시·군 */
+export function enrichLocal(p) {
+  let q = applyRules(p);
+  if (!q.targetRegionsInferred && (q.targetRegions || []).includes('전국')) return q; // 전국으로 명시된 공고는 그대로
+  const cities = detectCities(q, q.targetRegionsInferred ? null : q.targetRegions);
+  if (!cities.length) return q;
+  q = { ...q, targetDistricts: cities.map((c) => c.name) };
+  if (q.targetRegionsInferred || (q.targetRegions || []).includes('전국')) {
+    q.targetRegions = [...new Set(cities.map((c) => c.sido))];
+    q.targetRegionsInferred = false;
+  }
+  return q;
 }
 
 function publicShape(p) {
@@ -61,7 +76,7 @@ export async function build(env, { now = Date.now(), sourceTimeoutMs = 7000, aiT
   }
   const totalCollected = programs.length;
   const deduped = dedupe(programs);
-  const alive = deduped.filter((p) => isAlive(p, now));
+  const alive = deduped.filter((p) => isAlive(p, now)).map(enrichLocal);
 
   // AI 자격추출: 살아 있는 기업마당 공고 중 본문이 있는 것만(K-Startup은 업력·연령을 이미 정형 제공)
   let enriched = 0;

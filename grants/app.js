@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.8.1',
+  version: 'v3.9.0',
   updated: '2026-10-28',
   changelog: [
+    { v:'v3.9.0', d:'2026-10-28', note:'매칭 정확도: 공고 본문 정형 문구(업력·매출·근로자·대표자 연령) 규칙 추출, 시·군 기관 공고를 해당 시·군으로 제한, 설립 연·월 입력으로 업력 경계 판정' },
     { v:'v3.8.1', d:'2026-10-28', note:'실시간 공고 수집 정상화: 기업마당 시간 초과(0건)·K-Startup 페이지 파라미터 오류(10건) 수정, 수집을 백그라운드·예약 함수 + Netlify Blobs 스냅샷으로 분리' },
     { v:'v3.8.0', d:'2026-10-28', note:'자가부검·레드팀 점검 반영: 공고 데이터 XSS 차단·CSP, 공개 AI 프록시 제거·비용 보호 캐시, 연령대·매출·업력 경계 판정 수정, 적합도 산식 정상화(추천 등급 복구), 지역 정식명칭 인식, 지원금액 오추출 방지, 지원금/융자 분리 합계, 마감일 한국시간 기준, 데모 날짜 자동 이동, 과장 문구 정리' },
     { v:'v3.7.0', d:'2026-09-14', note:'시군구 매칭 버그 수정: 접미사(시/군/구) 유연 비교로 남양주시=남양주=[남양주] 모두 매칭, 짧은이름(중구 등) 오탐 방지' },
@@ -84,7 +85,7 @@ const finiteOrNull = v => (typeof v==='number' && Number.isFinite(v)) ? v : null
 function normalizeProgram(p){
   if(!p || typeof p!=='object' || typeof p.programName!=='string' || p.sourceProgramId==null) return null;
   const q = { ...p, sourceProgramId:String(p.sourceProgramId) };
-  for(const k of ['supportPurposes','targetBusinessType','targetRegions','targetIndustries','excludedIndustries','certificationConditions','specialRequirements','preferenceConditions']) q[k]=strArr(p[k]);
+  for(const k of ['supportPurposes','targetBusinessType','targetRegions','targetDistricts','targetIndustries','excludedIndustries','certificationConditions','specialRequirements','preferenceConditions']) q[k]=strArr(p[k]);
   for(const k of ['businessAgeMin','businessAgeMax','representativeAgeMin','representativeAgeMax','revenueMin','revenueMax','employeeMin','employeeMax','supportAmountMax']) q[k]=finiteOrNull(p[k]);
   return q;
 }
@@ -227,7 +228,7 @@ function userTargets(c){
 function blankCompany(){
   return {
     companyType:null, bizRegType:null,
-    region:null, district:null, establishedYear:null, businessAge:null,
+    region:null, district:null, establishedYear:null, establishedMonth:null, businessAge:null,
     industry:null, businessDescription:null, supportNeeds:[],
     revenueRange:null, employeeCount:null, representativeAge:null,
     representativeGender:null, ventureCertified:null, researchInstitute:null,
@@ -246,7 +247,11 @@ function sanitizeCompany(raw){
   c.district = c.region ? pick(raw.district, DISTRICTS[c.region]||[]) : null;
   c.industry = pick(raw.industry, INDUSTRIES.map(i=>i.v));
   const y = parseInt(raw.establishedYear,10);
-  if(y>=1960 && y<=CURRENT_YEAR){ c.establishedYear=String(y); c.businessAge=CURRENT_YEAR-y; }
+  if(y>=1960 && y<=CURRENT_YEAR){
+    c.establishedYear=String(y); c.businessAge=CURRENT_YEAR-y;
+    const mo=parseInt(raw.establishedMonth,10);
+    if(mo>=1 && mo<=12 && !(y===CURRENT_YEAR && mo>new Date().getMonth()+1)) c.establishedMonth=mo;
+  }
   c.revenueRange = pick(raw.revenueRange, Object.keys(REVENUE_BANDS));
   c.employeeCount = pick(raw.employeeCount, Object.keys(EMPLOYEE_BANDS));
   c.representativeAge = pick(raw.representativeAge, Object.keys(AGE_BANDS));
@@ -299,7 +304,14 @@ function rangeLabel(min,max,unit){
   return `${min}${unit} 이상`;
 }
 
-/* 업력: 설립'연도'만 받으므로 실제 업력은 (연도 차이 −1, +1) 사이. 경계 연차는 '확인 필요'. */
+/* 설립 연·월을 알면 경과 개월 수(일 단위 미반영이라 ±1개월 오차) */
+function monthsSinceFounding(c){
+  if(!c.establishedYear || !c.establishedMonth) return null;
+  const now=new Date();
+  return (now.getFullYear()-parseInt(c.establishedYear,10))*12 + (now.getMonth()+1-c.establishedMonth);
+}
+/* 업력: 설립 연·월이 있으면 개월 수로 판정(한도 ±1개월만 '확인 필요').
+   연도만 있으면 실제 업력이 (연도 차이 −1, +1) 사이라 경계 연차는 '확인 필요'. */
 function businessAgeCond(p, c, add){
   const L='업력 조건';
   const hasAge = p.businessAgeMin!=null || p.businessAgeMax!=null;
@@ -316,15 +328,22 @@ function businessAgeCond(p, c, add){
   if(!hasAge) return add(L,'na');
   if(c.businessAge==null) return add(L,'unknown','설립연도 미입력');
   const a = c.businessAge;
+  const M = monthsSinceFounding(c);
   const parts = [];
   if(p.businessAgeMin) parts.push(`${p.businessAgeMin}년 이상`);
   if(p.businessAgeMax!=null) parts.push(`창업 ${p.businessAgeMax}년 ${p.businessAgeMaxExclusive?'미만':'이내'}`);
   const req = parts.join(' · ') || '제한 없음';
   let r='pass';
+  if(M!=null){
+    // 'N년 이내'는 N×12개월까지, 'N년 미만'은 그 직전까지. 한도와 1개월 이내 차이는 일 단위로 갈리므로 확인 필요
+    if(p.businessAgeMax!=null){ const lim=p.businessAgeMax*12; if(M>lim+1) r='fail'; else if(M>=lim-1) r='unknown'; }
+    if(r!=='fail' && p.businessAgeMin){ const lim=p.businessAgeMin*12; if(M<lim-1) r='fail'; else if(M<=lim+1) r='unknown'; }
+    return add(L, r, `요건 ${req} · ${c.establishedYear}년 ${c.establishedMonth}월 설립(업력 약 ${(M/12).toFixed(1)}년)${r==='unknown'?' — 한도 1개월 이내라 사업자등록일로 확인':''}`);
+  }
   if(p.businessAgeMax!=null){ if(a>p.businessAgeMax) r='fail'; else if(a===p.businessAgeMax) r='unknown'; }
   if(r!=='fail' && p.businessAgeMin){ if(a<p.businessAgeMin) r='fail'; else if(a===p.businessAgeMin) r='unknown'; }
   add(L, r, r==='unknown'
-    ? `요건 ${req} · ${c.establishedYear}년 설립 — 경계 연차라 사업자등록일로 확인`
+    ? `요건 ${req} · ${c.establishedYear}년 설립 — 경계 연차라 설립 월을 입력하거나 사업자등록일로 확인`
     : `요건 ${req} · 귀사 업력 약 ${a}년`);
 }
 
@@ -357,6 +376,12 @@ function hardEligibility(p, c){
     regionTier = 0;
   } else if(!c.region){
     add('사업장 소재지','unknown','지역 미입력');
+  } else if(tr.includes(c.region) && (p.targetDistricts||[]).length){
+    // 시·군 기관(시청·산업진흥원 등) 공고: 그 시·군 기업 대상
+    const td = p.targetDistricts;
+    if(!c.district){ add('사업장 소재지','unknown',`${td.join('·')} 소재 기업 대상 — 시·군·구를 입력하면 판정`); regionTier = 1; }
+    else if(td.includes(c.district)){ add('사업장 소재지','pass',`${c.region} ${c.district} 대상`); regionTier = 2; }
+    else { add('사업장 소재지','fail',`대상: ${td.join('/')} (귀사 ${c.district})`); regionTier = -1; }
   } else if(tr.includes(c.region)){
     const hay = `${p.programName||''} ${tr.join(' ')} ${p._suptReginRaw||''} ${p.supportDescription||''}`;
     if(c.district && districtMatch(c.district, hay)){ add('사업장 소재지','pass',`${c.region} ${c.district} 대상`); regionTier = 2; }
@@ -655,9 +680,12 @@ const App = (function(){
           <div class="opt-grid c2">${[['개인사업자','개인사업자'],['법인사업자','법인사업자']].map(([v,l])=>optBtn('bizRegType',v,l,'',company.bizRegType===v)).join('')}</div>
           <div class="help">아직 사업자등록 전이라면 <button type="button" class="link-btn" onclick="App.pickPersona('founder')">예비창업자로 찾기</button>가 더 정확합니다.</div></div>
         ${regionField()}
-        <div class="field"><label class="q" for="f-year">설립연도<span class="req">*</span></label>
-          <input type="number" id="f-year" inputmode="numeric" placeholder="예: 2021" min="1960" max="${CURRENT_YEAR}" value="${esc(company.establishedYear||'')}">
-          <div class="help">사업자등록증의 개업연월일 기준. 업력 경계 연차(예: 창업 7년 이내인데 7년 차)는 '확인 필요'로 표시됩니다.</div></div>
+        <div class="field"><label class="q" for="f-year">설립 연·월<span class="req">*</span> <span class="opt-tag">월은 선택</span></label>
+          <div class="region-row">
+            <input type="number" id="f-year" inputmode="numeric" placeholder="연도 (예: 2021)" min="1960" max="${CURRENT_YEAR}" value="${esc(company.establishedYear||'')}">
+            <select id="f-month" aria-label="설립 월"><option value="">월 (선택)</option>${Array.from({length:12},(_,i)=>i+1).map(m=>`<option value="${m}" ${company.establishedMonth===m?'selected':''}>${m}월</option>`).join('')}</select>
+          </div>
+          <div class="help">사업자등록증의 개업연월일 기준. 월까지 넣으면 '창업 7년 이내' 같은 업력 조건을 경계 연차에도 정확히 판정합니다.</div></div>
         ${industrySelect()}`,
       valid:()=>{ const v=parseInt(company.establishedYear,10);
         return !!company.region && v>=1960 && v<=CURRENT_YEAR && !!company.industry && !!company.bizRegType; }
@@ -851,6 +879,12 @@ const App = (function(){
         warn.textContent=`설립연도를 확인해 주세요 (1960~${CURRENT_YEAR})`;
       } else if(warn){ warn.remove(); }
       refreshNext();
+    };
+    const mo=document.getElementById('f-month'); if(mo) mo.onchange=e=>{
+      const m=parseInt(e.target.value,10);
+      company.establishedMonth = (m>=1 && m<=12) ? m : null;
+      const y=parseInt(company.establishedYear,10);
+      if(company.establishedMonth && y===CURRENT_YEAR && company.establishedMonth>new Date().getMonth()+1){ company.establishedMonth=null; e.target.value=''; toast('미래 월은 선택할 수 없습니다.'); }
     };
     const ind=document.getElementById('f-industry'); if(ind) ind.onchange=e=>{ company.industry = INDUSTRIES.some(i=>i.v===e.target.value) ? e.target.value : null; refreshNext(); };
   }
@@ -1164,7 +1198,7 @@ const App = (function(){
       <div class="rc-line1">
         <span class="rc-state ${ST_CLS[m.state]}">${esc(m.state)}</span>
         ${regionBadge(m)}
-        ${p._aiEnriched?`<span class="ai-badge" title="공고 본문에서 자격조건을 AI로 추출(근거 문구 대조)한 사업">🤖 AI 본문분석</span>`:''}
+        ${p._aiEnriched?`<span class="ai-badge" title="공고 본문에서 자격조건을 AI로 추출(근거 문구 대조)한 사업">🤖 AI 본문분석</span>`:p.eligibilityDepth==='rule'?`<span class="ai-badge" title="공고 본문의 업력·매출·근로자·연령 문구를 읽어 판정한 사업">📄 본문분석</span>`:''}
         <span class="rc-dl ${dl.cls}">${dl.icon} ${esc(dl.txt)}</span>
       </div>
       <h3>${esc(p.programName)}</h3>
@@ -1228,9 +1262,10 @@ const App = (function(){
         <div><b>${esc(c.label)}</b>${c.evidence?`<span class="cond-ev">${esc(c.evidence)}</span>`:''}</div></div>`;
     }).join('') || '<p class="muted">판정할 자격 항목이 공고에 없습니다.</p>';
     const pref=(p.preferenceConditions||[]).map(x=>`<span class="pref">우대 ${esc(x)}</span>`).join('');
-    const ev=p._eligibilityEvidence && typeof p._eligibilityEvidence==='object'
-      ? Object.entries(p._eligibilityEvidence).slice(0,8).map(([k,v])=>`<li><b>${esc(k)}</b> “${esc(v)}”</li>`).join('') : '';
-    const depth = p._aiEnriched ? 'AI 본문 분석(근거 문구 대조)' : p.eligibilityDepth==='listing' ? '공고 목록 정보(본문 미분석)' : ProgramProvider.lastMode==='live' ? '공고 정보' : 'DEMO 예시 데이터';
+    const EV_LABEL={businessAgeMax:'업력 상한',businessAgeMin:'업력 하한',employeeMax:'근로자 상한',employeeMin:'근로자 하한',revenueMax:'매출 상한',revenueMin:'매출 하한',representativeAgeMax:'대표자 연령 상한',representativeAgeMin:'대표자 연령 하한',targetIndustries:'대상 업종',excludedIndustries:'제외 업종',specialRequirements:'필수 자격',requiresNoTaxArrears:'체납 제한',supportAmountMax:'지원금'};
+    const evObj = Object.assign({}, p._ruleEvidence||{}, p._eligibilityEvidence||{});
+    const ev = Object.entries(evObj).filter(([,v])=>typeof v==='string').slice(0,8).map(([k,v])=>`<li><b>${esc(EV_LABEL[k]||k)}</b> “${esc(v)}”</li>`).join('');
+    const depth = p._aiEnriched ? 'AI 본문 분석(근거 문구 대조)' : p.eligibilityDepth==='rule' ? '공고 본문 정형 문구 분석' : p.eligibilityDepth==='listing' ? '공고 목록 정보(본문 미분석)' : ProgramProvider.lastMode==='live' ? '공고 정보' : 'DEMO 예시 데이터';
     const period = (p.applicationStart||p.applicationEnd) ? `${p.applicationStart||'—'} ~ ${p.applicationEnd||'—'}` : periodText(p, m.dl);
     document.getElementById('modalBody').innerHTML=`
       <span class="rc-state ${ST_CLS[m.state]}" style="align-self:flex-start">${esc(m.state)}</span>
@@ -1245,7 +1280,7 @@ const App = (function(){
       </div>
       <div class="m-sec"><h4>사업 개요</h4><p>${esc(p.supportDescription||'—')}</p></div>
       <div class="m-sec"><h4>자격조건 판정 <span class="muted">(적합도 ${m.fit} · 확인도 ${m.conf} · 근거: ${esc(depth)})</span></h4>${conds}</div>
-      ${ev?`<div class="m-sec"><h4>AI가 인용한 공고 문구</h4><ul class="ev-list">${ev}</ul></div>`:''}
+      ${ev?`<div class="m-sec"><h4>판정에 쓴 공고 문구</h4><ul class="ev-list">${ev}</ul></div>`:''}
       ${pref?`<div class="m-sec"><h4>우대사항</h4><div class="prefs">${pref}</div></div>`:''}
     `;
     const link=document.getElementById('modalOpenLink');
