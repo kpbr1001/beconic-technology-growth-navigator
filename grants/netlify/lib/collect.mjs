@@ -129,13 +129,15 @@ export async function build(env, { now = Date.now(), sourceTimeoutMs = 7000, aiT
 // ---- 스냅샷 저장소(Netlify Blobs). 테스트는 _setStore로 메모리 저장소를 넣는다 ----
 let storeOverride = null;
 /** 운영 외(미리보기·브랜치) 배포는 별도 저장소 — 미리보기 코드가 운영 스냅샷을 덮어쓰지 않게.
- * 배포 맥락 값은 백그라운드 함수에서 보이지 않는 경우가 있어(운영 미리보기에서 확인) 요청 주소로 판단한다:
- * 미리보기·브랜치·배포 고유 주소는 'deploy-preview-45--사이트', 'main--사이트'처럼 '--'를 포함한다. */
+ * 판단 순서: 함수가 받은 배포 맥락(context.deploy.context) → 없을 때만 요청 주소의 '--'.
+ * v3.10~3.11: 주소만 보던 탓에 운영 programs 함수가 'main--사이트'(운영 브랜치 주소)로 요청을 받아
+ * 미리보기 저장소를 읽었다(운영·미리보기 fetchedAt 동일, 운영 분석 함수는 빈 색인으로 확인). */
 let deployHost = null;
-export function setDeployHost(host) { deployHost = host || null; }
-export function isPreview(host = deployHost, ctx = globalThis.Netlify?.context?.deploy?.context || process.env.CONTEXT) {
-  if (host && host.includes('--')) return true;
-  return !!(ctx && ctx !== 'production');
+let deployCtx = null;
+export function setDeployHost(host, ctx) { deployHost = host || null; deployCtx = ctx || null; }
+export function isPreview(host = deployHost, ctx = deployCtx || globalThis.Netlify?.context?.deploy?.context || process.env.CONTEXT) {
+  if (ctx) return ctx !== 'production';
+  return !!(host && host.includes('--'));
 }
 export function storeName(host = deployHost, ctx) { return isPreview(host, ctx) ? 'grant-programs-preview' : 'grant-programs'; }
 export function _setStore(s) { storeOverride = s; }
