@@ -128,8 +128,13 @@ export async function build(env, { now = Date.now(), sourceTimeoutMs = 7000, aiT
 
 // ---- 스냅샷 저장소(Netlify Blobs). 테스트는 _setStore로 메모리 저장소를 넣는다 ----
 let storeOverride = null;
-/** 운영 외(미리보기·브랜치) 배포는 별도 저장소 — 미리보기 코드가 운영 스냅샷을 덮어쓰지 않게 */
-export function storeName(ctx = globalThis.Netlify?.context?.deploy?.context || process.env.CONTEXT) {
+/** 운영 외(미리보기·브랜치) 배포는 별도 저장소 — 미리보기 코드가 운영 스냅샷을 덮어쓰지 않게.
+ * 배포 맥락 값은 백그라운드 함수에서 보이지 않는 경우가 있어(운영 미리보기에서 확인) 요청 주소로 판단한다:
+ * 미리보기·브랜치·배포 고유 주소는 'deploy-preview-45--사이트', 'main--사이트'처럼 '--'를 포함한다. */
+let deployHost = null;
+export function setDeployHost(host) { deployHost = host || null; }
+export function storeName(host = deployHost, ctx = globalThis.Netlify?.context?.deploy?.context || process.env.CONTEXT) {
+  if (host && host.includes('--')) return 'grant-programs-preview';
   return ctx && ctx !== 'production' ? 'grant-programs-preview' : 'grant-programs';
 }
 export function _setStore(s) { storeOverride = s; }
