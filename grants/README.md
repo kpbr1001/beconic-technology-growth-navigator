@@ -1,4 +1,4 @@
-# BECONIC 지원사업 MATCH (v3.9.0)
+# BECONIC 지원사업 MATCH (v3.10.0)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-grant-matching.netlify.app
@@ -13,7 +13,7 @@
 | 자격 → 적합도 → 확인도 분리 | 자격(충족·미충족·확인 필요)이 먼저, 적합도는 순서용, 확인도는 '얼마나 확정했나' |
 | 모르면 '확인 필요' | 구간 입력(연령대·매출·근로자)이 요건에 걸치거나, 업력 경계 연차, 공고에 표기 없는 대상은 단정하지 않음 |
 | 목록 정보의 한계 표시 | 실시간 공고는 목록 정보만 있으면 '세부 자격요건(공고문 확인)'을 남겨 최대 '조건부'. AI 근거 대조 추출 공고만 예외 |
-| 금액은 성격별 | 보조·출연과 융자·보증 한도를 따로 합산하고 '사업별 최대액 단순 합계'임을 표시 |
+| 금액은 성격별·추천만 | 지원금 합계는 '추천' 사업만. 보조·출연과 융자·보증 한도를 따로 합산, 지분 투자는 제외. '사업별 최대액 단순 합계'임을 표시 |
 | 적합도 산식 | `APP_CONFIG.MATCH_WEIGHTS` 중 입력으로 판단 가능한 요소만 가중평균 × (0.6 + 0.4 × 근거 비중) + 지역 가점(시군구 8·시도 5) |
 
 ## 구성
@@ -24,8 +24,8 @@ grants/
 ├─ netlify/functions/  programs.mjs(스냅샷 응답) · refresh-programs-scheduled.mjs(30분 수집) · refresh-programs-background.mjs(필요 시 수집) · health.mjs
 ├─ netlify/lib/        collect.mjs(수집·Blobs 스냅샷·규칙 보강) · rule-extract.mjs(본문 정형 문구) · bizinfo.mjs · kstartup.mjs · normalize.mjs · eligibility-ai.mjs
 ├─ scripts/build.mjs   # dist/ 배포본, --demo 로 단일 HTML(dist-demo/)
-├─ tests/server.test.mjs  # 서버 단위 19개(fetch·Blobs 스텁)
-├─ tests/qa.mjs           # Chromium QA 70개(엔진·흐름·레드팀 회귀·실시간 모의·모바일·PDF·데모 단일본)
+├─ tests/server.test.mjs  # 서버 단위 21개(fetch·Blobs 스텁)
+├─ tests/qa.mjs           # Chromium QA 78개(엔진·흐름·레드팀 회귀·실시간 모의·모바일·PDF·데모 단일본)
 └─ docs/  CHANGELOG.md · REDTEAM_2026-10-28.md · DEPLOY_GUIDE.md · AI_ELIGIBILITY.md
 ```
 

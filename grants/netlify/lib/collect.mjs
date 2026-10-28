@@ -7,7 +7,7 @@
 import { collectBizinfo } from './bizinfo.mjs';
 import { collectKstartup } from './kstartup.mjs';
 import { extractEligibility, mergeEligibility } from './eligibility-ai.mjs';
-import { dedupe, isPastKst, detectCities } from './normalize.mjs';
+import { dedupe, isPastKst, detectCities, detectGus } from './normalize.mjs';
 import { applyRules } from './rule-extract.mjs';
 
 const BIZINFO_MAX = 2000;           // 운영에서 500건 상한에 정확히 걸림(접수 공고가 더 있음) → 상향
@@ -24,16 +24,30 @@ export function isAlive(p, now = Date.now()) {
   return true;
 }
 
-/** AI 없이 하는 보강: 본문 규칙 추출 + 시·군 기관 공고의 대상 시·군 */
+const WOMEN_TITLE = /여성\s*(?:기업|창업|CEO|경제인|대표|기업인)/;
+
+/** AI 없이 하는 보강: 본문 규칙 추출 + 시·군·자치구 기관 공고의 대상 지역 + 여성기업 전용 공고 */
 export function enrichLocal(p) {
   let q = applyRules(p);
+  // 공고명이 여성기업·여성창업 사업이면 여성 대표 기업 대상(본문의 '여성기업 우대'는 필수 조건으로 보지 않음)
+  if (WOMEN_TITLE.test(q.programName || '') && !(q.specialRequirements || []).length) {
+    q = { ...q, specialRequirements: ['여성기업'], _ruleEvidence: { ...(q._ruleEvidence || {}), specialRequirements: `공고명: ${q.programName}` } };
+  }
   if (!q.targetRegionsInferred && (q.targetRegions || []).includes('전국')) return q; // 전국으로 명시된 공고는 그대로
   const cities = detectCities(q, q.targetRegionsInferred ? null : q.targetRegions);
-  if (!cities.length) return q;
-  q = { ...q, targetDistricts: cities.map((c) => c.name) };
-  if (q.targetRegionsInferred || (q.targetRegions || []).includes('전국')) {
-    q.targetRegions = [...new Set(cities.map((c) => c.sido))];
-    q.targetRegionsInferred = false;
+  if (cities.length) {
+    q = { ...q, targetDistricts: cities.map((c) => c.name) };
+    if (q.targetRegionsInferred || (q.targetRegions || []).includes('전국')) {
+      q.targetRegions = [...new Set(cities.map((c) => c.sido))];
+      q.targetRegionsInferred = false;
+    }
+    return q;
+  }
+  // 광역시 자치구: 광역시가 하나로 정해진 공고만(예: '[서울] 구로', '서울특별시 구로구')
+  const regs = q.targetRegions || [];
+  if (!q.targetRegionsInferred && regs.length === 1) {
+    const gus = detectGus(q, regs[0]);
+    if (gus.length) q = { ...q, targetDistricts: gus };
   }
   return q;
 }

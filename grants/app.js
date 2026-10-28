@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.9.0',
+  version: 'v3.10.0',
   updated: '2026-10-28',
   changelog: [
+    { v:'v3.10.0', d:'2026-10-28', note:'지원금 합계는 추천 사업만, 금액 추출 오류(쉼표 숫자·사업 총액) 수정, 광역시 자치구 공고 매칭, 선택 입력(대표자 성별·연령·인증, 소상인·소공인 규모) 추가, 여성기업 전용 공고 판정' },
     { v:'v3.9.0', d:'2026-10-28', note:'매칭 정확도: 공고 본문 정형 문구(업력·매출·근로자·대표자 연령) 규칙 추출, 시·군 기관 공고를 해당 시·군으로 제한, 설립 연·월 입력으로 업력 경계 판정' },
     { v:'v3.8.1', d:'2026-10-28', note:'실시간 공고 수집 정상화: 기업마당 시간 초과(0건)·K-Startup 페이지 파라미터 오류(10건) 수정, 수집을 백그라운드·예약 함수 + Netlify Blobs 스냅샷으로 분리' },
     { v:'v3.8.0', d:'2026-10-28', note:'자가부검·레드팀 점검 반영: 공고 데이터 XSS 차단·CSP, 공개 AI 프록시 제거·비용 보호 캐시, 연령대·매출·업력 경계 판정 수정, 적합도 산식 정상화(추천 등급 복구), 지역 정식명칭 인식, 지원금액 오추출 방지, 지원금/융자 분리 합계, 마감일 한국시간 기준, 데모 날짜 자동 이동, 과장 문구 정리' },
@@ -207,6 +208,15 @@ const COMPANY_TYPES = [
   {v:'중소기업',   s:'법인·개인사업자'}
 ];
 const BIZ_REG_TYPES = ['개인사업자','법인사업자'];
+/* 보유 인증(선택 입력). 하나라도 답하면 나머지는 '없음'(false), 답하지 않으면 모름(null) */
+const CERTS = [
+  {k:'ventureCertified', label:'벤처기업', kw:/벤처기업|벤처\s*확인/},
+  {k:'innobiz', label:'이노비즈', kw:/이노비즈|기술혁신형/},
+  {k:'mainbiz', label:'메인비즈', kw:/메인비즈|경영혁신형/},
+  {k:'researchInstitute', label:'기업부설연구소·연구전담부서', kw:/부설연구소|연구전담부서|연구개발전담/},
+  {k:'patentStatus', label:'특허 보유', kw:/특허/}
+];
+const CERT_KEYS = CERTS.map(c=>c.k);
 
 /* 구간 입력 → 범위 [하한, 상한]. 구간이 요건을 걸치면 '확인 필요'로 판정한다(중간값 비교 금지). */
 const AGE_BANDS = {'20대':[20,29],'30대':[30,39],'40대':[40,49],'50대':[50,59],'60대이상':[60,120]};
@@ -232,7 +242,7 @@ function blankCompany(){
     industry:null, businessDescription:null, supportNeeds:[],
     revenueRange:null, employeeCount:null, representativeAge:null,
     representativeGender:null, ventureCertified:null, researchInstitute:null,
-    exportHistory:null, patentStatus:null,
+    exportHistory:null, patentStatus:null, innobiz:null, mainbiz:null,
     taxArrears:null   // 국세·지방세 체납 여부
   };
 }
@@ -255,7 +265,8 @@ function sanitizeCompany(raw){
   c.revenueRange = pick(raw.revenueRange, Object.keys(REVENUE_BANDS));
   c.employeeCount = pick(raw.employeeCount, Object.keys(EMPLOYEE_BANDS));
   c.representativeAge = pick(raw.representativeAge, Object.keys(AGE_BANDS));
-  for(const k of ['exportHistory','taxArrears']) c[k] = typeof raw[k]==='boolean' ? raw[k] : null;
+  for(const k of ['exportHistory','taxArrears',...CERT_KEYS]) c[k] = typeof raw[k]==='boolean' ? raw[k] : null;
+  c.representativeGender = pick(raw.representativeGender, ['여성','남성']);
   return c;
 }
 
@@ -351,6 +362,12 @@ function isLoanProgram(p){
   const t = `${p.programName||''} ${p.subCategory||''} ${p.supportAmountText||''}`;
   return /융자|보증|대출|이차보전/.test(t) || p.category==='금융';
 }
+/* 지분 투자 사업(직접투자·투자 대상 모집·펀드)은 보조금이 아니므로 지원금 합계에서 뺀다 */
+function isInvestProgram(p){
+  if(isLoanProgram(p)) return false;
+  return /직접\s*투자|투자\s*대상|투자\s*유치\s*지원|펀드|모태|지분\s*투자|엔젤/.test(`${p.programName||''} ${p.supportDescription||''}`);
+}
+function amountLabel(p){ return isLoanProgram(p) ? '융자·보증 한도' : isInvestProgram(p) ? '투자 규모' : '최대 지원'; }
 
 /* ---- Hard Eligibility Engine ----
    판정: ELIGIBLE / CONDITIONAL / UNKNOWN / INELIGIBLE
@@ -445,12 +462,20 @@ function hardEligibility(p, c){
   // 8) 특수자격 (여성기업·벤처 등)
   const specialReqs = (p.specialRequirements||[]).length ? p.specialRequirements : (p.certificationConditions||[]);
   if(specialReqs.some(x=>x.includes('여성'))){
-    if(c.representativeGender==null) add('여성기업 확인','unknown','여성기업(대표자) 요건 — 해당 여부 확인');
+    if(c.representativeGender==null) add('여성기업 확인','unknown','여성기업(대표자) 요건 — 선택 정보에서 대표자 성별을 입력하면 판정');
     else add('여성기업 확인', c.representativeGender==='여성'?'pass':'fail', '여성 대표 요건');
   }
   if(specialReqs.some(x=>x.includes('벤처'))){
     if(c.ventureCertified==null) add('벤처확인','unknown','벤처기업 확인서 요건');
     else add('벤처확인', c.ventureCertified?'pass':'fail','벤처기업 확인 필요');
+  }
+  if(specialReqs.some(x=>x.includes('이노비즈'))){
+    if(c.innobiz==null) add('이노비즈 확인','unknown','이노비즈(기술혁신형) 확인 요건');
+    else add('이노비즈 확인', c.innobiz?'pass':'fail','이노비즈 확인 요건');
+  }
+  if(specialReqs.some(x=>x.includes('메인비즈'))){
+    if(c.mainbiz==null) add('메인비즈 확인','unknown','메인비즈(경영혁신형) 확인 요건');
+    else add('메인비즈 확인', c.mainbiz?'pass':'fail','메인비즈 확인 요건');
   }
   const exportReq = specialReqs.some(x=>x.includes('수출'));
   if(exportReq){
@@ -504,9 +529,13 @@ function fitScore(p, c, regionTier){
   use('stage', stageFit(p,c));
   const ti = p.targetIndustries||[], cBroad = industryToBroad(c.industry);
   use('industry', (!ti.length || ti.includes('전업종') || ti.includes(c.industry) || ti.includes(cBroad)) ? 1 : 0.4);
-  if(c.ventureCertified!=null || c.researchInstitute!=null || c.patentStatus!=null){
-    let cap=0.5; if(c.ventureCertified)cap+=0.2; if(c.researchInstitute)cap+=0.2; if(c.patentStatus)cap+=0.1;
-    use('capability', Math.min(1,cap));
+  // 보유 인증이 공고에 언급되면 관련도 높음(예: 이노비즈 기업이 '이노비즈 기업 대상' 공고)
+  const held = CERTS.filter(x=>c[x.k]===true);
+  if(CERTS.some(x=>c[x.k]!=null)){
+    const txt = `${p.programName||''} ${p.supportDescription||''}`;
+    const hit = held.filter(x=>x.kw.test(txt));
+    use('capability', hit.length ? 1 : held.length ? 0.6 : 0.5);
+    if(hit.length) parts._certHit = hit.map(x=>x.label);
   }
   use('amount', p.supportAmountMax ? 1 : 0.5);
   const dl = deadlineState(p);
@@ -578,12 +607,13 @@ function buildDashboard(matched){
   const rec = matched.filter(m=> m.state==='추천');
   const cond = matched.filter(m=> m.state==='조건부 추천');
   const check = matched.filter(m=> m.state==='확인 필요');
-  // 합계는 '추천 + 조건부'만(확인 필요는 자격 불확실 → 과대평가 방지). 보조·출연과 융자·보증은 성격이 달라 따로 합산.
+  // 합계는 '추천'(판정된 자격 모두 충족)만. 조건부·확인 필요는 자격이 확정되지 않아 합산하지 않는다.
+  // 보조·출연과 융자·보증은 성격이 달라 따로 합산.
   let grantSum=0, grantCnt=0, loanSum=0, loanCnt=0;
-  rec.concat(cond).forEach(m=>{
+  rec.forEach(m=>{
     const v = m.program.supportAmountMax;
     if(typeof v!=='number' || !(v>0)) return;
-    if(isLoanProgram(m.program)){ loanSum+=v; loanCnt++; } else { grantSum+=v; grantCnt++; }
+    if(isLoanProgram(m.program)){ loanSum+=v; loanCnt++; } else if(!isInvestProgram(m.program)){ grantSum+=v; grantCnt++; }
   });
   const closingSoon = considerable.filter(m=> m.dl.state==='CLOSING_SOON');
   return {
@@ -641,22 +671,23 @@ const App = (function(){
   const PERSONA_CFG = {
     founder: { key:'founder', companyType:'예비창업자', label:'예비창업자', icon:'🌱',
       cardDesc:'아직 사업자등록 전이에요. 창업 지원사업부터 쉽게 안내해 드립니다.',
-      steps:['creatorBasic'], defaultIndustry:null },
+      steps:['creatorBasic','extras'], defaultIndustry:null },
     retail: { key:'retail', companyType:'소상인', label:'소상인', icon:'🏪',
       cardDesc:'소매·음식·서비스업을 운영해요. 경영개선·자금·마케팅 지원 중심.',
-      steps:['bizBasic'], defaultIndustry:null },
+      steps:['bizBasic','smeProfile','extras'], defaultIndustry:null },
     maker: { key:'maker', companyType:'소공인', label:'소공인', icon:'🔧',
       cardDesc:'제조업 10인 미만이에요. 소공인특화·제조혁신 지원 중심.',
-      steps:['bizBasic'], defaultIndustry:'제조업' },
+      steps:['bizBasic','smeProfile','extras'], defaultIndustry:'제조업' },
     sme: { key:'sme', companyType:'중소기업', label:'중소기업', icon:'🏢',
       cardDesc:'법인·개인사업자로 성장 중이에요. R&D·수출·스마트공장·정책자금.',
-      steps:['bizBasic','smeProfile'], defaultIndustry:null }
+      steps:['bizBasic','smeProfile','extras'], defaultIndustry:null }
   };
   const personaOf = type => Object.keys(PERSONA_CFG).find(k=>PERSONA_CFG[k].companyType===type) || null;
 
   const PICKABLE = {
     bizRegType: BIZ_REG_TYPES,
     representativeAge: Object.keys(AGE_BANDS),
+    representativeGender: ['여성','남성'],
     revenueRange: Object.keys(REVENUE_BANDS),
     employeeCount: Object.keys(EMPLOYEE_BANDS)
   };
@@ -691,7 +722,7 @@ const App = (function(){
         return !!company.region && v>=1960 && v<=CURRENT_YEAR && !!company.industry && !!company.bizRegType; }
     },
     smeProfile: {
-      title:'기업 규모 (선택)',
+      title:'기업 규모·이력 (선택)',
       desc:'입력하면 매출·고용·세금 조건이 있는 사업의 확인도가 올라갑니다. 모르면 건너뛰어도 됩니다.',
       optional:true,
       render:()=>`
@@ -704,6 +735,21 @@ const App = (function(){
         <div class="field"><label class="q">국세·지방세 체납 <span class="opt-tag">대부분 사업 필수요건</span></label>
           <div class="help">체납이 있으면 대부분의 정부지원사업에서 신청이 제한됩니다.</div>
           <div class="opt-grid c2">${['없음(정상)','체납 있음'].map(v=>optBtn('_tax',v,v,'',(company.taxArrears===false&&v==='없음(정상)')||(company.taxArrears===true&&v==='체납 있음'))).join('')}</div></div>`,
+      valid:()=>true
+    },
+    extras: {
+      title:'대표자·인증 정보 (선택)',
+      desc:'여성기업·청년·인증 기업 대상 사업을 정확히 판정하는 데 씁니다. 모르면 비워 두고 분석해도 됩니다.',
+      optional:true,
+      render:()=>`
+        <div class="field"><label class="q">대표자 성별 <span class="opt-tag">여성기업 사업 판정</span></label>
+          <div class="opt-grid c2">${['여성','남성'].map(v=>optBtn('representativeGender',v,v,'',company.representativeGender===v)).join('')}</div></div>
+        ${company.companyType==='예비창업자' ? '' : `<div class="field"><label class="q">대표자 연령대 <span class="opt-tag">청년·시니어 사업 판정</span></label>
+          <div class="opt-grid c3">${Object.keys(AGE_BANDS).map(a=>optBtn('representativeAge',a,a,'',company.representativeAge===a)).join('')}</div></div>
+        <div class="field"><label class="q">보유 인증·조직 <span class="opt-tag">복수 선택</span></label>
+          <div class="help">하나라도 고르면 고르지 않은 항목은 '없음'으로 판정합니다.</div>
+          <div class="opt-grid c2">${CERTS.map(x=>`<button type="button" class="opt ${company[x.k]===true?'sel':''}" aria-pressed="${company[x.k]===true}" onclick="App.toggleCert('${x.k}')">${x.label}</button>`).join('')}
+            <button type="button" class="opt ${CERTS.every(x=>company[x.k]===false)?'sel':''}" onclick="App.toggleCert('none')">해당 없음</button></div></div>`}`,
       valid:()=>true
     }
   };
@@ -720,13 +766,13 @@ const App = (function(){
   return {
     company:()=>company, get step(){return step}, get persona(){return persona},
     get matched(){return matched}, get dash(){return dash},
-    init, pickPersona, jumpToPersona, next, back, pick,
+    init, pickPersona, jumpToPersona, next, back, pick, toggleCert,
     analyze, render, setFilter, setSort, toggleFunded, resetFilter, scrollToResults, expandGroup, showMore,
     openDetail, closeModal, printReport, openProgressive, applyProgressive, closeProgressive,
     reset, goHome, editInputs,
     saveDraft, clearDraft, resumeDraft, dismissDraft,
     runAutoUpdate, dismissUpdate, forgetProfile,
-    _ppset:(k,v)=>{ if(['revenueRange','employeeCount','representativeAge','exportHistory'].includes(k)) ppTmp[k]=v; }
+    _ppset:(k,v)=>{ if(['revenueRange','employeeCount','representativeAge','exportHistory','representativeGender'].includes(k)) ppTmp[k]=v; }
   };
 
   /* ================= INIT ================= */
@@ -833,7 +879,7 @@ const App = (function(){
 
   function renderProgress(){
     const el=document.getElementById('progress'); if(!el) return;
-    const labels=activeSteps().map(k=>({creatorBasic:'기본',bizBasic:'기업정보',smeProfile:'규모'}[k]||k));
+    const labels=activeSteps().map(k=>({creatorBasic:'기본',bizBasic:'기업정보',smeProfile:'규모',extras:'대표·인증'}[k]||k));
     labels.push('분석');
     el.innerHTML = labels.map((s,i)=>{
       const cls = i<step?'done':(i===step?'active':'');
@@ -901,6 +947,15 @@ const App = (function(){
     step++; renderStep(); saveDraft(true);
   }
   function back(){ if(step>0){ step--; renderStep(); } else goHome(); }
+  function toggleCert(k){
+    if(k==='none'){ const all=CERT_KEYS.every(x=>company[x]===false); CERT_KEYS.forEach(x=>{ company[x]= all ? null : false; }); renderStep(); return; }
+    if(!CERT_KEYS.includes(k)) return;
+    const turnOn = company[k]!==true;
+    CERT_KEYS.forEach(x=>{ if(company[x]==null) company[x]=false; });
+    company[k]=turnOn;
+    if(CERT_KEYS.every(x=>company[x]===false) && !turnOn) CERT_KEYS.forEach(x=>{ company[x]=null; });
+    renderStep();
+  }
   function pick(field,val){
     if(field==='_exp'){ company.exportHistory = (val==='있음'); renderStep(); return; }
     if(field==='_tax'){ company.taxArrears = (val==='체납 있음'); renderStep(); return; }
@@ -975,7 +1030,7 @@ const App = (function(){
     const el=document.getElementById('ppBanner'); if(!el) return;
     const needed=collectNeeded();
     if(!needed.length || progressiveDone){ el.innerHTML=''; return; }
-    const labels={revenue:'매출 조건',employee:'상시근로자 조건',repAge:'대표자 연령',export:'수출 조건'};
+    const labels={revenue:'매출 조건',employee:'상시근로자 조건',repAge:'대표자 연령',export:'수출 조건',gender:'여성기업 여부'};
     el.innerHTML=`<div class="pp-banner">
       <div class="ppb-t"><b>추가 정보 ${needed.length}가지를 알려주시면 자격 확인도를 높일 수 있어요</b>
         <span>현재 확인이 필요한 항목: ${needed.map(n=>labels[n]).join(' · ')}</span></div>
@@ -1006,7 +1061,6 @@ const App = (function(){
         <span class="mbar-t"><span class="mbar-f" style="width:${Math.round(f.count/maxF*100)}%;background:${PALETTE[i%PALETTE.length]}"></span></span>
         <span class="mbar-v">${f.count}</span></div>`).join('');
 
-    const okCnt = d.recommend + d.conditional;
     let heroBody;
     if(!d.considerable){
       heroBody = `<div class="dh-amount dh-amount-sm">지금 딱 맞는 사업은 적어요</div>
@@ -1015,21 +1069,25 @@ const App = (function(){
       const main = d.grantSum>0 ? d.grantSum : d.loanSum;
       const mainLabel = d.grantSum>0 ? `보조·출연 ${d.grantCnt}건` : `융자·보증 ${d.loanCnt}건`;
       heroBody = `<div class="dh-amount">${fmtKRW(main)}</div>
-         <div class="dh-sub">자격 충족(추천·조건부) <b>${okCnt}건</b> 중 금액 공개 ${mainLabel}의 사업별 최대액 단순 합계${d.grantSum>0&&d.loanSum>0?` · 융자·보증 한도 <b>${fmtKRW(d.loanSum)}</b> 별도`:''}</div>
+         <div class="dh-sub">추천 <b>${d.recommend}건</b> 중 금액 공개 ${mainLabel}의 사업별 최대액 단순 합계${d.grantSum>0&&d.loanSum>0?` · 융자·보증 한도 <b>${fmtKRW(d.loanSum)}</b> 별도`:''}</div>
          <div class="dh-note">중복수혜 제한·선정 여부에 따라 실제 받을 수 있는 금액은 이보다 적습니다.</div>
          ${d.closingSoon>0?`<div class="dh-chips"><span class="dchip soon">⏰ 마감임박 ${d.closingSoon}건</span></div>`:''}`;
     } else {
-      heroBody = `<div class="dh-amount dh-amount-sm">검토할 사업 ${d.considerable}건</div>
-         <div class="dh-sub">자격 충족 ${okCnt}건의 지원금액은 공고문에서 확인이 필요합니다.</div>`;
+      heroBody = d.recommend
+        ? `<div class="dh-amount dh-amount-sm">추천 ${d.recommend}건</div>
+           <div class="dh-sub">추천 사업의 지원금액은 공고문에서 확인이 필요합니다. 조건부 ${d.conditional}건은 공고 확인 후 합산 대상이 됩니다.</div>`
+        : `<div class="dh-amount dh-amount-sm">추천 확정 사업 없음</div>
+           <div class="dh-sub">조건부 ${d.conditional}건·확인 필요 ${d.check}건은 공고문 확인이 필요해 지원금 합계에 넣지 않았습니다. 선택 정보(설립 월·규모·인증)를 넣으면 추천으로 확정되는 사업이 늘어납니다.</div>`;
+      if(d.closingSoon>0) heroBody += `<div class="dh-chips"><span class="dchip soon">⏰ 마감임박 ${d.closingSoon}건</span></div>`;
     }
-    const heroLabel = d.grantSum>0 ? '자격 충족 사업 지원금 합계(추정)' : d.loanSum>0 ? '자격 충족 사업 융자·보증 한도 합계(추정)' : '검토 결과';
+    const heroLabel = d.grantSum>0 ? '추천 사업 지원금 합계(추정)' : d.loanSum>0 ? '추천 사업 융자·보증 한도 합계(추정)' : '추천 사업 지원 규모';
 
     const srcLabel = live ? '현재 접수 중·예정 공고' : 'DEMO 예시 공고';
     const hookBanner = `
       <button type="button" class="hook-banner" onclick="App.scrollToResults()">
         ${srcLabel} <span class="hook-num">${d.active.toLocaleString()}</span>개 중,
         검토할 만한 사업 <span class="hook-match">${d.considerable}개</span>
-        <span class="hook-split">(자격 충족 ${okCnt} · 확인 필요 ${d.check})</span>
+        <span class="hook-split">(추천 ${d.recommend} · 조건부 ${d.conditional} · 확인 필요 ${d.check})</span>
         <span class="hook-cta">아래에서 확인 ↓</span>
       </button>`;
 
@@ -1204,7 +1262,7 @@ const App = (function(){
       <h3>${esc(p.programName)}</h3>
       <div class="rc-agency">${esc(p.agency||'')}${p.executingAgency?` · ${esc(p.executingAgency)}`:''}</div>
       <div class="rc-amt-row">
-        <div class="rc-amt"><span class="rc-amt-l">${isLoanProgram(p)?'융자·보증 한도':'최대 지원'}</span><b>${esc(amt)}</b></div>
+        <div class="rc-amt"><span class="rc-amt-l">${amountLabel(p)}</span><b>${esc(amt)}</b></div>
         <div class="rc-fit" title="입력 정보로 계산한 적합도(선정확률 아님)">
           <span class="rc-fit-l">적합도</span><b>${m.fit}</b>
           <span class="rc-fit-bar"><span style="width:${m.fit}%"></span></span>
@@ -1274,12 +1332,13 @@ const App = (function(){
         <div><span>소관기관</span><b>${esc(p.agency||'—')}</b></div>
         <div><span>수행기관</span><b>${esc(p.executingAgency||'—')}</b></div>
         <div><span>지원분야</span><b>${esc(p.category||'—')}${p.subCategory?` / ${esc(p.subCategory)}`:''}</b></div>
-        <div><span>${isLoanProgram(p)?'융자·보증 한도':'지원금액'}</span><b>${esc(p.supportAmountText||fmtKRW(p.supportAmountMax))}</b></div>
+        <div><span>${amountLabel(p)}</span><b>${esc(p.supportAmountText||fmtKRW(p.supportAmountMax))}</b></div>
         <div><span>신청기간</span><b>${esc(period)} (${esc(dlBadge(m.dl).txt)})</b></div>
         <div><span>문의</span><b>${esc(p.contact||'—')}</b></div>
       </div>
       <div class="m-sec"><h4>사업 개요</h4><p>${esc(p.supportDescription||'—')}</p></div>
       <div class="m-sec"><h4>자격조건 판정 <span class="muted">(적합도 ${m.fit} · 확인도 ${m.conf} · 근거: ${esc(depth)})</span></h4>${conds}</div>
+      ${m.fitParts._certHit?`<div class="m-sec"><h4>보유 인증 관련</h4><p>공고에 귀사 보유 인증(${esc(m.fitParts._certHit.join('·'))})이 언급됩니다. 적합도에 반영했습니다.</p></div>`:''}
       ${ev?`<div class="m-sec"><h4>판정에 쓴 공고 문구</h4><ul class="ev-list">${ev}</ul></div>`:''}
       ${pref?`<div class="m-sec"><h4>우대사항</h4><div class="prefs">${pref}</div></div>`:''}
     `;
@@ -1314,6 +1373,7 @@ const App = (function(){
         if(/상시/.test(c.label) && !company.employeeCount) set.add('employee');
         if(/대표자/.test(c.label) && !company.representativeAge) set.add('repAge');
         if(/수출/.test(c.label) && company.exportHistory==null) set.add('export');
+        if(/여성기업/.test(c.label) && !company.representativeGender) set.add('gender');
       });
     });
     return [...set];
@@ -1323,7 +1383,8 @@ const App = (function(){
       revenue:{q:'연 매출 규모',opts:Object.keys(REVENUE_BANDS),key:'revenueRange'},
       employee:{q:'상시 근로자 수',opts:Object.keys(EMPLOYEE_BANDS),key:'employeeCount'},
       repAge:{q:'대표자 연령대',opts:Object.keys(AGE_BANDS),key:'representativeAge'},
-      export:{q:'수출 실적',opts:['있음','없음'],key:'exportHistory'}
+      export:{q:'수출 실적',opts:['있음','없음'],key:'exportHistory'},
+      gender:{q:'대표자 성별',opts:['여성','남성'],key:'representativeGender'}
     }[n];
     return `<div class="field"><label class="q">${F.q}</label><div class="opt-grid c3">
       ${F.opts.map(o=>`<button type="button" class="opt"
@@ -1333,7 +1394,7 @@ const App = (function(){
   function applyProgressive(){
     const next = { ...company, ...ppTmp };
     if(ppTmp.exportHistory!=null) next.exportHistory = ppTmp.exportHistory==='있음';
-    company = Object.assign(sanitizeCompany(next), {supportNeeds:company.supportNeeds});
+    company = Object.assign(sanitizeCompany(next), {supportNeeds:company.supportNeeds});   // 인증·성별도 sanitizeCompany가 유지
     matched=runMatching(programs,company);
     dash=buildDashboard(matched);
     progressiveDone=true;

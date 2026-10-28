@@ -2,7 +2,7 @@
 // 실행: node --test grants/tests/server.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { regionsFromText, extractAmount, dedupe, isPastKst, stripTags } from '../netlify/lib/normalize.mjs';
+import { regionsFromText, extractAmount, dedupe, isPastKst, stripTags, detectGus } from '../netlify/lib/normalize.mjs';
 import { normalizeBizinfo, parsePeriod } from '../netlify/lib/bizinfo.mjs';
 import { mapBusinessAge, mapAge, normalizeKstartup } from '../netlify/lib/kstartup.mjs';
 import { mergeEligibility, safeParse } from '../netlify/lib/eligibility-ai.mjs';
@@ -29,7 +29,12 @@ test('지원금액: 기업당 한도만 추출, 매출·예산 문구는 무시'
   assert.equal(extractAmount('최대 1억 5천만원 이내').max, 1.5e8);
   assert.equal(extractAmount('과제당 3,000만원 이내 지원').max, 3e7);
   assert.equal(extractAmount('연매출 10억원 이상 기업 대상').max, null);
-  assert.match(extractAmount('기업당 최대 5천만원').text, /최대 5천만원/);
+  assert.equal(extractAmount('기업당 최대 5천만원').text, '최대 5,000만원');
+  // 운영 데이터 오추출 회귀(v3.9): 쉼표 숫자·사업 총액·지원규모
+  assert.equal(extractAmount('대출 지원(예산 규모 1,395억원) - 건별 한도 : 발주서 금액의 80%').max, null);
+  assert.equal(extractAmount('☞ 융자 지원규모 3,300억원 이내(창업 및 경쟁력강화자금)').max, null);
+  assert.equal(extractAmount('☞ 총 180억원(업체당 최대 50백만원) 지원').max, 5e7);
+  assert.equal(extractAmount('예산규모 590억원 - 팩토링 한도 : 판매기업 10억원, 구매기업 30억원 이내').max, 3e9);
 });
 
 test('마감 판정: 마감 당일은 한국시간 자정까지 유효', () => {
@@ -140,6 +145,19 @@ test('Blobs 저장소: 미리보기 배포는 운영 스냅샷과 분리', () =>
   assert.equal(storeName('production'), 'grant-programs');
   assert.equal(storeName('deploy-preview'), 'grant-programs-preview');
   assert.equal(storeName('branch-deploy'), 'grant-programs-preview');
+});
+
+test('광역시 자치구·여성기업 공고명', () => {
+  assert.deepEqual(detectGus({ programName: '[서울] 구로 G밸리 기업 지원' }, '서울'), ['구로구']);
+  assert.deepEqual(detectGus({ agency: '용산구청' }, '서울'), ['용산구']);
+  assert.deepEqual(detectGus({ programName: '집중구간 지원' }, '서울'), []);
+  assert.deepEqual(detectGus({ programName: '구로구 지원' }, '부산'), [], '다른 광역시 이름은 무시');
+  const g = enrichLocal({ programName: '[인천] 서구 2026년 청년기업 인증', agency: '인천광역시', targetRegions: ['인천'], targetRegionsInferred: false });
+  assert.deepEqual(g.targetDistricts, ['서구']);
+  const w = enrichLocal({ programName: '2026년 여성기업 육성사업 공고', targetRegions: ['전국'], targetRegionsInferred: false });
+  assert.deepEqual(w.specialRequirements, ['여성기업']);
+  const nw = enrichLocal({ programName: '창업 지원', rawSummary: '여성기업 우대', targetRegions: ['전국'], targetRegionsInferred: false });
+  assert.equal(nw.specialRequirements, undefined, '본문의 여성기업 우대는 필수 아님');
 });
 
 test('stripTags: 태그 제거·엔티티 복원', () => {
