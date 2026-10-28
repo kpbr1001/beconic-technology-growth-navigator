@@ -83,7 +83,7 @@ https://내사이트주소/.netlify/functions/programs   → 실제 수집 결�
 - `"mode":"live"` + `"sourceCounts":{"bizinfo":N,"kstartup":M}` → ✅ 정상. `aliveCount`는 접수 중·예정 공고 수, `enriched`는 AI 추출 건수
 - `"mode":"not_configured"` → 키 미등록(이름 오타·재배포 누락 확인)
 - `"errors":{"kstartup":"..."}` → 해당 소스만 실패(나머지 소스로 동작)
-- 결과는 30분 캐시됩니다. 키를 바꾼 직후에는 재배포하면 새로 수집합니다.
+- 공고는 예약 함수가 30분마다 수집해 저장합니다(첫 배포 직후 1~2분은 직접 수집 결과). 키를 바꾼 뒤에는 재배포하고 1~2분 기다리면 새로 수집합니다.
 
 v3.7의 `/bizinfo`·`/kstartup`·`/ai-analysis` 주소는 쿼터·비용 보호를 위해 삭제했습니다(404가 정상).
 
@@ -105,8 +105,8 @@ v3.7의 `/bizinfo`·`/kstartup`·`/ai-analysis` 주소는 쿼터·비용 보호�
 **Q. 실시간 공고가 대부분 '조건부'·'확인 필요'예요**
 → 정상입니다. 기업마당 목록 API는 업력·매출 조건을 주지 않아 '세부 자격요건(공고문 확인)'이 남습니다. `ANTHROPIC_API_KEY`를 등록하면 본문을 분석한 공고부터 '추천'까지 올라갑니다(docs/AI_ELIGIBILITY.md).
 
-**Q. 함수가 시간 초과(10초)로 실패해요**
-→ 소스별 7초·AI 6초 제한이 있어 보통 10초 안에 끝납니다. 계속 실패하면 Netlify 함수 제한 시간을 26초로 늘리거나(Site configuration → Functions), `programs.mjs`의 `BIZINFO_MAX`를 줄입니다.
+**Q. errors에 'aborted due to timeout'이 보여요**
+→ 첫 배포 직후 직접 수집(7초 제한)에서 기업마당이 늦은 경우입니다. 백그라운드 수집(최대 60초 대기)이 이어서 스냅샷을 채우므로 1~2분 뒤 다시 확인하세요. Functions 탭에서 `refresh-programs-scheduled`가 30분마다 실행되는지 확인할 수 있습니다.
 
 ---
 

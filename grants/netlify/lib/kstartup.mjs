@@ -110,7 +110,8 @@ export function normalizeKstartup(item) {
 
 export async function callKstartup(key, { count = 100, page = 1, signal } = {}) {
   // 모집 진행 중 공고만 요청(cond 필터). 지원하지 않는 환경이면 무시되고, isAlive가 한 번 더 거른다.
-  const url = `${KSTARTUP_URL}?serviceKey=${encodeURIComponent(key)}&returnType=json&numOfRows=${count}&pageNo=${page}&${encodeURIComponent('cond[rcrt_prgs_yn::EQ]')}=Y`;
+  // 이 API는 page·perPage를 쓴다(numOfRows·pageNo는 무시돼 기본 10건만 옴 — 운영에서 확인). 두 이름을 함께 보낸다.
+  const url = `${KSTARTUP_URL}?serviceKey=${encodeURIComponent(key)}&returnType=json&page=${page}&perPage=${count}&pageNo=${page}&numOfRows=${count}&${encodeURIComponent('cond[rcrt_prgs_yn::EQ]')}=Y`;
   const res = await fetch(url, { headers: { accept: 'application/json' }, signal });
   if (!res.ok) throw new Error(`kstartup HTTP ${res.status}`);
   const data = await res.json();
@@ -121,7 +122,7 @@ export async function callKstartup(key, { count = 100, page = 1, signal } = {}) 
   return arr.map(normalizeKstartup).filter((p) => p.programName && p.sourceProgramId);
 }
 
-export async function collectKstartup(key, { max = 300, perPage = 100, signal } = {}) {
+export async function collectKstartup(key, { max = 500, perPage = 100, signal } = {}) {
   const pages = Math.min(Math.ceil(max / perPage), 5);
   const tasks = [];
   for (let i = 1; i <= pages; i++) tasks.push(callKstartup(key, { count: perPage, page: i, signal }));
