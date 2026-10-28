@@ -16,6 +16,7 @@ export function regionsFromText(text) {
   const s = String(text || '');
   const out = new Set(SIDO.filter((r) => s.includes(r)));
   for (const [re, short] of SIDO_ALIAS) if (re.test(s)) out.add(short);
+  if (out.size >= 10) return ['전국']; // 해시태그에 시·도를 전부 나열한 전국 공고(운영 데이터 157건)
   return out.size ? SIDO.filter((r) => out.has(r)) : null;
 }
 

@@ -1,4 +1,4 @@
-# BECONIC 지원사업 MATCH (v3.8.0)
+# BECONIC 지원사업 MATCH (v3.8.1)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-grant-matching.netlify.app
@@ -21,10 +21,10 @@
 ```text
 grants/
 ├─ index.html · app.js · data.js(DEMO 16건) · assets/   # 공개 파일 (dist/로 복사)
-├─ netlify/functions/  programs.mjs(BFF·캐시) · health.mjs
-├─ netlify/lib/        bizinfo.mjs · kstartup.mjs · normalize.mjs · eligibility-ai.mjs  (함수 내부 모듈, 공개 엔드포인트 아님)
+├─ netlify/functions/  programs.mjs(스냅샷 응답) · refresh-programs-scheduled.mjs(30분 수집) · refresh-programs-background.mjs(필요 시 수집) · health.mjs
+├─ netlify/lib/        collect.mjs(수집·Blobs 스냅샷) · bizinfo.mjs · kstartup.mjs · normalize.mjs · eligibility-ai.mjs
 ├─ scripts/build.mjs   # dist/ 배포본, --demo 로 단일 HTML(dist-demo/)
-├─ tests/server.test.mjs  # 서버 단위 14개(fetch 스텁)
+├─ tests/server.test.mjs  # 서버 단위 17개(fetch·Blobs 스텁)
 ├─ tests/qa.mjs           # Chromium QA 68개(엔진·흐름·레드팀 회귀·실시간 모의·모바일·PDF·데모 단일본)
 └─ docs/  CHANGELOG.md · REDTEAM_2026-10-28.md · DEPLOY_GUIDE.md · AI_ELIGIBILITY.md
 ```
@@ -35,7 +35,7 @@ grants/
 |---|---|
 | 적합도 가중치·지역 가점·마감임박 일수·목록/PDF 표시 개수 | `app.js` `APP_CONFIG` |
 | 입력 구간(연령대·매출·근로자) | `app.js` `AGE_BANDS`·`REVENUE_BANDS`·`EMPLOYEE_BANDS` |
-| 수집량·캐시 시간·AI 추출 건수·시간 예산 | `netlify/functions/programs.mjs` 상단 상수 |
+| 수집량·AI 추출 건수·갱신 간격 | `netlify/lib/collect.mjs` 상단 상수, 예약 주기는 `refresh-programs-scheduled.mjs`의 `config.schedule` |
 | 버전 | `package.json`의 `version`과 `app.js`의 `APP_VERSION.version`(빌드 시 불일치하면 실패) |
 
 ## 배포 (Netlify)

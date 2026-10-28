@@ -1,6 +1,6 @@
 {
   "name": "beconic-grant-match",
-  "version": "3.8.0",
+  "version": "3.8.1",
   "private": true,
   "type": "module",
   "description": "BECONIC 지원사업 MATCH — 기업마당·K-Startup 공고 자격 판정·매칭 (브라우저 계산, 입력값 서버 전송 없음)",
@@ -9,5 +9,8 @@
     "build:demo": "node scripts/build.mjs --demo",
     "test": "node --test tests/server.test.mjs",
     "qa": "node tests/qa.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.3"
   }
 }

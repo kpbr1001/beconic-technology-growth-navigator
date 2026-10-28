@@ -6,7 +6,8 @@ import { regionsFromText, extractAmount, dedupe, isPastKst, stripTags } from '..
 import { normalizeBizinfo, parsePeriod } from '../netlify/lib/bizinfo.mjs';
 import { mapBusinessAge, mapAge, normalizeKstartup } from '../netlify/lib/kstartup.mjs';
 import { mergeEligibility, safeParse } from '../netlify/lib/eligibility-ai.mjs';
-import { getPrograms, handler, isAlive, _resetCache } from '../netlify/functions/programs.mjs';
+import programsHandler, { getPrograms, _resetCache } from '../netlify/functions/programs.mjs';
+import { isAlive, refreshSnapshot, readSnapshot, _setStore } from '../netlify/lib/collect.mjs';
 import { handler as health } from '../netlify/functions/health.mjs';
 
 test('지역: 정식 명칭(경상남도·전라북도 등)도 약칭으로 인식, 없으면 null', () => {
@@ -16,6 +17,7 @@ test('지역: 정식 명칭(경상남도·전라북도 등)도 약칭으로 인�
   assert.deepEqual(regionsFromText('충청남도·충청북도 공동'), ['충북', '충남']);
   assert.deepEqual(regionsFromText('[서울] 소상공인'), ['서울']);
   assert.equal(regionsFromText('2026 중소기업 정책자금'), null);
+  assert.deepEqual(regionsFromText('서울,부산,대구,인천,광주,대전,울산,세종,경기,강원,충북,충남,전북,전남,경북,경남,제주'), ['전국']);
 });
 
 test('지원금액: 기업당 한도만 추출, 매출·예산 문구는 무시', () => {
@@ -130,42 +132,88 @@ const BIZ = [
 ];
 const KS = [{ pbanc_sn: 9, biz_pbanc_nm: '예비창업패키지', supt_regin: '전국', aply_trgt: '일반인', biz_enyy: '예비창업자', rcrt_prgs_yn: 'Y', pbanc_rcpt_end_dt: '20991231' }];
 
+function memStore() {
+  const m = new Map();
+  return { get: async (k) => (m.has(k) ? JSON.parse(m.get(k)) : null), setJSON: async (k, v) => { m.set(k, JSON.stringify(v)); }, _m: m };
+}
+const noRefresh = async () => {};
+
 test('programs: 키 없으면 not_configured, 외부 호출 없음', async () => {
-  _resetCache();
+  _resetCache(); _setStore(memStore());
   const calls = stubFetch();
-  const r = await getPrograms({}, { fresh: true });
+  const r = await getPrograms({}, { fresh: true, triggerRefresh: noRefresh });
   assert.equal(r.mode, 'not_configured');
   assert.equal(calls.bizinfo + calls.kstartup, 0);
 });
 
-test('programs: 수집·마감 제외·응답에 본문 원문 없음·캐시로 재호출 안 함', async () => {
-  _resetCache();
+test('K-Startup: page·perPage로 요청(numOfRows만 보내면 10건만 옴)', async () => {
+  const urls = [];
+  globalThis.fetch = async (u) => { urls.push(String(u)); return { ok: true, status: 200, json: async () => ({ data: [] }) }; };
+  const { collectKstartup } = await import('../netlify/lib/kstartup.mjs');
+  await collectKstartup('k', { max: 500 });
+  assert.equal(urls.length, 5);
+  assert.ok(urls.every((u) => /[?&]perPage=100/.test(u)) && urls.some((u) => /[?&]page=5/.test(u)));
+});
+
+test('programs: 스냅샷 없으면 직접 수집·저장, 마감 제외·본문 원문 없음, 이후 외부 API 재호출 없음', async () => {
+  _resetCache(); const st = memStore(); _setStore(st);
   const calls = stubFetch({ bizinfo: BIZ, kstartup: KS });
+  let refreshReq = 0;
   const env = { BIZINFO_API_KEY: 'b', KSTARTUP_API_KEY: 'k' };
-  const r = await getPrograms(env);
+  const r = await getPrograms(env, { fresh: true, triggerRefresh: async () => { refreshReq++; } });
   assert.equal(r.mode, 'live');
   assert.equal(r.totalCollected, 3);
   assert.deepEqual(r.programs.map((p) => p.sourceProgramId).sort(), ['KS_9', 'P1']);
   assert.ok(r.programs.every((p) => !('rawSummary' in p)));
-  assert.equal(r.enriched, 0);
-  await getPrograms(env);
-  await getPrograms(env);
-  assert.equal(calls.bizinfo, 1, '30분 캐시 안에서는 외부 API를 다시 부르지 않음');
+  assert.equal(refreshReq, 1, '백그라운드 수집 요청');
+  assert.ok((await readSnapshot())?.count === 2, '스냅샷 저장');
+  const before = calls.bizinfo;
+  await getPrograms(env, { fresh: true, triggerRefresh: noRefresh });
+  await getPrograms(env, { triggerRefresh: noRefresh });
+  assert.equal(calls.bizinfo, before, '스냅샷이 있으면 외부 API를 부르지 않음');
 });
 
-test('programs: 한 소스가 실패해도 나머지로 동작', async () => {
-  _resetCache();
+test('programs: 오래된 스냅샷은 그대로 응답하면서 갱신 요청, 응답 시점에 마감 공고 제외', async () => {
+  _resetCache(); _setStore(memStore());
+  stubFetch();
+  const { writeSnapshot } = await import('../netlify/lib/collect.mjs');
+  await writeSnapshot({ mode: 'live', fetchedAt: '2026-01-01T00:00:00Z', errors: {}, count: 2, programs: [{ sourceProgramId: 'A', applicationEnd: '2099-01-01' }, { sourceProgramId: 'B', applicationEnd: '2020-01-01' }] });
+  let refreshReq = 0;
+  const r = await getPrograms({ BIZINFO_API_KEY: 'b' }, { fresh: true, triggerRefresh: async () => { refreshReq++; } });
+  assert.deepEqual(r.programs.map((p) => p.sourceProgramId), ['A']);
+  assert.equal(refreshReq, 1);
+});
+
+test('수집 함수: 최근 스냅샷이면 건너뜀(반복 호출로 쿼터 소모 불가), 일시 장애로 급감하면 이전 유지', async () => {
+  _setStore(memStore());
+  const calls = stubFetch({ bizinfo: BIZ, kstartup: KS });
+  const env = { BIZINFO_API_KEY: 'b', KSTARTUP_API_KEY: 'k' };
+  const a = await refreshSnapshot(env);
+  assert.equal(a.written, true);
+  const b = await refreshSnapshot(env);
+  assert.equal(b.skipped, true);
+  assert.equal(calls.bizinfo, 1);
+  stubFetch({ bizinfo: [], fail: { kstartup: true } });
+  const later = Date.now() + 60 * 60 * 1000;
+  const c = await refreshSnapshot(env, { now: later });
+  assert.equal(c.reason, 'degraded');
+  assert.equal((await readSnapshot()).count, 2);
+});
+
+test('programs: 한 소스가 실패해도 나머지로 동작(부분 결과는 스냅샷 미저장)', async () => {
+  _resetCache(); _setStore(memStore());
   stubFetch({ bizinfo: BIZ, fail: { kstartup: true } });
-  const r = await getPrograms({ BIZINFO_API_KEY: 'b', KSTARTUP_API_KEY: 'k' }, { fresh: true });
+  const r = await getPrograms({ BIZINFO_API_KEY: 'b', KSTARTUP_API_KEY: 'k' }, { fresh: true, triggerRefresh: noRefresh });
   assert.equal(r.mode, 'live');
   assert.ok(r.errors.kstartup);
   assert.equal(r.sourceCounts.bizinfo, 2);
+  assert.equal(await readSnapshot(), null);
 });
 
 test('programs: AI 키가 있으면 살아 있는 기업마당 공고만 추출, 근거 대조 후 병합', async () => {
-  _resetCache();
+  _resetCache(); _setStore(memStore());
   const calls = stubFetch({ bizinfo: BIZ, kstartup: KS, claude: { businessAgeMax: 7, evidence: { businessAgeMax: '창업 7년 이내' }, confidence: 'high' } });
-  const r = await getPrograms({ BIZINFO_API_KEY: 'b', KSTARTUP_API_KEY: 'k', ANTHROPIC_API_KEY: 'sk-test' }, { fresh: true });
+  const r = await getPrograms({ BIZINFO_API_KEY: 'b', KSTARTUP_API_KEY: 'k', ANTHROPIC_API_KEY: 'sk-test' }, { fresh: true, triggerRefresh: noRefresh });
   assert.equal(calls.claude, 1, '마감 공고·K-Startup은 AI 호출 대상 아님');
   const p1 = r.programs.find((p) => p.sourceProgramId === 'P1');
   assert.equal(p1._aiEnriched, true);
@@ -173,17 +221,18 @@ test('programs: AI 키가 있으면 살아 있는 기업마당 공고만 추출,
   assert.equal(r.enriched, 1);
 });
 
-test('programs handler: 쿼리로 AI 호출 수를 늘릴 수 없고, CDN 캐시 헤더 부여', async () => {
-  _resetCache();
+test('programs handler: 키 값 비노출, 완전한 결과만 CDN 캐시', async () => {
+  _resetCache(); _setStore(memStore());
   const calls = stubFetch({ bizinfo: BIZ, kstartup: KS, claude: {} });
   const saved = { ...process.env };
   Object.assign(process.env, { BIZINFO_API_KEY: 'b', KSTARTUP_API_KEY: 'k', ANTHROPIC_API_KEY: 'sk-test' });
+  delete process.env.URL;
   try {
-    const res = await handler({ queryStringParameters: { enrichCount: '30', max: '5000' } });
-    assert.equal(res.statusCode, 200);
-    assert.match(res.headers['netlify-cdn-cache-control'], /s-maxage=1800/);
+    const res = await programsHandler(new Request('http://x/.netlify/functions/programs?enrichCount=30&max=5000'));
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get('netlify-cdn-cache-control'), /s-maxage=600/);
     assert.ok(calls.claude <= 12);
-    assert.ok(!res.body.includes('sk-test'));
+    assert.ok(!(await res.text()).includes('sk-test'));
   } finally { process.env = saved; }
 });
 
