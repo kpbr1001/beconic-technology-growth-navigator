@@ -14,10 +14,12 @@ const STALE_MS = 45 * 60 * 1000;  // 예약 수집(30분)이 한 번 빠져도 �
 let memo = null;      // { at, body }
 let inflight = null;  // 동시 요청이 같은 작업을 공유
 
-async function requestRefresh(env) {
-  if (!env.URL) return;
+// 요청이 들어온 배포 주소로 호출한다(미리보기 배포가 운영 수집 함수를 부르지 않게)
+async function requestRefresh(env, origin) {
+  const base = origin || env.URL;
+  if (!base) return;
   try {
-    await fetch(`${env.URL}/.netlify/functions/refresh-programs-background`, { method: 'POST', signal: AbortSignal.timeout(2000) });
+    await fetch(`${base}/.netlify/functions/refresh-programs-background`, { method: 'POST', signal: AbortSignal.timeout(2000) });
   } catch { /* 다음 요청·예약 수집에서 다시 시도 */ }
 }
 
@@ -26,23 +28,23 @@ function serve(snap, now) {
   return { ...snap, programs, count: programs.length, aliveCount: programs.length };
 }
 
-async function load(env, now, triggerRefresh) {
+async function load(env, now, triggerRefresh, origin) {
   const snap = await readSnapshot();
   if (snap && snap.mode === 'live') {
-    if (snapshotAge(snap, now) > STALE_MS || Object.keys(snap.errors || {}).length) await triggerRefresh(env);
+    if (snapshotAge(snap, now) > STALE_MS || Object.keys(snap.errors || {}).length) await triggerRefresh(env, origin);
     return serve(snap, now);
   }
   // 스냅샷 없음(첫 배포 직후): 백그라운드 수집을 걸어 두고, 이번 응답은 짧은 제한으로 직접 수집
-  await triggerRefresh(env);
+  await triggerRefresh(env, origin);
   const body = await build(env, { now });
   if (body.mode === 'live' && !Object.keys(body.errors).length) await writeSnapshot(body);
   return body;
 }
 
-export async function getPrograms(env = process.env, { now = Date.now(), fresh = false, triggerRefresh = requestRefresh } = {}) {
+export async function getPrograms(env = process.env, { now = Date.now(), fresh = false, triggerRefresh = requestRefresh, origin = null } = {}) {
   if (!fresh && memo && now - memo.at < MEMO_MS) return memo.body;
   if (!inflight) {
-    inflight = load(env, now, triggerRefresh)
+    inflight = load(env, now, triggerRefresh, origin)
       .then((body) => { if (body.mode === 'live' && !Object.keys(body.errors || {}).length) memo = { at: now, body }; return body; })
       .finally(() => { inflight = null; });
   }
@@ -51,9 +53,11 @@ export async function getPrograms(env = process.env, { now = Date.now(), fresh =
 
 export function _resetCache() { memo = null; inflight = null; }
 
-export default async () => {
+export default async (req) => {
   try {
-    const body = await getPrograms();
+    let origin = null;
+    try { origin = new URL(req.url).origin; } catch { /* 주소 없음 → env.URL */ }
+    const body = await getPrograms(process.env, { origin });
     // 일부 소스가 실패한 결과는 CDN에 오래 두지 않는다
     const complete = body.mode === 'live' && !Object.keys(body.errors || {}).length;
     return new Response(JSON.stringify(body), {

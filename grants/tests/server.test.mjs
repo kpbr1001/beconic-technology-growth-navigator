@@ -197,7 +197,9 @@ test('programs: 스냅샷 없으면 직접 수집·저장, 마감 제외·본문
   const calls = stubFetch({ bizinfo: BIZ, kstartup: KS });
   let refreshReq = 0;
   const env = { BIZINFO_API_KEY: 'b', KSTARTUP_API_KEY: 'k' };
-  const r = await getPrograms(env, { fresh: true, triggerRefresh: async () => { refreshReq++; } });
+  let refreshOrigin = null;
+  const r = await getPrograms(env, { fresh: true, origin: 'https://deploy-preview-1--x.netlify.app', triggerRefresh: async (_e, o) => { refreshReq++; refreshOrigin = o; } });
+  assert.equal(refreshOrigin, 'https://deploy-preview-1--x.netlify.app', '요청이 들어온 배포 주소로 수집 요청');
   assert.equal(r.mode, 'live');
   assert.equal(r.totalCollected, 3);
   assert.deepEqual(r.programs.map((p) => p.sourceProgramId).sort(), ['KS_9', 'P1']);
