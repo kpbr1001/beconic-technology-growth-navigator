@@ -133,16 +133,19 @@ let storeOverride = null;
  * 미리보기·브랜치·배포 고유 주소는 'deploy-preview-45--사이트', 'main--사이트'처럼 '--'를 포함한다. */
 let deployHost = null;
 export function setDeployHost(host) { deployHost = host || null; }
-export function storeName(host = deployHost, ctx = globalThis.Netlify?.context?.deploy?.context || process.env.CONTEXT) {
-  if (host && host.includes('--')) return 'grant-programs-preview';
-  return ctx && ctx !== 'production' ? 'grant-programs-preview' : 'grant-programs';
+export function isPreview(host = deployHost, ctx = globalThis.Netlify?.context?.deploy?.context || process.env.CONTEXT) {
+  if (host && host.includes('--')) return true;
+  return !!(ctx && ctx !== 'production');
 }
+export function storeName(host = deployHost, ctx) { return isPreview(host, ctx) ? 'grant-programs-preview' : 'grant-programs'; }
 export function _setStore(s) { storeOverride = s; }
-async function store() {
+/** base 이름의 Blobs 저장소(미리보기는 '-preview'). 테스트는 _setStore로 하나의 메모리 저장소를 공유 */
+export async function namedStore(base) {
   if (storeOverride) return storeOverride;
   const { getStore } = await import('@netlify/blobs');
-  return getStore({ name: storeName(), consistency: 'strong' });
+  return getStore({ name: isPreview() ? `${base}-preview` : base, consistency: 'strong' });
 }
+const store = () => namedStore('grant-programs');
 export async function readSnapshot() {
   try { return (await (await store()).get(SNAPSHOT_KEY, { type: 'json' })) || null; } catch { return null; }
 }

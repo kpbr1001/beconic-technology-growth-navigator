@@ -14,6 +14,8 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  # 공고문 PDF 텍스트 추출 라이브러리는 번들하지 않고 그대로 포함(크기·동적 import)
+  external_node_modules = ["unpdf"]
 
 [[headers]]
   for = "/*"
