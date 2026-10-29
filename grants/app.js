@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.19.0',
+  version: 'v3.19.1',
   updated: '2026-10-29',
   changelog: [
+    { v:'v3.19.1', d:'2026-10-29', note:'카카오톡 상담 연결: 신청 도움받기 창 맨 앞에 카카오톡 채널(비코닉) 1:1 채팅 — 누르면 요청 내용이 자동 복사되어 붙여넣기만 하면 됨, 결과 하단 상담 영역에도 카톡 상담 버튼' },
     { v:'v3.19.0', d:'2026-10-29', note:'신청 도움받기 개선: 메일 앱이 바로 열리던 방식 대신 앱 안의 창에서 필요한 도움(사업계획서·자격 확인·서류·발표)을 고르고 전화·메일·내용 복사 중 편한 방법으로 요청, 카드 버튼 디자인 정리' },
     { v:'v3.18.0', d:'2026-10-29', note:'찾은 다음 지원까지: 지금 모집이 없는 대표 사업은 \'다음 공고 예정\'(예년 공고 시기)과 공고 알림 등록(이 브라우저), 기다리던 공고가 올라오면 맨 위 알림, 카드별 \'신청 도움받기\'(사업명 자동 입력 메일), 상세에 신청 준비 체크리스트' },
     { v:'v3.17.0', d:'2026-10-29', note:'원하는 사업을 바로 찾기: 첫 질문 "지금 가장 필요한 지원"(대상별 선택지·최대 3개), 고른 지원으로 관련성 판정·대상별 대표 사업 우선·대상과 성격이 다른 공고 내림, 결과 첫 화면에 지원별 추천 3건, 사업명 검색(대상 아님이면 이유 표시)' },
@@ -471,7 +472,7 @@ const HELP_TYPES = [
   {id:'docs',  label:'제출 서류 준비',       sub:'빠짐없이 갖추기'},
   {id:'pitch', label:'발표·면접 준비',       sub:'평가 대응 전략'}
 ];
-const HELP_CONTACT = {tel:'070-4103-4177', email:'start@gven.kr'};
+const HELP_CONTACT = {tel:'070-4103-4177', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat'};
 const svgIcon = (d)=>`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const ICON = {
   chat:  svgIcon('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/>'),
@@ -480,6 +481,7 @@ const ICON = {
   phone: svgIcon('<path d="M5 4h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 6.3 6.3l1.4-2.2L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16.5 16.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/>'),
   mail:  svgIcon('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>'),
   copy:  svgIcon('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>'),
+  kakao: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 3.5c-5 0-9 3.2-9 7.1 0 2.5 1.6 4.7 4.1 6l-.9 3.4c-.1.3.3.6.6.4l4-2.6h1.2c5 0 9-3.2 9-7.2S17 3.5 12 3.5z"/></svg>',
   shield:svgIcon('<path d="M12 3l7 3v5.5c0 4.3-2.9 8.1-7 9.5-4.1-1.4-7-5.2-7-9.5V6z"/><path d="M9 12l2 2 4-4"/>')
 };
 function helpText(p, c, types){
@@ -1659,7 +1661,9 @@ const App = (function(){
           <span><b>${esc(x.label)}</b><small>${esc(x.sub)}</small></span></button>`; }).join('')}</div>
       <div class="hp-step"><span class="hp-num">2</span>편한 방법으로 요청하세요</div>
       <div class="hp-ch">
-        <a class="hp-c primary" href="tel:${HELP_CONTACT.tel.replace(/-/g,'')}">
+        <a class="hp-c kakao" href="${HELP_CONTACT.kakao}" target="_blank" rel="noopener noreferrer" onclick="App.copyHelp('kakao')">
+          <span class="hp-ci" aria-hidden="true">${ICON.kakao}</span><span><b>카카오톡 상담</b><small>요청 내용이 복사돼요 · 채팅창에 붙여넣기</small></span></a>
+        <a class="hp-c" href="tel:${HELP_CONTACT.tel.replace(/-/g,'')}">
           <span class="hp-ci" aria-hidden="true">${ICON.phone}</span><span><b>전화 상담</b><small>${HELP_CONTACT.tel}</small></span></a>
         <a class="hp-c" href="${esc(helpMailto(p, company, t))}">
           <span class="hp-ci" aria-hidden="true">${ICON.mail}</span><span><b>메일로 요청</b><small>내용이 자동으로 채워져요</small></span></a>
@@ -1675,7 +1679,7 @@ const App = (function(){
     renderHelp();
     const btn=[...document.querySelectorAll('#helpModal .hp-type')].find(b=>b.getAttribute('onclick').includes(`'${id}'`)); if(btn) btn.focus();
   }
-  async function copyHelp(){
+  async function copyHelp(via){
     const m=helpCtx && matched.find(x=>x.program.sourceProgramId===helpCtx.id); if(!m) return;
     const text=helpText(m.program, company, helpCtx.types);
     let ok=false;
@@ -1683,7 +1687,8 @@ const App = (function(){
       try{ const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
         document.body.appendChild(ta); ta.select(); ok=document.execCommand('copy'); ta.remove(); }catch{ ok=false; }
     }
-    toast(ok ? '요청 내용을 복사했어요. 카톡·문자·메일에 붙여넣어 보내세요.' : '복사가 안 되는 환경이에요. 아래 미리보기 내용을 직접 선택해 복사해 주세요.');
+    toast(ok ? (via==='kakao' ? '요청 내용을 복사했어요. 열린 카카오톡 채팅창에 붙여넣어 보내세요.' : '요청 내용을 복사했어요. 카톡·문자·메일에 붙여넣어 보내세요.')
+             : '복사가 안 되는 환경이에요. 아래 미리보기 내용을 직접 선택해 복사해 주세요.');
     if(!ok){ const d=document.querySelector('#helpModal .hp-preview'); if(d) d.open=true; }
   }
   function closeHelp(){
