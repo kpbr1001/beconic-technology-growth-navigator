@@ -562,5 +562,7 @@ test('챗봇 스킬 함수: POST만·토큰 검사·스냅샷 공고로 응답',
   assertKakao(j);
   assert.equal(j.template.outputs[0].listCard.items[0].title, '2099년 테스트 정책자금');
   assert.equal((await kakaoSkill(new Request('https://example.netlify.app/api/kakao/skill', { method: 'POST', body: '{' }), {})).status, 400);
+  const welcome = await (await call({ intent: { name: '웰컴 블록' }, userRequest: { utterance: '아무 문장', block: { name: '웰컴 블록' } } })).json();
+  assert.match(welcome.template.outputs[0].simpleText.text, /비코닉/, '웰컴 블록은 문장과 관계없이 첫 메뉴');
   _setStore(null);
 });
