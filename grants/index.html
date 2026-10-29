@@ -368,6 +368,20 @@ textarea{min-height:88px;resize:vertical}
 .list-head{grid-column:1/-1;font-weight:800;font-size:15px;color:var(--ink);margin:6px 0 2px}
 .name-search{flex:1 1 260px;min-width:0;max-width:420px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:13.5px;background:#fff}
 .flag-badge{font-size:11px;font-weight:700;color:#8a5a00;background:#fff3d6;border:1px solid #f3d9a8;border-radius:99px;padding:2px 8px}
+.watch-hit{grid-column:1/-1;min-width:0;background:#effaf3;border:1px solid #bfe6cd;border-radius:12px;padding:10px 14px;margin:0 0 12px;display:flex;flex-direction:column;gap:6px}
+.watch-hit .wh-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px}
+.np-group.upcoming{border-top:1px dashed #cdd7f3;padding-top:12px;margin-top:14px}
+.up-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.up-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.up-card .up-name{font-weight:800;font-size:14px;color:var(--ink)}
+.up-card .up-meta{font-size:12px;color:var(--sub)}
+.up-card .btn{align-self:flex-start}
+.up-note{font-size:11.5px;color:var(--muted);margin:8px 0 0}
+.rc-help{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;padding:9px 12px;border-radius:10px;background:#fff8ec;border:1px solid #f3d9a8;color:#8a5a00;font-weight:700;font-size:13px;text-decoration:none}
+.rc-help span{font-weight:500;font-size:11.5px;color:var(--sub)}
+.rc-help:hover{border-color:var(--orange)}
+.prep-list{margin:6px 0 10px;padding-left:18px;font-size:13px;line-height:1.7}
+.m-help-note{font-size:11.5px;margin:6px 0 0}
 .check-row{grid-column:1/-1;min-width:0;text-align:center;margin:18px 0 6px;padding:14px;border:1px dashed var(--line);border-radius:12px}
 .check-row p{margin:8px 0 0;font-size:12px;color:var(--sub)}
 .dc-title small{font-weight:500;color:var(--sub);font-size:11px;margin-left:4px}
@@ -475,6 +489,7 @@ footer .copy{font-size:11.5px;color:#8695bd}
 /* Print (BCG급 PDF) */
 @page{size:A4;margin:14mm 12mm}
 @media print{
+  .rc-help,.np-group.upcoming,.watch-hit,.name-search,
   header.site,footer.site,.landing-hero,.value-strip,.final-cta,.toolbar,.pp-banner,.result-count,.more-row,
   .res-actions,.rc-actions,.update-banner,.draft-banner,.cta-banner,.hook-cta,.disclaimer button,
   #view-landing,#view-form,#view-loading,.modal-bg,.toast{display:none !important}
