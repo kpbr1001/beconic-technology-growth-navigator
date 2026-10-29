@@ -535,6 +535,15 @@ test('챗봇: 공고 없으면 안내+맞춤 매칭, 진단 키워드는 진단�
   assert.equal(all.template.outputs[1].carousel.items.length, TOOLS.length);
 });
 
+test('챗봇: 상담 요청 글(앱 복사 문구·전화번호·긴 글)은 검색하지 않고 접수 안내', () => {
+  const appText = '[지원사업 신청 도움 요청]\n· 사업명: 2026년 소상공인 정책자금 융자사업 공고\n· 필요한 도움: 사업계획서 작성·검토\n· 연락처(이름·전화): ';
+  const r = route(appText, botPrograms, BOT_NOW);
+  assertKakao(r);
+  assert.match(r.template.outputs[0].simpleText.text, /접수됐어요[\s\S]*소상공인 정책자금 융자사업/);
+  assert.match(route('홍길동 010-1234-5678 사업계획서 상담 원해요', botPrograms, BOT_NOW).template.outputs[0].simpleText.text, /접수됐어요/);
+  assert.ok(route('정책자금', botPrograms, BOT_NOW).template.outputs[0].listCard, '짧은 사업명은 그대로 검색');
+});
+
 test('챗봇: 마감 임박·상담 연결·공고 미준비', () => {
   const soon = route('마감 임박', botPrograms, BOT_NOW);
   assertKakao(soon);

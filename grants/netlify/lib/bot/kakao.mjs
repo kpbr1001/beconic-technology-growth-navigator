@@ -77,6 +77,11 @@ export function route(utterance, programs, now = Date.now()) {
     return reply([{ basicCard: { title: '전문 컨설턴트와 상담하기', description: `그로스벤처스㈜ · 중기부 인증 중소기업상담회사(제2025-684호)\n사업계획서 작성·검토, 자격 확인, 서류 준비를 도와드려요.\n운영시간 외에는 내용을 남겨주시면 순서대로 답변드려요.`,
       buttons: [{ label: '전화 상담', action: 'phone', phoneNumber: CONTACT.tel }, { label: '요청 남기기', action: 'message', messageText: '상담 요청합니다' }] } }]);
   }
+  // 상담 요청 글(앱에서 복사한 요청·전화번호·긴 글)은 검색하지 않고 접수 안내 — 담당자가 1:1 채팅에서 이어서 답변
+  const plan = /\[지원사업 신청 도움 요청\]/.test(u) ? (/사업명:\s*([^\n]+)/.exec(u) || [])[1] : null;
+  if (plan || /01[016789][-.\s]?\d{3,4}[-.\s]?\d{4}|0\d{1,2}-\d{3,4}-\d{4}/.test(u) || u.length > 60) {
+    return reply([text(`상담 요청이 접수됐어요. 감사합니다 🙂${plan ? `\n· 사업: ${cut(plan, 60)}` : ''}\n운영시간(09~18시)에 담당 컨설턴트가 이 채팅방으로 답변드려요.\n급하시면 전화 ${CONTACT.tel} 로 연락 주세요.`)], quick(['지원사업 찾기', '경영진단', '처음']));
+  }
   // 분야 메뉴('재무' 등)나 '○○ 진단' → 해당 진단툴
   const area = TOOLS.filter((t) => t.area === u);
   const kwHit = TOOLS.filter((t) => t.id !== 'grants' && t.kw.test(u));
