@@ -33,7 +33,9 @@ export default async (req, context) => {
     if (raw.length > 20000) return json({ error: 'too large' }, 413);
     body = JSON.parse(raw);
   } catch { return json({ error: 'bad json' }, 400); }
-  const utterance = String(body?.userRequest?.utterance || '').slice(0, 200);
+  // 웰컴 블록(채팅방 첫 진입)은 보내는 문장이 비어 있거나 정해진 문구라서, 블록 이름으로 알아보고 항상 첫 메뉴를 보낸다
+  const blockName = String(body?.userRequest?.block?.name || body?.intent?.name || '');
+  const utterance = /웰컴|welcome/i.test(blockName) ? '처음' : String(body?.userRequest?.utterance || '').slice(0, 200);
   const now = Date.now();
   let list = null;
   try { list = await programs(now); } catch { list = null; }
