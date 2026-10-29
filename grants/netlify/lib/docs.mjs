@@ -10,7 +10,7 @@ import { analyzeDocText } from './doc-rules.mjs';
 
 export const LIMIT = 80;
 // 분석 규칙 버전 — 규칙을 바꾸면 올려서 기존 공고문을 다시 분석한다
-export const DOC_VER = 4;
+export const DOC_VER = 5;
 const CONCURRENCY = 4;
 const DL_TIMEOUT_MS = 20000;
 const MAX_BYTES = 20 * 1024 * 1024;

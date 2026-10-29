@@ -63,13 +63,20 @@ function eligText(text) {
 // 자격 문구의 소재 시·도: '충북 소재', '강원특별자치도 내에 본사', '본사가 전남광주통합특별시 내 舊 전라남도 지역에 소재'
 const LOC = /소재|본사|주\s*사업장|사업장|주소지|거주/g;
 const OLD_DO = /(?:舊|구)\s*(충청북도|충청남도|전라북도|전라남도|경상북도|경상남도)/;
+// 시·군 이름만 있는 표현('과천시에 사업장', '창원특례시에 소재', '구미지역 내 소재') → 시·도 추론용
+const CITY_LIST = Object.entries(CITIES).flatMap(([sido, list]) => list.map((name) => ({ sido, name, base: name.replace(/[시군]$/, '') })));
+const cityRe = (c) => `(?<![가-힣])(?:${c.name}|${c.base}(?:특례시|\\s*지역))`;
+function sidoFromCities(win) {
+  const hits = [...new Set(CITY_LIST.filter((c) => new RegExp(cityRe(c)).test(win)).map((c) => c.sido))];
+  return hits.length === 1 ? hits : null; // 고성군(강원·경남)처럼 겹치면 판단 보류
+}
 function sidosIn(elig) {
   for (const line of String(elig || '').split('\n')) {
     for (const m of line.matchAll(LOC)) {
       const win = line.slice(Math.max(0, m.index - 30), m.index + m[0].length + 30);
       if (/제외|아닌|이외|외\s*지역|타\s*지역|전국|제한\s*없/.test(win)) continue;
       const old = win.match(OLD_DO);
-      const r = regionsFromText(old ? old[1] : win);
+      const r = regionsFromText(old ? old[1] : win) || sidoFromCities(win);
       if (r && !r.includes('전국') && r.length <= 3) return { regions: r, evidence: win.trim() };
     }
   }
@@ -94,7 +101,9 @@ function districtsIn(text, regions) {
   const sidos = (regions || []).filter((r) => r !== '전국');
   for (const sido of sidos) {
     for (const name of [...(CITIES[sido] || []), ...(GUS[sido] || [])]) {
-      const re = new RegExp(`(?<![가-힣])${name}\\s*(?:내|에)?\\s*(?:소재|본사|주\\s*사업장|사업장|주소|거주)`);
+      // 시·군은 '창원특례시', '구미지역' 표기도 인정(구는 이름이 짧아 정식 명칭만)
+      const head = /[시군]$/.test(name) ? cityRe({ name, base: name.replace(/[시군]$/, '') }) : `(?<![가-힣])${name}`;
+      const re = new RegExp(`${head}\\s*(?:관내|내에|내|에)?\\s*(?:소재|본사|주\\s*사업장|사업장|주소|거주)`);
       if (re.test(s)) names.push(name);
     }
   }
@@ -137,8 +146,11 @@ export function applyDoc(p, doc) {
   }
   // 목록상 '전국'(지역 표기 없음, 또는 해시태그에 시·도 전부 나열) 공고만 공고문의 소재 시·도로 바로잡는다
   // 미리보기 실측: 공고문 소재지 156건 중 목록 지역과 일치 143, 충돌 0, '전국' 13(대부분 실제 지역 한정 공고)
+  // 목록이 여러 시·도(해시태그·'전남광주' 기관명 등)인데 공고문 소재지가 그 일부면 좁힌다(검증 세트 지역 오류 4건)
   const tr = q.targetRegions || [];
-  if (doc.regions?.length && (q.targetRegionsInferred || !tr.length || (tr.length === 1 && tr[0] === '전국'))) {
+  const nationwide = q.targetRegionsInferred || !tr.length || (tr.length === 1 && tr[0] === '전국');
+  const narrower = tr.length > 1 && doc.regions?.length && doc.regions.length < tr.length && doc.regions.every((r) => tr.includes(r));
+  if (doc.regions?.length && (nationwide || narrower)) {
     q.targetRegions = doc.regions;
     q.targetRegionsInferred = false;
     ev.targetRegions = `공고문: ${doc.regionEvidence}`;

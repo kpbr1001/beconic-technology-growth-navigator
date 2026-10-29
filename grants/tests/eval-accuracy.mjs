@@ -78,9 +78,9 @@ export function evaluate(set) {
   return { n: rows.length, random: set.filter((x) => x.stratum === 'random').length, fields: res };
 }
 
-// CI 기준(v3.11 측정값으로 고정): 규칙을 바꿀 때 이보다 나빠지면 실패한다. 개선되면 기준을 올린다.
+// CI 기준(v3.12 측정값으로 고정 — v3.11: 지역 85%·시군구 90%·틀린 추출 3건): 규칙을 바꿀 때 이보다 나빠지면 실패한다. 개선되면 기준을 올린다.
 //   지역·시군구 정확도 하한, 값 항목 '틀린 추출' 총수 상한, '맞힌 추출' 총수 하한
-export const BASELINE = { regionsAccuracy: 0.84, districtsAccuracy: 0.89, maxWrong: 3, minCorrect: 59 };
+export const BASELINE = { regionsAccuracy: 0.91, districtsAccuracy: 0.94, maxWrong: 0, minCorrect: 59 };
 
 export function check(r) {
   const bad = [];
