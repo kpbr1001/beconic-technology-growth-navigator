@@ -443,3 +443,28 @@ test('공고문 지역: 여러 시·도 목록 좁히기, 시·군 이름·특�
   assert.deepEqual(analyzeDocText('□ 지원 대상\n◦ 경북·구미지역 내에 소재(본사, 공장)한 중소기업', { regions: ['경북'] }).districts, ['구미시']);
   assert.equal(analyzeDocText('□ 지원대상\n○ 고성군 소재 기업').regions, undefined, '두 도에 있는 이름(고성군)은 판단 보류');
 });
+
+test('규칙 추출: 구간표·제외 문맥·업종별 기준은 자격 조건 아님(2차 검증 세트)', () => {
+  assert.equal(extractRules('매출액 규모 50억 이상 30억 이상~50억 미만 10억 이상~30억미만 3억 초과~10억 미만 3억 미만 성장단계 5점 4점 3점'), null, '평가 점수표');
+  assert.equal(extractRules('∎ (총매출액 3억이하) 카드매출액의 0.4% 지원 ∎ (총매출액 3억초과 5억이하) 카드매출액의 1.0% 지원')?.fields?.revenueMin, undefined, '지원율 구간표');
+  assert.equal(extractRules('연매출액 기준 이상 (업력 1년 미만, 면세법인사업자 심사 제외)'), null, '제외 괄호');
+  assert.equal(extractRules('※ 도‧소매업, 음식업, 숙박업: 상시 종업원수 5인 이상 업체'), null, '특정 업종에만 붙은 기준');
+  assert.equal(extractRules('상시근로자 5인 미만(제조, 건설, 운수, 광업 10인 미만) 소상공인'), null, '업종별로 다른 기준');
+  assert.equal(extractRules('지원대상 확대 ￭ 업력 1년 이상 ￭ 업력 6개월 이상'), null, '개월 단위·변경 전후 비교표는 보류');
+  assert.equal(extractRules('보조금을 지원받은 사업자는 해당 방지시설을 3년 이상 운영하여야 함'), null, '시설 운영 의무는 업력 아님');
+});
+
+test('규칙 추출: 업력·근로자·대표자 연령 표현 확장(개선 우선순위 4)', () => {
+  assert.equal(extractRules('사업 개시 3년 미만의 기창업자').fields.businessAgeMax, 3);
+  assert.equal(extractRules('* 창업기업 : 사업개시일로부터 7년 이내 기업').fields.businessAgeMax, 7);
+  assert.equal(extractRules('대표로서 1년 이상 사업을 운영하고 있는 기업').fields.businessAgeMin, 1);
+  assert.equal(extractRules('- 고용보험 피보험자 5인 이상 기업(소상공인, 중소·중견기업)').fields.employeeMin, 5);
+  const r = extractRules('상시근로자 5인 이상 300인 미만의 중소기업');
+  assert.deepEqual([r.fields.employeeMin, r.fields.employeeMax], [5, 299]);
+  assert.equal(extractRules('수혜기업 중 50인 미만 중소사업장').fields.employeeMax, 49);
+  assert.equal(extractRules('재취업지원서비스 1,000인 이상 의무대상기업').fields.employeeMin, 1000);
+  assert.equal(extractRules('신청자가 대표자로 있는 사업장에 상시 근로자가 없는 1인 장애인기업').fields.employeeMax, 0);
+  assert.equal(extractRules('동래구에 소재하며 18~39세 이하의 청년이 대표로서').fields.representativeAgeMax, 39);
+  assert.equal(extractRules('도내 창업을 희망하는 만 40세 이상인 자').fields.representativeAgeMin, 40);
+  assert.equal(extractRules('만 15세 이상~ 34세 이하 취업애로유형 청년'), null, '채용 대상 청년 연령은 대표자 조건 아님');
+});
