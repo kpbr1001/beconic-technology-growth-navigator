@@ -422,3 +422,24 @@ test('공고문 병합: 전국 간주 공고만 소재 시·도로 바로잡고 
   assert.deepEqual(applyDoc({ targetRegions: ['전국'], targetRegionsInferred: false }, doc).targetRegions, ['충북'], '해시태그 전국 공고도 공고문 소재지로');
   assert.deepEqual(applyDoc({ targetRegions: ['서울'], targetRegionsInferred: false }, doc).targetRegions, ['서울'], '목록에 지역이 있으면 유지');
 });
+
+test('규칙 추출: 우대·선택 요건의 숫자는 필수 조건으로 쓰지 않음(검증 세트 오류 3건)', () => {
+  assert.equal(extractRules('■ 정부지원금 추가지원 대상 여부 창업 5년이내 기업(3%) 이노비즈 인증기업(3%)'), null, '지원율 가산 항목');
+  assert.equal(extractRules('중소기업 중 아래 하나에 해당되는 기업 m 제조업 전업률 30% 이상 m 벤처기업 m 최근 1년 동안 월평균 상시근로자수 5인 이상'), null, '선택지 목록');
+  assert.equal(extractRules('기술혁신기업 : 기술창업기업(업력 7년미만), 중소벤처기업, 중소이노비즈기업'), null, '나열된 유형 정의');
+  // 필수 조건은 유지
+  assert.equal(extractRules('청년 창업기업(창업 3년 이내)으로 상시근로자 10인 미만').fields.businessAgeMax, 3);
+  assert.equal(extractRules('다음 중 하나에 해당하는 기업은 제외 1. 휴업 2. 신청자격 가. 창업 7년 이내 기업').fields.businessAgeMax, 7, '선택지 목록이 끝난 뒤의 조건');
+});
+
+test('공고문 지역: 여러 시·도 목록 좁히기, 시·군 이름·특례시 표기', () => {
+  const doc = { status: 'ok', regions: ['대구'], regionEvidence: '대구 소재' };
+  assert.deepEqual(applyDoc({ targetRegions: ['대구', '경북'], targetRegionsInferred: false }, doc).targetRegions, ['대구']);
+  assert.deepEqual(applyDoc({ targetRegions: ['서울', '경기'], targetRegionsInferred: false }, doc).targetRegions, ['서울', '경기'], '목록 밖 지역으로는 바꾸지 않음');
+  const g = analyzeDocText('□ 지원대상\n○ 과천시에 사업장을 두고 운영 중인 중소기업');
+  assert.deepEqual(g.regions, ['경기']);
+  assert.deepEqual(g.districts, ['과천시']);
+  assert.deepEqual(analyzeDocText('□ 지원대상\n○ 본사가 경상남도 창원특례시에 소재한 기업', { regions: ['경남'] }).districts, ['창원시']);
+  assert.deepEqual(analyzeDocText('□ 지원 대상\n◦ 경북·구미지역 내에 소재(본사, 공장)한 중소기업', { regions: ['경북'] }).districts, ['구미시']);
+  assert.equal(analyzeDocText('□ 지원대상\n○ 고성군 소재 기업').regions, undefined, '두 도에 있는 이름(고성군)은 판단 보류');
+});
