@@ -15,7 +15,10 @@
 
 const PREF = /우대|가점|가산점|가산|추가\s*지원|우선\s*지원|우선\s*선정/;
 // 여러 요건 중 하나만 충족하면 되는 목록의 머리말(앞 400자 안에 있으면 그 목록의 숫자는 필수 아님)
-const ALT_HEAD = /(?:다음|아래)\s*(?:각\s*호\s*)?중\s*(?:어느\s*)?(?:하나|1개|한\s*가지)|하나\s*이상에\s*해당|(?:어느\s*)?하나에\s*해당|중\s*(?:택\s*)?1\s*(?:개|가지)?\s*이상/;
+const ALT_HEAD = /(?:다음|아래)\s*(?:각\s*호\s*)?중\s*(?:어느\s*)?(?:하나|1개|한\s*가지)|하나\s*이상(?:을|에)?\s*(?:충족|해당)|(?:어느\s*)?하나에\s*해당|중\s*(?:택\s*)?1\s*(?:개|가지)?\s*이상/;
+// 구간표(평가 점수표·지원율 구간표)의 표지: 'N점', 'N% 지원/할인', 범위 '~'
+const TIER_MARK = /\d+\s*점(?![가-힣])|\d+(?:\.\d+)?\s*%\s*(?:지원|할인)|\d\s*[~∼]\s*\d|[이상|초과]\s*[~∼]/;
+const THRESH = /\d+(?:\.\d+)?\s*(?:억|천만|인|명|년|세)\s*원?\s*(?:이상|이하|미만|초과)/g;
 // 목록이 끝났다고 볼 경계(다음 큰 항목 시작)
 const SECTION_BREAK = /(?:^|\s)(?:\d{1,2}\s*[.)]|[가-하]\s*[.)]|[□■◆◇◼])\s*\S/;
 
@@ -46,11 +49,33 @@ function clauseAround(text, idx, len) {
   return text.slice(a, b).trim();
 }
 
+// 2차 검증 세트(처음 보는 공고)에서 찾은 오인 유형 — 일반 규칙으로 걸러낸다
+function notACondition(text, idx, len) {
+  const end = idx + len;
+  const after = text.slice(end, end + 18);
+  // 제외 문맥: '업력 10년 이상 기업 제외', '(업력 1년 미만, … 심사 제외)'
+  if (/^[^.;○◦]{0,12}(?:제외|불가|면제)/.test(after)) return true;
+  const open = text.lastIndexOf('(', idx), close = text.lastIndexOf(')', idx);
+  if (open > close && idx - open < 20) {
+    const inner = text.slice(open, text.indexOf(')', end) + 1 || end + 30);
+    if (/제외|면제|예외/.test(inner)) return true;
+  }
+  // 특정 업종에만 붙은 기준: '※ 도·소매업, 음식업, 숙박업: 상시 종업원수 5인 이상 업체'
+  if (/[가-힣]+업\s*[,，·‧]\s*(?:[가-힣]+업\s*[,，·‧]\s*)*[가-힣]+업\s*[:：][^.;○◦]{0,30}$/.test(text.slice(Math.max(0, idx - 60), idx))) return true;
+  // 업종별로 다른 기준: '5인 미만(제조·건설 10인 미만)'
+  if (/^\s*\(\s*[^)]{0,30}\d+\s*(?:인|명)\s*(?:미만|이하|이상)/.test(text.slice(end, end + 40))) return true;
+  // 구간표: 같은 종류의 기준값이 둘 이상 더 있고 점수·지원율·범위 표지가 함께 있음
+  const win = text.slice(Math.max(0, idx - 60), end + 80);
+  if ((win.match(THRESH) || []).length >= 3 && TIER_MARK.test(win)) return true;
+  return false;
+}
+
 function collect(text, re, toValue, { ctx, notCtx } = {}) {
   const found = [];
   for (const m of text.matchAll(re)) {
     const clause = clauseAround(text, m.index, m[0].length);
     if (PREF.test(clause)) continue;
+    if (notACondition(text, m.index, m[0].length)) continue;
     // 지원율 가산 항목: '창업 5년이내 기업(3%)'
     if (/^\s*(?:인\s*)?(?:기업|업체|사업자)?\s*\(\s*\d+(?:\.\d+)?\s*%/.test(text.slice(m.index + m[0].length, m.index + m[0].length + 14))) continue;
     if (inAltList(text, m.index) || inListedParen(text, m.index, m[0].length)) continue;
@@ -80,25 +105,37 @@ export function extractRules(raw) {
   const ev = {};
 
   // 업력: 창업·업력·설립 (후) N년 이내/미만/이하 · 이상/초과
-  const age = collect(text, /(?:창업|업력|설립)\s*(?:후|일로부터|한\s*지)?\s*(\d{1,2})\s*년\s*(이내|미만|이하|이상|초과)/g, (m) => {
-    const n = +m[1];
-    if (n < 1 || n > 30) return null;
-    if (m[2] === '이상') return { min: n };
-    if (m[2] === '초과') return { min: n + 1 };
-    return { max: n, exclusive: m[2] === '미만' };
-  });
+  // '사업 개시 3년 미만', '사업개시일로부터 7년 이내'도 업력. 'N개월'은 연 단위로 판정할 수 없어 같은 항목을 보류
+  const age = [
+    ...collect(text, /(?:창업|업력|설립|사업\s*개시(?:일)?|개업)\s*(?:후|일로부터|로부터|한\s*지)?\s*(\d{1,2})\s*(년|개월)\s*(이내|미만|이하|이상|초과)/g, (m) => {
+      const n = +m[1];
+      if (m[2] === '개월') return m[3] === '이상' || m[3] === '초과' ? { min: -1 } : { max: -1 };
+      if (n < 1 || n > 30) return null;
+      if (m[3] === '이상') return { min: n };
+      if (m[3] === '초과') return { min: n + 1 };
+      return { max: n, exclusive: m[3] === '미만' };
+    }),
+    ...collect(text, /(\d{1,2})\s*년\s*이상\s*(?:사업을|기업을)\s*(?:운영|영위)/g, (m) => (+m[1] >= 1 && +m[1] <= 30 ? { min: +m[1] } : null)),
+  ];
   const aMax = agree(age, 'max'), aMin = agree(age, 'min');
-  if (aMax) { out.businessAgeMax = aMax.value; out.businessAgeMaxExclusive = aMax.exclusive; ev.businessAgeMax = aMax.evidence; }
-  if (aMin) { out.businessAgeMin = aMin.value; ev.businessAgeMin = aMin.evidence; }
+  if (aMax && aMax.value < 0) aMax.value = null;
+  if (aMin && aMin.value < 0) aMin.value = null;
+  if (aMax?.value != null) { out.businessAgeMax = aMax.value; out.businessAgeMaxExclusive = aMax.exclusive; ev.businessAgeMax = aMax.evidence; }
+  if (aMin?.value != null) { out.businessAgeMin = aMin.value; ev.businessAgeMin = aMin.evidence; }
 
   // 상시근로자
-  const emp = collect(text, /(?:상시\s*근로자|상시\s*종업원|종업원)\s*(?:수)?\s*(?:가|는)?\s*(\d{1,4})\s*(?:인|명)\s*(이하|미만|이상|초과)/g, (m) => {
-    const n = +m[1];
-    if (m[2] === '이하') return { max: n };
-    if (m[2] === '미만') return { max: n - 1 };
-    if (m[2] === '이상') return { min: n };
-    return { min: n + 1 };
-  });
+  const NUMS = '(\\d{1,3}(?:,\\d{3})+|\\d{1,4})';
+  const empVal = (n, op) => (op === '이하' ? { max: n } : op === '미만' ? { max: n - 1 } : op === '이상' ? { min: n } : { min: n + 1 });
+  const num = (x) => +String(x).replace(/,/g, '');
+  const WORKER = '(?:상시\\s*근로자|상시\\s*종업원|종업원|(?:고용보험\\s*)?피보험자)\\s*(?:수)?\\s*(?:가|는)?\\s*';
+  const emp = [
+    ...collect(text, new RegExp(`${WORKER}${NUMS}\\s*(?:인|명)\\s*(이하|미만|이상|초과)`, 'g'), (m) => empVal(num(m[1]), m[2])),
+    // '상시근로자 5인 이상 300인 미만'의 두 번째 경계
+    ...collect(text, new RegExp(`${WORKER}${NUMS}\\s*(?:인|명)\\s*(?:이상|초과)\\s*[~∼]?\\s*${NUMS}\\s*(?:인|명)\\s*(이하|미만)`, 'g'), (m) => empVal(num(m[2]), m[3])),
+    // 규모로 정한 대상: '50인 미만 중소사업장', '1,000인 이상 의무대상기업'
+    ...collect(text, new RegExp(`(?<![\\d,])${NUMS}\\s*(?:인|명)\\s*(이하|미만|이상|초과)\\s*(?:의\\s*)?(?:중소\\s*)?(?:사업장|기업|업체|사업자|소기업|의무대상기업)`, 'g'), (m) => empVal(num(m[1]), m[2])),
+    ...collect(text, /(?:상시\s*)?근로자가\s*없는\s*1인/g, () => ({ max: 0 })),
+  ];
   const eMax = agree(emp, 'max'), eMin = agree(emp, 'min');
   if (eMax && eMax.value >= 0) { out.employeeMax = eMax.value; ev.employeeMax = eMax.evidence; }
   if (eMin) { out.employeeMin = eMin.value; ev.employeeMin = eMin.evidence; }
@@ -114,12 +151,17 @@ export function extractRules(raw) {
   if (rMin) { out.revenueMin = rMin.value; ev.revenueMin = rMin.evidence; }
 
   // 대표자 연령: 대표·창업자·신청자·청년 문맥만
-  const rep = collect(text, /만\s*(\d{2})\s*세\s*(이하|미만|이상)/g, (m) => {
-    const n = +m[1];
-    if (m[2] === '이하') return { max: n };
-    if (m[2] === '미만') return { max: n - 1 };
-    return n >= 20 ? { min: n } : null; // '만 19세 이상'은 성인 일반 조건이라 판정에 쓰지 않음
-  }, { ctx: /대표|창업자|신청자|청년|예비창업자/, notCtx: /근로자|고령자|채용|직원|인력|구직|참여자|학생/ });
+  const REP_CTX = { ctx: /대표|창업|신청자|청년/, notCtx: /근로자|고령자|채용|직원|인력|구직|취업|참여자|학생/ };
+  const rep = [
+    ...collect(text, /만\s*(\d{2})\s*세\s*(이하|미만|이상)/g, (m) => {
+      const n = +m[1];
+      if (m[2] === '이하') return { max: n };
+      if (m[2] === '미만') return { max: n - 1 };
+      return n >= 20 ? { min: n } : null; // '만 19세 이상'은 성인 일반 조건이라 판정에 쓰지 않음
+    }, REP_CTX),
+    // 범위: '18~39세 이하의 청년이 대표', '청년농업인(만18~39세)이 대표'
+    ...collect(text, /(?:만\s*)?(\d{2})\s*세?\s*[~∼]\s*(?:만\s*)?(\d{2})\s*세/g, (m) => ({ max: +m[2], ...(+m[1] >= 20 ? { min: +m[1] } : {}) }), REP_CTX),
+  ];
   const pMax = agree(rep, 'max'), pMin = agree(rep, 'min');
   if (pMax && pMax.value >= 19 && pMax.value <= 70) { out.representativeAgeMax = pMax.value; ev.representativeAgeMax = pMax.evidence; }
   if (pMin && pMin.value <= 80) { out.representativeAgeMin = pMin.value; ev.representativeAgeMin = pMin.evidence; }

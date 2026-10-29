@@ -80,9 +80,15 @@ export function evaluate(set) {
 
 // CI 기준(v3.12 측정값으로 고정 — v3.11: 지역 85%·시군구 90%·틀린 추출 3건): 규칙을 바꿀 때 이보다 나빠지면 실패한다. 개선되면 기준을 올린다.
 //   지역·시군구 정확도 하한, 값 항목 '틀린 추출' 총수 상한, '맞힌 추출' 총수 하한
-export const BASELINE = { regionsAccuracy: 0.91, districtsAccuracy: 0.94, maxWrong: 0, minCorrect: 59 };
+// 세트별 기준. 2차 세트(eval-set-2)는 1차 세트로 규칙을 고친 뒤 새로 뽑은 표본(과적합 확인용)
+export const BASELINES = {
+  // v3.13 측정값(1차: 지역 92%·시군구 95%·틀린 0·맞힌 63 / 2차: 지역 97%·시군구 93%·틀린 2·맞힌 68)
+  'eval-set.json': { regionsAccuracy: 0.91, districtsAccuracy: 0.94, maxWrong: 0, minCorrect: 63 },
+  'eval-set-2.json': { regionsAccuracy: 0.96, districtsAccuracy: 0.93, maxWrong: 2, minCorrect: 68 },
+};
+export const BASELINE = BASELINES['eval-set.json'];
 
-export function check(r) {
+export function check(r, BASELINE = BASELINES['eval-set.json']) {
   const bad = [];
   const fs_ = r.fields;
   if (fs_.regions.accuracy < BASELINE.regionsAccuracy - 1e-9) bad.push(`지역 정확도 ${(fs_.regions.accuracy * 100).toFixed(0)}% < ${BASELINE.regionsAccuracy * 100}%`);
@@ -96,11 +102,16 @@ export function check(r) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const set = JSON.parse(fs.readFileSync(new URL('./fixtures/eval-set.json', import.meta.url), 'utf8'));
+  // --set eval-set-2.json 으로 세트 선택, --all 이면 모든 세트를 차례로
+  const argSet = process.argv[process.argv.indexOf('--set') + 1];
+  const files = process.argv.includes('--all') ? Object.keys(BASELINES) : [process.argv.includes('--set') ? argSet : 'eval-set.json'];
+  let failed = false;
+  for (const file of files) {
+  const set = JSON.parse(fs.readFileSync(new URL(`./fixtures/${file}`, import.meta.url), 'utf8'));
   const r = evaluate(set);
   if (process.argv.includes('--json')) { console.log(JSON.stringify(r, null, 1)); process.exit(0); }
   const pct = (x) => (x == null ? '  -  ' : `${(x * 100).toFixed(0).padStart(3)}%`);
-  console.log(`검증 세트 ${r.n}건 (무작위 ${r.random} · 추출 ${r.n - r.random})`);
+  console.log(`[${file}] 검증 세트 ${r.n}건 (무작위 ${r.random} · 추출 ${r.n - r.random})`);
   console.log(`${LABEL.regions}: 정확도 ${pct(r.fields.regions.accuracy)} (과대 ${r.fields.regions.over} · 과소 ${r.fields.regions.under})`);
   console.log(`${LABEL.districts}: 정확도 ${pct(r.fields.districts.accuracy)}`);
   for (const k of ['preStartup', ...NUM]) {
@@ -108,8 +119,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(`${LABEL[k].padEnd(12)} 정밀도 ${pct(f.precision)} (${f.correct}/${f.predicted})  재현율(무작위) ${pct(f.recall)} (${f.foundInRandom}/${f.goldInRandom})  전체 ${f.foundAll}/${f.goldAll}`);
   }
   if (process.argv.includes('--check')) {
-    const c = check(r);
-    if (!c.ok) { console.error('기준 미달:', c.bad.join(', ')); process.exit(1); }
-    console.log(`기준 충족 (틀린 추출 ${c.wrong}건 · 맞힌 추출 ${c.correct}건)`);
+    const c = check(r, BASELINES[file]);
+    if (!c.ok) { console.error(`[${file}] 기준 미달:`, c.bad.join(', ')); failed = true; }
+    else console.log(`[${file}] 기준 충족 (틀린 추출 ${c.wrong}건 · 맞힌 추출 ${c.correct}건)`);
   }
+  }
+  if (failed) process.exit(1);
 }
