@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.14.0',
+  version: 'v3.15.0',
   updated: '2026-10-29',
   changelog: [
+    { v:'v3.15.0', d:'2026-10-29', note:'결과 화면 정리: 목록은 추천·조건부만 먼저(확인 필요는 \'더 보기\'로 별도 섹션), 기본 정렬 추천순(같은 등급·적합도대는 마감 빠른 순), 이번 주 마감 띠, 대시보드 숫자 일치(도넛 합계 = 가운데 숫자), 마감임박은 추천·조건부만 집계' },
     { v:'v3.14.0', d:'2026-10-29', note:'공고문의 시·군 나열(예: "신청 가능 지역: 포항시, 경주시, 김천시")을 대상 시·군으로 인식, 3차 검증 세트(규칙 개발에 쓰지 않은 새 표본 60건)로 정확도 확인' },
     { v:'v3.13.0', d:'2026-10-29', note:'2차 검증 세트(새 표본 60건) 기반: 평가 점수표·지원율 구간표·제외 문맥·업종별 기준의 숫자를 자격 조건에서 제외, 업력(사업 개시·운영 연수)·근로자(피보험자·규모 표현·1인 기업)·대표자 연령 범위 표현 확장' },
     { v:'v3.12.0', d:'2026-10-29', note:'정확도 검증 세트(60건) 기반 개선: 우대·선택 요건의 숫자를 필수 조건에서 제외, 공고문 소재지로 여러 시·도 목록 좁히기, 시·군 이름·특례시 표기로 지역 추론' },
@@ -619,12 +620,13 @@ function buildDashboard(matched){
     if(typeof v!=='number' || !(v>0)) return;
     if(isLoanProgram(m.program)){ loanSum+=v; loanCnt++; } else if(!isInvestProgram(m.program)){ grantSum+=v; grantCnt++; }
   });
-  const closingSoon = considerable.filter(m=> m.dl.state==='CLOSING_SOON');
+  // 마감임박은 바로 행동할 수 있는 추천·조건부만 센다(확인 필요까지 세면 숫자만 커지고 쓸모가 없음)
+  const closingSoon = [...rec, ...cond].filter(m=> m.dl.state==='CLOSING_SOON');
   return {
     total: matched.length,
     active: matched.filter(m=>m.dl.state!=='CLOSED').length,
     considerable: considerable.length,
-    recommend: rec.length, conditional: cond.length, check: check.length,
+    recommend: rec.length, conditional: cond.length, check: check.length, primary: rec.length + cond.length,
     ineligible: matched.length - considerable.length,
     grantSum, grantCnt, loanSum, loanCnt,
     closingSoon: closingSoon.length,
@@ -651,8 +653,9 @@ const App = (function(){
   let matched = [];
   let dash = null;
   let filter = 'all';
-  let sortBy = 'deadline';
+  let sortBy = 'fit';
   let fundedOnly = false;
+  let showCheck = false;        // '확인 필요' 사업 펼침(기본은 추천·조건부만)
   let progressiveDone = false;
   let printMode = false;
   let currentView = 'landing';
@@ -771,7 +774,7 @@ const App = (function(){
     company:()=>company, get step(){return step}, get persona(){return persona},
     get matched(){return matched}, get dash(){return dash},
     init, pickPersona, jumpToPersona, next, back, pick, toggleCert,
-    analyze, render, setFilter, setSort, toggleFunded, resetFilter, scrollToResults, expandGroup, showMore,
+    analyze, render, setFilter, setSort, toggleFunded, toggleCheck, resetFilter, scrollToResults, expandGroup, showMore,
     openDetail, closeModal, printReport, openProgressive, applyProgressive, closeProgressive,
     reset, goHome, editInputs,
     saveDraft, clearDraft, resumeDraft, dismissDraft,
@@ -987,8 +990,8 @@ const App = (function(){
     TODAY = startOfToday();
     matched = runMatching(programs, company);
     dash = buildDashboard(matched);
-    filter='all'; sortBy='deadline'; fundedOnly=false; expanded=new Set(); listLimit=APP_CONFIG.LIST_LIMIT;
-    const ss=document.getElementById('sortSel'); if(ss) ss.value='deadline';
+    filter='all'; sortBy='fit'; fundedOnly=false; showCheck=false; expanded=new Set(); listLimit=APP_CONFIG.LIST_LIMIT;
+    const ss=document.getElementById('sortSel'); if(ss) ss.value='fit';
     syncFundedBtn();
     saveProfile();
     clearDraft();
@@ -1056,7 +1059,7 @@ const App = (function(){
     const el=document.getElementById('dashboard'); if(!el||!dash) return;
     const d=dash;
     const live = ProgramProvider.lastMode==='live';
-    const fieldBuckets = fieldBucketCounts();
+    const fieldBuckets = chartBuckets(fieldBucketCounts(primaryOf(matched)));
     const PALETTE=['#1f9d6b','#e8921a','#4666c4','#c0428a','#2a9d9d','#8a6d3b','#9b59b6','#e05252'];
     const segs = fieldBuckets.slice(0,8).map((f,i)=>({label:needLabel(f.field), value:f.count, color:PALETTE[i%PALETTE.length]}));
     const maxF = Math.max(1, ...fieldBuckets.map(f=>f.count));
@@ -1090,8 +1093,8 @@ const App = (function(){
     const hookBanner = `
       <button type="button" class="hook-banner" onclick="App.scrollToResults()">
         ${srcLabel} <span class="hook-num">${d.active.toLocaleString()}</span>개 중,
-        검토할 만한 사업 <span class="hook-match">${d.considerable}개</span>
-        <span class="hook-split">(추천 ${d.recommend} · 조건부 ${d.conditional} · 확인 필요 ${d.check})</span>
+        검토할 만한 사업 <span class="hook-match">${d.primary}개</span>
+        <span class="hook-split">(추천 ${d.recommend} · 조건부 ${d.conditional})${d.check?` · 정보가 더 필요한 사업 ${d.check}개`:''}</span>
         <span class="hook-cta">아래에서 확인 ↓</span>
       </button>`;
 
@@ -1102,20 +1105,20 @@ const App = (function(){
           ${heroBody}
         </div>
         <div class="dash-card">
-          <div class="dc-title">분야별 구성</div>
+          <div class="dc-title">분야별 구성 <small>추천·조건부 · 대표 분야 기준</small></div>
           <div class="donut-wrap">${donutSVG(segs)}
-            <div class="donut-center"><b>${d.considerable}</b><span>건</span></div>
+            <div class="donut-center"><b>${d.primary}</b><span>추천·조건부</span></div>
           </div>
         </div>
         <div class="dash-card">
-          <div class="dc-title">분야별 매칭 건수</div>
+          <div class="dc-title">분야별 매칭 건수 <small>추천·조건부</small></div>
           <div class="mbars">${bars||'<span class="muted">데이터 없음</span>'}</div>
         </div>
       </div>
       <div class="status-legend" aria-label="판정 범례">
         <span class="lg-item"><i class="lg-dot ok"></i><b>추천</b> 판정된 자격 모두 충족·적합도 높음</span>
         <span class="lg-item"><i class="lg-dot cond"></i><b>조건부</b> 미충족 없음 · 일부 조건 공고 확인 또는 적합도 보통</span>
-        <span class="lg-item"><i class="lg-dot check"></i><b>확인 필요</b> 자격 판정에 정보 부족</span>
+        <span class="lg-item"><i class="lg-dot check"></i><b>확인 필요</b> 정보 부족으로 판정 미완료 또는 적합도 낮음(목록 아래 '더 보기')</span>
       </div>`;
   }
 
@@ -1124,11 +1127,19 @@ const App = (function(){
     for(const f of FIELD_ORDER){ if(purposes.includes(f)) return f; }
     return purposes[0] || '기타';
   }
-  function fieldBucketCounts(){
+  function primaryOf(list){ return list.filter(m=> m.state==='추천' || m.state==='조건부 추천'); }
+  function fieldBucketCounts(list){
     const counts={};
-    matched.filter(m=>m.state!=='대상 아님').forEach(m=>{ const b=bucketOf(m); counts[b]=(counts[b]||0)+1; });
+    list.forEach(m=>{ const b=bucketOf(m); counts[b]=(counts[b]||0)+1; });
     const ordered=[...FIELD_ORDER.filter(f=>counts[f]), ...Object.keys(counts).filter(f=>!FIELD_ORDER.includes(f))];
     return ordered.map(f=>({field:f, count:counts[f]}));
+  }
+  // 차트는 8칸: 상위 7개 분야 + 나머지 '기타'로 묶어 합계가 가운데 숫자와 같게
+  function chartBuckets(b){
+    if(b.length<=8) return b;
+    const top=[...b].sort((x,y)=>y.count-x.count).slice(0,7);
+    const keep=b.filter(x=>top.includes(x));
+    return [...keep, {field:'기타', count:b.filter(x=>!top.includes(x)).reduce((s,x)=>s+x.count,0)}];
   }
   function donutSVG(segs){
     const total=segs.reduce((s,x)=>s+x.value,0)||1;
@@ -1144,8 +1155,22 @@ const App = (function(){
   }
 
   /* ================= 결과 카드 ================= */
+  // 목록 기본은 추천·조건부. '확인 필요'는 펼쳤을 때, 또는 추천·조건부가 하나도 없을 때만
+  function baseList(){
+    const all = matched.filter(m=>m.state!=='대상 아님');
+    const prim = primaryOf(all);
+    return (showCheck || !prim.length) ? all : prim;
+  }
+  function hiddenCheckCount(){
+    if(showCheck || !primaryOf(matched).length) return 0;
+    let list = matched.filter(m=>m.state==='확인 필요');
+    if(fundedOnly) list=list.filter(m=> m.program.supportAmountMax>0);
+    if(filter==='마감임박') list=list.filter(m=>m.dl.state==='CLOSING_SOON');
+    else if(filter!=='all'){ const ps=needToPurposes(filter); list=list.filter(m=>(m.program.supportPurposes||[]).some(pp=>ps.includes(pp))); }
+    return list.length;
+  }
   function visibleList(){
-    let list = matched.filter(m=>m.state!=='대상 아님');
+    let list = baseList();
     if(fundedOnly) list=list.filter(m=> m.program.supportAmountMax>0);
     if(filter==='마감임박') list=list.filter(m=>m.dl.state==='CLOSING_SOON');
     else if(filter!=='all'){ const ps=needToPurposes(filter); list=list.filter(m=>(m.program.supportPurposes||[]).some(pp=>ps.includes(pp))); }
@@ -1169,16 +1194,60 @@ const App = (function(){
     if(pn) pn.textContent='';
     const list = visibleList();
     renderResultCount(list.length);
+    if(!list.length && hiddenCheckCount()){ cards.innerHTML = checkRow(); return; }
     if(!list.length){
       cards.innerHTML=`<div class="empty"><h3>${filter==='all'&&!fundedOnly?'조건에 맞는 사업이 아직 없어요':'이 조건엔 사업이 없어요'}</h3>
         <p>${filter==='all'&&!fundedOnly?'조건을 바꾸거나, 아래 상담으로 맞춤 사업을 찾아드릴게요.':'<button type="button" class="btn btn-ghost btn-sm" onclick="App.resetFilter()">← 전체 보기</button>'}</p></div>`;
       return;
     }
     const useGrouping = filter==='all' && !fundedOnly;
-    if(useGrouping){ cards.innerHTML = renderGroupedByField(list); return; }
+    if(useGrouping){
+      // 펼친 '확인 필요'는 분야 그룹에 섞지 않고 맨 아래 별도 섹션으로(그룹당 카드 제한에 가려지지 않게)
+      const prim = primaryOf(list);
+      if(!prim.length){ cards.innerHTML = renderGroupedByField(list); return; }
+      cards.innerHTML = closingStrip() + renderGroupedByField(prim) + (showCheck ? checkSection(list.filter(m=>m.state==='확인 필요')) : '') + checkRow();
+      return;
+    }
     const shown = list.slice(0, listLimit);
     cards.innerHTML = shown.map(cardHTML).join('')
-      + (list.length>shown.length ? `<div class="more-row"><button type="button" class="more-btn" onclick="App.showMore()">${list.length-shown.length}건 더 보기</button></div>` : '');
+      + (list.length>shown.length ? `<div class="more-row"><button type="button" class="more-btn" onclick="App.showMore()">${list.length-shown.length}건 더 보기</button></div>` : '')
+      + checkRow();
+  }
+  // 추천순일 때 마감이 묻히지 않게: 추천·조건부 중 마감 7일 이내 상위 5건을 목록 맨 위에 요약
+  function closingStrip(){
+    if(sortBy!=='fit') return '';
+    const order={'추천':0,'조건부 추천':1};
+    const soon = primaryOf(matched).filter(m=>m.dl.state==='CLOSING_SOON')
+      .sort((a,b)=>(a.dl.dday-b.dl.dday) || (order[a.state]-order[b.state]) || (b.fit-a.fit));
+    if(!soon.length) return '';
+    const rows = soon.slice(0,5).map(m=>{ const dl=dlBadge(m.dl); return `
+      <button type="button" class="cs-row" data-id="${esc(m.program.sourceProgramId)}" onclick="App.openDetail(this.dataset.id)">
+        <span class="rc-state ${ST_CLS[m.state]}">${esc(m.state)}</span>
+        <span class="cs-name">${esc(m.program.programName)}</span>
+        <span class="rc-dl ${dl.cls}">${dl.icon} ${esc(dl.txt)}</span>
+      </button>`; }).join('');
+    return `<section class="closing-strip" aria-label="이번 주 마감">
+      <div class="cs-head">⏰ 이번 주 마감 <small>추천·조건부 ${soon.length}건${soon.length>5?' 중 마감 빠른 5건':''}</small></div>${rows}</section>`;
+  }
+  function checkSection(items){
+    if(!items.length) return '';
+    const shown = items.slice(0, listLimit);
+    return `<div class="need-group check-group">
+        <div class="need-group-head">
+          <span class="ng-icon" aria-hidden="true">🔎</span>
+          <h3 class="ng-title">정보가 더 필요한 사업</h3>
+          <span class="ng-count">${items.length}건</span>
+        </div>
+        <div class="need-group-cards">${shown.map(cardHTML).join('')}</div>
+        ${items.length>shown.length?`<div class="more-row"><button type="button" class="more-btn" onclick="App.showMore()">${items.length-shown.length}건 더 보기</button></div>`:''}
+      </div>`;
+  }
+  function checkRow(){
+    const n = hiddenCheckCount();
+    if(n) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">정보가 부족해 판정하지 못한 사업 ${n}건 더 보기</button>
+      <p>설립 월·매출 규모·인증 같은 선택 정보를 넣으면 이 중 일부가 추천·조건부로 바뀔 수 있어요.</p></div>`;
+    if(showCheck && primaryOf(matched).length) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">추천·조건부만 보기</button></div>`;
+    return '';
   }
   function renderResultCount(n){
     const el=document.getElementById('resultCount'); if(!el) return;
@@ -1234,18 +1303,20 @@ const App = (function(){
         return (da-db) || ((b.regionTier??-1)-(a.regionTier??-1));
       }
       if(sortBy==='amount') return (b.program.supportAmountMax||0)-(a.program.supportAmountMax||0) || (order[a.state]-order[b.state]);
-      // 추천순: 판정 상태 → 내 지역 특화 → 적합도
-      return (order[a.state]-order[b.state]) || ((b.regionTier??-1)-(a.regionTier??-1)) || (b.fit-a.fit);
+      // 추천순: 판정 상태 → 내 지역 특화 → 적합도(10점 단위) → 마감 빠른 순 → 적합도
+      const band=m=>Math.floor(m.fit/10), dd=m=>(grp(m)===0 && m.dl.dday!=null) ? m.dl.dday : 9999;
+      return (order[a.state]-order[b.state]) || ((b.regionTier??-1)-(a.regionTier??-1)) || (band(b)-band(a)) || (dd(a)-dd(b)) || (b.fit-a.fit);
     });
   }
 
   function renderNeedFilter(){
     const seg=document.getElementById('seg-filter'); if(!seg) return;
     const fieldCount={};
-    matched.filter(m=>m.state!=='대상 아님').forEach(m=>{ (m.program.supportPurposes||[]).forEach(f=>{ fieldCount[f]=(fieldCount[f]||0)+1; }); });
+    baseList().forEach(m=>{ (m.program.supportPurposes||[]).forEach(f=>{ fieldCount[f]=(fieldCount[f]||0)+1; }); });
     const fields=FIELD_ORDER.filter(f=>fieldCount[f]);
     const btn=(val,label)=>`<button type="button" data-val="${esc(val)}" class="${filter===val?'on':''}" aria-pressed="${filter===val}" onclick="App.setFilter(this.dataset.val)">${label}</button>`;
     seg.innerHTML = btn('all','전체') + fields.map(f=>btn(f, `${esc(needLabel(f))} <small>${fieldCount[f]}</small>`)).join('') + btn('마감임박','⏰ 마감임박');
+    seg.title='분야 숫자는 중복 포함: 여러 분야에 걸친 사업은 각 분야에 모두 셉니다';
   }
 
   function cardHTML(m){
@@ -1309,7 +1380,8 @@ const App = (function(){
   }
 
   function setFilter(f){ filter = typeof f==='string' && f ? f : 'all'; listLimit=APP_CONFIG.LIST_LIMIT; render(); }
-  function setSort(s){ sortBy = ['deadline','fit','amount'].includes(s) ? s : 'deadline'; render(); }
+  function setSort(s){ sortBy = ['deadline','fit','amount'].includes(s) ? s : 'fit'; render(); }
+  function toggleCheck(){ showCheck=!showCheck; listLimit=APP_CONFIG.LIST_LIMIT; render(); }
   function toggleFunded(){ fundedOnly=!fundedOnly; listLimit=APP_CONFIG.LIST_LIMIT; syncFundedBtn(); render(); }
   function syncFundedBtn(){ const btn=document.getElementById('fundedToggle'); if(btn){ btn.classList.toggle('on', fundedOnly); btn.setAttribute('aria-pressed', String(fundedOnly)); } }
 
