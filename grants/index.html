@@ -243,12 +243,13 @@ textarea{min-height:88px;resize:vertical}
 .donut-legend{display:flex;flex-direction:column;gap:6px}
 .donut-legend .lg{font-size:12px;font-weight:600;color:var(--sub);display:flex;align-items:center;gap:6px}
 .donut-legend .lg i{width:10px;height:10px;border-radius:3px;flex:none}
-.mbars{display:flex;flex-direction:column;gap:9px}
-.mbar{display:grid;grid-template-columns:76px 1fr 24px;align-items:center;gap:8px;font-size:12px}
-.mbar-l{color:var(--sub);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mbar-t{height:8px;background:var(--line-2);border-radius:99px;overflow:hidden}
-.mbar-f{display:block;height:100%;background:linear-gradient(90deg,var(--navy),var(--navy-soft));border-radius:99px}
-.mbar-v{font-weight:700;color:var(--navy);text-align:right}
+.funnel{display:flex;flex-direction:column;gap:12px}
+.fn-lab{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--sub);font-weight:600;margin-bottom:4px}
+.fn-lab b{font-size:15px;color:var(--navy);font-weight:800}
+.fn-track{height:10px;background:var(--line-2);border-radius:99px;overflow:hidden}
+.fn-bar{display:block;height:100%;border-radius:99px}
+.fn-bar.f0{background:#9aa6c4}.fn-bar.f1{background:#4666c4}.fn-bar.f2{background:var(--cond)}.fn-bar.f3{background:var(--ok)}
+.fn-note{font-size:11px;color:var(--muted);margin-top:3px}
 .dc-alert{margin-top:14px;font-size:12.5px;font-weight:600;color:#7a4d0c;background:var(--orange-soft);border:1px solid #f2dcb3;border-radius:10px;padding:9px 12px}
 
 /* ===== Results ===== */
@@ -279,6 +280,13 @@ textarea{min-height:88px;resize:vertical}
 .pp-banner{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-left:3px solid var(--orange);border-radius:12px;padding:14px 18px;margin:6px 0 14px}
 .pp-banner .ppb-t b{font-size:14px}
 .pp-banner .ppb-t span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.pp-banner{background:#fffaf2;border-left-width:4px;padding:16px 20px}
+.pp-banner .ppb-t{flex:1;min-width:240px}
+.pp-banner .ppb-t b{font-size:15px}
+.pp-banner .ppb-t em{font-style:normal;color:var(--orange)}
+.ppb-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ppb-chip{font-size:12px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:3px 10px;color:var(--sub)}
+.ppb-chip b{color:var(--ink)}
 .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0 16px}
 .seg{display:flex;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:11px;padding:3px;gap:2px;max-width:100%}
 .seg button small{font-size:11px;opacity:.7;margin-left:2px}

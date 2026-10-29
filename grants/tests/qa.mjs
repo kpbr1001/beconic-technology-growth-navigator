@@ -167,6 +167,8 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   }));
   check('기본 정렬 추천순', def.sort === 'fit', def.sort);
   check('기본 목록: 확인 필요 숨김(추천·조건부만)', !def.states.includes('확인 필요'), def.states.join(','));
+  const fn = await page.evaluate(() => [...document.querySelectorAll('.funnel .fn-lab b')].map((e) => +e.textContent.replace(/,/g, '')));
+  check('판정 퍼널: 4단계·단계마다 줄어듦·추천·조건부 단계 = 도넛 숫자', fn.length === 4 && fn.every((n, i) => i === 0 || fn[i - 1] >= n) && fn[2] === def.center, fn.join(' → '));
   check('대시보드: 도넛 합계 = 가운데 숫자 = 추천·조건부 수', def.segSum === def.center && def.center === def.primary, `${def.segSum}/${def.center}/${def.primary}`);
   if (def.check) {
     check('확인 필요 더 보기 버튼', await page.locator('.check-row .more-btn', { hasText: `${def.check}건 더 보기` }).count() === 1);
@@ -219,6 +221,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   const hero = await page.locator('.dash-hero').innerText();
   check('대시보드: 합계 성격(단순 합계·실제 수령액과 다름) 명시', /단순 합계/.test(hero) && /실제/.test(hero), hero.replace(/\s+/g, ' ').slice(0, 120));
   const ppVisible = await page.locator('#ppBanner .pp-banner').count();
+  if (ppVisible) check('추가정보 카드: 확정 가능 사업 수·항목별 건수', /사업 [\d,]+건의 자격을 확정/.test(await page.locator('#ppBanner').innerText()) && await page.locator('#ppBanner .ppb-chip').count() > 0);
   if (ppVisible) {
     await page.locator('#ppBanner .btn').click();
     const opts = page.locator('#ppBody .opt');

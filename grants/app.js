@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.15.0',
+  version: 'v3.16.0',
   updated: '2026-10-29',
   changelog: [
+    { v:'v3.16.0', d:'2026-10-29', note:'대시보드: 분야별 막대(도넛과 중복) 대신 판정 단계 퍼널(전체 공고 → 자격 대상 → 추천·조건부 → 추천), 추가정보 카드에 입력 시 자격을 확정할 수 있는 사업 수와 항목별 건수 표시' },
     { v:'v3.15.0', d:'2026-10-29', note:'결과 화면 정리: 목록은 추천·조건부만 먼저(확인 필요는 \'더 보기\'로 별도 섹션), 기본 정렬 추천순(같은 등급·적합도대는 마감 빠른 순), 이번 주 마감 띠, 대시보드 숫자 일치(도넛 합계 = 가운데 숫자), 마감임박은 추천·조건부만 집계' },
     { v:'v3.14.0', d:'2026-10-29', note:'공고문의 시·군 나열(예: "신청 가능 지역: 포항시, 경주시, 김천시")을 대상 시·군으로 인식, 3차 검증 세트(규칙 개발에 쓰지 않은 새 표본 60건)로 정확도 확인' },
     { v:'v3.13.0', d:'2026-10-29', note:'2차 검증 세트(새 표본 60건) 기반: 평가 점수표·지원율 구간표·제외 문맥·업종별 기준의 숫자를 자격 조건에서 제외, 업력(사업 개시·운영 연수)·근로자(피보험자·규모 표현·1인 기업)·대표자 연령 범위 표현 확장' },
@@ -1037,11 +1038,15 @@ const App = (function(){
     const el=document.getElementById('ppBanner'); if(!el) return;
     const needed=collectNeeded();
     if(!needed.length || progressiveDone){ el.innerHTML=''; return; }
-    const labels={revenue:'매출 조건',employee:'상시근로자 조건',repAge:'대표자 연령',export:'수출 조건',gender:'여성기업 여부'};
+    const labels={revenue:'매출 규모',employee:'상시근로자 수',repAge:'대표자 연령대',export:'수출 실적',gender:'대표자 성별'};
+    const imp=neededImpact(needed);
+    const chips=needed.map(n=>({n, c:imp.per[n]||0})).sort((a,b)=>b.c-a.c)
+      .map(x=>`<span class="ppb-chip">${labels[x.n]} <b>${x.c.toLocaleString()}건</b></span>`).join('');
     el.innerHTML=`<div class="pp-banner">
-      <div class="ppb-t"><b>추가 정보 ${needed.length}가지를 알려주시면 자격 확인도를 높일 수 있어요</b>
-        <span>현재 확인이 필요한 항목: ${needed.map(n=>labels[n]).join(' · ')}</span></div>
-      <button type="button" class="btn btn-primary btn-sm" onclick="App.openProgressive()">추가 정보 입력하기</button>
+      <div class="ppb-t"><b>${needed.length}가지만 더 알려주시면 사업 <em>${imp.total.toLocaleString()}건</em>의 자격을 확정할 수 있어요</b>
+        <span>지금은 이 정보가 없어 '조건부'나 '확인 필요'로 남아 있는 사업이에요. 입력 정보는 이 브라우저에만 저장됩니다.</span>
+        <div class="ppb-chips">${chips}</div></div>
+      <button type="button" class="btn btn-primary" onclick="App.openProgressive()">추가 정보 입력하기 →</button>
     </div>`;
   }
   function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
@@ -1062,11 +1067,20 @@ const App = (function(){
     const fieldBuckets = chartBuckets(fieldBucketCounts(primaryOf(matched)));
     const PALETTE=['#1f9d6b','#e8921a','#4666c4','#c0428a','#2a9d9d','#8a6d3b','#9b59b6','#e05252'];
     const segs = fieldBuckets.slice(0,8).map((f,i)=>({label:needLabel(f.field), value:f.count, color:PALETTE[i%PALETTE.length]}));
-    const maxF = Math.max(1, ...fieldBuckets.map(f=>f.count));
-    const bars = fieldBuckets.slice(0,8).map((f,i)=>`
-      <div class="mbar"><span class="mbar-l">${FIELD_ICON[f.field]||'•'} ${esc(needLabel(f.field))}</span>
-        <span class="mbar-t"><span class="mbar-f" style="width:${Math.round(f.count/maxF*100)}%;background:${PALETTE[i%PALETTE.length]}"></span></span>
-        <span class="mbar-v">${f.count}</span></div>`).join('');
+    // 판정 퍼널: 전체 공고가 어디서 걸러졌는지 한눈에(막대 폭은 첫 단계 대비, 너무 작으면 최소 폭)
+    const steps = [
+      {label: live ? '접수 중·예정 공고' : '예시 공고', n:d.active, cls:'f0'},
+      {label:'자격 대상', n:d.considerable, cls:'f1', note:d.active-d.considerable>0?`−${(d.active-d.considerable).toLocaleString()} 자격 미충족·지역·업종 등 대상 아님`:''},
+      {label:'추천·조건부', n:d.primary, cls:'f2', note:d.check?`−${d.check.toLocaleString()} 정보 부족·적합도 낮음`:''},
+      {label:'추천', n:d.recommend, cls:'f3'},
+    ];
+    const top = Math.max(1, d.active);
+    const funnel = steps.map(st=>`
+      <div class="fn-row">
+        <div class="fn-lab"><span>${esc(st.label)}</span><b>${st.n.toLocaleString()}</b></div>
+        <div class="fn-track"><span class="fn-bar ${st.cls}" style="width:${st.n?Math.max(4, Math.round(st.n/top*100)):0}%"></span></div>
+        ${st.note?`<div class="fn-note">${esc(st.note)}</div>`:''}
+      </div>`).join('');
 
     let heroBody;
     if(!d.considerable){
@@ -1111,8 +1125,8 @@ const App = (function(){
           </div>
         </div>
         <div class="dash-card">
-          <div class="dc-title">분야별 매칭 건수 <small>추천·조건부</small></div>
-          <div class="mbars">${bars||'<span class="muted">데이터 없음</span>'}</div>
+          <div class="dc-title">판정 단계 <small>공고가 걸러진 과정</small></div>
+          <div class="funnel">${funnel}</div>
         </div>
       </div>
       <div class="status-legend" aria-label="판정 범례">
@@ -1440,17 +1454,31 @@ const App = (function(){
     document.getElementById('ppModal').classList.remove('hidden');
   }
   function closeProgressive(){ const el=document.getElementById('ppModal'); if(el) el.classList.add('hidden'); }
+  // 선택 정보별로 판정이 '확인 필요'에 머문 사업 수(추천 확정 전인 사업만). total은 중복 제거
+  function neededKeys(c){
+    const k=[];
+    if(/매출/.test(c.label) && !company.revenueRange) k.push('revenue');
+    if(/상시/.test(c.label) && !company.employeeCount) k.push('employee');
+    if(/대표자/.test(c.label) && !company.representativeAge) k.push('repAge');
+    if(/수출/.test(c.label) && company.exportHistory==null) k.push('export');
+    if(/여성기업/.test(c.label) && !company.representativeGender) k.push('gender');
+    return k;
+  }
+  function neededImpact(needed){
+    const per={}; let total=0;
+    matched.forEach(m=>{
+      if(m.state==='대상 아님' || m.state==='추천') return;
+      const ks=new Set(m.elig.conds.filter(c=>c.result==='unknown').flatMap(neededKeys).filter(k=>needed.includes(k)));
+      if(!ks.size) return;
+      total++; ks.forEach(k=>{ per[k]=(per[k]||0)+1; });
+    });
+    return {per, total};
+  }
   function collectNeeded(){
     const set=new Set();
     matched.forEach(m=>{
       if(m.state==='대상 아님') return;
-      m.elig.conds.filter(c=>c.result==='unknown').forEach(c=>{
-        if(/매출/.test(c.label) && !company.revenueRange) set.add('revenue');
-        if(/상시/.test(c.label) && !company.employeeCount) set.add('employee');
-        if(/대표자/.test(c.label) && !company.representativeAge) set.add('repAge');
-        if(/수출/.test(c.label) && company.exportHistory==null) set.add('export');
-        if(/여성기업/.test(c.label) && !company.representativeGender) set.add('gender');
-      });
+      m.elig.conds.filter(c=>c.result==='unknown').forEach(c=> neededKeys(c).forEach(k=>set.add(k)));
     });
     return [...set];
   }
