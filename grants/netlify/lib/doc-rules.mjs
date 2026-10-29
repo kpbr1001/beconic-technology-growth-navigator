@@ -110,6 +110,27 @@ function districtsIn(text, regions) {
   return [...new Set(names)];
 }
 
+// 시·군 나열: '14개 시군 : 포항, 경주, 안동 …', '신청가능 지역: 창원, 진주, 통영 …', '신청지역 ○ 안동, 구미 …'
+// 대상 지역을 알리는 말(신청·모집·지원 지역, N개 시·군) 바로 뒤에서 같은 시·도의 시·군 이름이 3개 이상 이어질 때만
+const LIST_CUE = /(?:신청|모집|지원|대상|참여)\s*(?:가능\s*)?(?:지역|시\s*[·ㆍ]?\s*군)|\d+\s*개\s*시\s*[·ㆍ]?\s*군/g;
+function cityListIn(text, regions) {
+  const s = String(text || '').replace(/\s+/g, ' ');
+  for (const sido of (regions || []).filter((r) => r !== '전국')) {
+    const list = (CITIES[sido] || []).map((name) => ({ name, base: name.replace(/[시군]$/, '') }));
+    if (!list.length) continue;
+    const alt = list.map((c) => `${c.base}(?:시|군)?`).sort((a, b) => b.length - a.length).join('|');
+    const run = new RegExp(`(?<![가-힣])(?:${alt})(?![가-힣])(?:\\s*[,，·ㆍ]\\s*(?:${alt})(?![가-힣])){2,}`, 'g');
+    for (const cue of s.matchAll(LIST_CUE)) {
+      run.lastIndex = cue.index + cue[0].length;
+      const m = run.exec(s);
+      if (!m || m.index - (cue.index + cue[0].length) > 40) continue;
+      const names = m[0].split(/\s*[,，·ㆍ]\s*/).map((x) => list.find((c) => c.name === x || c.base === x)?.name).filter(Boolean);
+      if (names.length >= 3) return { names: [...new Set(names)], evidence: `${cue[0]} ${m[0]}`.slice(0, 80) };
+    }
+  }
+  return null;
+}
+
 /** 공고문 텍스트 분석 결과(캐시에 저장되는 형태) */
 export function analyzeDocText(text, { regions = null } = {}) {
   const elig = eligText(text);
@@ -124,6 +145,11 @@ export function analyzeDocText(text, { regions = null } = {}) {
     const known = (regions || []).filter((r) => r !== '전국');
     const d = districtsIn(elig, known.length ? known : sido?.regions);
     if (d.length) { out.districts = d; out.districtEvidence = d.map((n) => `${n} 소재`).join(', '); }
+  }
+  if (!out.districts) {
+    const known = (regions || []).filter((r) => r !== '전국');
+    const listed = cityListIn(text, known.length ? known : out.regions);
+    if (listed) { out.districts = listed.names; out.districtEvidence = listed.evidence; }
   }
   const sup = supportText(text);
   if (sup) {

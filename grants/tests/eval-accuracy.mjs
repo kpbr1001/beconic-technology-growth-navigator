@@ -82,9 +82,11 @@ export function evaluate(set) {
 //   지역·시군구 정확도 하한, 값 항목 '틀린 추출' 총수 상한, '맞힌 추출' 총수 하한
 // 세트별 기준. 2차 세트(eval-set-2)는 1차 세트로 규칙을 고친 뒤 새로 뽑은 표본(과적합 확인용)
 export const BASELINES = {
-  // v3.13 측정값(1차: 지역 92%·시군구 95%·틀린 0·맞힌 63 / 2차: 지역 97%·시군구 93%·틀린 2·맞힌 68)
-  'eval-set.json': { regionsAccuracy: 0.91, districtsAccuracy: 0.94, maxWrong: 0, minCorrect: 63 },
-  'eval-set-2.json': { regionsAccuracy: 0.96, districtsAccuracy: 0.93, maxWrong: 2, minCorrect: 68 },
+  // v3.14 측정값(1차: 지역 92%·시군구 98%·틀린 0·맞힌 63 / 2차: 지역 97%·시군구 95%·틀린 2·맞힌 68 / 3차: 지역 98%·시군구 98%·틀린 3·맞힌 64)
+  // 3차 세트(eval-set-3)는 v3.13까지 규칙을 고친 뒤 새로 뽑은 표본 — 규칙 개발에 쓰지 않은 확인용
+  'eval-set.json': { regionsAccuracy: 0.91, districtsAccuracy: 0.98, maxWrong: 0, minCorrect: 63 },
+  'eval-set-2.json': { regionsAccuracy: 0.96, districtsAccuracy: 0.95, maxWrong: 2, minCorrect: 68 },
+  'eval-set-3.json': { regionsAccuracy: 0.98, districtsAccuracy: 0.98, maxWrong: 3, minCorrect: 64 },
 };
 export const BASELINE = BASELINES['eval-set.json'];
 

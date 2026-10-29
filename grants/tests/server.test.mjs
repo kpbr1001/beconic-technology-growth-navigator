@@ -468,3 +468,10 @@ test('규칙 추출: 업력·근로자·대표자 연령 표현 확장(개선 �
   assert.equal(extractRules('도내 창업을 희망하는 만 40세 이상인 자').fields.representativeAgeMin, 40);
   assert.equal(extractRules('만 15세 이상~ 34세 이하 취업애로유형 청년'), null, '채용 대상 청년 연령은 대표자 조건 아님');
 });
+
+test('공고문 시·군 나열: 대상 지역을 알리는 말 뒤 같은 시·도 시·군 3개 이상', () => {
+  assert.deepEqual(analyzeDocText('□ 지원대상\n○ 14개 시군 소재 중소기업\n※ 14개 시군 : 포항, 경주, 안동, 구미', { regions: ['경북'] }).districts, ['포항시', '경주시', '안동시', '구미시']);
+  assert.deepEqual(analyzeDocText('□ 신청지역\n○ 안동, 구미, 영천, 울릉', { regions: ['경북'] }).districts, ['안동시', '구미시', '영천시', '울릉군']);
+  assert.equal(analyzeDocText('□ 지원기관별 한도\n창원시 1백만원 밀양시 2백만원 양산시 1백만원', { regions: ['경남'] }).districts, undefined, '알림말 없는 표는 무시');
+  assert.equal(analyzeDocText('□ 신청지역\n○ 창원, 진주', { regions: ['경남'] }).districts, undefined, '2개 이하는 무시');
+});
