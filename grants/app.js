@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.18.0',
+  version: 'v3.19.0',
   updated: '2026-10-29',
   changelog: [
+    { v:'v3.19.0', d:'2026-10-29', note:'신청 도움받기 개선: 메일 앱이 바로 열리던 방식 대신 앱 안의 창에서 필요한 도움(사업계획서·자격 확인·서류·발표)을 고르고 전화·메일·내용 복사 중 편한 방법으로 요청, 카드 버튼 디자인 정리' },
     { v:'v3.18.0', d:'2026-10-29', note:'찾은 다음 지원까지: 지금 모집이 없는 대표 사업은 \'다음 공고 예정\'(예년 공고 시기)과 공고 알림 등록(이 브라우저), 기다리던 공고가 올라오면 맨 위 알림, 카드별 \'신청 도움받기\'(사업명 자동 입력 메일), 상세에 신청 준비 체크리스트' },
     { v:'v3.17.0', d:'2026-10-29', note:'원하는 사업을 바로 찾기: 첫 질문 "지금 가장 필요한 지원"(대상별 선택지·최대 3개), 고른 지원으로 관련성 판정·대상별 대표 사업 우선·대상과 성격이 다른 공고 내림, 결과 첫 화면에 지원별 추천 3건, 사업명 검색(대상 아님이면 이유 표시)' },
     { v:'v3.16.1', d:'2026-10-29', note:'모바일에서 이번 주 마감 띠의 긴 공고명 때문에 화면이 옆으로 넘치던 문제 수정' },
@@ -463,18 +464,41 @@ function prepChecklist(p, m, c){
   if(labels.has('수출 실적')) out.push('수출 실적 증명(수출실적증명서 등)');
   return out;
 }
-/* 신청 도움 요청 메일(사용자의 메일 앱에서 직접 보냄 — 서버 전송 없음) */
-function helpMailto(p, m, c){
-  const subject = `[지원사업 신청 도움] ${p.programName||''}`.slice(0,120);
-  const body = [
-    '아래 지원사업 신청 관련해 도움을 받고 싶습니다.', '',
-    `· 사업명: ${p.programName||''}`, `· 주관: ${[p.agency,p.executingAgency].filter(Boolean).join(' / ')}`,
+/* 신청 도움 요청 — 앱 안의 창에서 필요한 도움을 고르고 전화·메일·복사 중 편한 방법으로 연결(서버 전송 없음) */
+const HELP_TYPES = [
+  {id:'plan',  label:'사업계획서 작성·검토', sub:'평가 기준에 맞춰 완성도 높이기'},
+  {id:'elig',  label:'신청 자격 사전 확인',  sub:'우리 회사가 해당되는지'},
+  {id:'docs',  label:'제출 서류 준비',       sub:'빠짐없이 갖추기'},
+  {id:'pitch', label:'발표·면접 준비',       sub:'평가 대응 전략'}
+];
+const HELP_CONTACT = {tel:'070-4103-4177', email:'start@gven.kr'};
+const svgIcon = (d)=>`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const ICON = {
+  chat:  svgIcon('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/>'),
+  arrow: svgIcon('<path d="M9 6l6 6-6 6"/>'),
+  check: svgIcon('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+  phone: svgIcon('<path d="M5 4h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 6.3 6.3l1.4-2.2L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16.5 16.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/>'),
+  mail:  svgIcon('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/>'),
+  copy:  svgIcon('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>'),
+  shield:svgIcon('<path d="M12 3l7 3v5.5c0 4.3-2.9 8.1-7 9.5-4.1-1.4-7-5.2-7-9.5V6z"/><path d="M9 12l2 2 4-4"/>')
+};
+function helpText(p, c, types){
+  const picked = HELP_TYPES.filter(t=>types.includes(t.id)).map(t=>t.label);
+  return [
+    '[지원사업 신청 도움 요청]',
+    `· 사업명: ${p.programName||''}`,
+    `· 주관: ${[p.agency,p.executingAgency].filter(Boolean).join(' / ')||'—'}`,
     `· 신청기간: ${[p.applicationStart,p.applicationEnd].filter(Boolean).join(' ~ ')||'공고 확인'}`,
-    p.originalUrl ? `· 공고: ${p.originalUrl}` : '', '',
-    `· 우리 회사: ${[c.companyType, c.region, c.district, c.industry].filter(Boolean).join(' · ')}`,
-    '· 연락처: ', '· 궁금한 점: '
+    p.originalUrl ? `· 공고: ${p.originalUrl}` : null,
+    `· 필요한 도움: ${picked.length ? picked.join(', ') : '상담 후 결정'}`,
+    `· 우리 회사: ${[c.companyType, c.region, c.district, c.industry].filter(Boolean).join(' · ')||'—'}`,
+    '· 연락처(이름·전화): ',
+    '· 궁금한 점: '
   ].filter(x=>x!==null).join('\n');
-  return `mailto:start@gven.kr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+function helpMailto(p, c, types){
+  const subject = `[지원사업 신청 도움] ${p.programName||''}`.slice(0,120);
+  return `mailto:${HELP_CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(helpText(p, c, types||[]))}`;
 }
 function isLoanProgram(p){
   const t = `${p.programName||''} ${p.subCategory||''} ${p.supportAmountText||''}`;
@@ -775,6 +799,7 @@ const App = (function(){
   let fundedOnly = false;
   let showCheck = false;        // '확인 필요' 사업 펼침(기본은 추천·조건부만)
   let query = '';               // 사업명 검색어(자격과 관계없이 전체 공고에서 찾음)
+  let helpCtx = null;           // 신청 도움받기 창: {id, types:[]}
   let progressiveDone = false;
   let printMode = false;
   let currentView = 'landing';
@@ -896,7 +921,8 @@ const App = (function(){
     company:()=>company, get step(){return step}, get persona(){return persona},
     get matched(){return matched}, get dash(){return dash},
     init, pickPersona, jumpToPersona, next, back, pick, toggleCert, toggleNeed,
-    analyze, render, setFilter, setSort, toggleFunded, toggleCheck, setQuery, toggleWatch, resetFilter, scrollToResults, expandGroup, showMore,
+    analyze, render, setFilter, setSort, toggleFunded, toggleCheck, setQuery, toggleWatch,
+    openHelp, closeHelp, toggleHelpType, copyHelp, resetFilter, scrollToResults, expandGroup, showMore,
     openDetail, closeModal, printReport, openProgressive, applyProgressive, closeProgressive,
     reset, goHome, editInputs,
     saveDraft, clearDraft, resumeDraft, dismissDraft,
@@ -913,7 +939,7 @@ const App = (function(){
     checkAutoUpdate();
     checkDraft();
     try{ LEGACY_KEYS.forEach(k=>localStorage.removeItem(k)); }catch{ /* 저장소 사용 불가 */ }
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); closeProgressive(); } });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeHelp(); closeModal(); closeProgressive(); } });
     window.addEventListener('beforeprint', ()=>{ if(currentView==='results' && matched.length && !printMode){ printMode=true; render(); } });
     window.addEventListener('afterprint', ()=>{ if(printMode){ printMode=false; render(); } });
   }
@@ -1571,7 +1597,10 @@ const App = (function(){
         <button type="button" class="btn btn-primary btn-sm" data-id="${esc(p.sourceProgramId)}" onclick="App.openDetail(this.dataset.id)">자세히 · 자격보기</button>
         ${url?`<a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener noreferrer">공식공고 ↗</a>`:''}
       </div>
-      ${m.state!=='대상 아님'?`<a class="rc-help" href="${esc(helpMailto(p,m,company))}" title="메일 앱이 열리고, 내용을 확인한 뒤 직접 보내요">🙋 이 사업 신청 도움받기 <span>사업계획서·서류 검토</span></a>`:''}
+      ${m.state!=='대상 아님'?`<button type="button" class="rc-help" data-id="${esc(p.sourceProgramId)}" onclick="App.openHelp(this.dataset.id)">
+        <span class="rh-ic" aria-hidden="true">${ICON.chat}</span>
+        <span class="rh-t"><b>신청 도움받기</b><small>사업계획서·서류를 전문가와 함께 준비해요</small></span>
+        <span class="rh-go" aria-hidden="true">${ICON.arrow}</span></button>`:''}
     </article>`;
   }
 
@@ -1605,6 +1634,63 @@ const App = (function(){
   function setFilter(f){ filter = typeof f==='string' && f ? f : 'all'; listLimit=APP_CONFIG.LIST_LIMIT; render(); }
   function setSort(s){ sortBy = ['deadline','fit','amount'].includes(s) ? s : 'fit'; render(); }
   function toggleCheck(){ showCheck=!showCheck; listLimit=APP_CONFIG.LIST_LIMIT; render(); }
+  /* ---- 신청 도움받기 창 ---- */
+  function openHelp(id){
+    const m=matched.find(x=>x.program.sourceProgramId===String(id)); if(!m) return;
+    helpCtx = {id:String(id), types:['plan']};
+    lastFocus = document.activeElement;
+    renderHelp();
+    document.getElementById('helpModal').classList.remove('hidden');
+    const first=document.querySelector('#helpModal .hp-type'); if(first) first.focus();
+  }
+  function renderHelp(){
+    const m=helpCtx && matched.find(x=>x.program.sourceProgramId===helpCtx.id); if(!m) return;
+    const p=m.program, dl=dlBadge(m.dl), t=helpCtx.types;
+    document.getElementById('helpBody').innerHTML=`
+      <div class="hp-prog">
+        <span class="hp-k">신청할 사업</span>
+        <b class="hp-name">${esc(p.programName)}</b>
+        <span class="hp-meta">${esc(p.agency||'')}<span class="rc-dl ${dl.cls}">${dl.icon} ${esc(dl.txt)}</span></span>
+      </div>
+      <div class="hp-step"><span class="hp-num">1</span>어떤 도움이 필요하세요? <small>여러 개 고를 수 있어요</small></div>
+      <div class="hp-types">${HELP_TYPES.map(x=>{ const on=t.includes(x.id); return `
+        <button type="button" class="hp-type ${on?'on':''}" aria-pressed="${on}" onclick="App.toggleHelpType('${x.id}')">
+          <span class="hp-chk" aria-hidden="true">${on?ICON.check:''}</span>
+          <span><b>${esc(x.label)}</b><small>${esc(x.sub)}</small></span></button>`; }).join('')}</div>
+      <div class="hp-step"><span class="hp-num">2</span>편한 방법으로 요청하세요</div>
+      <div class="hp-ch">
+        <a class="hp-c primary" href="tel:${HELP_CONTACT.tel.replace(/-/g,'')}">
+          <span class="hp-ci" aria-hidden="true">${ICON.phone}</span><span><b>전화 상담</b><small>${HELP_CONTACT.tel}</small></span></a>
+        <a class="hp-c" href="${esc(helpMailto(p, company, t))}">
+          <span class="hp-ci" aria-hidden="true">${ICON.mail}</span><span><b>메일로 요청</b><small>내용이 자동으로 채워져요</small></span></a>
+        <button type="button" class="hp-c" onclick="App.copyHelp()">
+          <span class="hp-ci" aria-hidden="true">${ICON.copy}</span><span><b>요청 내용 복사</b><small>카톡·문자에 붙여넣기</small></span></button>
+      </div>
+      <details class="hp-preview"><summary>보낼 내용 미리보기</summary><pre>${esc(helpText(p, company, t))}</pre></details>
+      <p class="hp-trust">${ICON.shield} 그로스벤처스㈜ · 중기부 인증 중소기업상담회사(제2025-684호) · 입력 정보는 서버로 전송되지 않아요</p>`;
+  }
+  function toggleHelpType(id){
+    if(!helpCtx || !HELP_TYPES.some(x=>x.id===id)) return;
+    const t=helpCtx.types; helpCtx.types = t.includes(id) ? t.filter(x=>x!==id) : [...t, id];
+    renderHelp();
+    const btn=[...document.querySelectorAll('#helpModal .hp-type')].find(b=>b.getAttribute('onclick').includes(`'${id}'`)); if(btn) btn.focus();
+  }
+  async function copyHelp(){
+    const m=helpCtx && matched.find(x=>x.program.sourceProgramId===helpCtx.id); if(!m) return;
+    const text=helpText(m.program, company, helpCtx.types);
+    let ok=false;
+    try{ await navigator.clipboard.writeText(text); ok=true; }catch{
+      try{ const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select(); ok=document.execCommand('copy'); ta.remove(); }catch{ ok=false; }
+    }
+    toast(ok ? '요청 내용을 복사했어요. 카톡·문자·메일에 붙여넣어 보내세요.' : '복사가 안 되는 환경이에요. 아래 미리보기 내용을 직접 선택해 복사해 주세요.');
+    if(!ok){ const d=document.querySelector('#helpModal .hp-preview'); if(d) d.open=true; }
+  }
+  function closeHelp(){
+    const el=document.getElementById('helpModal'); if(!el || el.classList.contains('hidden')) return;
+    el.classList.add('hidden'); helpCtx=null;
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
   function watchList(){ const w=readJSON(WATCH_KEY); return Array.isArray(w) ? w.filter(id=>UPCOMING.some(u=>u.id===id)) : []; }
   function toggleWatch(id){
     if(!UPCOMING.some(u=>u.id===id)) return;
@@ -1651,8 +1737,10 @@ const App = (function(){
       ${pref?`<div class="m-sec"><h4>우대사항</h4><div class="prefs">${pref}</div></div>`:''}
       ${m.state!=='대상 아님'?`<div class="m-sec m-prep"><h4>📝 신청 준비 체크리스트 <span class="muted">(일반적으로 필요한 것 — 실제 목록은 공고문 확인)</span></h4>
         <ul class="prep-list">${prepChecklist(p,m,company).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
-        <a class="btn btn-primary btn-sm m-help" href="${esc(helpMailto(p,m,company))}">🙋 이 사업 신청 도움받기 (사업계획서·서류 검토)</a>
-        <p class="muted m-help-note">메일 앱이 열리고 사업명이 미리 채워져요. 내용을 확인한 뒤 직접 보내세요. 전화 070-4103-4177</p></div>`:''}
+        <button type="button" class="rc-help m-help" data-id="${esc(p.sourceProgramId)}" onclick="App.closeModal();App.openHelp(this.dataset.id)">
+          <span class="rh-ic" aria-hidden="true">${ICON.chat}</span>
+          <span class="rh-t"><b>이 사업 신청 도움받기</b><small>사업계획서·자격·서류를 전문가와 함께 준비해요</small></span>
+          <span class="rh-go" aria-hidden="true">${ICON.arrow}</span></button></div>`:''}
     `;
     const link=document.getElementById('modalOpenLink');
     if(url){ link.href=url; link.classList.remove('hidden'); } else { link.removeAttribute('href'); link.classList.add('hidden'); }
