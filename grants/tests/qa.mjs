@@ -18,8 +18,13 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const errors = [];
 // 결과 화면 대기: 실패하면 그때까지의 페이지 오류를 함께 출력(CI에서 원인 파악용)
 // 선택 단계는 건너뛰며 결과 화면까지 '다음'을 누른다
+// 첫 단계의 '지금 가장 필요한 지원'(필수)이 비어 있으면 첫 선택지를 고른다
+async function pickNeed(page) {
+  if (await page.locator('.need-grid .opt').count() && !(await page.locator('.need-grid .opt.sel').count())) await page.locator('.need-grid .opt').first().click();
+}
 async function toResults(page) {
   for (let i = 0; i < 6 && await page.locator('#view-form:not(.hidden)').count(); i++) {
+    await pickNeed(page);
     await page.locator('#nextBtn').click();
     await page.waitForTimeout(50);
   }
@@ -140,6 +145,10 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.selectOption('#f-district', '강남구');
   await page.selectOption('#f-industry', 'AI·빅데이터');
   await page.locator('.opt', { hasText: '30대' }).click();
+  check('필요 지원 미선택 → 다음 비활성(필수)', await page.locator('#nextBtn').isDisabled());
+  check('예비창업자 필요 지원 선택지(사업화 자금 포함·4개)', await page.locator('.need-grid .opt').count() === 4 && await page.locator('.need-grid .opt', { hasText: '사업화 자금' }).count() === 1);
+  await page.locator('.need-grid .opt', { hasText: '사업화 자금' }).click();
+  await page.locator('.need-grid .opt', { hasText: '공간·멘토링' }).click();
   await page.locator('#nextBtn').click();
   check('선택 단계: 대표자 성별 입력(예비창업자는 인증 질문 없음)', await page.locator('.opt', { hasText: '여성' }).count() === 1 && await page.locator('.opt', { hasText: '이노비즈' }).count() === 0);
   await page.locator('.opt', { hasText: '여성' }).click();
@@ -150,6 +159,20 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('결과: 카드마다 판정 상태 배지', await page.locator('#cards .rcard .rc-state').count() === cards);
   const states = await page.locator('#cards .rc-state').allInnerTexts();
   check('예비창업자(30대): 청년창업사관학교 포함·추천 등급 존재', (await page.locator('#cards', { hasText: '청년창업사관학교' }).count()) === 1 && states.includes('추천'), states.join(','));
+  check('필요 지원 저장·지원별 추천 섹션(고른 2개)', await page.evaluate(() => App.company().supportNeeds.join(',')) === 'grant,space' && await page.locator('.need-picks .np-group').count() === 2, await page.evaluate(() => App.company().supportNeeds.join(',')));
+  // 사업명 검색: 자격과 관계없이 찾고, 대상 아님이면 이유 표시
+  await page.fill('#nameSearch', '사관 학교');
+  const sr = await page.evaluate(() => ({ n: document.querySelectorAll('#cards .rcard').length, names: [...document.querySelectorAll('#cards .rcard h3')].map((e) => e.textContent) }));
+  check('사업명 검색(띄어쓰기 무시): 청년창업사관학교 찾음', sr.n >= 1 && sr.names.some((t) => /사관학교/.test(t)), sr.names.join(' | '));
+  const anyNo = await page.evaluate(() => { const m = App.matched.find((x) => x.state === '대상 아님'); return m ? m.program.programName.slice(0, 6) : null; });
+  if (anyNo) {
+    await page.fill('#nameSearch', anyNo);
+    check('검색: 대상 아님 사업도 이유와 함께 표시', await page.locator('#cards .rcard.no .chk', { hasText: '대상 아님' }).count() >= 1);
+  }
+  await page.fill('#nameSearch', '존재하지않는사업명');
+  check('검색 결과 없음 안내(연 1회 공고 안내)', /공고 전일 수 있어요/.test(await page.locator('#cards').innerText()));
+  await page.fill('#nameSearch', '');
+  check('검색 지우면 목록 복원', await page.locator('#cards .rcard').count() > 0 && await page.locator('.need-picks').count() === 1);
   const hook = await page.locator('.hook-banner').innerText();
   check('후킹 문구: DEMO 표기·검토할 만한(신청 가능 단정 아님)', /DEMO 예시 공고/.test(hook) && /검토할 만한/.test(hook) && !/신청할 수 있는/.test(hook), hook.replace(/\s+/g, ' '));
   const notice = await page.locator('.data-notice').innerText();
@@ -211,13 +234,15 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.selectOption('#f-district', '남양주시');
   await page.fill('#f-year', '2024');
   await page.selectOption('#f-industry', 'SW·시스템통합');
+  await page.locator('.need-grid .opt', { hasText: '운영·사업 자금' }).click();
   await page.locator('#nextBtn').click();
   check('규모 단계(선택): 다음 버튼 활성', !(await page.locator('#nextBtn').isDisabled()));
   await page.locator('#nextBtn').click();
   await page.locator('.opt', { hasText: '이노비즈' }).click();
   check('인증 하나 선택 → 나머지 없음(false)', await page.evaluate(() => { const c = App.company(); return c.innobiz === true && c.ventureCertified === false && c.mainbiz === false; }));
   await toResults(page);
-  check('남양주 특례보증: 내 시군구 배지', await page.locator('.rcard', { hasText: '남양주시' }).locator('.rgn-badge.t2').count() === 1);
+  check('남양주 특례보증: 내 시군구 배지', await page.locator('.need-group .rcard', { hasText: '남양주시' }).locator('.rgn-badge.t2').count() === 1);
+  check('운영·사업 자금 선택 → 지원별 추천에 남양주 특례보증', await page.locator('.need-picks .rcard', { hasText: '남양주' }).count() === 1);
   const hero = await page.locator('.dash-hero').innerText();
   check('대시보드: 합계 성격(단순 합계·실제 수령액과 다름) 명시', /단순 합계/.test(hero) && /실제/.test(hero), hero.replace(/\s+/g, ' ').slice(0, 120));
   const ppVisible = await page.locator('#ppBanner .pp-banner').count();
@@ -299,9 +324,9 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('실시간: 안내에 본문 자격요건 미분석 명시', /세부 자격요건/.test(await page.locator('.data-notice').innerText()));
   const st = await page.locator('#cards .rc-state').allInnerTexts();
   check('실시간 목록 공고는 "추천" 확정 없음(조건부 이하)', st.length > 0 && !st.includes('추천'), [...new Set(st)].join(','));
-  check('그룹당 카드 제한 + 더 보기', await page.locator('#cards .rcard').count() === 6 && await page.locator('.more-btn').count() === 1);
-  await page.locator('.more-btn').click();
-  check('더 보기 → 전체 표시', await page.locator('#cards .rcard').count() === 120);
+  check('그룹당 카드 제한 + 더 보기(지원별 추천 3건은 별도)', await page.locator('#cards .need-group .rcard').count() === 6 && await page.locator('.need-group .more-btn').count() === 1 && await page.locator('.need-picks .rcard').count() === 3);
+  await page.locator('.need-group .more-btn').click();
+  check('더 보기 → 전체 표시', await page.locator('#cards .need-group .rcard').count() === 120);
   await page.emulateMedia({ media: 'print' });
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
   const printed = await page.locator('#cards .rcard').count();
@@ -309,7 +334,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.pdf({ path: path.join(OUT, 'report-live.pdf'), format: 'A4', printBackground: true });
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
   await page.emulateMedia({ media: 'screen' });
-  check('인쇄 후 화면 목록 복원', await page.locator('#cards .rcard').count() === 120);
+  check('인쇄 후 화면 목록 복원', await page.locator('#cards .need-group .rcard').count() === 120);
   await page.context().close();
 }
 

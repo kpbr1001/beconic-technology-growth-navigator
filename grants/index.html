@@ -359,6 +359,15 @@ textarea{min-height:88px;resize:vertical}
 .closing-strip .cs-row{min-width:0;display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;cursor:pointer;font:inherit;color:inherit}
 .closing-strip .cs-row:hover{border-color:var(--cond)}
 .closing-strip .cs-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:600}
+.need-picks{grid-column:1/-1;min-width:0;background:#f4f7ff;border:1px solid #d9e2fb;border-radius:14px;padding:14px 16px;margin:0 0 16px}
+.need-picks .np-head{font-weight:800;font-size:15px;color:var(--ink);margin-bottom:8px}
+.need-picks .np-head small,.np-title small,.list-head small{font-weight:500;color:var(--sub);font-size:12px;margin-left:6px}
+.need-picks .np-group{margin-top:10px}
+.need-picks .np-title{font-size:14px;margin:0 0 8px;color:var(--navy)}
+.need-picks .np-empty{font-size:12.5px;color:var(--sub);margin:0;background:#fff;border:1px dashed var(--line);border-radius:10px;padding:10px 12px}
+.list-head{grid-column:1/-1;font-weight:800;font-size:15px;color:var(--ink);margin:6px 0 2px}
+.name-search{flex:1 1 260px;min-width:0;max-width:420px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:13.5px;background:#fff}
+.flag-badge{font-size:11px;font-weight:700;color:#8a5a00;background:#fff3d6;border:1px solid #f3d9a8;border-radius:99px;padding:2px 8px}
 .check-row{grid-column:1/-1;min-width:0;text-align:center;margin:18px 0 6px;padding:14px;border:1px dashed var(--line);border-radius:12px}
 .check-row p{margin:8px 0 0;font-size:12px;color:var(--sub)}
 .dc-title small{font-weight:500;color:var(--sub);font-size:11px;margin-left:4px}
@@ -604,6 +613,7 @@ footer .copy{font-size:11.5px;color:#8695bd}
 
     <!-- 툴바 -->
     <div class="toolbar">
+      <input type="search" id="nameSearch" class="name-search" placeholder="🔍 사업명 검색 (예: 정책자금, 예비창업패키지)" aria-label="사업명 검색" maxlength="40" oninput="App.setQuery(this.value)">
       <div class="seg" id="seg-filter" role="group" aria-label="지원분야 필터"></div>
       <div class="sp"></div>
       <button type="button" id="fundedToggle" class="funded-toggle" aria-pressed="false" onclick="App.toggleFunded()">💰 금액 공개 사업만</button>

@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.16.1',
+  version: 'v3.17.0',
   updated: '2026-10-29',
   changelog: [
+    { v:'v3.17.0', d:'2026-10-29', note:'원하는 사업을 바로 찾기: 첫 질문 "지금 가장 필요한 지원"(대상별 선택지·최대 3개), 고른 지원으로 관련성 판정·대상별 대표 사업 우선·대상과 성격이 다른 공고 내림, 결과 첫 화면에 지원별 추천 3건, 사업명 검색(대상 아님이면 이유 표시)' },
     { v:'v3.16.1', d:'2026-10-29', note:'모바일에서 이번 주 마감 띠의 긴 공고명 때문에 화면이 옆으로 넘치던 문제 수정' },
     { v:'v3.16.0', d:'2026-10-29', note:'대시보드: 분야별 막대(도넛과 중복) 대신 판정 단계 퍼널(전체 공고 → 자격 대상 → 추천·조건부 → 추천), 추가정보 카드에 입력 시 자격을 확정할 수 있는 사업 수와 항목별 건수 표시' },
     { v:'v3.15.0', d:'2026-10-29', note:'결과 화면 정리: 목록은 추천·조건부만 먼저(확인 필요는 \'더 보기\'로 별도 섹션), 기본 정렬 추천순(같은 등급·적합도대는 마감 빠른 순), 이번 주 마감 띠, 대시보드 숫자 일치(도넛 합계 = 가운데 숫자), 마감임박은 추천·조건부만 집계' },
@@ -208,6 +209,54 @@ const SUPPORT_FIELDS = [
 ];
 function needToPurposes(need){ const f=SUPPORT_FIELDS.find(x=>x.v===need); return f?f.p:[need]; }
 
+/* 필요 지원(대상별) — 사용자가 고른 '지금 원하는 지원'으로 공고 관련성을 판정한다.
+   p: 공고 목록의 지원분야, kw: 공고명·개요 키워드(공고명에 있으면 더 강한 근거) */
+const NEEDS = {
+  fund:    {label:'운영·사업 자금', sub:'융자·보증·이자지원', p:['정책자금/금융'], kw:/정책자금|육성자금|융자|대출|특례보증|보증|이차보전|이자\s*지원|경영안정자금/},
+  grant:   {label:'사업화 자금', sub:'창업 보조금·패키지', p:['사업화','창업'], kw:/사업화|패키지|사관학교|창업중심대학|생애최초|창업지원금|시제품/},
+  space:   {label:'공간·멘토링·교육', sub:'입주·보육·액셀러레이팅', p:['시설/공간'], kw:/입주|보육|창업공간|멘토링|액셀러|아카데미|교육생|부트캠프/},
+  invest:  {label:'투자 연계', sub:'TIPS·IR·크라우드펀딩', p:[], kw:/투자|TIPS|팁스|\bIR\b|데모데이|크라우드펀딩|엔젤/},
+  rnd:     {label:'R&D 과제', sub:'기술개발·실증', p:['R&D/기술'], kw:/R&D|기술개발|연구개발|실증|기술사업화/},
+  voucher: {label:'바우처', sub:'혁신·수출·AI·데이터', p:[], kw:/바우처/},
+  cert:    {label:'인증·특허·시험', sub:'지식재산·시험인증', p:[], kw:/인증|특허|지식재산|\bIP\b|시험|표준/},
+  env:     {label:'가게·시설 개선', sub:'환경개선·간판·인테리어', p:[], kw:/(?<!노동)환경개선|시설개선|점포.*개선|리모델링|간판|인테리어|노후\s*(점포|시설|설비)|에너지\s*효율|고효율/},
+  online:  {label:'판로·온라인 판매', sub:'입점·라이브커머스·홍보', p:['판로','마케팅'], kw:/판로|온라인|입점|라이브커머스|쇼핑|배달|홍보|마케팅|박람회|판매/},
+  digital: {label:'디지털·스마트 도입', sub:'스마트상점·키오스크', p:['디지털전환'], kw:/디지털|스마트상점|스마트기술|키오스크|스마트오더|DX/},
+  smart:   {label:'스마트공장·설비', sub:'제조혁신·자동화', p:['제조혁신'], kw:/스마트공장|스마트\s*제조|제조혁신|설비|공정|자동화|스마트공방/},
+  export:  {label:'수출·해외진출', sub:'수출바우처·해외전시', p:['수출'], kw:/수출|해외|글로벌|무역|바이어/},
+  hire:    {label:'인력 채용·고용', sub:'인건비·일자리', p:['인력'], kw:/채용|고용|인력|일자리|인건비|근로자/},
+  relief:  {label:'경영안정·재기', sub:'희망리턴·폐업·공공요금', p:[], kw:/경영안정|재기|재창업|희망리턴|폐업|재도전|카드수수료|전기요금|공공요금|경영개선/},
+};
+const PERSONA_NEEDS = {
+  '예비창업자':['grant','space','invest','cert'],
+  '소상인':['fund','env','online','digital','relief','hire'],
+  '소공인':['fund','smart','online','cert','rnd','relief'],
+  '중소기업':['fund','rnd','smart','export','hire','voucher','invest','cert']
+};
+const MAX_NEEDS = 3;
+/* 공고가 필요 지원에 맞는 정도: 2 공고명에 키워드 · 1 지원분야 일치 · 0.5 개요에만 키워드 · 0 무관
+   (지원별 추천 3건에는 1 이상만 — 개요에 한 번 나온 단어만으로는 고르지 않음) */
+function needMatch(p, need){
+  const n = NEEDS[need]; if(!n) return 0;
+  if(n.kw.test(p.programName||'')) return 2;
+  if((p.supportPurposes||[]).some(x=>n.p.includes(x))) return 1;
+  if(n.kw.test(p.supportDescription||'')) return 0.5;
+  return 0;
+}
+/* 대상별 대표 사업(공고명 기준) — 같은 조건이면 위로 */
+const FLAGSHIP = {
+  '예비창업자':/예비창업패키지|청년창업사관학교|신사업창업사관학교|창업중심대학|생애최초/,
+  '소상인':/소상공인\s*정책자금|소상공인.*(자금|대출|융자)|희망리턴|스마트상점|스마트기술\s*보급|경영환경개선|카드수수료|소상공인.*(디지털|온라인|판로|경영안정|재기)/,
+  '소공인':/소공인|스마트공방|소상공인\s*정책자금|공동기반시설/,
+  '중소기업':/스마트공장|스마트\s*제조혁신|수출바우처|혁신바우처|중소기업\s*정책자금|중소기업\s*육성자금|중소기업육성자금|TIPS|팁스|창업성장기술개발|초기창업패키지|창업도약패키지/
+};
+/* 대상과 성격이 다른 공고(공고명 기준) — 자격에 걸리지 않아도 관련성이 낮아 아래로 */
+const MISFIT = {
+  '예비창업자':/융자|대출|특례보증|이차보전|스마트공장|수출바우처|채용|고용장려|딥테크|출연\(연\)/,
+  '소상인':/국제공동|국제협력|딥테크|연구개발|기술개발|R&D|실증|반도체|바이오|양자|우주|스마트공장|TIPS|팁스|IP투자|핀테크|방송영상|MWC|CES|출연\(연\)|수출|중견/,
+  '소공인':/국제공동|국제협력|딥테크|양자|우주|반도체|핀테크|방송영상|MWC|CES/
+};
+
 const COMPANY_TYPES = [
   {v:'예비창업자', s:'아직 사업자등록 전'},
   {v:'소상인',     s:'소매·음식·서비스업 소규모'},
@@ -274,6 +323,8 @@ function sanitizeCompany(raw){
   c.representativeAge = pick(raw.representativeAge, Object.keys(AGE_BANDS));
   for(const k of ['exportHistory','taxArrears',...CERT_KEYS]) c[k] = typeof raw[k]==='boolean' ? raw[k] : null;
   c.representativeGender = pick(raw.representativeGender, ['여성','남성']);
+  const allowed = PERSONA_NEEDS[c.companyType] || Object.keys(NEEDS);
+  c.supportNeeds = Array.isArray(raw.supportNeeds) ? [...new Set(raw.supportNeeds.filter(x=>allowed.includes(x)))].slice(0, MAX_NEEDS) : [];
   return c;
 }
 
@@ -526,11 +577,12 @@ function fitScore(p, c, regionTier){
   const parts = {}; let num=0, den=0;
   const use=(k,v)=>{ parts[k]=Math.round(v*W[k]*10)/10; num+=v*W[k]; den+=W[k]; };
   let purposeHit = null;
-  const needs = c.supportNeeds||[];
+  const needs = (c.supportNeeds||[]).filter(n=>NEEDS[n]);
   if(needs.length){
-    const needP = new Set(needs.flatMap(needToPurposes));
-    purposeHit = (p.supportPurposes||[]).some(x=>needP.has(x));
-    use('purpose', purposeHit?1:0); use('field', purposeHit?1:0.3);
+    const best = Math.max(...needs.map(n=>needMatch(p,n)));
+    purposeHit = best>0;
+    parts._needMatch = best;
+    use('purpose', best===2?1 : best===1?0.7 : best>0?0.4 : 0); use('field', best===2?1 : best===1?0.8 : best>0?0.6 : 0.3);
   }
   if(c.businessDescription) use('semantic', semanticFit(p,c));
   use('stage', stageFit(p,c));
@@ -553,6 +605,10 @@ function fitScore(p, c, regionTier){
   const bonus = regionTier===2 ? B.district : regionTier===1 ? B.sido : 0;
   if(bonus){ parts.regionBonus = bonus; s += bonus; }
   if(purposeHit===false){ s = Math.min(s, 48); parts._purposeMismatch = true; }
+  const name = p.programName||'';
+  const misfit = MISFIT[c.companyType];
+  if(misfit && misfit.test(name)){ s = Math.min(s, 45); parts._misfit = true; }
+  else if(FLAGSHIP[c.companyType] && FLAGSHIP[c.companyType].test(name) && purposeHit!==false){ s += 8; parts._flagship = true; }
   parts._coverage = Math.round(coverage*100);
   return {score: Math.round(Math.max(0, Math.min(100, s))), parts};
 }
@@ -658,6 +714,7 @@ const App = (function(){
   let sortBy = 'fit';
   let fundedOnly = false;
   let showCheck = false;        // '확인 필요' 사업 펼침(기본은 추천·조건부만)
+  let query = '';               // 사업명 검색어(자격과 관계없이 전체 공고에서 찾음)
   let progressiveDone = false;
   let printMode = false;
   let currentView = 'landing';
@@ -706,16 +763,18 @@ const App = (function(){
       title:'어떤 창업을 준비하세요?',
       desc:'지역과 사업 분야만 고르면 돼요. 창업 전이어도 괜찮습니다.',
       render:()=>`
+        ${needsField()}
         ${regionField()}
         ${industrySelect()}
         <div class="field"><label class="q">대표자 연령대 <span class="opt-tag">청년 지원 판정</span></label>
           <div class="opt-grid c3">${Object.keys(AGE_BANDS).map(a=>optBtn('representativeAge',a,a,'',company.representativeAge===a)).join('')}</div></div>`,
-      valid:()=>!!company.region && !!company.industry
+      valid:()=>!!company.region && !!company.industry && (company.supportNeeds||[]).length>0
     },
     bizBasic: {
       title:'기업 기본정보',
       desc:'자격 판정에 필요한 정보만 받아요. 오래 안 걸려요.',
       render:()=>`
+        ${needsField()}
         <div class="field"><label class="q">사업자 형태<span class="req">*</span></label>
           <div class="opt-grid c2">${[['개인사업자','개인사업자'],['법인사업자','법인사업자']].map(([v,l])=>optBtn('bizRegType',v,l,'',company.bizRegType===v)).join('')}</div>
           <div class="help">아직 사업자등록 전이라면 <button type="button" class="link-btn" onclick="App.pickPersona('founder')">예비창업자로 찾기</button>가 더 정확합니다.</div></div>
@@ -728,7 +787,7 @@ const App = (function(){
           <div class="help">사업자등록증의 개업연월일 기준. 월까지 넣으면 '창업 7년 이내' 같은 업력 조건을 경계 연차에도 정확히 판정합니다.</div></div>
         ${industrySelect()}`,
       valid:()=>{ const v=parseInt(company.establishedYear,10);
-        return !!company.region && v>=1960 && v<=CURRENT_YEAR && !!company.industry && !!company.bizRegType; }
+        return !!company.region && v>=1960 && v<=CURRENT_YEAR && !!company.industry && !!company.bizRegType && (company.supportNeeds||[]).length>0; }
     },
     smeProfile: {
       title:'기업 규모·이력 (선택)',
@@ -775,8 +834,8 @@ const App = (function(){
   return {
     company:()=>company, get step(){return step}, get persona(){return persona},
     get matched(){return matched}, get dash(){return dash},
-    init, pickPersona, jumpToPersona, next, back, pick, toggleCert,
-    analyze, render, setFilter, setSort, toggleFunded, toggleCheck, resetFilter, scrollToResults, expandGroup, showMore,
+    init, pickPersona, jumpToPersona, next, back, pick, toggleCert, toggleNeed,
+    analyze, render, setFilter, setSort, toggleFunded, toggleCheck, setQuery, resetFilter, scrollToResults, expandGroup, showMore,
     openDetail, closeModal, printReport, openProgressive, applyProgressive, closeProgressive,
     reset, goHome, editInputs,
     saveDraft, clearDraft, resumeDraft, dismissDraft,
@@ -903,6 +962,22 @@ const App = (function(){
     bindStepInputs();
   }
   function head(k,t,d){ return `<div class="panel-head"><span class="kicker">${k}</span><h2>${t}</h2><p>${d}</p></div>`; }
+  // 첫 질문: 지금 원하는 지원(대상별 선택지, 최대 3개) — 결과를 이 기준으로 고르고 정렬한다
+  function needsField(){
+    const ids = PERSONA_NEEDS[company.companyType] || Object.keys(NEEDS);
+    const sel = company.supportNeeds||[];
+    return `<div class="field need-field"><label class="q">지금 가장 필요한 지원<span class="req">*</span> <span class="opt-tag">최대 ${MAX_NEEDS}개</span></label>
+      <div class="help">고른 지원에 맞는 사업을 먼저 찾아 드려요.</div>
+      <div class="opt-grid c2 need-grid">${ids.map(id=>{ const n=NEEDS[id], on=sel.includes(id);
+        return `<button type="button" class="opt ${on?'sel':''}" aria-pressed="${on}" ${!on&&sel.length>=MAX_NEEDS?'disabled':''} onclick="App.toggleNeed('${id}')">${n.label}<small>${n.sub}</small></button>`; }).join('')}</div></div>`;
+  }
+  function toggleNeed(id){
+    const ids = PERSONA_NEEDS[company.companyType] || Object.keys(NEEDS);
+    if(!ids.includes(id)) return;
+    const cur = company.supportNeeds||[];
+    company.supportNeeds = cur.includes(id) ? cur.filter(x=>x!==id) : (cur.length<MAX_NEEDS ? [...cur, id] : cur);
+    renderStep();
+  }
   function optBtn(field,val,label,sub,sel){
     return `<button type="button" class="opt ${sel?'sel':''}" aria-pressed="${sel?'true':'false'}" onclick="App.pick('${field}','${val}')">${label}${sub?`<small>${sub}</small>`:''}</button>`;
   }
@@ -992,7 +1067,8 @@ const App = (function(){
     TODAY = startOfToday();
     matched = runMatching(programs, company);
     dash = buildDashboard(matched);
-    filter='all'; sortBy='fit'; fundedOnly=false; showCheck=false; expanded=new Set(); listLimit=APP_CONFIG.LIST_LIMIT;
+    filter='all'; sortBy='fit'; fundedOnly=false; showCheck=false; query=''; expanded=new Set(); listLimit=APP_CONFIG.LIST_LIMIT;
+    const qs=document.getElementById('nameSearch'); if(qs) qs.value='';
     const ss=document.getElementById('sortSel'); if(ss) ss.value='fit';
     syncFundedBtn();
     saveProfile();
@@ -1133,7 +1209,7 @@ const App = (function(){
       <div class="status-legend" aria-label="판정 범례">
         <span class="lg-item"><i class="lg-dot ok"></i><b>추천</b> 판정된 자격 모두 충족·적합도 높음</span>
         <span class="lg-item"><i class="lg-dot cond"></i><b>조건부</b> 미충족 없음 · 일부 조건 공고 확인 또는 적합도 보통</span>
-        <span class="lg-item"><i class="lg-dot check"></i><b>확인 필요</b> 정보 부족으로 판정 미완료 또는 적합도 낮음(목록 아래 '더 보기')</span>
+        <span class="lg-item"><i class="lg-dot check"></i><b>확인 필요</b> 고른 지원과 덜 맞거나 정보 부족(목록 아래 '더 보기')</span>
       </div>`;
   }
 
@@ -1207,6 +1283,7 @@ const App = (function(){
       return;
     }
     if(pn) pn.textContent='';
+    if(query.trim()){ renderSearch(cards); return; }
     const list = visibleList();
     renderResultCount(list.length);
     if(!list.length && hiddenCheckCount()){ cards.innerHTML = checkRow(); return; }
@@ -1220,13 +1297,55 @@ const App = (function(){
       // 펼친 '확인 필요'는 분야 그룹에 섞지 않고 맨 아래 별도 섹션으로(그룹당 카드 제한에 가려지지 않게)
       const prim = primaryOf(list);
       if(!prim.length){ cards.innerHTML = renderGroupedByField(list); return; }
-      cards.innerHTML = closingStrip() + renderGroupedByField(prim) + (showCheck ? checkSection(list.filter(m=>m.state==='확인 필요')) : '') + checkRow();
+      cards.innerHTML = needPicksHTML() + closingStrip() + `<div class="list-head">전체 목록 <small>분야별</small></div>` + renderGroupedByField(prim) + (showCheck ? checkSection(list.filter(m=>m.state==='확인 필요')) : '') + checkRow();
       return;
     }
     const shown = list.slice(0, listLimit);
     cards.innerHTML = shown.map(cardHTML).join('')
       + (list.length>shown.length ? `<div class="more-row"><button type="button" class="more-btn" onclick="App.showMore()">${list.length-shown.length}건 더 보기</button></div>` : '')
       + checkRow();
+  }
+  // 결과 첫 화면: 고른 지원별로 맞는 사업 상위 3건(공고명 일치 → 대표 사업 → 등급 → 내 지역 → 적합도 → 마감)
+  function needPicks(){
+    const needs=(company.supportNeeds||[]).filter(n=>NEEDS[n]);
+    const O={'추천':0,'조건부 추천':1}, dd=m=>m.dl.dday==null?9999:m.dl.dday;
+    const used=new Set(), prim=primaryOf(matched);
+    return needs.map(n=>{
+      const items=prim.filter(m=>!used.has(m) && needMatch(m.program,n)>=1).sort((a,b)=>
+        (needMatch(b.program,n)-needMatch(a.program,n)) || ((b.fitParts._flagship?1:0)-(a.fitParts._flagship?1:0))
+        || (O[a.state]-O[b.state]) || ((b.regionTier??-1)-(a.regionTier??-1)) || (b.fit-a.fit) || (dd(a)-dd(b))).slice(0,3);
+      items.forEach(m=>used.add(m));
+      return {n, items};
+    });
+  }
+  function needPicksHTML(){
+    const picks=needPicks(); if(!picks.length) return '';
+    return `<section class="need-picks" aria-label="선택하신 지원별 추천">
+      <div class="np-head">📌 선택하신 지원별 추천 <small>조건에 맞는 사업 중 지원별 상위 3건</small></div>
+      ${picks.map(({n,items})=>`<div class="np-group">
+        <h3 class="np-title">${esc(NEEDS[n].label)} <small>${esc(NEEDS[n].sub)}</small></h3>
+        ${items.length ? `<div class="need-group-cards">${items.map(cardHTML).join('')}</div>`
+          : `<p class="np-empty">지금 접수 중·예정인 공고 중에는 맞는 사업이 없어요. 대표 사업은 보통 1년에 한 번 공고되니, 위 검색창에서 사업명으로 찾아보세요.</p>`}
+      </div>`).join('')}
+    </section>`;
+  }
+  // 사업명 검색: 자격과 관계없이 전체에서 찾고, 대상이 아니면 이유를 보여준다
+  function renderSearch(cards){
+    const norm=x=>String(x||'').replace(/\s+/g,'').toLowerCase();
+    const q=norm(query);
+    const O={'추천':0,'조건부 추천':1,'확인 필요':2,'대상 아님':3};
+    const list=matched.filter(m=>norm(m.program.programName).includes(q)).sort((a,b)=>(O[a.state]-O[b.state]) || (b.fit-a.fit));
+    const el=document.getElementById('resultCount');
+    if(el) el.innerHTML=`<div class="rc-count-in"><b>'${esc(query.trim())}' 검색</b> <span class="rc-count-n">${list.length}건</span>
+      <button type="button" class="rc-count-reset" onclick="App.setQuery('');document.getElementById('nameSearch').value=''">검색 지우기 ✕</button></div>`;
+    if(!list.length){
+      cards.innerHTML=`<div class="empty"><h3>'${esc(query.trim())}'(이)가 들어간 공고가 지금은 없어요</h3>
+        <p>지금 접수 중·예정인 공고만 모아 둡니다. 이미 마감됐거나 아직 공고 전일 수 있어요. 대표 사업은 보통 1년에 한 번 공고됩니다.</p></div>`;
+      return;
+    }
+    const shown=list.slice(0, listLimit);
+    cards.innerHTML = shown.map(cardHTML).join('')
+      + (list.length>shown.length ? `<div class="more-row"><button type="button" class="more-btn" onclick="App.showMore()">${list.length-shown.length}건 더 보기</button></div>` : '');
   }
   // 추천순일 때 마감이 묻히지 않게: 추천·조건부 중 마감 7일 이내 상위 5건을 목록 맨 위에 요약
   function closingStrip(){
@@ -1250,7 +1369,7 @@ const App = (function(){
     return `<div class="need-group check-group">
         <div class="need-group-head">
           <span class="ng-icon" aria-hidden="true">🔎</span>
-          <h3 class="ng-title">정보가 더 필요한 사업</h3>
+          <h3 class="ng-title">덜 맞거나 정보가 더 필요한 사업</h3>
           <span class="ng-count">${items.length}건</span>
         </div>
         <div class="need-group-cards">${shown.map(cardHTML).join('')}</div>
@@ -1259,8 +1378,8 @@ const App = (function(){
   }
   function checkRow(){
     const n = hiddenCheckCount();
-    if(n) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">정보가 부족해 판정하지 못한 사업 ${n}건 더 보기</button>
-      <p>설립 월·매출 규모·인증 같은 선택 정보를 넣으면 이 중 일부가 추천·조건부로 바뀔 수 있어요.</p></div>`;
+    if(n) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">고른 지원과 덜 맞거나 정보가 부족한 사업 ${n}건 더 보기</button>
+      <p>필요한 지원을 바꾸거나 선택 정보(매출 규모·인증 등)를 넣으면 이 중 일부가 추천·조건부로 바뀔 수 있어요.</p></div>`;
     if(showCheck && primaryOf(matched).length) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">추천·조건부만 보기</button></div>`;
     return '';
   }
@@ -1339,13 +1458,17 @@ const App = (function(){
     const passCount=m.elig.conds.filter(c=>c.result==='pass').length;
     const checkItems=m.elig.conds.filter(c=>c.result==='unknown').map(c=>c.label);
     const amt = p.supportAmountText || fmtKRW(p.supportAmountMax);
-    const eligLine = checkItems.length
+    const fail = m.elig.conds.find(c=>c.result==='fail');
+    const eligLine = m.state==='대상 아님'
+      ? `<span class="chk">대상 아님 · ${esc(m.dl.state==='CLOSED' ? '접수 마감' : fail ? fail.label+(fail.evidence?` — ${fail.evidence}`:'') : '자격 미충족')}</span>`
+      : checkItems.length
       ? `자격 ${passCount}개 충족 · <span class="chk">${esc(checkItems.slice(0,2).join('·'))}${checkItems.length>2?` 외 ${checkItems.length-2}`:''} 확인 필요</span>`
       : `판정된 자격 ${passCount}개 모두 충족`;
     return `<article class="rcard ${ST_CLS[m.state]}" data-id="${esc(p.sourceProgramId)}">
       <div class="rc-line1">
         <span class="rc-state ${ST_CLS[m.state]}">${esc(m.state)}</span>
         ${regionBadge(m)}
+        ${m.fitParts&&m.fitParts._flagship?`<span class="flag-badge" title="이 유형 기업이 많이 찾는 대표 사업">⭐ 대표 사업</span>`:''}
         ${p._aiEnriched?`<span class="ai-badge" title="공고 본문에서 자격조건을 AI로 추출(근거 문구 대조)한 사업">🤖 AI 본문분석</span>`:p.eligibilityDepth==='doc'?`<span class="ai-badge" title="공고문(PDF)의 신청자격 절을 읽어 판정한 사업">📑 공고문분석</span>`:p.eligibilityDepth==='rule'?`<span class="ai-badge" title="공고 본문의 업력·매출·근로자·연령 문구를 읽어 판정한 사업">📄 본문분석</span>`:''}
         <span class="rc-dl ${dl.cls}">${dl.icon} ${esc(dl.txt)}</span>
       </div>
@@ -1397,6 +1520,7 @@ const App = (function(){
   function setFilter(f){ filter = typeof f==='string' && f ? f : 'all'; listLimit=APP_CONFIG.LIST_LIMIT; render(); }
   function setSort(s){ sortBy = ['deadline','fit','amount'].includes(s) ? s : 'fit'; render(); }
   function toggleCheck(){ showCheck=!showCheck; listLimit=APP_CONFIG.LIST_LIMIT; render(); }
+  function setQuery(q){ query = String(q||'').slice(0,40); listLimit=APP_CONFIG.LIST_LIMIT; render(); }
   function toggleFunded(){ fundedOnly=!fundedOnly; listLimit=APP_CONFIG.LIST_LIMIT; syncFundedBtn(); render(); }
   function syncFundedBtn(){ const btn=document.getElementById('fundedToggle'); if(btn){ btn.classList.toggle('on', fundedOnly); btn.setAttribute('aria-pressed', String(fundedOnly)); } }
 
