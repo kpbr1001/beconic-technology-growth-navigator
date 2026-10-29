@@ -475,3 +475,92 @@ test('공고문 시·군 나열: 대상 지역을 알리는 말 뒤 같은 시·
   assert.equal(analyzeDocText('□ 지원기관별 한도\n창원시 1백만원 밀양시 2백만원 양산시 1백만원', { regions: ['경남'] }).districts, undefined, '알림말 없는 표는 무시');
   assert.equal(analyzeDocText('□ 신청지역\n○ 창원, 진주', { regions: ['경남'] }).districts, undefined, '2개 이하는 무시');
 });
+
+// ---------- 카카오 챗봇 허브(오픈빌더 스킬 v2.0) ----------
+import kakaoSkill, { _resetBotCache } from '../netlify/functions/kakao-skill.mjs';
+import { route, searchPrograms, ddayKst } from '../netlify/lib/bot/kakao.mjs';
+import { TOOLS } from '../netlify/lib/bot/tools.mjs';
+
+const BOT_NOW = Date.parse('2026-10-29T03:00:00Z'); // 한국시간 10-29 12:00
+const botPrograms = [
+  { programName: '2026년 소상공인 정책자금 융자사업 공고', agency: '중소벤처기업부', applicationEnd: '2026-11-03', originalUrl: 'https://www.bizinfo.go.kr/a' },
+  { programName: '[서울] 2026년 중소기업 정책 자금 지원', agency: '서울특별시', applicationEnd: null, originalUrl: 'https://www.bizinfo.go.kr/b' },
+  { programName: '2026년 스마트공장 구축 지원', agency: '중소벤처기업부', applicationEnd: '2026-10-29', originalUrl: 'javascript:alert(1)' },
+  { programName: '2026년 수출상담회 참가기업 모집', agency: 'KOTRA', applicationEnd: '2026-12-31', originalUrl: 'https://www.bizinfo.go.kr/c' },
+];
+// 카카오 제한 검사: 출력 3개·바로가기 10개(라벨 14자)·리스트 5개·캐러셀 10장·카드 설명 230자·링크는 https만
+function assertKakao(res) {
+  assert.equal(res.version, '2.0');
+  const { outputs, quickReplies = [] } = res.template;
+  assert.ok(outputs.length >= 1 && outputs.length <= 3);
+  assert.ok(quickReplies.length <= 10 && quickReplies.every((q) => q.label.length <= 14 && q.action === 'message'));
+  for (const o of outputs) {
+    if (o.listCard) { assert.ok(o.listCard.items.length <= 5); o.listCard.items.forEach((i) => { if (i.link) assert.match(i.link.web, /^https:\/\//); }); }
+    if (o.carousel) { assert.ok(o.carousel.items.length <= 10); o.carousel.items.forEach((c) => assert.ok(c.description.length <= 230)); }
+    if (o.basicCard) assert.ok((o.basicCard.description || '').length <= 230);
+  }
+}
+
+test('챗봇: 처음·메뉴는 인사와 메뉴 바로가기, 응답 형식이 카카오 제한 안', () => {
+  const r = route('처음', botPrograms, BOT_NOW);
+  assertKakao(r);
+  assert.match(r.template.outputs[0].simpleText.text, /비코닉/);
+  assert.deepEqual(r.template.quickReplies.map((q) => q.label), ['지원사업 찾기', '사업명 검색', '마감 임박', '경영진단', '상담 연결']);
+  assertKakao(route('', botPrograms, BOT_NOW));
+});
+
+test('챗봇: 사업명 검색은 띄어쓰기 무시·마감 가까운 순·https 링크만', () => {
+  assert.deepEqual(searchPrograms(botPrograms, '정책 자금', BOT_NOW).map((p) => p.agency), ['중소벤처기업부', '서울특별시']);
+  const r = route('정책자금', botPrograms, BOT_NOW);
+  assertKakao(r);
+  const lc = r.template.outputs[0].listCard;
+  assert.match(lc.header.title, /정책자금.*2건/);
+  assert.match(lc.items[0].description, /D-5/);
+  assert.match(lc.items[1].description, /예산 소진/);
+  const s = route('스마트공장', botPrograms, BOT_NOW).template.outputs[0].listCard.items[0];
+  assert.match(s.description, /오늘 마감/);
+  assert.equal(s.link, undefined, 'javascript: 링크는 넣지 않음');
+});
+
+test('챗봇: 공고 없으면 안내+맞춤 매칭, 진단 키워드는 진단툴 카드, 공고명에 있으면 공고 우선', () => {
+  const none = route('존재하지않는사업', botPrograms, BOT_NOW);
+  assertKakao(none);
+  assert.match(none.template.outputs[0].simpleText.text, /지금은 없어요/);
+  const fin = route('재무 진단', botPrograms, BOT_NOW);
+  assert.equal(fin.template.outputs[0].carousel.items[0].title, '기업 재무진단');
+  assert.equal(route('재무', botPrograms, BOT_NOW).template.outputs[0].carousel.items[0].buttons[0].webLinkUrl, 'https://beconic-diagnosis-finance.netlify.app/');
+  assert.ok(route('수출상담회', botPrograms, BOT_NOW).template.outputs[0].listCard, '"상담"이 들어간 공고명은 상담 연결이 아니라 검색');
+  const all = route('경영진단', botPrograms, BOT_NOW);
+  assertKakao(all);
+  assert.equal(all.template.outputs[1].carousel.items.length, TOOLS.length);
+});
+
+test('챗봇: 마감 임박·상담 연결·공고 미준비', () => {
+  const soon = route('마감 임박', botPrograms, BOT_NOW);
+  assertKakao(soon);
+  assert.deepEqual(soon.template.outputs[0].listCard.items.map((i) => i.title.slice(0, 13)), ['2026년 스마트공장 구축', '2026년 소상공인 정책자금 '].map((t) => t.slice(0, 13)));
+  const c = route('상담 연결', botPrograms, BOT_NOW);
+  assertKakao(c);
+  assert.equal(c.template.outputs[0].basicCard.buttons[0].action, 'phone');
+  assert.match(route('정책자금', null, BOT_NOW).template.outputs[0].simpleText.text, /불러오는 중/);
+  assert.equal(ddayKst('2026-10-28', BOT_NOW), -1);
+});
+
+test('챗봇 스킬 함수: POST만·토큰 검사·스냅샷 공고로 응답', async () => {
+  const mem = new Map();
+  _setStore({ get: async (k) => mem.get(k) ?? null, setJSON: async (k, v) => { mem.set(k, v); } });
+  _resetBotCache();
+  mem.set('latest', { mode: 'live', fetchedAt: new Date().toISOString(), programs: [{ programName: '2099년 테스트 정책자금', agency: '기관', applicationEnd: '2099-12-31', originalUrl: 'https://x.kr/1' }] });
+  const call = (body, headers = {}) => kakaoSkill(new Request('https://example.netlify.app/api/kakao/skill', { method: 'POST', headers, body: JSON.stringify(body) }), {});
+  assert.equal((await kakaoSkill(new Request('https://example.netlify.app/api/kakao/skill'), {})).status, 405);
+  process.env.KAKAO_SKILL_TOKEN = 't0ken';
+  assert.equal((await call({ userRequest: { utterance: '처음' } })).status, 401);
+  const ok = await call({ userRequest: { utterance: '정책자금' } }, { 'x-beconic-skill-token': 't0ken' });
+  delete process.env.KAKAO_SKILL_TOKEN;
+  assert.equal(ok.status, 200);
+  const j = await ok.json();
+  assertKakao(j);
+  assert.equal(j.template.outputs[0].listCard.items[0].title, '2099년 테스트 정책자금');
+  assert.equal((await kakaoSkill(new Request('https://example.netlify.app/api/kakao/skill', { method: 'POST', body: '{' }), {})).status, 400);
+  _setStore(null);
+});

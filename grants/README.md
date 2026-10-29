@@ -1,4 +1,4 @@
-# BECONIC 지원사업 MATCH (v3.19.1)
+# BECONIC 지원사업 MATCH (v3.20.0)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-grant-matching.netlify.app
