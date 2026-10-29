@@ -186,7 +186,8 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   // 신청 도움받기: 앱 안의 창 — 사업명·필요 도움 선택·전화/메일/복사
   const helpName = (await page.locator('.need-group .rcard').first().locator('h3').innerText()).replace(/NEW$/, '').trim();
   await page.locator('.need-group .rcard .rc-help').first().click();
-  check('신청 도움받기 창: 사업명·도움 선택지 4개·연결 방법 3개', await page.locator('#helpModal:not(.hidden) .hp-name', { hasText: helpName }).count() === 1 && await page.locator('#helpModal .hp-type').count() === 4 && await page.locator('#helpModal .hp-c').count() === 3);
+  check('신청 도움받기 창: 사업명·도움 선택지 4개·연결 방법 4개(카톡·전화·메일·복사)', await page.locator('#helpModal:not(.hidden) .hp-name', { hasText: helpName }).count() === 1 && await page.locator('#helpModal .hp-type').count() === 4 && await page.locator('#helpModal .hp-c').count() === 4);
+  check('카카오톡 상담: 채널 1:1 채팅 새 창', (await page.locator('#helpModal a.hp-c.kakao').getAttribute('href')) === 'https://pf.kakao.com/_WjMxeG/chat' && (await page.locator('#helpModal a.hp-c.kakao').getAttribute('target')) === '_blank');
   await page.locator('#helpModal .hp-type', { hasText: '제출 서류 준비' }).click();
   const mail = decodeURIComponent(await page.locator('#helpModal a.hp-c[href^="mailto:"]').getAttribute('href'));
   check('도움 선택 → 메일 내용에 사업명·고른 도움 반영', mail.startsWith('mailto:start@gven.kr?subject=') && mail.includes(helpName) && /사업계획서 작성·검토, 제출 서류 준비/.test(mail), mail.slice(0, 90));
