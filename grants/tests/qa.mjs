@@ -327,6 +327,9 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.selectOption('#f-industry', '제조업');
   await toResults(page);
   check('모바일 결과: 가로 넘침 없음(필터 줄바꿈)', (await overflow()) <= 0, `${await overflow()}px`);
+  // 이번 주 마감 띠: 긴 공고명도 줄임표로 처리(v3.15 띠가 모바일에서 가로로 넘친 회귀)
+  await page.evaluate(() => { const m = App.matched.find((x) => x.state === '추천' || x.state === '조건부 추천'); m.dl = { state: 'CLOSING_SOON', dday: 2 }; m.program.programName = '아주 긴 지원사업 공고명 '.repeat(12); App.render(); });
+  check('모바일 결과: 이번 주 마감 띠 긴 공고명도 가로 넘침 없음', await page.locator('.closing-strip').count() === 1 && (await overflow()) <= 0, `${await overflow()}px`);
   await page.screenshot({ path: path.join(OUT, 'mobile-results.png'), fullPage: false });
   await page.context().close();
 }
