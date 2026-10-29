@@ -40,7 +40,9 @@ function programList(title, list, now, moreLabel) {
   };
 }
 function toolCard(t) {
-  return { title: cut(t.name, 40), description: cut(t.desc, 230), buttons: [web('진단 시작', t.url), { label: '상담 연결', action: 'message', messageText: '상담 연결' }] };
+  const consult = { label: '상담 연결', action: 'message', messageText: '상담 연결' };
+  if (!t.url) return { title: cut(t.name, 40), description: cut(`${t.desc}\n지금은 컨설턴트 상담으로 진행해 드려요.`, 230), buttons: [consult, { label: '전화 상담', action: 'phone', phoneNumber: CONTACT.tel }] };
+  return { title: cut(t.name, 40), description: cut(t.desc, 230), buttons: [web('진단 시작', t.url), consult] };
 }
 
 /** 사업명 검색: 띄어쓰기 무시, 마감 가까운 순(마감일 없는 공고는 뒤) */

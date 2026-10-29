@@ -528,7 +528,11 @@ test('챗봇: 공고 없으면 안내+맞춤 매칭, 진단 키워드는 진단�
   assert.match(none.template.outputs[0].simpleText.text, /지금은 없어요/);
   const fin = route('재무 진단', botPrograms, BOT_NOW);
   assert.equal(fin.template.outputs[0].carousel.items[0].title, '기업 재무진단');
-  assert.equal(route('재무', botPrograms, BOT_NOW).template.outputs[0].carousel.items[0].buttons[0].webLinkUrl, 'https://beconic-diagnosis-finance.netlify.app/');
+  const finBtns = route('재무', botPrograms, BOT_NOW).template.outputs[0].carousel.items[0].buttons;
+  assert.deepEqual(finBtns.map((b) => b.action), ['message', 'phone'], '진단툴은 링크 없이 상담 연결만(AI 연동 보호 전)');
+  for (const q of ['처음', '경영진단', '재무', '인사 진단', '기술', '성장전략', '정책자금', '상담 연결', '없는말']) {
+    assert.ok(!/beconic-diagnosis/.test(JSON.stringify(route(q, botPrograms, BOT_NOW))), `진단툴 주소 노출 금지: ${q}`);
+  }
   assert.ok(route('수출상담회', botPrograms, BOT_NOW).template.outputs[0].listCard, '"상담"이 들어간 공고명은 상담 연결이 아니라 검색');
   const all = route('경영진단', botPrograms, BOT_NOW);
   assertKakao(all);
