@@ -159,7 +159,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('결과: 카드마다 판정 상태 배지', await page.locator('#cards .rcard .rc-state').count() === cards);
   const states = await page.locator('#cards .rc-state').allInnerTexts();
   check('예비창업자(30대): 청년창업사관학교 포함·추천 등급 존재', (await page.locator('#cards', { hasText: '청년창업사관학교' }).count()) === 1 && states.includes('추천'), states.join(','));
-  check('필요 지원 저장·지원별 추천 섹션(고른 2개)', await page.evaluate(() => App.company().supportNeeds.join(',')) === 'grant,space' && await page.locator('.need-picks .np-group').count() === 2, await page.evaluate(() => App.company().supportNeeds.join(',')));
+  check('필요 지원 저장·지원별 추천 섹션(고른 2개)', await page.evaluate(() => App.company().supportNeeds.join(',')) === 'grant,space' && await page.locator('.need-picks .np-group:not(.upcoming)').count() === 2, await page.evaluate(() => App.company().supportNeeds.join(',')));
   // 사업명 검색: 자격과 관계없이 찾고, 대상 아님이면 이유 표시
   await page.fill('#nameSearch', '사관 학교');
   const sr = await page.evaluate(() => ({ n: document.querySelectorAll('#cards .rcard').length, names: [...document.querySelectorAll('#cards .rcard h3')].map((e) => e.textContent) }));
@@ -173,6 +173,23 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('검색 결과 없음 안내(연 1회 공고 안내)', /공고 전일 수 있어요/.test(await page.locator('#cards').innerText()));
   await page.fill('#nameSearch', '');
   check('검색 지우면 목록 복원', await page.locator('#cards .rcard').count() > 0 && await page.locator('.need-picks').count() === 1);
+  // 2단계: 다음 공고 예정(지금 신청 가능한 공고가 없는 대표 사업) · 알림 등록 · 기다리던 공고 알림
+  const ups = await page.evaluate(() => [...document.querySelectorAll('.up-card .up-name')].map((e) => e.textContent));
+  const upOk = await page.evaluate(() => [...document.querySelectorAll('.up-card .up-name')].every((e) => !App.matched.some((m) => m.state !== '대상 아님' && m.program.programName.includes(e.textContent))));
+  check('다음 공고 예정 카드: 지금 신청 가능한 공고가 없는 대표 사업만', ups.length > 0 && upOk, ups.join(', '));
+  await page.locator('.up-card .btn').first().click();
+  check('공고 나오면 알림: 이 브라우저에 등록·버튼 상태', (await page.evaluate(() => JSON.parse(localStorage.getItem('beconic_watch_v1') || '[]').length)) === 1 && await page.locator('.up-card .btn[aria-pressed="true"]').count() === 1);
+  await page.evaluate(() => { localStorage.setItem('beconic_watch_v1', JSON.stringify(['chungsa'])); App.render(); });
+  check('기다리던 대표 사업 공고가 있으면 맨 위 알림', await page.locator('.watch-hit', { hasText: '청년창업사관학교' }).count() === 1);
+  await page.evaluate(() => { localStorage.removeItem('beconic_watch_v1'); App.render(); });
+  // 카드별 신청 도움받기(메일 앱 · 사업명 자동 입력) · 신청 준비 체크리스트
+  const help = await page.locator('.need-group .rcard .rc-help').first().getAttribute('href');
+  const helpName = await page.locator('.need-group .rcard').first().locator('h3').innerText();
+  check('카드: 신청 도움받기 메일(사업명 자동 입력)', /^mailto:start@gven\.kr\?subject=/.test(help) && decodeURIComponent(help).includes(helpName.replace(/NEW$/, '').trim()), decodeURIComponent(help).slice(0, 80));
+  await page.locator('.need-group .rcard .btn-primary').first().click();
+  const prep = await page.locator('#detailModal .prep-list li').allInnerTexts();
+  check('상세: 신청 준비 체크리스트·도움받기 버튼', prep.length >= 2 && prep.some((t) => /납세증명/.test(t)) && await page.locator('#detailModal .m-help').count() === 1, prep.join(' / '));
+  await page.keyboard.press('Escape');
   const hook = await page.locator('.hook-banner').innerText();
   check('후킹 문구: DEMO 표기·검토할 만한(신청 가능 단정 아님)', /DEMO 예시 공고/.test(hook) && /검토할 만한/.test(hook) && !/신청할 수 있는/.test(hook), hook.replace(/\s+/g, ' '));
   const notice = await page.locator('.data-notice').innerText();

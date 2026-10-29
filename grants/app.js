@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.17.0',
+  version: 'v3.18.0',
   updated: '2026-10-29',
   changelog: [
+    { v:'v3.18.0', d:'2026-10-29', note:'찾은 다음 지원까지: 지금 모집이 없는 대표 사업은 \'다음 공고 예정\'(예년 공고 시기)과 공고 알림 등록(이 브라우저), 기다리던 공고가 올라오면 맨 위 알림, 카드별 \'신청 도움받기\'(사업명 자동 입력 메일), 상세에 신청 준비 체크리스트' },
     { v:'v3.17.0', d:'2026-10-29', note:'원하는 사업을 바로 찾기: 첫 질문 "지금 가장 필요한 지원"(대상별 선택지·최대 3개), 고른 지원으로 관련성 판정·대상별 대표 사업 우선·대상과 성격이 다른 공고 내림, 결과 첫 화면에 지원별 추천 3건, 사업명 검색(대상 아님이면 이유 표시)' },
     { v:'v3.16.1', d:'2026-10-29', note:'모바일에서 이번 주 마감 띠의 긴 공고명 때문에 화면이 옆으로 넘치던 문제 수정' },
     { v:'v3.16.0', d:'2026-10-29', note:'대시보드: 분야별 막대(도넛과 중복) 대신 판정 단계 퍼널(전체 공고 → 자격 대상 → 추천·조건부 → 추천), 추가정보 카드에 입력 시 자격을 확정할 수 있는 사업 수와 항목별 건수 표시' },
@@ -250,6 +251,8 @@ const FLAGSHIP = {
   '소공인':/소공인|스마트공방|소상공인\s*정책자금|공동기반시설/,
   '중소기업':/스마트공장|스마트\s*제조혁신|수출바우처|혁신바우처|중소기업\s*정책자금|중소기업\s*육성자금|중소기업육성자금|TIPS|팁스|창업성장기술개발|초기창업패키지|창업도약패키지/
 };
+/* 대표 사업 이름이 들어간 부대 행사(설명회·아카데미·특강 등) — 본 공고로 보지 않음 */
+const SIDE_EVENT = /설명회|아카데미|교육생|특강|캠프|IR\s*전략|워크숍/;
 /* 대상과 성격이 다른 공고(공고명 기준) — 자격에 걸리지 않아도 관련성이 낮아 아래로 */
 const MISFIT = {
   '예비창업자':/융자|대출|특례보증|이차보전|스마트공장|수출바우처|채용|고용장려|딥테크|출연\(연\)/,
@@ -416,6 +419,63 @@ function businessAgeCond(p, c, add){
     : `요건 ${req} · 귀사 업력 약 ${a}년`);
 }
 
+/* 대표 사업 공고 달력(예년 기준·변동 가능) — 지금 접수 중 공고가 없으면 '다음 공고 예정'으로 보여준다 */
+const UPCOMING = [
+  {id:'yebi',   name:'예비창업패키지',          org:'중소벤처기업부·창업진흥원',   when:'2~3월', who:['예비창업자'], needs:['grant'], re:/예비창업패키지/},
+  {id:'chungsa',name:'청년창업사관학교',        org:'중소벤처기업부·중소벤처기업진흥공단', when:'1~2월', who:['예비창업자','중소기업'], needs:['grant','space'], re:/청년창업사관학교/},
+  {id:'sinsa',  name:'신사업창업사관학교',      org:'소상공인시장진흥공단',        when:'1~2월', who:['예비창업자'], needs:['grant','space'], re:/신사업창업사관학교/},
+  {id:'univ',   name:'창업중심대학',            org:'중소벤처기업부·창업진흥원',   when:'3월 전후', who:['예비창업자','중소기업'], needs:['grant'], re:/창업중심대학/},
+  {id:'chogi',  name:'초기창업패키지',          org:'중소벤처기업부·창업진흥원',   when:'2~3월', who:['중소기업'], needs:['grant','invest'], re:/초기창업패키지/},
+  {id:'doyak',  name:'창업도약패키지',          org:'중소벤처기업부·창업진흥원',   when:'2~3월', who:['중소기업'], needs:['grant','invest'], re:/창업도약패키지/},
+  {id:'didim',  name:'창업성장기술개발(디딤돌)', org:'중소벤처기업부',             when:'연초 공고, 연중 차수별', who:['중소기업','소공인'], needs:['rnd'], re:/창업성장기술개발|디딤돌\s*(창업|R&D|과제)/},
+  {id:'expv',   name:'수출바우처',              org:'중소벤처기업부·산업통상부',   when:'1~2월(추가 모집 수시)', who:['중소기업','소공인'], needs:['export','voucher'], re:/수출\s*바우처/},
+  {id:'innov',  name:'중소기업 혁신바우처',     org:'중소벤처기업부',             when:'2~3월', who:['중소기업','소공인'], needs:['voucher','smart'], re:/혁신\s*바우처/},
+  {id:'aiv',    name:'AI 바우처',               org:'과학기술정보통신부',         when:'2~3월', who:['중소기업'], needs:['voucher','rnd'], re:/AI\s*바우처/},
+  {id:'datav',  name:'데이터바우처',            org:'과학기술정보통신부',         when:'2~3월', who:['중소기업'], needs:['voucher'], re:/데이터\s*바우처/},
+  {id:'sshop',  name:'스마트상점 기술보급',     org:'소상공인시장진흥공단',        when:'3~4월', who:['소상인'], needs:['digital'], re:/스마트상점|스마트기술\s*보급/},
+  {id:'envimp', name:'소상공인 경영환경개선',   org:'지자체·소상공인시장진흥공단', when:'상반기(지역별)', who:['소상인','소공인'], needs:['env'], re:/경영환경개선/},
+  {id:'hope',   name:'희망리턴패키지',          org:'소상공인시장진흥공단',        when:'연초 공고 후 연중 수시', who:['소상인','소공인'], needs:['relief'], re:/희망리턴/},
+  {id:'sfac',   name:'스마트공장 구축 지원',    org:'중소벤처기업부',             when:'연초 통합공고·수시', who:['중소기업','소공인'], needs:['smart'], re:/스마트공장|스마트\s*제조혁신/}
+];
+/* 고른 지원·유형에 맞는 대표 사업 중 지금 신청 가능한 공고가 없는 것 */
+function upcomingFor(c, list){
+  const needs = c.supportNeeds||[];
+  return UPCOMING.filter(u=> u.who.includes(c.companyType) && u.needs.some(n=>needs.includes(n))
+    && !list.some(m=> m.state!=='대상 아님' && isMainCall(u, m.program.programName)));
+}
+/* 대표 사업 본 공고인지(같은 이름이 들어간 설명회·아카데미·특강 등 부대 행사는 제외) */
+function isMainCall(u, name){ return u.re.test(name||'') && !SIDE_EVENT.test(name||''); }
+/* 신청 준비 체크리스트 — 공고 성격·판정 조건에서 일반적으로 필요한 것(공고별 실제 목록은 공고문 확인) */
+function prepChecklist(p, m, c){
+  const txt = `${p.programName||''} ${p.supportDescription||''}`;
+  const labels = new Set((m.elig.conds||[]).filter(x=>x.result!=='na').map(x=>x.label));
+  const out = [];
+  if(m.dl.state==='CLOSING_SOON') out.push(`마감이 가까워요(${m.dl.dday===0?'오늘':`D-${m.dl.dday}`}) — 서류부터 바로 준비`);
+  else if(m.dl.dday==null && m.dl.state==='OPEN') out.push('예산 소진 시 마감 — 늦을수록 불리해요');
+  if(/사업계획서|발표\s*평가|서면\s*평가|심사|평가위원/.test(txt) || /창업|사업화|R&D|기술개발|바우처/.test(p.programName||'')) out.push('사업계획서(신청서) 작성 — 서면·발표 평가가 있는 경우가 많아요');
+  if(isLoanProgram(p)) out.push('융자·보증 심사 서류 — 재무제표·부가세 과세표준증명, 신용·담보 확인');
+  out.push(c.companyType==='예비창업자' ? '신분증·본인 확인(사업자등록 전)' : '사업자등록증명원');
+  out.push('국세·지방세 납세증명서(체납 없음 확인)');
+  if(labels.has('매출 조건')) out.push('매출 증빙 — 부가세 과세표준증명 또는 재무제표');
+  if(labels.has('상시근로자 조건')) out.push('상시근로자 증빙 — 4대보험 가입자 명부');
+  if(labels.has('여성기업 확인')) out.push('여성기업 확인서');
+  for(const [k,l] of [['벤처확인','벤처기업 확인서'],['이노비즈 확인','이노비즈 확인서'],['메인비즈 확인','메인비즈 확인서']]) if(labels.has(k)) out.push(l);
+  if(labels.has('수출 실적')) out.push('수출 실적 증명(수출실적증명서 등)');
+  return out;
+}
+/* 신청 도움 요청 메일(사용자의 메일 앱에서 직접 보냄 — 서버 전송 없음) */
+function helpMailto(p, m, c){
+  const subject = `[지원사업 신청 도움] ${p.programName||''}`.slice(0,120);
+  const body = [
+    '아래 지원사업 신청 관련해 도움을 받고 싶습니다.', '',
+    `· 사업명: ${p.programName||''}`, `· 주관: ${[p.agency,p.executingAgency].filter(Boolean).join(' / ')}`,
+    `· 신청기간: ${[p.applicationStart,p.applicationEnd].filter(Boolean).join(' ~ ')||'공고 확인'}`,
+    p.originalUrl ? `· 공고: ${p.originalUrl}` : '', '',
+    `· 우리 회사: ${[c.companyType, c.region, c.district, c.industry].filter(Boolean).join(' · ')}`,
+    '· 연락처: ', '· 궁금한 점: '
+  ].filter(x=>x!==null).join('\n');
+  return `mailto:start@gven.kr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 function isLoanProgram(p){
   const t = `${p.programName||''} ${p.subCategory||''} ${p.supportAmountText||''}`;
   return /융자|보증|대출|이차보전/.test(t) || p.category==='금융';
@@ -608,7 +668,7 @@ function fitScore(p, c, regionTier){
   const name = p.programName||'';
   const misfit = MISFIT[c.companyType];
   if(misfit && misfit.test(name)){ s = Math.min(s, 45); parts._misfit = true; }
-  else if(FLAGSHIP[c.companyType] && FLAGSHIP[c.companyType].test(name) && purposeHit!==false){ s += 8; parts._flagship = true; }
+  else if(FLAGSHIP[c.companyType] && FLAGSHIP[c.companyType].test(name) && !SIDE_EVENT.test(name) && purposeHit!==false){ s += 8; parts._flagship = true; }
   parts._coverage = Math.round(coverage*100);
   return {score: Math.round(Math.max(0, Math.min(100, s))), parts};
 }
@@ -724,6 +784,7 @@ const App = (function(){
   const DRAFT_KEY   = 'beconic_match_draft_v2';
   const PROFILE_KEY = 'beconic_match_profile_v2';   // 무가입 재매칭용
   const LASTSEEN_KEY = 'beconic_lastseen_v2';
+  const WATCH_KEY = 'beconic_watch_v1';             // '공고 나오면 알림' 등록한 대표 사업(이 브라우저에만)
   const LEGACY_KEYS = ['beconic_clients_v2'];        // v3.4까지 컨설턴트 고객사 목록(기능 삭제)
   let toastTimer = null;
   let lastFocus = null;          // 모달 닫을 때 포커스 복귀
@@ -835,7 +896,7 @@ const App = (function(){
     company:()=>company, get step(){return step}, get persona(){return persona},
     get matched(){return matched}, get dash(){return dash},
     init, pickPersona, jumpToPersona, next, back, pick, toggleCert, toggleNeed,
-    analyze, render, setFilter, setSort, toggleFunded, toggleCheck, setQuery, resetFilter, scrollToResults, expandGroup, showMore,
+    analyze, render, setFilter, setSort, toggleFunded, toggleCheck, setQuery, toggleWatch, resetFilter, scrollToResults, expandGroup, showMore,
     openDetail, closeModal, printReport, openProgressive, applyProgressive, closeProgressive,
     reset, goHome, editInputs,
     saveDraft, clearDraft, resumeDraft, dismissDraft,
@@ -1318,15 +1379,38 @@ const App = (function(){
       return {n, items};
     });
   }
+  // 알림 등록한 대표 사업 중 지금 신청 가능한 공고가 생긴 것
+  function watchHitsHTML(){
+    const hits=UPCOMING.filter(u=>watchList().includes(u.id) && matched.some(m=>m.state!=='대상 아님' && isMainCall(u, m.program.programName)));
+    if(!hits.length) return '';
+    return `<section class="watch-hit" aria-label="기다리던 공고">${hits.map(u=>`
+      <div class="wh-row">🔔 <b>기다리시던 '${esc(u.name)}' 공고가 올라왔어요</b>
+        <button type="button" class="btn btn-primary btn-sm" data-q="${esc(u.name)}" onclick="document.getElementById('nameSearch').value=this.dataset.q;App.setQuery(this.dataset.q)">공고 보기</button></div>`).join('')}</section>`;
+  }
+  function upcomingHTML(){
+    const ups=upcomingFor(company, matched); if(!ups.length) return '';
+    const w=watchList();
+    return `<div class="np-group upcoming">
+      <h3 class="np-title">📅 지금은 모집이 없는 대표 사업 <small>예년 공고 시기 기준 · 실제 일정은 달라질 수 있어요</small></h3>
+      <div class="up-list">${ups.map(u=>{ const on=w.includes(u.id); return `
+        <div class="up-card">
+          <div class="up-name">${esc(u.name)}</div>
+          <div class="up-meta">${esc(u.org)} · 예년 <b>${esc(u.when)}</b> 공고</div>
+          <button type="button" class="btn btn-sm ${on?'btn-primary':'btn-ghost'}" aria-pressed="${on}" onclick="App.toggleWatch('${u.id}')">${on?'🔔 알림 등록됨':'🔔 공고 나오면 알림'}</button>
+        </div>`; }).join('')}</div>
+      <p class="up-note">알림은 이 브라우저에 저장돼요. 다시 방문해 '다시 매칭하기'를 누르면 공고가 올라온 경우 맨 위에 알려드려요.</p>
+    </div>`;
+  }
   function needPicksHTML(){
     const picks=needPicks(); if(!picks.length) return '';
-    return `<section class="need-picks" aria-label="선택하신 지원별 추천">
+    return watchHitsHTML() + `<section class="need-picks" aria-label="선택하신 지원별 추천">
       <div class="np-head">📌 선택하신 지원별 추천 <small>조건에 맞는 사업 중 지원별 상위 3건</small></div>
       ${picks.map(({n,items})=>`<div class="np-group">
         <h3 class="np-title">${esc(NEEDS[n].label)} <small>${esc(NEEDS[n].sub)}</small></h3>
         ${items.length ? `<div class="need-group-cards">${items.map(cardHTML).join('')}</div>`
-          : `<p class="np-empty">지금 접수 중·예정인 공고 중에는 맞는 사업이 없어요. 대표 사업은 보통 1년에 한 번 공고되니, 위 검색창에서 사업명으로 찾아보세요.</p>`}
+          : `<p class="np-empty">지금 접수 중·예정인 공고 중에는 맞는 사업이 없어요. 대표 사업은 보통 1년에 한 번 공고되니, 아래 '모집이 없는 대표 사업'이나 검색창을 확인해 보세요.</p>`}
       </div>`).join('')}
+      ${upcomingHTML()}
     </section>`;
   }
   // 사업명 검색: 자격과 관계없이 전체에서 찾고, 대상이 아니면 이유를 보여준다
@@ -1487,6 +1571,7 @@ const App = (function(){
         <button type="button" class="btn btn-primary btn-sm" data-id="${esc(p.sourceProgramId)}" onclick="App.openDetail(this.dataset.id)">자세히 · 자격보기</button>
         ${url?`<a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener noreferrer">공식공고 ↗</a>`:''}
       </div>
+      ${m.state!=='대상 아님'?`<a class="rc-help" href="${esc(helpMailto(p,m,company))}" title="메일 앱이 열리고, 내용을 확인한 뒤 직접 보내요">🙋 이 사업 신청 도움받기 <span>사업계획서·서류 검토</span></a>`:''}
     </article>`;
   }
 
@@ -1520,6 +1605,14 @@ const App = (function(){
   function setFilter(f){ filter = typeof f==='string' && f ? f : 'all'; listLimit=APP_CONFIG.LIST_LIMIT; render(); }
   function setSort(s){ sortBy = ['deadline','fit','amount'].includes(s) ? s : 'fit'; render(); }
   function toggleCheck(){ showCheck=!showCheck; listLimit=APP_CONFIG.LIST_LIMIT; render(); }
+  function watchList(){ const w=readJSON(WATCH_KEY); return Array.isArray(w) ? w.filter(id=>UPCOMING.some(u=>u.id===id)) : []; }
+  function toggleWatch(id){
+    if(!UPCOMING.some(u=>u.id===id)) return;
+    const w=watchList(), on=w.includes(id), next=on ? w.filter(x=>x!==id) : [...w, id];
+    try{ localStorage.setItem(WATCH_KEY, JSON.stringify(next)); }catch{ toast('이 브라우저에서는 알림 등록을 저장할 수 없어요.'); return; }
+    toast(on ? '알림 등록을 해제했어요.' : '등록했어요. 다시 방문해 매칭하면 공고가 올라왔을 때 맨 위에 알려드려요.');
+    render();
+  }
   function setQuery(q){ query = String(q||'').slice(0,40); listLimit=APP_CONFIG.LIST_LIMIT; render(); }
   function toggleFunded(){ fundedOnly=!fundedOnly; listLimit=APP_CONFIG.LIST_LIMIT; syncFundedBtn(); render(); }
   function syncFundedBtn(){ const btn=document.getElementById('fundedToggle'); if(btn){ btn.classList.toggle('on', fundedOnly); btn.setAttribute('aria-pressed', String(fundedOnly)); } }
@@ -1556,6 +1649,10 @@ const App = (function(){
       ${m.fitParts._certHit?`<div class="m-sec"><h4>보유 인증 관련</h4><p>공고에 귀사 보유 인증(${esc(m.fitParts._certHit.join('·'))})이 언급됩니다. 적합도에 반영했습니다.</p></div>`:''}
       ${ev?`<div class="m-sec"><h4>판정에 쓴 공고 문구</h4><ul class="ev-list">${ev}</ul></div>`:''}
       ${pref?`<div class="m-sec"><h4>우대사항</h4><div class="prefs">${pref}</div></div>`:''}
+      ${m.state!=='대상 아님'?`<div class="m-sec m-prep"><h4>📝 신청 준비 체크리스트 <span class="muted">(일반적으로 필요한 것 — 실제 목록은 공고문 확인)</span></h4>
+        <ul class="prep-list">${prepChecklist(p,m,company).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+        <a class="btn btn-primary btn-sm m-help" href="${esc(helpMailto(p,m,company))}">🙋 이 사업 신청 도움받기 (사업계획서·서류 검토)</a>
+        <p class="muted m-help-note">메일 앱이 열리고 사업명이 미리 채워져요. 내용을 확인한 뒤 직접 보내세요. 전화 070-4103-4177</p></div>`:''}
     `;
     const link=document.getElementById('modalOpenLink');
     if(url){ link.href=url; link.classList.remove('hidden'); } else { link.removeAttribute('href'); link.classList.add('hidden'); }
@@ -1688,7 +1785,7 @@ const App = (function(){
   }
   function dismissUpdate(){ const b=document.getElementById('updateBanner'); if(b) b.remove(); }
   function forgetProfile(){
-    try{ [PROFILE_KEY, LASTSEEN_KEY, DRAFT_KEY].forEach(k=>localStorage.removeItem(k)); }catch{ /* 저장소 사용 불가 */ }
+    try{ [PROFILE_KEY, LASTSEEN_KEY, DRAFT_KEY, WATCH_KEY].forEach(k=>localStorage.removeItem(k)); }catch{ /* 저장소 사용 불가 */ }
     dismissUpdate(); const d=document.getElementById('draftBanner'); if(d) d.remove();
     toast('이 브라우저에 저장된 조건을 삭제했습니다.');
   }
