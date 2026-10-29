@@ -138,8 +138,8 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   await page.waitForSelector('#v-result.on');
   const r = await page.locator('#resultRoot').innerText();
   check('결과: 핵심 문제 한 문장·단계 기대수준·응답 근거 섹션', r.includes('핵심 문제') && r.includes('기대') && r.includes('영역별 응답 근거와 다음 단계'));
-  check('결과: 공공 지원·연계 진단 + 응답 점검 섹션', r.includes('공공 지원·연계 진단') && r.includes('응답 점검 결과'));
-  check('결과: 조직 고민 → HR(24) 연계 진단 추천', r.includes('HR 진단'));
+  check('결과: 공공 지원 + 응답 점검 섹션', r.includes('공공 지원과 함께 쓰기') && r.includes('응답 점검 결과'));
+  check('결과: 외부 BECONIC 진단 연계 없음(다른 진단 링크·추천 미노출)', !r.includes('BECONIC 진단') && !r.includes('HR 진단') && !/beconic-diagnosis-(?!business-growth)/.test(await page.content()));
   check("결과: '모름' 문항 목록 표시", /'모름' 문항: .*[A-Z]\d/.test(r));
   // 임시 저장 → 새로고침 후 이어하기
   await page.goto(BASE);
