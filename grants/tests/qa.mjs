@@ -183,12 +183,24 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('기다리던 대표 사업 공고가 있으면 맨 위 알림', await page.locator('.watch-hit', { hasText: '청년창업사관학교' }).count() === 1);
   await page.evaluate(() => { localStorage.removeItem('beconic_watch_v1'); App.render(); });
   // 카드별 신청 도움받기(메일 앱 · 사업명 자동 입력) · 신청 준비 체크리스트
-  const help = await page.locator('.need-group .rcard .rc-help').first().getAttribute('href');
-  const helpName = await page.locator('.need-group .rcard').first().locator('h3').innerText();
-  check('카드: 신청 도움받기 메일(사업명 자동 입력)', /^mailto:start@gven\.kr\?subject=/.test(help) && decodeURIComponent(help).includes(helpName.replace(/NEW$/, '').trim()), decodeURIComponent(help).slice(0, 80));
+  // 신청 도움받기: 앱 안의 창 — 사업명·필요 도움 선택·전화/메일/복사
+  const helpName = (await page.locator('.need-group .rcard').first().locator('h3').innerText()).replace(/NEW$/, '').trim();
+  await page.locator('.need-group .rcard .rc-help').first().click();
+  check('신청 도움받기 창: 사업명·도움 선택지 4개·연결 방법 3개', await page.locator('#helpModal:not(.hidden) .hp-name', { hasText: helpName }).count() === 1 && await page.locator('#helpModal .hp-type').count() === 4 && await page.locator('#helpModal .hp-c').count() === 3);
+  await page.locator('#helpModal .hp-type', { hasText: '제출 서류 준비' }).click();
+  const mail = decodeURIComponent(await page.locator('#helpModal a.hp-c[href^="mailto:"]').getAttribute('href'));
+  check('도움 선택 → 메일 내용에 사업명·고른 도움 반영', mail.startsWith('mailto:start@gven.kr?subject=') && mail.includes(helpName) && /사업계획서 작성·검토, 제출 서류 준비/.test(mail), mail.slice(0, 90));
+  check('전화 상담 링크', (await page.locator('#helpModal a.hp-c[href^="tel:"]').getAttribute('href')) === 'tel:07041034177');
+  await page.locator('#helpModal button.hp-c').click();
+  const copied = await page.waitForFunction(() => /복사/.test((document.getElementById('toast') || {}).textContent || ''), null, { timeout: 3000 }).then(() => true, () => false);
+  check('요청 내용 복사 → 안내', copied);
+  await page.keyboard.press('Escape');
+  check('Esc로 도움받기 창 닫힘', await page.locator('#helpModal.hidden').count() === 1);
   await page.locator('.need-group .rcard .btn-primary').first().click();
   const prep = await page.locator('#detailModal .prep-list li').allInnerTexts();
   check('상세: 신청 준비 체크리스트·도움받기 버튼', prep.length >= 2 && prep.some((t) => /납세증명/.test(t)) && await page.locator('#detailModal .m-help').count() === 1, prep.join(' / '));
+  await page.locator('#detailModal .m-help').click();
+  check('상세의 도움받기 → 상세 닫고 도움받기 창', await page.locator('#detailModal.hidden').count() === 1 && await page.locator('#helpModal:not(.hidden)').count() === 1);
   await page.keyboard.press('Escape');
   const hook = await page.locator('.hook-banner').innerText();
   check('후킹 문구: DEMO 표기·검토할 만한(신청 가능 단정 아님)', /DEMO 예시 공고/.test(hook) && /검토할 만한/.test(hook) && !/신청할 수 있는/.test(hook), hook.replace(/\s+/g, ' '));
