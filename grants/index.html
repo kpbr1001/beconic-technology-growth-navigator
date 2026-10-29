@@ -345,6 +345,15 @@ textarea{min-height:88px;resize:vertical}
 .empty h3{margin:0 0 8px}.empty p{color:var(--sub);margin:0 0 16px}
 .empty-sm{text-align:center;padding:32px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:14px}
 .more-row{grid-column:1/-1;text-align:center;margin:12px 0 4px}
+.closing-strip{grid-column:1/-1;background:#fff8ec;border:1px solid #f3d9a8;border-radius:12px;padding:12px 14px;margin:0 0 14px;display:flex;flex-direction:column;gap:6px}
+.closing-strip .cs-head{font-weight:800;font-size:14px;color:var(--ink)}
+.closing-strip .cs-head small{font-weight:600;color:var(--sub);margin-left:6px;font-size:12px}
+.closing-strip .cs-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;cursor:pointer;font:inherit;color:inherit}
+.closing-strip .cs-row:hover{border-color:var(--cond)}
+.closing-strip .cs-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:600}
+.check-row{grid-column:1/-1;text-align:center;margin:18px 0 6px;padding:14px;border:1px dashed var(--line);border-radius:12px}
+.check-row p{margin:8px 0 0;font-size:12px;color:var(--sub)}
+.dc-title small{font-weight:500;color:var(--sub);font-size:11px;margin-left:4px}
 .more-btn{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;color:var(--sub)}
 .more-btn:hover{border-color:var(--navy);color:var(--navy)}
 .ev-list{margin:0;padding-left:18px;font-size:12.5px;color:var(--sub);display:flex;flex-direction:column;gap:4px}
@@ -564,7 +573,7 @@ footer .copy{font-size:11.5px;color:#8695bd}
       <div class="panel-head">
         <span class="kicker">매칭 결과</span>
         <h2 style="font-size:22px">검토할 만한 지원사업</h2>
-        <p>자격 판정에서 제외되지 않은 사업을 지원분야별로 묶었습니다. 기본 정렬은 마감임박순입니다.</p>
+        <p>자격 판정에서 제외되지 않은 사업을 지원분야별로 묶었습니다. 추천·조건부 사업을 먼저 보여주고, 기본 정렬은 추천순입니다.</p>
       </div>
       <div class="res-actions" id="resActions">
         <button type="button" class="btn btn-back btn-sm" onclick="App.editInputs()">← 조건 수정</button>
@@ -591,8 +600,8 @@ footer .copy{font-size:11.5px;color:#8695bd}
       <div class="sp"></div>
       <button type="button" id="fundedToggle" class="funded-toggle" aria-pressed="false" onclick="App.toggleFunded()">💰 금액 공개 사업만</button>
       <select id="sortSel" aria-label="정렬" onchange="App.setSort(this.value)">
-        <option value="deadline" selected>마감임박순</option>
-        <option value="fit">추천순</option>
+        <option value="fit" selected>추천순</option>
+        <option value="deadline">마감임박순</option>
         <option value="amount">지원규모순</option>
       </select>
     </div>

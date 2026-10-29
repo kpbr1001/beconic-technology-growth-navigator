@@ -156,11 +156,29 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('데이터 안내: DEMO·예시 명시', /DEMO/.test(notice) && /예시/.test(notice));
   const resFoot = await page.locator('#resFoot').innerText();
   check('결과 하단 출처: DEMO 표기', /DEMO 예시 데이터/.test(resFoot), resFoot);
+  // 기본: 추천순 · 추천·조건부만(확인 필요는 '더 보기'로 펼침)
+  const def = await page.evaluate(() => ({
+    sort: document.getElementById('sortSel').value,
+    states: [...document.querySelectorAll('#cards .rcard .rc-state')].map((e) => e.textContent.trim()),
+    check: App.matched.filter((m) => m.state === '확인 필요').length,
+    primary: App.matched.filter((m) => m.state === '추천' || m.state === '조건부 추천').length,
+    center: +document.querySelector('.donut-center b').textContent,
+    segSum: [...document.querySelectorAll('.donut-legend .lg')].reduce((s, e) => s + +e.textContent.match(/(\d+)$/)[1], 0),
+  }));
+  check('기본 정렬 추천순', def.sort === 'fit', def.sort);
+  check('기본 목록: 확인 필요 숨김(추천·조건부만)', !def.states.includes('확인 필요'), def.states.join(','));
+  check('대시보드: 도넛 합계 = 가운데 숫자 = 추천·조건부 수', def.segSum === def.center && def.center === def.primary, `${def.segSum}/${def.center}/${def.primary}`);
+  if (def.check) {
+    check('확인 필요 더 보기 버튼', await page.locator('.check-row .more-btn', { hasText: `${def.check}건 더 보기` }).count() === 1);
+    await page.locator('.check-row .more-btn').click();
+    check('더 보기 → 확인 필요 사업 표시', await page.locator('#cards .rc-state', { hasText: '확인 필요' }).count() > 0);
+    await page.locator('.check-row .more-btn', { hasText: '추천·조건부만 보기' }).click();
+  } else check('확인 필요 더 보기(해당 시)', true, '확인 필요 없음');
   // 정렬: 마감임박순은 마감일 순서
-  const dd = await page.evaluate(() => { App.setFilter('창업'); return [...document.querySelectorAll('#cards .rc-dl')].map((e) => e.textContent.trim()); });
+  const dd = await page.evaluate(() => { App.setSort('deadline'); App.setFilter('창업'); return [...document.querySelectorAll('#cards .rc-dl')].map((e) => e.textContent.trim()); });
   const nums = dd.map((t) => (/오늘/.test(t) ? 0 : /D-(\d+)/.test(t) && !/접수/.test(t) ? +t.match(/D-(\d+)/)[1] : 9999));
   check('마감임박순: 마감일 오름차순(지역 우선 정렬 제거)', nums.every((n, i) => i === 0 || nums[i - 1] <= n), dd.join(' | '));
-  await page.evaluate(() => App.resetFilter());
+  await page.evaluate(() => { App.resetFilter(); App.setSort('fit'); });
   // 상세 모달 · Esc
   await page.locator('#cards .rcard .btn-primary').first().click();
   check('상세 모달 열림·판정 근거 표시', await page.locator('#detailModal:not(.hidden) .cond-row').count() > 0);
