@@ -67,7 +67,7 @@ jobs:
         run: npm run test:roadmap
       - name: 지원사업 MATCH 서버 함수 (정규화·중복제거·마감·캐시·AI 근거 대조, fetch 스텁)
         run: node --test grants/tests/server.test.mjs
-      - name: 지원사업 MATCH 공고문 분석 정확도 (검증 세트 1·2차 각 60건, 기준 미달 시 실패)
+      - name: 지원사업 MATCH 공고문 분석 정확도 (검증 세트 1·2·3차 각 60건, 기준 미달 시 실패)
         run: node grants/tests/eval-accuracy.mjs --all --check
 
   e2e:
