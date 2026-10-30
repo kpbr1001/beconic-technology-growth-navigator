@@ -8,6 +8,8 @@ import { TOOLS, AREAS } from './tools.mjs';
 
 export const CONTACT = { tel: '070-4103-4177', app: 'https://beconic-grant-matching.netlify.app/' };
 const MENU = ['지원사업 찾기', '사업명 검색', '마감 임박', '경영진단', '상담 연결'];
+// 행사·교육·공모전 성격 공고 — 마감 임박 목록에서 지원사업(자금·R&D·창업 등) 뒤로
+const EVENT = /설명회|아카데미|교육생|특강|캠프|워크숍|세미나|포럼|박람회|전시회|상담회|데모데이|IR|비즈니스\s*데이|공모전|경진대회|시상|행사|참가기업|참여기업|참가자|참여자/;
 const POPULAR = ['정책자금', '예비창업패키지', '스마트공장', '수출바우처', '희망리턴', '창업'];
 
 const cut = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1) + '…' : s; };
@@ -68,9 +70,12 @@ export function route(utterance, programs, now = Date.now()) {
   if (n === norm('사업명 검색')) return reply([text('찾는 사업명을 입력해 주세요.\n\n예) 정책자금, 예비창업패키지,\n스마트공장, 수출바우처')], quick([...POPULAR, '처음']));
   if (n === norm('마감 임박')) {
     if (!programs) return reply([text('공고 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.')]);
-    const soon = programs.map((p) => [p, ddayKst(p.applicationEnd, now)]).filter(([, d]) => d != null && d >= 0 && d <= 7).sort((a, b) => a[1] - b[1]).map(([p]) => p);
+    // 지원사업 먼저(D-1~7 → 오늘 마감), 행사·교육·공모전은 뒤 — 같은 묶음 안에서는 마감 가까운 순
+    const rank = (p, d) => (EVENT.test(p.programName || '') ? 2 : d === 0 ? 1 : 0);
+    const soon = programs.map((p) => [p, ddayKst(p.applicationEnd, now)]).filter(([, d]) => d != null && d >= 0 && d <= 7)
+      .sort((a, b) => rank(...a) - rank(...b) || a[1] - b[1]).map(([p]) => p);
     if (!soon.length) return reply([text('이번 주에 마감되는 공고가 없어요.')]);
-    return reply([programList(`이번 주 마감 ${soon.length}건 중 5건`, soon, now, '내게 맞는지 확인')]);
+    return reply([programList('서둘러 신청할 공고 (이번 주 마감)', soon, now, '내게 맞는지 확인')]);
   }
   if (n === norm('경영진단') || n === norm('진단')) {
     return reply([text('어떤 고민이 있으세요?\n분야를 고르면 맞는 진단을 안내해 드려요.'),
@@ -82,7 +87,7 @@ export function route(utterance, programs, now = Date.now()) {
       text('평일 09~18시에 담당 컨설턴트가\n이 채팅방으로 답변드려요.')], []);
   }
   if (/^(상담|상담연결|상담원|상담원연결|문의|전화|전화상담|연락처|컨설팅)$/.test(n)) {
-    return reply([{ basicCard: { title: '전문 컨설턴트와 상담하기', description: para(`그로스벤처스㈜\n중기부 인증 중소기업상담회사 (제2025-684호)\n\n✔ 사업계획서 작성·검토\n✔ 신청 자격 확인\n✔ 서류 준비·발표 코칭\n\n평일 09~18시 · 시간 외에는 요청을 남겨주세요.`, 230),
+    return reply([{ basicCard: { title: '전문 컨설턴트와 상담하기', description: para(`그로스벤처스㈜\n중기부 인증 중소기업상담회사 (제2025-684호)\n\n✔ 사업계획서 작성·검토\n✔ 신청 자격 확인\n✔ 서류 준비·발표 코칭\n\n☎ ${CONTACT.tel} (평일 09~18시)\n시간 외에는 요청을 남겨주세요.`, 230),
       buttons: [{ label: '전화 상담', action: 'phone', phoneNumber: CONTACT.tel }, { label: '요청 남기기', action: 'message', messageText: '상담 요청합니다' }] } }]);
   }
   // 상담 요청 글(앱에서 복사한 요청·전화번호·긴 글)은 검색하지 않고 접수 안내 — 담당자가 1:1 채팅에서 이어서 답변
