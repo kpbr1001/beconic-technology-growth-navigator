@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.25.0',
+  version: 'v3.26.0',
   updated: '2026-10-30',
   changelog: [
+    { v:'v3.26.0', d:'2026-10-30', note:'공장·설비 투자 자금(에너지이용합리화·산업재해예방시설·구조고도화·오염방지시설·시설자금 등)은 제조·에너지·바이오 등 업종일 때만 추천, 매장형 소상인·서비스업은 확인 필요로(유통·점포 시설자금은 제외). 녹색채권·SW 지식재산(IP) 평가보증도 분야 한정. 결과 첫 화면 최대액은 예비창업자·소상인·소공인이면 10억 초과 한도를 빼고 표시(음식점 소상인에게 최대 300억 표시되던 문제)' },
     { v:'v3.25.0', d:'2026-10-30', note:'모바일 체감 개선: 글꼴을 쓰는 글자만 받는 방식으로(첫 화면 글꼴 약 4.7MB → 수백 KB), 휴대폰 뒤로가기 = 이전 화면·단계·창 닫기(앱 밖으로 나가지 않음), 카카오톡 등 앱 안 브라우저에서는 PDF 저장 대신 결과 요약 복사. 결과 첫 화면은 사업별 최대액을 더한 합계 대신 추천 건수와 1건 기준 최대액. 공고 수를 차수 묶음 기준으로 통일. 안드로이드 홈 화면 아이콘(512·maskable) 추가·아이콘 경로 오류 수정' },
     { v:'v3.24.0', d:'2026-10-30', note:'매칭 단계(깔때기) 표시: 전체 공고 → 1단계 지역·기업규모·업종 → 2단계 사업자 형태·설립연도 → 3단계 세부 자격 → 4단계 필요한 지원 맞춤 건수와 내 지역·시군구 건수, 미입력 정보 안내. 공고문 분석 확대: 신청자격 절을 읽었는데 업력·매출 등 제한이 없으면 그것도 분석 결과로 반영(운영 분석 717건 중 반영 132건 → 약 600건 예상)' },
     { v:'v3.23.0', d:'2026-10-30', note:'업종 판정 추가: 공고명으로 대상 산업(제조·ICT·바이오·에너지·유통서비스 + 방산·소방·환경·원자력·의료헬스 등)을 추론해 귀사 업종과 비교(기술을 도입·활용하는 사업은 제외), 결과 아래 \'조건은 맞는 사업\'(지역·기업형태·업종은 맞고 분야·세부 자격은 확인 필요)을 내 지역 사업 먼저 보여줌. 정밀도 41.0%→42.3%' },
@@ -307,10 +308,13 @@ const SECTOR_ONLY = [
   {label:'핀테크·금융', re:/핀테크|금융\s*테스트베드|마이데이터/, ok:c=>INDUSTRIES.find(i=>i.v===c.industry)?.group==='ICT·SW'},
   {label:'방산', re:/방산|국방|방위산업/, ok:c=>['제조·소재','신산업·에너지','ICT·SW'].includes(industryGroup(c.industry))},
   {label:'소방산업', re:/소방\s*(?:산업|기업|제품)/, ok:c=>industryGroup(c.industry)==='제조·소재'},
-  {label:'환경·기후', re:/환경\s*(?:기업|산업)|기후\s*테크|녹색\s*(?:산업|기업)/, ok:c=>c.industry==='환경·수자원' || industryGroup(c.industry)==='신산업·에너지'},
+  {label:'환경·기후', re:/환경\s*(?:기업|산업)|기후\s*테크|녹색\s*(?:산업|기업|채권)/, ok:c=>c.industry==='환경·수자원' || industryGroup(c.industry)==='신산업·에너지'},
   {label:'원자력·방사선', re:/원자력|방사선/, ok:c=>['제조·소재','신산업·에너지','바이오·헬스'].includes(industryGroup(c.industry))},
   {label:'의료·헬스', re:/슬립\s*테크|의료기기|디지털\s*헬스|헬스케어/, ok:c=>industryGroup(c.industry)==='바이오·헬스'},
-  {label:'기술기업', re:/기술임치|기술가치평가|기술보호|기술분쟁|IP\s*(?:보증|담보)|지식재산\s*평가|지식재산평가/, ok:c=>TECH_GROUPS.includes(INDUSTRIES.find(i=>i.v===c.industry)?.group)}
+  // 공장·설비 투자 자금(에너지 절약·산재 예방·오염 방지 시설 등) — 매장형 소상인·서비스업과는 거리가 멀다(정답셋: 음식점 0 · 기계 소공인 1). 유통·점포 시설자금은 제외
+  {label:'산업 시설·설비', re:/에너지이용합리화|산업재해예방시설|구조고도화|오염방지시설|시설\s*(?:자금|투자)|설비\s*(?:자금|투자)/, skip:/유통|소상공인|상점|점포|전통시장/,
+    ok:c=>['제조·소재','신산업·에너지','바이오·헬스'].includes(industryGroup(c.industry)) || ['건설·건축','환경·수자원','물류·유통','농림수산업','기능성식품'].includes(c.industry)},
+  {label:'기술기업', re:/기술임치|기술가치평가|기술보호|기술분쟁|IP\)?\s*(?:평가\s*)?(?:보증|담보)|지식재산권?\s*(?:\(IP\)\s*)?평가/, ok:c=>TECH_GROUPS.includes(INDUSTRIES.find(i=>i.v===c.industry)?.group)}
 ];
 /* 공고명으로 대상 산업 추론 — 목록 데이터에 업종 조건이 없어서(운영 0%) 공고명의 산업 표현을 업종 그룹과 비교한다.
    기술을 '도입·활용'하는 사업(AI 바우처·AI 교육 등)은 그 기술 업종 대상이 아니라서 ICT는 '○○ 기업·산업·창업·실증'처럼 업종을 가리킬 때만 */
@@ -323,7 +327,7 @@ const PROGRAM_SECTORS = [
 ];
 function programSectors(p){ const n=p.programName||''; return PROGRAM_SECTORS.filter(x=>x.re.test(n) && !(x.skip && x.skip.test(n))).map(x=>x.g); }
 function industryGroup(ind){ return INDUSTRIES.find(i=>i.v===ind)?.group || null; }
-function sectorMismatch(p, c){ if(!c.industry) return null; const n=p.programName||''; return SECTOR_ONLY.find(x=>x.re.test(n) && !x.ok(c)) || null; }
+function sectorMismatch(p, c){ if(!c.industry) return null; const n=p.programName||''; return SECTOR_ONLY.find(x=>x.re.test(n) && !(x.skip && x.skip.test(n)) && !x.ok(c)) || null; }
 const AGRI_ONLY = /농업인|어업인|농어업인|귀농|귀어|농식품|농업경영체|해양수산|수산(?!부산물)|축산|임업|산림/;
 const AGRI_NEAR = ['농림수산업','기능성식품','음식점업(F&B)','도소매업','물류·유통','바이오·제약','환경·수자원'];
 /* 농·수산·식품 분야 사업인데 업종이 멀면 관련도 낮음(자격 확정은 공고 확인) */
@@ -893,7 +897,10 @@ function runMatching(programs, company){
 /* =====================================================================
    Dashboard 집계 — runMatching 결과 입력
    ===================================================================== */
-function buildDashboard(all){
+/* 예비창업자·소상인·소공인에게 1건 기준 최대액으로 보여 주기에 비현실적인 금액(공장 설비·중견기업 한도 등) — 카드에는 그대로, 첫 화면 최대액에서만 뺀다 */
+const SMALL_AMOUNT_CAP = 1e9;
+const SMALL_TYPES = ['예비창업자','소상인','소공인'];
+function buildDashboard(all, company){
   const matched = all.filter(m=>!m.variantOf);   // 차수·변경 공고는 대표 공고 하나로 집계
   const considerable = matched.filter(m=> m.state!=='대상 아님');
   const rec = matched.filter(m=> m.state==='추천');
@@ -902,10 +909,12 @@ function buildDashboard(all){
   // 합계는 '추천'(판정된 자격 모두 충족)만. 조건부·확인 필요는 자격이 확정되지 않아 합산하지 않는다.
   // 보조·출연과 융자·보증은 성격이 달라 따로 합산.
   let grantSum=0, grantCnt=0, loanSum=0, loanCnt=0, grantMax=0, loanMax=0;
+  const cap = company && SMALL_TYPES.includes(company.companyType) ? SMALL_AMOUNT_CAP : Infinity;
   rec.forEach(m=>{
     const v = m.program.supportAmountMax;
     if(typeof v!=='number' || !(v>0)) return;
-    if(isLoanProgram(m.program)){ loanSum+=v; loanCnt++; loanMax=Math.max(loanMax,v); } else if(!isInvestProgram(m.program)){ grantSum+=v; grantCnt++; grantMax=Math.max(grantMax,v); }
+    const shown = v<=cap ? v : 0;
+    if(isLoanProgram(m.program)){ loanSum+=v; loanCnt++; loanMax=Math.max(loanMax,shown); } else if(!isInvestProgram(m.program)){ grantSum+=v; grantCnt++; grantMax=Math.max(grantMax,shown); }
   });
   // 마감임박은 바로 행동할 수 있는 추천·조건부만 센다(확인 필요까지 세면 숫자만 커지고 쓸모가 없음)
   const closingSoon = [...rec, ...cond].filter(m=> m.dl.state==='CLOSING_SOON');
@@ -1353,7 +1362,7 @@ const App = (function(){
     if(!loadOk){ renderError(); return; }
     TODAY = startOfToday();
     matched = runMatching(programs, company);
-    dash = buildDashboard(matched);
+    dash = buildDashboard(matched, company);
     filter='all'; sortBy='fit'; fundedOnly=false; showCheck=false; query=''; expanded=new Set(); listLimit=APP_CONFIG.LIST_LIMIT;
     const qs=document.getElementById('nameSearch'); if(qs) qs.value='';
     const ss=document.getElementById('sortSel'); if(ss) ss.value='fit';
@@ -2066,7 +2075,7 @@ const App = (function(){
     if(ppTmp._special){ const t=SPECIAL_TARGETS.find(x=>x.label===ppTmp._special); next.specialStatus = t ? [t.k] : []; }
     company = Object.assign(sanitizeCompany(next), {supportNeeds:company.supportNeeds});   // 인증·성별도 sanitizeCompany가 유지
     matched=runMatching(programs,company);
-    dash=buildDashboard(matched);
+    dash=buildDashboard(matched, company);
     progressiveDone=true;
     closeProgressive();
     saveProfile();
