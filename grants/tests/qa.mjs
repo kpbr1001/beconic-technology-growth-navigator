@@ -112,6 +112,12 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
       variants: (() => { const m = runMatching([P({ sourceProgramId: 'V1', programName: '2026년 1차 지역산업위기대응 이차보전 지원사업 변경 공고', applicationEnd: plus(30) }), P({ sourceProgramId: 'V2', programName: '2026년 2차 지역산업위기대응 이차보전 지원사업 공고', applicationEnd: plus(30) }), P({ sourceProgramId: 'V3', programName: '2026년 2차전지 소재 실증 공고', applicationEnd: plus(30) })], C(sme));
         return [m.filter((x) => x.variantOf).length, m.filter((x) => x.variantCount === 1).length, m.find((x) => x.program.sourceProgramId === 'V3').variantOf || null, buildDashboard(m).total]; })(),
       specialSan: sanitizeCompany({ specialStatus: ['disabled', 'x', 'disabled'] }).specialStatus,
+      // 업종 추론(공고명): 도입·활용 사업은 업종 제한 아님, 업종 그룹 일치/불일치
+      sector: [cond({ programName: '2026 AI 바우처 지원사업' }, { ...sme, industry: '음식점업(F&B)' }, '업종 조건').result,
+        cond({ programName: '[경북] 게임 기업 맞춤형 지원사업' }, { ...sme, industry: '음식점업(F&B)' }, '업종 조건').result,
+        cond({ programName: '스마트공장 구축 지원' }, sme, '업종 조건').result,
+        cond({ programName: '2026년 에너지이용합리화자금 융자사업' }, { ...sme, industry: '기계·장비' }, '업종 조건').result,
+        runMatching([P({ programName: '[경북] 게임 기업 맞춤형 지원사업', applicationEnd: plus(30) })], C({ ...sme, industry: '음식점업(F&B)' }))[0].state],
     };
   });
   check('연령대: 30대 vs 만39세 이하 → 충족 (v3.7은 문자열 비교로 전원 탈락)', r.age30 === 'pass', r.age30);
@@ -151,6 +157,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('전국 공고·기관 경북 → 대전 기업 확인 필요, 대전 기관 → 대전 기업 지역 우선(1)', r.hintOther === 'unknown' && r.hintSame === 1, `${r.hintOther}/${r.hintSame}`);
   check('지역 추론 오탐 방지: "수산부산물"은 부산 아님, 기관명에 지역 없으면 전국 그대로', r.hintFalse === 'pass' && r.hintNone === 'pass', `${r.hintFalse}/${r.hintNone}`);
   check('차수·변경 공고 묶기(1차·2차·변경 → 1건, "2차전지"는 별개), 대시보드 집계도 1건', r.variants[0] === 1 && r.variants[1] === 1 && r.variants[2] === null && r.variants[3] === 2, JSON.stringify(r.variants));
+  check('업종 추론: AI 바우처(도입)·에너지 효율 자금은 제한 아님, 게임 기업 사업은 음식점 확인 필요·추천 아님, 스마트공장은 제조 충족', r.sector[0] === 'na' && r.sector[1] === 'unknown' && r.sector[2] === 'pass' && r.sector[3] === 'na' && r.sector[4] !== '추천', r.sector.join('/'));
   check('해당되는 항목 저장값 정제(허용 키·중복 제거)', JSON.stringify(r.specialSan) === '["disabled"]', JSON.stringify(r.specialSan));
   check('저장값 정제: 허용 밖 값 제거', r.sanitize.region === null && r.sanitize.establishedYear === null && r.sanitize.exportHistory === null && r.sanitize.industry === '제조업');
   await page.context().close();
@@ -394,6 +401,31 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
   await page.emulateMedia({ media: 'screen' });
   check('인쇄 후 화면 목록 복원', await page.locator('#cards .need-group .rcard').count() === 117);
+  await page.context().close();
+}
+
+// ---------- 5-1. ② 조건은 맞는 사업(내 지역 먼저) ----------
+{
+  const page = await newPage();
+  const P = (id, name, regions) => ({ source: 'bizinfo', sourceProgramId: id, programName: name, agency: '기관', category: '경영', supportPurposes: ['경영'],
+    targetBusinessType: ['법인', '개인사업자'], targetRegions: regions, targetIndustries: [], applicationEnd: '2099-12-31', eligibilityDepth: 'doc', originalUrl: 'https://www.bizinfo.go.kr/' + id });
+  const progs = [P('T1', '중소기업 R&D 기술개발 과제', ['전국']), P('T2', '[부산] 상권 활성화 행사 참가 모집', ['부산']), P('T3', '중소기업 경영 세미나 참가 모집', ['전국'])];
+  await page.route('**/.netlify/functions/programs', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ mode: 'live', fetchedAt: new Date().toISOString(), sourceCounts: {}, enriched: 0, aliveCount: 3, programs: progs }) }));
+  await page.goto(BASE);
+  await page.evaluate(() => { APP_CONFIG.DATA_MODE = 'live'; ProgramProvider._p = null; });
+  await page.locator('.persona-card.sme').click();
+  await page.locator('.opt', { hasText: '법인사업자' }).click();
+  await page.selectOption('#f-region', '부산');
+  await page.fill('#f-year', '2018');
+  await page.selectOption('#f-industry', 'SW·시스템통합');
+  await page.locator('.need-grid .opt', { hasText: 'R&D' }).click();
+  await toResults(page);
+  const btn = page.locator('.check-row .more-btn');
+  check('② 조건은 맞는 사업: 버튼에 내 지역 건수', /조건은 맞는 사업 2건 더 보기 · 내 지역 1건/.test(await btn.innerText()), await btn.innerText());
+  await btn.click();
+  const titles = await page.locator('.check-group .ng-title').allInnerTexts();
+  const first = await page.locator('.check-group').first().locator('.rcard h3').first().innerText();
+  check('② 조건은 맞는 사업: 내 지역 → 전국 순서', titles.length === 2 && /내 지역/.test(titles[0]) && /전국/.test(titles[1]) && /부산/.test(first), titles.join(' / '));
   await page.context().close();
 }
 
