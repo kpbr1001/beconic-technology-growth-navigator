@@ -1,6 +1,6 @@
 {
   "name": "beconic-grant-match",
-  "version": "3.25.0",
+  "version": "3.26.0",
   "private": true,
   "type": "module",
   "description": "BECONIC 지원사업 MATCH — 기업마당·K-Startup 공고 자격 판정·매칭 (브라우저 계산, 입력값 서버 전송 없음)",
