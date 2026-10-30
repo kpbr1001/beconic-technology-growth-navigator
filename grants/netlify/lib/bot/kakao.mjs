@@ -7,6 +7,9 @@
 import { TOOLS, AREAS } from './tools.mjs';
 
 export const CONTACT = { tel: '070-4103-4177', app: 'https://beconic-grant-matching.netlify.app/' };
+// 카드 썸네일(800×400, 2:1) — 원본 design/kakao-card.html, 다시 만들기 scripts/render-images.mjs. 바꾸면 v를 올려 카카오 캐시를 비운다
+const THUMB_V = 1;
+const thumb = (k) => ({ thumbnail: { imageUrl: `${CONTACT.app}assets/kakao/${k}.png?v=${THUMB_V}` } });
 const MENU = ['지원사업 찾기', '사업명 검색', '마감 임박', '경영진단', '상담 연결'];
 // 행사·교육·공모전 성격 공고 — 마감 임박 목록에서 지원사업(자금·R&D·창업 등) 뒤로
 const EVENT = /설명회|아카데미|교육생|특강|캠프|워크숍|세미나|포럼|박람회|전시회|상담회|데모데이|IR|비즈니스\s*데이|공모전|경진대회|시상|행사|참가기업|참여기업|참가자|참여자/;
@@ -45,8 +48,9 @@ function programList(title, list, now, moreLabel) {
 }
 function toolCard(t) {
   const consult = { label: '상담 연결', action: 'message', messageText: '상담 연결' };
-  if (!t.url) return { title: cut(t.name, 40), description: para(`${t.desc}\n\n지금은 컨설턴트 상담으로 진행해 드려요.`, 230), buttons: [consult, { label: '전화 상담', action: 'phone', phoneNumber: CONTACT.tel }] };
-  return { title: cut(t.name, 40), description: cut(t.desc, 230), buttons: [web('진단 시작', t.url), consult] };
+  const th = thumb(t.id === 'grants' ? 'match' : t.id);
+  if (!t.url) return { ...th, title: cut(t.name, 40), description: para(`${t.desc}\n\n지금은 컨설턴트 상담으로 진행해 드려요.`, 230), buttons: [consult, { label: '전화 상담', action: 'phone', phoneNumber: CONTACT.tel }] };
+  return { ...th, title: cut(t.name, 40), description: cut(t.desc, 230), buttons: [web(t.id === 'grants' ? '지원사업 찾기' : '진단 시작', t.url), consult] };
 }
 
 /** 사업명 검색: 띄어쓰기 무시, 마감 가까운 순(마감일 없는 공고는 뒤) */
@@ -64,7 +68,7 @@ export function route(utterance, programs, now = Date.now()) {
     return reply([text('안녕하세요, 비코닉입니다 🙂\n\n우리 회사에 맞는 지원사업과\n경영진단을 찾아드려요.\n\n아래 버튼을 누르거나\n찾는 사업명을 바로 입력해 주세요.\n예) 정책자금, 수출바우처')]);
   }
   if (n === norm('지원사업 찾기')) {
-    return reply([{ basicCard: { title: '우리 회사 맞춤 지원사업 찾기', description: '지역·업종·필요한 지원을 고르면\n지금 신청할 수 있는 사업을 추천해 드려요.\n\n회원가입 없음 · 30초', buttons: [web('맞춤 매칭 시작', CONTACT.app)] } },
+    return reply([{ basicCard: { ...thumb('match'), title: '우리 회사 맞춤 지원사업 찾기', description: '지역·업종·필요한 지원을 고르면\n지금 신청할 수 있는 사업을 추천해 드려요.\n\n회원가입 없음 · 30초', buttons: [web('맞춤 매칭 시작', CONTACT.app)] } },
       text('많이 찾는 사업은 아래 버튼으로 바로 볼 수 있어요.')], quick([...POPULAR, '처음']));
   }
   if (n === norm('사업명 검색')) return reply([text('찾는 사업명을 입력해 주세요.\n\n예) 정책자금, 예비창업패키지,\n스마트공장, 수출바우처')], quick([...POPULAR, '처음']));
@@ -87,7 +91,7 @@ export function route(utterance, programs, now = Date.now()) {
       text('평일 09~18시에 담당 컨설턴트가\n이 채팅방으로 답변드려요.')], []);
   }
   if (/^(상담|상담연결|상담원|상담원연결|문의|전화|전화상담|연락처|컨설팅)$/.test(n)) {
-    return reply([{ basicCard: { title: '전문 컨설턴트와 상담하기', description: para(`그로스벤처스㈜\n중기부 인증 중소기업상담회사 (제2025-684호)\n\n✔ 사업계획서 작성·검토\n✔ 신청 자격 확인\n✔ 서류 준비·발표 코칭\n\n☎ ${CONTACT.tel} (평일 09~18시)\n시간 외에는 요청을 남겨주세요.`, 230),
+    return reply([{ basicCard: { ...thumb('consult'), title: '전문 컨설턴트와 상담하기', description: para(`그로스벤처스㈜\n중기부 인증 중소기업상담회사 (제2025-684호)\n\n✔ 사업계획서 작성·검토\n✔ 신청 자격 확인\n✔ 서류 준비·발표 코칭\n\n☎ ${CONTACT.tel} (평일 09~18시)\n시간 외에는 요청을 남겨주세요.`, 230),
       buttons: [{ label: '전화 상담', action: 'phone', phoneNumber: CONTACT.tel }, { label: '요청 남기기', action: 'message', messageText: '상담 요청합니다' }] } }]);
   }
   // 상담 요청 글(앱에서 복사한 요청·전화번호·긴 글)은 검색하지 않고 접수 안내 — 담당자가 1:1 채팅에서 이어서 답변
@@ -107,7 +111,7 @@ export function route(utterance, programs, now = Date.now()) {
   if (!found.length && kwHit.length) return toolReply(kwHit);
   if (!found.length) {
     return reply([text(`'${cut(u, 20)}'(이)가 들어간 공고가 지금은 없어요.\n\n접수 중·예정인 공고만 찾아드려요.\n대표 사업은 보통 1년에 한 번 공고되니\n이미 마감됐거나 공고 전일 수 있어요.`),
-      { basicCard: { title: '맞춤 매칭으로 찾아보기', description: '조건을 입력하면 지금 신청 가능한 사업과\n다음 공고 예정 사업까지 알려드려요.', buttons: [web('맞춤 매칭 시작', CONTACT.app)] } }]);
+      { basicCard: { ...thumb('match'), title: '맞춤 매칭으로 찾아보기', description: '조건을 입력하면 지금 신청 가능한 사업과\n다음 공고 예정 사업까지 알려드려요.', buttons: [web('맞춤 매칭 시작', CONTACT.app)] } }]);
   }
   return reply([programList(`'${cut(u, 12)}' 공고 ${found.length}건${found.length > 5 ? ' 중 5건' : ''}`, found, now)]);
 }

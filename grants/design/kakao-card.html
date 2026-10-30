@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!-- 카카오 챗봇 카드 썸네일 원본(800×400, 2:1). 주소 뒤 #종류 로 내용을 고른다. `node scripts/render-images.mjs`로 assets/kakao/에 만든다. -->
+<html lang="ko"><head><meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:800px;height:400px;font-family:'Pretendard',sans-serif;letter-spacing:-.02em;word-break:keep-all;overflow:hidden;
+  background:var(--bg);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 60px;position:relative}
+body::before{content:"";position:absolute;right:-90px;top:-90px;width:340px;height:340px;border-radius:50%;background:var(--glow)}
+.k{display:inline-flex;align-items:center;gap:10px;font-size:22px;font-weight:700;color:var(--kc);margin-bottom:18px}
+.k img{width:34px;height:34px}
+h1{font-size:52px;font-weight:800;line-height:1.25;letter-spacing:-.035em;max-width:600px;position:relative}
+p{font-size:23px;font-weight:600;color:var(--pc);margin-top:18px;position:relative}
+.ic{position:absolute;right:60px;bottom:52px;font-size:84px;line-height:1}
+</style></head><body>
+<span class="k"><img src="../assets/shield-white.png" alt="">BECONIC</span>
+<h1 id="t"></h1><p id="d"></p><span class="ic" id="i"></span>
+<script>
+const C={
+  match:   {t:'우리 회사 맞춤<br>지원사업 찾기', d:'회원가입 없이 · 30초 · 자격조건 먼저 판정', i:'🎯', bg:'#1a2a56', glow:'rgba(120,150,230,.16)', kc:'#ffd08a', pc:'#c9d3ee'},
+  consult: {t:'전문 컨설턴트와<br>함께 준비해요', d:'중기부 인증 중소기업상담회사 (제2025-684호)', i:'💬', bg:'#e8921a', glow:'rgba(255,255,255,.18)', kc:'#fff4e4', pc:'#fff4e4'},
+  finance: {t:'기업 재무진단', d:'성장성·수익성·안정성·현금흐름', i:'📊', bg:'#1f6f5c', glow:'rgba(255,255,255,.12)', kc:'#c8f0e2', pc:'#c8f0e2'},
+  hr:      {t:'HR 조직건강 진단', d:'조직 상태·HR 제도·법정 노무', i:'👥', bg:'#3b4fa0', glow:'rgba(255,255,255,.12)', kc:'#dfe5fb', pc:'#dfe5fb'},
+  tech:    {t:'기업 기술진단', d:'기술수준·R&D 역량·기술격차', i:'🔬', bg:'#24406f', glow:'rgba(255,255,255,.12)', kc:'#d4e2fa', pc:'#d4e2fa'},
+  growth:  {t:'성장활동 진단', d:'9개 영역 27문항 · 90일 실행계획', i:'🚀', bg:'#5b3e8f', glow:'rgba(255,255,255,.12)', kc:'#e9dffb', pc:'#e9dffb'},
+};
+const c=C[location.hash.slice(1)]||C.match;
+for(const [k,v] of Object.entries({'--bg':c.bg,'--glow':c.glow,'--kc':c.kc,'--pc':c.pc})) document.body.style.setProperty(k,v);
+t.innerHTML=c.t; d.textContent=c.d; i.textContent=c.i;
+</script>
+</body></html>
