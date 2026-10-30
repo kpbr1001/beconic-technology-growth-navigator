@@ -286,7 +286,9 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.locator('#cards .rcard .btn-primary').first().click();
   check('상세 모달 열림·판정 근거 표시', await page.locator('#detailModal:not(.hidden) .cond-row').count() > 0);
   await page.keyboard.press('Escape');
-  check('Esc로 모달 닫힘', await page.locator('#detailModal.hidden').count() === 1);
+  // 창을 닫으면 창 기록을 되돌린다(비동기) — 되돌리기가 끝난 뒤 새로고침해야 탐색이 겹치지 않는다
+  await page.waitForFunction(() => !(history.state && history.state.m), null, { timeout: 3000 }).catch(() => {});
+  check('Esc로 모달 닫힘·창 기록 정리', await page.locator('#detailModal.hidden').count() === 1 && !(await page.evaluate(() => history.state && history.state.m)));
   // 저장·재방문
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('beconic_match_profile_v2')));
   check('재매칭용 조건은 이 브라우저에만 저장(서버 전송 없음)', saved && saved.company.region === '서울');
