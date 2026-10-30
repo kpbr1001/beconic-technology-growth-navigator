@@ -425,6 +425,8 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await btn.click();
   const titles = await page.locator('.check-group .ng-title').allInnerTexts();
   const first = await page.locator('.check-group').first().locator('.rcard h3').first().innerText();
+  const fn = await page.$$eval('.fn-step .fn-n', (es) => es.map((e) => +e.textContent.replace(/,/g, '')));
+  check('매칭 단계: 4단계 표시·단계마다 줄거나 같음·마지막은 추천·조건부 수', fn.length === 4 && fn.every((v, i) => i === 0 || v <= fn[i - 1]) && fn[3] === await page.evaluate(() => App.matched.filter((m) => !m.variantOf && (m.state === '추천' || m.state === '조건부 추천')).length), fn.join('>'));
   check('② 조건은 맞는 사업: 내 지역 → 전국 순서', titles.length === 2 && /내 지역/.test(titles[0]) && /전국/.test(titles[1]) && /부산/.test(first), titles.join(' / '));
   await page.context().close();
 }

@@ -197,6 +197,14 @@ test('공고문 병합: 요약문 값 유지, 빈 항목만 채움, 근거·깊�
   assert.equal(applyDoc(p, { status: 'notext' }), p);
 });
 
+test('공고문 병합: 자격 절을 읽었고 숫자 제한이 없으면 공고문 분석으로 표시(제한 없음도 결과)', () => {
+  const p = { sourceProgramId: 'Y', eligibilityDepth: 'listing', targetRegions: ['서울'] };
+  const q = applyDoc(p, { status: 'ok', sectionFound: true });
+  assert.equal(q.eligibilityDepth, 'doc');
+  assert.match(q._docEvidence.eligibility, /제한 문구 없음/);
+  assert.equal(applyDoc(p, { status: 'ok', sectionFound: false }).eligibilityDepth, 'listing', '자격 절을 못 찾으면 그대로');
+});
+
 test('공고문 주소: 본문출력 PDF 우선, 없으면 첨부 중 PDF, 기업마당 주소만', () => {
   assert.equal(docUrlOf({ printFlpthNm: 'https://www.bizinfo.go.kr/cmm/fms/getImageFile.do?atchFileId=F1&fileSn=0', printFileNm: '공고.pdf' }), 'https://www.bizinfo.go.kr/cmm/fms/getImageFile.do?atchFileId=F1&fileSn=0');
   assert.equal(docUrlOf({ printFlpthNm: 'https://www.bizinfo.go.kr/a', printFileNm: '공고.hwp', flpthNm: 'https://www.bizinfo.go.kr/b@https://www.bizinfo.go.kr/c', fileNm: '서식.hwp@공고문.pdf' }), 'https://www.bizinfo.go.kr/c');

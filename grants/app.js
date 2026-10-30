@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.23.0',
+  version: 'v3.24.0',
   updated: '2026-10-30',
   changelog: [
+    { v:'v3.24.0', d:'2026-10-30', note:'매칭 단계(깔때기) 표시: 전체 공고 → 1단계 지역·기업규모·업종 → 2단계 사업자 형태·설립연도 → 3단계 세부 자격 → 4단계 필요한 지원 맞춤 건수와 내 지역·시군구 건수, 미입력 정보 안내. 공고문 분석 확대: 신청자격 절을 읽었는데 업력·매출 등 제한이 없으면 그것도 분석 결과로 반영(운영 분석 717건 중 반영 132건 → 약 600건 예상)' },
     { v:'v3.23.0', d:'2026-10-30', note:'업종 판정 추가: 공고명으로 대상 산업(제조·ICT·바이오·에너지·유통서비스 + 방산·소방·환경·원자력·의료헬스 등)을 추론해 귀사 업종과 비교(기술을 도입·활용하는 사업은 제외), 결과 아래 \'조건은 맞는 사업\'(지역·기업형태·업종은 맞고 분야·세부 자격은 확인 필요)을 내 지역 사업 먼저 보여줌. 정밀도 41.0%→42.3%' },
     { v:'v3.22.0', d:'2026-10-30', note:'매칭 정밀도 개선: 대상이 정해진 사업(장애인기업·사회적경제·보훈·재창업·청년·중장년·위기지역·특구·업종 한정)을 해당 여부로 판정하고 모르면 \'확인 필요\'로 내림, 선택 정보 \'해당되는 항목\' 추가, 전국 공고라도 공고명·기관이 다른 지역이면 확인 필요, 차수·변경 공고는 하나로 묶고 지원별 추천에 나온 사업은 전체 목록에서 반복하지 않음. 고정 스냅샷 8개 기업 유형 상위 10건 정밀도 30.8%→41.0%' },
     { v:'v3.21.1', d:'2026-10-30', note:'카카오톡 미리보기 이미지를 Pretendard 글꼴로 다시 제작(원본 HTML 보관·재생성 스크립트), 카카오 챗봇 카드에 썸네일(맞춤 매칭·상담·진단 분야별), 지원사업 MATCH 카드 버튼 \'지원사업 찾기\'' },
@@ -1068,7 +1069,7 @@ const App = (function(){
     init, pickPersona, jumpToPersona, next, back, pick, toggleCert, toggleSpecial, toggleNeed,
     analyze, render, setFilter, setSort, toggleFunded, toggleCheck, setQuery, toggleWatch,
     openHelp, closeHelp, toggleHelpType, copyHelp, resetFilter, scrollToResults, expandGroup, showMore,
-    openDetail, closeModal, printReport, openProgressive, applyProgressive, closeProgressive,
+    openDetail, closeModal, printReport, openProgressive, applyProgressive, closeProgressive, showConditionsMet,
     reset, goHome, editInputs,
     saveDraft, clearDraft, resumeDraft, dismissDraft,
     runAutoUpdate, dismissUpdate, forgetProfile,
@@ -1378,7 +1379,43 @@ const App = (function(){
   }
 
   /* ================= 대시보드 ================= */
+  /* 매칭 깔때기: 입력을 단계별로 더해 판정했을 때 남는 공고 수(차수·변경 공고는 1건, 마감 제외)
+     1단계 지역·기업규모·업종 → 2단계 +사업자 형태·설립연도 → 3단계 +세부 자격(매출·인원·연령 등) → 4단계 필요한 지원 맞춤(추천·조건부) */
+  function funnelCounts(){
+    const c=company, base={companyType:c.companyType, region:c.region, district:c.district, industry:c.industry};
+    const s1=Object.assign(blankCompany(), base);
+    const s2=Object.assign(blankCompany(), base, {bizRegType:c.bizRegType, establishedYear:c.establishedYear, establishedMonth:c.establishedMonth, businessAge:c.businessAge});
+    const s3=Object.assign({}, c, {supportNeeds:[]});
+    const open=programs.filter(p=>deadlineState(p).state!=='CLOSED');
+    const alive=co=>runMatching(open, co).filter(m=>!m.variantOf && m.state!=='대상 아님');
+    const a1=alive(s1), a2=alive(s2), a3=alive(s3), prim=primaryOf(listed());
+    const local=a=>a.filter(m=>m.regionTier>=1).length, dist=a=>a.filter(m=>m.regionTier===2).length;
+    return { total:open.length, s1:a1.length, s1Local:local(a1), s1Dist:dist(a1), s2:a2.length, s3:a3.length, s4:prim.length };
+  }
+  function renderFunnel(){
+    const el=document.getElementById('funnel'); if(!el) return;
+    if(!matched.length){ el.innerHTML=''; return; }
+    const f=funnelCounts(), c=company, n=v=>v.toLocaleString();
+    const missing3 = ['revenueRange','employeeCount','representativeAge'].filter(k=>!c[k]).length + (Array.isArray(c.specialStatus)?0:1);
+    const step=(no,label,val,sub,extra='')=>`<li class="fn-step${no===4?' last':''}"><span class="fn-no">${no}</span>
+      <span class="fn-t"><b>${label}</b><small>${sub}</small></span><span class="fn-n">${n(val)}</span>${extra}</li>`;
+    el.innerHTML=`<section class="funnel-box" aria-label="매칭 단계">
+      <div class="fb-head">매칭 단계 <small>전체 공고 ${n(f.total)}건에서 단계별로 남은 사업</small></div>
+      <ol class="fn-steps">
+        ${step(1,'지역·기업규모·업종',f.s1,`${esc(c.region||'')}${c.district?' '+esc(c.district):''} · ${esc(c.companyType||'')} · ${esc(c.industry||'')}${f.s1Local?` — 내 지역 ${n(f.s1Local)}${f.s1Dist?` · ${esc(c.district)} ${n(f.s1Dist)}`:''}`:''}`)}
+        ${c.companyType==='예비창업자' ? '' : step(2,'사업자 형태·설립연도',f.s2,`${esc(c.bizRegType||'형태 미입력')} · ${c.establishedYear?esc(c.establishedYear)+'년 설립':'설립연도 미입력'}`)}
+        ${step(3,'세부 자격',f.s3, missing3?`매출·인원·연령·해당 항목 중 ${missing3}개 미입력`:'매출·인원·연령·인증 반영',
+          missing3?`<button type="button" class="fn-more" onclick="App.openProgressive()">입력하면 더 정확</button>`:'')}
+        ${step(4,'필요한 지원 맞춤',f.s4,'추천·조건부 — 아래 목록')}
+      </ol>
+      ${f.s3>f.s4?`<button type="button" class="fn-link" onclick="App.showConditionsMet()">3단계까지 맞지만 필요한 지원과 덜 맞는 사업은 아래 '조건은 맞는 사업'에서 볼 수 있어요 →</button>`:''}
+    </section>`;
+  }
+  function showConditionsMet(){ if(!showCheck){ showCheck=true; listLimit=APP_CONFIG.LIST_LIMIT; render(); }
+    const h=[...document.querySelectorAll('.list-head')].find(x=>/조건은 맞는 사업/.test(x.textContent)) || document.querySelector('.check-row');
+    if(h) h.scrollIntoView({behavior:'smooth', block:'start'}); }
   function renderDashboard(){
+    renderFunnel();
     const el=document.getElementById('dashboard'); if(!el||!dash) return;
     const d=dash;
     const live = ProgramProvider.lastMode==='live';
@@ -1884,7 +1921,7 @@ const App = (function(){
         <div><b>${esc(c.label)}</b>${c.evidence?`<span class="cond-ev">${esc(c.evidence)}</span>`:''}</div></div>`;
     }).join('') || '<p class="muted">판정할 자격 항목이 공고에 없습니다.</p>';
     const pref=(p.preferenceConditions||[]).map(x=>`<span class="pref">우대 ${esc(x)}</span>`).join('');
-    const EV_LABEL={businessAgeMax:'업력 상한',businessAgeMin:'업력 하한',employeeMax:'근로자 상한',employeeMin:'근로자 하한',revenueMax:'매출 상한',revenueMin:'매출 하한',representativeAgeMax:'대표자 연령 상한',representativeAgeMin:'대표자 연령 하한',targetRegions:'대상 지역',targetDistricts:'대상 시·군·구',preStartupAllowed:'예비창업자 신청',targetIndustries:'대상 업종',excludedIndustries:'제외 업종',specialRequirements:'필수 자격',requiresNoTaxArrears:'체납 제한',supportAmountMax:'지원금'};
+    const EV_LABEL={businessAgeMax:'업력 상한',businessAgeMin:'업력 하한',employeeMax:'근로자 상한',employeeMin:'근로자 하한',revenueMax:'매출 상한',revenueMin:'매출 하한',representativeAgeMax:'대표자 연령 상한',representativeAgeMin:'대표자 연령 하한',targetRegions:'대상 지역',targetDistricts:'대상 시·군·구',preStartupAllowed:'예비창업자 신청',targetIndustries:'대상 업종',excludedIndustries:'제외 업종',specialRequirements:'필수 자격',requiresNoTaxArrears:'체납 제한',supportAmountMax:'지원금',eligibility:'신청자격'};
     const evObj = Object.assign({}, p._ruleEvidence||{}, p._docEvidence||{}, p._eligibilityEvidence||{});
     const ev = Object.entries(evObj).filter(([,v])=>typeof v==='string').slice(0,8).map(([k,v])=>`<li><b>${esc(EV_LABEL[k]||k)}</b> “${esc(v)}”</li>`).join('');
     const depth = p._aiEnriched ? 'AI 본문 분석(근거 문구 대조)' : p.eligibilityDepth==='doc' ? '공고문(PDF) 신청자격 분석' : p.eligibilityDepth==='rule' ? '공고 본문 정형 문구 분석' : p.eligibilityDepth==='listing' ? '공고 목록 정보(본문 미분석)' : ProgramProvider.lastMode==='live' ? '공고 정보' : 'DEMO 예시 데이터';

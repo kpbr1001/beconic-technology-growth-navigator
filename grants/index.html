@@ -566,6 +566,20 @@ header.site{border-bottom-color:transparent;box-shadow:0 1px 0 rgba(23,37,68,.06
 .rgn-badge.t0{background:var(--fill);color:var(--sub)}
 .flag-badge{background:#fff3d6}
 .need-group-head .ng-sub{font-size:12px;font-weight:500;color:var(--sub);margin-left:6px;letter-spacing:0}
+.funnel-box{background:#fff;border-radius:20px;box-shadow:var(--shadow-sm);padding:18px 20px;margin:0 0 16px}
+.funnel-box .fb-head{font-weight:800;font-size:15px;margin-bottom:12px}
+.funnel-box .fb-head small{font-weight:500;color:var(--sub);font-size:12.5px;margin-left:6px}
+.fn-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.fn-step{display:grid;grid-template-columns:26px 1fr auto;align-items:center;column-gap:12px;row-gap:6px;padding:10px 12px;border-radius:14px;background:var(--fill)}
+.fn-step.last{background:#eaf0fb}
+.fn-no{width:26px;height:26px;border-radius:50%;background:#fff;color:var(--navy);font-weight:800;font-size:13px;display:grid;place-items:center}
+.fn-step.last .fn-no{background:var(--navy);color:#fff}
+.fn-t{min-width:0;display:flex;flex-direction:column;gap:1px}
+.fn-t b{font-size:14px}
+.fn-t small{font-size:12px;color:var(--sub);line-height:1.45}
+.fn-n{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
+.fn-more{grid-column:2/4;justify-self:start;border:none;background:#fff;color:var(--navy);font:inherit;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:10px;cursor:pointer}
+.fn-link{margin-top:10px;border:none;background:none;padding:0;color:var(--navy);font:inherit;font-size:13px;font-weight:700;cursor:pointer;text-align:left}
 .var-badge{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:8px;background:var(--fill);color:var(--sub);cursor:help}
 .rc-amt-row{border:none;background:var(--fill);border-radius:14px;padding:14px 16px;gap:20px;margin-bottom:8px;align-items:flex-start}
 .rc-amt{flex:1 1 auto;min-width:0;gap:3px}
@@ -670,7 +684,7 @@ header.site{border-bottom-color:transparent;box-shadow:0 1px 0 rgba(23,37,68,.06
 @media print{
   .rc-help,.np-group.upcoming,.watch-hit,.name-search,
   header.site,footer.site,.landing-hero,.value-strip,.final-cta,.toolbar,.pp-banner,.result-count,.more-row,
-  .res-actions,.rc-actions,.update-banner,.draft-banner,.cta-banner,.hook-cta,.disclaimer button,
+  .res-actions,.rc-actions,.update-banner,.fn-more,.fn-link,.draft-banner,.cta-banner,.hook-cta,.disclaimer button,
   #view-landing,#view-form,#view-loading,.modal-bg,.toast{display:none !important}
   .need-group-cards,.cards{display:grid !important}
   body{background:#fff}
@@ -799,6 +813,9 @@ header.site{border-bottom-color:transparent;box-shadow:0 1px 0 rgba(23,37,68,.06
     <div id="dashboard"></div>
 
     <!-- Progressive 배너 -->
+    <!-- 매칭 단계(깔때기) -->
+    <div id="funnel"></div>
+
     <div id="ppBanner"></div>
 
     <!-- 결과 개수 안내 -->

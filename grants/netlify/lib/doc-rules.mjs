@@ -191,6 +191,9 @@ export function applyDoc(p, doc) {
     ev.targetDistricts = `공고문: ${doc.districtEvidence}`;
   }
   if (doc.amount && q.supportAmountMax == null) { q.supportAmountMax = doc.amount; q.supportAmountText = doc.amountText; ev.supportAmountMax = `공고문: ${doc.amountText}`; }
+  // 자격 절을 찾아 읽었는데 숫자 제한(업력·매출·근로자·연령)이 없으면 '제한 없음'도 분석 결과로 쓴다.
+  // 검증 세트 180건 실측: 자격 절 찾음 88%, 그중 제한을 못 뽑은 138건에서 실제 제한을 놓친 공고 4건(2.9%)
+  if (doc.sectionFound && !Object.keys(ev).length) ev.eligibility = '공고문 신청자격 절 확인 — 업력·매출·근로자 수 제한 문구 없음';
   if (!Object.keys(ev).length) return q;
   q._docEvidence = ev;
   if (q.eligibilityDepth === 'listing' || q.eligibilityDepth === 'rule') q.eligibilityDepth = 'doc';
