@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.22.0',
+  version: 'v3.23.0',
   updated: '2026-10-30',
   changelog: [
+    { v:'v3.23.0', d:'2026-10-30', note:'업종 판정 추가: 공고명으로 대상 산업(제조·ICT·바이오·에너지·유통서비스 + 방산·소방·환경·원자력·의료헬스 등)을 추론해 귀사 업종과 비교(기술을 도입·활용하는 사업은 제외), 결과 아래 \'조건은 맞는 사업\'(지역·기업형태·업종은 맞고 분야·세부 자격은 확인 필요)을 내 지역 사업 먼저 보여줌. 정밀도 41.0%→42.3%' },
     { v:'v3.22.0', d:'2026-10-30', note:'매칭 정밀도 개선: 대상이 정해진 사업(장애인기업·사회적경제·보훈·재창업·청년·중장년·위기지역·특구·업종 한정)을 해당 여부로 판정하고 모르면 \'확인 필요\'로 내림, 선택 정보 \'해당되는 항목\' 추가, 전국 공고라도 공고명·기관이 다른 지역이면 확인 필요, 차수·변경 공고는 하나로 묶고 지원별 추천에 나온 사업은 전체 목록에서 반복하지 않음. 고정 스냅샷 8개 기업 유형 상위 10건 정밀도 30.8%→41.0%' },
     { v:'v3.21.1', d:'2026-10-30', note:'카카오톡 미리보기 이미지를 Pretendard 글꼴로 다시 제작(원본 HTML 보관·재생성 스크립트), 카카오 챗봇 카드에 썸네일(맞춤 매칭·상담·진단 분야별), 지원사업 MATCH 카드 버튼 \'지원사업 찾기\'' },
     { v:'v3.21.0', d:'2026-10-30', note:'화면 디자인 정리(토스식): 선 대신 면으로 구분·넉넉한 여백·버튼 위계, 단어 단위 줄바꿈(제목·버튼이 한두 글자로 끊기지 않게), 결과 카드 정보 순서 정리(상태·마감 → 사업명 → 지원금·적합도 → 버튼), 모바일 유형 선택 한 줄 목록·입력 다음 버튼 하단 고정·상세는 아래에서 올라오는 창, 글자 대비 접근성 기준 충족' },
@@ -302,8 +303,24 @@ const SECTOR_ONLY = [
   {label:'관광', re:/관광(?:진흥|사업|기업|객)|여행업|숙박업|MICE/, ok:c=>['관광·MICE·숙박'].includes(c.industry)},
   {label:'뷰티', re:/K-?뷰티|화장품/, ok:c=>['뷰티·화장품'].includes(c.industry)},
   {label:'핀테크·금융', re:/핀테크|금융\s*테스트베드|마이데이터/, ok:c=>INDUSTRIES.find(i=>i.v===c.industry)?.group==='ICT·SW'},
+  {label:'방산', re:/방산|국방|방위산업/, ok:c=>['제조·소재','신산업·에너지','ICT·SW'].includes(industryGroup(c.industry))},
+  {label:'소방산업', re:/소방\s*(?:산업|기업|제품)/, ok:c=>industryGroup(c.industry)==='제조·소재'},
+  {label:'환경·기후', re:/환경\s*(?:기업|산업)|기후\s*테크|녹색\s*(?:산업|기업)/, ok:c=>c.industry==='환경·수자원' || industryGroup(c.industry)==='신산업·에너지'},
+  {label:'원자력·방사선', re:/원자력|방사선/, ok:c=>['제조·소재','신산업·에너지','바이오·헬스'].includes(industryGroup(c.industry))},
+  {label:'의료·헬스', re:/슬립\s*테크|의료기기|디지털\s*헬스|헬스케어/, ok:c=>industryGroup(c.industry)==='바이오·헬스'},
   {label:'기술기업', re:/기술임치|기술가치평가|기술보호|기술분쟁|IP\s*(?:보증|담보)|지식재산\s*평가|지식재산평가/, ok:c=>TECH_GROUPS.includes(INDUSTRIES.find(i=>i.v===c.industry)?.group)}
 ];
+/* 공고명으로 대상 산업 추론 — 목록 데이터에 업종 조건이 없어서(운영 0%) 공고명의 산업 표현을 업종 그룹과 비교한다.
+   기술을 '도입·활용'하는 사업(AI 바우처·AI 교육 등)은 그 기술 업종 대상이 아니라서 ICT는 '○○ 기업·산업·창업·실증'처럼 업종을 가리킬 때만 */
+const PROGRAM_SECTORS = [
+  {g:'제조·소재', re:/제조|공장|소공인|뿌리\s*(?:기업|산업)|금형|주조|용접|열처리|표면처리|소재|부품|공작기계|섬유|화학|반도체|디스플레이|조선|금속|기계\s*(?:산업|부품|기업)/},
+  {g:'ICT·SW', re:/(?:소프트웨어|(?<![A-Za-z])SW|ICT|정보통신|인공지능|(?<![A-Za-z])AI|빅데이터|클라우드|메타버스|블록체인|정보보호|사이버\s*보안|게임)\s*(?:·\s*\S+\s*)?(?:기업|산업|스타트업|창업|분야|전문기업|개발사|실증|융합|센터)/},
+  {g:'바이오·헬스', re:/바이오|제약|의약|의료기기|헬스케어|디지털\s*헬스|화장품|뷰티|건강기능/},
+  {g:'신산업·에너지', skip:/이용|효율|절감|합리화|보급|바우처|전환|진단|감량/, re:/에너지|태양광|수소|2차\s*전지|이차전지|배터리|모빌리티|자율주행|자동차|드론|로봇|우주|항공|스마트시티|(?<![A-Za-z])IoT/},
+  {g:'유통·서비스', re:/전통시장|상점가|상권|골목|외식|음식점|식당|프랜차이즈|도소매|숙박|관광|서비스업/}
+];
+function programSectors(p){ const n=p.programName||''; return PROGRAM_SECTORS.filter(x=>x.re.test(n) && !(x.skip && x.skip.test(n))).map(x=>x.g); }
+function industryGroup(ind){ return INDUSTRIES.find(i=>i.v===ind)?.group || null; }
 function sectorMismatch(p, c){ if(!c.industry) return null; const n=p.programName||''; return SECTOR_ONLY.find(x=>x.re.test(n) && !x.ok(c)) || null; }
 const AGRI_ONLY = /농업인|어업인|농어업인|귀농|귀어|농식품|농업경영체|해양수산|수산(?!부산물)|축산|임업|산림/;
 const AGRI_NEAR = ['농림수산업','기능성식품','음식점업(F&B)','도소매업','물류·유통','바이오·제약','환경·수자원'];
@@ -622,6 +639,10 @@ function hardEligibility(p, c){
     else if(ti.includes(c.industry) || ti.includes(cBroad)) add('업종 조건','pass',`${c.industry} 대상`);
     else if(p.category==='제조혁신' || p.subCategory==='제조혁신') add('업종 조건', cBroad==='제조업'?'pass':'fail', cBroad==='제조업'?'제조업':'제조업 아님');
     else add('업종 조건','unknown',`대상업종: ${ti.slice(0,3).join('/')}`);
+  } else if(c.industry && programSectors(p).length){
+    const sec=programSectors(p), g=industryGroup(c.industry);
+    if(sec.includes(g)) add('업종 조건','pass',`공고명상 ${sec.join('·')} 분야 · ${c.industry}`);
+    else add('업종 조건','unknown',`공고명상 ${sec.join('·')} 분야 사업 — ${c.industry} 기업 신청 가능 여부 공고 확인`, true);
   } else add('업종 조건','na');
 
   // 5) 매출 — AI 추출 숫자(원) 우선, 없으면 공고 문구
@@ -786,7 +807,10 @@ function fitScore(p, c, regionTier, elig){
   if(c.businessDescription) use('semantic', semanticFit(p,c));
   use('stage', stageFit(p,c));
   const ti = p.targetIndustries||[], cBroad = industryToBroad(c.industry);
-  use('industry', (!ti.length || ti.includes('전업종') || ti.includes(c.industry) || ti.includes(cBroad)) ? 1 : 0.4);
+  const sec = (!ti.length && c.industry) ? programSectors(p) : [];
+  use('industry', sec.length ? (sec.includes(industryGroup(c.industry)) ? 1 : 0.4)
+    : (!ti.length || ti.includes('전업종') || ti.includes(c.industry) || ti.includes(cBroad)) ? 1 : 0.4);
+  if(sec.length && sec.includes(industryGroup(c.industry))) parts._sectorHit = true;
   // 보유 인증이 공고에 언급되면 관련도 높음(예: 이노비즈 기업이 '이노비즈 기업 대상' 공고)
   const held = CERTS.filter(x=>c[x.k]===true);
   if(CERTS.some(x=>c[x.k]!=null)){
@@ -1479,6 +1503,7 @@ const App = (function(){
     else if(filter!=='all'){ const ps=needToPurposes(filter); list=list.filter(m=>(m.program.supportPurposes||[]).some(pp=>ps.includes(pp))); }
     return list.length;
   }
+  function hiddenCheckLocal(){ return listed().filter(m=>m.state==='확인 필요' && m.regionTier>=1).length; }
   function visibleList(){
     let list = baseList();
     if(fundedOnly) list=list.filter(m=> m.program.supportAmountMax>0);
@@ -1608,23 +1633,32 @@ const App = (function(){
     return `<section class="closing-strip" aria-label="이번 주 마감">
       <div class="cs-head">⏰ 이번 주 마감 <small>추천·조건부 ${soon.length}건${soon.length>5?' 중 마감 빠른 5건':''}</small></div>${rows}</section>`;
   }
+  // ② 조건은 맞는 사업: 지역·기업형태·업종에 걸리지 않지만 고른 지원과 덜 맞거나 확인할 정보가 남은 사업 — 내 지역 사업 먼저
   function checkSection(items){
     if(!items.length) return '';
-    const shown = items.slice(0, listLimit);
-    return `<div class="need-group check-group">
+    const byFit=(a,b)=>((b.regionTier??-1)-(a.regionTier??-1)) || (b.fit-a.fit);
+    const local=items.filter(m=>m.regionTier>=1).sort(byFit), nation=items.filter(m=>!(m.regionTier>=1)).sort(byFit);
+    let left=listLimit;
+    const part=(title,icon,list,sub)=>{ if(!list.length) return ''; const shown=list.slice(0, Math.max(0,left)); left-=shown.length;
+      return `<div class="need-group check-group">
         <div class="need-group-head">
-          <span class="ng-icon" aria-hidden="true">🔎</span>
-          <h3 class="ng-title">덜 맞거나 정보가 더 필요한 사업</h3>
-          <span class="ng-count">${items.length}건</span>
+          <span class="ng-icon" aria-hidden="true">${icon}</span>
+          <h3 class="ng-title">${title} <small class="ng-sub">${sub}</small></h3>
+          <span class="ng-count">${list.length}건</span>
         </div>
-        <div class="need-group-cards">${shown.map(cardHTML).join('')}</div>
-        ${items.length>shown.length?`<div class="more-row"><button type="button" class="more-btn" onclick="App.showMore()">${items.length-shown.length}건 더 보기</button></div>`:''}
-      </div>`;
+        ${shown.length?`<div class="need-group-cards">${shown.map(cardHTML).join('')}</div>`:''}
+      </div>`; };
+    const html = `<div class="list-head">조건은 맞는 사업 <small>지역·기업형태·업종은 맞고, 지원 분야나 세부 자격은 공고 확인</small></div>`
+      + part(`내 지역 사업`, '📍', local, `${company.district||company.region||''} · 지역 공고는 경쟁이 덜한 경우가 많아요`)
+      + part('전국 사업', '🔎', nation, '고른 지원과 덜 맞거나 확인할 정보가 남은 사업');
+    const rest = items.length - Math.min(items.length, listLimit);
+    return html + (rest>0 ? `<div class="more-row"><button type="button" class="more-btn" onclick="App.showMore()">${rest}건 더 보기</button></div>` : '');
   }
   function checkRow(){
     const n = hiddenCheckCount();
-    if(n) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">고른 지원과 덜 맞거나 정보가 부족한 사업 ${n}건 더 보기</button>
-      <p>필요한 지원을 바꾸거나 선택 정보(매출 규모·인증 등)를 넣으면 이 중 일부가 추천·조건부로 바뀔 수 있어요.</p></div>`;
+    if(n){ const local=hiddenCheckLocal();
+      return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">조건은 맞는 사업 ${n}건 더 보기${local?` · 내 지역 ${local}건`:''}</button>
+      <p>지역·기업형태·업종은 맞지만 고른 지원과 덜 맞거나 확인할 정보가 남은 사업이에요. 선택 정보(해당되는 항목·매출 규모 등)를 넣으면 일부가 추천으로 바뀔 수 있어요.</p></div>`; }
     if(showCheck && primaryOf(listed()).length) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">추천·조건부만 보기</button></div>`;
     return '';
   }
