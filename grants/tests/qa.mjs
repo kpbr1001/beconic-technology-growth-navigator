@@ -95,6 +95,23 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
       monthAge: (() => { const n = new Date(); const y = n.getFullYear() - 7, m = n.getMonth() + 1; const mk = (mm, yy = y) => cond({ businessAgeMax: 7 }, { ...sme, establishedYear: String(yy), establishedMonth: mm, businessAge: n.getFullYear() - yy }, '업력 조건').result;
         return [mk(m), mk(m === 12 ? 12 : m + 3 > 12 ? 12 : m + 3, y + 1), mk(m, y - 1)]; })(),
       sanitize: sanitizeCompany({ region: '<img>', industry: '제조업', establishedYear: '1800', companyType: '중소기업', exportHistory: 'yes' }),
+      // 정밀도: 대상 한정 사업(운영 데이터에서 '추천'으로 잘못 뜬 사례)
+      disabled: ['장애인 창업 컨설팅지원 대상자 모집 공고', null, [], ['disabled']].slice(1).map((st) => cond({ programName: '2026년 장애인 창업 컨설팅지원 대상자 모집 공고' }, { ...sme, specialStatus: st }, '장애인기업 대상').result),
+      disabledHire: cond({ programName: '2026년 장애인 고용장려금 지원' }, sme, '장애인기업 대상'),
+      social: runMatching([P({ programName: '[경기] 2026년 사회적경제조직 특례보증 및 이차보전 지원 사업 공고', targetRegions: ['경기'], applicationEnd: plus(30), businessAgeMax: 9, supportAmountMax: 1e8 })], C({ ...sme, region: '경기' }))[0].state,
+      socialNo: runMatching([P({ programName: '사회적기업 시설·운영비 지원사업', applicationEnd: plus(30) })], C({ ...sme, specialStatus: [] }))[0].state,
+      senior: [cond({ programName: '중장년 소상공인 디지털 전환지원' }, { ...sme, representativeAge: '30대' }, '중장년 대상').result, cond({ programName: '시니어인턴십 참여 기업 모집' }, sme, '중장년 대상')],
+      zone: cond({ programName: '강원연구개발특구육성(R&D)사업 참여기업 모집' }, sme, '소재지 한정').result,
+      agri: (() => { const m = runMatching([P({ programName: '2026년 농식품 크라우드펀딩 지원사업 공고', applicationEnd: plus(30), businessAgeMax: 9, supportAmountMax: 1e8 })], C({ ...sme, industry: 'AI·빅데이터' }))[0]; return [m.state, m.fitParts._misfit === true]; })(),
+      // 정밀도: '전국' 공고의 공고명·기관 지역
+      hintOther: cond({ programName: '「2026년 창업-BuS at 경북」참여기업 모집공고', agency: '경북창조경제혁신센터', targetRegions: ['전국'] }, { ...sme, region: '대전' }, '사업장 소재지').result,
+      hintSame: runMatching([P({ programName: '2026년 대전 창업도시 프로젝트', agency: '대전창조경제혁신센터', targetRegions: ['전국'] })], C({ ...sme, region: '대전' }))[0].regionTier,
+      hintFalse: cond({ programName: '[경남] 2026년 수산부산물 재활용 지원', agency: '경남테크노파크', targetRegions: ['전국'] }, { ...sme, region: '경남' }, '사업장 소재지').result,
+      hintNone: cond({ programName: '2026 중소기업 정책자금', agency: '중소벤처기업진흥공단', targetRegions: ['전국'] }, { ...sme, region: '대전' }, '사업장 소재지').result,
+      // 정밀도: 차수·변경 공고 묶기
+      variants: (() => { const m = runMatching([P({ sourceProgramId: 'V1', programName: '2026년 1차 지역산업위기대응 이차보전 지원사업 변경 공고', applicationEnd: plus(30) }), P({ sourceProgramId: 'V2', programName: '2026년 2차 지역산업위기대응 이차보전 지원사업 공고', applicationEnd: plus(30) }), P({ sourceProgramId: 'V3', programName: '2026년 2차전지 소재 실증 공고', applicationEnd: plus(30) })], C(sme));
+        return [m.filter((x) => x.variantOf).length, m.filter((x) => x.variantCount === 1).length, m.find((x) => x.program.sourceProgramId === 'V3').variantOf || null, buildDashboard(m).total]; })(),
+      specialSan: sanitizeCompany({ specialStatus: ['disabled', 'x', 'disabled'] }).specialStatus,
     };
   });
   check('연령대: 30대 vs 만39세 이하 → 충족 (v3.7은 문자열 비교로 전원 탈락)', r.age30 === 'pass', r.age30);
@@ -124,6 +141,17 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('대시보드: 보조금과 융자 한도 분리 합산', r.loanSplit[0] === 5e7 && r.loanSplit[1] === 1e9, JSON.stringify(r.loanSplit));
   check('시·군 기관 공고: 다른 시·군 미충족·같은 시·군 내 지역(2)·시·군 미입력 확인 필요', r.distNo === 'fail' && r.distYes === 2 && r.distUnknown === 'unknown', `${r.distNo}/${r.distYes}/${r.distUnknown}`);
   check('설립 연·월: 7년 경계 월은 확인 필요, 6년 몇 개월은 충족, 8년은 미충족', r.monthAge[0] === 'unknown' && r.monthAge[1] === 'pass' && r.monthAge[2] === 'fail', r.monthAge.join('/'));
+  check('대상 한정: 장애인기업 사업 — 미입력 확인 필요·해당 없음 미충족·해당 충족', r.disabled.join('/') === 'unknown/fail/pass', r.disabled.join('/'));
+  check('대상 한정: 장애인 "고용" 지원은 채용 사업이라 기업 자격으로 보지 않음', r.disabledHire == null);
+  check('대상 한정: 사회적경제 사업은 해당 여부 미입력이면 "추천" 아님', r.social !== '추천', r.social);
+  check('대상 한정: 사회적기업 사업, 해당 없음 입력 → 대상 아님', r.socialNo === '대상 아님', r.socialNo);
+  check('중장년 사업: 30대 대표 미충족, 시니어 "인턴십"(채용)은 제외', r.senior[0] === 'fail' && r.senior[1] == null);
+  check('위기지역·특구 소재 사업은 확인 필요', r.zone === 'unknown');
+  check('농·수산·식품 사업: 먼 업종(AI)은 추천 아님·관련도 낮춤', r.agri[0] !== '추천' && r.agri[1] === true, JSON.stringify(r.agri));
+  check('전국 공고·기관 경북 → 대전 기업 확인 필요, 대전 기관 → 대전 기업 지역 우선(1)', r.hintOther === 'unknown' && r.hintSame === 1, `${r.hintOther}/${r.hintSame}`);
+  check('지역 추론 오탐 방지: "수산부산물"은 부산 아님, 기관명에 지역 없으면 전국 그대로', r.hintFalse === 'pass' && r.hintNone === 'pass', `${r.hintFalse}/${r.hintNone}`);
+  check('차수·변경 공고 묶기(1차·2차·변경 → 1건, "2차전지"는 별개), 대시보드 집계도 1건', r.variants[0] === 1 && r.variants[1] === 1 && r.variants[2] === null && r.variants[3] === 2, JSON.stringify(r.variants));
+  check('해당되는 항목 저장값 정제(허용 키·중복 제거)', JSON.stringify(r.specialSan) === '["disabled"]', JSON.stringify(r.specialSan));
   check('저장값 정제: 허용 밖 값 제거', r.sanitize.region === null && r.sanitize.establishedYear === null && r.sanitize.exportHistory === null && r.sanitize.industry === '제조업');
   await page.context().close();
 }
@@ -271,7 +299,8 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.locator('.opt', { hasText: '이노비즈' }).click();
   check('인증 하나 선택 → 나머지 없음(false)', await page.evaluate(() => { const c = App.company(); return c.innobiz === true && c.ventureCertified === false && c.mainbiz === false; }));
   await toResults(page);
-  check('남양주 특례보증: 내 시군구 배지', await page.locator('.need-group .rcard', { hasText: '남양주시' }).locator('.rgn-badge.t2').count() === 1);
+  check('남양주 특례보증: 내 시군구 배지', await page.locator('#cards .rcard', { hasText: '남양주시' }).locator('.rgn-badge.t2').count() === 1);
+  check('지원별 추천에 나온 사업은 전체 목록에서 반복하지 않음', await page.evaluate(() => { const ids = [...document.querySelectorAll('#cards .rcard')].map((c) => c.dataset.id); return ids.length > 0 && ids.length === new Set(ids).size; }));
   check('운영·사업 자금 선택 → 지원별 추천에 남양주 특례보증', await page.locator('.need-picks .rcard', { hasText: '남양주' }).count() === 1);
   const hero = await page.locator('.dash-hero').innerText();
   check('대시보드: 합계 성격(단순 합계·실제 수령액과 다름) 명시', /단순 합계/.test(hero) && /실제/.test(hero), hero.replace(/\s+/g, ' ').slice(0, 120));
@@ -356,7 +385,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('실시간 목록 공고는 "추천" 확정 없음(조건부 이하)', st.length > 0 && !st.includes('추천'), [...new Set(st)].join(','));
   check('그룹당 카드 제한 + 더 보기(지원별 추천 3건은 별도)', await page.locator('#cards .need-group .rcard').count() === 6 && await page.locator('.need-group .more-btn').count() === 1 && await page.locator('.need-picks .rcard').count() === 3);
   await page.locator('.need-group .more-btn').click();
-  check('더 보기 → 전체 표시', await page.locator('#cards .need-group .rcard').count() === 120);
+  check('더 보기 → 전체 표시(위 추천 3건 제외)', await page.locator('#cards .need-group .rcard').count() === 117 && /위 추천 3건 제외/.test(await page.locator('.list-head').innerText()));
   await page.emulateMedia({ media: 'print' });
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
   const printed = await page.locator('#cards .rcard').count();
@@ -364,7 +393,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.pdf({ path: path.join(OUT, 'report-live.pdf'), format: 'A4', printBackground: true });
   await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
   await page.emulateMedia({ media: 'screen' });
-  check('인쇄 후 화면 목록 복원', await page.locator('#cards .need-group .rcard').count() === 120);
+  check('인쇄 후 화면 목록 복원', await page.locator('#cards .need-group .rcard').count() === 117);
   await page.context().close();
 }
 

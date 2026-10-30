@@ -115,6 +115,7 @@ jobs:
           (cd grants/dist && python3 -m http.server 8793 --bind 127.0.0.1 >/dev/null 2>&1 &)
           sleep 1
           node grants/tests/qa.mjs http://127.0.0.1:8793/
+          node grants/tests/eval-precision.mjs http://127.0.0.1:8793/
       - name: 검수 결과물 업로드
         if: always()
         uses: actions/upload-artifact@v4
