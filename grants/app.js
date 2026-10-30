@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.21.1',
+  version: 'v3.22.0',
   updated: '2026-10-30',
   changelog: [
+    { v:'v3.22.0', d:'2026-10-30', note:'매칭 정밀도 개선: 대상이 정해진 사업(장애인기업·사회적경제·보훈·재창업·청년·중장년·위기지역·특구·업종 한정)을 해당 여부로 판정하고 모르면 \'확인 필요\'로 내림, 선택 정보 \'해당되는 항목\' 추가, 전국 공고라도 공고명·기관이 다른 지역이면 확인 필요, 차수·변경 공고는 하나로 묶고 지원별 추천에 나온 사업은 전체 목록에서 반복하지 않음. 고정 스냅샷 8개 기업 유형 상위 10건 정밀도 30.8%→41.0%' },
     { v:'v3.21.1', d:'2026-10-30', note:'카카오톡 미리보기 이미지를 Pretendard 글꼴로 다시 제작(원본 HTML 보관·재생성 스크립트), 카카오 챗봇 카드에 썸네일(맞춤 매칭·상담·진단 분야별), 지원사업 MATCH 카드 버튼 \'지원사업 찾기\'' },
     { v:'v3.21.0', d:'2026-10-30', note:'화면 디자인 정리(토스식): 선 대신 면으로 구분·넉넉한 여백·버튼 위계, 단어 단위 줄바꿈(제목·버튼이 한두 글자로 끊기지 않게), 결과 카드 정보 순서 정리(상태·마감 → 사업명 → 지원금·적합도 → 버튼), 모바일 유형 선택 한 줄 목록·입력 다음 버튼 하단 고정·상세는 아래에서 올라오는 창, 글자 대비 접근성 기준 충족' },
     { v:'v3.20.0', d:'2026-10-29', note:'카카오 챗봇 허브 서버(오픈빌더 스킬): 카톡 채널에서 사업명 검색·마감 임박·경영진단 안내·상담 연결, 진단툴 목록 한 곳에서 관리' },
@@ -281,6 +282,49 @@ const CERTS = [
   {k:'patentStatus', label:'특허 보유', kw:/특허/}
 ];
 const CERT_KEYS = CERTS.map(c=>c.k);
+/* 대상 한정 사업(공고명·기관 기준) — 해당 기업만 신청할 수 있는 사업. 선택 정보 '해당되는 항목'으로 판정한다.
+   strict: 답했는데 해당 없으면 대상 아님 / 아니면 확인 필요. notEmp: 고용·채용 사업(장애인 '고용' 지원 등)은 채용 대상이라 제외 */
+const SPECIAL_TARGETS = [
+  {k:'disabled', label:'장애인기업', re:/장애인/, agency:true, notEmp:true, strict:true},
+  {k:'social',   label:'사회적경제기업', sub:'사회적기업·협동조합·마을기업', re:/사회적\s*(?:경제|기업)|협동조합|마을기업|자활기업|소셜\s*벤처/, agency:true, strict:true},
+  {k:'veteran',  label:'제대군인·보훈', re:/보훈|국가유공자|제대군인|전역\s*(?:예정\s*)?장병/, notEmp:true, strict:true},
+  {k:'restart',  label:'재창업·폐업(예정)', re:/재창업|재도전|재기\s*(?:지원|창업|자금)|폐업|사업\s*정리/, strict:false}
+];
+const SPECIAL_KEYS = SPECIAL_TARGETS.map(x=>x.k);
+const EMPLOY_PROGRAM = /고용|채용|일자리|근로자|인턴|직무|훈련|장려금/;
+const ZONE_ONLY = /위기\s*지역|산업위기|고용위기|연구개발특구|규제자유특구/;
+const SENIOR_ONLY = /중장년|신중년|시니어/;
+const YOUTH_ONLY = /청년(?!몰)/;   // 공고명에 '청년'(대체로 만 39세 이하) — 청년몰은 상가 이름이라 제외
+/* 업종이 정해진 사업(공고명 기준) — 업종이 멀면 관련도 낮춤(자격 확정은 공고 확인) */
+const TECH_GROUPS = ['제조·소재','ICT·SW','바이오·헬스','신산업·에너지'];
+const SECTOR_ONLY = [
+  {label:'문화·콘텐츠', re:/문화산업|콘텐츠|게임|웹툰|방송|영상\s*(?:제작|기업)|출판|음악|공연|로케이션/, ok:c=>['게임·콘텐츠','문화·예술·미디어','디자인'].includes(c.industry)},
+  {label:'관광', re:/관광(?:진흥|사업|기업|객)|여행업|숙박업|MICE/, ok:c=>['관광·MICE·숙박'].includes(c.industry)},
+  {label:'뷰티', re:/K-?뷰티|화장품/, ok:c=>['뷰티·화장품'].includes(c.industry)},
+  {label:'핀테크·금융', re:/핀테크|금융\s*테스트베드|마이데이터/, ok:c=>INDUSTRIES.find(i=>i.v===c.industry)?.group==='ICT·SW'},
+  {label:'기술기업', re:/기술임치|기술가치평가|기술보호|기술분쟁|IP\s*(?:보증|담보)|지식재산\s*평가|지식재산평가/, ok:c=>TECH_GROUPS.includes(INDUSTRIES.find(i=>i.v===c.industry)?.group)}
+];
+function sectorMismatch(p, c){ if(!c.industry) return null; const n=p.programName||''; return SECTOR_ONLY.find(x=>x.re.test(n) && !x.ok(c)) || null; }
+const AGRI_ONLY = /농업인|어업인|농어업인|귀농|귀어|농식품|농업경영체|해양수산|수산(?!부산물)|축산|임업|산림/;
+const AGRI_NEAR = ['농림수산업','기능성식품','음식점업(F&B)','도소매업','물류·유통','바이오·제약','환경·수자원'];
+/* 농·수산·식품 분야 사업인데 업종이 멀면 관련도 낮음(자격 확정은 공고 확인) */
+function agriMismatch(p, c){ return !!c.industry && AGRI_ONLY.test(p.programName||'') && !AGRI_NEAR.includes(c.industry); }
+
+/* '전국' 공고인데 공고명·기관에 시·도가 있으면(예: 강원창조경제혁신센터) 그 지역 중심 사업일 가능성 — 다른 지역은 '확인 필요' */
+const SIDO_LONG = [[/경상남도/,'경남'],[/경상북도/,'경북'],[/전라남도/,'전남'],[/전라북도|전북특별자치도/,'전북'],[/충청남도/,'충남'],[/충청북도/,'충북'],
+  [/강원특별자치도|강원도/,'강원'],[/제주특별자치도|제주도/,'제주'],[/세종특별자치시/,'세종']];
+const SIDO_TOKEN = new RegExp('(?<![가-힣])('+REGIONS.join('|')+')(?=$|[^가-힣]|특별|광역|도(?![가-힣])|시(?![가-힣])|권|지역|창조|테크노|경제|산업|소재|청(?![가-힣])|센터|신용|정보|글로벌|혁신|중소|형|연구개발특구|특구|바이오|콘텐츠|문화|관광|디자인|과학|일자리|여성|청년|사회)','g');
+/* 한 시·도에만 있는 시·군·구 이름(예: 강동구 → 서울, 화성시 → 경기). 중구·동구·고성군처럼 겹치는 이름은 쓰지 않는다 */
+const UNIQUE_DISTRICT = (()=>{ const n={}; for(const [sido,ds] of Object.entries(DISTRICTS)) for(const d of ds) (n[d]=n[d]||[]).push(sido);
+  return Object.fromEntries(Object.entries(n).filter(([d,s])=>s.length===1 && d.length>=3 && d!=='세종시').map(([d,s])=>[d,s[0]])); })();
+const DISTRICT_TOKEN = new RegExp('(?<![가-힣])('+Object.keys(UNIQUE_DISTRICT).join('|')+')','g');
+function regionHint(p){
+  const s=`${p.programName||''} ${p.agency||''} ${p.executingAgency||''}`;
+  const out=new Set([...s.matchAll(SIDO_TOKEN)].map(m=>m[1]));
+  for(const m of s.matchAll(DISTRICT_TOKEN)) out.add(UNIQUE_DISTRICT[m[1]]);
+  for(const [re,k] of SIDO_LONG) if(re.test(s)) out.add(k);
+  return out.size>3 ? [] : [...out];   // 여러 시·도를 나열한 공고는 전국으로 둔다
+}
 
 /* 구간 입력 → 범위 [하한, 상한]. 구간이 요건을 걸치면 '확인 필요'로 판정한다(중간값 비교 금지). */
 const AGE_BANDS = {'20대':[20,29],'30대':[30,39],'40대':[40,49],'50대':[50,59],'60대이상':[60,120]};
@@ -307,7 +351,8 @@ function blankCompany(){
     revenueRange:null, employeeCount:null, representativeAge:null,
     representativeGender:null, ventureCertified:null, researchInstitute:null,
     exportHistory:null, patentStatus:null, innobiz:null, mainbiz:null,
-    taxArrears:null   // 국세·지방세 체납 여부
+    taxArrears:null,  // 국세·지방세 체납 여부
+    specialStatus:null   // 해당되는 항목(SPECIAL_TARGETS 키 배열). null=답 안 함, []=해당 없음
   };
 }
 
@@ -331,6 +376,7 @@ function sanitizeCompany(raw){
   c.representativeAge = pick(raw.representativeAge, Object.keys(AGE_BANDS));
   for(const k of ['exportHistory','taxArrears',...CERT_KEYS]) c[k] = typeof raw[k]==='boolean' ? raw[k] : null;
   c.representativeGender = pick(raw.representativeGender, ['여성','남성']);
+  c.specialStatus = Array.isArray(raw.specialStatus) ? [...new Set(raw.specialStatus.filter(x=>SPECIAL_KEYS.includes(x)))] : null;
   const allowed = PERSONA_NEEDS[c.companyType] || Object.keys(NEEDS);
   c.supportNeeds = Array.isArray(raw.supportNeeds) ? [...new Set(raw.supportNeeds.filter(x=>allowed.includes(x)))].slice(0, MAX_NEEDS) : [];
   return c;
@@ -521,7 +567,8 @@ function amountLabel(p){ return isLoanProgram(p) ? '융자·보증 한도' : isI
    조건별 결과와 근거(evidence)를 함께 반환 → 화면 설명에 재사용 */
 function hardEligibility(p, c){
   const conds = [];
-  const add=(label,result,evidence)=>{ conds.push({label,result,evidence:evidence||''}); };
+  // restricted: 대상이 한정된 사업인데 해당 여부를 아직 모름 → '확인 필요'로 내린다(fitScore 상한)
+  const add=(label,result,evidence,restricted)=>{ conds.push({label,result,evidence:evidence||'',...(restricted&&result==='unknown'?{restricted:true}:{})}); };
 
   // 1) 사업자 유형
   const tbt = p.targetBusinessType||[];
@@ -535,7 +582,14 @@ function hardEligibility(p, c){
   // 2) 지역 — 3단계 관련도(전국 0 → 광역시도 1 → 시군구 2), 대상 아님 -1
   let regionTier = null;
   const tr = p.targetRegions||[];
-  if(!tr.length || tr.includes('전국')){
+  const hint = (!tr.length || tr.includes('전국')) ? regionHint(p) : [];
+  if(hint.length && c.region && !hint.includes(c.region)){
+    add('사업장 소재지','unknown',`전국 공고이지만 공고명·기관이 ${hint.join('·')} 지역 — ${c.region} 기업도 신청 가능한지 공고 확인`, true);
+    regionTier = 0;
+  } else if(hint.length && c.region){
+    add('사업장 소재지','pass',`${c.region} 기관·지역 사업(전국 공고)`);
+    regionTier = 1;
+  } else if(!tr.length || tr.includes('전국')){
     add('사업장 소재지','pass', p.targetRegionsInferred ? '공고명·기관에 지역 표기 없음(전국으로 간주)' : '전국 대상');
     regionTier = 0;
   } else if(!c.region){
@@ -609,7 +663,7 @@ function hardEligibility(p, c){
   // 8) 특수자격 (여성기업·벤처 등)
   const specialReqs = (p.specialRequirements||[]).length ? p.specialRequirements : (p.certificationConditions||[]);
   if(specialReqs.some(x=>x.includes('여성'))){
-    if(c.representativeGender==null) add('여성기업 확인','unknown','여성기업(대표자) 요건 — 선택 정보에서 대표자 성별을 입력하면 판정');
+    if(c.representativeGender==null) add('여성기업 확인','unknown','여성기업(대표자) 요건 — 선택 정보에서 대표자 성별을 입력하면 판정', true);
     else add('여성기업 확인', c.representativeGender==='여성'?'pass':'fail', '여성 대표 요건');
   }
   if(specialReqs.some(x=>x.includes('벤처'))){
@@ -629,6 +683,9 @@ function hardEligibility(p, c){
     if(c.exportHistory==null) add('수출 실적','unknown','수출 실적 요건');
     else add('수출 실적', c.exportHistory?'pass':'fail','수출 실적 요건');
   }
+
+  // 8-1) 대상 한정 사업(장애인기업·사회적경제·보훈·재창업 / 중장년 / 위기지역·특구 / 농·수산·식품)
+  specialTargetConds(p, c, add);
 
   // 9) 수출 조건(문구) — '100만불 미만'처럼 상한이면 실적 없음=충족, 실적 있음=금액 확인
   if(p.exportConditions && !exportReq){
@@ -657,10 +714,63 @@ function hardEligibility(p, c){
   return {verdict, conds, regionTier};
 }
 
+function specialTargetConds(p, c, add){
+  const name=p.programName||'', withAgency=`${name} ${p.agency||''} ${p.executingAgency||''}`;
+  for(const t of SPECIAL_TARGETS){
+    if(!t.re.test(t.agency ? withAgency : name) || (t.notEmp && EMPLOY_PROGRAM.test(name))) continue;
+    const L=`${t.label} 대상`;
+    if(!Array.isArray(c.specialStatus)) add(L,'unknown',`${t.label} 대상 사업 — 선택 정보 '해당되는 항목'에서 고르면 판정`, true);
+    else if(c.specialStatus.includes(t.k)) add(L,'pass',`${t.label} 해당`);
+    else add(L, t.strict?'fail':'unknown', t.strict ? `${t.label} 대상 사업(해당 없음으로 입력)` : `${t.label} 대상 — 해당 여부 공고 확인`);
+  }
+  // 대표자 연령 요건을 따로 읽지 못한 '청년' 사업: 40대 이상이면 미충족, 모르면 확인 필요
+  if(YOUTH_ONLY.test(name) && !EMPLOY_PROGRAM.test(name) && p.representativeAgeMax==null){
+    const band=AGE_BANDS[c.representativeAge];
+    if(band) add('청년 대상', band[0]>=40?'fail':'pass', `청년(대체로 만 39세 이하) 대상 · 대표자 ${c.representativeAge}`);
+    else add('청년 대상','unknown','청년(대체로 만 39세 이하) 대상 — 대표자 연령대를 입력하면 판정');
+  }
+  if(ZONE_ONLY.test(name)) add('소재지 한정','unknown','위기지역·특구 소재 기업 대상 — 사업장이 해당 지역인지 공고 확인', true);
+  if(SENIOR_ONLY.test(name) && !EMPLOY_PROGRAM.test(name)){
+    const band=AGE_BANDS[c.representativeAge];
+    if(!band) add('중장년 대상','unknown','중장년(대체로 만 40·50세 이상) 대상 — 대표자 연령대를 입력하면 판정');
+    else add('중장년 대상', band[1]<40?'fail':band[0]>=50?'pass':'unknown', `중장년 대상 · 대표자 ${c.representativeAge}${band[0]>=40&&band[0]<50?' (나이 기준 공고 확인)':''}`);
+  }
+  const sec=sectorMismatch(p, c);
+  if(sec) add('분야 한정','unknown',`${sec.label} 분야 사업 — ${c.industry} 기업 신청 가능 여부 공고 확인`);
+  if(AGRI_ONLY.test(name)){
+    if(!c.industry) add('분야 한정','unknown','농·수산·식품 분야 사업 — 업종 확인');
+    else if(c.industry==='농림수산업') add('분야 한정','pass','농림수산업 대상');
+    else add('분야 한정','unknown',`농·수산·식품 분야 사업 — ${c.industry} 기업 신청 가능 여부 공고 확인`);
+  }
+}
+
+/* 같은 사업의 차수·변경·재공고('1차/2차 …', '… 변경 공고')는 하나로 묶는다.
+   판정이 가장 좋은 공고를 대표로 두고 나머지는 variantOf(목록·집계에서 빼고 검색에서만 보임) */
+function variantKey(p){
+  const n=String(p.programName||'')
+    .replace(/(?:제\s*)?\d+\s*차(?![가-힣])/g,'')
+    .replace(/(?:변경|수정|정정|재|연장|추가|긴급)\s*(?:공고|모집)/g,'')
+    .replace(/(?:모집|지원|계획)?\s*공고/g,'')
+    .replace(/[\s·ㆍ,.\-_()「」『』<>]/g,'');
+  return `${n}|${p.agency||''}`;
+}
+function markVariants(results){
+  const O={'추천':0,'조건부 추천':1,'확인 필요':2,'대상 아님':3};
+  const groups=new Map();
+  results.forEach(m=>{ const k=variantKey(m.program); (groups.get(k)||groups.set(k,[]).get(k)).push(m); });
+  for(const g of groups.values()){
+    if(g.length<2) continue;
+    g.sort((a,b)=>(O[a.state]-O[b.state]) || (b.fit-a.fit) || String(b.program.registeredDate||'').localeCompare(String(a.program.registeredDate||'')));
+    g[0].variantCount=g.length-1;
+    g.slice(1).forEach(m=>{ m.variantOf=g[0].program.sourceProgramId; });
+  }
+  return results;
+}
+
 /* ---- Fit Score ----
    입력으로 판단 가능한 요소만 가중평균하고, 판단 근거가 적을수록 상한을 낮춘다.
    v3.7은 입력받지 않는 항목(지원목적·사업내용)을 0점 처리해 최대 58점 → '추천'(70+)이 나올 수 없었다. */
-function fitScore(p, c, regionTier){
+function fitScore(p, c, regionTier, elig){
   const W = APP_CONFIG.MATCH_WEIGHTS;
   const totalW = Object.values(W).reduce((a,b)=>a+b,0);
   const parts = {}; let num=0, den=0;
@@ -696,7 +806,8 @@ function fitScore(p, c, regionTier){
   if(purposeHit===false){ s = Math.min(s, 48); parts._purposeMismatch = true; }
   const name = p.programName||'';
   const misfit = MISFIT[c.companyType];
-  if(misfit && misfit.test(name)){ s = Math.min(s, 45); parts._misfit = true; }
+  if((misfit && misfit.test(name)) || agriMismatch(p, c) || sectorMismatch(p, c)){ s = Math.min(s, 45); parts._misfit = true; }
+  else if(elig && elig.conds.some(x=>x.restricted)){ s = Math.min(s, 60); parts._restricted = true; }
   else if(FLAGSHIP[c.companyType] && FLAGSHIP[c.companyType].test(name) && !SIDE_EVENT.test(name) && purposeHit!==false){ s += 8; parts._flagship = true; }
   parts._coverage = Math.round(coverage*100);
   return {score: Math.round(Math.max(0, Math.min(100, s))), parts};
@@ -739,22 +850,23 @@ function recommendState(verdict, fit, conf, dl){
 
 /* ---- 전체 매칭 실행 ---- */
 function runMatching(programs, company){
-  return programs.map(p=>{
+  return markVariants(programs.map(p=>{
     const dl = deadlineState(p);
     const elig = hardEligibility(p, company);
-    const fit = fitScore(p, company, elig.regionTier);
+    const fit = fitScore(p, company, elig.regionTier, elig);
     const conf = confidenceScore(elig, company);
     const state = recommendState(elig.verdict, fit.score, conf, dl);
     const regionTier = elig.regionTier;
     const regionLabel = regionTier===2 ? company.district : regionTier===1 ? company.region : (regionTier===0 ? '전국' : null);
     return {program:p, dl, elig, fit:fit.score, fitParts:fit.parts, conf, state, localMatch:regionTier===2, regionTier, regionLabel};
-  });
+  }));
 }
 
 /* =====================================================================
    Dashboard 집계 — runMatching 결과 입력
    ===================================================================== */
-function buildDashboard(matched){
+function buildDashboard(all){
+  const matched = all.filter(m=>!m.variantOf);   // 차수·변경 공고는 대표 공고 하나로 집계
   const considerable = matched.filter(m=> m.state!=='대상 아님');
   const rec = matched.filter(m=> m.state==='추천');
   const cond = matched.filter(m=> m.state==='조건부 추천');
@@ -903,6 +1015,10 @@ const App = (function(){
       render:()=>`
         <div class="field"><label class="q">대표자 성별 <span class="opt-tag">여성기업 사업 판정</span></label>
           <div class="opt-grid c2">${['여성','남성'].map(v=>optBtn('representativeGender',v,v,'',company.representativeGender===v)).join('')}</div></div>
+        <div class="field"><label class="q">해당되는 항목 <span class="opt-tag">복수 선택</span></label>
+          <div class="help">장애인기업·사회적경제 등 대상이 정해진 사업을 가려 드려요. 고르면 고르지 않은 항목은 '해당 없음'으로 판정합니다.</div>
+          <div class="opt-grid c2">${SPECIAL_TARGETS.map(x=>`<button type="button" class="opt ${(company.specialStatus||[]).includes(x.k)?'sel':''}" aria-pressed="${(company.specialStatus||[]).includes(x.k)}" onclick="App.toggleSpecial('${x.k}')">${x.label}${x.sub?`<small>${x.sub}</small>`:''}</button>`).join('')}
+            <button type="button" class="opt ${Array.isArray(company.specialStatus)&&!company.specialStatus.length?'sel':''}" onclick="App.toggleSpecial('none')">해당 없음</button></div></div>
         ${company.companyType==='예비창업자' ? '' : `<div class="field"><label class="q">대표자 연령대 <span class="opt-tag">청년·시니어 사업 판정</span></label>
           <div class="opt-grid c3">${Object.keys(AGE_BANDS).map(a=>optBtn('representativeAge',a,a,'',company.representativeAge===a)).join('')}</div></div>
         <div class="field"><label class="q">보유 인증·조직 <span class="opt-tag">복수 선택</span></label>
@@ -925,14 +1041,14 @@ const App = (function(){
   return {
     company:()=>company, get step(){return step}, get persona(){return persona},
     get matched(){return matched}, get dash(){return dash},
-    init, pickPersona, jumpToPersona, next, back, pick, toggleCert, toggleNeed,
+    init, pickPersona, jumpToPersona, next, back, pick, toggleCert, toggleSpecial, toggleNeed,
     analyze, render, setFilter, setSort, toggleFunded, toggleCheck, setQuery, toggleWatch,
     openHelp, closeHelp, toggleHelpType, copyHelp, resetFilter, scrollToResults, expandGroup, showMore,
     openDetail, closeModal, printReport, openProgressive, applyProgressive, closeProgressive,
     reset, goHome, editInputs,
     saveDraft, clearDraft, resumeDraft, dismissDraft,
     runAutoUpdate, dismissUpdate, forgetProfile,
-    _ppset:(k,v)=>{ if(['revenueRange','employeeCount','representativeAge','exportHistory','representativeGender'].includes(k)) ppTmp[k]=v; }
+    _ppset:(k,v)=>{ if(['revenueRange','employeeCount','representativeAge','exportHistory','representativeGender','_special'].includes(k)) ppTmp[k]=v; }
   };
 
   /* ================= INIT ================= */
@@ -1132,6 +1248,15 @@ const App = (function(){
     if(CERT_KEYS.every(x=>company[x]===false) && !turnOn) CERT_KEYS.forEach(x=>{ company[x]=null; });
     renderStep();
   }
+  function toggleSpecial(k){
+    const cur=Array.isArray(company.specialStatus) ? company.specialStatus : null;
+    if(k==='none') company.specialStatus = (cur && !cur.length) ? null : [];
+    else if(SPECIAL_KEYS.includes(k)){
+      const set=new Set(cur||[]); if(set.has(k)) set.delete(k); else set.add(k);
+      company.specialStatus = set.size ? [...set] : null;
+    }
+    renderStep();
+  }
   function pick(field,val){
     if(field==='_exp'){ company.exportHistory = (val==='있음'); renderStep(); return; }
     if(field==='_tax'){ company.taxArrears = (val==='체납 있음'); renderStep(); return; }
@@ -1207,7 +1332,7 @@ const App = (function(){
     const el=document.getElementById('ppBanner'); if(!el) return;
     const needed=collectNeeded();
     if(!needed.length || progressiveDone){ el.innerHTML=''; return; }
-    const labels={revenue:'매출 규모',employee:'상시근로자 수',repAge:'대표자 연령대',export:'수출 실적',gender:'대표자 성별'};
+    const labels={revenue:'매출 규모',employee:'상시근로자 수',repAge:'대표자 연령대',export:'수출 실적',gender:'대표자 성별',special:'해당되는 항목'};
     const imp=neededImpact(needed);
     const chips=needed.map(n=>({n, c:imp.per[n]||0})).sort((a,b)=>b.c-a.c)
       .map(x=>`<span class="ppb-chip">${labels[x.n]} <b>${x.c.toLocaleString()}건</b></span>`).join('');
@@ -1233,7 +1358,7 @@ const App = (function(){
     const el=document.getElementById('dashboard'); if(!el||!dash) return;
     const d=dash;
     const live = ProgramProvider.lastMode==='live';
-    const fieldBuckets = chartBuckets(fieldBucketCounts(primaryOf(matched)));
+    const fieldBuckets = chartBuckets(fieldBucketCounts(primaryOf(listed())));
     const PALETTE=['#1f9d6b','#e8921a','#4666c4','#c0428a','#2a9d9d','#8a6d3b','#9b59b6','#e05252'];
     const segs = fieldBuckets.slice(0,8).map((f,i)=>({label:needLabel(f.field), value:f.count, color:PALETTE[i%PALETTE.length]}));
     // 판정 퍼널: 전체 공고가 어디서 걸러졌는지 한눈에(막대 폭은 첫 단계 대비, 너무 작으면 최소 폭)
@@ -1339,14 +1464,16 @@ const App = (function(){
 
   /* ================= 결과 카드 ================= */
   // 목록 기본은 추천·조건부. '확인 필요'는 펼쳤을 때, 또는 추천·조건부가 하나도 없을 때만
+  // 목록·집계는 차수·변경 공고를 대표 하나로(검색·상세는 전체)
+  function listed(){ return matched.filter(m=>!m.variantOf); }
   function baseList(){
-    const all = matched.filter(m=>m.state!=='대상 아님');
+    const all = listed().filter(m=>m.state!=='대상 아님');
     const prim = primaryOf(all);
     return (showCheck || !prim.length) ? all : prim;
   }
   function hiddenCheckCount(){
-    if(showCheck || !primaryOf(matched).length) return 0;
-    let list = matched.filter(m=>m.state==='확인 필요');
+    if(showCheck || !primaryOf(listed()).length) return 0;
+    let list = listed().filter(m=>m.state==='확인 필요');
     if(fundedOnly) list=list.filter(m=> m.program.supportAmountMax>0);
     if(filter==='마감임박') list=list.filter(m=>m.dl.state==='CLOSING_SOON');
     else if(filter!=='all'){ const ps=needToPurposes(filter); list=list.filter(m=>(m.program.supportPurposes||[]).some(pp=>ps.includes(pp))); }
@@ -1366,7 +1493,7 @@ const App = (function(){
     const pn=document.getElementById('printNote');
     if(printMode){
       // PDF: 필터와 관계없이 추천순 상위 N건만(실시간 수백 건이 수십 쪽이 되지 않게)
-      const all = matched.filter(m=>m.state!=='대상 아님');
+      const all = listed().filter(m=>m.state!=='대상 아님');
       const order={'추천':0,'조건부 추천':1,'확인 필요':2};
       all.sort((a,b)=>(order[a.state]-order[b.state]) || (b.fit-a.fit));
       const top = all.slice(0, APP_CONFIG.PRINT_LIMIT);
@@ -1389,7 +1516,10 @@ const App = (function(){
       // 펼친 '확인 필요'는 분야 그룹에 섞지 않고 맨 아래 별도 섹션으로(그룹당 카드 제한에 가려지지 않게)
       const prim = primaryOf(list);
       if(!prim.length){ cards.innerHTML = renderGroupedByField(list); return; }
-      cards.innerHTML = needPicksHTML() + closingStrip() + `<div class="list-head">전체 목록 <small>분야별</small></div>` + renderGroupedByField(prim) + (showCheck ? checkSection(list.filter(m=>m.state==='확인 필요')) : '') + checkRow();
+      // 위 '지원별 추천'에 나온 사업은 전체 목록에서 다시 보여주지 않는다
+      const picks=needPicks(), picked=new Set(picks.flatMap(x=>x.items));
+      const rest=prim.filter(m=>!picked.has(m));
+      cards.innerHTML = needPicksHTML(picks) + closingStrip() + `<div class="list-head">전체 목록 <small>분야별${picked.size?` · 위 추천 ${picked.size}건 제외`:''}</small></div>` + renderGroupedByField(rest) + (showCheck ? checkSection(list.filter(m=>m.state==='확인 필요')) : '') + checkRow();
       return;
     }
     const shown = list.slice(0, listLimit);
@@ -1401,7 +1531,7 @@ const App = (function(){
   function needPicks(){
     const needs=(company.supportNeeds||[]).filter(n=>NEEDS[n]);
     const O={'추천':0,'조건부 추천':1}, dd=m=>m.dl.dday==null?9999:m.dl.dday;
-    const used=new Set(), prim=primaryOf(matched);
+    const used=new Set(), prim=primaryOf(listed());
     return needs.map(n=>{
       const items=prim.filter(m=>!used.has(m) && needMatch(m.program,n)>=1).sort((a,b)=>
         (needMatch(b.program,n)-needMatch(a.program,n)) || ((b.fitParts._flagship?1:0)-(a.fitParts._flagship?1:0))
@@ -1432,8 +1562,8 @@ const App = (function(){
       <p class="up-note">알림은 이 브라우저에 저장돼요. 다시 방문해 '다시 매칭하기'를 누르면 공고가 올라온 경우 맨 위에 알려드려요.</p>
     </div>`;
   }
-  function needPicksHTML(){
-    const picks=needPicks(); if(!picks.length) return '';
+  function needPicksHTML(picks=needPicks()){
+    if(!picks.length) return '';
     return watchHitsHTML() + `<section class="need-picks" aria-label="선택하신 지원별 추천">
       <div class="np-head">📌 선택하신 지원별 추천 <small>조건에 맞는 사업 중 지원별 상위 3건</small></div>
       ${picks.map(({n,items})=>`<div class="np-group">
@@ -1466,7 +1596,7 @@ const App = (function(){
   function closingStrip(){
     if(sortBy!=='fit') return '';
     const order={'추천':0,'조건부 추천':1};
-    const soon = primaryOf(matched).filter(m=>m.dl.state==='CLOSING_SOON')
+    const soon = primaryOf(listed()).filter(m=>m.dl.state==='CLOSING_SOON')
       .sort((a,b)=>(a.dl.dday-b.dl.dday) || (order[a.state]-order[b.state]) || (b.fit-a.fit));
     if(!soon.length) return '';
     const rows = soon.slice(0,5).map(m=>{ const dl=dlBadge(m.dl); return `
@@ -1495,7 +1625,7 @@ const App = (function(){
     const n = hiddenCheckCount();
     if(n) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">고른 지원과 덜 맞거나 정보가 부족한 사업 ${n}건 더 보기</button>
       <p>필요한 지원을 바꾸거나 선택 정보(매출 규모·인증 등)를 넣으면 이 중 일부가 추천·조건부로 바뀔 수 있어요.</p></div>`;
-    if(showCheck && primaryOf(matched).length) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">추천·조건부만 보기</button></div>`;
+    if(showCheck && primaryOf(listed()).length) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">추천·조건부만 보기</button></div>`;
     return '';
   }
   function renderResultCount(n){
@@ -1586,7 +1716,7 @@ const App = (function(){
       </div>
       <h3>${esc(p.programName)}</h3>
       <div class="rc-agency">${esc(p.agency||'')}${p.executingAgency?` · ${esc(p.executingAgency)}`:''}</div>
-      <div class="rc-tags">${regionBadge(m)}${m.fitParts&&m.fitParts._flagship?`<span class="flag-badge" title="이 유형 기업이 많이 찾는 대표 사업">⭐ 대표 사업</span>`:''}${p._aiEnriched?`<span class="ai-badge" title="공고 본문에서 자격조건을 AI로 추출(근거 문구 대조)한 사업">🤖 AI 본문분석</span>`:p.eligibilityDepth==='doc'?`<span class="ai-badge" title="공고문(PDF)의 신청자격 절을 읽어 판정한 사업">📑 공고문분석</span>`:p.eligibilityDepth==='rule'?`<span class="ai-badge" title="공고 본문의 업력·매출·근로자·연령 문구를 읽어 판정한 사업">📄 본문분석</span>`:''}</div>
+      <div class="rc-tags">${regionBadge(m)}${m.fitParts&&m.fitParts._flagship?`<span class="flag-badge" title="이 유형 기업이 많이 찾는 대표 사업">⭐ 대표 사업</span>`:''}${p._aiEnriched?`<span class="ai-badge" title="공고 본문에서 자격조건을 AI로 추출(근거 문구 대조)한 사업">🤖 AI 본문분석</span>`:p.eligibilityDepth==='doc'?`<span class="ai-badge" title="공고문(PDF)의 신청자격 절을 읽어 판정한 사업">📑 공고문분석</span>`:p.eligibilityDepth==='rule'?`<span class="ai-badge" title="공고 본문의 업력·매출·근로자·연령 문구를 읽어 판정한 사업">📄 본문분석</span>`:''}${m.variantCount?`<span class="var-badge" title="같은 사업의 차수·변경 공고는 하나로 묶었어요(사업명 검색에서 모두 볼 수 있어요)">같은 사업 공고 ${m.variantCount}건 더</span>`:''}</div>
       <div class="rc-amt-row">
         <div class="rc-amt"><span class="rc-amt-l">${amountLabel(p)}</span><b>${esc(amt)}</b></div>
         <div class="rc-fit" title="입력 정보로 계산한 적합도(선정확률 아님)">
@@ -1775,7 +1905,8 @@ const App = (function(){
     const k=[];
     if(/매출/.test(c.label) && !company.revenueRange) k.push('revenue');
     if(/상시/.test(c.label) && !company.employeeCount) k.push('employee');
-    if(/대표자/.test(c.label) && !company.representativeAge) k.push('repAge');
+    if(/대표자|중장년|청년/.test(c.label) && !company.representativeAge) k.push('repAge');
+    if(SPECIAL_TARGETS.some(t=>c.label===`${t.label} 대상`) && !Array.isArray(company.specialStatus)) k.push('special');
     if(/수출/.test(c.label) && company.exportHistory==null) k.push('export');
     if(/여성기업/.test(c.label) && !company.representativeGender) k.push('gender');
     return k;
@@ -1804,7 +1935,8 @@ const App = (function(){
       employee:{q:'상시 근로자 수',opts:Object.keys(EMPLOYEE_BANDS),key:'employeeCount'},
       repAge:{q:'대표자 연령대',opts:Object.keys(AGE_BANDS),key:'representativeAge'},
       export:{q:'수출 실적',opts:['있음','없음'],key:'exportHistory'},
-      gender:{q:'대표자 성별',opts:['여성','남성'],key:'representativeGender'}
+      gender:{q:'대표자 성별',opts:['여성','남성'],key:'representativeGender'},
+      special:{q:'해당되는 항목',opts:[...SPECIAL_TARGETS.map(t=>t.label),'해당 없음'],key:'_special'}
     }[n];
     return `<div class="field"><label class="q">${F.q}</label><div class="opt-grid c3">
       ${F.opts.map(o=>`<button type="button" class="opt"
@@ -1814,6 +1946,7 @@ const App = (function(){
   function applyProgressive(){
     const next = { ...company, ...ppTmp };
     if(ppTmp.exportHistory!=null) next.exportHistory = ppTmp.exportHistory==='있음';
+    if(ppTmp._special){ const t=SPECIAL_TARGETS.find(x=>x.label===ppTmp._special); next.specialStatus = t ? [t.k] : []; }
     company = Object.assign(sanitizeCompany(next), {supportNeeds:company.supportNeeds});   // 인증·성별도 sanitizeCompany가 유지
     matched=runMatching(programs,company);
     dash=buildDashboard(matched);
