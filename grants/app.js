@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.24.0',
+  version: 'v3.25.0',
   updated: '2026-10-30',
   changelog: [
+    { v:'v3.25.0', d:'2026-10-30', note:'모바일 체감 개선: 글꼴을 쓰는 글자만 받는 방식으로(첫 화면 글꼴 약 4.7MB → 수백 KB), 휴대폰 뒤로가기 = 이전 화면·단계·창 닫기(앱 밖으로 나가지 않음), 카카오톡 등 앱 안 브라우저에서는 PDF 저장 대신 결과 요약 복사. 결과 첫 화면은 사업별 최대액을 더한 합계 대신 추천 건수와 1건 기준 최대액. 공고 수를 차수 묶음 기준으로 통일. 안드로이드 홈 화면 아이콘(512·maskable) 추가·아이콘 경로 오류 수정' },
     { v:'v3.24.0', d:'2026-10-30', note:'매칭 단계(깔때기) 표시: 전체 공고 → 1단계 지역·기업규모·업종 → 2단계 사업자 형태·설립연도 → 3단계 세부 자격 → 4단계 필요한 지원 맞춤 건수와 내 지역·시군구 건수, 미입력 정보 안내. 공고문 분석 확대: 신청자격 절을 읽었는데 업력·매출 등 제한이 없으면 그것도 분석 결과로 반영(운영 분석 717건 중 반영 132건 → 약 600건 예상)' },
     { v:'v3.23.0', d:'2026-10-30', note:'업종 판정 추가: 공고명으로 대상 산업(제조·ICT·바이오·에너지·유통서비스 + 방산·소방·환경·원자력·의료헬스 등)을 추론해 귀사 업종과 비교(기술을 도입·활용하는 사업은 제외), 결과 아래 \'조건은 맞는 사업\'(지역·기업형태·업종은 맞고 분야·세부 자격은 확인 필요)을 내 지역 사업 먼저 보여줌. 정밀도 41.0%→42.3%' },
     { v:'v3.22.0', d:'2026-10-30', note:'매칭 정밀도 개선: 대상이 정해진 사업(장애인기업·사회적경제·보훈·재창업·청년·중장년·위기지역·특구·업종 한정)을 해당 여부로 판정하고 모르면 \'확인 필요\'로 내림, 선택 정보 \'해당되는 항목\' 추가, 전국 공고라도 공고명·기관이 다른 지역이면 확인 필요, 차수·변경 공고는 하나로 묶고 지원별 추천에 나온 사업은 전체 목록에서 반복하지 않음. 고정 스냅샷 8개 기업 유형 상위 10건 정밀도 30.8%→41.0%' },
@@ -788,6 +789,8 @@ function markVariants(results){
   }
   return results;
 }
+// 접수 중·예정 공고 수 — 차수·변경 공고는 하나로 센다(첫 화면·매칭 단계·결과 요약이 같은 숫자를 쓰게)
+function openProgramCount(programs){ return new Set(programs.filter(p=>deadlineState(p).state!=='CLOSED').map(variantKey)).size; }
 
 /* ---- Fit Score ----
    입력으로 판단 가능한 요소만 가중평균하고, 판단 근거가 적을수록 상한을 낮춘다.
@@ -898,21 +901,21 @@ function buildDashboard(all){
   const check = matched.filter(m=> m.state==='확인 필요');
   // 합계는 '추천'(판정된 자격 모두 충족)만. 조건부·확인 필요는 자격이 확정되지 않아 합산하지 않는다.
   // 보조·출연과 융자·보증은 성격이 달라 따로 합산.
-  let grantSum=0, grantCnt=0, loanSum=0, loanCnt=0;
+  let grantSum=0, grantCnt=0, loanSum=0, loanCnt=0, grantMax=0, loanMax=0;
   rec.forEach(m=>{
     const v = m.program.supportAmountMax;
     if(typeof v!=='number' || !(v>0)) return;
-    if(isLoanProgram(m.program)){ loanSum+=v; loanCnt++; } else if(!isInvestProgram(m.program)){ grantSum+=v; grantCnt++; }
+    if(isLoanProgram(m.program)){ loanSum+=v; loanCnt++; loanMax=Math.max(loanMax,v); } else if(!isInvestProgram(m.program)){ grantSum+=v; grantCnt++; grantMax=Math.max(grantMax,v); }
   });
   // 마감임박은 바로 행동할 수 있는 추천·조건부만 센다(확인 필요까지 세면 숫자만 커지고 쓸모가 없음)
   const closingSoon = [...rec, ...cond].filter(m=> m.dl.state==='CLOSING_SOON');
   return {
     total: matched.length,
-    active: matched.filter(m=>m.dl.state!=='CLOSED').length,
+    active: openProgramCount(all.map(m=>m.program)),
     considerable: considerable.length,
     recommend: rec.length, conditional: cond.length, check: check.length, primary: rec.length + cond.length,
     ineligible: matched.length - considerable.length,
-    grantSum, grantCnt, loanSum, loanCnt,
+    grantSum, grantCnt, loanSum, loanCnt, grantMax, loanMax,
     closingSoon: closingSoon.length,
     avgFit: considerable.length ? Math.round(considerable.reduce((s,m)=>s+m.fit,0)/considerable.length) : 0
   };
@@ -1061,6 +1064,40 @@ const App = (function(){
     const el=document.getElementById('view-'+view);
     if(el) el.classList.remove('hidden');
     window.scrollTo({top:0,behavior:'instant'});
+    navPush();
+  }
+
+  /* ---------- 뒤로가기: 화면·입력 단계·창을 방문 기록에 남겨 휴대폰 뒤로가기 = 이전 화면(앱 밖으로 나가지 않게) ---------- */
+  let navPopping=false, navSkipPop=false;   // navSkipPop: 창 기록을 되돌리는 중(그 popstate는 화면을 바꾸지 않음)
+  // 카카오톡·네이버·인스타그램 등 앱 안 브라우저 — 인쇄(PDF 저장) 미지원
+  const IN_APP = /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|BAND\/|DaumApps|everytimeApp/i.test(navigator.userAgent||'');
+  const MODAL_IDS=['detailModal','helpModal','ppModal'];
+  const anyModalOpen=()=>MODAL_IDS.some(id=>{ const e=document.getElementById(id); return e && !e.classList.contains('hidden'); });
+  const navKey=()=>({v:currentView, s:currentView==='form'?step:0});
+  function navPush(){
+    if(navPopping || currentView==='loading') return;
+    const cur=history.state||{}, k=navKey();
+    if(cur.v===k.v && cur.s===k.s && !cur.m) return;
+    try{ history.pushState({...k, pv:cur.v?{v:cur.v,s:cur.s}:null}, ''); }catch{ /* 기록 사용 불가 */ }
+  }
+  // 창을 열면 기록 1칸 — 뒤로가기는 창만 닫는다. 버튼으로 닫으면 그 칸을 되돌린다(다른 창으로 바로 이어지면 유지)
+  // 되돌리기(history.back)는 비동기라 끝나기 전에는 새 기록을 넣거나 또 되돌리지 않고, 끝난 뒤 창 상태에 맞춘다
+  function navModalOpen(){ if(navPopping || navSkipPop || (history.state||{}).m) return; try{ history.pushState({...navKey(), m:1}, ''); }catch{ /* 기록 사용 불가 */ } }
+  function navModalClosed(){
+    if(navPopping) return;
+    setTimeout(()=>{ if(!navSkipPop && !anyModalOpen() && (history.state||{}).m){ navSkipPop=true; history.back(); } }, 0);
+  }
+  function onPopState(e){
+    if(navSkipPop){ navSkipPop=false; if(anyModalOpen()) navModalOpen(); return; }
+    const st=e.state||{v:'landing', s:0};
+    navPopping=true;
+    try{
+      closeHelp(); closeModal(); closeProgressive();
+      if(st.m || (st.v===currentView && (st.v!=='form' || st.s===step))) return;
+      if(st.v==='form' && persona){ step=Math.max(0, Math.min(st.s|0, lastStepIdx())); renderStep(); show('form'); }
+      else if(st.v==='results' && matched.length) show('results');
+      else goHome();
+    }finally{ navPopping=false; }
   }
 
   return {
@@ -1085,6 +1122,9 @@ const App = (function(){
     checkAutoUpdate();
     checkDraft();
     try{ LEGACY_KEYS.forEach(k=>localStorage.removeItem(k)); }catch{ /* 저장소 사용 불가 */ }
+    try{ history.replaceState({v:'landing', s:0}, ''); }catch{ /* 기록 사용 불가 */ }
+    if(IN_APP){ const pb=document.getElementById('pdfBtn'); if(pb) pb.textContent='📋 결과 복사'; }
+    window.addEventListener('popstate', onPopState);
     document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeHelp(); closeModal(); closeProgressive(); } });
     window.addEventListener('beforeprint', ()=>{ if(currentView==='results' && matched.length && !printMode){ printMode=true; render(); } });
     window.addEventListener('afterprint', ()=>{ if(printMode){ printMode=false; render(); } });
@@ -1095,7 +1135,7 @@ const App = (function(){
       const list = await ProgramProvider.fetchPrograms();
       updateDataSourceUI();
       if(ProgramProvider.lastMode!=='live') return;   // DEMO면 '출처 2곳' 표기 유지(가짜 수치 금지)
-      const n = list.filter(p=>deadlineState(p).state!=='CLOSED').length;
+      const n = openProgramCount(list);
       if(n>0){
         el.textContent = n.toLocaleString();
         const lab=document.getElementById('statProgramsLabel'); if(lab) lab.textContent='접수 중·예정 공고';
@@ -1261,9 +1301,14 @@ const App = (function(){
     const def=STEP_DEFS[activeSteps()[step]];
     if(!def.optional && !def.valid()) return;
     if(step===lastStepIdx()){ analyze(); return; }
-    step++; renderStep(); saveDraft(true);
+    step++; renderStep(); navPush(); saveDraft(true);
   }
-  function back(){ if(step>0){ step--; renderStep(); } else goHome(); }
+  // '이전' 버튼: 바로 앞 기록이 이전 단계(첫 단계면 첫 화면)면 기록을 되돌려 휴대폰 뒤로가기와 같은 동작
+  function back(){
+    const pv=(history.state||{}).pv;
+    if(pv && (step>0 ? pv.v==='form' && pv.s===step-1 : pv.v==='landing')){ history.back(); return; }
+    if(step>0){ step--; renderStep(); navPush(); } else goHome();
+  }
   function toggleCert(k){
     if(k==='none'){ const all=CERT_KEYS.every(x=>company[x]===false); CERT_KEYS.forEach(x=>{ company[x]= all ? null : false; }); renderStep(); return; }
     if(!CERT_KEYS.includes(k)) return;
@@ -1390,7 +1435,7 @@ const App = (function(){
     const alive=co=>runMatching(open, co).filter(m=>!m.variantOf && m.state!=='대상 아님');
     const a1=alive(s1), a2=alive(s2), a3=alive(s3), prim=primaryOf(listed());
     const local=a=>a.filter(m=>m.regionTier>=1).length, dist=a=>a.filter(m=>m.regionTier===2).length;
-    return { total:open.length, s1:a1.length, s1Local:local(a1), s1Dist:dist(a1), s2:a2.length, s3:a3.length, s4:prim.length };
+    return { total:openProgramCount(open), s1:a1.length, s1Local:local(a1), s1Dist:dist(a1), s2:a2.length, s3:a3.length, s4:prim.length };
   }
   function renderFunnel(){
     const el=document.getElementById('funnel'); if(!el) return;
@@ -1441,12 +1486,12 @@ const App = (function(){
     if(!d.considerable){
       heroBody = `<div class="dh-amount dh-amount-sm">지금 딱 맞는 사업은 적어요</div>
          <div class="dh-sub">조건을 바꾸거나, 아래 상담으로 찾아드릴게요.</div>`;
-    } else if(d.grantSum>0 || d.loanSum>0){
-      const main = d.grantSum>0 ? d.grantSum : d.loanSum;
-      const mainLabel = d.grantSum>0 ? `보조·출연 ${d.grantCnt}건` : `융자·보증 ${d.loanCnt}건`;
-      heroBody = `<div class="dh-amount">${fmtKRW(main)}</div>
-         <div class="dh-sub">추천 <b>${d.recommend}건</b> 중 금액 공개 ${mainLabel}의 사업별 최대액 단순 합계${d.grantSum>0&&d.loanSum>0?` · 융자·보증 한도 <b>${fmtKRW(d.loanSum)}</b> 별도`:''}</div>
-         <div class="dh-note">중복수혜 제한·선정 여부에 따라 실제 받을 수 있는 금액은 이보다 적습니다.</div>
+    } else if(d.grantMax>0 || d.loanMax>0){
+      // 사업별 최대액을 더한 합계는 실제로 받을 수 없는 금액이라 기대를 부풀린다 → 건수 + 한 사업 기준 최대액
+      const maxes = [d.grantMax>0?`<span class="nw">보조·출연 최대 <b>${fmtKRW(d.grantMax)}</b></span>`:'', d.loanMax>0?`<span class="nw">융자·보증 한도 최대 <b>${fmtKRW(d.loanMax)}</b></span>`:''].filter(Boolean).join(' · ');
+      heroBody = `<div class="dh-amount">${d.recommend}건</div>
+         <div class="dh-sub">금액이 공개된 추천 사업 중 1건 기준 ${maxes}</div>
+         <div class="dh-note">여러 사업을 더한 금액이 아니라 한 사업에서 받을 수 있는 최대액이에요. 실제 지원액은 심사·중복수혜 제한에 따라 달라집니다.</div>
          ${d.closingSoon>0?`<div class="dh-chips"><span class="dchip soon">⏰ 마감임박 ${d.closingSoon}건</span></div>`:''}`;
     } else {
       heroBody = d.recommend
@@ -1456,7 +1501,7 @@ const App = (function(){
            <div class="dh-sub">조건부 ${d.conditional}건·확인 필요 ${d.check}건은 공고문 확인이 필요해 지원금 합계에 넣지 않았습니다. 선택 정보(설립 월·규모·인증)를 넣으면 추천으로 확정되는 사업이 늘어납니다.</div>`;
       if(d.closingSoon>0) heroBody += `<div class="dh-chips"><span class="dchip soon">⏰ 마감임박 ${d.closingSoon}건</span></div>`;
     }
-    const heroLabel = d.grantSum>0 ? '추천 사업 지원금 합계(추정)' : d.loanSum>0 ? '추천 사업 융자·보증 한도 합계(추정)' : '추천 사업 지원 규모';
+    const heroLabel = d.grantMax>0 || d.loanMax>0 ? '바로 검토할 추천 사업' : '추천 사업 지원 규모';
 
     const srcLabel = live ? '현재 접수 중·예정 공고' : 'DEMO 예시 공고';
     const hookBanner = `
@@ -1844,7 +1889,7 @@ const App = (function(){
     helpCtx = {id:String(id), types:['plan']};
     lastFocus = document.activeElement;
     renderHelp();
-    document.getElementById('helpModal').classList.remove('hidden');
+    document.getElementById('helpModal').classList.remove('hidden'); navModalOpen();
     const first=document.querySelector('#helpModal .hp-type'); if(first) first.focus();
   }
   function renderHelp(){
@@ -1883,19 +1928,20 @@ const App = (function(){
   }
   async function copyHelp(via){
     const m=helpCtx && matched.find(x=>x.program.sourceProgramId===helpCtx.id); if(!m) return;
-    const text=helpText(m.program, company, helpCtx.types);
-    let ok=false;
-    try{ await navigator.clipboard.writeText(text); ok=true; }catch{
-      try{ const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
-        document.body.appendChild(ta); ta.select(); ok=document.execCommand('copy'); ta.remove(); }catch{ ok=false; }
-    }
+    const ok=await copyText(helpText(m.program, company, helpCtx.types));
     toast(ok ? (via==='kakao' ? '요청 내용을 복사했어요. 열린 카카오톡 채팅창에 붙여넣어 보내세요.' : '요청 내용을 복사했어요. 카톡·문자·메일에 붙여넣어 보내세요.')
              : '복사가 안 되는 환경이에요. 아래 미리보기 내용을 직접 선택해 복사해 주세요.');
     if(!ok){ const d=document.querySelector('#helpModal .hp-preview'); if(d) d.open=true; }
   }
+  async function copyText(text){
+    try{ await navigator.clipboard.writeText(text); return true; }catch{
+      try{ const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select(); const ok=document.execCommand('copy'); ta.remove(); return ok; }catch{ return false; }
+    }
+  }
   function closeHelp(){
     const el=document.getElementById('helpModal'); if(!el || el.classList.contains('hidden')) return;
-    el.classList.add('hidden'); helpCtx=null;
+    el.classList.add('hidden'); helpCtx=null; navModalClosed();
     if(lastFocus && lastFocus.focus) lastFocus.focus();
   }
   function watchList(){ const w=readJSON(WATCH_KEY); return Array.isArray(w) ? w.filter(id=>UPCOMING.some(u=>u.id===id)) : []; }
@@ -1952,13 +1998,13 @@ const App = (function(){
     const link=document.getElementById('modalOpenLink');
     if(url){ link.href=url; link.classList.remove('hidden'); } else { link.removeAttribute('href'); link.classList.add('hidden'); }
     lastFocus = document.activeElement;
-    document.getElementById('detailModal').classList.remove('hidden');
+    document.getElementById('detailModal').classList.remove('hidden'); navModalOpen();
     const close=document.querySelector('#detailModal .modal-close'); if(close) close.focus();
   }
   function closeModal(){
     const md=document.getElementById('detailModal');
     if(!md || md.classList.contains('hidden')) return;
-    md.classList.add('hidden');
+    md.classList.add('hidden'); navModalClosed();
     if(lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
@@ -1968,9 +2014,9 @@ const App = (function(){
     if(!needed.length){ toast('추가로 확인할 항목이 없습니다.'); return; }
     ppTmp = {};
     document.getElementById('ppBody').innerHTML = needed.map(ppField).join('');
-    document.getElementById('ppModal').classList.remove('hidden');
+    document.getElementById('ppModal').classList.remove('hidden'); navModalOpen();
   }
-  function closeProgressive(){ const el=document.getElementById('ppModal'); if(el) el.classList.add('hidden'); }
+  function closeProgressive(){ const el=document.getElementById('ppModal'); if(!el || el.classList.contains('hidden')) return; el.classList.add('hidden'); navModalClosed(); }
   // 선택 정보별로 판정이 '확인 필요'에 머문 사업 수(추천 확정 전인 사업만). total은 중복 제거
   function neededKeys(c){
     const k=[];
@@ -2122,7 +2168,23 @@ const App = (function(){
   function dismissDraft(){ clearDraft(); }
 
   /* ================= PDF ================= */
-  function printReport(){
+  // 앱 안 브라우저(IN_APP)는 인쇄를 지원하지 않는다 → 결과 요약을 복사해 대화방에 보관
+  function resultSummary(){
+    const top=primaryOf(listed()).sort((a,b)=>(a.state===b.state?0:a.state==='추천'?-1:1) || (b.fit-a.fit)).slice(0,10);
+    const dl=m=>m.dl.dday==null ? '상시·예산 소진 시' : m.dl.state==='UPCOMING' ? `접수 예정 D-${m.dl.dday}` : m.dl.dday===0 ? '오늘 마감' : `마감 D-${m.dl.dday}`;
+    return [`[BECONIC 지원사업 매칭 결과] ${fmtStamp(new Date())}`,
+      [company.region, company.district, company.companyType, company.industry].filter(Boolean).join(' · '),
+      `추천 ${dash.recommend}건 · 조건부 ${dash.conditional}건`, '',
+      ...top.map((m,i)=>`${i+1}. [${m.state==='추천'?'추천':'조건부'}] ${m.program.programName} (${dl(m)})${safeUrl(m.program.originalUrl)?`\n   ${safeUrl(m.program.originalUrl)}`:''}`),
+      '', `다시 매칭: ${location.origin}${location.pathname}`].join('\n');
+  }
+  async function printReport(){
+    if(IN_APP){
+      if(!dash) return;
+      const ok=await copyText(resultSummary());
+      toast(ok ? '앱 안 브라우저에서는 PDF 저장이 안 돼요. 결과 요약을 복사했으니 나와의 채팅에 붙여넣어 보관하세요.' : '이 화면에서는 저장·복사가 안 돼요. 오른쪽 위 메뉴의 \'다른 브라우저로 열기\'를 이용해 주세요.');
+      return;
+    }
     printMode=true; render();
     setTimeout(()=>{ window.print(); }, 50);   // afterprint에서 화면 목록 복원
   }

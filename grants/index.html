@@ -29,7 +29,7 @@
 <link rel="apple-touch-icon" href="assets/icon-180.png" />
 <link rel="manifest" href="assets/manifest.webmanifest" />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
 <style>
 :root{
   --navy:#1a2a56; --navy-2:#142044; --navy-soft:#26386b;
@@ -48,7 +48,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+body{font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
   color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;text-size-adjust:100%;
   word-break:keep-all;overflow-wrap:break-word;letter-spacing:-.01em}
 h1,h2,h3,h4{text-wrap:balance}
@@ -802,7 +802,7 @@ header.site{border-bottom-color:transparent;box-shadow:0 1px 0 rgba(23,37,68,.06
       </div>
       <div class="res-actions" id="resActions">
         <button type="button" class="btn btn-back btn-sm" onclick="App.editInputs()">← 조건 수정</button>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="App.printReport()">📄 PDF 저장</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="pdfBtn" onclick="App.printReport()">📄 PDF 저장</button>
         <button type="button" class="btn btn-ghost btn-sm" onclick="App.goHome()">홈</button>
       </div>
     </div>
