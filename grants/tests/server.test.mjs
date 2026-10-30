@@ -2,6 +2,7 @@
 // 실행: node --test grants/tests/server.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { regionsFromText, extractAmount, dedupe, isPastKst, stripTags, detectGus } from '../netlify/lib/normalize.mjs';
 import { normalizeBizinfo, parsePeriod } from '../netlify/lib/bizinfo.mjs';
 import { mapBusinessAge, mapAge, normalizeKstartup } from '../netlify/lib/kstartup.mjs';
@@ -496,8 +497,16 @@ function assertKakao(res) {
   assert.ok(quickReplies.length <= 10 && quickReplies.every((q) => q.label.length <= 14 && q.action === 'message'));
   for (const o of outputs) {
     if (o.listCard) { assert.ok(o.listCard.items.length <= 5); o.listCard.items.forEach((i) => { if (i.link) assert.match(i.link.web, /^https:\/\//); }); }
-    if (o.carousel) { assert.ok(o.carousel.items.length <= 10); o.carousel.items.forEach((c) => assert.ok(c.description.length <= 230)); }
+    if (o.carousel) {
+      assert.ok(o.carousel.items.length <= 10); o.carousel.items.forEach((c) => assert.ok(c.description.length <= 230));
+      assert.ok(o.carousel.items.every((c) => c.thumbnail) || o.carousel.items.every((c) => !c.thumbnail), '캐러셀 카드 썸네일은 모두 있거나 모두 없어야 함');
+    }
     if (o.basicCard) assert.ok((o.basicCard.description || '').length <= 230);
+    for (const c of [o.basicCard, ...(o.carousel?.items || [])].filter((x) => x?.thumbnail)) {
+      const m = /^https:\/\/beconic-grant-matching\.netlify\.app\/(assets\/kakao\/[a-z]+\.png)\?v=\d+$/.exec(c.thumbnail.imageUrl);
+      assert.ok(m, `썸네일 주소 형식: ${c.thumbnail.imageUrl}`);
+      assert.ok(existsSync(new URL(`../${m[1]}`, import.meta.url)), `썸네일 파일 없음: ${m[1]}`);
+    }
   }
 }
 

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!-- 카카오톡·SNS 미리보기 이미지 원본(1200×630). 수정 후 `node scripts/render-images.mjs`로 assets/에 다시 만든다. -->
+<html lang="ko"><head><meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*{box-sizing:border-box;margin:0}
+body{width:1200px;height:630px;font-family:'Pretendard',sans-serif;display:flex;letter-spacing:-.02em;word-break:keep-all;overflow:hidden}
+.l{width:440px;background:#1a2a56;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;position:relative}
+.l::after{content:"";position:absolute;right:0;top:0;bottom:0;width:10px;background:#e8921a}
+.l img{width:230px;height:230px;margin-bottom:34px}
+.l b{font-size:54px;font-weight:800;letter-spacing:.01em;line-height:1}
+.l .s{font-size:30px;font-weight:600;color:#c9d3ee;margin-top:14px}
+.l .by{font-size:19px;font-weight:500;color:#93a1cc;margin-top:22px;padding-top:16px;border-top:3px solid #e8921a}
+.r{flex:1;background:#f2f4f7;padding:0 64px;display:flex;flex-direction:column;justify-content:center}
+h1{font-size:60px;font-weight:800;line-height:1.26;color:#172544;letter-spacing:-.035em}
+h1 em{font-style:normal;color:#1a2a56;background:linear-gradient(transparent 62%,#ffd9a3 62%)}
+.chip{margin-top:34px;align-self:flex-start;font-size:25px;font-weight:700;color:#9a5b05;background:#fff4e4;border-radius:16px;padding:16px 24px}
+.tags{display:flex;gap:10px;margin-top:26px}
+.tags span{font-size:21px;font-weight:700;color:#334a86;background:#fff;border-radius:999px;padding:9px 18px}
+</style></head><body>
+<div class="l"><img src="../assets/shield-white.png" alt=""><b>BECONIC</b><span class="s">지원사업 MATCH</span><span class="by">by Growth Ventures</span></div>
+<div class="r">
+  <h1>우리 기업에 맞는<br><em>정부·공공 지원사업</em>을<br>쉽고 빠르게.</h1>
+  <span class="chip">회원가입 없이 · 30초 매칭 · 자격조건 먼저 판정</span>
+  <div class="tags"><span>#자금지원</span><span>#R&amp;D</span><span>#수출</span><span>#창업</span><span>#마케팅</span></div>
+</div>
+</body></html>
