@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.20.0',
-  updated: '2026-10-29',
+  version: 'v3.21.0',
+  updated: '2026-10-30',
   changelog: [
+    { v:'v3.21.0', d:'2026-10-30', note:'화면 디자인 정리(토스식): 선 대신 면으로 구분·넉넉한 여백·버튼 위계, 단어 단위 줄바꿈(제목·버튼이 한두 글자로 끊기지 않게), 결과 카드 정보 순서 정리(상태·마감 → 사업명 → 지원금·적합도 → 버튼), 모바일 유형 선택 한 줄 목록·입력 다음 버튼 하단 고정·상세는 아래에서 올라오는 창, 글자 대비 접근성 기준 충족' },
     { v:'v3.20.0', d:'2026-10-29', note:'카카오 챗봇 허브 서버(오픈빌더 스킬): 카톡 채널에서 사업명 검색·마감 임박·경영진단 안내·상담 연결, 진단툴 목록 한 곳에서 관리' },
     { v:'v3.19.1', d:'2026-10-29', note:'카카오톡 상담 연결: 신청 도움받기 창 맨 앞에 카카오톡 채널(비코닉) 1:1 채팅 — 누르면 요청 내용이 자동 복사되어 붙여넣기만 하면 됨, 결과 하단 상담 영역에도 카톡 상담 버튼' },
     { v:'v3.19.0', d:'2026-10-29', note:'신청 도움받기 개선: 메일 앱이 바로 열리던 방식 대신 앱 안의 창에서 필요한 도움(사업계획서·자격 확인·서류·발표)을 고르고 전화·메일·내용 복사 중 편한 방법으로 요청, 카드 버튼 디자인 정리' },
@@ -1580,25 +1581,23 @@ const App = (function(){
     return `<article class="rcard ${ST_CLS[m.state]}" data-id="${esc(p.sourceProgramId)}">
       <div class="rc-line1">
         <span class="rc-state ${ST_CLS[m.state]}">${esc(m.state)}</span>
-        ${regionBadge(m)}
-        ${m.fitParts&&m.fitParts._flagship?`<span class="flag-badge" title="이 유형 기업이 많이 찾는 대표 사업">⭐ 대표 사업</span>`:''}
-        ${p._aiEnriched?`<span class="ai-badge" title="공고 본문에서 자격조건을 AI로 추출(근거 문구 대조)한 사업">🤖 AI 본문분석</span>`:p.eligibilityDepth==='doc'?`<span class="ai-badge" title="공고문(PDF)의 신청자격 절을 읽어 판정한 사업">📑 공고문분석</span>`:p.eligibilityDepth==='rule'?`<span class="ai-badge" title="공고 본문의 업력·매출·근로자·연령 문구를 읽어 판정한 사업">📄 본문분석</span>`:''}
         <span class="rc-dl ${dl.cls}">${dl.icon} ${esc(dl.txt)}</span>
       </div>
       <h3>${esc(p.programName)}</h3>
       <div class="rc-agency">${esc(p.agency||'')}${p.executingAgency?` · ${esc(p.executingAgency)}`:''}</div>
+      <div class="rc-tags">${regionBadge(m)}${m.fitParts&&m.fitParts._flagship?`<span class="flag-badge" title="이 유형 기업이 많이 찾는 대표 사업">⭐ 대표 사업</span>`:''}${p._aiEnriched?`<span class="ai-badge" title="공고 본문에서 자격조건을 AI로 추출(근거 문구 대조)한 사업">🤖 AI 본문분석</span>`:p.eligibilityDepth==='doc'?`<span class="ai-badge" title="공고문(PDF)의 신청자격 절을 읽어 판정한 사업">📑 공고문분석</span>`:p.eligibilityDepth==='rule'?`<span class="ai-badge" title="공고 본문의 업력·매출·근로자·연령 문구를 읽어 판정한 사업">📄 본문분석</span>`:''}</div>
       <div class="rc-amt-row">
         <div class="rc-amt"><span class="rc-amt-l">${amountLabel(p)}</span><b>${esc(amt)}</b></div>
         <div class="rc-fit" title="입력 정보로 계산한 적합도(선정확률 아님)">
-          <span class="rc-fit-l">적합도</span><b>${m.fit}</b>
+          <span class="rc-fit-top"><span class="rc-fit-l">적합도</span><b>${m.fit}</b></span>
           <span class="rc-fit-bar"><span style="width:${m.fit}%"></span></span>
         </div>
       </div>
       <div class="rc-period">📅 ${esc(periodText(p, m.dl))}</div>
       <div class="rc-elig">${eligLine}</div>
       <div class="rc-actions">
-        <button type="button" class="btn btn-primary btn-sm" data-id="${esc(p.sourceProgramId)}" onclick="App.openDetail(this.dataset.id)">자세히 · 자격보기</button>
-        ${url?`<a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener noreferrer">공식공고 ↗</a>`:''}
+        <button type="button" class="btn btn-primary btn-sm" data-id="${esc(p.sourceProgramId)}" onclick="App.openDetail(this.dataset.id)">자세히 보기</button>
+        ${url?`<a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener noreferrer">공식 공고 ↗</a>`:''}
       </div>
       ${m.state!=='대상 아님'?`<button type="button" class="rc-help" data-id="${esc(p.sourceProgramId)}" onclick="App.openHelp(this.dataset.id)">
         <span class="rh-ic" aria-hidden="true">${ICON.chat}</span>
