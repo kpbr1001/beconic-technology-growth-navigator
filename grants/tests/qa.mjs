@@ -310,7 +310,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('지원별 추천에 나온 사업은 전체 목록에서 반복하지 않음', await page.evaluate(() => { const ids = [...document.querySelectorAll('#cards .rcard')].map((c) => c.dataset.id); return ids.length > 0 && ids.length === new Set(ids).size; }));
   check('운영·사업 자금 선택 → 지원별 추천에 남양주 특례보증', await page.locator('.need-picks .rcard', { hasText: '남양주' }).count() === 1);
   const hero = await page.locator('.dash-hero').innerText();
-  check('대시보드: 합계 성격(단순 합계·실제 수령액과 다름) 명시', /단순 합계/.test(hero) && /실제/.test(hero), hero.replace(/\s+/g, ' ').slice(0, 120));
+  check('대시보드: 사업별 최대액을 더한 합계 대신 추천 건수·1건 기준 최대액(실제 지원액과 다름 명시)', /1건 기준/.test(hero) && /실제/.test(hero) && !/합계/.test(hero), hero.replace(/\s+/g, ' ').slice(0, 120));
   const ppVisible = await page.locator('#ppBanner .pp-banner').count();
   if (ppVisible) check('추가정보 카드: 확정 가능 사업 수·항목별 건수', /사업 [\d,]+건의 자격을 확정/.test(await page.locator('#ppBanner').innerText()) && await page.locator('#ppBanner .ppb-chip').count() > 0);
   if (ppVisible) {
@@ -386,6 +386,8 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.selectOption('#f-region', '부산');
   await page.selectOption('#f-industry', '제조업');
   await toResults(page);
+  const fbTotal = +(await page.locator('#funnel .fb-head small').innerText()).replace(/[^\d]/g, '');
+  check('공고 수 통일: 매칭 단계 전체 = 결과 요약 = 120(차수 묶음 기준)', fbTotal === 120 && await page.evaluate(() => App.dash.active) === 120, `${fbTotal}`);
   check('실시간: 헤더 배지 "실시간 공고"', (await page.locator('.badge-demo').innerText()) === '실시간 공고');
   check('실시간: 안내에 본문 자격요건 미분석 명시', /세부 자격요건/.test(await page.locator('.data-notice').innerText()));
   const st = await page.locator('#cards .rc-state').allInnerTexts();
@@ -450,6 +452,51 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('모바일 결과: 이번 주 마감 띠 긴 공고명도 가로 넘침 없음', await page.locator('.closing-strip').count() === 1 && (await overflow()) <= 0, `${await overflow()}px`);
   await page.screenshot({ path: path.join(OUT, 'mobile-results.png'), fullPage: false });
   await page.context().close();
+}
+
+// ---------- 6-1. 휴대폰 뒤로가기 · 앱 안 브라우저 · 홈 화면 아이콘 ----------
+{
+  const ctx = await browser.newContext({ viewport: { width: 375, height: 812 }, userAgent: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36 KAKAOTALK 10.8.0' });
+  await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(BASE).origin });
+  const page = await ctx.newPage();
+  page.on('pageerror', (e) => errors.push(String(e)));
+  const view = () => page.evaluate(() => ['landing', 'form', 'results'].find((v) => !document.getElementById('view-' + v).classList.contains('hidden')));
+  await page.goto(BASE);
+  await page.locator('.persona-card.sme').click();
+  await page.goBack(); await page.waitForTimeout(100);
+  check('뒤로가기: 입력 첫 단계 → 첫 화면(앱 밖으로 나가지 않음)', (await view()) === 'landing' && page.url().startsWith(BASE));
+  await page.locator('.persona-card.sme').click();
+  await page.locator('.opt', { hasText: '법인사업자' }).click();
+  await page.selectOption('#f-region', '서울');
+  await page.fill('#f-year', '2019');
+  await page.selectOption('#f-industry', '제조업');
+  await pickNeed(page);
+  await page.locator('#nextBtn').click(); await page.waitForTimeout(50);
+  const s2 = await page.evaluate(() => App.step);
+  await page.locator('#formPanel .btn', { hasText: '이전' }).first().click(); await page.waitForTimeout(100);
+  check("'이전' 버튼 = 뒤로가기(기록도 한 칸 되돌림)", await page.evaluate(() => App.step) === s2 - 1 && await page.evaluate(() => history.state && history.state.s) === s2 - 1);
+  await toResults(page);
+  const lastStep = await page.evaluate(() => App.step);
+  await page.goBack(); await page.waitForTimeout(100);
+  check('뒤로가기: 결과 → 마지막 입력 단계', (await view()) === 'form' && await page.evaluate(() => App.step) === lastStep);
+  await page.goForward(); await page.waitForTimeout(100);
+  check('앞으로가기: 다시 결과(재계산 없이)', (await view()) === 'results');
+  const id = await page.locator('#cards .rcard').first().getAttribute('data-id');
+  await page.evaluate((x) => App.openDetail(x), id);
+  await page.goBack(); await page.waitForTimeout(100);
+  check('뒤로가기: 상세 창만 닫고 결과 유지', (await view()) === 'results' && await page.locator('#detailModal.hidden').count() === 1);
+  await page.evaluate((x) => App.openDetail(x), id);
+  await page.evaluate(() => App.closeModal()); await page.waitForTimeout(150);
+  check('창을 버튼으로 닫으면 창 기록도 정리(다음 뒤로가기가 헛돌지 않음)', (await view()) === 'results' && !(await page.evaluate(() => history.state && history.state.m)));
+  check('카카오톡 안: PDF 버튼 → 결과 복사', (await page.locator('#pdfBtn').innerText()).includes('결과 복사'));
+  await page.locator('#pdfBtn').click(); await page.waitForTimeout(150);
+  const clip = await page.evaluate(() => navigator.clipboard.readText());
+  check('카카오톡 안: 결과 요약(조건·추천 사업·다시 매칭 주소) 복사', /BECONIC 지원사업 매칭 결과/.test(clip) && /서울/.test(clip) && /다시 매칭: http/.test(clip), clip.split('\n').slice(0, 3).join(' | '));
+  const mf = await page.request.get(new URL('assets/manifest.webmanifest', BASE).href);
+  const man = await mf.json();
+  const icons = await Promise.all(man.icons.map(async (i) => [i.sizes, i.purpose || 'any', (await page.request.get(new URL(i.src, mf.url()).href)).status()]));
+  check('홈 화면 아이콘: 512(일반·maskable) 포함, 모든 아이콘 주소 열림', icons.some(([s, p]) => s === '512x512' && p === 'any') && icons.some(([s, p]) => s === '512x512' && p === 'maskable') && icons.every(([, , st]) => st === 200), JSON.stringify(icons));
+  await ctx.close();
 }
 
 // ---------- 7. PDF (DEMO) ----------
