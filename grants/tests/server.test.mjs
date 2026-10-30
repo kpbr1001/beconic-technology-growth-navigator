@@ -548,6 +548,16 @@ test('챗봇: 상담 요청 글(앱 복사 문구·전화번호·긴 글)은 검
   assert.ok(route('정책자금', botPrograms, BOT_NOW).template.outputs[0].listCard, '짧은 사업명은 그대로 검색');
 });
 
+test('챗봇: 말풍선·카드 줄바꿈 유지, 요청 양식 → 채운 양식은 접수', () => {
+  assert.match(route('처음', botPrograms, BOT_NOW).template.outputs[0].simpleText.text, /비코닉입니다 🙂\n\n/, '줄바꿈이 공백으로 뭉개지지 않음');
+  assert.match(route('상담 연결', botPrograms, BOT_NOW).template.outputs[0].basicCard.description, /\n✔ 사업계획서/);
+  const form = route('상담 요청합니다', botPrograms, BOT_NOW);
+  assertKakao(form);
+  assert.match(form.template.outputs[1].simpleText.text, /^회사명:\n업종\/지역:/);
+  assert.match(route('회사명: 비코닉\n관심 사업: 수출바우처', botPrograms, BOT_NOW).template.outputs[0].simpleText.text, /접수됐어요/);
+  assert.ok(!/접수됐어요/.test(route('회사명:\n업종/지역:', botPrograms, BOT_NOW).template.outputs[0].simpleText?.text || ''), '빈 양식은 접수로 보지 않음');
+});
+
 test('챗봇: 마감 임박·상담 연결·공고 미준비', () => {
   const soon = route('마감 임박', botPrograms, BOT_NOW);
   assertKakao(soon);
