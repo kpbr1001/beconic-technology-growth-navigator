@@ -9,7 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const FIX = JSON.parse(readFileSync(path.join(here, 'fixtures/programs-2026-10-30.json'), 'utf8'));
+const FIX = JSON.parse(readFileSync(process.env.PRECISION_FIXTURE || path.join(here, 'fixtures/programs-2026-10-30.json'), 'utf8'));
 const GOLD = JSON.parse(readFileSync(path.join(here, 'fixtures/precision-gold.json'), 'utf8'));
 const args = process.argv.slice(2);
 const BASE = args.find((a) => /^https?:/.test(a)) || 'http://127.0.0.1:8793/';
