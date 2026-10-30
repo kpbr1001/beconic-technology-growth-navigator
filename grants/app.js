@@ -1068,7 +1068,7 @@ const App = (function(){
   }
 
   /* ---------- 뒤로가기: 화면·입력 단계·창을 방문 기록에 남겨 휴대폰 뒤로가기 = 이전 화면(앱 밖으로 나가지 않게) ---------- */
-  let navPopping=false, navSkipPop=false;
+  let navPopping=false, navSkipPop=false;   // navSkipPop: 창 기록을 되돌리는 중(그 popstate는 화면을 바꾸지 않음)
   // 카카오톡·네이버·인스타그램 등 앱 안 브라우저 — 인쇄(PDF 저장) 미지원
   const IN_APP = /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|BAND\/|DaumApps|everytimeApp/i.test(navigator.userAgent||'');
   const MODAL_IDS=['detailModal','helpModal','ppModal'];
@@ -1081,13 +1081,14 @@ const App = (function(){
     try{ history.pushState({...k, pv:cur.v?{v:cur.v,s:cur.s}:null}, ''); }catch{ /* 기록 사용 불가 */ }
   }
   // 창을 열면 기록 1칸 — 뒤로가기는 창만 닫는다. 버튼으로 닫으면 그 칸을 되돌린다(다른 창으로 바로 이어지면 유지)
-  function navModalOpen(){ if(navPopping || (history.state||{}).m) return; try{ history.pushState({...navKey(), m:1}, ''); }catch{ /* 기록 사용 불가 */ } }
+  // 되돌리기(history.back)는 비동기라 끝나기 전에는 새 기록을 넣거나 또 되돌리지 않고, 끝난 뒤 창 상태에 맞춘다
+  function navModalOpen(){ if(navPopping || navSkipPop || (history.state||{}).m) return; try{ history.pushState({...navKey(), m:1}, ''); }catch{ /* 기록 사용 불가 */ } }
   function navModalClosed(){
     if(navPopping) return;
-    setTimeout(()=>{ if(!anyModalOpen() && (history.state||{}).m){ navSkipPop=true; history.back(); } }, 0);
+    setTimeout(()=>{ if(!navSkipPop && !anyModalOpen() && (history.state||{}).m){ navSkipPop=true; history.back(); } }, 0);
   }
   function onPopState(e){
-    if(navSkipPop){ navSkipPop=false; return; }
+    if(navSkipPop){ navSkipPop=false; if(anyModalOpen()) navModalOpen(); return; }
     const st=e.state||{v:'landing', s:0};
     navPopping=true;
     try{

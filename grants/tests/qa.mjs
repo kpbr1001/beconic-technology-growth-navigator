@@ -488,6 +488,17 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.evaluate((x) => App.openDetail(x), id);
   await page.evaluate(() => App.closeModal()); await page.waitForTimeout(150);
   check('창을 버튼으로 닫으면 창 기록도 정리(다음 뒤로가기가 헛돌지 않음)', (await view()) === 'results' && !(await page.evaluate(() => history.state && history.state.m)));
+  // 창을 빠르게 연달아 열고 닫아도(비동기 되돌리기가 겹쳐도) 결과 화면을 벗어나지 않음 — CPU 6배 느리게
+  const cdp = await ctx.newCDPSession(page); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 });
+  await page.evaluate((x) => App.openHelp(x), id); await page.keyboard.press('Escape');
+  await page.evaluate((x) => App.openDetail(x), id); await page.locator('#detailModal .m-help').click(); await page.keyboard.press('Escape');
+  await page.evaluate((x) => App.openDetail(x), id); await page.evaluate(() => App.closeModal());
+  await page.evaluate((x) => App.openDetail(x), id); await page.keyboard.press('Escape');
+  await page.waitForTimeout(400); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+  check('창을 연달아 열고 닫아도 결과 화면 유지·창 기록 남지 않음', (await view()) === 'results' && !(await page.evaluate(() => history.state && history.state.m)), await page.evaluate(() => JSON.stringify(history.state)));
+  await page.evaluate((x) => App.openDetail(x), id);
+  await page.goBack(); await page.waitForTimeout(150);
+  check('연달아 닫은 뒤에도 뒤로가기는 창만 닫음', (await view()) === 'results' && await page.locator('#detailModal.hidden').count() === 1);
   check('카카오톡 안: PDF 버튼 → 결과 복사', (await page.locator('#pdfBtn').innerText()).includes('결과 복사'));
   await page.locator('#pdfBtn').click(); await page.waitForTimeout(150);
   const clip = await page.evaluate(() => navigator.clipboard.readText());
