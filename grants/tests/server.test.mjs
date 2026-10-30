@@ -561,7 +561,10 @@ test('챗봇: 말풍선·카드 줄바꿈 유지, 요청 양식 → 채운 양�
 test('챗봇: 마감 임박·상담 연결·공고 미준비', () => {
   const soon = route('마감 임박', botPrograms, BOT_NOW);
   assertKakao(soon);
-  assert.deepEqual(soon.template.outputs[0].listCard.items.map((i) => i.title.slice(0, 13)), ['2026년 스마트공장 구축', '2026년 소상공인 정책자금 '].map((t) => t.slice(0, 13)));
+  assert.deepEqual(soon.template.outputs[0].listCard.items.map((i) => i.title.slice(0, 13)), ['2026년 소상공인 정책자금 ', '2026년 스마트공장 구축'].map((t) => t.slice(0, 13)), 'D-1~7 지원사업 먼저, 오늘 마감은 뒤');
+  const ev = route('마감 임박', [{ programName: '2026 스타 IR 데모데이 참여기업 모집', applicationEnd: '2026-10-30' }, ...botPrograms], BOT_NOW);
+  assert.match(ev.template.outputs[0].listCard.items.at(-1).title, /데모데이/, '행사성 공고는 맨 뒤');
+  assert.match(route('상담 연결', botPrograms, BOT_NOW).template.outputs[0].basicCard.description, /070-4103-4177/, 'PC는 전화 버튼이 안 보여 번호를 글로도 표시');
   const c = route('상담 연결', botPrograms, BOT_NOW);
   assertKakao(c);
   assert.equal(c.template.outputs[0].basicCard.buttons[0].action, 'phone');
