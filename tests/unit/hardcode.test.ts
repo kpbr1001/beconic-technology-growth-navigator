@@ -24,7 +24,7 @@ describe('하드코딩 재발 방지', () => {
     }
   });
   it('발행사 정보(전화·주소·인증번호)는 ISSUER에서만 — 화면·보고서 소스에 직접 쓰지 않음', () => {
-    for (const p of ['src/app/legacy-ui.ts', 'src/reports/keysummary.ts', 'src/main.ts']) expect(code(p), p).not.toMatch(/070-4103-4177|디지털로27길|제2025-684호|start@gven\.kr/);
+    for (const p of ['src/app/legacy-ui.ts', 'src/reports/keysummary.ts', 'src/main.ts']) expect(code(p), p).not.toMatch(/02-6124-5960|디지털로27길|제2025-684호|start@gven\.kr/);
   });
 });
 

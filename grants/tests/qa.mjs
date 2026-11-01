@@ -239,7 +239,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   await page.locator('#helpModal .hp-type', { hasText: '제출 서류 준비' }).click();
   const mail = decodeURIComponent(await page.locator('#helpModal a.hp-c[href^="mailto:"]').getAttribute('href'));
   check('도움 선택 → 메일 내용에 사업명·고른 도움 반영', mail.startsWith('mailto:start@gven.kr?subject=') && mail.includes(helpName) && /사업계획서 작성·검토, 제출 서류 준비/.test(mail), mail.slice(0, 90));
-  check('전화 상담 링크', (await page.locator('#helpModal a.hp-c[href^="tel:"]').getAttribute('href')) === 'tel:07041034177');
+  check('전화 상담 링크', (await page.locator('#helpModal a.hp-c[href^="tel:"]').getAttribute('href')) === 'tel:0261245960');
   await page.locator('#helpModal button.hp-c').click();
   const copied = await page.waitForFunction(() => /복사/.test((document.getElementById('toast') || {}).textContent || ''), null, { timeout: 3000 }).then(() => true, () => false);
   check('요청 내용 복사 → 안내', copied);

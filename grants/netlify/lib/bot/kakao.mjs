@@ -6,7 +6,7 @@
 // ============================================================================
 import { TOOLS, AREAS } from './tools.mjs';
 
-export const CONTACT = { tel: '070-4103-4177', app: 'https://beconic-grant-matching.netlify.app/' };
+export const CONTACT = { tel: '02-6124-5960', app: 'https://beconic-grant-matching.netlify.app/' };
 // 카드 썸네일(800×400, 2:1) — 원본 design/kakao-card.html, 다시 만들기 scripts/render-images.mjs. 바꾸면 v를 올려 카카오 캐시를 비운다
 const THUMB_V = 1;
 const thumb = (k) => ({ thumbnail: { imageUrl: `${CONTACT.app}assets/kakao/${k}.png?v=${THUMB_V}` } });
