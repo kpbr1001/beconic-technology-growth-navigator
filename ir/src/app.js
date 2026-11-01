@@ -1,5 +1,6 @@
 // BECONIC IR 진단 v2 — 화면. 입력 내용과 업로드한 파일은 이 브라우저 안에서만 처리하며 서버로 보내지 않는다.
-import { CATEGORIES, QUESTIONS, STAGES, INDUSTRIES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SOURCES, N_Q, EFFORT, INDUSTRY_ADJ } from './model.js';
+import { CATEGORIES, QUESTIONS, STAGES, INDUSTRIES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SOURCES, N_Q, EFFORT, INDUSTRY_ADJ, LENSES,
+  estMinutes, bandColor, SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS } from './model.js';
 import { evaluate, SCORE_VERSION } from './score.js';
 import { ACCOUNTS, CORE, parseStatements, parseWon } from './fin.js';
 import { blank, load, save, clear, hasLegacy, today, validate } from './store.js';
@@ -8,7 +9,7 @@ import { gauge, radar, finBars, dots } from './charts.js';
 import { renderReport, reportId } from './report.js';
 import { COMPANY, telHref } from './contact.js';
 
-export const APP = { version: 'v2.1.0', updated: '2026-11-01' };
+export const APP = { version: 'v2.1.1', updated: '2026-11-01' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const nb = (t) => esc(t).replace(/·/g, '⁠·⁠');
@@ -42,7 +43,11 @@ function footerHtml() {
   <p class="f-legal">IR 준비도 점수는 대표 응답과 제출한 재무제표를 바탕으로 한 자가진단 결과예요. 투자 유치 여부나 기업가치를 판단·보장하지 않아요. 입력 내용과 파일은 이 브라우저에만 저장돼요.</p>
   <p class="f-ver">${APP.version} · 문항 ${MODEL_VERSION} · 점수 ${SCORE_VERSION}</p></div></footer>`;
 }
-const barColor = (s) => (s >= 80 ? '#3182f6' : s >= 60 ? '#5aa0ff' : s >= 40 ? '#f0a43a' : '#e5484d');
+const barColor = bandColor; // 점수 막대 색 구간은 model.js BANDS
+const START_FIELDS = ['회사명', '투자 단계', '업종']; // 시작 화면에서 묻는 기본 정보
+const N_CAT = CATEGORIES.length;
+const ROAD_SPAN = ROADMAP_BUCKETS.map((b) => b.label.replace(/^지금 ~ /, '').replace(' 안에', '')).join('·'); // 2주·30일·90일
+const GRADE_SPAN = `${GRADES[0].g}~${GRADES[GRADES.length - 1].g}`;
 function catBar(c) {
   return `<div class="cbar"><b>${nb(c.name)}</b><div class="track"><i style="width:${c.score ?? 0}%;background:${barColor(c.score ?? 0)}"></i></div><em>${c.score ?? '—'}</em></div>`;
 }
@@ -56,8 +61,8 @@ function homeHtml() {
   <section class="hero"><div class="wrap hero-in"><div>
     <p class="eyebrow">근거로 준비하고, 실행으로 연결합니다</p>
     <h1>우리 회사 IR,<br><em>투자자 관점에서</em><br>준비되어 있나요?</h1>
-    <p class="lead">9개 영역 36문항에서 "우리 회사에 맞는 문장"을 고르고 표준재무제표를 올리면, IR 준비도 점수와 강점·보완점, 재무 지표, 실행 로드맵을 한눈에 보여 드려요.</p>
-    <div class="cta-row">${resume ? `<button class="btn primary lg" data-act="resume">이어서 하기 · ${esc(st.meta.company)} (${n}/${N_Q})</button><button class="btn ghost lg" data-act="new">새로 시작</button>` : '<button class="btn primary lg" data-act="new">IR 진단 시작하기 · 약 10분</button>'}</div>
+    <p class="lead">${N_CAT}개 영역 ${N_Q}문항에서 "우리 회사에 맞는 문장"을 고르고 표준재무제표를 올리면, IR 준비도 점수와 강점·보완점, 재무 지표, 실행 로드맵을 한눈에 보여 드려요.</p>
+    <div class="cta-row">${resume ? `<button class="btn primary lg" data-act="resume">이어서 하기 · ${esc(st.meta.company)} (${n}/${N_Q})</button><button class="btn ghost lg" data-act="new">새로 시작</button>` : '<button class="btn primary lg" data-act="new">IR 진단 시작하기 · 약 ${estMinutes()}분</button>'}</div>
     <p class="micro">회원가입 없음 · 입력 내용과 파일은 이 브라우저에만 저장 · <button class="link sm" data-act="sample">합성 예시 결과 보기</button></p>
   </div>
   <div class="hero-card" aria-label="결과 화면 예시"><div class="hc-top"><span>IR 진단 결과</span><small>합성 예시</small></div>
@@ -65,19 +70,19 @@ function homeHtml() {
     <div class="cbars">${CATEGORIES.slice(0, 4).map((c) => catBar(demo.cats[c.id])).join('')}</div></div></div></section>
 
   <section class="wrap"><h2 class="sec-t">이렇게 진단해요</h2><div class="cards4">
-    ${[['1', '5점 척도 진단', '문제·제품·기술·시장·실적·경쟁·팀·재무·IR 자료 9개 영역, 문항마다 행동 기준 문장 5개 중 하나만 고르면 돼요.'],
+    ${[['1', `${SCALE_MAX}점 척도 진단`, `${CATEGORIES.map((c) => c.short).join('·')} ${N_CAT}개 영역, 문항마다 행동 기준 문장 ${SCALE_MAX}개 중 하나만 고르면 돼요.`],
        ['2', '표준재무제표 분석', '홈택스 표준재무제표증명 PDF를 올리면 매출·이익·부채를 읽어 지표로 보여 드려요. 파일은 업로드되지 않아요.'],
        ['3', '강점·보완점', '종합 점수에 영향이 큰 순서로 보완할 문항과 다음 단계를 짚어 드려요.'],
-       ['4', '실행 로드맵·PDF', '2주·30일·90일 할 일과 결과 보고서 PDF로 바로 실행에 옮길 수 있어요.']]
+       ['4', '실행 로드맵·PDF', `${ROAD_SPAN} 할 일과 결과 보고서 PDF로 바로 실행에 옮길 수 있어요.`]]
       .map(([i, t, d]) => `<div class="fcard"><span class="ic">${i}</span><b>${t}</b><p>${d}</p></div>`).join('')}</div></section>
 
   <section class="wrap two">
-    <div class="panel ok-p"><h3>결과에서 볼 수 있는 것</h3><ul><li>종합 IR 준비도 점수·등급(S~D)과 영역별 점수</li><li>강점 3개, 먼저 보완할 3개와 다음 단계</li><li>매출 성장률·영업이익률·부채비율 등 재무 지표</li><li>2주·30일·90일 실행 로드맵</li></ul></div>
+    <div class="panel ok-p"><h3>결과에서 볼 수 있는 것</h3><ul><li>종합 IR 준비도 점수·등급(${GRADE_SPAN})과 영역별 점수</li><li>투자자 관점 ${LENSES.length}가지 질문과 경계 신호</li><li>강점 ${TOP_N}개, 먼저 보완할 ${TOP_N}개와 목표 단계</li><li>매출 성장률·영업이익률·부채비율 등 재무 지표</li><li>${ROAD_SPAN} 실행 로드맵(산출물 포함)</li></ul></div>
     <div class="panel no-p"><h3>점수의 의미</h3><ul><li>대표 응답과 제출한 재무제표를 바탕으로 한 자가진단이에요</li><li>투자 유치 여부나 기업가치를 판단·보장하지 않아요</li><li>투자 단계(예비창업~시리즈A 이상)에 따라 영역 비중이 달라요</li><li>근거 자료 확보율을 점수와 함께 보여 드려요</li></ul></div>
   </section>
 
   <section class="wrap steps"><h2 class="sec-t">진행 순서</h2><ol>
-    <li><b>기본 정보 3가지</b><span>회사명·투자 단계·업종 (30초)</span></li><li><b>36문항 진단</b><span>한 화면에 한 문항 (약 10분)</span></li>
+    <li><b>기본 정보 ${START_FIELDS.length}가지</b><span>${START_FIELDS.join('·')} (30초)</span></li><li><b>${N_Q}문항 진단</b><span>한 화면에 한 문항 (약 ${estMinutes()}분)</span></li>
     <li><b>재무제표 올리기</b><span>표준재무제표 PDF 또는 직접 입력 (선택)</span></li><li><b>결과·PDF</b><span>대시보드와 결과 보고서</span></li></ol></section>
 
   <section class="wrap consult"><div class="cbox"><div><b>결과를 보고 IR을 함께 준비하고 싶다면</b><p>그로스벤처스는 중기부 인증 중소기업상담회사(${COMPANY.cert})예요. 15년 경력 컨설턴트가 진단 결과를 바탕으로 IR 자료와 투자 준비를 함께 설계해 드려요.</p></div>
@@ -85,11 +90,11 @@ function homeHtml() {
   </main>${footerHtml()}`;
 }
 
-// ───────────────────────── 시작(기본 정보 3가지)
+// ───────────────────────── 시작(기본 정보)
 function startHtml() {
   const m = (st || blank()).meta;
   return `${headerHtml()}<main class="wrap narrow"><button class="back" data-act="home">← 처음으로</button>
-  <h1 class="pg-t">회사 정보 3가지만 알려 주세요</h1><p class="pg-s">투자 단계에 따라 영역별 비중이 달라져요.</p>
+  <h1 class="pg-t">회사 정보 ${START_FIELDS.length}가지만 알려 주세요</h1><p class="pg-s">투자 단계에 따라 영역별 비중이 달라져요.</p>
   <div class="card">
     <label class="fld">회사명<input id="s-company" maxlength="60" value="${esc(m.company)}" placeholder="예: 주식회사 비코닉" autocomplete="organization"></label>
     <div class="fld">투자 단계<div class="choice c2" role="radiogroup" aria-label="투자 단계">${STAGES.map((s) => `<button role="radio" aria-checked="${m.stage === s.id}" class="${m.stage === s.id ? 'on' : ''}" data-act="stage" data-v="${s.id}"><b>${s.label}</b><span>${s.desc}</span></button>`).join('')}</div></div>
@@ -115,7 +120,7 @@ function questionHtml(n) {
     ${q.opts.map((t, j) => `<button role="radio" aria-checked="${a.v === j + 1}" class="opt ${a.v === j + 1 ? 'on' : ''}" data-act="pick" data-v="${j + 1}"><span class="n">${j + 1}</span><span class="ot">${esc(t)}</span><span class="ck" aria-hidden="true">${a.v === j + 1 ? '선택됨' : ''}</span></button>`).join('')}
     <button role="radio" aria-checked="${a.v === 0}" class="opt unk ${a.v === 0 ? 'on' : ''}" data-act="pick" data-v="0">잘 모르겠어요${a.v === 0 ? ' · 선택됨' : ''}</button>
   </div>
-  <p class="hint">${typeof a.v === 'number' ? '선택했어요. "다음"을 누르거나 같은 보기를 한 번 더 누르면 넘어가요(Enter 키도 돼요).' : '가장 가까운 문장을 골라 주세요. 키보드 1~5로도 고를 수 있어요.'}</p></main>
+  <p class="hint">${typeof a.v === 'number' ? '선택했어요. "다음"을 누르거나 같은 보기를 한 번 더 누르면 넘어가요(Enter 키도 돼요).' : '가장 가까운 문장을 골라 주세요. 키보드 1~${SCALE_MAX}로도 고를 수 있어요.'}</p></main>
   <div class="bottom-bar"><div class="wrap narrow bb"><a class="btn ghost" href="/answers">전체 문항</a><button class="btn ${typeof a.v === 'number' ? 'primary' : 'ghost'}" data-act="next">${i === N_Q - 1 ? '재무제표 단계로 ›' : '다음 ›'}</button></div></div>`;
 }
 
@@ -168,11 +173,11 @@ function resultHtml() {
 
   ${r.flags.length ? `<section class="card flags"><h3>투자자 경계 신호</h3><p class="hint">투자 검토에서 멈칫하게 되는 지점이에요. 미팅 전에 먼저 정리하세요.</p><ul class="chk-l">${r.flags.map((f) => `<li class="warn">${esc(f.text)}${f.qid ? ` <a href="/q/${qn(f.qid)}">응답 보기</a>` : ''}</li>`).join('')}</ul></section>` : ''}
 
-  <section class="card"><h3>투자자 관점 진단</h3><p class="hint">투자 심사에서 묻는 6가지 질문으로 다시 묶어 봤어요. 질문마다 실사에서 확인하는 자료도 함께 적었어요.</p>
+  <section class="card"><h3>투자자 관점 진단</h3><p class="hint">투자 심사에서 묻는 ${LENSES.length}가지 질문으로 다시 묶어 봤어요. 질문마다 실사에서 확인하는 자료도 함께 적었어요.</p>
     <div class="lenses">${r.lenses.map((l) => `<div class="lens ${l.verdict?.tone || ''}"><div class="lh"><b>${esc(l.name)}</b><em>${l.score ?? '—'}</em></div><p class="lq">${esc(l.q)}</p>
       <div class="track"><i style="width:${l.score ?? 0}%;background:${barColor(l.score ?? 0)}"></i></div>
       <p class="lv">${l.verdict ? esc(l.verdict.text) : '응답 없음'}${l.note ? ` · <span class="muted">${esc(l.note)}</span>` : ''}</p>
-      ${l.weakest && (l.score ?? 100) < 80 ? `<p class="lw">가장 약한 부분: <a href="/q/${qn(l.weakest.id)}">${esc(l.weakest.title)}</a></p>` : ''}<p class="ld">실사 확인 자료: ${esc(l.docs)}</p></div>`).join('')}</div></section>
+      ${l.weakest && l.verdict?.tone !== 'good' ? `<p class="lw">가장 약한 부분: <a href="/q/${qn(l.weakest.id)}">${esc(l.weakest.title)}</a></p>` : ''}<p class="ld">실사 확인 자료: ${esc(l.docs)}</p></div>`).join('')}</div></section>
 
   <div class="grid2">
     <section class="card"><h3>영역별 점수</h3><div class="ch-wrap">${radar(CATEGORIES.map((x) => ({ name: x.short, score: r.cats[x.id].score })), { size: 320 })}</div></section>
@@ -181,8 +186,8 @@ function resultHtml() {
   </div>
 
   <div class="grid2">
-    <section class="card"><h3>강점</h3><div class="lst">${r.strengths.length ? r.strengths.map((s) => `<div class="it good"><div class="h"><span>${esc(s.q.title)} <span class="muted sm">${esc(CMAP[s.q.cat].name)}</span></span>${dots(s.v)}</div><p>${esc(s.text)}${s.ev ? '' : ' · 근거 자료 확인 필요'}</p></div>`).join('') : '<p class="hint">4점 이상인 문항이 아직 없어요.</p>'}</div></section>
-    <section class="card"><h3>먼저 보완할 3가지</h3><p class="hint">점수를 올릴 여지가 크고 비중이 높은 순서예요.</p><div class="lst">${r.weaknesses.map((w) => `<div class="it need"><div class="h"><span>${esc(w.q.title)} <span class="muted sm">${esc(CMAP[w.q.cat].name)}</span></span>${dots(w.v)}</div><p>지금: ${esc(w.now)}</p><p class="nx"><b>목표</b> ${esc(w.next)} <span class="muted sm">(달성 시 +${w.gainTo}점)</span></p><p class="sm muted">산출물: ${esc(w.doc)}</p></div>`).join('') || '<p class="hint">3점 이하 문항이 없어요.</p>'}</div></section>
+    <section class="card"><h3>강점</h3><div class="lst">${r.strengths.length ? r.strengths.map((s) => `<div class="it good"><div class="h"><span>${esc(s.q.title)} <span class="muted sm">${esc(CMAP[s.q.cat].name)}</span></span>${dots(s.v)}</div><p>${esc(s.text)}${s.ev ? '' : ' · 근거 자료 확인 필요'}</p></div>`).join('') : `<p class="hint">${STRONG_MIN}점 이상인 문항이 아직 없어요.</p>`}</div></section>
+    <section class="card"><h3>먼저 보완할 ${TOP_N}가지</h3><p class="hint">점수를 올릴 여지가 크고 비중이 높은 순서예요.</p><div class="lst">${r.weaknesses.map((w) => `<div class="it need"><div class="h"><span>${esc(w.q.title)} <span class="muted sm">${esc(CMAP[w.q.cat].name)}</span></span>${dots(w.v)}</div><p>지금: ${esc(w.now)}</p><p class="nx"><b>목표</b> ${esc(w.next)} <span class="muted sm">(달성 시 +${w.gainTo}점)</span></p><p class="sm muted">산출물: ${esc(w.doc)}</p></div>`).join('') || `<p class="hint">${WEAK_MAX}점 이하 문항이 없어요.</p>`}</div></section>
   </div>
 
   ${r.checks.length ? `<section class="card"><h3>응답과 재무제표 확인</h3><ul class="chk-l">${r.checks.map((x) => `<li class="${x.type}">${esc(x.text)}${x.qid ? ` <a href="/q/${qn(x.qid)}">응답 보기</a>` : ''}</li>`).join('')}</ul></section>` : ''}
@@ -193,8 +198,8 @@ function resultHtml() {
     <div class="res-act"><a class="btn white sm" href="/finance">재무 수정</a></div>`
     : `<div class="stat warn">재무제표가 반영되지 않았어요. 재무·자금 점수는 대표 응답만으로 계산했어요.</div><p class="hint">투자자는 표준재무제표를 가장 먼저 요청해요. 올리면 매출 성장률·영업이익률·부채비율·유동비율·현금 보유 개월 수와 응답 교차 확인이 추가돼요.</p><a class="btn primary" href="/finance">표준재무제표 올리기</a>`}</section>
 
-  <section class="card"><h3>보완 로드맵</h3><p class="hint">종합 점수에 영향이 큰 순서로 고른 뒤, 보완 난이도에 맞춰 기간에 배치했어요. 항목마다 만들어야 할 산출물을 적었어요.</p>
-    <div class="road">${roadCol('지금 ~ 2주', '빠르게 정리', r.roadmap.now)}${roadCol('30일 안에', '자료·실적 보강', r.roadmap.d30)}${roadCol('90일 안에', '구조·실적 만들기', r.roadmap.d90)}</div></section>
+  <section class="card"><h3>보완 로드맵</h3><p class="hint">종합 점수에 영향이 큰 순서로 고른 뒤, 보완 난이도에 맞춰 기간에 배치했어요. 목표는 바로 다음 단계(최소 ${GOAL_FLOOR}단계·문서화 수준)이고, 항목마다 만들어야 할 산출물을 적었어요.</p>
+    <div class="road">${ROADMAP_BUCKETS.map((b) => roadCol(b.label, b.sub, r.roadmap[b.key])).join('')}</div></section>
 
   <section class="card"><h3>영역별 상세 진단</h3><p class="hint">영역마다 투자자가 보는 포인트, 지금 상태, 보완 목표와 준비할 자료예요.</p>
   ${r.analysis.map((a) => `<details class="qd"><summary><span>${nb(a.c.name)} <span class="bdg ${a.gap === null ? '' : a.gap >= 0 ? 'ok' : 'warn'}">${esc(a.status)}</span></span><span>${a.score ?? '—'}점 ›</span></summary>
@@ -203,7 +208,7 @@ function resultHtml() {
     ${qByCatLocal(a.c.id).map((q) => `<div class="qrow"><div><b>${esc(q.title)} ${dots(st.answers[q.id]?.v)}</b><span>${ansText(q)}${st.answers[q.id]?.ev ? ' · 근거 있음' : ''}</span></div><a href="/q/${qn(q.id)}">수정</a></div>`).join('')}</div></details>`).join('')}</section>
 
   <section class="card method"><h3>점수는 이렇게 계산해요</h3>
-    <p>문항은 1~5점(잘 모르겠어요 = 1점), 영역 점수 = 문항 평균 × 20, 종합 = 투자 단계별 영역 비중(기술 집약 업종은 기술역량 비중 보정)으로 가중 평균해요. 대표 응답과 제출한 재무제표 기반의 자가진단이며, 투자 유치 여부나 기업가치를 판단·보장하지 않아요.</p>
+    <p>문항은 1~${SCALE_MAX}점(잘 모르겠어요 = ${UNKNOWN_AS}점), 영역 점수 = 문항 평균 × ${SCORE_FACTOR}, 종합 = 투자 단계별 영역 비중(기술 집약 업종은 기술역량 비중 보정)으로 가중 평균해요. 대표 응답과 제출한 재무제표 기반의 자가진단이며, 투자 유치 여부나 기업가치를 판단·보장하지 않아요.</p>
     <div class="tw"><table><thead><tr><th>등급</th>${GRADES.map((g) => `<th>${g.g}</th>`).join('')}</tr></thead><tbody><tr><td>기준</td>${GRADES.map((g) => `<td>${g.min}+</td>`).join('')}</tr></tbody></table></div>
     <p class="sm">영역 구성은 ${Object.values(SOURCES).slice(0, 2).map((s) => `${esc(s.publisher)} 「${esc(s.title)}」`).join(', ')}의 투자 설명 항목을 참고했어요. 가중치·단계 기대 수준·업종 보정은 비코닉 설계값(실증 검증 전)이에요.</p></section>
 
@@ -253,7 +258,7 @@ async function handlePdf(file) {
     if (textless) { finDraft = { source: 'manual', fileName: file.name, cur: {}, prev: {}, found: {}, status: { type: 'warn', text: '글자를 읽을 수 없는 PDF예요(스캔 이미지일 수 있어요). 재무제표를 보고 직접 입력해 주세요.' } }; render(); return; }
     const p = parseStatements(lines); const n = Object.keys(p.found).length; const coreN = CORE.filter((k) => typeof p.cur[k] === 'number').length;
     finDraft = { source: 'upload', fileName: file.name, cur: p.cur, prev: p.prev, found: p.found, years: p.years,
-      status: n ? { type: coreN === CORE.length ? 'ok' : 'info', text: `${ACCOUNTS.length}개 계정 중 ${n}개를 읽었어요${p.unit > 1 ? ` (단위 ${p.unit === 1000 ? '천원' : '백만원'} → 원으로 바꿈)` : ''}. ${coreN < CORE.length ? '빈 핵심 항목을 채워 주세요.' : '값이 맞는지 확인해 주세요.'}` }
+      status: n ? { type: coreN === CORE.length ? 'ok' : 'info', text: `${ACCOUNTS.length}개 계정 중 ${n}개를 읽었어요${p.unit !== 1 ? ` (단위 ${p.unit === 1000 ? '천원' : '백만원'} → 원으로 바꿈)` : ''}. ${coreN < CORE.length ? '빈 핵심 항목을 채워 주세요.' : '값이 맞는지 확인해 주세요.'}` }
         : { type: 'warn', text: '표준재무제표 형식의 계정을 찾지 못했어요. 직접 입력해 주세요.' } };
     render();
   } catch { finDraft = { source: 'manual', fileName: file.name, cur: {}, prev: {}, found: {}, status: { type: 'warn', text: 'PDF를 여는 중 문제가 생겼어요. 직접 입력해 주세요.' } }; render(); }
@@ -345,4 +350,4 @@ export function printReport() {
 }
 
 render();
-window.__IR = { get state() { return st; }, evaluate: () => evaluate(st), go, APP, hasLegacy, WEIGHTS };
+window.__IR = { get state() { return st; }, evaluate: () => evaluate(st), go, APP, hasLegacy, WEIGHTS, N_Q, qids: QUESTIONS.map((q) => q.id) };

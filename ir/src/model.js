@@ -157,11 +157,11 @@ export const N_Q = QUESTIONS.length;
 // 투자자 관점 — 투자 심사에서 묻는 6가지 질문과 연결 문항·실사 확인 자료
 export const LENSES = [
   { id: 'L1', name: '시장성', q: '시장이 충분히 크고, 지금이 적기인가?', qs: ['MK1', 'MK2', 'MK3', 'MK4'], docs: '시장 규모 산출 근거(출처), 진입 전략' },
-  { id: 'L2', name: '고객 검증·실적', q: '고객이 정말 원하고 돈을 내는가?', qs: ['PC2', 'PC4', 'BM2', 'BM3'], docs: '인터뷰 기록, 계약·매출 자료, 유지율' },
+  { id: 'L2', name: '고객 검증·실적', q: '고객이 정말 원하고 돈을 내는가?', qs: ['PC2', 'PC4', 'BM2', 'BM3'], docs: '인터뷰 기록, 계약·매출 자료, 유지율', fin: 'growth' },
   { id: 'L3', name: '제품·기술 경쟁력', q: '제품과 기술이 실제로 작동하고 따라 하기 어려운가?', qs: ['SP1', 'SP2', 'TC1', 'TC2', 'TC4', 'CO3'], docs: '데모·시험성적, 지식재산 목록, 외부 검증' },
   { id: 'L4', name: '팀 실행력', q: '이 팀이 해낼 수 있는가?', qs: ['TM1', 'TM2', 'TC3', 'SP4'], docs: '팀 이력·역할표, 개발 로드맵' },
-  { id: 'L5', name: '수익성·자금', q: '팔수록 남는 구조이고, 자금 계획이 분명한가?', qs: ['BM1', 'BM4', 'FN2', 'FN3'], docs: '단위 경제성, 자금 사용 계획, 현금흐름' },
-  { id: 'L6', name: '투자 실행 준비', q: '지금 바로 실사·계약을 진행할 수 있는가?', qs: ['FN1', 'FN4', 'TM3', 'IR2', 'IR3'], docs: '재무제표, 주주명부·계약, 데이터룸' },
+  { id: 'L5', name: '수익성·자금', q: '팔수록 남는 구조이고, 자금 계획이 분명한가?', qs: ['BM1', 'BM4', 'FN2', 'FN3'], docs: '단위 경제성, 자금 사용 계획, 현금흐름', fin: 'opm', needsFin: true },
+  { id: 'L6', name: '투자 실행 준비', q: '지금 바로 실사·계약을 진행할 수 있는가?', qs: ['FN1', 'FN4', 'TM3', 'IR2', 'IR3'], docs: '재무제표, 주주명부·계약, 데이터룸', needsFin: true },
 ];
 export const LENS_VERDICT = [
   { min: 80, text: '투자자에게 강점으로 제시할 수 있어요', tone: 'good' },
@@ -169,3 +169,39 @@ export const LENS_VERDICT = [
   { min: 0, text: '투자자 질문에 답하기 어려운 영역이에요', tone: 'warn' },
 ];
 export const EFFORT = { S: '2주 안', M: '30일 안', L: '90일 안' };
+
+// ───────────────────────── 점수·해석 규칙 (화면·보고서·엔진이 모두 여기서 가져간다)
+export const SCALE_MAX = 5;                 // 5점 척도
+export const UNKNOWN_AS = 1;                // "잘 모르겠어요"를 계산할 점수
+export const SCORE_FACTOR = 100 / SCALE_MAX; // 문항 평균 × 20 = 100점 환산
+export const STRONG_MIN = 4;                // 강점으로 보는 최소 점수
+export const WEAK_MAX = 3;                  // 보완 대상으로 보는 최대 점수
+export const GOAL_FLOOR = 3;                // 목표 단계의 최소 수준(문서화·데이터 수준)
+export const TOP_N = 3;                     // 강점·먼저 보완할 항목 수
+export const SEC_PER_Q = 15;                // 문항당 평균 응답 시간(초)
+export const estMinutes = () => Math.max(5, Math.round((N_Q * SEC_PER_Q) / 60 / 5) * 5); // 5분 단위
+export const BANDS = [ // 점수 막대 색 구간
+  { min: 80, color: '#3182f6' }, { min: 60, color: '#5aa0ff' }, { min: 40, color: '#f0a43a' }, { min: 0, color: '#e5484d' },
+];
+export const bandColor = (s) => (BANDS.find((b) => (s ?? 0) >= b.min) || BANDS[BANDS.length - 1]).color;
+// 보완 로드맵 칸: 난이도(S·M·L)별 기간과 칸 수
+export const ROADMAP_BUCKETS = [
+  { key: 'now', effort: 'S', label: '지금 ~ 2주', sub: '빠르게 정리', cap: 4 },
+  { key: 'd30', effort: 'M', label: '30일 안에', sub: '자료·실적 보강', cap: 4 },
+  { key: 'd90', effort: 'L', label: '90일 안에', sub: '구조·실적 만들기', cap: 5 },
+];
+// 기술 집약 업종 = 업종 보정에서 기술역량 비중을 올리는 업종
+export const TECH_INDUSTRIES = Object.keys(INDUSTRY_ADJ).filter((k) => (INDUSTRY_ADJ[k].TC || 0) > 0);
+// 응답 경계 신호 규칙: 문항 점수가 max 이하이면 신호(unknown: "잘 모르겠어요"도 신호로 볼지)
+export const FLAG_RULES = [
+  { id: 'no-competitor', qid: 'CO1', max: 1, unknown: false, text: '"경쟁자가 없다"는 답은 시장 조사가 부족하다는 신호로 읽혀요.' },
+  { id: 'cap-table', qid: 'TM3', max: 2, unknown: true, text: '지분·창업자 계약이 정리되지 않았어요. 실사에서 반드시 확인하는 항목이에요.' },
+  { id: 'no-fs', qid: 'FN1', max: 2, unknown: true, onlyNoFin: true, text: '재무제표를 바로 낼 수 없어요. 투자 검토의 첫 요청 자료예요.' },
+  { id: 'cash-unknown', qid: 'FN3', max: 2, unknown: true, text: '현금과 월 지출을 모르면 투자 시점과 금액을 설명하기 어려워요.' },
+  { id: 'numbers', qid: 'IR2', max: 2, unknown: true, text: '자료마다 숫자가 다를 수 있어요. 숫자 불일치는 신뢰를 크게 떨어뜨려요.' },
+  { id: 'no-customer', qid: 'PC2', max: 1, unknown: true, skipStages: ['pre'], text: '아직 타깃 고객을 직접 만나지 않았어요.' },
+  { id: 'tech-outsourced', qid: 'TC3', max: 2, unknown: true, techOnly: true, text: '기술 집약 업종인데 핵심 기술을 외부에 의존해요.' },
+];
+export const FLAG_LIMITS = { unknown: 5, noEvidenceHigh: 8, cashMonths: 6 }; // 개수·개월 기준
+// 응답 ↔ 재무제표 교차 확인에 쓰는 문항
+export const FIN_LINK = { revenue: 'BM2', fsReady: 'FN1', cash: 'FN3' };
