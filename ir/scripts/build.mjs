@@ -13,4 +13,9 @@ rmSync(out, { recursive: true, force: true }); mkdirSync(path.join(out, 'src'), 
 writeFileSync(path.join(out, 'index.html'), html);
 for (const f of readdirSync(path.join(root, 'src'))) if (f.endsWith('.js')) cpSync(path.join(root, 'src', f), path.join(out, 'src', f));
 cpSync(path.join(root, 'assets'), path.join(out, 'assets'), { recursive: true });
+// 수동 업로드(드래그 앤 드롭·CLI deploy)에도 보안 헤더가 적용되도록 _headers 생성 — netlify.toml [[headers]]와 같은 값
+const toml = readFileSync(path.join(root, 'netlify.toml'), 'utf8');
+const blocks = [...toml.matchAll(/\[\[headers\]\]\s*\n\s*for = "([^"]+)"\s*\n\s*\[headers\.values\]\s*\n((?:\s*[\w-]+ = "[^"]*"\s*\n?)+)/g)];
+if (!blocks.length) { console.error('netlify.toml 헤더 파싱 실패'); process.exit(1); }
+writeFileSync(path.join(out, '_headers'), blocks.map(([, f, body]) => `${f}\n${[...body.matchAll(/([\w-]+) = "([^"]*)"/g)].map(([, k, v]) => `  ${k}: ${v}`).join('\n')}`).join('\n\n') + '\n');
 console.log(`✅ dist/ v${version} (index.html · src/*.js · assets/)`);
