@@ -71,7 +71,7 @@ const fRef = (m, qid) => m.findings.filter((f) => f.refs.includes(qid)).map((f) 
 function header(m, kind) {
   const s = m.snap; const st = m.st;
   return `<div class="r-band">${s.draft ? `<div class="r-water">${esc(m.t.draft)}</div>` : ''}${st.meta.synthetic ? `<div class="r-water syn">${esc(m.t.synthetic)}</div>` : ''}</div>
-  <div class="r-head"><img src="assets/shield.png" alt="" class="r-logo"><div><div class="r-brand">BECONIC IR 진단 <span>by Growth Ventures</span></div>
+  <div class="r-head"><img src="/assets/shield.png" alt="" class="r-logo"><div><div class="r-brand">BECONIC IR 진단 <span>by Growth Ventures</span></div>
   <h1>${esc(kind === 'brief' ? m.t.brief : m.t.detail)}</h1><div class="r-sub">${esc(st.meta.company || '회사명 미입력')} · ${m.lang === 'en' ? 'As of' : '자료 기준일'} ${esc(st.meta.baseDate)} · ${esc(s.reportId)} · v${s.version}</div></div></div>`;
 }
 const reviewerScope = (m) => {

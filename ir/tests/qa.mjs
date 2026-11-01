@@ -12,6 +12,8 @@ const exe = process.env.CHROME_PATH || (existsSync('/opt/pw-browsers/chromium') 
 const browser = await chromium.launch({ executablePath: exe });
 let fails = 0; const ok = (c, msg) => { console.log(`${c ? '✅' : '❌'} ${msg}`); if (!c) fails++; };
 const errors = [];
+// 앱 안 이동(일반 경로). 로컬 정적 서버는 경로 연결(_redirects)을 모르므로 첫 화면만 직접 열고 나머지는 앱 라우터로 이동
+const nav = (p, r) => p.evaluate((x) => window.__IR.go(x), r).then(() => p.waitForTimeout(60));
 const newPage = async (w = 390, h = 844) => { const p = await browser.newPage({ viewport: { width: w, height: h }, acceptDownloads: true }); p.on('pageerror', (e) => errors.push(e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/fonts|pretendard|ERR_|net::/i.test(m.text())) errors.push(m.text()); }); return p; };
 
 // 1) 레이아웃
@@ -19,8 +21,8 @@ for (const [w, h] of [[360, 740], [390, 844], [768, 1024], [1280, 900]]) {
   const p = await newPage(w, h);
   await p.goto(BASE, { waitUntil: 'networkidle' });
   await p.click('[data-act=sample]'); await p.waitForTimeout(150);
-  for (const r of ['', '#/work/todo', '#/work/list', '#/work/evidence', '#/work/report', '#/q/Q23', '#/q/Q17', '#/setup']) {
-    await p.goto(BASE + r); await p.waitForTimeout(80);
+  for (const r of ['', 'work/todo', 'work/list', 'work/evidence', 'work/report', 'q/Q23', 'q/Q17', 'setup']) {
+    await nav(p, r); await p.waitForTimeout(80);
     const sw = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     if (sw > 0) ok(false, `${w}px ${r || 'home'} 가로 넘침 ${sw}px`);
   }
@@ -39,7 +41,7 @@ await p.fill('input[name=company]', '테스트 주식회사'); await p.fill('inp
 await p.click('[data-act=setup-save]');
 ok((await p.textContent('.sum h1')) === '테스트 주식회사', '작업 공간 진입');
 ok((await p.textContent('.sum')).includes('투자 준비도나 사업성 점수가 아니에요'), '진행률 = 업무 진행률 고지');
-await p.goto(BASE + '#/q/Q22');
+await nav(p, 'q/Q22');
 for (const [k, v] of [['open', '100,000,000'], ['op', '-30,000,000'], ['inv', '-10,000,000'], ['fin', '50,000,000'], ['close', '120,000,000']]) await p.fill(`#f-Q22-${k}`, v);
 await p.waitForTimeout(100);
 const calc = await p.textContent('#live-calc');
@@ -61,27 +63,27 @@ await p.click('[data-act=role]');
 ok(await p.locator('#f-Q22-open').isDisabled(), '컨설턴트는 대표 답변을 직접 수정할 수 없음');
 await p.check('input[name=scope][value="수치 재계산"]'); await p.click('[data-act=reviewed][data-q=Q22]');
 ok((await p.textContent('#q-chips')).includes('검토자 검토'), '검토자 검토 기록');
-await p.goto(BASE + '#/q/Q01'); await p.fill('#sg-text', '고객 유형을 넣어 주세요'); await p.fill('#sg-prop', '중소 제조기업에 설비 점검 SaaS 제공'); await p.click('[data-act=sg-add]');
-await p.goto(BASE + '#/work/report');
+await nav(p, 'q/Q01'); await p.fill('#sg-text', '고객 유형을 넣어 주세요'); await p.fill('#sg-prop', '중소 제조기업에 설비 점검 SaaS 제공'); await p.click('[data-act=sg-add]');
+await nav(p, 'work/report');
 ok((await p.textContent('.approve')).includes('대표 화면에서만'), '컨설턴트는 승인 불가');
 // 대표: 제안 반려(사유 필수) → 승인
 await p.click('[data-act=role]');
-await p.goto(BASE + '#/q/Q01');
+await nav(p, 'q/Q01');
 await p.click('[data-act=sg-reject]'); ok((await p.locator('.sg.open').count()) === 1, '반려 사유 없으면 반려 안 됨');
 await p.fill('.sg-act input', '소개서 표기와 다름'); await p.click('[data-act=sg-reject]');
 ok((await p.textContent('.sg')).includes('대표 반려 — 소개서 표기와 다름'), '반려 사유 기록');
-await p.goto(BASE + '#/work/report');
+await nav(p, 'work/report');
 await p.click('[data-act=approve]'); ok((await p.evaluate(() => window.__IR.state.snapshots.length)) === 0, '확인 체크 없이 승인 불가');
 for (const id of ['ap1', 'ap2', 'ap3']) await p.check(`#${id}`);
 await p.click('[data-act=approve]'); await p.waitForTimeout(300);
 const s1 = await p.evaluate(() => window.__IR.state.snapshots[0]);
 ok(s1 && /^[0-9a-f]{64}$/.test(s1.hash) && s1.byQ.Q22.review === 'approved', 'v1 스냅샷 고정(해시·검토자 검토→대표 승인)');
 // 승인 후 변경 → 재검토, 스냅샷 불변
-await p.goto(BASE + '#/q/Q22'); await p.fill('#f-Q22-close', '999'); await p.locator('#f-Q22-close').blur(); await p.waitForTimeout(150);
+await nav(p, 'q/Q22'); await p.fill('#f-Q22-close', '999'); await p.locator('#f-Q22-close').blur(); await p.waitForTimeout(150);
 const after = await p.evaluate(() => ({ a: window.__IR.state.answers.Q22, snapClose: window.__IR.state.snapshots[0].state.answers.Q22.fields.close }));
 ok(after.a.stale && after.a.review === 'none' && after.snapClose === '110,000,000', '승인 후 변경 → 재검토 대상, 승인본은 그대로');
 // 자료 새 버전 → 연결 문항 재검토
-await p.goto(BASE + '#/work/evidence'); writeFileSync(tmp, 'sample evidence v2');
+await nav(p, 'work/evidence'); writeFileSync(tmp, 'sample evidence v2');
 await p.setInputFiles('[data-act=ev-replace]', tmp); await p.waitForTimeout(300);
 ok((await p.evaluate(() => window.__IR.state.evidence[0].version)) === 2, '자료 교체 시 버전 증가');
 // 검토 파일 왕복
@@ -102,7 +104,7 @@ await p.close();
 // 3) PDF — 합성 예시 승인본, 요약본·상세본
 const q = await newPage(1280, 900);
 await q.goto(BASE, { waitUntil: 'networkidle' }); await q.click('[data-act=sample]');
-await q.goto(BASE + '#/work/report'); for (const id of ['ap1', 'ap2', 'ap3']) await q.check(`#${id}`);
+await nav(q, 'work/report'); for (const id of ['ap1', 'ap2', 'ap3']) await q.check(`#${id}`);
 await q.click('[data-act=approve]'); await q.waitForTimeout(300);
 await q.evaluate(() => { window.__noPrint = true; });
 for (const kind of ['brief', 'detail']) for (const mask of ['0', '1']) {
@@ -122,6 +124,20 @@ for (const kind of ['brief', 'detail']) for (const mask of ['0', '1']) {
   if (mask === '1') ok(!text.includes('엔젤투자자(예시)'), '마스킹: 주주명 비노출');
 }
 await q.close();
+
+// 3.5) 주소: '#' 없는 일반 경로, 예전 해시 주소는 경로로 전환, 배포본은 직접 접속·새로고침 지원
+const u = await newPage(); await u.goto(BASE, { waitUntil: 'networkidle' }); await u.click('[data-act=sample]'); await u.waitForTimeout(100);
+await u.click('a[href="/work/list"]'); await u.click('a[href="/q/Q07"]'); await u.waitForTimeout(100);
+ok(new URL(u.url()).pathname === '/q/Q07' && !u.url().includes('#'), `앱 안 이동 주소에 # 없음 (${new URL(u.url()).pathname})`);
+await u.goBack(); await u.waitForTimeout(100); ok(new URL(u.url()).pathname === '/work/list' && (await u.locator('.qsec').count()) > 0, '뒤로 가기');
+await u.goto(BASE + '#/q/Q23'); await u.waitForTimeout(150);
+ok(new URL(u.url()).pathname === '/q/Q23' && !u.url().includes('#') && (await u.textContent('.q-t')).includes('IR 덱'), '예전 #/ 주소 → 일반 경로로 전환');
+if (/^https:/.test(BASE)) {
+  await u.goto(BASE + 'q/Q17', { waitUntil: 'networkidle' });
+  ok((await u.textContent('.q-t')).includes('주주'), '배포본 직접 접속·새로고침(/q/Q17)');
+  const css = await u.request.get(BASE + 'assets/shield.png'); ok(css.headers()['content-type'].startsWith('image/'), '경로 연결이 실제 파일을 가리지 않음');
+}
+await u.close();
 
 // 4) OG·메타
 const o = await newPage(); await o.goto(BASE, { waitUntil: 'networkidle' });
