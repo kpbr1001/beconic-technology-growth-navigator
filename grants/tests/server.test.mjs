@@ -581,7 +581,7 @@ test('챗봇: 마감 임박·상담 연결·공고 미준비', () => {
   assert.deepEqual(soon.template.outputs[0].listCard.items.map((i) => i.title.slice(0, 13)), ['2026년 소상공인 정책자금 ', '2026년 스마트공장 구축'].map((t) => t.slice(0, 13)), 'D-1~7 지원사업 먼저, 오늘 마감은 뒤');
   const ev = route('마감 임박', [{ programName: '2026 스타 IR 데모데이 참여기업 모집', applicationEnd: '2026-10-30' }, ...botPrograms], BOT_NOW);
   assert.match(ev.template.outputs[0].listCard.items.at(-1).title, /데모데이/, '행사성 공고는 맨 뒤');
-  assert.match(route('상담 연결', botPrograms, BOT_NOW).template.outputs[0].basicCard.description, /070-4103-4177/, 'PC는 전화 버튼이 안 보여 번호를 글로도 표시');
+  assert.match(route('상담 연결', botPrograms, BOT_NOW).template.outputs[0].basicCard.description, /02-6124-5960/, 'PC는 전화 버튼이 안 보여 번호를 글로도 표시');
   const c = route('상담 연결', botPrograms, BOT_NOW);
   assertKakao(c);
   assert.equal(c.template.outputs[0].basicCard.buttons[0].action, 'phone');
@@ -608,4 +608,17 @@ test('챗봇 스킬 함수: POST만·토큰 검사·스냅샷 공고로 응답',
   const welcome = await (await call({ intent: { name: '웰컴 블록' }, userRequest: { utterance: '아무 문장', block: { name: '웰컴 블록' } } })).json();
   assert.match(welcome.template.outputs[0].simpleText.text, /비코닉/, '웰컴 블록은 문장과 관계없이 첫 메뉴');
   _setStore(null);
+});
+
+test('상담 연락처: 카카오 챗봇(CONTACT)과 화면(app.js HELP_CONTACT)이 같은 번호·인증번호 — 한쪽만 바뀌지 않게', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { CONTACT } = await import('../netlify/lib/bot/kakao.mjs');
+  const app = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const help = /const HELP_CONTACT = \{([\s\S]*?)\};/.exec(app)[1];
+  const val = (k) => new RegExp(`${k}:'([^']+)'`).exec(help)[1];
+  assert.equal(CONTACT.tel, val('tel'));
+  assert.equal(CONTACT.cert, val('cert'));
+  // 화면·인쇄 HTML에는 번호·주소·인증번호를 직접 쓰지 않는다([data-ct] 자리에 HELP_CONTACT로 채움)
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  for (const k of ['tel', 'email', 'addr', 'cert']) assert.ok(!html.includes(val(k)), `index.html에 ${k} 직접 표기`);
 });

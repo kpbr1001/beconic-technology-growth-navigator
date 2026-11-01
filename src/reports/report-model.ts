@@ -8,7 +8,7 @@ export const ISSUER = {
   certification: '중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호',
   certificationShort: '중기부 인증 중소기업상담회사 제2025-684호',
   address: '서울시 구로구 디지털로27길 24, 209호',
-  phone: '070-4103-4177',
+  phone: '02-6124-5960',
   email: 'start@gven.kr',
   web: 'www.beconic.kr',
 } as const;

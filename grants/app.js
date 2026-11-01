@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.26.0',
-  updated: '2026-10-30',
+  version: 'v3.26.1',
+  updated: '2026-11-01',
   changelog: [
+    { v:'v3.26.1', d:'2026-11-01', note:'상담 전화번호 변경: 070-4103-4177 → 02-6124-5960(상담 안내·신청 도움받기·인쇄 머리말·푸터·카카오 챗봇 상담 카드·전화 버튼)' },
     { v:'v3.26.0', d:'2026-10-30', note:'공장·설비 투자 자금(에너지이용합리화·산업재해예방시설·구조고도화·오염방지시설·시설자금 등)은 제조·에너지·바이오 등 업종일 때만 추천, 매장형 소상인·서비스업은 확인 필요로(유통·점포 시설자금은 제외). 녹색채권·SW 지식재산(IP) 평가보증도 분야 한정. 결과 첫 화면 최대액은 예비창업자·소상인·소공인이면 10억 초과 한도를 빼고 표시(음식점 소상인에게 최대 300억 표시되던 문제)' },
     { v:'v3.25.0', d:'2026-10-30', note:'모바일 체감 개선: 글꼴을 쓰는 글자만 받는 방식으로(첫 화면 글꼴 약 4.7MB → 수백 KB), 휴대폰 뒤로가기 = 이전 화면·단계·창 닫기(앱 밖으로 나가지 않음), 카카오톡 등 앱 안 브라우저에서는 PDF 저장 대신 결과 요약 복사. 결과 첫 화면은 사업별 최대액을 더한 합계 대신 추천 건수와 1건 기준 최대액. 공고 수를 차수 묶음 기준으로 통일. 안드로이드 홈 화면 아이콘(512·maskable) 추가·아이콘 경로 오류 수정' },
     { v:'v3.24.0', d:'2026-10-30', note:'매칭 단계(깔때기) 표시: 전체 공고 → 1단계 지역·기업규모·업종 → 2단계 사업자 형태·설립연도 → 3단계 세부 자격 → 4단계 필요한 지원 맞춤 건수와 내 지역·시군구 건수, 미입력 정보 안내. 공고문 분석 확대: 신청자격 절을 읽었는데 업력·매출 등 제한이 없으면 그것도 분석 결과로 반영(운영 분석 717건 중 반영 132건 → 약 600건 예상)' },
@@ -544,7 +545,18 @@ const HELP_TYPES = [
   {id:'docs',  label:'제출 서류 준비',       sub:'빠짐없이 갖추기'},
   {id:'pitch', label:'발표·면접 준비',       sub:'평가 대응 전략'}
 ];
-const HELP_CONTACT = {tel:'070-4103-4177', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat'};
+/* 발행사·상담 연락처 — 화면·인쇄의 번호·주소는 모두 여기서([data-ct]·[data-ct-href] 자리에 채움). 소스에 직접 쓰지 않는다.
+   카카오 챗봇(netlify/lib/bot/kakao.mjs CONTACT)은 서버 코드라 따로 두되 같은 값인지 서버 테스트가 확인한다 */
+const HELP_CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat',
+  web:'www.beconic.kr', webUrl:'https://www.beconic.kr/', addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호'};
+function contactHref(k, subject){
+  const c=HELP_CONTACT;
+  return k==='tel' ? `tel:${c.tel.replace(/-/g,'')}` : k==='email' ? `mailto:${c.email}${subject?`?subject=${encodeURIComponent(subject)}`:''}` : k==='kakao' ? c.kakao : k==='web' ? c.webUrl : '';
+}
+function bindContact(root){
+  root.querySelectorAll('[data-ct]').forEach(e=>{ e.textContent=HELP_CONTACT[e.dataset.ct]||''; });
+  root.querySelectorAll('[data-ct-href]').forEach(e=>{ const h=contactHref(e.dataset.ctHref, e.dataset.subject); if(h) e.setAttribute('href', h); });
+}
 const svgIcon = (d)=>`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const ICON = {
   chat:  svgIcon('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/>'),
@@ -1125,6 +1137,7 @@ const App = (function(){
   /* ================= INIT ================= */
   function init(){
     injectVersion();
+    bindContact(document);
     renderPersonaCards();
     updateDataSourceUI(true);
     prefetchProgramCount();
@@ -1919,7 +1932,7 @@ const App = (function(){
       <div class="hp-ch">
         <a class="hp-c kakao" href="${HELP_CONTACT.kakao}" target="_blank" rel="noopener noreferrer" onclick="App.copyHelp('kakao')">
           <span class="hp-ci" aria-hidden="true">${ICON.kakao}</span><span><b>카카오톡 상담</b><small>요청 내용이 복사돼요 · 채팅창에 붙여넣기</small></span></a>
-        <a class="hp-c" href="tel:${HELP_CONTACT.tel.replace(/-/g,'')}">
+        <a class="hp-c" href="${contactHref('tel')}">
           <span class="hp-ci" aria-hidden="true">${ICON.phone}</span><span><b>전화 상담</b><small>${HELP_CONTACT.tel}</small></span></a>
         <a class="hp-c" href="${esc(helpMailto(p, company, t))}">
           <span class="hp-ci" aria-hidden="true">${ICON.mail}</span><span><b>메일로 요청</b><small>내용이 자동으로 채워져요</small></span></a>
@@ -1927,7 +1940,7 @@ const App = (function(){
           <span class="hp-ci" aria-hidden="true">${ICON.copy}</span><span><b>요청 내용 복사</b><small>카톡·문자에 붙여넣기</small></span></button>
       </div>
       <details class="hp-preview"><summary>보낼 내용 미리보기</summary><pre>${esc(helpText(p, company, t))}</pre></details>
-      <p class="hp-trust">${ICON.shield} 그로스벤처스㈜ · 중기부 인증 중소기업상담회사(제2025-684호) · 입력 정보는 서버로 전송되지 않아요</p>`;
+      <p class="hp-trust">${ICON.shield} 그로스벤처스㈜ · 중기부 인증 중소기업상담회사(${HELP_CONTACT.cert}) · 입력 정보는 서버로 전송되지 않아요</p>`;
   }
   function toggleHelpType(id){
     if(!helpCtx || !HELP_TYPES.some(x=>x.id===id)) return;

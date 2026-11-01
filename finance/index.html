@@ -770,7 +770,7 @@ const APP={name:'BECONIC 기업 재무진단',version:'1.7.0',released:'2026-10-
 // 배포 주소·업데이트 일자는 실행 환경에서 읽는다(배포 시 자동 갱신). 로컬 파일로 열면 기본값 사용
 APP.url=/^https?:$/.test(location.protocol)&&!/^(localhost|127\.)/.test(location.hostname)?location.origin:APP.home;
 APP.updated=(()=>{const d=new Date(document.lastModified);return isNaN(d)||d.getFullYear()<2020?APP.released:d.toISOString().slice(0,10)})();
-const COMPANY={name:'그로스벤처스 주식회사',en:'growthventures Co., Ltd.',since:2023,addr:'서울시 구로구 디지털로27길 24, 209호',tel:'070-4103-4177',email:'start@gven.kr',site:'www.beconic.kr',cert:'중소벤처기업부 공식 인증 중소기업상담회사 (제2025-684호)'};
+const COMPANY={name:'그로스벤처스 주식회사',en:'growthventures Co., Ltd.',since:2023,addr:'서울시 구로구 디지털로27길 24, 209호',tel:'02-6124-5960',email:'start@gven.kr',site:'www.beconic.kr',cert:'중소벤처기업부 공식 인증 중소기업상담회사 (제2025-684호)'};
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
