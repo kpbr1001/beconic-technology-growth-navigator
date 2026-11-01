@@ -1,4 +1,4 @@
-// E2E QA — 실제 클릭: 화면 크기별 레이아웃·대표 입력→컨설턴트 검토→대표 승인→PDF·승인 후 변경 재검토·검토 파일 왕복·OG.
+// E2E QA v2 — 실제 클릭: 화면 크기별 레이아웃, 시작→32문항→표준재무제표 PDF 업로드(pdf.js)→결과, 스캔본 대체, 건너뛰기, 결과 파일 왕복, 결과 보고서 PDF, OG.
 // 실행: (cd ir && npm run build && cd dist && python3 -m http.server 8794) 후 node ir/tests/qa.mjs http://127.0.0.1:8794/
 import { chromium } from 'playwright';
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
@@ -12,143 +12,109 @@ const exe = process.env.CHROME_PATH || (existsSync('/opt/pw-browsers/chromium') 
 const browser = await chromium.launch({ executablePath: exe });
 let fails = 0; const ok = (c, msg) => { console.log(`${c ? '✅' : '❌'} ${msg}`); if (!c) fails++; };
 const errors = [];
-// 앱 안 이동(일반 경로). 로컬 정적 서버는 경로 연결(_redirects)을 모르므로 첫 화면만 직접 열고 나머지는 앱 라우터로 이동
-const nav = (p, r) => p.evaluate((x) => window.__IR.go(x), r).then(() => p.waitForTimeout(60));
-const newPage = async (w = 390, h = 844) => { const p = await browser.newPage({ viewport: { width: w, height: h }, acceptDownloads: true }); p.on('pageerror', (e) => errors.push(e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/fonts|pretendard|ERR_|net::/i.test(m.text())) errors.push(m.text()); }); return p; };
+const ctx = await browser.newContext({ acceptDownloads: true });
+const newPage = async (w = 390, h = 844) => { const p = await ctx.newPage(); await p.setViewportSize({ width: w, height: h }); p.on('pageerror', (e) => errors.push(e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/fonts|pretendard|net::/i.test(m.text())) errors.push(m.text()); }); return p; };
+const nav = async (p, r) => { await p.waitForFunction(() => window.__IR); await p.evaluate((x) => window.__IR.go(x), r); await p.waitForTimeout(80); };
+
+// 합성 표준재무제표 PDF(텍스트형)·스캔본(이미지만) 만들기
+const g = await ctx.newPage();
+await g.setContent(`<html><body style="font-family:sans-serif;font-size:12px"><h3>표준재무제표증명</h3><p>제 5 기 2025년 01월 01일부터 2025년 12월 31일까지 (단위: 원)</p><table border=1 cellpadding=4>
+<tr><td>코드</td><td>계정과목</td><td>당기</td><td>전기</td></tr><tr><td>1</td><td>Ⅰ. 매출액</td><td>950,000,000</td><td>600,000,000</td></tr><tr><td>3</td><td>Ⅳ. 영업이익(손실)</td><td>(80,000,000)</td><td>△ 120,000,000</td></tr>
+<tr><td>4</td><td>당기순이익(손실)</td><td>-90,000,000</td><td>-130,000,000</td></tr><tr><td>5</td><td>자산총계</td><td>1,000,000,000</td><td>800,000,000</td></tr><tr><td>6</td><td>부채총계</td><td>650,000,000</td><td>500,000,000</td></tr>
+<tr><td>7</td><td>자본총계</td><td>350,000,000</td><td>300,000,000</td></tr><tr><td>8</td><td>자본금</td><td>200,000,000</td><td>200,000,000</td></tr><tr><td>9</td><td>유동자산</td><td>600,000,000</td><td>500,000,000</td></tr><tr><td>10</td><td>유동부채</td><td>450,000,000</td><td>380,000,000</td></tr></table></body></html>`);
+const STD = path.join(OUT, 'std-financials.pdf'); await g.pdf({ path: STD });
+const shot = (await g.screenshot()).toString('base64');
+await g.setContent(`<img src="data:image/png;base64,${shot}" style="width:100%">`); const SCAN = path.join(OUT, 'scanned.pdf'); await g.pdf({ path: SCAN }); await g.close();
 
 // 1) 레이아웃
 for (const [w, h] of [[360, 740], [390, 844], [768, 1024], [1280, 900]]) {
-  const p = await newPage(w, h);
-  await p.goto(BASE, { waitUntil: 'networkidle' });
-  await p.click('[data-act=sample]'); await p.waitForTimeout(150);
-  for (const r of ['', 'work/todo', 'work/list', 'work/evidence', 'work/report', 'q/Q23', 'q/Q17', 'setup']) {
-    await nav(p, r); await p.waitForTimeout(80);
-    const sw = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+  const p = await newPage(w, h); await p.goto(BASE, { waitUntil: 'networkidle' }); await p.click('[data-act=sample]'); await p.waitForTimeout(150);
+  for (const r of ['', 'start', 'q/1', 'q/23', 'finance', 'result', 'answers']) {
+    await nav(p, r); const sw = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     if (sw > 0) ok(false, `${w}px ${r || 'home'} 가로 넘침 ${sw}px`);
   }
-  ok(true, `${w}px 8개 화면 가로 넘침 검사`);
-  await p.close();
+  ok(true, `${w}px 7개 화면 가로 넘침 검사`); await p.close();
 }
 
-// 2) 대표 입력 → 컨설턴트 → 승인 → 변경 후 재검토
+// 2) 전체 흐름
 const p = await newPage(390, 844);
-await p.goto(BASE, { waitUntil: 'networkidle' });
-await p.evaluate(() => localStorage.clear()); await p.reload();
-await p.click('[data-act=new]');
-await p.click('[data-act=setup-save]');
-ok((await p.textContent('#setup-err')).includes('회사명'), '기본 정보 필수값 검사');
-await p.fill('input[name=company]', '테스트 주식회사'); await p.fill('input[name=baseDate]', '2026-09-30'); await p.fill('input[name=ceo]', '대표A'); await p.fill('input[name=consultant]', '컨설턴트B');
-await p.click('[data-act=setup-save]');
-ok((await p.textContent('.sum h1')) === '테스트 주식회사', '작업 공간 진입');
-ok((await p.textContent('.sum')).includes('투자 준비도나 사업성 점수가 아니에요'), '진행률 = 업무 진행률 고지');
-await nav(p, 'q/Q22');
-for (const [k, v] of [['open', '100,000,000'], ['op', '-30,000,000'], ['inv', '-10,000,000'], ['fin', '50,000,000'], ['close', '120,000,000']]) await p.fill(`#f-Q22-${k}`, v);
-await p.waitForTimeout(100);
-const calc = await p.textContent('#live-calc');
-ok(calc.includes('불일치') && calc.includes('10,000,000원 차이') && calc.includes('원인은 확인되지 않았습니다'), '현금흐름 불일치 실시간 표시(차액만, 원인 비추측)');
-await p.fill('#f-Q22-close', '110,000,000'); await p.locator('#f-Q22-close').blur(); await p.waitForTimeout(100);
-ok((await p.textContent('#live-calc')).includes('일치'), '수정 후 일치');
-// 자료 등록·연결·위치
-await p.click('.newev summary'); await p.fill('.newev [data-k=name]', '2025 현금흐름표.pdf');
-const tmp = path.join(OUT, 'evidence.txt'); writeFileSync(tmp, 'sample evidence v1');
-await p.setInputFiles('.newev input[type=file]', tmp); await p.waitForTimeout(200);
-await p.click('[data-act=ev-add][data-scope=q]'); await p.waitForTimeout(100);
-ok((await p.textContent('#q-chips')).includes('제출됨'), '위치 없는 연결은 원문 연결 확인 아님');
-await p.fill('[data-link="0"]', '3쪽'); await p.waitForTimeout(100);
-ok((await p.textContent('#q-chips')).includes('자료 간 일치') || (await p.textContent('#q-chips')).includes('원문 연결'), '위치 기록 후 원문 연결/일치');
-const sha = await p.evaluate(() => window.__IR.state.evidence[0].sha256);
-ok(/^[0-9a-f]{64}$/.test(sha), '파일 SHA-256 로컬 계산(업로드 없음)');
-// 컨설턴트
-await p.click('[data-act=role]');
-ok(await p.locator('#f-Q22-open').isDisabled(), '컨설턴트는 대표 답변을 직접 수정할 수 없음');
-await p.check('input[name=scope][value="수치 재계산"]'); await p.click('[data-act=reviewed][data-q=Q22]');
-ok((await p.textContent('#q-chips')).includes('검토자 검토'), '검토자 검토 기록');
-await nav(p, 'q/Q01'); await p.fill('#sg-text', '고객 유형을 넣어 주세요'); await p.fill('#sg-prop', '중소 제조기업에 설비 점검 SaaS 제공'); await p.click('[data-act=sg-add]');
-await nav(p, 'work/report');
-ok((await p.textContent('.approve')).includes('대표 화면에서만'), '컨설턴트는 승인 불가');
-// 대표: 제안 반려(사유 필수) → 승인
-await p.click('[data-act=role]');
-await nav(p, 'q/Q01');
-await p.click('[data-act=sg-reject]'); ok((await p.locator('.sg.open').count()) === 1, '반려 사유 없으면 반려 안 됨');
-await p.fill('.sg-act input', '소개서 표기와 다름'); await p.click('[data-act=sg-reject]');
-ok((await p.textContent('.sg')).includes('대표 반려 — 소개서 표기와 다름'), '반려 사유 기록');
-await nav(p, 'work/report');
-await p.click('[data-act=approve]'); ok((await p.evaluate(() => window.__IR.state.snapshots.length)) === 0, '확인 체크 없이 승인 불가');
-for (const id of ['ap1', 'ap2', 'ap3']) await p.check(`#${id}`);
-await p.click('[data-act=approve]'); await p.waitForTimeout(300);
-const s1 = await p.evaluate(() => window.__IR.state.snapshots[0]);
-ok(s1 && /^[0-9a-f]{64}$/.test(s1.hash) && s1.byQ.Q22.review === 'approved', 'v1 스냅샷 고정(해시·검토자 검토→대표 승인)');
-// 승인 후 변경 → 재검토, 스냅샷 불변
-await nav(p, 'q/Q22'); await p.fill('#f-Q22-close', '999'); await p.locator('#f-Q22-close').blur(); await p.waitForTimeout(150);
-const after = await p.evaluate(() => ({ a: window.__IR.state.answers.Q22, snapClose: window.__IR.state.snapshots[0].state.answers.Q22.fields.close }));
-ok(after.a.stale && after.a.review === 'none' && after.snapClose === '110,000,000', '승인 후 변경 → 재검토 대상, 승인본은 그대로');
-// 자료 새 버전 → 연결 문항 재검토
-await nav(p, 'work/evidence'); writeFileSync(tmp, 'sample evidence v2');
-await p.setInputFiles('[data-act=ev-replace]', tmp); await p.waitForTimeout(300);
-ok((await p.evaluate(() => window.__IR.state.evidence[0].version)) === 2, '자료 교체 시 버전 증가');
-// 검토 파일 왕복
+await p.goto(BASE, { waitUntil: 'networkidle' }); await p.evaluate(() => { localStorage.clear(); localStorage.setItem('beconic-ir:v1', '{"legacy":true}'); }); await p.reload();
+await p.click('[data-act=new]'); await p.click('[data-act=start-go]');
+ok((await p.textContent('#s-err')).includes('회사명'), '회사명 필수');
+await p.fill('#s-company', '테스트랩'); await p.click('[data-act=start-go]');
+ok((await p.textContent('#s-err')).includes('투자 단계'), '투자 단계 필수');
+await p.click('[data-act=stage][data-v=prea]'); ok((await p.inputValue('#s-company')) === '테스트랩', '단계 선택 후에도 회사명 유지');
+await p.click('[data-act=start-go]'); await p.waitForTimeout(150);
+ok(new URL(p.url()).pathname === '/q/1' && (await p.textContent('.qtitle')).includes('고객 문제'), '1번 문항 진입');
+const plan = Array.from({ length: 32 }, (_, i) => [3, 4, 2, 5, 1][i % 5]); plan[27] = 0; // FN4 = 모르겠어요
+for (let i = 0; i < 32; i++) {
+  if (i % 7 === 0) await p.check('[data-act=ev]');
+  await p.click(`.opt[data-v="${plan[i]}"]`); await p.waitForTimeout(320);
+}
+ok(new URL(p.url()).pathname === '/finance', '32문항 후 재무 단계로 자동 이동');
+const st = await p.evaluate(() => window.__IR.state);
+ok(Object.keys(st.answers).length === 32 && st.answers.FN4.v === 0 && st.answers.PC1.ev === true, '응답·모르겠어요·근거 체크 저장');
+await nav(p, 'q/2'); await p.keyboard.press('5'); await p.waitForTimeout(350);
+ok((await p.evaluate(() => window.__IR.state.answers.PC2.v)) === 5 && new URL(p.url()).pathname === '/q/3', '키보드로 응답 수정');
+// 스캔본 → 직접 입력 안내
+await nav(p, 'finance'); await p.setInputFiles('[data-act=fin-file]', SCAN); await p.waitForSelector('.stat', { timeout: 15000 });
+ok((await p.textContent('.stat')).includes('글자를 읽을 수 없는'), '스캔 PDF → 직접 입력 안내');
+await p.click('[data-act=fin-cancel]');
+// 표준재무제표 업로드
+await p.setInputFiles('[data-act=fin-file]', STD); await p.waitForSelector('.fgrid', { timeout: 15000 }); await p.waitForTimeout(200);
+const draft = await p.evaluate(() => [...document.querySelectorAll('[data-fin]')].map((i) => [i.dataset.fin, i.dataset.k, i.value]));
+const val = (f, k) => draft.find((d) => d[0] === f && d[1] === k)?.[2];
+ok(val('cur', 'rev') === '950,000,000' && val('prev', 'rev') === '600,000,000', 'pdf.js로 매출 당기·전기 추출');
+ok(val('cur', 'op') === '-80,000,000' && val('prev', 'op') === '-120,000,000', '괄호·△(공백 분리) 음수 추출');
+await p.fill('[data-fin=cur][data-k=cash]', '3억'); await p.click('[data-act=fin-save]'); await p.waitForTimeout(200);
+const fin = await p.evaluate(() => window.__IR.state.fin);
+ok(fin.confirmed && fin.cur.cash === 300000000 && fin.source === 'upload', '확인·수정 후 반영(억 단위 입력)');
+const ev = await p.evaluate(() => window.__IR.evaluate());
+ok(new URL(p.url()).pathname === '/result' && (await p.textContent('.ch-gauge text:nth-of-type(2)')).includes(String(ev.overall)), `결과 게이지 = 엔진 점수(${ev.overall})`);
+ok((await p.textContent('.sum-lines')).includes('표준재무제표 반영') && (await p.locator('.kpi').count()) >= 5 && (await p.locator('.ch-radar').count()) === 1 && (await p.locator('.ch-fin').count()) === 1, '요약·지표·레이더·재무 차트');
+ok((await p.textContent('main')).includes('목표 달성 시'), '로드맵 목표 단계 표시');
+// 뒤로 가기·결과 파일 왕복
 const [dl] = await Promise.all([p.waitForEvent('download'), p.click('[data-act=export]')]);
-const file = path.join(OUT, 'review.json'); await dl.saveAs(file);
-const json = JSON.parse(readFileSync(file, 'utf8'));
-ok(json.app === 'beconic-ir' && json.snapshots.length === 1 && !JSON.stringify(json).includes('sample evidence'), '검토 파일 내보내기(원본 파일 내용 미포함)');
-await p.evaluate(() => localStorage.clear()); await p.goto(BASE); await p.reload();
-await p.click('[data-act=new]'); await p.fill('input[name=company]', 'X'); await p.click('[data-act=setup-save]');
-p.once('dialog', (d) => d.accept());
-await p.setInputFiles('[data-act=import]', file); await p.waitForTimeout(300);
-ok((await p.textContent('.sum h1')) === '테스트 주식회사', '검토 파일 불러오기');
-const badF = path.join(OUT, 'bad.json'); writeFileSync(badF, '{"app":"other"}');
-await p.setInputFiles('[data-act=import]', badF); await p.waitForTimeout(200);
-ok((await p.textContent('#toast')).includes('검토 파일이 아니에요'), '잘못된 파일 거부');
+const file = path.join(OUT, 'result.json'); await dl.saveAs(file);
+ok(JSON.parse(readFileSync(file, 'utf8')).schema === 2, '결과 파일 저장');
+await p.evaluate(() => localStorage.removeItem('beconic-ir:v2')); await p.goto(BASE); await p.reload();
+await p.click('[data-act=sample]'); p.once('dialog', (d) => d.accept()); await p.setInputFiles('[data-act=import]', file); await p.waitForTimeout(300);
+ok((await p.textContent('.res-h h1')).includes('테스트랩'), '결과 파일 열기');
+const bad = path.join(OUT, 'bad.json'); writeFileSync(bad, '{"app":"other"}'); await p.setInputFiles('[data-act=import]', bad); await p.waitForTimeout(200);
+ok((await p.textContent('#toast')).includes('결과 파일이 아니에요'), '잘못된 파일 거부');
+ok((await p.evaluate(() => localStorage.getItem('beconic-ir:v1'))) === '{"legacy":true}', 'v1 기록은 지우지 않고 보존');
+// 재무 건너뛰기
+await p.evaluate(() => { const s = window.__IR.state; s.fin = null; localStorage.setItem('beconic-ir:v2', JSON.stringify(s)); }); await p.goto(BASE); await nav(p, 'result'); // 로컬 정적 서버는 /result 새로고침 시 404(배포본은 _redirects)
+ok((await p.textContent('main')).includes('재무제표가 반영되지 않았어요') && (await p.textContent('.road')).includes('표준재무제표증명'), '재무 미반영 해석·로드맵 반영');
 await p.close();
 
-// 3) PDF — 합성 예시 승인본, 요약본·상세본
+// 3) 결과 보고서 PDF (합성 예시, 재무 반영)
 const q = await newPage(1280, 900);
-await q.goto(BASE, { waitUntil: 'networkidle' }); await q.click('[data-act=sample]');
-await nav(q, 'work/report'); for (const id of ['ap1', 'ap2', 'ap3']) await q.check(`#${id}`);
-await q.click('[data-act=approve]'); await q.waitForTimeout(300);
-await q.evaluate(() => { window.__noPrint = true; });
-for (const kind of ['brief', 'detail']) for (const mask of ['0', '1']) {
-  await q.selectOption('#rp-mask', mask);
-  await q.click(`[data-act=print][data-kind=${kind}][data-v="1"]`);
-  await q.emulateMedia({ media: 'print' }); await q.evaluate(() => document.fonts.ready);
-  const f = path.join(OUT, `${kind}${mask === '1' ? '-masked' : ''}.pdf`);
-  await q.pdf({ path: f, preferCSSPageSize: true, printBackground: true });
-  await q.emulateMedia({ media: 'screen' }); await q.evaluate(() => document.body.classList.remove('printing'));
-  let text = ''; let pages = 0;
-  try { text = execFileSync('pdftotext', ['-layout', f, '-'], { encoding: 'utf8' }); pages = Number(execFileSync('pdfinfo', [f], { encoding: 'utf8' }).match(/Pages:\s+(\d+)/)[1]); } catch { console.log('ℹ️ pdftotext 없음 — 텍스트 검사 생략'); continue; }
-  // PDF 텍스트 추출은 글꼴 간격에 따라 ID 중간에 공백을 넣을 수 있어(예: '321107 F2') 공백을 지우고 검사
-  ok(text.includes('합성 예시') && /IR-20260930-[0-9A-F]{8}/.test(text.replace(/\s+/g, '')), `${kind}${mask === '1' ? '(마스킹)' : ''}: 합성 예시 표시·보고서 ID (${pages}쪽)`);
-  ok(new RegExp(`1\\s*/\\s*${pages}`).test(text), `${kind}: 쪽 번호 "n / ${pages}"`);
-  ok(text.includes('30,000,000원') && ![...text.matchAll(/점수|합격|확률|예측/g)].some((m) => !/아닙|않|없/.test(text.slice(m.index - 40, m.index + 240))), `${kind}: 불일치 금액 포함·금지어 없음`);
-  if (kind === 'brief') ok(pages === 1, `요약본 1쪽 (${pages}쪽)`);
-  if (kind === 'detail') ok(pages <= 13, `상세본 13쪽 이하 — 빈 행·빈 쪽 압축 (${pages}쪽)`);
-  const fonts = execFileSync('pdffonts', [f], { encoding: 'utf8' }); ok(!/Type 3/.test(fonts) && /Pretendard/.test(fonts), `${kind}: Pretendard 일반 글꼴 임베딩(Type 3 아님)`);
-  if (kind === 'detail') ok(['검토 범위와 방법', '확인 사항과 자료 요청', '용어집', 'SHA-256'].every((s) => text.includes(s)), '상세본 12개 섹션 주요 항목');
-  if (mask === '1') ok(!text.includes('엔젤투자자(예시)'), '마스킹: 주주명 비노출');
-}
+await q.goto(BASE, { waitUntil: 'networkidle' }); await q.click('[data-act=sample]'); await q.waitForTimeout(200);
+await q.evaluate(() => { window.__noPrint = true; }); await q.click('[data-act=print] >> nth=0');
+await q.emulateMedia({ media: 'print' }); await q.evaluate(() => document.fonts.ready);
+const RP = path.join(OUT, 'report.pdf'); await q.pdf({ path: RP, preferCSSPageSize: true, printBackground: true });
+await q.emulateMedia({ media: 'screen' });
+try {
+  const text = execFileSync('pdftotext', ['-layout', RP, '-'], { encoding: 'utf8' }); const pages = Number(execFileSync('pdfinfo', [RP], { encoding: 'utf8' }).match(/Pages:\s+(\d+)/)[1]);
+  const compact = text.replace(/\s+/g, '');
+  ok(pages >= 2 && pages <= 4, `보고서 ${pages}쪽(2~4쪽)`);
+  ok(['핵심요약', '영역별점수', '강점과먼저보완할점', '실행로드맵', '문항별응답', '진단방법', '합성예시'].every((s) => compact.includes(s)), '보고서 주요 섹션·합성 예시 표시');
+  ok(new RegExp(`1\\s*/\\s*${pages}`).test(text) && /IR-\d{8}-[0-9A-F]{6}/.test(compact), '쪽 번호·보고서 ID');
+  ok(![...text.matchAll(/예측|확률|성공률/g)].some((m) => !/않|없|아닙/.test(text.slice(m.index - 40, m.index + 200))), '금지 표현 없음');
+  const fonts = execFileSync('pdffonts', [RP], { encoding: 'utf8' }); ok(!/Type 3/.test(fonts) && /Pretendard/.test(fonts), 'Pretendard 일반 글꼴 임베딩');
+} catch { console.log('ℹ️ pdftotext 없음 — 보고서 텍스트 검사 생략'); }
 await q.close();
 
-// 3.5) 주소: '#' 없는 일반 경로, 예전 해시 주소는 경로로 전환, 배포본은 직접 접속·새로고침 지원
-const u = await newPage(); await u.goto(BASE, { waitUntil: 'networkidle' }); await u.click('[data-act=sample]'); await u.waitForTimeout(100);
-await u.click('a[href="/work/list"]'); await u.click('a[href="/q/Q07"]'); await u.waitForTimeout(100);
-ok(new URL(u.url()).pathname === '/q/Q07' && !u.url().includes('#'), `앱 안 이동 주소에 # 없음 (${new URL(u.url()).pathname})`);
-await u.goBack(); await u.waitForTimeout(100); ok(new URL(u.url()).pathname === '/work/list' && (await u.locator('.qsec').count()) > 0, '뒤로 가기');
-await u.goto(BASE + '#/q/Q23'); await u.waitForTimeout(150);
-ok(new URL(u.url()).pathname === '/q/Q23' && !u.url().includes('#') && (await u.textContent('.q-t')).includes('IR 덱'), '예전 #/ 주소 → 일반 경로로 전환');
-if (/^https:/.test(BASE)) {
-  await u.goto(BASE + 'q/Q17', { waitUntil: 'networkidle' });
-  ok((await u.textContent('.q-t')).includes('주주'), '배포본 직접 접속·새로고침(/q/Q17)');
-  const css = await u.request.get(BASE + 'assets/shield.png'); ok(css.headers()['content-type'].startsWith('image/'), '경로 연결이 실제 파일을 가리지 않음');
-}
+// 4) 주소·OG
+const u = await newPage(); await u.goto(BASE + '#/result'); await u.waitForTimeout(200);
+ok(!u.url().includes('#'), '예전 #/ 주소 → 일반 경로');
+if (/^https:/.test(BASE)) { await u.goto(BASE + 'q/5', { waitUntil: 'networkidle' }); ok((await u.textContent('.qtitle')).length > 5, '배포본 직접 접속·새로고침(/q/5)'); }
+const og = await u.evaluate(() => Object.fromEntries([...document.querySelectorAll('meta[property^="og:"]')].map((m) => [m.getAttribute('property'), m.content])));
+ok(og['og:url'] === 'https://beconic-diagnosis-ir.netlify.app/' && /og-ir-banner-1200x630\.jpg/.test(og['og:image']), 'OG(카카오) 메타');
+ok((await u.request.get(BASE + 'vendor/pdfjs/pdf.worker.min.mjs')).ok(), 'pdf.js 워커 배포본 포함');
+ok(await u.evaluate(() => document.fonts.check('700 16px Pretendard')), 'Pretendard 로드');
 await u.close();
-
-// 4) OG·메타
-const o = await newPage(); await o.goto(BASE, { waitUntil: 'networkidle' });
-const og = await o.evaluate(() => Object.fromEntries([...document.querySelectorAll('meta[property^="og:"]')].map((m) => [m.getAttribute('property'), m.content])));
-ok(og['og:url'] === 'https://beconic-diagnosis-ir.netlify.app/' && og['og:image'].startsWith('https://beconic-diagnosis-ir.netlify.app/assets/og-ir-banner-1200x630.jpg') && og['og:image:width'] === '1200', 'OG(카카오) 절대 URL·1200×630');
-const img = await o.request.get(BASE + 'assets/og-ir-banner-1200x630.jpg'); ok(img.ok(), 'OG 이미지 배포본 포함');
-ok(await o.evaluate(() => document.fonts.check('700 16px Pretendard')), 'Pretendard 로드');
-await o.close();
 
 ok(errors.length === 0, `콘솔·페이지 오류 없음${errors.length ? ': ' + errors.join(' | ') : ''}`);
 await browser.close();

@@ -1,38 +1,26 @@
-// 금지 표현 검사 — 점수·등급·확률·전망 표현은 부정 문맥(하지 않음·아님)에서만 허용.
+// 표현 검사 — 투자 성공 예측·확률·기업가치 산정 표현은 부정 문맥(하지 않음·아님)에서만 허용. 사용자 입력은 이스케이프.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { renderBrief, renderDetail } from '../src/report.js';
-import { evaluate } from '../src/engine.js';
+import { renderReport } from '../src/report.js';
+import { evaluate } from '../src/score.js';
 import { sampleState } from '../src/sample.js';
 
-const BANNED = /준비도\s*\d|\d+\s*점(?![검])|점수|(?<!비밀)등급|합격|성공률|확률|예측|예상|추정|상위\s*\d+\s*%|흑자\s*전환|밸류에이션|런웨이/g;
-const NEG = /않|없|아니|아님|아닙|금지|제외|폐기|하지\s*않|만들지|매기지|판단하지|계산하지/;
+const BANNED = /예측|확률|성공률|밸류에이션|추정|예상|투자 유치 가능성|보장합니다|흑자 전환/g;
+const NEG = /않|없|아니|아님|아닙|금지|제외|하지\s*않/;
 function check(name, text) {
-  const plain = text.replace(/<[^>]+>/g, ' ');
-  const bad = [];
-  for (const m of plain.matchAll(BANNED)) {
-    const win = plain.slice(Math.max(0, m.index - 60), m.index + 60);
-    if (!NEG.test(win)) bad.push(`${name}: …${win.replace(/\s+/g, ' ')}…`);
-  }
+  const plain = text.replace(/<[^>]+>/g, ' '); const bad = [];
+  for (const m of plain.matchAll(BANNED)) { const w = plain.slice(Math.max(0, m.index - 60), m.index + 80); if (!NEG.test(w)) bad.push(`${name}: …${w.replace(/\s+/g, ' ')}…`); }
   assert.deepEqual(bad, []);
 }
-test('화면 문구', () => {
-  for (const f of ['index.html', 'src/app.js', 'src/registry.js', 'src/guide.js', 'design/og.html']) check(f, readFileSync(new URL(`../${f}`, import.meta.url), 'utf8'));
+test('화면·모델·보고서 원본 문구', () => {
+  for (const f of ['index.html', 'src/app.js', 'src/model.js', 'src/score.js', 'src/fin.js', 'src/report.js', 'design/og.html']) check(f, readFileSync(new URL(`../${f}`, import.meta.url), 'utf8'));
 });
-test('생성 보고서(합성 예시, 한/영, 마스킹)', () => {
-  const st = sampleState(); const ev = evaluate(st);
-  const snap = { draft: false, version: 1, reportId: 'IR-TEST', hash: 'x'.repeat(64), approvedAt: new Date().toISOString(), approvedBy: '김대표(예시)', state: st, findings: ev.findings, byQ: ev.byQ, history: [] };
-  for (const lang of ['ko', 'en']) for (const mask of [false, true]) {
-    check(`brief-${lang}`, renderBrief(snap, { lang, mask })); check(`detail-${lang}`, renderDetail(snap, { lang, mask }));
-  }
-  const masked = renderDetail(snap, { lang: 'ko', mask: true });
-  assert.doesNotMatch(masked, /엔젤투자자\(예시\)/); assert.match(masked, /주주 A/);
-  assert.doesNotMatch(masked, /영업팀장\(예시\)/);
+test('생성 보고서(재무 반영/미반영)', () => {
+  const st = sampleState(); check('report', renderReport(st, evaluate(st), { id: 'IR-X', date: '2026-11-01', version: 'v' }));
+  st.fin = null; const html = renderReport(st, evaluate(st), { id: 'IR-X', date: '2026-11-01', version: 'v' }); check('report-nofin', html); assert.match(html, /재무제표 미반영/);
 });
-test('사용자 입력은 이스케이프된다', () => {
-  const st = sampleState(); st.answers.Q01.text = '<img src=x onerror=alert(1)>'; st.meta.company = '<script>x</script>';
-  const ev = evaluate(st);
-  const html = renderDetail({ draft: true, version: 1, reportId: 'R', hash: '', state: st, findings: ev.findings, byQ: ev.byQ, history: [] }, {});
-  assert.doesNotMatch(html, /<img src=x|<script>x/);
+test('사용자 입력 이스케이프', () => {
+  const st = sampleState(); st.meta.company = '<script>x</script>'; st.fin.fileName = '<img src=x onerror=1>';
+  const html = renderReport(st, evaluate(st), { id: 'IR-X', date: 'd', version: 'v' }); assert.doesNotMatch(html, /<script>x|<img src=x/);
 });

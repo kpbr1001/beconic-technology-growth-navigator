@@ -69,7 +69,7 @@ jobs:
         run: node --test grants/tests/server.test.mjs
       - name: 지원사업 MATCH 공고문 분석 정확도 (검증 세트 1·2·3차 각 60건, 기준 미달 시 실패)
         run: node grants/tests/eval-accuracy.mjs --all --check
-      - name: IR 진단 단위 (검증 엔진·문항/출처 원장·금지 표현·이스케이프)
+      - name: IR 진단 단위 (문항 모델·점수·재무 추출·표현·이스케이프)
         run: node --test ir/tests/*.test.mjs
 
   e2e:
@@ -118,7 +118,7 @@ jobs:
           sleep 1
           node grants/tests/qa.mjs http://127.0.0.1:8793/
           node grants/tests/eval-precision.mjs http://127.0.0.1:8793/
-      - name: IR 진단 QA (레이아웃·대표→컨설턴트→승인 플로우·재검토·검토 파일·A4 PDF 2종·OG)
+      - name: IR 진단 QA (레이아웃·32문항 흐름·표준재무제표 PDF 업로드·결과·보고서 PDF·OG)
         run: |
           sudo apt-get install -y poppler-utils
           (cd ir && npm run build)

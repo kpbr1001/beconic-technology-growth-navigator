@@ -1,41 +1,38 @@
-# BECONIC IR 진단 (ir/)
+# BECONIC IR 진단 (ir/) — v2
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 
 - 서비스: https://beconic-diagnosis-ir.netlify.app
-- 기준 문서: 07 근거기반 통합기획 v2 · 08 진단문항·출처·검증원장 · 09 글로벌투자자 PDF 보고서명세 · 10 Claude Code v2 우선 프롬프트
-- 하는 일: 제출 자료의 **존재·범위·자료 간 일치** 확인, 출처가 있는 재현 가능한 계산, 미제출·확인 요청 목록, 근거 연결 보고서(PDF 2종)
-- 하지 않는 일: 점수·등급·합격선, 투자 성공 확률, 밸류·성장·현금 전망, 차이 원인 추측, 회계 적정성·법적 유효성 판정
+- 하는 일: 8개 영역 32문항 5점 진단 + 표준재무제표(홈택스 표준재무제표증명 PDF) 분석 → IR 준비도 점수·등급(S~D), 영역별 점수, 강점·보완점, 재무 지표, 응답↔재무 교차 확인, 2주·30일·90일 로드맵, 결과 보고서 PDF
+- 점수의 의미: 대표 응답과 제출 재무제표 기반의 자가진단. 투자 유치 여부·기업가치를 판단·보장하지 않음
+- 개인정보: 입력 내용과 PDF는 브라우저 안에서만 처리(서버 전송 없음, pdf.js 내장)
 
 ## 구조
 
 ```text
 ir/
-├─ index.html            # 화면 마크업·스타일(Pretendard, 토스형 UI)·인쇄(A4) 스타일·OG 메타
+├─ index.html          # 화면·인쇄(A4) 스타일, OG 메타 (Pretendard 정적 글꼴)
 ├─ src/
-│  ├─ registry.js        # SourceRegistry(S01~S08) · QuestionRegistry(Q01~Q24) · 규칙 목록
-│  ├─ engine.js          # VerificationEngine — 순수 함수, BigInt 정수 계산, 상태 2축, 지금 할 일
-│  ├─ store.js           # 브라우저 저장·검토 파일 검증
-│  ├─ guide.js           # 해석 가이드(GUIDE-1.0) — 확인할 항목·보완 방법·준비 방법·먼저 하면 좋은 일·섹션 정리
-│  ├─ report.js          # Investor Brief · Evidence Review Report (승인 스냅샷 → HTML → 인쇄 PDF)
-│  ├─ sample.js          # 합성 예시(실제 기업 자료 아님)
-│  └─ app.js             # 화면·워크플로우(대표 입력 → 컨설턴트 검토 → 대표 승인 → PDF)
-├─ assets/               # 방패 로고·아이콘·OG 이미지(1200×630)
-├─ design/og.html        # OG 이미지 원본 → npm run images
-├─ scripts/              # build(dist 복사) · render-images
-├─ tests/                # 단위(엔진·원장·금지어) + E2E·PDF QA
-└─ docs/                 # v2 마이그레이션 · 자가부검/레드팀 · 배포 · 변경 이력
+│  ├─ model.js         # 8영역·32문항·5단계 행동 기준 보기·단계별 가중치·등급 구간
+│  ├─ score.js         # 점수(평균×20, 단계 가중 평균)·강점·보완·로드맵·교차 확인·요약 — 순수 함수
+│  ├─ fin.js           # 표준재무제표 텍스트 → 계정 추출, 지표·참고 구간, 대차 확인
+│  ├─ pdfread.js       # pdf.js로 PDF → 텍스트 줄(브라우저 안)
+│  ├─ charts.js        # SVG 게이지·레이더·재무 막대
+│  ├─ report.js        # 결과 보고서(3쪽) HTML
+│  ├─ store.js         # 브라우저 저장(v2 키, v1 기록은 보존)
+│  ├─ sample.js        # 합성 예시
+│  └─ app.js           # 화면: 시작 → 한 문항씩 진단 → 재무 → 결과
+├─ vendor/pdfjs/       # pdfjs-dist 4.10.38(Apache-2.0) + 한국어 CMap
+├─ tests/              # 단위(모델·점수·재무·표현) + E2E·PDF QA
+└─ docs/
 ```
 
 ## 개발·검사
 
 ```bash
 cd ir
-npm run build                      # dist/ 생성 (버전 일치 검사)
-npm test                           # 단위 테스트(엔진·문항 원장·금지어·이스케이프)
+npm run build
+npm test
 (cd dist && python3 -m http.server 8794 --bind 127.0.0.1) &
-node tests/qa.mjs http://127.0.0.1:8794/   # E2E·PDF QA (Chromium, pdftotext 필요)
-npm run images                     # OG 이미지 재생성
+node tests/qa.mjs http://127.0.0.1:8794/
 ```
-
-데이터 흐름·권한 범위·남은 과제는 [docs/REDTEAM_2026-11-01.md](docs/REDTEAM_2026-11-01.md), 배포는 [docs/DEPLOY.md](docs/DEPLOY.md)를 보세요.
