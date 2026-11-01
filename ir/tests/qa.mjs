@@ -116,7 +116,8 @@ for (const kind of ['brief', 'detail']) for (const mask of ['0', '1']) {
   await q.emulateMedia({ media: 'screen' }); await q.evaluate(() => document.body.classList.remove('printing'));
   let text = ''; let pages = 0;
   try { text = execFileSync('pdftotext', ['-layout', f, '-'], { encoding: 'utf8' }); pages = Number(execFileSync('pdfinfo', [f], { encoding: 'utf8' }).match(/Pages:\s+(\d+)/)[1]); } catch { console.log('ℹ️ pdftotext 없음 — 텍스트 검사 생략'); continue; }
-  ok(text.includes('합성 예시') && /IR-20260930-[0-9A-F]{8}/.test(text), `${kind}${mask === '1' ? '(마스킹)' : ''}: 합성 예시 표시·보고서 ID (${pages}쪽)`);
+  // PDF 텍스트 추출은 글꼴 간격에 따라 ID 중간에 공백을 넣을 수 있어(예: '321107 F2') 공백을 지우고 검사
+  ok(text.includes('합성 예시') && /IR-20260930-[0-9A-F]{8}/.test(text.replace(/\s+/g, '')), `${kind}${mask === '1' ? '(마스킹)' : ''}: 합성 예시 표시·보고서 ID (${pages}쪽)`);
   ok(new RegExp(`1\\s*/\\s*${pages}`).test(text), `${kind}: 쪽 번호 "n / ${pages}"`);
   ok(text.includes('30,000,000원') && ![...text.matchAll(/점수|합격|확률|예측/g)].some((m) => !/아닙|않|없/.test(text.slice(m.index - 40, m.index + 240))), `${kind}: 불일치 금액 포함·금지어 없음`);
   if (kind === 'brief') ok(pages === 1, `요약본 1쪽 (${pages}쪽)`);
