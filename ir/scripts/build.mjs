@@ -17,5 +17,7 @@ cpSync(path.join(root, 'assets'), path.join(out, 'assets'), { recursive: true })
 const toml = readFileSync(path.join(root, 'netlify.toml'), 'utf8');
 const blocks = [...toml.matchAll(/\[\[headers\]\]\s*\n\s*for = "([^"]+)"\s*\n\s*\[headers\.values\]\s*\n((?:\s*[\w-]+ = "[^"]*"\s*\n?)+)/g)];
 if (!blocks.length) { console.error('netlify.toml 헤더 파싱 실패'); process.exit(1); }
+// 일반 경로 주소(/q/Q07)를 새로고침·직접 접속해도 앱이 열리도록 모든 경로를 index.html로 연결(실제 파일이 있으면 파일 우선)
+writeFileSync(path.join(out, '_redirects'), '/*  /index.html  200\n');
 writeFileSync(path.join(out, '_headers'), blocks.map(([, f, body]) => `${f}\n${[...body.matchAll(/([\w-]+) = "([^"]*)"/g)].map(([, k, v]) => `  ${k}: ${v}`).join('\n')}`).join('\n\n') + '\n');
 console.log(`✅ dist/ v${version} (index.html · src/*.js · assets/)`);

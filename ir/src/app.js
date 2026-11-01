@@ -5,7 +5,7 @@ import { blank, load, save, clear, validate, nextEvidenceId, nowIso, today } fro
 import { sampleState } from './sample.js';
 import { renderBrief, renderDetail, esc, fmtDate } from './report.js';
 
-export const APP = { version: 'v1.0.0', updated: '2026-11-01' };
+export const APP = { version: 'v1.0.1', updated: '2026-11-01' };
 const $ = (s, el = document) => el.querySelector(s);
 const root = () => $('#app');
 const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'SGD', 'CNY'];
@@ -36,9 +36,17 @@ function touched(qid, what) {
 }
 
 // ───────────────────────── 라우팅
-const route = () => (location.hash.replace(/^#\/?/, '') || '').split('/');
-const go = (h) => { if (location.hash === `#/${h}`) render(); else location.hash = `#/${h}`; };
-window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+// 주소는 일반 경로(/q/Q07). 예전 해시 주소(#/q/Q07)로 들어오면 경로로 바꿔 준다.
+if (location.hash.startsWith('#/')) history.replaceState(null, '', `/${location.hash.slice(2)}`);
+const route = () => location.pathname.replace(/^\/+|\/+$/g, '').split('/');
+const go = (h) => { const to = `/${h}`; if (location.pathname !== to) history.pushState(null, '', to); render(); window.scrollTo(0, 0); };
+window.addEventListener('popstate', () => { render(); window.scrollTo(0, 0); });
+// 앱 안의 링크(href="/...")는 새로고침 없이 화면만 바꾼다
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href^="/"]');
+  if (!a || a.target || a.hasAttribute('download') || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+  e.preventDefault(); go(a.getAttribute('href').slice(1));
+});
 
 // ───────────────────────── 공통 조각
 const chip = (cls, txt, title) => `<span class="chip ${cls}"${title ? ` title="${esc(title)}"` : ''}>${esc(txt)}</span>`;
@@ -48,10 +56,10 @@ const fChip = (r) => chip(`f-${r}`, RESULT_LABEL[r]);
 
 function headerHtml(inWork) {
   const roleBtn = inWork && st ? `<button class="role" data-act="role" aria-label="역할 바꾸기">${st.role === 'ceo' ? '대표' : '컨설턴트'}<span>로 보는 중 · 바꾸기</span></button>` : '';
-  return `<header class="site"><div class="wrap hd"><a class="brand" href="#/" aria-label="BECONIC IR 진단 처음으로"><img src="assets/shield.png" alt="" width="34" height="34"><span class="txt"><b>BECONIC</b><small>IR 진단 · by Growth Ventures</small></span></a>${roleBtn}</div></header>`;
+  return `<header class="site"><div class="wrap hd"><a class="brand" href="/" aria-label="BECONIC IR 진단 처음으로"><img src="/assets/shield.png" alt="" width="34" height="34"><span class="txt"><b>BECONIC</b><small>IR 진단 · by Growth Ventures</small></span></a>${roleBtn}</div></header>`;
 }
 function footerHtml() {
-  return `<footer class="site"><div class="wrap ft"><div class="f-brand"><img src="assets/shield-white.png" alt="" width="40" height="40"><div><b>BECONIC</b><small>IR 진단 · by Growth Ventures</small></div></div>
+  return `<footer class="site"><div class="wrap ft"><div class="f-brand"><img src="/assets/shield-white.png" alt="" width="40" height="40"><div><b>BECONIC</b><small>IR 진단 · by Growth Ventures</small></div></div>
   <p class="f-info">그로스벤처스 주식회사 · 서울시 구로구 디지털로27길 24, 209호<br>전화 <a href="tel:070-4103-4177">070-4103-4177</a> · 이메일 <a href="mailto:start@gven.kr">start@gven.kr</a> · <a href="https://www.beconic.kr/" target="_blank" rel="noopener">www.beconic.kr</a></p>
   <p class="f-cert">중소벤처기업부 공식 인증 중소기업상담회사 (제2025-684호)</p>
   <p class="f-legal">이 서비스는 제출 자료의 존재·범위·자료 간 일치 여부를 정리하는 도구입니다. 투자 권유, 회계감사, 법률·지식재산 의견, 사업 전망을 제공하지 않습니다. 입력한 내용은 이 브라우저에만 저장됩니다.</p>
@@ -113,7 +121,7 @@ function homeHtml() {
 // ───────────────────────── 기본 정보
 function setupHtml() {
   const m = (st || blank()).meta;
-  return `${headerHtml(false)}<main class="wrap narrow"><a class="back" href="#/">← 처음으로</a>
+  return `${headerHtml(false)}<main class="wrap narrow"><a class="back" href="/">← 처음으로</a>
   <h1 class="pg-t">기본 정보를 알려 주세요</h1><p class="pg-s">보고서 표지와 모든 숫자 비교의 기준이 돼요. 나중에 바꿀 수 있어요.</p>
   <form id="setup" class="card form" novalidate>
     <label>회사명<input name="company" required maxlength="80" value="${esc(m.company)}" placeholder="예: 주식회사 비코닉"></label>
@@ -131,14 +139,14 @@ function setupHtml() {
 // ───────────────────────── 작업 공간
 function summaryHtml(ev) {
   const p = ev.progress; const pct = p.applicable ? Math.round((p.submitted / p.applicable) * 100) : 0;
-  return `<div class="sum card"><div class="sum-top"><div><small>${esc(st.meta.synthetic ? '합성 예시 · ' : '')}자료 기준일 ${esc(st.meta.baseDate)}</small><h1>${esc(st.meta.company)}</h1></div><a class="link sm" href="#/setup">정보 수정</a></div>
+  return `<div class="sum card"><div class="sum-top"><div><small>${esc(st.meta.synthetic ? '합성 예시 · ' : '')}자료 기준일 ${esc(st.meta.baseDate)}</small><h1>${esc(st.meta.company)}</h1></div><a class="link sm" href="/setup">정보 수정</a></div>
   <div class="prog"><div class="prog-l"><span>제출</span><b>${p.submitted}<i>/${p.applicable}</i></b></div><div class="prog-l"><span>검토 완료</span><b>${p.reviewed}<i>/${p.applicable}</i></b></div><div class="prog-l"><span>확인할 항목</span><b>${ev.todo.filter((t) => t.type !== 'none').length}</b></div></div>
   <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="제출 진행률"><i style="width:${pct}%"></i></div>
   <small class="muted">업무 진행률이에요(적용 문항 중 제출·검토 건수). 투자 준비도나 사업성 점수가 아니에요.</small></div>`;
 }
 function tabsHtml(cur) {
   const t = [['todo', '지금 할 일'], ['list', '24문항'], ['evidence', '자료함'], ['report', '보고서']];
-  return `<nav class="tabs" role="tablist">${t.map(([k, l]) => `<a role="tab" aria-selected="${k === cur}" class="${k === cur ? 'on' : ''}" href="#/work/${k}">${l}</a>`).join('')}</nav>`;
+  return `<nav class="tabs" role="tablist">${t.map(([k, l]) => `<a role="tab" aria-selected="${k === cur}" class="${k === cur ? 'on' : ''}" href="/work/${k}">${l}</a>`).join('')}</nav>`;
 }
 function workHtml(tab) {
   const ev = evaluate({ ...st, today: today() });
@@ -157,12 +165,12 @@ function todoHtml(ev) {
   if (!ev.todo.length) return '<div class="empty card"><b>지금 확인할 항목이 없어요</b><p>보고서 탭에서 승인하고 PDF를 만들 수 있어요.</p></div>';
   const groups = TODO_ORDER.map((type) => [type, ev.todo.filter((t) => t.type === type)]).filter(([, l]) => l.length);
   return `<p class="hint">정해진 순서(차이 → 요청 → 재검토 → 미제출)로 보여 드려요. 위험도 순위가 아니에요.</p>${groups.map(([type, list]) => `<section class="tgroup"><h3>${TODO_LABEL[type]} <span>${list.length}</span></h3>
-  ${list.map((t) => `<a class="trow card" href="#/q/${t.qid}"><span class="tq">${t.qid}</span><div><b>${esc(QMAP[t.qid].q)}</b><small>${esc(t.text)}</small></div><span class="arr" aria-hidden="true">›</span></a>`).join('')}</section>`).join('')}`;
+  ${list.map((t) => `<a class="trow card" href="/q/${t.qid}"><span class="tq">${t.qid}</span><div><b>${esc(QMAP[t.qid].q)}</b><small>${esc(t.text)}</small></div><span class="arr" aria-hidden="true">›</span></a>`).join('')}</section>`).join('')}`;
 }
 
 function listHtml(ev) {
   return SECTIONS.map((s) => `<section class="qsec"><h3>${s.id}. ${s.title}</h3>${QUESTIONS.filter((q) => q.sec === s.id).map((q) => { const b = ev.byQ[q.id]; const a = st.answers[q.id] || {};
-    return `<a class="qrow card" href="#/q/${q.id}"><span class="tq">${q.id}</span><div><b>${esc(q.q)}</b><span class="chips">${dChip(b.data)}${rChip(b.review)}${a.stale ? chip('stale', '재검토 필요') : ''}</span></div><span class="arr" aria-hidden="true">›</span></a>`; }).join('')}</section>`).join('');
+    return `<a class="qrow card" href="/q/${q.id}"><span class="tq">${q.id}</span><div><b>${esc(q.q)}</b><span class="chips">${dChip(b.data)}${rChip(b.review)}${a.stale ? chip('stale', '재검토 필요') : ''}</span></div><span class="arr" aria-hidden="true">›</span></a>`; }).join('')}</section>`).join('');
 }
 
 // ───────────────────────── 자료함
@@ -171,7 +179,7 @@ function evidenceHtml() {
   return `<div class="card form"><h3>자료 등록</h3><p class="hint">파일은 업로드되지 않아요. 파일을 고르면 이 기기 안에서 이름·크기·SHA-256(원본 일치 확인용 지문)만 계산해 기록해요.</p>
   ${evidenceForm('ev')}<button class="btn primary" data-act="ev-add" data-scope="ev" ${st.role !== 'ceo' ? 'disabled' : ''}>자료 등록</button>${st.role !== 'ceo' ? '<p class="hint">자료 등록은 대표 화면에서 해요.</p>' : ''}</div>
   ${st.evidence.length ? st.evidence.map((e) => `<div class="card ev"><div class="ev-h"><span class="tq">${esc(e.id)}</span><div><b>${esc(e.name)}</b><small>${esc(e.kind)} · 작성일 ${esc(e.docDate || '미입력')} · v${e.version}${e.size ? ` · ${(e.size / 1024).toFixed(0)}KB` : ''}</small></div></div>
-    <p class="mono sm">${e.sha256 ? `SHA-256 ${esc(e.sha256)}` : '파일 미선택 — 해시 없음'}</p><p class="sm">연결 문항: ${linkedQs(e.id).map((q) => `<a href="#/q/${q}">${q}</a>`).join(', ') || '없음'}</p>
+    <p class="mono sm">${e.sha256 ? `SHA-256 ${esc(e.sha256)}` : '파일 미선택 — 해시 없음'}</p><p class="sm">연결 문항: ${linkedQs(e.id).map((q) => `<a href="/q/${q}">${q}</a>`).join(', ') || '없음'}</p>
     ${st.role === 'ceo' ? `<label class="link sm file">새 버전 파일로 교체<input type="file" data-act="ev-replace" data-eid="${esc(e.id)}" hidden></label>` : ''}
     <details class="sm"><summary>변경 기록</summary>${(e.history || []).map((h) => `<div>${esc(fmtDate(h.at))} · v${h.v} · ${esc(h.what)}</div>`).join('')}</details></div>`).join('') : '<div class="empty card"><b>아직 등록한 자료가 없어요</b><p>IR 덱, 매출원장, 재무제표, 주주명부부터 등록해 보세요.</p></div>'}`;
 }
@@ -251,7 +259,7 @@ function questionHtml(qid) {
     <hr><fieldset class="scope"><legend>검토 범위</legend>${['원문 대조', '수치 재계산', '서류 존재 확인'].map((x) => `<label class="chk"><input type="checkbox" name="scope" value="${x}"> ${x}</label>`).join('')}</fieldset><button class="btn primary sm" data-act="reviewed" data-q="${qid}">검토 완료로 표시</button>
     ${s === 'na' && !a.naApproved ? `<hr><button class="btn primary sm" data-act="na-approve" data-q="${qid}" ${(a.naReason || '').trim() ? '' : 'disabled'}>적용 제외 승인</button>` : ''}</div>`
     : (a.review === 'asked' ? `<div class="card rv ask"><h3>컨설턴트 확인 요청</h3><p>${esc(a.askNote || '')}</p><label>답변 메모<input id="author-note" maxlength="300" placeholder="무엇을 확인·보완했는지"></label><button class="btn primary sm" data-act="author" data-q="${qid}">확인했어요</button></div>` : '');
-  return `${headerHtml(true)}<main class="wrap narrow qpage"><a class="back" href="#/work/list">← 24문항</a>
+  return `${headerHtml(true)}<main class="wrap narrow qpage"><a class="back" href="/work/list">← 24문항</a>
   ${st.meta.synthetic ? '<div class="syn-band">합성 예시 데이터예요.</div>' : ''}
   <p class="q-meta">${q.id} · ${esc(sec.title)}${q.plan ? ' · 경영진 제출 계획' : ''}</p><h1 class="q-t">${esc(q.q)}</h1><div class="chips" id="q-chips">${live.chips}</div>
   <details class="acc" open><summary>왜 묻나요?</summary><p>${esc(q.why)}</p><ul class="srcs-q">${q.src.map(([sid, loc]) => `<li><a href="${esc(SMAP[sid].url)}" target="_blank" rel="noopener">${sid} ${esc(SMAP[sid].title)}</a> — ${esc(loc)}<br><small>${esc(SMAP[sid].limit)}</small></li>`).join('')}</ul></details>
@@ -263,7 +271,7 @@ function questionHtml(qid) {
   ${a.stale ? `<div class="card stale-box"><b>재검토 필요</b><p>${esc(a.staleNote || '')}</p></div>` : ''}
   ${sugg ? `<div class="card"><h3>수정 제안</h3>${sugg}</div>` : ''}${reviewPanel}
   <details class="acc"><summary>수정 기록 (${(a.history || []).length})</summary>${(a.history || []).slice().reverse().map((h) => `<div class="sm">${esc(fmtDate(h.at))} · ${esc(h.by)} · ${esc(h.what)}</div>`).join('') || '<p class="sm">기록 없음</p>'}</details>
-  </main><div class="bottom-bar"><div class="wrap bb">${prev ? `<a class="btn ghost" href="#/q/${prev.id}">‹ ${prev.id}</a>` : '<span></span>'}<span id="save-ind" class="sm muted" aria-live="polite">${lastSaved ? `자동 저장됨 ${lastSaved.toTimeString().slice(0, 5)}` : ''}</span>${next ? `<a class="btn primary" href="#/q/${next.id}">다음 · ${next.id} ›</a>` : '<a class="btn primary" href="#/work/report">보고서로 ›</a>'}</div></div>`;
+  </main><div class="bottom-bar"><div class="wrap bb">${prev ? `<a class="btn ghost" href="/q/${prev.id}">‹ ${prev.id}</a>` : '<span></span>'}<span id="save-ind" class="sm muted" aria-live="polite">${lastSaved ? `자동 저장됨 ${lastSaved.toTimeString().slice(0, 5)}` : ''}</span>${next ? `<a class="btn primary" href="/q/${next.id}">다음 · ${next.id} ›</a>` : '<a class="btn primary" href="/work/report">보고서로 ›</a>'}</div></div>`;
 }
 
 // ───────────────────────── 보고서 탭
@@ -442,4 +450,4 @@ document.addEventListener('click', async (e) => {
 });
 
 render();
-window.__IR = { get state() { return st; }, evaluate: () => evaluate(st), APP };
+window.__IR = { get state() { return st; }, evaluate: () => evaluate(st), go, APP };
