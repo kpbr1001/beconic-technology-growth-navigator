@@ -545,7 +545,18 @@ const HELP_TYPES = [
   {id:'docs',  label:'제출 서류 준비',       sub:'빠짐없이 갖추기'},
   {id:'pitch', label:'발표·면접 준비',       sub:'평가 대응 전략'}
 ];
-const HELP_CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat'};
+/* 발행사·상담 연락처 — 화면·인쇄의 번호·주소는 모두 여기서([data-ct]·[data-ct-href] 자리에 채움). 소스에 직접 쓰지 않는다.
+   카카오 챗봇(netlify/lib/bot/kakao.mjs CONTACT)은 서버 코드라 따로 두되 같은 값인지 서버 테스트가 확인한다 */
+const HELP_CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat',
+  web:'www.beconic.kr', webUrl:'https://www.beconic.kr/', addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호'};
+function contactHref(k, subject){
+  const c=HELP_CONTACT;
+  return k==='tel' ? `tel:${c.tel.replace(/-/g,'')}` : k==='email' ? `mailto:${c.email}${subject?`?subject=${encodeURIComponent(subject)}`:''}` : k==='kakao' ? c.kakao : k==='web' ? c.webUrl : '';
+}
+function bindContact(root){
+  root.querySelectorAll('[data-ct]').forEach(e=>{ e.textContent=HELP_CONTACT[e.dataset.ct]||''; });
+  root.querySelectorAll('[data-ct-href]').forEach(e=>{ const h=contactHref(e.dataset.ctHref, e.dataset.subject); if(h) e.setAttribute('href', h); });
+}
 const svgIcon = (d)=>`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const ICON = {
   chat:  svgIcon('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/>'),
@@ -1126,6 +1137,7 @@ const App = (function(){
   /* ================= INIT ================= */
   function init(){
     injectVersion();
+    bindContact(document);
     renderPersonaCards();
     updateDataSourceUI(true);
     prefetchProgramCount();
@@ -1920,7 +1932,7 @@ const App = (function(){
       <div class="hp-ch">
         <a class="hp-c kakao" href="${HELP_CONTACT.kakao}" target="_blank" rel="noopener noreferrer" onclick="App.copyHelp('kakao')">
           <span class="hp-ci" aria-hidden="true">${ICON.kakao}</span><span><b>카카오톡 상담</b><small>요청 내용이 복사돼요 · 채팅창에 붙여넣기</small></span></a>
-        <a class="hp-c" href="tel:${HELP_CONTACT.tel.replace(/-/g,'')}">
+        <a class="hp-c" href="${contactHref('tel')}">
           <span class="hp-ci" aria-hidden="true">${ICON.phone}</span><span><b>전화 상담</b><small>${HELP_CONTACT.tel}</small></span></a>
         <a class="hp-c" href="${esc(helpMailto(p, company, t))}">
           <span class="hp-ci" aria-hidden="true">${ICON.mail}</span><span><b>메일로 요청</b><small>내용이 자동으로 채워져요</small></span></a>
@@ -1928,7 +1940,7 @@ const App = (function(){
           <span class="hp-ci" aria-hidden="true">${ICON.copy}</span><span><b>요청 내용 복사</b><small>카톡·문자에 붙여넣기</small></span></button>
       </div>
       <details class="hp-preview"><summary>보낼 내용 미리보기</summary><pre>${esc(helpText(p, company, t))}</pre></details>
-      <p class="hp-trust">${ICON.shield} 그로스벤처스㈜ · 중기부 인증 중소기업상담회사(제2025-684호) · 입력 정보는 서버로 전송되지 않아요</p>`;
+      <p class="hp-trust">${ICON.shield} 그로스벤처스㈜ · 중기부 인증 중소기업상담회사(${HELP_CONTACT.cert}) · 입력 정보는 서버로 전송되지 않아요</p>`;
   }
   function toggleHelpType(id){
     if(!helpCtx || !HELP_TYPES.some(x=>x.id===id)) return;

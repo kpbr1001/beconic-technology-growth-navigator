@@ -6,6 +6,7 @@ import { blank, load, save, clear, hasLegacy, today, validate } from './store.js
 import { sampleState } from './sample.js';
 import { gauge, radar, finBars, dots } from './charts.js';
 import { renderReport, reportId } from './report.js';
+import { COMPANY, telHref } from './contact.js';
 
 export const APP = { version: 'v2.0.0', updated: '2026-11-01' };
 const $ = (s, el = document) => el.querySelector(s);
@@ -37,8 +38,8 @@ function headerHtml() {
 }
 function footerHtml() {
   return `<footer class="site"><div class="wrap ft"><div class="f-brand"><img src="/assets/shield-white.png" alt="" width="40" height="40"><div><b>BECONIC</b><small>IR 진단 · by Growth Ventures</small></div></div>
-  <p class="f-info">그로스벤처스 주식회사 · 서울시 구로구 디지털로27길 24, 209호<br>전화 <a href="tel:02-6124-5960">02-6124-5960</a> · 이메일 <a href="mailto:start@gven.kr">start@gven.kr</a> · <a href="https://www.beconic.kr/" target="_blank" rel="noopener">www.beconic.kr</a></p>
-  <p class="f-cert">중소벤처기업부 공식 인증 중소기업상담회사 (제2025-684호)</p>
+  <p class="f-info">${COMPANY.name} · ${COMPANY.addr}<br>전화 <a href="${telHref}">${COMPANY.tel}</a> · 이메일 <a href="mailto:${COMPANY.email}">${COMPANY.email}</a> · <a href="${COMPANY.webUrl}" target="_blank" rel="noopener">${COMPANY.web}</a></p>
+  <p class="f-cert">중소벤처기업부 공식 인증 중소기업상담회사 (${COMPANY.cert})</p>
   <p class="f-legal">IR 준비도 점수는 대표 응답과 제출한 재무제표를 바탕으로 한 자가진단 결과예요. 투자 유치 여부나 기업가치를 판단·보장하지 않아요. 입력 내용과 파일은 이 브라우저에만 저장돼요.</p>
   <p class="f-ver">${APP.version} · 문항 ${MODEL_VERSION} · 점수 ${SCORE_VERSION}</p></div></footer>`;
 }
@@ -80,8 +81,8 @@ function homeHtml() {
     <li><b>기본 정보 3가지</b><span>회사명·투자 단계·업종 (30초)</span></li><li><b>32문항 진단</b><span>한 화면에 한 문항, 탭 한 번 (약 8분)</span></li>
     <li><b>재무제표 올리기</b><span>표준재무제표 PDF 또는 직접 입력 (선택)</span></li><li><b>결과·PDF</b><span>대시보드와 결과 보고서</span></li></ol></section>
 
-  <section class="wrap consult"><div class="cbox"><div><b>결과를 보고 IR을 함께 준비하고 싶다면</b><p>그로스벤처스는 중기부 인증 중소기업상담회사(제2025-684호)예요. 15년 경력 컨설턴트가 진단 결과를 바탕으로 IR 자료와 투자 준비를 함께 설계해 드려요.</p></div>
-    <div class="cbtn"><a class="btn primary" href="tel:02-6124-5960">02-6124-5960 전화</a><a class="btn ghost" href="mailto:start@gven.kr?subject=IR 진단 상담 문의">이메일 문의</a></div></div></section>
+  <section class="wrap consult"><div class="cbox"><div><b>결과를 보고 IR을 함께 준비하고 싶다면</b><p>그로스벤처스는 중기부 인증 중소기업상담회사(${COMPANY.cert})예요. 15년 경력 컨설턴트가 진단 결과를 바탕으로 IR 자료와 투자 준비를 함께 설계해 드려요.</p></div>
+    <div class="cbtn"><a class="btn primary" href="${telHref}">${COMPANY.tel} 전화</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 상담 문의">이메일 문의</a></div></div></section>
   </main>${footerHtml()}`;
 }
 
@@ -196,7 +197,7 @@ function resultHtml() {
     <p class="sm">영역 구성은 ${Object.values(SOURCES).slice(0, 2).map((s) => `${esc(s.publisher)} 「${esc(s.title)}」`).join(', ')}의 투자 설명 항목을 참고했어요. 가중치는 비코닉 설계값(실증 검증 전)이에요.</p></section>
 
   <div class="res-act"><button class="btn primary" data-act="print">결과 보고서 PDF</button><a class="btn white" href="/finance">재무 ${r.fin.has ? '수정' : '올리기'}</a><button class="btn white" data-act="export">결과 파일 저장</button><label class="btn white file">결과 파일 열기<input type="file" accept="application/json,.json" data-act="import" hidden></label><button class="link danger" data-act="reset">모두 지우기</button></div>
-  <section class="consult" style="margin-top:24px"><div class="cbox"><div><b>보완 항목을 함께 준비하고 싶다면</b><p>진단 결과를 바탕으로 IR 덱·재무 자료·투자 전략을 함께 설계해 드려요.</p></div><div class="cbtn"><a class="btn primary" href="tel:02-6124-5960">02-6124-5960</a><a class="btn ghost" href="mailto:start@gven.kr?subject=IR 진단 결과 상담">이메일 상담</a></div></div></section>
+  <section class="consult" style="margin-top:24px"><div class="cbox"><div><b>보완 항목을 함께 준비하고 싶다면</b><p>진단 결과를 바탕으로 IR 덱·재무 자료·투자 전략을 함께 설계해 드려요.</p></div><div class="cbtn"><a class="btn primary" href="${telHref}">${COMPANY.tel}</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 결과 상담">이메일 상담</a></div></div></section>
   </main>${footerHtml()}`;
 }
 

@@ -3,6 +3,7 @@ import { CATEGORIES, QUESTIONS, STAGES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SO
 import { SCORE_VERSION } from './score.js';
 import { ACCOUNTS, fmtWon } from './fin.js';
 import { gauge, radar, finBars } from './charts.js';
+import { COMPANY } from './contact.js';
 
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const rdots = (v) => `<span class="r-dots">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= (v || 0) ? 'on' : ''}"></i>`).join('')}</span>`;
@@ -65,6 +66,6 @@ export function renderReport(st, r, { id, date, version }) {
   ${QUESTIONS.map((q) => { const a = st.answers[q.id] || {}; return `<tr><td class="r-nw">${esc(CMAP[q.cat].name)}</td><td><b>${esc(q.title)}</b></td><td>${typeof a.v !== 'number' ? '미응답' : a.v === 0 ? '잘 모르겠어요(1점으로 계산)' : esc(q.opts[a.v - 1])}</td><td class="r-c r-nw">${rdots(a.v)}</td><td class="r-c">${a.ev ? '있음' : '—'}</td></tr>`; }).join('')}
   </tbody></table>
 
-  <div class="r-foot">이 보고서는 대표 응답과 제출한 재무제표를 바탕으로 한 IR 준비도 자가진단 결과입니다. 투자 권유, 투자 유치 여부·기업가치 판단, 회계감사, 법률 의견이 아닙니다. 보고서 ID ${esc(id)}는 입력 내용의 지문으로 원본 일치 확인용입니다.<br>그로스벤처스 주식회사 · 중소벤처기업부 인증 중소기업상담회사 제2025-684호 · 02-6124-5960 · start@gven.kr · www.beconic.kr</div>
+  <div class="r-foot">이 보고서는 대표 응답과 제출한 재무제표를 바탕으로 한 IR 준비도 자가진단 결과입니다. 투자 권유, 투자 유치 여부·기업가치 판단, 회계감사, 법률 의견이 아닙니다. 보고서 ID ${esc(id)}는 입력 내용의 지문으로 원본 일치 확인용입니다.<br>${COMPANY.name} · 중소벤처기업부 인증 중소기업상담회사 ${COMPANY.cert} · ${COMPANY.tel} · ${COMPANY.email} · ${COMPANY.web}</div>
   </article>`;
 }

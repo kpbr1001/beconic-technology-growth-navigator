@@ -183,6 +183,9 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   const body = await page.locator('body').innerText();
   check('홈: 과장·검증 불가 문구 제거(여기뿐·수천·매일 갱신·실시간으로 뒤져)', !/여기뿐|수천|매일 갱신|실시간으로 뒤져/.test(body));
   check('홈: DEMO 모드에서 가짜 공고 수 대신 출처 표기', (await page.locator('#statPrograms').innerText()) === '2곳');
+  const ct = await page.evaluate(() => ({ tels: [...document.querySelectorAll('[data-ct="tel"]')].map((e) => e.textContent), telHrefs: [...document.querySelectorAll('[data-ct-href="tel"]')].map((e) => e.getAttribute('href')),
+    cert: [...document.querySelectorAll('[data-ct="cert"]')].map((e) => e.textContent), mail: document.querySelector('[data-ct-href="email"][data-subject]')?.getAttribute('href') || '' }));
+  check('연락처: 화면·인쇄 자리마다 한 곳(HELP_CONTACT)의 번호·인증번호·링크', ct.tels.length >= 3 && ct.tels.every((t) => /^0\d{1,2}-\d{3,4}-\d{4}$/.test(t) && t === ct.tels[0]) && ct.telHrefs.length >= 3 && ct.telHrefs.every((h) => h === 'tel:' + ct.tels[0].replace(/-/g, '')) && ct.cert.length >= 3 && ct.cert.every((c) => /^제\d{4}-\d+호$/.test(c)) && /^mailto:.+\?subject=/.test(ct.mail), JSON.stringify({ tel: ct.tels[0], n: ct.tels.length, href: ct.telHrefs[0] }));
   const ver = await page.evaluate(() => APP_VERSION.version);
   check('푸터 버전 표기 = APP_VERSION', (await page.locator('#footVer').innerText()).includes(ver), ver);
   check('스크립트 캐시 버전 = 앱 버전', await page.evaluate((v) => [...document.scripts].some((s) => s.src.includes('app.js?v=' + v.slice(1))), ver));

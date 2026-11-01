@@ -609,3 +609,16 @@ test('챗봇 스킬 함수: POST만·토큰 검사·스냅샷 공고로 응답',
   assert.match(welcome.template.outputs[0].simpleText.text, /비코닉/, '웰컴 블록은 문장과 관계없이 첫 메뉴');
   _setStore(null);
 });
+
+test('상담 연락처: 카카오 챗봇(CONTACT)과 화면(app.js HELP_CONTACT)이 같은 번호·인증번호 — 한쪽만 바뀌지 않게', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { CONTACT } = await import('../netlify/lib/bot/kakao.mjs');
+  const app = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const help = /const HELP_CONTACT = \{([\s\S]*?)\};/.exec(app)[1];
+  const val = (k) => new RegExp(`${k}:'([^']+)'`).exec(help)[1];
+  assert.equal(CONTACT.tel, val('tel'));
+  assert.equal(CONTACT.cert, val('cert'));
+  // 화면·인쇄 HTML에는 번호·주소·인증번호를 직접 쓰지 않는다([data-ct] 자리에 HELP_CONTACT로 채움)
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  for (const k of ['tel', 'email', 'addr', 'cert']) assert.ok(!html.includes(val(k)), `index.html에 ${k} 직접 표기`);
+});

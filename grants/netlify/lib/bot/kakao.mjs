@@ -6,7 +6,8 @@
 // ============================================================================
 import { TOOLS, AREAS } from './tools.mjs';
 
-export const CONTACT = { tel: '02-6124-5960', app: 'https://beconic-grant-matching.netlify.app/' };
+// 상담 연락처 — 화면(app.js HELP_CONTACT)과 같은 값이어야 한다(서버 테스트가 확인)
+export const CONTACT = { tel: '02-6124-5960', cert: '제2025-684호', app: 'https://beconic-grant-matching.netlify.app/' };
 // 카드 썸네일(800×400, 2:1) — 원본 design/kakao-card.html, 다시 만들기 scripts/render-images.mjs. 바꾸면 v를 올려 카카오 캐시를 비운다
 const THUMB_V = 1;
 const thumb = (k) => ({ thumbnail: { imageUrl: `${CONTACT.app}assets/kakao/${k}.png?v=${THUMB_V}` } });
@@ -91,7 +92,7 @@ export function route(utterance, programs, now = Date.now()) {
       text('평일 09~18시에 담당 컨설턴트가\n이 채팅방으로 답변드려요.')], []);
   }
   if (/^(상담|상담연결|상담원|상담원연결|문의|전화|전화상담|연락처|컨설팅)$/.test(n)) {
-    return reply([{ basicCard: { ...thumb('consult'), title: '전문 컨설턴트와 상담하기', description: para(`그로스벤처스㈜\n중기부 인증 중소기업상담회사 (제2025-684호)\n\n✔ 사업계획서 작성·검토\n✔ 신청 자격 확인\n✔ 서류 준비·발표 코칭\n\n☎ ${CONTACT.tel} (평일 09~18시)\n시간 외에는 요청을 남겨주세요.`, 230),
+    return reply([{ basicCard: { ...thumb('consult'), title: '전문 컨설턴트와 상담하기', description: para(`그로스벤처스㈜\n중기부 인증 중소기업상담회사 (${CONTACT.cert})\n\n✔ 사업계획서 작성·검토\n✔ 신청 자격 확인\n✔ 서류 준비·발표 코칭\n\n☎ ${CONTACT.tel} (평일 09~18시)\n시간 외에는 요청을 남겨주세요.`, 230),
       buttons: [{ label: '전화 상담', action: 'phone', phoneNumber: CONTACT.tel }, { label: '요청 남기기', action: 'message', messageText: '상담 요청합니다' }] } }]);
   }
   // 상담 요청 글(앱에서 복사한 요청·전화번호·긴 글)은 검색하지 않고 접수 안내 — 담당자가 1:1 채팅에서 이어서 답변
