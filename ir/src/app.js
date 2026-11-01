@@ -4,8 +4,9 @@ import { evaluate, parseAmount, parseCount, fmtUnit, canonical, sha256Hex, DATA_
 import { blank, load, save, clear, validate, nextEvidenceId, nowIso, today } from './store.js';
 import { sampleState } from './sample.js';
 import { renderBrief, renderDetail, esc, fmtDate } from './report.js';
+import { guideFor, QUESTION_GUIDE, nextActions, sectionSummary, GUIDE_NOTE } from './guide.js';
 
-export const APP = { version: 'v1.1.0', updated: '2026-11-01' };
+export const APP = { version: 'v1.2.0', updated: '2026-11-01' };
 const $ = (s, el = document) => el.querySelector(s);
 const root = () => $('#app');
 const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'SGD', 'CNY'];
@@ -180,7 +181,10 @@ function todoHtml(ev) {
     <li><b>컨설턴트 검토</b>가 필요하면 보고서 탭에서 검토 파일을 내보내 전달해요.</li>
     <li><b>대표 승인</b> 후 투자자 요약본·상세본 PDF를 만들어요.</li></ol>
     <div class="ver-act"><a class="btn primary" href="/q/${first.id}">${first.id}부터 답하기</a><a class="btn ghost" href="/work/evidence">자료 먼저 등록하기</a></div></div>` : '';
-  return `${guide}<p class="hint">정해진 순서(차이 → 요청 → 재검토 → 미제출)로 보여 드려요. 위험도 순위가 아니에요.</p>${groups.map(([type, list]) => `<section class="tgroup"><h3>${TODO_LABEL[type]} <span>${list.length}</span></h3>
+  const acts = nextActions(ev).slice(0, 5);
+  const actCard = acts.length ? `<div class="card acts"><h3>먼저 하면 좋은 일</h3><p class="hint">확인된 차이 해소가 먼저, 그다음은 채우면 자동 확인이 많이 늘어나는 문항 순이에요. 위험도 순위가 아니에요.</p>
+    ${acts.map((x) => `<a class="act ${x.kind}" href="/q/${x.qid}"><span class="tq">${x.qid}</span><div><b>${esc(x.title)}</b><small>${esc(x.text)}</small></div><span class="arr" aria-hidden="true">›</span></a>`).join('')}</div>` : '';
+  return `${guide}${actCard}<p class="hint">정해진 순서(차이 → 요청 → 재검토 → 미제출)로 보여 드려요. 위험도 순위가 아니에요.</p>${groups.map(([type, list]) => `<section class="tgroup"><h3>${TODO_LABEL[type]} <span>${list.length}</span></h3>
   ${(() => { const row = (t) => `<a class="trow card" href="/q/${t.qid}"><span class="tq">${t.qid}</span><div><b>${nb(QMAP[t.qid].q)}</b><small>${esc(t.text)}</small></div><span class="arr" aria-hidden="true">›</span></a>`;
     if (type !== 'none' || list.length <= 6) return list.map(row).join('');
     return `${list.slice(0, 5).map(row).join('')}<details class="more"><summary>나머지 ${list.length - 5}개 보기</summary>${list.slice(5).map(row).join('')}</details>`; })()}</section>`).join('')}`;
@@ -188,7 +192,8 @@ function todoHtml(ev) {
 
 function listHtml(ev) {
   return SECTIONS.map((s) => { const qs = QUESTIONS.filter((q) => q.sec === s.id); const n = qs.filter((q) => !['none', 'na_wait'].includes(ev.byQ[q.id].data)).length;
-    return `<section class="qsec"><h3>${s.id}. ${s.title} <small>${n}/${qs.length} 제출</small></h3>${QUESTIONS.filter((q) => q.sec === s.id).map((q) => { const b = ev.byQ[q.id]; const a = st.answers[q.id] || {};
+    const sm = sectionSummary(ev, s.id);
+    return `<section class="qsec"><h3>${s.id}. ${s.title} <small>${n}/${qs.length} 제출</small></h3><p class="sec-sum">${esc(sm.sentence)}</p>${QUESTIONS.filter((q) => q.sec === s.id).map((q) => { const b = ev.byQ[q.id]; const a = st.answers[q.id] || {};
     return `<a class="qrow card" href="/q/${q.id}"><span class="tq">${q.id}</span><div><b>${nb(q.q)}</b><span class="chips">${dChip(b.data)}${rChip(b.review)}${a.stale ? chip('stale', '재검토 필요') : ''}</span></div><span class="arr" aria-hidden="true">›</span></a>`; }).join('')}</section>`; }).join('');
 }
 
@@ -250,7 +255,9 @@ function liveHtml(qid) {
   const ev = evaluate(st); const b = ev.byQ[qid];
   const fs = b.findings;
   return { chips: `${dChip(b.data)}${rChip(b.review)}${(st.answers[qid] || {}).stale ? chip('stale', '재검토 필요') : ''}`,
-    calc: fs.length ? fs.map((f) => `<div class="fd f-${f.result}"><div class="fd-h">${fChip(f.result)}<b>${esc(f.title)}</b><small>${esc(f.id)}</small></div><p>${f.fact.map(esc).join('<br>')}</p>${f.calc ? `<p class="mono sm">${esc(f.calc)}</p>` : ''}${f.request ? `<p class="sm req">확인 요청: ${esc(f.request)}</p>` : ''}</div>`).join('') : '' };
+    calc: fs.length ? fs.map((f) => { const g = guideFor(f);
+      return `<div class="fd f-${f.result}"><div class="fd-h">${fChip(f.result)}<b>${esc(f.title)}</b><small>${esc(f.id)}</small></div><p>${f.fact.map(esc).join('<br>')}</p>${f.calc ? `<p class="mono sm">${esc(f.calc)}</p>` : ''}
+      ${g ? `<div class="gd"><div class="gd-c"><b>확인할 항목</b><ul>${g.checks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div><div class="gd-c"><b>보완 방법</b><ol>${g.fix.map((x) => `<li>${esc(x)}</li>`).join('')}</ol></div><p class="gd-n">${esc(GUIDE_NOTE)}</p></div>` : ''}</div>`; }).join('') : '' };
 }
 
 function questionHtml(qid) {
@@ -290,7 +297,7 @@ function questionHtml(qid) {
   <div class="q-prog" aria-hidden="true"><i style="width:${pct}%"></i></div>
   ${st.meta.synthetic ? '<div class="syn-band">합성 예시 데이터예요.</div>' : ''}
   <p class="q-meta">${q.id} · ${sec.id}. ${esc(sec.title)}${q.plan ? ' · 경영진 제출 계획' : ''}</p><h1 class="q-t">${nb(q.q)}</h1><div class="chips" id="q-chips">${live.chips}</div>
-  <div class="q-info"><p class="q-why">${esc(q.why)}</p><p class="q-need"><b>필요한 자료</b> ${q.ex.map((x) => `<span>${esc(x)}</span>`).join('')}</p></div>
+  <div class="q-info"><p class="q-why">${esc(q.why)}</p><p class="q-need"><b>필요한 자료</b> ${q.ex.map((x) => `<span>${esc(x)}</span>`).join('')}</p>${QUESTION_GUIDE[q.id] ? `<div class="q-prep"><b>이렇게 준비하면 확인이 쉬워요</b><ul>${QUESTION_GUIDE[q.id].map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}</div>
   <details class="acc"><summary>질문 근거와 확인 방법</summary><ul class="srcs-q">${q.src.map(([sid, loc]) => `<li><a href="${esc(SMAP[sid].url)}" target="_blank" rel="noopener">${sid} ${esc(SMAP[sid].title)}</a> — ${esc(loc)}<br><small>${esc(SMAP[sid].limit)}</small></li>`).join('')}</ul><p class="sm"><b>앱의 확인 방법</b> ${esc(q.check)}</p>${q.expert ? `<p class="sm">${esc(q.expert)} 분야 전문가 검토가 필요한 항목이에요. 이 앱은 자료 존재·범위만 확인해요.</p>` : ''}<p class="sm muted">출처는 질문 주제의 근거이며, 해당 기관이 이 질문을 승인한 것은 아니에요.</p></details>
   <div class="card ans"><div class="seg" role="radiogroup" aria-label="답하는 방법">${modes.map(([k, l]) => `<button role="radio" aria-checked="${k === s}" class="${k === s ? 'on' : ''}" data-act="mode" data-q="${qid}" data-m="${k}" ${ro ? 'disabled' : ''}>${l}</button>`).join('')}</div>
   ${ro ? '<p class="hint">컨설턴트 화면에서는 답변을 읽기만 할 수 있어요.</p>' : ''}${s === 'answer' && !ro ? '<p class="hint">자료가 없으면 "담당자에게 요청"이나 "아직 몰라요"를 골라도 돼요. 미제출도 보고서에 그대로 표시돼요.</p>' : ''}${body}</div>
@@ -337,12 +344,12 @@ async function makeSnapshot() {
   const hash = await sha256Hex(canonical({ state, registry: REGISTRY_VERSION, engine: ENGINE_VERSION, version }));
   const d = st.meta.baseDate.replaceAll('-', '');
   return { version, reportId: `IR-${d}-${hash.slice(0, 8).toUpperCase()}`, hash, approvedAt: nowIso(), approvedBy: st.meta.ceo || '대표', appVersion: APP.version,
-    state, findings: ev.findings, byQ: ev.byQ, history: st.snapshots.map((s) => ({ version: s.version, approvedAt: s.approvedAt, approvedBy: s.approvedBy, hash: s.hash })) };
+    state, findings: ev.findings, byQ: ev.byQ, todo: ev.todo, history: st.snapshots.map((s) => ({ version: s.version, approvedAt: s.approvedAt, approvedBy: s.approvedBy, hash: s.hash })) };
 }
 function draftSnapshot() {
   const ev = evaluate(st);
   return { draft: true, version: st.snapshots.length + 1, reportId: `IR-${st.meta.baseDate.replaceAll('-', '')}-DRAFT`, hash: '', approvedAt: '', approvedBy: '', appVersion: APP.version,
-    state: JSON.parse(JSON.stringify({ meta: st.meta, answers: st.answers, evidence: st.evidence })), findings: ev.findings, byQ: ev.byQ, history: st.snapshots.map((s) => ({ version: s.version, approvedAt: s.approvedAt, approvedBy: s.approvedBy, hash: s.hash })) };
+    state: JSON.parse(JSON.stringify({ meta: st.meta, answers: st.answers, evidence: st.evidence })), findings: ev.findings, byQ: ev.byQ, todo: ev.todo, history: st.snapshots.map((s) => ({ version: s.version, approvedAt: s.approvedAt, approvedBy: s.approvedBy, hash: s.hash })) };
 }
 export function printReport(snap, kind, opts) {
   const pr = $('#print-root');
