@@ -184,7 +184,7 @@ export function summary(st, res) {
   if (!res.complete) lines.push(`${N_Q}문항 중 ${res.answered}문항만 답했어요. 남은 문항을 답하면 결과가 정확해져요.`);
   return lines;
 }
-/** 투자 준비 서류 — 연결 문항 응답·근거 체크·재무제표 업로드로 준비 상태 추정(ready 준비됨 / partial 보완 필요 / todo 준비 전) */
+/** 투자 준비 서류 — 연결 문항 응답·근거 체크·재무제표 업로드로 준비 상태 판단(ready 준비됨 / partial 보완 필요 / todo 준비 전) */
 export function dataRoom(st, res) {
   const ans = st.answers || {};
   return DATAROOM.map((d) => {
@@ -195,7 +195,7 @@ export function dataRoom(st, res) {
     return { ...d, state, note };
   });
 }
-/** 투자자 예상 질문 — 점수가 낮은(기대 미달 우선) 영역부터 */
+/** 투자자가 물어볼 질문 — 점수가 낮은(기대 미달 우선) 영역부터 */
 export function asks(st, res) {
   return CATEGORIES.map((c) => res.cats[c.id]).filter((c) => c.score !== null)
     .sort((a, b) => a.gap - b.gap || a.score - b.score).slice(0, TOP_N)

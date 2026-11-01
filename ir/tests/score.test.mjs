@@ -73,11 +73,25 @@ test('로드맵: 난이도별 배치(S→2주, L은 2주에 오지 않음), 항�
   const r = evaluate(withAll(2, 'seed', { confirmed: true, source: 'manual', cur: { rev: 1, op: 1, net: 1, assets: 2, liab: 1, equity: 1 }, prev: {} }));
   const all = [...r.roadmap.now, ...r.roadmap.d30, ...r.roadmap.d90];
   assert.ok(all.every((x) => x.doc)); assert.ok(r.roadmap.now.every((x) => x.effort === 'S'));
-  assert.ok(!r.roadmap.d30.some((x) => x.effort === 'L')); assert.ok(r.roadmap.now.length <= 4 && r.roadmap.d90.length <= 5);
+  assert.ok(!r.roadmap.d30.some((x) => x.effort === 'L'));
+  const extra = r.roadmap.now.filter((x) => x.special).length; assert.ok(r.roadmap.now.length <= 4 + extra && r.roadmap.d90.length <= 5);
+  assert.ok(r.roadmap.now.some((x) => x.special === 'fin-years'), '1개년만 있으면 전년도 자료 안내'); assert.equal(r.fin.years, 1);
 });
 test('v2.0 응답 이관(SP3 → TC2)·현금 보유 개월 수(참고)', () => {
   const v = validate({ app: 'beconic-ir', schema: 2, meta: { company: 'x' }, answers: { SP3: { v: 4, ev: true } }, fin: null });
   assert.deepEqual(v.answers, { TC2: { v: 4, ev: true } });
   const b = indicators({ cur: { cash: 120, op: -120 }, prev: {} }).find((x) => x.k === 'burn'); assert.equal(b.value, 12); assert.match(b.note, /전망이 아니에요/);
   assert.ok(!indicators({ cur: { cash: 120, op: 5 }, prev: {} }).some((x) => x.k === 'burn')); // 흑자면 계산 안 함
+});
+
+test('재무 3개년: 1개년만·0개년도 반영, 이전 저장 형식(cur·prev) 이관, 준비 서류·물어볼 질문', () => {
+  const base = withAll(3, 'seed', null);
+  const none = evaluate(base); assert.equal(none.fin.has, false); assert.equal(none.dataRoom.find((d) => d.id === 'fs').state, 'partial'); // FN1 3점
+  assert.ok(none.asks.length > 0 && none.asks.every((a) => a.qs.length));
+  const onlyPrev = evaluate({ ...base, fin: { y0: '2025', cur: {}, prev: { rev: 100, op: -10 }, pp: {} } }); // 최근 연도 칸이 비어도 반영(앞으로 당김)
+  assert.equal(onlyPrev.fin.has, true); assert.equal(onlyPrev.fin.years, 1); assert.equal(onlyPrev.years[0].label, '최근 연도(2024년)');
+  const three = evaluate({ ...base, fin: { y0: '2025', cur: { rev: 120, op: 5 }, prev: { rev: 80, op: -1 }, pp: { rev: 30, op: -5 } } });
+  assert.equal(three.fin.years, 3); assert.ok(three.indicators.some((x) => x.k === 'cagr')); assert.equal(three.dataRoom.find((d) => d.id === 'fs').state, 'ready');
+  const old = validate({ app: 'beconic-ir', schema: 2, meta: { company: 'x' }, answers: {}, fin: { source: 'upload', fileName: 'a.pdf', cur: { rev: 1, bad: 'x' }, prev: {}, years: ['2024'], confirmed: true } });
+  assert.deepEqual(old.fin.pp, {}); assert.equal(old.fin.y0, '2024'); assert.equal(old.fin.cur.bad, undefined); assert.equal(old.fin.files[0].name, 'a.pdf');
 });

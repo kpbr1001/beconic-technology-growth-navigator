@@ -22,8 +22,9 @@ export const SLOTS = [{ k: 'cur', label: '최근 연도' }, { k: 'prev', label: 
 export const slotLabel = (fin, i) => { const y = fin?.y0 ? Number(fin.y0) - i : null; return y ? `${SLOTS[i].label}(${y}년)` : SLOTS[i].label; };
 
 const norm = (s) => String(s).replace(/\s+/g, '').replace(/^\d+(?=[^\d,])/, '').replace(/^[(（]?[ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩIVX0-9]+[.)）]\s*/, '').replace(/^[·\-•]/, '');
-// 금액: 쉼표 구분 숫자 또는 4자리 이상 숫자, 그리고 단독 "0". 쉼표 없는 1~3자리(계정 코드 01·02 등)는 금액으로 보지 않는다.
-const AMT = /[(（△▲-]?\d{1,3}(?:,\d{3})+[)）]?|[(（△▲-]?\d{4,}[)）]?|(?<![\d,.])0(?![\d,.])/g;
+// 금액 후보: 쉼표 구분 숫자·일반 숫자(괄호·△·- 음수 포함)
+const AMT_ALL = /[(（△▲-]?\d{1,3}(?:,\d{3})+[)）]?|[(（△▲-]?\d+[)）]?/g;
+const SHORT = /^\d{1,3}$/; // 부호·쉼표 없는 1~3자리
 function toNum(tok) {
   const neg = /^[(（△▲-]/.test(tok) || /[)）]$/.test(tok);
   const v = Number(tok.replace(/[^\d]/g, ''));
@@ -70,7 +71,11 @@ export function parseStatements(lines) {
       const re = new RegExp(hit.split('').map((ch) => ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s*'));
       const m = re.exec(line); if (!m) continue;
       const tailTxt = line.slice(m.index + m[0].length).replace(/([(（△▲-])\s+(?=\d)/g, '$1').replace(/(\d)\s+([)）])/g, '$1$2');
-      const nums = (tailTxt.match(AMT) || []).map(toNum);
+      // 계정명 바로 뒤의 짧은 숫자(코드 01·228 등)는 금액이 아님. 천원·백만원 단위 문서에선 짧은 금액(예: 300)도 금액으로 본다
+      let toks = (tailTxt.match(AMT_ALL) || []).filter((t) => !/^0\d+$/.test(t)); // 01·02처럼 0으로 시작하는 건 코드
+      if (toks.length > 1 && SHORT.test(toks[0])) toks = toks.slice(1);
+      if (unit === 1) toks = toks.filter((t) => !SHORT.test(t) || t === '0');
+      const nums = toks.map(toNum);
       if (!nums.length) continue;
       const loss = (a.lossAlt || []).includes(hit); // '영업손실'처럼 손실 계정명이면 양수도 손실로
       const val = (x) => (loss && x > 0 ? -x : x) * unit;
@@ -96,7 +101,7 @@ export function mergeParsed(draft, parsed) {
       for (let i = K.length - 1; i >= 0; i--) d[K[i]] = i - shift >= 0 ? d[K[i - shift]] : {};
       d.y0 = parsed.year; shift = 0;
     }
-    idx = -shift;
+    idx = shift === 0 ? 0 : -shift;
   } else idx = K.findIndex((k) => !hasData(d[k]));
   if (idx < 0 || idx >= K.length) return { draft: d, slot: -1 };
   d[K[idx]] = { ...d[K[idx]], ...parsed.cur };
