@@ -126,8 +126,8 @@ await q.close();
 // 4) OG·메타
 const o = await newPage(); await o.goto(BASE, { waitUntil: 'networkidle' });
 const og = await o.evaluate(() => Object.fromEntries([...document.querySelectorAll('meta[property^="og:"]')].map((m) => [m.getAttribute('property'), m.content])));
-ok(og['og:url'] === 'https://beconic-diagnosis-ir.netlify.app/' && og['og:image'].startsWith('https://beconic-diagnosis-ir.netlify.app/assets/og-ir-diagnosis-1200x630.jpg') && og['og:image:width'] === '1200', 'OG(카카오) 절대 URL·1200×630');
-const img = await o.request.get(BASE + 'assets/og-ir-diagnosis-1200x630.jpg'); ok(img.ok(), 'OG 이미지 배포본 포함');
+ok(og['og:url'] === 'https://beconic-diagnosis-ir.netlify.app/' && og['og:image'].startsWith('https://beconic-diagnosis-ir.netlify.app/assets/og-ir-banner-1200x630.jpg') && og['og:image:width'] === '1200', 'OG(카카오) 절대 URL·1200×630');
+const img = await o.request.get(BASE + 'assets/og-ir-banner-1200x630.jpg'); ok(img.ok(), 'OG 이미지 배포본 포함');
 ok(await o.evaluate(() => document.fonts.check('700 16px "Pretendard Variable"')), 'Pretendard 로드');
 await o.close();
 

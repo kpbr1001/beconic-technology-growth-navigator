@@ -1,4 +1,5 @@
-// 카카오톡·SNS 미리보기(OG) 이미지를 design/og.html 원본에서 다시 만든다(Pretendard 로드 확인 후 캡처).
+// 예비 OG 이미지(텍스트형)를 design/og.html 원본에서 만든다(Pretendard 로드 확인 후 캡처).
+// 현재 사이트 OG는 대표 제공 배너(assets/og-ir-banner-1200x630.jpg)이며, 이 스크립트는 그 파일을 덮어쓰지 않는다.
 // 실행: npm run images   (Chromium 필요 — CHROME_PATH로 경로 지정 가능)
 import { chromium } from 'playwright';
 import path from 'node:path';
@@ -11,6 +12,6 @@ await page.goto(pathToFileURL(path.join(root, 'design/og.html')).href, { waitUnt
 await page.evaluate(() => document.fonts.ready);
 const ok = await page.evaluate(() => document.fonts.check('800 40px Pretendard') && document.fonts.check('700 20px Pretendard'));
 if (!ok) { console.error('❌ Pretendard 글꼴을 불러오지 못함'); process.exit(1); }
-await page.screenshot({ path: path.join(root, 'assets/og-ir-diagnosis-1200x630.jpg'), type: 'jpeg', quality: 90 });
-console.log('✅ assets/og-ir-diagnosis-1200x630.jpg');
+await page.screenshot({ path: path.join(root, 'design/og-text-1200x630.jpg'), type: 'jpeg', quality: 90 });
+console.log('✅ design/og-text-1200x630.jpg (예비본)');
 await browser.close();

@@ -12,6 +12,7 @@
 보안 헤더: CSP(`script-src 'self'`, 인라인 스크립트 없음), `X-Frame-Options: DENY`, `frame-ancestors 'none'`.
 
 ## 현재 배포 상태 (2026-11-01)
-- 사이트는 GitHub 미연결 상태이며, `ir/` 폴더를 Netlify에 직접 업로드해 Netlify에서 빌드했다(deploy `6ae6a875f8f7dac3556a7729`).
+- Netlify 사이트가 GitHub 저장소와 연결됨(Production branch `main`, Base directory `ir`).
+- PR 머지 전까지는 main에 `ir/`가 없으므로, 저장소 최상위에서 직접 업로드해 배포했다(deploy `6ae6aa421984ed3b8f6504b1`). 업로드도 Base directory `ir` 기준이므로 **반드시 저장소 최상위에서** 실행한다.
 - 수동 업로드에도 보안 헤더가 적용되도록 빌드가 `netlify.toml`의 `[[headers]]`로 `dist/_headers`를 만든다.
-- 이후 변경을 자동 배포하려면 위 1~3단계로 저장소를 연결하고 PR을 main에 머지한다.
+- OG 이미지: 대표 제공 배너 `assets/og-ir-banner-1200x630.jpg?v=101` (결정 기록은 v2-migration.md).
