@@ -2,26 +2,30 @@
 // 문항 1~5점, "모르겠어요"(0)는 1점으로 계산하고 따로 표시한다(투자자 관점에서 확인되지 않은 항목).
 // 영역 점수 = 문항 평균 × 20, 종합 = 단계별(업종 보정) 가중 평균. 자가진단 기반이며 투자 성공을 판단·보장하지 않는다.
 import { CATEGORIES, QUESTIONS, GRADES, STAGES, CMAP, QMAP, LENSES, LENS_VERDICT, EXPECT, EFFORT, N_Q, weightsFor, qByCat,
-  SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS, TECH_INDUSTRIES, FLAG_RULES, FLAG_LIMITS, FIN_LINK } from './model.js';
-import { indicators, balanceCheck, fmtWon, CORE } from './fin.js';
+  SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS, TECH_INDUSTRIES, FLAG_RULES, FLAG_LIMITS, FIN_LINK,
+  ASKS, DATAROOM, FIN_YEARS_GOOD } from './model.js';
+import { indicators, balanceCheck, fmtWon, CORE, SLOTS, normalizeFin, filledYears, yearRows, finStory } from './fin.js';
 
-export const SCORE_VERSION = 'SC-2.1';
+export const SCORE_VERSION = 'SC-2.2';
 export const gradeOf = (s) => GRADES.find((g) => s >= g.min) || GRADES[GRADES.length - 1];
 export const verdictOf = (s) => LENS_VERDICT.find((v) => s >= v.min);
 const r1 = (x) => Math.round(x * 10) / 10;
 const val = (a) => (a && typeof a.v === 'number' ? (a.v === 0 ? UNKNOWN_AS : a.v) : null); // 0 = 모르겠어요 → UNKNOWN_AS점
 
+// 재무: 최근 연도·전년도·전전년도 중 어느 해든 핵심 계정이 하나라도 있으면 반영(1년만 있어도 반영)
 export function finStatus(st) {
-  const f = st.fin || {};
-  const has = !!(f.confirmed && CORE.some((k) => typeof f.cur?.[k] === 'number'));
-  return { has, source: has ? f.source : null, fileName: f.fileName || '' };
+  const f = st.fin ? normalizeFin(st.fin) : {};
+  const has = f.confirmed !== false && SLOTS.some((s) => CORE.some((k) => typeof f[s.k]?.[k] === 'number'));
+  const files = (f.files || []).map((x) => x.name).filter(Boolean);
+  return { has, years: has ? filledYears(f) : 0, source: has ? f.source : null, fileName: files.join(', ') || f.fileName || '' };
 }
 
 // 목표 단계: 바로 다음 단계, 단 2단계 이하는 최소 3단계(문서화·데이터 수준) — 약한 상태 문장을 목표로 내지 않기 위해
 export const targetOf = (v) => Math.min(SCALE_MAX, Math.max((v === 0 ? UNKNOWN_AS : v) + 1, GOAL_FLOOR));
 const goalText = (q, v) => (v === 0 ? `먼저 현황을 확인하고, "${q.opts[targetOf(v) - 1]}" 수준을 목표로 해요` : q.opts[targetOf(v) - 1]);
 
-export function evaluate(st) {
+export function evaluate(st0) {
+  const st = { ...st0, fin: st0.fin ? normalizeFin(st0.fin) : null }; // 앞쪽 빈 해를 당겨 '최근 연도'를 맞춤
   const stage = st.meta?.stage || 'seed'; const industry = st.meta?.industry || '';
   const W = weightsFor(stage, industry); const E = EXPECT[stage] || EXPECT.seed;
   const ans = st.answers || {};
@@ -46,12 +50,13 @@ export function evaluate(st) {
     noEvidenceHigh: QUESTIONS.filter((q) => (ans[q.id]?.v || 0) >= STRONG_MIN && !ans[q.id]?.ev).map((q) => q.id),
     cats, overall, grade: overall === null ? null : gradeOf(overall), fin,
     indicators: fin.has ? indicators(st.fin) : [], balance: fin.has ? balanceCheck(st.fin) : null,
+    years: fin.has ? yearRows(st.fin) : [], finStory: fin.has ? finStory(st.fin) : [],
   };
   res.evidenceRate = res.answered ? Math.round((res.evidence / res.answered) * 100) : 0;
   res.gaps = CATEGORIES.map((c) => cats[c.id]).filter((c) => c.gap !== null && c.gap < 0).sort((a, b) => a.gap - b.gap);
   res.lenses = lenses(st, res); res.flags = redFlags(st, res);
   res.strengths = strengths(st, res); res.weaknesses = weaknesses(st, res);
-  res.analysis = catAnalysis(st, res); res.roadmap = roadmap(st, res); res.checks = crossChecks(st, res); res.summary = summary(st, res);
+  res.analysis = catAnalysis(st, res); res.roadmap = roadmap(st, res); res.checks = crossChecks(st, res); res.dataRoom = dataRoom(st, res); res.asks = asks(st, res); res.summary = summary(st, res);
   return res;
 }
 
@@ -88,8 +93,8 @@ export function redFlags(st, res) {
   if (res.fin.has) {
     if (typeof c.equity === 'number' && c.equity <= 0) add('impair-full', '재무제표상 완전 자본잠식 상태예요(자본총계 0 이하).', null);
     else if (typeof c.equity === 'number' && typeof c.capital === 'number' && c.capital > 0 && c.equity < c.capital) add('impair-part', '재무제표상 부분 자본잠식 상태예요(자본총계 < 자본금).', null);
-    const g = res.indicators.find((x) => x.k === 'growth'); if (g && g.value < 0) add('rev-down', `재무제표상 매출이 전기 대비 ${Math.abs(g.value)}% 줄었어요.`, null);
-    const b = res.indicators.find((x) => x.k === 'burn'); if (b && b.value !== null && b.value < FLAG_LIMITS.cashMonths) add('cash-short', `직전 연도 영업손실 기준으로 현금이 약 ${b.value}개월분이에요(참고 계산).`, null);
+    const g = res.indicators.find((x) => x.k === 'growth'); if (g && g.value < 0) add('rev-down', `재무제표상 최근 연도 매출이 전년도보다 ${Math.abs(g.value)}% 줄었어요.`, null);
+    const b = res.indicators.find((x) => x.k === 'burn'); if (b && b.value !== null && b.value < FLAG_LIMITS.cashMonths) add('cash-short', `최근 연도 영업손실 기준으로 현금이 약 ${b.value}개월분이에요(참고 계산).`, null);
   }
   if (res.unknown.length >= FLAG_LIMITS.unknown) add('unknown', `"잘 모르겠어요"가 ${res.unknown.length}개예요. 투자자 질문에 답하기 어려운 부분이 많아요.`, null);
   if (res.noEvidenceHigh.length >= FLAG_LIMITS.noEvidenceHigh) add('no-evidence', `근거 자료 없이 ${STRONG_MIN}~${SCALE_MAX}점으로 답한 문항이 ${res.noEvidenceHigh.length}개예요. 실사에서 자료로 확인돼야 해요.`, null);
@@ -123,7 +128,7 @@ export function catAnalysis(st, res) {
       diag += worst && val(ans[worst.id]) <= WEAK_MAX ? `가장 먼저 보완할 문항은 ${worst.title}(${ans[worst.id].v === 0 ? '모르겠어요' : `${ans[worst.id].v}점`})이에요.` : `모든 문항이 ${STRONG_MIN}점 이상이에요.`;
     }
     const actions = qs.filter((q) => val(ans[q.id]) <= WEAK_MAX).map((q) => item(st, res, q)).sort((a, b) => b.impact - a.impact);
-    return { c, ...cc, status, diag, actions, docs: actions.map((x) => x.doc) };
+    return { c, ...cc, status, diag, actions, docs: actions.map((x) => x.doc), asks: ASKS[c.id] || [] };
   });
 }
 
@@ -133,7 +138,8 @@ export function roadmap(st, res) {
   const items = QUESTIONS.filter((q) => val(ans[q.id]) !== null && val(ans[q.id]) <= WEAK_MAX).map((q) => item(st, res, q))
     .sort((a, b) => b.impact - a.impact || QUESTIONS.indexOf(a.q) - QUESTIONS.indexOf(b.q));
   const extra = [];
-  if (!res.fin.has) extra.push({ q: null, special: 'fin', action: '홈택스에서 표준재무제표증명을 발급해 업로드하세요(재무 지표·교차 확인이 열려요)', doc: '최근 2개년 표준재무제표증명', effort: 'S' });
+  if (!res.fin.has) extra.push({ q: null, special: 'fin', action: '홈택스에서 표준재무제표증명을 발급해 업로드하세요(재무 지표·교차 확인이 열려요)', doc: '최근 3개년 표준재무제표증명', effort: 'S' });
+  else if (res.fin.years < FIN_YEARS_GOOD) extra.push({ q: null, special: 'fin-years', action: '전년도 표준재무제표증명도 올려 성장 추이를 보여 주세요(1개년만 반영됨)', doc: '전년도·전전년도 표준재무제표증명', effort: 'S' });
   if (res.unknown.length) extra.push({ q: null, special: 'unknown', action: `"잘 모르겠어요"로 답한 ${res.unknown.length}문항(${res.unknown.join(', ')})의 현황부터 확인하세요`, doc: '문항별 현황 메모', effort: 'S' });
   const B = ROADMAP_BUCKETS; const out = Object.fromEntries(B.map((b) => [b.key, []])); out[B[0].key].push(...extra);
   for (const it of items) {
@@ -152,8 +158,8 @@ export function crossChecks(st, res) {
     if ((ans[F]?.v || 0) >= GOAL_FLOOR) out.push({ type: 'info', qid: F, text: '재무제표를 갖고 있다고 답했어요. 업로드하면 재무 지표와 응답 교차 확인이 반영돼요.' });
     return out;
   }
-  if ((ans[R]?.v || 0) >= GOAL_FLOOR && c.rev === 0) out.push({ type: 'warn', qid: R, text: `${T(R)}에서 매출이 있다고 답했지만 재무제표 당기 매출은 0원이에요. 기간이나 응답을 확인해 주세요.` });
-  if (ans[R] && val(ans[R]) < GOAL_FLOOR && c.rev > 0) out.push({ type: 'warn', qid: R, text: `재무제표에 당기 매출 ${fmtWon(c.rev, true)}이 있어요. ${T(R)} 응답을 다시 확인해 주세요.` });
+  if ((ans[R]?.v || 0) >= GOAL_FLOOR && c.rev === 0) out.push({ type: 'warn', qid: R, text: `${T(R)}에서 매출이 있다고 답했지만 재무제표 최근 연도 매출은 0원이에요. 기간이나 응답을 확인해 주세요.` });
+  if (ans[R] && val(ans[R]) < GOAL_FLOOR && c.rev > 0) out.push({ type: 'warn', qid: R, text: `재무제표에 최근 연도 매출 ${fmtWon(c.rev, true)}이 있어요. ${T(R)} 응답을 다시 확인해 주세요.` });
   if ((ans[C]?.v || 0) >= STRONG_MIN && typeof c.equity === 'number' && c.equity <= 0) out.push({ type: 'warn', qid: C, text: `${T(C)}가 잘 되고 있다고 답했지만 재무제표는 완전 자본잠식 상태예요. 투자자가 반드시 묻는 부분이에요.` });
   if (ans[F] && val(ans[F]) < GOAL_FLOOR) out.push({ type: 'info', qid: F, text: `재무제표를 업로드했어요. ${T(F)} 응답을 ${GOAL_FLOOR}점 이상으로 다시 확인해 보세요.` });
   if (res.balance && !res.balance.ok) out.push({ type: 'warn', qid: null, text: `자산총계와 부채+자본 합계가 ${fmtWon(Math.abs(res.balance.diff))} 달라요. 추출값을 확인해 주세요.` });
@@ -168,7 +174,7 @@ export function summary(st, res) {
   lines.push(res.gaps.length ? `${res.stageLabel} 단계 기대 수준에 못 미치는 영역이 ${res.gaps.length}개예요: ${res.gaps.slice(0, TOP_N).map((c) => `${c.name}(${c.gap})`).join(', ')}${res.gaps.length > TOP_N ? ' 외' : ''}.` : `모든 영역이 ${res.stageLabel} 단계 기대 수준을 넘었어요.`);
   if (res.fin.has) {
     const g = (k) => res.indicators.find((x) => x.k === k);
-    const parts = [`당기 매출 ${fmtWon(st.fin.cur.rev, true)}`];
+    const parts = [`${res.fin.years}개년 반영`]; if (typeof st.fin.cur.rev === 'number') parts.push(`최근 연도 매출 ${fmtWon(st.fin.cur.rev, true)}`);
     if (g('growth')) parts.push(`매출 성장률 ${g('growth').value}%`);
     if (g('opm')) parts.push(`영업이익률 ${g('opm').value}%`);
     if (g('debt')) parts.push(g('debt').value === null ? '자본잠식' : `부채비율 ${g('debt').value}%`);
@@ -177,5 +183,22 @@ export function summary(st, res) {
   if (res.flags.length) lines.push(`투자자가 멈칫할 수 있는 경계 신호 ${res.flags.length}개가 있어요. 아래에서 먼저 확인하세요.`);
   if (!res.complete) lines.push(`${N_Q}문항 중 ${res.answered}문항만 답했어요. 남은 문항을 답하면 결과가 정확해져요.`);
   return lines;
+}
+/** 투자 준비 서류 — 연결 문항 응답·근거 체크·재무제표 업로드로 준비 상태 추정(ready 준비됨 / partial 보완 필요 / todo 준비 전) */
+export function dataRoom(st, res) {
+  const ans = st.answers || {};
+  return DATAROOM.map((d) => {
+    let state;
+    if (d.fin) state = res.fin.years >= FIN_YEARS_GOOD ? 'ready' : res.fin.has ? 'partial' : (ans[d.qid]?.v || 0) >= GOAL_FLOOR ? 'partial' : 'todo';
+    else { const v = ans[d.qid]?.v || 0; state = v >= STRONG_MIN && ans[d.qid]?.ev ? 'ready' : v >= GOAL_FLOOR ? 'partial' : 'todo'; }
+    const note = d.fin ? (res.fin.has ? `${res.fin.years}개년 반영` : '미반영') : `${QMAP[d.qid].title} ${ans[d.qid]?.v === 0 ? '모르겠어요' : typeof ans[d.qid]?.v === 'number' ? `${ans[d.qid].v}점` : '미응답'}${ans[d.qid]?.ev ? ' · 근거 있음' : ''}`;
+    return { ...d, state, note };
+  });
+}
+/** 투자자 예상 질문 — 점수가 낮은(기대 미달 우선) 영역부터 */
+export function asks(st, res) {
+  return CATEGORIES.map((c) => res.cats[c.id]).filter((c) => c.score !== null)
+    .sort((a, b) => a.gap - b.gap || a.score - b.score).slice(0, TOP_N)
+    .map((c) => ({ c: CMAP[c.id], score: c.score, gap: c.gap, qs: ASKS[c.id] || [], weak: qByCat(c.id).filter((q) => val(st.answers[q.id]) !== null && val(st.answers[q.id]) <= WEAK_MAX).map((q) => q.title) }));
 }
 export { CMAP, EFFORT, SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS };

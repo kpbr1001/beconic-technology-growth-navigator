@@ -35,25 +35,24 @@ export function radar(cats, { size = 300 } = {}) {
   ${labels}</svg>`;
 }
 
-/** 전기·당기 막대(음수 지원) — items: [{label, prev, cur}] */
-export function finBars(items, { width = 460, height = 220 } = {}) {
-  const vals = items.flatMap((i) => [i.prev, i.cur]).filter((v) => typeof v === 'number');
+/** 연도별 재무 추이 막대(음수 지원) — rows: 오래된 해 → 최근 해 [{label, rev, op, net}] */
+export const TREND_SERIES = [{ k: 'rev', name: '매출액', color: '#3182f6' }, { k: 'op', name: '영업이익', color: '#00a37a' }, { k: 'net', name: '당기순이익', color: '#f0a43a' }];
+export function trend(rows, { width = 520, height = 230 } = {}) {
+  const S = TREND_SERIES; const vals = rows.flatMap((r) => S.map((x) => r[x.k])).filter((v) => typeof v === 'number');
   if (!vals.length) return '';
   const max = Math.max(0, ...vals), min = Math.min(0, ...vals), span = max - min || 1;
-  const top = 18, bottom = 36, ph = height - top - bottom, y0 = top + (max / span) * ph;
-  const gw = (width - 20) / items.length, bw = Math.min(34, gw / 3);
-  const yOf = (v) => top + ((max - v) / span) * ph;
+  const top = 26, bottom = 30, ph = height - top - bottom, yOf = (v) => top + ((max - v) / span) * ph, y0 = yOf(0);
+  const gw = (width - 20) / rows.length, bw = Math.min(30, (gw - 24) / S.length);
   const fmt = (v) => (Math.abs(v) >= 1e8 ? `${(v / 1e8).toFixed(1).replace(/\.0$/, '')}억` : `${Math.round(v / 1e4).toLocaleString('ko-KR')}만`);
-  const bars = items.map((it, i) => {
-    const gx = 10 + gw * i + gw / 2;
-    const one = (v, dx, fill) => { if (typeof v !== 'number') return ''; const y = Math.min(yOf(v), y0), h = Math.max(1, Math.abs(yOf(v) - y0));
-      return `<rect x="${(gx + dx).toFixed(1)}" y="${y.toFixed(1)}" width="${bw}" height="${h.toFixed(1)}" rx="3" fill="${fill}"/><text x="${(gx + dx + bw / 2).toFixed(1)}" y="${(v >= 0 ? y - 4 : y + h + 11).toFixed(1)}" text-anchor="middle" font-size="10" fill="#4e5968">${fmt(v)}</text>`; };
-    return `${one(it.prev, -bw - 2, '#b0c8f0')}${one(it.cur, 2, '#3182f6')}<text x="${gx}" y="${height - 14}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#333d4b">${esc(it.label)}</text>`;
+  const bars = rows.map((r, i) => {
+    const gx = 10 + gw * i + gw / 2 - (bw * S.length + 4 * (S.length - 1)) / 2;
+    return S.map((x, j) => { const v = r[x.k]; if (typeof v !== 'number') return ''; const bx = gx + j * (bw + 4); const y = Math.min(yOf(v), y0), h = Math.max(1, Math.abs(yOf(v) - y0));
+      return `<rect x="${bx.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${x.color}"/><text x="${(bx + bw / 2).toFixed(1)}" y="${(v >= 0 ? y - 4 : y + h + 11).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="#4e5968">${fmt(v)}</text>`; }).join('')
+      + `<text x="${(10 + gw * i + gw / 2).toFixed(1)}" y="${height - 10}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#333d4b">${esc(r.label)}</text>`;
   }).join('');
-  return `<svg class="ch-fin" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="전기 대비 당기 재무 막대 차트">
-  <line x1="6" y1="${y0.toFixed(1)}" x2="${width - 6}" y2="${y0.toFixed(1)}" stroke="#b0b8c1"/>${bars}
-  <rect x="${width - 120}" y="2" width="10" height="10" rx="2" fill="#b0c8f0"/><text x="${width - 106}" y="11" font-size="10.5" fill="#4e5968">전기</text>
-  <rect x="${width - 70}" y="2" width="10" height="10" rx="2" fill="#3182f6"/><text x="${width - 56}" y="11" font-size="10.5" fill="#4e5968">당기</text></svg>`;
+  const legend = S.map((x, j) => `<rect x="${10 + j * 82}" y="4" width="10" height="10" rx="2" fill="${x.color}"/><text x="${24 + j * 82}" y="13" font-size="10.5" fill="#4e5968">${x.name}</text>`).join('');
+  return `<svg class="ch-fin" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="연도별 매출액·영업이익·당기순이익 추이 막대 차트">
+  ${legend}<line x1="6" y1="${y0.toFixed(1)}" x2="${width - 6}" y2="${y0.toFixed(1)}" stroke="#b0b8c1"/>${bars}</svg>`;
 }
 
 /** 점수 점(●●●○○) */

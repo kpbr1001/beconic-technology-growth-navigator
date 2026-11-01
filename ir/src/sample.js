@@ -7,8 +7,9 @@ export function sampleState() {
     CO1: 3, CO2: 3, CO3: 2, CO4: 2, TM1: 4, TM2: 3, TM3: 3, TM4: 3, FN1: 3, FN2: 3, FN3: 4, FN4: 0, IR1: 3, IR2: 2, IR3: 2, IR4: 2 };
   const ev = ['PC1', 'PC2', 'PC4', 'SP1', 'BM1', 'TM1', 'FN1', 'FN3'];
   st.answers = Object.fromEntries(Object.entries(v).map(([k, x]) => [k, { v: x, ev: ev.includes(k) }]));
-  st.fin = { source: 'upload', fileName: '(합성 예시) 표준재무제표증명.pdf', confirmed: true, years: ['2025'],
+  st.fin = { source: 'upload', confirmed: true, y0: '2025', files: [{ name: '(합성 예시) 표준재무제표증명_2023-2025.pdf', type: 'ok', text: '3개년 읽음' }],
     cur: { rev: 120000000, cogs: 48000000, op: -90000000, net: -95000000, assets: 520000000, liab: 210000000, equity: 310000000, capital: 100000000, ca: 400000000, cl: 150000000, cash: 310000000 },
-    prev: { rev: 80000000, cogs: 36000000, op: -110000000, net: -112000000 } };
+    prev: { rev: 80000000, cogs: 36000000, op: -110000000, net: -112000000, assets: 430000000, liab: 160000000, equity: 270000000, capital: 100000000 },
+    pp: { rev: 30000000, cogs: 15000000, op: -70000000, net: -71000000, assets: 260000000, liab: 60000000, equity: 200000000, capital: 100000000 } };
   return st;
 }
