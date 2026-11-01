@@ -1,6 +1,6 @@
 {
   "name": "beconic-ir-diagnosis",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "BECONIC IR 진단 — 제출 자료의 존재·범위·자료 간 일치 확인과 근거 연결 보고서 (브라우저 저장, 서버 전송 없음)",

@@ -137,7 +137,7 @@ function ruleCash(st) {
   const u = cur(st, q); const inputs = { 기준일: F(st, q).asOf || '—', 통화: u };
   if (total < 0n || rs < 0n) out.push(finding('R-CASH-01', q, 'blocked', { inputs, fact: ['음수 금액이 입력되어 가용 현금을 계산하지 않았습니다.'], request: '잔액증명서의 금액과 부호를 확인해 주세요.' }));
   else if (rs > total) out.push(finding('R-CASH-01', q, 'mismatch', { inputs, fact: [`사용 제한 금액 ${fmtUnit(rs, u)}이 총잔액 ${fmtUnit(total, u)}보다 큽니다. 차이의 원인은 확인되지 않았습니다.`], request: '사용 제한 내역과 잔액 자료의 기준일·범위를 확인해 주세요.' }));
-  else out.push(finding('R-CASH-01', q, 'calc', { inputs, calc: `${fmtUnit(total, u)} − ${fmtUnit(rs, u)} = ${fmtUnit(total - rs, u)}`, fact: [`${F(st, q).asOf || '기준일 미입력'} 기준 총잔액 ${fmtUnit(total, u)} 중 사용 제한 금액 ${fmtUnit(rs, u)}을 뺀 가용 현금은 ${fmtUnit(total - rs, u)}입니다.`], unconfirmed: '외부 잔액 확인(은행 조회)은 수행하지 않았습니다.' }));
+  else out.push(finding('R-CASH-01', q, 'calc', { inputs, calc: `${fmtUnit(total, u)} - ${fmtUnit(rs, u)} = ${fmtUnit(total - rs, u)}`, fact: [`${F(st, q).asOf || '기준일 미입력'} 기준 총잔액 ${fmtUnit(total, u)} 중 사용 제한 금액 ${fmtUnit(rs, u)}을 뺀 가용 현금은 ${fmtUnit(total - rs, u)}입니다.`], unconfirmed: '외부 잔액 확인(은행 조회)은 수행하지 않았습니다.' }));
   return out;
 }
 
@@ -150,7 +150,7 @@ function ruleCash2(st) {
   if (!a.asOf || !b.end || a.asOf !== b.end) return [finding('R-CASH-02', 'Q21', 'blocked', { ...o, fact: [`잔액 기준일(${a.asOf || '미입력'})과 현금흐름 종료일(${b.end || '미입력'})이 같지 않아 비교하지 않았습니다.`], request: '같은 날짜 기준의 잔액 자료가 있으면 연결해 주세요.' })];
   const u = cur(st, 'Q21');
   if (total === close) return [finding('R-CASH-02', 'Q21', 'match', { ...o, calc: `${fmtUnit(total, u)} = ${fmtUnit(close, u)}`, fact: [`${a.asOf} 기준 잔액 자료의 총잔액과 현금흐름의 기말 현금이 ${fmtUnit(total, u)}으로 같습니다.`] })];
-  return [finding('R-CASH-02', 'Q21', 'mismatch', { ...o, calc: `${fmtUnit(total, u)} − ${fmtUnit(close, u)} = ${fmtUnit(total - close, u)}`, fact: [`${a.asOf} 기준 잔액 자료의 총잔액은 ${fmtUnit(total, u)}, 현금흐름의 기말 현금은 ${fmtUnit(close, u)}입니다.`, `${fmtUnit(abs(total - close), u)} 차이의 원인은 확인되지 않았습니다.`], request: '두 자료의 현금 범위(현금성자산 포함 여부)와 기준일을 확인해 주세요.' })];
+  return [finding('R-CASH-02', 'Q21', 'mismatch', { ...o, calc: `${fmtUnit(total, u)} - ${fmtUnit(close, u)} = ${fmtUnit(total - close, u)}`, fact: [`${a.asOf} 기준 잔액 자료의 총잔액은 ${fmtUnit(total, u)}, 현금흐름의 기말 현금은 ${fmtUnit(close, u)}입니다.`, `${fmtUnit(abs(total - close), u)} 차이의 원인은 확인되지 않았습니다.`], request: '두 자료의 현금 범위(현금성자산 포함 여부)와 기준일을 확인해 주세요.' })];
 }
 
 function ruleCap(st) {
@@ -192,7 +192,7 @@ function ruleRev(st) {
   if (!a.start || !a.end || a.start !== b.cStart || a.end !== b.cEnd) return [finding('R-REV-01', 'Q07', 'blocked', { ...o, fact: ['매출원장 집계 기간과 재무자료 당기 기간이 같지 않아 비교하지 않았습니다.'] })];
   const u = cur(st, 'Q07');
   if (led === rev) return [finding('R-REV-01', 'Q07', 'match', { ...o, calc: `${fmtUnit(led, u)} = ${fmtUnit(rev, u)}`, fact: [`${a.start}~${a.end} 매출원장 합계와 재무자료 당기 매출이 ${fmtUnit(led, u)}으로 같습니다.`] })];
-  return [finding('R-REV-01', 'Q07', 'mismatch', { ...o, calc: `${fmtUnit(led, u)} − ${fmtUnit(rev, u)} = ${fmtUnit(led - rev, u)}`, fact: [`${a.start}~${a.end} 매출원장 합계는 ${fmtUnit(led, u)}, 재무자료 당기 매출은 ${fmtUnit(rev, u)}입니다.`, `${fmtUnit(abs(led - rev), u)} 차이의 원인은 확인되지 않았습니다.`], request: '매출 정의(부가세·총액/순액)와 자료 기준일을 확인해 주세요.' })];
+  return [finding('R-REV-01', 'Q07', 'mismatch', { ...o, calc: `${fmtUnit(led, u)} - ${fmtUnit(rev, u)} = ${fmtUnit(led - rev, u)}`, fact: [`${a.start}~${a.end} 매출원장 합계는 ${fmtUnit(led, u)}, 재무자료 당기 매출은 ${fmtUnit(rev, u)}입니다.`, `${fmtUnit(abs(led - rev), u)} 차이의 원인은 확인되지 않았습니다.`], request: '매출 정의(부가세·총액/순액)와 자료 기준일을 확인해 주세요.' })];
 }
 
 function ruleGrowth(st) {
@@ -208,7 +208,7 @@ function ruleGrowth(st) {
   if (monthIndex(f.pEnd) >= monthIndex(f.cStart)) return [finding('R-GROW-01', q, 'blocked', { inputs, fact: ['전기 기간이 당기와 겹치거나 뒤에 있어 증감률을 계산하지 않았습니다.'] })];
   const g = growthPct(p, c);
   if (g === null) return [finding('R-GROW-01', q, 'blocked', { inputs, fact: ['전기 매출이 0 이하라 증감률을 계산하지 않았습니다.'] })];
-  return [finding('R-GROW-01', q, 'calc', { inputs, calc: `(${fmtUnit(c, u)} − ${fmtUnit(p, u)}) ÷ ${fmtUnit(p, u)} × 100 = ${g > 0n ? '+' : ''}${fmtNum(g)}%`, fact: [`같은 길이(${lc}개월)의 전기 매출 ${fmtUnit(p, u)}, 당기 매출 ${fmtUnit(c, u)}의 과거 증감률은 ${g > 0n ? '+' : ''}${fmtNum(g)}%입니다. 이 값은 과거 실적 계산이며 사업 전망이 아닙니다.`], unconfirmed: `감사 상태: ${f.audit || '미입력'}` })];
+  return [finding('R-GROW-01', q, 'calc', { inputs, calc: `(${fmtUnit(c, u)} - ${fmtUnit(p, u)}) ÷ ${fmtUnit(p, u)} × 100 = ${g > 0n ? '+' : ''}${fmtNum(g)}%`, fact: [`같은 길이(${lc}개월)의 전기 매출 ${fmtUnit(p, u)}, 당기 매출 ${fmtUnit(c, u)}의 과거 증감률은 ${g > 0n ? '+' : ''}${fmtNum(g)}%입니다. 이 값은 과거 실적 계산이며 사업 전망이 아닙니다.`], unconfirmed: `감사 상태: ${f.audit || '미입력'}` })];
 }
 
 function ruleCust(st) {
@@ -265,7 +265,7 @@ function ruleDeck(st) {
     if (r.unit !== src.unit) { out.push(finding('R-DECK-01', q, 'blocked', { ...base, fact: [`덱 단위(${r.unit})와 원자료 단위(${src.unit})가 달라 비교하지 않았습니다. 통화·단위는 환산하지 않습니다.`] })); return; }
     const sp = normPeriod(src.period);
     if (!dp || !sp || dp !== sp) { out.push(finding('R-DECK-01', q, 'blocked', { ...base, fact: [`덱 기간(${r.period || '미입력'})과 원자료 기간(${src.period || '미입력'})이 같은 형식·범위로 확인되지 않아 비교하지 않았습니다.`], request: '덱 숫자의 기간을 원자료와 같은 형식(예: 2025-01~2025-12)으로 입력해 주세요.' })); return; }
-    const d = deck.v - src.v; const calc = `덱 ${fmtUnit(deck.v, r.unit)} − 원자료 ${fmtUnit(src.v, r.unit)} = ${fmtUnit(d, r.unit)}`;
+    const d = deck.v - src.v; const calc = `덱 ${fmtUnit(deck.v, r.unit)} - 원자료 ${fmtUnit(src.v, r.unit)} = ${fmtUnit(d, r.unit)}`;
     if (d === 0n) { out.push(finding('R-DECK-01', q, 'match', { ...base, calc, fact: [`덱 ${r.page ? r.page + '쪽 ' : ''}"${name}" ${fmtUnit(deck.v, r.unit)}이 같은 기간(${dp}) 원자료와 같습니다.`] })); return; }
     out.push(finding('R-DECK-01', q, 'mismatch', { ...base, calc, fact: [`같은 기간(${dp}) 원자료${src.q ? `(${src.q})` : ''}는 ${fmtUnit(src.v, r.unit)}입니다. 덱 ${r.page ? r.page + '쪽' : ''}에는 ${fmtUnit(deck.v, r.unit)}이 기재되어 있습니다.`, `${fmtUnit(abs(d), r.unit)} 차이의 원인은 확인되지 않았습니다.`], unconfirmed: '차이의 원인', request: '숫자 정의(예: 매출 인식 기준)와 자료 기준일을 확인해 주세요.' }));
   });

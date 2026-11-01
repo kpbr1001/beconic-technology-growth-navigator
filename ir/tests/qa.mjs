@@ -119,7 +119,9 @@ for (const kind of ['brief', 'detail']) for (const mask of ['0', '1']) {
   ok(text.includes('합성 예시') && /IR-20260930-[0-9A-F]{8}/.test(text), `${kind}${mask === '1' ? '(마스킹)' : ''}: 합성 예시 표시·보고서 ID (${pages}쪽)`);
   ok(new RegExp(`1\\s*/\\s*${pages}`).test(text), `${kind}: 쪽 번호 "n / ${pages}"`);
   ok(text.includes('30,000,000원') && ![...text.matchAll(/점수|합격|확률|예측/g)].some((m) => !/아닙|않|없/.test(text.slice(m.index - 40, m.index + 240))), `${kind}: 불일치 금액 포함·금지어 없음`);
-  if (kind === 'brief') ok(pages <= 2, `요약본 2쪽 이하 (${pages}쪽)`);
+  if (kind === 'brief') ok(pages === 1, `요약본 1쪽 (${pages}쪽)`);
+  if (kind === 'detail') ok(pages <= 13, `상세본 13쪽 이하 — 빈 행·빈 쪽 압축 (${pages}쪽)`);
+  const fonts = execFileSync('pdffonts', [f], { encoding: 'utf8' }); ok(!/Type 3/.test(fonts) && /Pretendard/.test(fonts), `${kind}: Pretendard 일반 글꼴 임베딩(Type 3 아님)`);
   if (kind === 'detail') ok(['검토 범위와 방법', '확인 사항과 자료 요청', '용어집', 'SHA-256'].every((s) => text.includes(s)), '상세본 12개 섹션 주요 항목');
   if (mask === '1') ok(!text.includes('엔젤투자자(예시)'), '마스킹: 주주명 비노출');
 }
@@ -144,7 +146,7 @@ const o = await newPage(); await o.goto(BASE, { waitUntil: 'networkidle' });
 const og = await o.evaluate(() => Object.fromEntries([...document.querySelectorAll('meta[property^="og:"]')].map((m) => [m.getAttribute('property'), m.content])));
 ok(og['og:url'] === 'https://beconic-diagnosis-ir.netlify.app/' && og['og:image'].startsWith('https://beconic-diagnosis-ir.netlify.app/assets/og-ir-banner-1200x630.jpg') && og['og:image:width'] === '1200', 'OG(카카오) 절대 URL·1200×630');
 const img = await o.request.get(BASE + 'assets/og-ir-banner-1200x630.jpg'); ok(img.ok(), 'OG 이미지 배포본 포함');
-ok(await o.evaluate(() => document.fonts.check('700 16px "Pretendard Variable"')), 'Pretendard 로드');
+ok(await o.evaluate(() => document.fonts.check('700 16px Pretendard')), 'Pretendard 로드');
 await o.close();
 
 ok(errors.length === 0, `콘솔·페이지 오류 없음${errors.length ? ': ' + errors.join(' | ') : ''}`);
