@@ -97,6 +97,11 @@ export function indicators(fin) {
     const st = c.equity <= 0 ? '완전 자본잠식' : c.equity < c.capital ? '부분 자본잠식' : '자본잠식 없음';
     out.push({ k: 'impair', label: '자본잠식', value: null, text: st, unit: '', band: st === '자본잠식 없음' ? 'good' : 'warn', formula: '자본총계와 자본금 비교', note: '자본총계 < 자본금이면 부분 잠식' });
   }
+  // 참고 계산: 현금 ÷ (직전 연도 영업손실 ÷ 12) — 과거 기준 산술이며 앞으로의 지출 전망이 아님
+  if (has(c, 'cash') && has(c, 'op') && c.op < 0) {
+    const v = Math.round((c.cash / (-c.op / 12)) * 10) / 10;
+    out.push({ k: 'burn', label: '현금 보유 개월 수(참고)', value: v, unit: '개월', band: v >= 12 ? 'good' : v >= 6 ? 'mid' : 'warn', formula: '현금및현금성자산 ÷ (영업손실 ÷ 12)', note: '직전 연도 영업손실 기준 참고 계산이에요. 앞으로의 지출 전망이 아니에요' });
+  }
   return out;
 }
 

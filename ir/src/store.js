@@ -13,6 +13,9 @@ const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
 export function validate(raw) {
   if (!isObj(raw) || raw.app !== 'beconic-ir' || raw.schema !== SCHEMA || !isObj(raw.meta) || !isObj(raw.answers)) return null;
   const st = { ...blank(), ...raw, meta: { ...blank().meta, ...raw.meta } };
+  // v2.0 → v2.1: '기술·지식재산'(SP3)이 기술역량 영역(TC2)으로 이동
+  if (st.answers.SP3 && !st.answers.TC2) st.answers.TC2 = st.answers.SP3;
+  delete st.answers.SP3;
   for (const [k, a] of Object.entries(st.answers)) if (!isObj(a) || !(a.v === undefined || [0, 1, 2, 3, 4, 5].includes(a.v))) delete st.answers[k];
   if (st.fin !== null && !isObj(st.fin)) st.fin = null;
   return st;

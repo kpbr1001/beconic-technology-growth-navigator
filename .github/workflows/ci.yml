@@ -118,7 +118,7 @@ jobs:
           sleep 1
           node grants/tests/qa.mjs http://127.0.0.1:8793/
           node grants/tests/eval-precision.mjs http://127.0.0.1:8793/
-      - name: IR 진단 QA (레이아웃·32문항 흐름·표준재무제표 PDF 업로드·결과·보고서 PDF·OG)
+      - name: IR 진단 QA (레이아웃·36문항 흐름·표준재무제표 PDF 업로드·결과·보고서 PDF·OG)
         run: |
           sudo apt-get install -y poppler-utils
           (cd ir && npm run build)
