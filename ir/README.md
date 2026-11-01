@@ -16,6 +16,7 @@ ir/
 │  ├─ registry.js        # SourceRegistry(S01~S08) · QuestionRegistry(Q01~Q24) · 규칙 목록
 │  ├─ engine.js          # VerificationEngine — 순수 함수, BigInt 정수 계산, 상태 2축, 지금 할 일
 │  ├─ store.js           # 브라우저 저장·검토 파일 검증
+│  ├─ guide.js           # 해석 가이드(GUIDE-1.0) — 확인할 항목·보완 방법·준비 방법·먼저 하면 좋은 일·섹션 정리
 │  ├─ report.js          # Investor Brief · Evidence Review Report (승인 스냅샷 → HTML → 인쇄 PDF)
 │  ├─ sample.js          # 합성 예시(실제 기업 자료 아님)
 │  └─ app.js             # 화면·워크플로우(대표 입력 → 컨설턴트 검토 → 대표 승인 → PDF)

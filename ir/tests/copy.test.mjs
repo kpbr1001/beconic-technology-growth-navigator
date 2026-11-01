@@ -18,7 +18,7 @@ function check(name, text) {
   assert.deepEqual(bad, []);
 }
 test('화면 문구', () => {
-  for (const f of ['index.html', 'src/app.js', 'src/registry.js', 'design/og.html']) check(f, readFileSync(new URL(`../${f}`, import.meta.url), 'utf8'));
+  for (const f of ['index.html', 'src/app.js', 'src/registry.js', 'src/guide.js', 'design/og.html']) check(f, readFileSync(new URL(`../${f}`, import.meta.url), 'utf8'));
 });
 test('생성 보고서(합성 예시, 한/영, 마스킹)', () => {
   const st = sampleState(); const ev = evaluate(st);
