@@ -69,6 +69,8 @@ jobs:
         run: node --test grants/tests/server.test.mjs
       - name: 지원사업 MATCH 공고문 분석 정확도 (검증 세트 1·2·3차 각 60건, 기준 미달 시 실패)
         run: node grants/tests/eval-accuracy.mjs --all --check
+      - name: IR 진단 단위 (검증 엔진·문항/출처 원장·금지 표현·이스케이프)
+        run: node --test ir/tests/*.test.mjs
 
   e2e:
     name: E2E · 사용자 플로우 · PDF QA
@@ -116,6 +118,13 @@ jobs:
           sleep 1
           node grants/tests/qa.mjs http://127.0.0.1:8793/
           node grants/tests/eval-precision.mjs http://127.0.0.1:8793/
+      - name: IR 진단 QA (레이아웃·대표→컨설턴트→승인 플로우·재검토·검토 파일·A4 PDF 2종·OG)
+        run: |
+          sudo apt-get install -y poppler-utils
+          (cd ir && npm run build)
+          (cd ir/dist && python3 -m http.server 8794 --bind 127.0.0.1 >/dev/null 2>&1 &)
+          sleep 1
+          node ir/tests/qa.mjs http://127.0.0.1:8794/
       - name: 검수 결과물 업로드
         if: always()
         uses: actions/upload-artifact@v4
@@ -126,6 +135,7 @@ jobs:
             hr/tests/out/
             growth/tests/out/
             grants/tests/out/
+            ir/tests/out/
           retention-days: 14
 
   db:

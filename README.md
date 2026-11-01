@@ -3,6 +3,7 @@
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 
 - 서비스: https://beconic-diagnosis-tech.netlify.app
+- IR 진단: https://beconic-diagnosis-ir.netlify.app (`ir/`, [ir/README.md](ir/README.md))
 - 회사: 서울시 구로구 디지털로27길 24, 209호 · 070-4103-4177 · start@gven.kr · www.beconic.kr
 
 ## 구조
