@@ -205,8 +205,8 @@ export const QUESTIONS = [
     ] },
 ];
 
-// 08 문서의 순서(Q01~Q24)로 정렬한 사본
-export const Q_ORDER = [...QUESTIONS].sort((a, b) => a.id.localeCompare(b.id));
+// 화면 진행 순서 = 섹션 순서(A→F). 문항 ID 순서(Q05가 B, Q06이 A)로 넘기면 섹션이 오락가락하므로 쓰지 않는다.
+export const Q_ORDER = SECTIONS.flatMap((s) => QUESTIONS.filter((q) => q.sec === s.id));
 export const QMAP = Object.fromEntries(QUESTIONS.map((q) => [q.id, q]));
 export const SMAP = Object.fromEntries(SOURCES.map((s) => [s.id, s]));
 
@@ -229,7 +229,7 @@ export const RULES = {
   'R-RET-01': { v: '1.0', name: '과거 갱신·재구매 비율 계산', desc: '분모가 0보다 크고 분자가 분모 이하일 때만 계산(과거 실적이며 전망 아님)' },
   'R-CAP-01': { v: '1.0', name: '주주별 주식 합계 = 발행주식 총수', desc: '같은 기준일의 주주명부 입력값끼리 합계 확인' },
   'R-GROW-01': { v: '1.0', name: '과거 매출 증감률 계산', desc: '전기·당기 기간 길이(개월)가 같고 전기 매출이 0보다 클 때만 계산' },
-  'R-CASH-01': { v: '1.0', name: '가용 현금 = 총잔액 − 사용 제한 금액', desc: '사용 제한 금액이 총잔액 이하인지 확인' },
+  'R-CASH-01': { v: '1.0', name: '가용 현금 = 총잔액 - 사용 제한 금액', desc: '사용 제한 금액이 총잔액 이하인지 확인' },
   'R-CASH-02': { v: '1.0', name: '잔액 자료 ↔ 현금흐름 기말 현금 대사', desc: '잔액 기준일 = 현금흐름 종료일, 같은 통화일 때만 비교' },
   'R-CF-01': { v: '1.0', name: '기초 + 영업 + 투자 + 재무 (+ 환율효과) = 기말', desc: '현금흐름 3활동 구분 대사' },
   'R-DECK-01': { v: '1.0', name: '덱 숫자 ↔ 원자료 대사', desc: '같은 기간·단위·정의일 때만 비교, 다르면 비교하지 않음' },

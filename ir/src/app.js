@@ -5,7 +5,7 @@ import { blank, load, save, clear, validate, nextEvidenceId, nowIso, today } fro
 import { sampleState } from './sample.js';
 import { renderBrief, renderDetail, esc, fmtDate } from './report.js';
 
-export const APP = { version: 'v1.0.1', updated: '2026-11-01' };
+export const APP = { version: 'v1.1.0', updated: '2026-11-01' };
 const $ = (s, el = document) => el.querySelector(s);
 const root = () => $('#app');
 const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'SGD', 'CNY'];
@@ -53,9 +53,10 @@ const chip = (cls, txt, title) => `<span class="chip ${cls}"${title ? ` title="$
 const dChip = (s) => chip(`d-${s}`, DATA_LABEL[s], DATA_HELP[s]);
 const rChip = (s) => chip(`v-${s}`, REVIEW_LABEL[s]);
 const fChip = (r) => chip(`f-${r}`, RESULT_LABEL[r]);
+const nb = (t) => esc(t).replace(/·/g, '\u2060·\u2060'); // '제품·서비스'가 '·'에서 줄바꿈되지 않게
 
 function headerHtml(inWork) {
-  const roleBtn = inWork && st ? `<button class="role" data-act="role" aria-label="역할 바꾸기">${st.role === 'ceo' ? '대표' : '컨설턴트'}<span>로 보는 중 · 바꾸기</span></button>` : '';
+  const roleBtn = inWork && st ? `<button class="role ${st.role}" data-act="role" aria-label="역할 바꾸기 (지금 ${st.role === 'ceo' ? '대표' : '컨설턴트'} 화면)"><b>${st.role === 'ceo' ? '대표' : '컨설턴트'}</b> 화면<span class="role-x"> · 바꾸기</span> <i aria-hidden="true">⇄</i></button>` : '';
   return `<header class="site"><div class="wrap hd"><a class="brand" href="/" aria-label="BECONIC IR 진단 처음으로"><img src="/assets/shield.png" alt="" width="34" height="34"><span class="txt"><b>BECONIC</b><small>IR 진단 · by Growth Ventures</small></span></a>${roleBtn}</div></header>`;
 }
 function footerHtml() {
@@ -144,6 +145,13 @@ function summaryHtml(ev) {
   <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="제출 진행률"><i style="width:${pct}%"></i></div>
   <small class="muted">업무 진행률이에요(적용 문항 중 제출·검토 건수). 투자 준비도나 사업성 점수가 아니에요.</small></div>`;
 }
+// 진행 단계(입력 → 컨설턴트 검토 → 대표 승인 → PDF). 완료 여부는 실제 기록으로만 판단
+function stepsHtml(ev) {
+  const done = [ev.progress.submitted > 0, ev.progress.reviewed > 0, st.snapshots.length > 0, st.snapshots.length > 0];
+  const cur = done.indexOf(false) === -1 ? 3 : done.indexOf(false);
+  const items = [['답변·자료 입력', '/work/list'], ['컨설턴트 검토', '/work/report'], ['대표 승인', '/work/report'], ['PDF 보고서', '/work/report']];
+  return `<ol class="steps-bar" aria-label="진행 단계">${items.map(([t, h], i) => `<li class="${done[i] ? 'done' : ''} ${i === cur ? 'cur' : ''}"><a href="${h}"><span class="n">${done[i] ? '✓' : i + 1}</span><span class="t">${t}</span></a></li>`).join('')}</ol>`;
+}
 function tabsHtml(cur) {
   const t = [['todo', '지금 할 일'], ['list', '24문항'], ['evidence', '자료함'], ['report', '보고서']];
   return `<nav class="tabs" role="tablist">${t.map(([k, l]) => `<a role="tab" aria-selected="${k === cur}" class="${k === cur ? 'on' : ''}" href="/work/${k}">${l}</a>`).join('')}</nav>`;
@@ -155,7 +163,7 @@ function workHtml(tab) {
   else if (tab === 'list') body = listHtml(ev);
   else if (tab === 'evidence') body = evidenceHtml();
   else body = reportTabHtml(ev);
-  return `${headerHtml(true)}<main class="wrap work">${st.meta.synthetic ? '<div class="syn-band">합성 예시 데이터예요. 실제 기업 자료가 아니에요.</div>' : ''}${summaryHtml(ev)}${tabsHtml(tab)}<div class="tab-body">${body}</div>
+  return `${headerHtml(true)}<main class="wrap work">${st.meta.synthetic ? '<div class="syn-band">합성 예시 데이터예요. 실제 기업 자료가 아니에요.</div>' : ''}${summaryHtml(ev)}${stepsHtml(ev)}${tabsHtml(tab)}<div class="tab-body">${body}</div>
   <div class="tools"><span id="save-ind" aria-live="polite">${lastSaved ? `자동 저장됨 ${lastSaved.toTimeString().slice(0, 5)}` : '이 브라우저에 자동 저장돼요'}</span>
   <button class="link sm" data-act="export">검토 파일 내보내기</button><label class="link sm file">검토 파일 불러오기<input type="file" accept="application/json,.json" data-act="import" hidden></label><button class="link sm danger" data-act="reset">모두 지우기</button></div></main>${footerHtml()}`;
 }
@@ -163,14 +171,25 @@ function workHtml(tab) {
 function todoHtml(ev) {
   // 기한 지남 표시는 오늘 날짜(한국시간)를 입력으로 받는다 — 엔진은 시계를 직접 읽지 않음(결정론)
   if (!ev.todo.length) return '<div class="empty card"><b>지금 확인할 항목이 없어요</b><p>보고서 탭에서 승인하고 PDF를 만들 수 있어요.</p></div>';
-  const groups = TODO_ORDER.map((type) => [type, ev.todo.filter((t) => t.type === type)]).filter(([, l]) => l.length);
-  return `<p class="hint">정해진 순서(차이 → 요청 → 재검토 → 미제출)로 보여 드려요. 위험도 순위가 아니에요.</p>${groups.map(([type, list]) => `<section class="tgroup"><h3>${TODO_LABEL[type]} <span>${list.length}</span></h3>
-  ${list.map((t) => `<a class="trow card" href="/q/${t.qid}"><span class="tq">${t.qid}</span><div><b>${esc(QMAP[t.qid].q)}</b><small>${esc(t.text)}</small></div><span class="arr" aria-hidden="true">›</span></a>`).join('')}</section>`).join('')}`;
+  const order = (qid) => Q_ORDER.findIndex((q) => q.id === qid);
+  const groups = TODO_ORDER.map((type) => [type, ev.todo.filter((t) => t.type === type).sort((x, y) => order(x.qid) - order(y.qid))]).filter(([, l]) => l.length);
+  const first = Q_ORDER.find((q) => ev.byQ[q.id].data === 'none') || Q_ORDER[0];
+  const guide = ev.progress.submitted === 0 ? `<div class="card guide"><h3>처음이시면 이렇게 시작하세요</h3><ol>
+    <li><b>자료함</b>에 IR 덱·매출원장·재무제표·주주명부를 먼저 등록해요. 파일은 업로드되지 않아요.</li>
+    <li><b>24문항</b>을 순서대로 답하고, 숫자는 원자료와 같은 기간으로 입력해요. 모르는 건 "아직 몰라요"로 넘어가도 돼요.</li>
+    <li><b>컨설턴트 검토</b>가 필요하면 보고서 탭에서 검토 파일을 내보내 전달해요.</li>
+    <li><b>대표 승인</b> 후 투자자 요약본·상세본 PDF를 만들어요.</li></ol>
+    <div class="ver-act"><a class="btn primary" href="/q/${first.id}">${first.id}부터 답하기</a><a class="btn ghost" href="/work/evidence">자료 먼저 등록하기</a></div></div>` : '';
+  return `${guide}<p class="hint">정해진 순서(차이 → 요청 → 재검토 → 미제출)로 보여 드려요. 위험도 순위가 아니에요.</p>${groups.map(([type, list]) => `<section class="tgroup"><h3>${TODO_LABEL[type]} <span>${list.length}</span></h3>
+  ${(() => { const row = (t) => `<a class="trow card" href="/q/${t.qid}"><span class="tq">${t.qid}</span><div><b>${nb(QMAP[t.qid].q)}</b><small>${esc(t.text)}</small></div><span class="arr" aria-hidden="true">›</span></a>`;
+    if (type !== 'none' || list.length <= 6) return list.map(row).join('');
+    return `${list.slice(0, 5).map(row).join('')}<details class="more"><summary>나머지 ${list.length - 5}개 보기</summary>${list.slice(5).map(row).join('')}</details>`; })()}</section>`).join('')}`;
 }
 
 function listHtml(ev) {
-  return SECTIONS.map((s) => `<section class="qsec"><h3>${s.id}. ${s.title}</h3>${QUESTIONS.filter((q) => q.sec === s.id).map((q) => { const b = ev.byQ[q.id]; const a = st.answers[q.id] || {};
-    return `<a class="qrow card" href="/q/${q.id}"><span class="tq">${q.id}</span><div><b>${esc(q.q)}</b><span class="chips">${dChip(b.data)}${rChip(b.review)}${a.stale ? chip('stale', '재검토 필요') : ''}</span></div><span class="arr" aria-hidden="true">›</span></a>`; }).join('')}</section>`).join('');
+  return SECTIONS.map((s) => { const qs = QUESTIONS.filter((q) => q.sec === s.id); const n = qs.filter((q) => !['none', 'na_wait'].includes(ev.byQ[q.id].data)).length;
+    return `<section class="qsec"><h3>${s.id}. ${s.title} <small>${n}/${qs.length} 제출</small></h3>${QUESTIONS.filter((q) => q.sec === s.id).map((q) => { const b = ev.byQ[q.id]; const a = st.answers[q.id] || {};
+    return `<a class="qrow card" href="/q/${q.id}"><span class="tq">${q.id}</span><div><b>${nb(q.q)}</b><span class="chips">${dChip(b.data)}${rChip(b.review)}${a.stale ? chip('stale', '재검토 필요') : ''}</span></div><span class="arr" aria-hidden="true">›</span></a>`; }).join('')}</section>`; }).join('');
 }
 
 // ───────────────────────── 자료함
@@ -212,12 +231,19 @@ function hintFor(type, v, cur) {
   if (!p) return ''; if (p.err) return `<span class="bad">${esc(p.err)}</span>`;
   return `= ${esc(type === 'count' ? fmtUnit(p.v, '') .trim() : type === 'money' ? fmtUnit(p.v, cur || st.meta.currency) : fmtUnit(p.v, ''))}`;
 }
+const DECK_SRC = { '매출(Q07 원장)': ['Q07', 'ledger', 'start', 'end'], '고객 수(Q09)': ['Q09', 'total', 'asOf'], '현금 잔액(Q21)': ['Q21', 'total', 'asOf'] };
+function deckSrcInfo(metric) {
+  const m = DECK_SRC[metric]; if (!m) return '';
+  const f = (st.answers[m[0]] || {}).fields || {}; const per = m[3] ? (f[m[2]] && f[m[3]] ? `${f[m[2]]}~${f[m[3]]}` : '') : f[m[2]] || '';
+  return f[m[1]] ? `<p class="src-info">비교할 원자료: <a href="/q/${m[0]}">${m[0]}</a> ${esc(f[m[1]])}${per ? ` · ${esc(per)}` : ' · 기간 미입력'} — 덱 기간을 이 형식으로 적어 주세요.</p>`
+    : `<p class="src-info warn">비교할 원자료(<a href="/q/${m[0]}">${m[0]}</a>)가 아직 비어 있어요. 먼저 입력해야 비교할 수 있어요.</p>`;
+}
 function rowsInput(q, f, a, ro) {
   const rows = (a.fields || {})[f.k] || [];
   return `<fieldset class="rows"><legend>${esc(f.label)}</legend>${rows.map((r, i) => `<div class="row-card"><div class="row-h"><b>${i + 1}</b>${ro ? '' : `<button class="link sm danger" data-act="row-del" data-q="${q.id}" data-k="${f.k}" data-i="${i}" aria-label="${i + 1}번째 행 삭제">삭제</button>`}</div><div class="row-g">
-  ${f.cols.map((c) => { const id = `r-${q.id}-${f.k}-${i}-${c.k}`; const attrs = `id="${id}" data-q="${q.id}" data-k="${f.k}" data-i="${i}" data-c="${c.k}" ${ro ? 'disabled' : ''}`;
+  ${f.cols.filter((c) => !['src', 'srcPeriod'].includes(c.k) || r.metric === '기타(직접 입력)').map((c) => { const id = `r-${q.id}-${f.k}-${i}-${c.k}`; const attrs = `id="${id}" data-q="${q.id}" data-k="${f.k}" data-i="${i}" data-c="${c.k}" ${ro ? 'disabled' : ''}`;
     if (c.type === 'select') return `<label for="${id}">${esc(c.label)}<select ${attrs}><option value="">선택</option>${c.options.map((o) => `<option ${o === r[c.k] ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></label>`;
-    return `<label for="${id}">${esc(c.label)}<input ${attrs} ${['money', 'count', 'num'].includes(c.type) ? 'inputmode="decimal"' : ''} value="${esc(r[c.k] ?? '')}" maxlength="120"></label>`; }).join('')}</div></div>`).join('')}
+    return `<label for="${id}">${esc(c.label)}<input ${attrs} ${['money', 'count', 'num'].includes(c.type) ? 'inputmode="decimal"' : ''} value="${esc(r[c.k] ?? '')}" maxlength="120"></label>`; }).join('')}</div>${q.id === 'Q23' ? deckSrcInfo(r.metric) : ''}</div>`).join('')}
   ${ro ? '' : `<button class="btn ghost sm" data-act="row-add" data-q="${q.id}" data-k="${f.k}">+ 행 추가</button>`}</fieldset>`;
 }
 function liveHtml(qid) {
@@ -233,12 +259,13 @@ function questionHtml(qid) {
   const idx = Q_ORDER.findIndex((x) => x.id === qid); const prev = Q_ORDER[idx - 1]; const next = Q_ORDER[idx + 1];
   const sec = SECTIONS.find((x) => x.id === q.sec); const live = liveHtml(qid);
   const modes = [['answer', '답변하기'], ['request', '담당자에게 요청'], ['unknown', '아직 몰라요'], ['na', '해당 없음']];
+  const pos = `${idx + 1} / ${Q_ORDER.length}`; const pct = Math.round(((idx + 1) / Q_ORDER.length) * 100);
   const evOpts = st.evidence.map((e) => `<option value="${esc(e.id)}">${esc(e.id)} ${esc(e.name)}</option>`).join('');
   let body = '';
   if (s === 'answer') {
     body = `<label for="t-${qid}">답변 <i>(대표 진술)</i><textarea id="t-${qid}" data-q="${qid}" data-k="__text" rows="3" maxlength="2000" ${ro ? 'disabled' : ''} placeholder="자료에 적힌 표현 그대로 쓰면 대조가 쉬워요">${esc(a.text || '')}</textarea></label>
     ${(q.fields || []).length ? `<div class="fields">${q.fields.map((f) => fieldInput(q, f, a, ro)).join('')}</div>` : ''}
-    <div class="links"><h4>연결한 자료</h4>${(a.links || []).map((l, i) => { const e = st.evidence.find((x) => x.id === l.eid); return `<div class="lk"><span class="tq">${esc(l.eid)}</span><div><b>${esc(e ? e.name : '삭제된 자료')}</b><label class="inl">문서 내 위치<input data-q="${qid}" data-link="${i}" value="${esc(l.loc || '')}" placeholder="예: 11쪽, 합계 시트 B42" maxlength="80" ${ro ? 'disabled' : ''}></label></div>${ro ? '' : `<button class="link sm danger" data-act="link-del" data-q="${qid}" data-i="${i}">해제</button>`}</div>`; }).join('') || '<p class="hint">아직 연결한 자료가 없어요. 자료와 문서 내 위치를 남기면 "원문 연결 확인" 상태가 돼요.</p>'}
+    <div class="links"><h4>연결한 자료</h4>${(a.links || []).map((l, i) => { const e = st.evidence.find((x) => x.id === l.eid); return `<div class="lk"><span class="tq">${esc(l.eid)}</span><div><b>${esc(e ? e.name : '삭제된 자료')}</b><label class="inl">문서 내 위치<input class="${(l.loc || '').trim() ? '' : 'need'}" data-q="${qid}" data-link="${i}" value="${esc(l.loc || '')}" placeholder="예: 11쪽, 합계 시트 B42" maxlength="80" ${ro ? 'disabled' : ''}></label>${(l.loc || '').trim() ? '' : '<small class="need-t">위치를 적어야 "원문 연결 확인"이 돼요</small>'}</div>${ro ? '' : `<button class="link sm danger" data-act="link-del" data-q="${qid}" data-i="${i}">해제</button>`}</div>`; }).join('') || '<p class="hint">아직 연결한 자료가 없어요. 자료와 문서 내 위치를 남기면 "원문 연결 확인" 상태가 돼요.</p>'}
     ${ro ? '' : `<div class="lk-add">${st.evidence.length ? `<select id="link-sel" aria-label="연결할 자료"><option value="">자료함에서 고르기</option>${evOpts}</select><button class="btn ghost sm" data-act="link-add" data-q="${qid}">연결</button>` : ''}
       <details class="newev"${(draftNew.q && (draftNew.q.name || draftNew.q.sha256)) ? ' open' : ''}><summary>새 자료 등록하고 연결</summary>${evidenceForm('q')}<button class="btn ghost sm" data-act="ev-add" data-scope="q" data-q="${qid}">등록하고 연결</button></details></div>`}</div>`;
   } else if (s === 'request') {
@@ -259,31 +286,40 @@ function questionHtml(qid) {
     <hr><fieldset class="scope"><legend>검토 범위</legend>${['원문 대조', '수치 재계산', '서류 존재 확인'].map((x) => `<label class="chk"><input type="checkbox" name="scope" value="${x}"> ${x}</label>`).join('')}</fieldset><button class="btn primary sm" data-act="reviewed" data-q="${qid}">검토 완료로 표시</button>
     ${s === 'na' && !a.naApproved ? `<hr><button class="btn primary sm" data-act="na-approve" data-q="${qid}" ${(a.naReason || '').trim() ? '' : 'disabled'}>적용 제외 승인</button>` : ''}</div>`
     : (a.review === 'asked' ? `<div class="card rv ask"><h3>컨설턴트 확인 요청</h3><p>${esc(a.askNote || '')}</p><label>답변 메모<input id="author-note" maxlength="300" placeholder="무엇을 확인·보완했는지"></label><button class="btn primary sm" data-act="author" data-q="${qid}">확인했어요</button></div>` : '');
-  return `${headerHtml(true)}<main class="wrap narrow qpage"><a class="back" href="/work/list">← 24문항</a>
+  return `${headerHtml(true)}<main class="wrap narrow qpage"><div class="q-nav"><a class="back" href="/work/list">← 24문항</a><span class="q-pos">${pos}</span></div>
+  <div class="q-prog" aria-hidden="true"><i style="width:${pct}%"></i></div>
   ${st.meta.synthetic ? '<div class="syn-band">합성 예시 데이터예요.</div>' : ''}
-  <p class="q-meta">${q.id} · ${esc(sec.title)}${q.plan ? ' · 경영진 제출 계획' : ''}</p><h1 class="q-t">${esc(q.q)}</h1><div class="chips" id="q-chips">${live.chips}</div>
-  <details class="acc" open><summary>왜 묻나요?</summary><p>${esc(q.why)}</p><ul class="srcs-q">${q.src.map(([sid, loc]) => `<li><a href="${esc(SMAP[sid].url)}" target="_blank" rel="noopener">${sid} ${esc(SMAP[sid].title)}</a> — ${esc(loc)}<br><small>${esc(SMAP[sid].limit)}</small></li>`).join('')}</ul></details>
-  <details class="acc"><summary>어떤 자료인가요?</summary><p>${q.ex.map(esc).join(' · ')}</p><p class="sm"><b>앱의 확인 방법</b> ${esc(q.check)}</p>${q.expert ? `<p class="sm">${esc(q.expert)} 분야 전문가 검토가 필요한 항목이에요. 이 앱은 자료 존재·범위만 확인해요.</p>` : ''}</details>
-  <details class="acc"><summary>자료가 없어요</summary><p>괜찮아요. 담당자가 있으면 "담당자에게 요청", 아직 모르면 "아직 몰라요"를 고르세요. 미제출도 보고서에 그대로 표시돼요. 해당 사업을 하지 않으면 "해당 없음"과 이유를 남겨 주세요.</p></details>
+  <p class="q-meta">${q.id} · ${sec.id}. ${esc(sec.title)}${q.plan ? ' · 경영진 제출 계획' : ''}</p><h1 class="q-t">${nb(q.q)}</h1><div class="chips" id="q-chips">${live.chips}</div>
+  <div class="q-info"><p class="q-why">${esc(q.why)}</p><p class="q-need"><b>필요한 자료</b> ${q.ex.map((x) => `<span>${esc(x)}</span>`).join('')}</p></div>
+  <details class="acc"><summary>질문 근거와 확인 방법</summary><ul class="srcs-q">${q.src.map(([sid, loc]) => `<li><a href="${esc(SMAP[sid].url)}" target="_blank" rel="noopener">${sid} ${esc(SMAP[sid].title)}</a> — ${esc(loc)}<br><small>${esc(SMAP[sid].limit)}</small></li>`).join('')}</ul><p class="sm"><b>앱의 확인 방법</b> ${esc(q.check)}</p>${q.expert ? `<p class="sm">${esc(q.expert)} 분야 전문가 검토가 필요한 항목이에요. 이 앱은 자료 존재·범위만 확인해요.</p>` : ''}<p class="sm muted">출처는 질문 주제의 근거이며, 해당 기관이 이 질문을 승인한 것은 아니에요.</p></details>
   <div class="card ans"><div class="seg" role="radiogroup" aria-label="답하는 방법">${modes.map(([k, l]) => `<button role="radio" aria-checked="${k === s}" class="${k === s ? 'on' : ''}" data-act="mode" data-q="${qid}" data-m="${k}" ${ro ? 'disabled' : ''}>${l}</button>`).join('')}</div>
-  ${ro ? '<p class="hint">컨설턴트 화면에서는 답변을 읽기만 할 수 있어요.</p>' : ''}${body}</div>
+  ${ro ? '<p class="hint">컨설턴트 화면에서는 답변을 읽기만 할 수 있어요.</p>' : ''}${s === 'answer' && !ro ? '<p class="hint">자료가 없으면 "담당자에게 요청"이나 "아직 몰라요"를 골라도 돼요. 미제출도 보고서에 그대로 표시돼요.</p>' : ''}${body}</div>
   <div id="live-calc" class="live">${live.calc}</div>
   ${a.stale ? `<div class="card stale-box"><b>재검토 필요</b><p>${esc(a.staleNote || '')}</p></div>` : ''}
   ${sugg ? `<div class="card"><h3>수정 제안</h3>${sugg}</div>` : ''}${reviewPanel}
   <details class="acc"><summary>수정 기록 (${(a.history || []).length})</summary>${(a.history || []).slice().reverse().map((h) => `<div class="sm">${esc(fmtDate(h.at))} · ${esc(h.by)} · ${esc(h.what)}</div>`).join('') || '<p class="sm">기록 없음</p>'}</details>
-  </main><div class="bottom-bar"><div class="wrap bb">${prev ? `<a class="btn ghost" href="/q/${prev.id}">‹ ${prev.id}</a>` : '<span></span>'}<span id="save-ind" class="sm muted" aria-live="polite">${lastSaved ? `자동 저장됨 ${lastSaved.toTimeString().slice(0, 5)}` : ''}</span>${next ? `<a class="btn primary" href="/q/${next.id}">다음 · ${next.id} ›</a>` : '<a class="btn primary" href="/work/report">보고서로 ›</a>'}</div></div>`;
+  </main><div class="bottom-bar"><div class="wrap bb">${prev ? `<a class="btn ghost" href="/q/${prev.id}">‹ ${prev.id}</a>` : '<span></span>'}<span id="save-ind" class="sm muted" aria-live="polite">${lastSaved ? `저장됨 ${lastSaved.toTimeString().slice(0, 5)}` : pos}</span>${next ? `<a class="btn primary" href="/q/${next.id}">다음 · ${next.id} ›</a>` : '<a class="btn primary" href="/work/report">보고서로 ›</a>'}</div></div>`;
 }
 
 // ───────────────────────── 보고서 탭
+let reportOpts = { lang: 'ko', mask: '0' };
+function consultCard() {
+  if (st.role === 'ceo') return `<div class="card consult-c"><h3>컨설턴트 검토 받기 <i>(선택)</i></h3><ol class="mini">
+    <li>아래 <b>검토 파일 내보내기</b>로 파일(.json)을 받아요. 증빙 원본 파일은 들어 있지 않아요.</li>
+    <li>메일·카카오톡으로 컨설턴트에게 보내요.</li><li>컨설턴트가 확인 요청·수정 제안을 남긴 파일을 돌려주면 <b>불러오기</b>로 열어요.</li></ol>
+    <div class="ver-act"><button class="btn ghost sm" data-act="export">검토 파일 내보내기</button><label class="btn ghost sm file">돌려받은 파일 불러오기<input type="file" accept="application/json,.json" data-act="import" hidden></label><a class="btn ghost sm" href="mailto:start@gven.kr?subject=IR 진단 검토 요청">그로스벤처스에 검토 요청</a></div></div>`;
+  return `<div class="card consult-c"><h3>검토 마치고 대표에게 돌려보내기</h3><p class="hint">문항별로 확인 요청·수정 제안·검토 완료를 남긴 뒤 파일로 내보내 대표에게 전달해요.</p><button class="btn primary sm" data-act="export">검토 파일 내보내기</button></div>`;
+}
 function reportTabHtml(ev) {
   const unresolved = QUESTIONS.filter((q) => ['none', 'mismatch', 'na_wait'].includes(ev.byQ[q.id].data) || ev.byQ[q.id].review === 'asked');
   const last = st.snapshots[st.snapshots.length - 1];
   const vers = st.snapshots.slice().reverse().map((s) => `<div class="card ver"><div class="ver-h"><b>v${s.version}</b><span>${esc(s.reportId)}</span></div><small>${esc(s.approvedBy)} 승인 · ${esc(fmtDate(s.approvedAt))}</small><p class="mono sm">SHA-256 ${esc(s.hash)}</p>
     <div class="ver-act"><button class="btn primary sm" data-act="print" data-kind="brief" data-v="${s.version}">투자자 요약본 PDF</button><button class="btn ghost sm" data-act="print" data-kind="detail" data-v="${s.version}">근거 검토 상세본 PDF</button></div></div>`).join('');
-  return `<div class="card"><h3>보고서 옵션</h3><div class="grid2"><label>언어<select id="rp-lang"><option value="ko">한국어</option><option value="en">English (용어만 영문, 서술은 한국어 원문)</option></select></label>
-  <label>공유 범위<select id="rp-mask"><option value="0">내부 검토용(마스킹 없음)</option><option value="1">투자자 공유용(주주명·담당자명 마스킹)</option></select></label></div>
-  <p class="hint">PDF는 브라우저 인쇄 창에서 "PDF로 저장"을 골라 만들어요. 파일은 대표님 기기에만 저장되고, 외부로 보내지 않아요.</p></div>
-  <div class="card"><h3>승인 전 미리보기</h3><p class="hint">현재 입력으로 만든 초안이에요. "승인 전 초안" 표시가 붙어요.</p><div class="ver-act"><button class="btn ghost sm" data-act="print" data-kind="brief" data-v="draft">요약본 초안</button><button class="btn ghost sm" data-act="print" data-kind="detail" data-v="draft">상세본 초안</button></div></div>
+  const opt = (id, v, t) => `<option value="${v}" ${reportOpts[id] === v ? 'selected' : ''}>${t}</option>`;
+  return `${consultCard()}<div class="card"><h3>PDF 옵션</h3><div class="grid2"><label>언어<select id="rp-lang" data-ropt="lang">${opt('lang', 'ko', '한국어')}${opt('lang', 'en', 'English (용어만 영문, 서술은 한국어 원문)')}</select></label>
+  <label>공유 범위<select id="rp-mask" data-ropt="mask">${opt('mask', '0', '내부 검토용(마스킹 없음)')}${opt('mask', '1', '투자자 공유용(주주명·담당자명 마스킹)')}</select></label></div>
+  <p class="hint">버튼을 누르면 인쇄 창이 열려요. 대상에서 <b>"PDF로 저장"</b>을 고르세요(용지 A4, 배율 기본값, "배경 그래픽" 켜기 권장). 파일은 대표님 기기에만 저장돼요.</p>
+  <div class="ver-act"><button class="btn ghost sm" data-act="print" data-kind="brief" data-v="draft">요약본 초안 보기</button><button class="btn ghost sm" data-act="print" data-kind="detail" data-v="draft">상세본 초안 보기</button></div><p class="hint">초안에는 "승인 전 초안" 표시가 붙어요. 투자자에게는 승인본을 보내세요.</p></div>
   <div class="card approve"><h3>대표 승인하고 보고서 고정</h3>
   <p>미해결 항목 <b>${unresolved.length}건</b>${unresolved.length ? ` (${unresolved.map((q) => q.id).join(', ')})` : ''}은 숨기지 않고 보고서에 그대로 표시돼요.</p>
   ${last ? `<p class="hint">최근 승인본 v${last.version} 이후 변경된 문항: ${QUESTIONS.filter((q) => (st.answers[q.id] || {}).stale).map((q) => q.id).join(', ') || '없음'}</p>` : ''}
@@ -312,7 +348,7 @@ export function printReport(snap, kind, opts) {
   const pr = $('#print-root');
   const html = kind === 'brief' ? renderBrief(snap, opts) : renderDetail(snap, opts);
   const label = `${snap.reportId} v${snap.version}${snap.draft ? ' 초안' : ''} · 대외비`;
-  pr.innerHTML = `<style>@page{@bottom-left{content:"${label.replace(/"/g, '')}";font-size:8pt;color:#6b7684;font-family:'Pretendard Variable','Pretendard',sans-serif}@bottom-right{content:counter(page) " / " counter(pages);font-size:8pt;color:#6b7684;font-family:'Pretendard Variable','Pretendard',sans-serif}}</style>${html}`;
+  pr.innerHTML = `<style>@page{@bottom-left{content:"${label.replace(/"/g, '')}";font-size:8pt;color:#6b7684;font-family:'Pretendard',sans-serif}@bottom-right{content:counter(page) " / " counter(pages);font-size:8pt;color:#6b7684;font-family:'Pretendard',sans-serif}}</style>${html}`;
   const safe = (st.meta.company || 'company').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40);
   const prevTitle = document.title;
   document.title = `BECONIC_IR_${kind === 'brief' ? 'Investor_Brief' : 'Evidence_Review'}_${safe}_v${snap.version}${snap.draft ? '_DRAFT' : ''}`;
@@ -332,7 +368,7 @@ function render() {
   else if (r0 === 'work') html = workHtml(['todo', 'list', 'evidence', 'report'].includes(r1) ? r1 : 'todo');
   else if (r0 === 'q') html = questionHtml(r1) || workHtml('list');
   else html = homeHtml();
-  root().innerHTML = html;
+  root().innerHTML = html.replace(/(<label[^>]*>)([^<]+)<i>([^<]*)<\/i>/g, '$1<span>$2<i>$3</i></span>');
   document.body.dataset.route = r0 || 'home';
 }
 
@@ -363,9 +399,16 @@ document.addEventListener('change', async (e) => {
   if (el.dataset.act === 'ev-file' && el.files[0]) { const d = (draftNew[el.dataset.scope] ||= {}); Object.assign(d, await hashFile(el.files[0])); if (!d.name) d.name = el.files[0].name; render(); return; }
   if (el.dataset.act === 'ev-replace' && el.files[0]) { await replaceEvidence(el.dataset.eid, el.files[0]); return; }
   if (el.dataset.act === 'import' && el.files[0]) { await importFile(el.files[0]); return; }
+  if (el.dataset.ropt) { reportOpts[el.dataset.ropt] = el.value; return; }
   const qid = el.dataset.q; if (!qid || !st || st.role !== 'ceo') return;
   const lab = el.dataset.c ? `${QMAP[qid].fields.find((f) => f.k === el.dataset.k)?.label} ${Number(el.dataset.i) + 1}행` : el.dataset.link !== undefined ? '자료 위치' : el.dataset.k === '__text' ? '답변' : (fieldOf(qid, el.dataset.k)?.label || el.dataset.k?.replace('__', ''));
   touched(qid, `${lab} 수정`); commit(true);
+  if (el.dataset.c === 'metric') { render(); return; }
+  // 위치 입력칸은 다시 그리지 않고 표시만 바꾼다(다시 그리면 바로 이어진 버튼 클릭이 사라짐)
+  if (el.dataset.link !== undefined) {
+    const has = !!el.value.trim(); el.classList.toggle('need', !has);
+    const t = el.closest('label')?.nextElementSibling; if (t && t.classList.contains('need-t')) t.hidden = has;
+  }
   const live = liveHtml(qid); const c = $('#q-chips'); if (c) c.innerHTML = live.chips;
 });
 
@@ -440,7 +483,7 @@ document.addEventListener('click', async (e) => {
       const snap = await makeSnapshot(); st.snapshots.push(snap); commit(true); render(); toast(`v${snap.version}을 고정했어요. 이제 PDF를 만들 수 있어요.`); break;
     }
     case 'print': {
-      const opts = { lang: $('#rp-lang')?.value || 'ko', mask: $('#rp-mask')?.value === '1' };
+      const opts = { lang: reportOpts.lang, mask: reportOpts.mask === '1' };
       const snap = b.dataset.v === 'draft' ? draftSnapshot() : st.snapshots.find((s) => String(s.version) === b.dataset.v);
       if (snap) printReport(snap, b.dataset.kind, opts); break;
     }
