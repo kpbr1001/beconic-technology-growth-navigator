@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.26.1',
+  version: 'v3.27.0',
   updated: '2026-11-01',
   changelog: [
+    { v:'v3.27.0', d:'2026-11-01', note:'정밀도 개선(상위 10건 42.3% → 51.3%): 예비창업자에게 소상공인 사업·자금만 원하면 행사·교육·투자 연계·유공자 포상 낮춤, 공고명 (법인/개인사업자) 판정, 출산·양육 대상 확인 필요, 업력 8년 이상은 창업 사업 확인 필요, 농식품 사업은 음식점·도소매와 거리, 넷제로·혁신제품·소프트웨어 분야 한정. 결과 링크(조건을 주소에 담아 같은 매칭 다시 열기·링크 복사), 이용 측정(이벤트 이름·건수만), 카카오 챗봇 줄임말 검색(예창패·청창사·소진공 등)' },
     { v:'v3.26.1', d:'2026-11-01', note:'상담 전화번호 변경: 070-4103-4177 → 02-6124-5960(상담 안내·신청 도움받기·인쇄 머리말·푸터·카카오 챗봇 상담 카드·전화 버튼)' },
     { v:'v3.26.0', d:'2026-10-30', note:'공장·설비 투자 자금(에너지이용합리화·산업재해예방시설·구조고도화·오염방지시설·시설자금 등)은 제조·에너지·바이오 등 업종일 때만 추천, 매장형 소상인·서비스업은 확인 필요로(유통·점포 시설자금은 제외). 녹색채권·SW 지식재산(IP) 평가보증도 분야 한정. 결과 첫 화면 최대액은 예비창업자·소상인·소공인이면 10억 초과 한도를 빼고 표시(음식점 소상인에게 최대 300억 표시되던 문제)' },
     { v:'v3.25.0', d:'2026-10-30', note:'모바일 체감 개선: 글꼴을 쓰는 글자만 받는 방식으로(첫 화면 글꼴 약 4.7MB → 수백 KB), 휴대폰 뒤로가기 = 이전 화면·단계·창 닫기(앱 밖으로 나가지 않음), 카카오톡 등 앱 안 브라우저에서는 PDF 저장 대신 결과 요약 복사. 결과 첫 화면은 사업별 최대액을 더한 합계 대신 추천 건수와 1건 기준 최대액. 공고 수를 차수 묶음 기준으로 통일. 안드로이드 홈 화면 아이콘(512·maskable) 추가·아이콘 경로 오류 수정' },
@@ -264,10 +265,19 @@ const FLAGSHIP = {
 };
 /* 대표 사업 이름이 들어간 부대 행사(설명회·아카데미·특강 등) — 본 공고로 보지 않음 */
 const SIDE_EVENT = /설명회|아카데미|교육생|특강|캠프|IR\s*전략|워크숍/;
+/* 행사·교육·참가자 모집 성격 공고 — 자금(운영·사업화·투자·R&D·바우처)만 원하는 기업에는 관련성이 낮다 */
+const STARTUP_PROGRAM = /(?<!재)창업(?!\s*(?:도시|진흥원|지원센터|보육센터|경제))|스타트업|딥테크\s*스튜디오/;
+/* 지원사업이 아닌 공고(유공자 포상·시상 신청) — 필요한 지원과 상관없이 아래로 */
+const NOT_SUPPORT = /유공자|포상\s*(?:신청|계획|공고)|시상식/;
+const EVENT_LIKE = /포럼|설명회|세미나|워크숍|박람회|전시회|참가\s*신청|참가자|참여자\s*모집|수강생|교육생|교육\s*프로그램|(?:과정|교육)\s*(?:참여|모집)|아카데미|캠프|특강|공모전|경진대회|판매\s*사이트/;
+const MONEY_NEEDS = ['fund','grant','invest','rnd','voucher'];
+/* 지분 투자 연계(TIPS·LIPS·투자유치) — 융자·보조금을 원하는 기업에는 다른 성격(크라우드펀딩은 판로·자금 성격이라 제외) */
+const INVEST_LINK = /투자\s*연계|투[ㆍ·]?\s*융자\s*연계|투자\s*유치|TIPS|팁스|립스|LIPS|엔젤/;
 /* 대상과 성격이 다른 공고(공고명 기준) — 자격에 걸리지 않아도 관련성이 낮아 아래로 */
 const MISFIT = {
-  '예비창업자':/융자|대출|특례보증|이차보전|스마트공장|수출바우처|채용|고용장려|딥테크|출연\(연\)/,
-  '소상인':/국제공동|국제협력|딥테크|연구개발|기술개발|R&D|실증|반도체|바이오|양자|우주|스마트공장|TIPS|팁스|IP투자|핀테크|방송영상|MWC|CES|출연\(연\)|수출|중견/,
+  // 예비창업자: '소상공인' 대상 사업은 사업자등록 후 대상(예비·창업·재창업을 함께 뽑는 공고는 제외)
+  '예비창업자':/융자|대출|특례보증|이차보전|스마트공장|수출바우처|채용|고용장려|딥테크|출연\(연\)|^(?!.*(?:예비|창업|희망리턴)).*소상공인/,
+  '소상인':/국제공동|국제협력|딥테크|연구개발|기술개발|R&D|실증|반도체|바이오|양자|우주|스마트공장|TIPS|팁스|IP투자|핀테크|방송영상|MWC|CES|출연\(연\)|수출|중견|중소기업\s*정책자금/,   // 소상공인은 소상공인 정책자금 대상(중진공 정책자금은 중소기업)
   '소공인':/국제공동|국제협력|딥테크|양자|우주|반도체|핀테크|방송영상|MWC|CES/
 };
 
@@ -309,18 +319,20 @@ const SECTOR_ONLY = [
   {label:'핀테크·금융', re:/핀테크|금융\s*테스트베드|마이데이터/, ok:c=>INDUSTRIES.find(i=>i.v===c.industry)?.group==='ICT·SW'},
   {label:'방산', re:/방산|국방|방위산업/, ok:c=>['제조·소재','신산업·에너지','ICT·SW'].includes(industryGroup(c.industry))},
   {label:'소방산업', re:/소방\s*(?:산업|기업|제품)/, ok:c=>industryGroup(c.industry)==='제조·소재'},
-  {label:'환경·기후', re:/환경\s*(?:기업|산업)|기후\s*테크|녹색\s*(?:산업|기업|채권)/, ok:c=>c.industry==='환경·수자원' || industryGroup(c.industry)==='신산업·에너지'},
+  {label:'환경·기후', re:/환경\s*(?:기업|산업)|기후\s*테크|녹색\s*(?:산업|기업|채권)|넷제로|탄소\s*중립/, ok:c=>c.industry==='환경·수자원' || industryGroup(c.industry)==='신산업·에너지'},
   {label:'원자력·방사선', re:/원자력|방사선/, ok:c=>['제조·소재','신산업·에너지','바이오·헬스'].includes(industryGroup(c.industry))},
   {label:'의료·헬스', re:/슬립\s*테크|의료기기|디지털\s*헬스|헬스케어/, ok:c=>industryGroup(c.industry)==='바이오·헬스'},
   // 공장·설비 투자 자금(에너지 절약·산재 예방·오염 방지 시설 등) — 매장형 소상인·서비스업과는 거리가 멀다(정답셋: 음식점 0 · 기계 소공인 1). 유통·점포 시설자금은 제외
   {label:'산업 시설·설비', re:/에너지이용합리화|산업재해예방시설|구조고도화|오염방지시설|시설\s*(?:자금|투자)|설비\s*(?:자금|투자)/, skip:/유통|소상공인|상점|점포|전통시장/,
     ok:c=>['제조·소재','신산업·에너지','바이오·헬스'].includes(industryGroup(c.industry)) || ['건설·건축','환경·수자원','물류·유통','농림수산업','기능성식품'].includes(c.industry)},
+  {label:'소프트웨어', re:/소프트웨어\s*(?:기업|산업|지식재산|IP)|(?<![A-Za-z])SW\s*(?:기업|지식재산|IP)/, ok:c=>industryGroup(c.industry)==='ICT·SW'},
+  {label:'혁신제품(공공조달)', re:/혁신제품/, ok:c=>TECH_GROUPS.includes(industryGroup(c.industry))},
   {label:'기술기업', re:/기술임치|기술가치평가|기술보호|기술분쟁|IP\)?\s*(?:평가\s*)?(?:보증|담보)|지식재산권?\s*(?:\(IP\)\s*)?평가/, ok:c=>TECH_GROUPS.includes(INDUSTRIES.find(i=>i.v===c.industry)?.group)}
 ];
 /* 공고명으로 대상 산업 추론 — 목록 데이터에 업종 조건이 없어서(운영 0%) 공고명의 산업 표현을 업종 그룹과 비교한다.
    기술을 '도입·활용'하는 사업(AI 바우처·AI 교육 등)은 그 기술 업종 대상이 아니라서 ICT는 '○○ 기업·산업·창업·실증'처럼 업종을 가리킬 때만 */
 const PROGRAM_SECTORS = [
-  {g:'제조·소재', re:/제조|공장|소공인|뿌리\s*(?:기업|산업)|금형|주조|용접|열처리|표면처리|소재|부품|공작기계|섬유|화학|반도체|디스플레이|조선|금속|기계\s*(?:산업|부품|기업)/},
+  {g:'제조·소재', re:/제조|공장|소공인|기계장비|뿌리\s*(?:기업|산업)|금형|주조|용접|열처리|표면처리|소재|부품|공작기계|섬유|화학|반도체|디스플레이|조선|금속|기계\s*(?:산업|부품|기업)/},
   {g:'ICT·SW', re:/(?:소프트웨어|(?<![A-Za-z])SW|ICT|정보통신|인공지능|(?<![A-Za-z])AI|빅데이터|클라우드|메타버스|블록체인|정보보호|사이버\s*보안|게임)\s*(?:·\s*\S+\s*)?(?:기업|산업|스타트업|창업|분야|전문기업|개발사|실증|융합|센터)/},
   {g:'바이오·헬스', re:/바이오|제약|의약|의료기기|헬스케어|디지털\s*헬스|화장품|뷰티|건강기능/},
   {g:'신산업·에너지', skip:/이용|효율|절감|합리화|보급|바우처|전환|진단|감량/, re:/에너지|태양광|수소|2차\s*전지|이차전지|배터리|모빌리티|자율주행|자동차|드론|로봇|우주|항공|스마트시티|(?<![A-Za-z])IoT/},
@@ -330,7 +342,8 @@ function programSectors(p){ const n=p.programName||''; return PROGRAM_SECTORS.fi
 function industryGroup(ind){ return INDUSTRIES.find(i=>i.v===ind)?.group || null; }
 function sectorMismatch(p, c){ if(!c.industry) return null; const n=p.programName||''; return SECTOR_ONLY.find(x=>x.re.test(n) && !(x.skip && x.skip.test(n)) && !x.ok(c)) || null; }
 const AGRI_ONLY = /농업인|어업인|농어업인|귀농|귀어|농식품|농업경영체|해양수산|수산(?!부산물)|축산|임업|산림/;
-const AGRI_NEAR = ['농림수산업','기능성식품','음식점업(F&B)','도소매업','물류·유통','바이오·제약','환경·수자원'];
+// 농식품부·해수부 사업은 농업경영체·식품 제조 대상 — 음식점·도소매(매장)는 대체로 대상 밖(정답셋: 농식품 크라우드펀딩·글로벌성장패키지 0)
+const AGRI_NEAR = ['농림수산업','기능성식품','물류·유통','바이오·제약','환경·수자원'];
 /* 농·수산·식품 분야 사업인데 업종이 멀면 관련도 낮음(자격 확정은 공고 확인) */
 function agriMismatch(p, c){ return !!c.industry && AGRI_ONLY.test(p.programName||'') && !AGRI_NEAR.includes(c.industry); }
 
@@ -472,6 +485,9 @@ function businessAgeCond(p, c, add){
     return add(L,'unknown',`창업 ${p.businessAgeMax}년 이내 요건 — 예비창업자 신청 가능 여부는 공고 확인`);
   }
   if(p.preStartupOnly) return add(L,'fail','예비창업자 전용 사업');
+  // 업력 상한을 읽지 못한 '창업(기업)' 사업 — 창업기업은 대체로 7년 이내(중소기업창업 지원법). 8년 이상이면 확인 필요로 낮춤
+  if(!hasAge && c.businessAge!=null && c.businessAge>7 && STARTUP_PROGRAM.test(p.programName||''))
+    return add(L,'unknown',`창업기업 대상 사업 — 창업 7년 이내 대상인 경우가 많아요(업력 ${c.businessAge}년, 공고 확인)`, true);
   if(!hasAge) return add(L,'na');
   if(c.businessAge==null) return add(L,'unknown','설립연도 미입력');
   const a = c.businessAge;
@@ -549,6 +565,10 @@ const HELP_TYPES = [
    카카오 챗봇(netlify/lib/bot/kakao.mjs CONTACT)은 서버 코드라 따로 두되 같은 값인지 서버 테스트가 확인한다 */
 const HELP_CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat',
   web:'www.beconic.kr', webUrl:'https://www.beconic.kr/', addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호'};
+/* 이용 측정 — 이벤트 이름만 보낸다(입력한 기업 정보·식별자 없음). 실시간 배포(https)에서만, 실패해도 화면에 영향 없음 */
+function track(ev){
+  try{ if(APP_CONFIG.DATA_MODE==='live' && location.protocol==='https:' && navigator.sendBeacon) navigator.sendBeacon('/api/e', ev); }catch{ /* 측정 생략 */ }
+}
 function contactHref(k, subject){
   const c=HELP_CONTACT;
   return k==='tel' ? `tel:${c.tel.replace(/-/g,'')}` : k==='email' ? `mailto:${c.email}${subject?`?subject=${encodeURIComponent(subject)}`:''}` : k==='kakao' ? c.kakao : k==='web' ? c.webUrl : '';
@@ -613,6 +633,9 @@ function hardEligibility(p, c){
     else if(p.targetBusinessTypeInferred) add('지원대상 유형','unknown','공고 목록에 지원대상 표기 없음 — 공식 공고 확인');
     else add('지원대상 유형','fail',`대상: ${tbt.join(', ')} (${c.companyType}${c.bizRegType?'·'+c.bizRegType:''} 미포함)`);
   } else add('지원대상 유형','na');
+  // 공고명에 사업자 형태를 못박은 경우(예: '소상공인(법인사업자) …') — 다른 형태면 미충족
+  const regOnly = /\(\s*(법인|개인)\s*사업자\s*\)/.exec(p.programName||'');
+  if(regOnly && c.bizRegType) add('사업자 형태', c.bizRegType===`${regOnly[1]}사업자` ? 'pass' : 'fail', `${regOnly[1]}사업자 대상(공고명) · ${c.bizRegType}`);
 
   // 2) 지역 — 3단계 관련도(전국 0 → 광역시도 1 → 시군구 2), 대상 아님 -1
   let regionTier = null;
@@ -762,6 +785,8 @@ function specialTargetConds(p, c, add){
     else if(c.specialStatus.includes(t.k)) add(L,'pass',`${t.label} 해당`);
     else add(L, t.strict?'fail':'unknown', t.strict ? `${t.label} 대상 사업(해당 없음으로 입력)` : `${t.label} 대상 — 해당 여부 공고 확인`);
   }
+  // 출산·양육 중인 대표자 대상(생활 지원) — 해당 여부를 묻지 않으므로 확인 필요
+  if(/출산|양육|육아/.test(name) && !EMPLOY_PROGRAM.test(name)) add('대상 한정','unknown','출산·양육 중인 대표자 대상 — 해당 여부 공고 확인', true);
   // 대표자 연령 요건을 따로 읽지 못한 '청년' 사업: 40대 이상이면 미충족, 모르면 확인 필요
   if(YOUTH_ONLY.test(name) && !EMPLOY_PROGRAM.test(name) && p.representativeAgeMax==null){
     const band=AGE_BANDS[c.representativeAge];
@@ -847,8 +872,14 @@ function fitScore(p, c, regionTier, elig){
   const B = APP_CONFIG.REGION_BONUS;
   const bonus = regionTier===2 ? B.district : regionTier===1 ? B.sido : 0;
   if(bonus){ parts.regionBonus = bonus; s += bonus; }
-  if(purposeHit===false){ s = Math.min(s, 48); parts._purposeMismatch = true; }
   const name = p.programName||'';
+  if(needs.length && purposeHit!==false){
+    // 공고명에 원하는 지원 키워드가 있으면(예: '예비창업패키지 … 아카데미', '사업화 … 캠프') 행사여도 관련 있음
+    if(EVENT_LIKE.test(name) && needs.every(n=>MONEY_NEEDS.includes(n)) && parts._needMatch<2){ purposeHit=false; parts._eventForMoney = true; }
+    else if(INVEST_LINK.test(name) && !needs.includes('invest')){ purposeHit=false; parts._investLink = true; }
+  }
+  if(purposeHit===false){ s = Math.min(s, 48); parts._purposeMismatch = true; }
+  if(NOT_SUPPORT.test(name)){ s = Math.min(s, 40); parts._notSupport = true; }
   const misfit = MISFIT[c.companyType];
   if((misfit && misfit.test(name)) || agriMismatch(p, c) || sectorMismatch(p, c)){ s = Math.min(s, 45); parts._misfit = true; }
   else if(elig && elig.conds.some(x=>x.restricted)){ s = Math.min(s, 60); parts._restricted = true; }
@@ -1127,7 +1158,7 @@ const App = (function(){
     init, pickPersona, jumpToPersona, next, back, pick, toggleCert, toggleSpecial, toggleNeed,
     analyze, render, setFilter, setSort, toggleFunded, toggleCheck, setQuery, toggleWatch,
     openHelp, closeHelp, toggleHelpType, copyHelp, resetFilter, scrollToResults, expandGroup, showMore,
-    openDetail, closeModal, printReport, openProgressive, applyProgressive, closeProgressive, showConditionsMet,
+    openDetail, closeModal, printReport, copyLink, openProgressive, applyProgressive, closeProgressive, showConditionsMet,
     reset, goHome, editInputs,
     saveDraft, clearDraft, resumeDraft, dismissDraft,
     runAutoUpdate, dismissUpdate, forgetProfile,
@@ -1146,6 +1177,11 @@ const App = (function(){
     try{ LEGACY_KEYS.forEach(k=>localStorage.removeItem(k)); }catch{ /* 저장소 사용 불가 */ }
     try{ history.replaceState({v:'landing', s:0}, ''); }catch{ /* 기록 사용 불가 */ }
     if(IN_APP){ const pb=document.getElementById('pdfBtn'); if(pb) pb.textContent='📋 결과 복사'; }
+    track('visit');
+    // 전화·카카오톡·메일 연결 클릭(어느 화면에서든)
+    document.addEventListener('click', e=>{ const a=e.target.closest && e.target.closest('a[href]'); if(!a) return;
+      const h=a.getAttribute('href')||''; if(h.startsWith('tel:')) track('call_click'); else if(h.includes('pf.kakao.com')) track('kakao_click'); else if(h.startsWith('mailto:')) track('mail_click'); });
+    openFromLink();
     window.addEventListener('popstate', onPopState);
     document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeHelp(); closeModal(); closeProgressive(); } });
     window.addEventListener('beforeprint', ()=>{ if(currentView==='results' && matched.length && !printMode){ printMode=true; render(); } });
@@ -1190,7 +1226,8 @@ const App = (function(){
 
   /* ================= PERSONA ================= */
   function pickPersona(p){
-    if(!PERSONA_CFG[p]) return;
+    if(!Object.prototype.hasOwnProperty.call(PERSONA_CFG, p)) return;
+    track('persona_'+p);
     persona = p;
     const cfg = PERSONA_CFG[p];
     const prev = company;
@@ -1358,7 +1395,7 @@ const App = (function(){
   }
 
   /* ================= 분석 ================= */
-  async function analyze(){
+  async function analyze(via){
     show('loading');
     const steps=['기업조건 확인','지원사업 데이터 조회','자격조건 비교','적합도·확인도 계산','대시보드·리포트 정리'];
     const box=document.getElementById('loadSteps');
@@ -1384,6 +1421,7 @@ const App = (function(){
     clearDraft();
     renderDashboard(); renderPpBanner(); render(); afterRenderMeta();
     show('results');
+    track(via==='results_link' ? 'results_link' : 'results');
   }
 
   function updateDataSourceUI(initial){
@@ -1908,6 +1946,7 @@ const App = (function(){
   /* ---- 신청 도움받기 창 ---- */
   function openHelp(id){
     const m=matched.find(x=>x.program.sourceProgramId===String(id)); if(!m) return;
+    track('help_open');
     helpCtx = {id:String(id), types:['plan']};
     lastFocus = document.activeElement;
     renderHelp();
@@ -1950,7 +1989,7 @@ const App = (function(){
   }
   async function copyHelp(via){
     const m=helpCtx && matched.find(x=>x.program.sourceProgramId===helpCtx.id); if(!m) return;
-    const ok=await copyText(helpText(m.program, company, helpCtx.types));
+    const ok=await copyText(helpText(m.program, company, helpCtx.types)); if(ok) track('help_copy');
     toast(ok ? (via==='kakao' ? '요청 내용을 복사했어요. 열린 카카오톡 채팅창에 붙여넣어 보내세요.' : '요청 내용을 복사했어요. 카톡·문자·메일에 붙여넣어 보내세요.')
              : '복사가 안 되는 환경이에요. 아래 미리보기 내용을 직접 선택해 복사해 주세요.');
     if(!ok){ const d=document.querySelector('#helpModal .hp-preview'); if(d) d.open=true; }
@@ -1974,13 +2013,14 @@ const App = (function(){
     toast(on ? '알림 등록을 해제했어요.' : '등록했어요. 다시 방문해 매칭하면 공고가 올라왔을 때 맨 위에 알려드려요.');
     render();
   }
-  function setQuery(q){ query = String(q||'').slice(0,40); listLimit=APP_CONFIG.LIST_LIMIT; render(); }
+  function setQuery(q){ const prev=query; query = String(q||'').slice(0,40); if(!prev && query.length>=2) track('search'); listLimit=APP_CONFIG.LIST_LIMIT; render(); }
   function toggleFunded(){ fundedOnly=!fundedOnly; listLimit=APP_CONFIG.LIST_LIMIT; syncFundedBtn(); render(); }
   function syncFundedBtn(){ const btn=document.getElementById('fundedToggle'); if(btn){ btn.classList.toggle('on', fundedOnly); btn.setAttribute('aria-pressed', String(fundedOnly)); } }
 
   /* ================= 상세 모달 ================= */
   function openDetail(id){
     const m=matched.find(x=>x.program.sourceProgramId===String(id)); if(!m) return;
+    track('detail_open');
     const p=m.program, url=safeUrl(p.originalUrl);
     const conds=m.elig.conds.filter(c=>c.result!=='na').map(c=>{
       const ic={pass:'충족',fail:'미충족',unknown:'확인필요'}[c.result];
@@ -2032,6 +2072,7 @@ const App = (function(){
 
   /* ================= Progressive Profiling ================= */
   function openProgressive(){
+    track('more_info');
     const needed=collectNeeded();
     if(!needed.length){ toast('추가로 확인할 항목이 없습니다.'); return; }
     ppTmp = {};
@@ -2166,7 +2207,7 @@ const App = (function(){
   function loadDraft(){
     const d=readJSON(DRAFT_KEY); if(!d || typeof d!=='object') return null;
     const c=sanitizeCompany(d.company);
-    const p = PERSONA_CFG[d.persona] ? d.persona : personaOf(c.companyType);
+    const p = Object.prototype.hasOwnProperty.call(PERSONA_CFG, d.persona) ? d.persona : personaOf(c.companyType);
     if(!p) return null;
     c.companyType = PERSONA_CFG[p].companyType;
     const s = Math.max(0, Math.min(parseInt(d.step,10)||0, PERSONA_CFG[p].steps.length-1));
@@ -2190,6 +2231,34 @@ const App = (function(){
   function dismissDraft(){ clearDraft(); }
 
   /* ================= PDF ================= */
+  /* ---------- 결과 링크 — 조건(유형·지역·업종·설립연도·사업자 형태·필요한 지원)을 주소에 담아 같은 매칭을 다시 연다.
+     서버에는 아무것도 저장하지 않는다. 주소의 값은 허용 목록으로만 받는다(sanitizeCompany) ---------- */
+  function shareUrl(){
+    const q=new URLSearchParams(), c=company;
+    if(persona) q.set('t', persona);
+    [['r',c.region],['d',c.district],['i',c.industry],['y',c.establishedYear],['m',c.establishedMonth],['b',c.bizRegType]].forEach(([k,v])=>{ if(v!=null && v!=='') q.set(k, String(v)); });
+    if((c.supportNeeds||[]).length) q.set('n', c.supportNeeds.join(','));
+    return `${location.origin}${location.pathname}?${q}`;
+  }
+  function linkFromUrl(){
+    const q=new URLSearchParams(location.search), t=q.get('t');
+    if(!t || !Object.prototype.hasOwnProperty.call(PERSONA_CFG, t)) return null;   // '__proto__' 같은 키 차단
+    return {persona:t, company:sanitizeCompany({companyType:PERSONA_CFG[t].companyType, region:q.get('r'), district:q.get('d'), industry:q.get('i'),
+      establishedYear:q.get('y'), establishedMonth:q.get('m'), bizRegType:q.get('b'), supportNeeds:(q.get('n')||'').split(',')})};
+  }
+  // 링크로 열면: 필수 조건이 다 있으면 바로 결과, 빠졌으면 그 단계부터 입력. 주소의 조건은 지워 새로고침해도 다시 돌지 않게
+  function openFromLink(){
+    const l=linkFromUrl(); if(!l) return false;
+    try{ history.replaceState({v:'landing', s:0}, '', location.pathname); }catch{ /* 기록 사용 불가 */ }
+    persona=l.persona; company=l.company; setPersonaBadge();
+    const bad=activeSteps().findIndex(k=>{ const d=STEP_DEFS[k]; return !d.optional && !d.valid(); });
+    if(bad<0){ step=lastStepIdx(); analyze('results_link'); } else { step=bad; renderStep(); show('form'); }
+    return true;
+  }
+  async function copyLink(){
+    const ok=await copyText(shareUrl()); if(ok) track('link_copy');
+    toast(ok ? '결과 링크를 복사했어요. 열면 같은 조건으로 바로 매칭돼요(지역·업종·설립연도가 주소에 담겨요).' : '복사가 안 되는 환경이에요.');
+  }
   // 앱 안 브라우저(IN_APP)는 인쇄를 지원하지 않는다 → 결과 요약을 복사해 대화방에 보관
   function resultSummary(){
     const top=primaryOf(listed()).sort((a,b)=>(a.state===b.state?0:a.state==='추천'?-1:1) || (b.fit-a.fit)).slice(0,10);
@@ -2198,15 +2267,16 @@ const App = (function(){
       [company.region, company.district, company.companyType, company.industry].filter(Boolean).join(' · '),
       `추천 ${dash.recommend}건 · 조건부 ${dash.conditional}건`, '',
       ...top.map((m,i)=>`${i+1}. [${m.state==='추천'?'추천':'조건부'}] ${m.program.programName} (${dl(m)})${safeUrl(m.program.originalUrl)?`\n   ${safeUrl(m.program.originalUrl)}`:''}`),
-      '', `다시 매칭: ${location.origin}${location.pathname}`].join('\n');
+      '', `같은 조건으로 다시 보기: ${shareUrl()}`].join('\n');
   }
   async function printReport(){
     if(IN_APP){
       if(!dash) return;
-      const ok=await copyText(resultSummary());
+      const ok=await copyText(resultSummary()); if(ok) track('result_copy');
       toast(ok ? '앱 안 브라우저에서는 PDF 저장이 안 돼요. 결과 요약을 복사했으니 나와의 채팅에 붙여넣어 보관하세요.' : '이 화면에서는 저장·복사가 안 돼요. 오른쪽 위 메뉴의 \'다른 브라우저로 열기\'를 이용해 주세요.');
       return;
     }
+    track('pdf');
     printMode=true; render();
     setTimeout(()=>{ window.print(); }, 50);   // afterprint에서 화면 목록 복원
   }

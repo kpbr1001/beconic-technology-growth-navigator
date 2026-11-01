@@ -65,6 +65,9 @@ Netlify 함수(서버)가 필요하고, v3.8부터는 빌드(`npm run build`)로
 | `BIZINFO_API_KEY` | 기업마당 crtfcKey | 권장 |
 | `KSTARTUP_API_KEY` | K-Startup 디코딩 인증키 | 권장 |
 | `ANTHROPIC_API_KEY` | sk-ant-... | 선택(본문 자격조건 추출) |
+| `METRICS_TOKEN` | 직접 정한 긴 임의 문자열 | 선택(이용 측정 조회 — 없으면 조회 불가, 집계는 그대로) |
+
+**이용 측정 조회:** `curl -H "x-beconic-metrics-token: <METRICS_TOKEN 값>" https://beconic-grant-matching.netlify.app/api/metrics?days=30` → 날짜별 이벤트 건수(방문·유형 선택·결과·상세·도움받기·전화/카톡/메일 클릭·결과 복사·링크 복사 등). 입력값·IP·식별자는 저장하지 않는다.
 
 4. 다 넣었으면 **Deploys 탭 → Trigger deploy → Deploy site** (환경변수는 재배포해야 함수에 반영)
 

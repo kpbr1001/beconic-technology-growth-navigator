@@ -54,11 +54,28 @@ function toolCard(t) {
   return { ...th, title: cut(t.name, 40), description: cut(t.desc, 230), buttons: [web(t.id === 'grants' ? '지원사업 찾기' : '진단 시작', t.url), consult] };
 }
 
-/** 사업명 검색: 띄어쓰기 무시, 마감 가까운 순(마감일 없는 공고는 뒤) */
+/* 줄임말·약칭 → 공고명(name) 또는 기관명(agency)에서 찾을 말. 키는 띄어쓰기 없는 소문자 */
+export const ALIASES = {
+  '예창패': { name: ['예비창업패키지'] }, '초창패': { name: ['초기창업패키지'] }, '창도패': { name: ['창업도약패키지'] },
+  '청창사': { name: ['청년창업사관학교'] }, '신창사': { name: ['신사업창업사관학교'] }, '창중대': { name: ['창업중심대학'] },
+  '팁스': { name: ['팁스', 'tips'] }, 'tips': { name: ['팁스', 'tips'] }, '립스': { name: ['립스', 'lips'] },
+  '수바': { name: ['수출바우처'] }, '혁바': { name: ['혁신바우처'] }, '스공': { name: ['스마트공장'] },
+  '희리': { name: ['희망리턴'] },
+  '소진공': { agency: ['소상공인시장진흥공단'] }, '중진공': { agency: ['중소벤처기업진흥공단'] }, '창진원': { agency: ['창업진흥원'] },
+  '기보': { agency: ['기술보증기금'] }, '신보': { agency: ['신용보증기금'] }, '중기부': { agency: ['중소벤처기업부'] },
+  '산자부': { agency: ['산업통상자원부', '산업통상부'] }, '과기부': { agency: ['과학기술정보통신부'] }, 'kotra': { agency: ['대한무역투자진흥공사', 'kotra'] }
+};
+/** 줄임말이면 원래 이름(검색어 안내용) — 아니면 null */
+export function aliasOf(q) { const a = ALIASES[norm(q)]; return a ? (a.name || a.agency)[0] : null; }
+
+/** 사업명 검색: 띄어쓰기 무시, 줄임말(예창패·소진공 등) 인식, 마감 가까운 순(마감일 없는 공고는 뒤) */
 export function searchPrograms(programs, q, now = Date.now()) {
   const k = norm(q); if (k.length < 2) return [];
+  const a = ALIASES[k];
+  const names = a ? (a.name || []).map(norm) : [k], agencies = a ? (a.agency || []).map(norm) : [];
+  const hit = (p) => names.some((n) => norm(p.programName).includes(n)) || agencies.some((n) => norm(`${p.agency || ''} ${p.executingAgency || ''}`).includes(n));
   const d = (p) => { const x = ddayKst(p.applicationEnd, now); return x == null ? 9999 : x; };
-  return programs.filter((p) => norm(p.programName).includes(k)).sort((a, b) => d(a) - d(b));
+  return programs.filter(hit).sort((x, y) => d(x) - d(y));
 }
 
 /** 문장 → 스킬 응답. programs: 접수 중·예정 공고(없으면 공고 관련 메뉴는 준비 중 안내) */
@@ -109,10 +126,11 @@ export function route(utterance, programs, now = Date.now()) {
   // 그 밖의 문장은 사업명 검색 — 공고가 없고 진단 분야 키워드면 진단툴 안내
   if (!programs) return reply([text('공고 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.')]);
   const found = searchPrograms(programs, u, now);
+  const full = aliasOf(u);
   if (!found.length && kwHit.length) return toolReply(kwHit);
   if (!found.length) {
-    return reply([text(`'${cut(u, 20)}'(이)가 들어간 공고가 지금은 없어요.\n\n접수 중·예정인 공고만 찾아드려요.\n대표 사업은 보통 1년에 한 번 공고되니\n이미 마감됐거나 공고 전일 수 있어요.`),
+    return reply([text(`'${cut(full || u, 20)}'(이)가 들어간 공고가 지금은 없어요.\n\n접수 중·예정인 공고만 찾아드려요.\n대표 사업은 보통 1년에 한 번 공고되니\n이미 마감됐거나 공고 전일 수 있어요.`),
       { basicCard: { ...thumb('match'), title: '맞춤 매칭으로 찾아보기', description: '조건을 입력하면 지금 신청 가능한 사업과\n다음 공고 예정 사업까지 알려드려요.', buttons: [web('맞춤 매칭 시작', CONTACT.app)] } }]);
   }
-  return reply([programList(`'${cut(u, 12)}' 공고 ${found.length}건${found.length > 5 ? ' 중 5건' : ''}`, found, now)]);
+  return reply([programList(`'${cut(full || u, 12)}' 공고 ${found.length}건${found.length > 5 ? ' 중 5건' : ''}`, found, now)]);
 }
