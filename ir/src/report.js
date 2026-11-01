@@ -1,7 +1,8 @@
 // 결과 보고서(HTML → 브라우저 인쇄 PDF). 1쪽 핵심 요약·영역 점수, 2쪽 강점·보완·재무·로드맵, 3쪽~ 문항별 응답·방법론.
-import { CATEGORIES, QUESTIONS, STAGES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SOURCES, N_Q, EFFORT, INDUSTRY_ADJ } from './model.js';
+import { CATEGORIES, QUESTIONS, STAGES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SOURCES, N_Q, EFFORT, INDUSTRY_ADJ,
+  bandColor, SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS } from './model.js';
 import { SCORE_VERSION } from './score.js';
-import { ACCOUNTS, fmtWon } from './fin.js';
+import { ACCOUNTS, fmtWon, finBandSummary } from './fin.js';
 import { gauge, radar, finBars } from './charts.js';
 import { COMPANY } from './contact.js';
 
@@ -33,19 +34,19 @@ export function renderReport(st, r, { id, date, version }) {
 
   <h2>투자자 관점 진단</h2>
   <table class="r-tbl"><thead><tr><th>투자자 질문</th><th class="r-c">점수</th><th>판단</th><th>가장 약한 부분</th><th>실사 확인 자료</th></tr></thead><tbody>
-  ${r.lenses.map((l) => `<tr><td><b>${esc(l.name)}</b><br><span class="r-note">${esc(l.q)}</span></td><td class="r-c r-num"><b>${l.score ?? '—'}</b></td><td>${l.verdict ? esc(l.verdict.text) : '—'}${l.note ? `<br><span class="r-note">${esc(l.note)}</span>` : ''}</td><td>${l.weakest && (l.score ?? 100) < 80 ? esc(l.weakest.title) : '—'}</td><td>${esc(l.docs)}</td></tr>`).join('')}
+  ${r.lenses.map((l) => `<tr><td><b>${esc(l.name)}</b><br><span class="r-note">${esc(l.q)}</span></td><td class="r-c r-num"><b>${l.score ?? '—'}</b></td><td>${l.verdict ? esc(l.verdict.text) : '—'}${l.note ? `<br><span class="r-note">${esc(l.note)}</span>` : ''}</td><td>${l.weakest && l.verdict?.tone !== 'good' ? esc(l.weakest.title) : '—'}</td><td>${esc(l.docs)}</td></tr>`).join('')}
   </tbody></table>
 
   <h2>영역별 점수</h2>
   <div class="r-grid"><div class="r-radar">${radar(CATEGORIES.map((x) => ({ name: x.short, score: r.cats[x.id].score })), { size: 300 })}</div>
     <table class="r-tbl"><thead><tr><th>영역</th><th>점수</th><th class="r-c">기대</th><th class="r-c">비중</th><th class="r-c">근거</th></tr></thead><tbody>
-    ${CATEGORIES.map((x) => { const cc = r.cats[x.id]; return `<tr><td class="r-nw">${esc(x.name)}</td><td class="r-nw"><span class="r-bar-t"><span class="r-bar" style="width:${cc.score ?? 0}%;background:${(cc.score ?? 0) >= 60 ? '#3182f6' : '#f0a43a'}"></span></span><b class="r-num">${cc.score ?? '—'}</b></td><td class="r-c ${cc.gap !== null && cc.gap < 0 ? 'r-gap' : ''}">${cc.expect}</td><td class="r-c">${cc.weight}%</td><td class="r-c">${cc.ev}/${cc.total}</td></tr>`; }).join('')}
+    ${CATEGORIES.map((x) => { const cc = r.cats[x.id]; return `<tr><td class="r-nw">${esc(x.name)}</td><td class="r-nw"><span class="r-bar-t"><span class="r-bar" style="width:${cc.score ?? 0}%;background:${bandColor(cc.score)}"></span></span><b class="r-num">${cc.score ?? '—'}</b></td><td class="r-c ${cc.gap !== null && cc.gap < 0 ? 'r-gap' : ''}">${cc.expect}</td><td class="r-c">${cc.weight}%</td><td class="r-c">${cc.ev}/${cc.total}</td></tr>`; }).join('')}
     </tbody></table></div>
-  <p class="r-note">기대 = ${esc(stage)} 단계에서 갖추면 좋은 수준(비코닉 기준, 빨간색은 미달). 점수 = 대표 응답(1~5점, 잘 모르겠어요 = 1점) 평균 × 20, 종합 = ${esc(stage)} 단계 영역 비중${INDUSTRY_ADJ[r.industry] ? `(${esc(r.industry)} 업종 보정)` : ''} 가중 평균. 자가진단 결과이며 투자 유치 여부나 기업가치를 판단·보장하지 않습니다.</p>
+  <p class="r-note">기대 = ${esc(stage)} 단계에서 갖추면 좋은 수준(비코닉 기준, 빨간색은 미달). 점수 = 대표 응답(1~${SCALE_MAX}점, 잘 모르겠어요 = ${UNKNOWN_AS}점) 평균 × ${SCORE_FACTOR}, 종합 = ${esc(stage)} 단계 영역 비중${INDUSTRY_ADJ[r.industry] ? `(${esc(r.industry)} 업종 보정)` : ''} 가중 평균. 자가진단 결과이며 투자 유치 여부나 기업가치를 판단·보장하지 않습니다.</p>
 
   <h2>강점과 먼저 보완할 점</h2>
-  <div class="r-grid"><div><h3>강점</h3>${r.strengths.length ? r.strengths.map((s) => `<div class="r-it good"><b>${esc(s.q.title)}</b> <span class="r-note">${esc(CMAP[s.q.cat].name)}</span> ${rdots(s.v)}<p>${esc(s.text)}${s.ev ? '' : ' · 근거 자료 확인 필요'}</p></div>`).join('') : '<p class="r-note">4점 이상 문항 없음</p>'}</div>
-    <div><h3>먼저 보완할 3가지</h3>${r.weaknesses.map((w) => `<div class="r-it need"><b>${esc(w.q.title)}</b> <span class="r-note">${esc(CMAP[w.q.cat].name)}</span> ${rdots(w.v)}<p>지금: ${esc(w.now)}</p><p class="nx"><em>목표</em> ${esc(w.next)} <span class="r-note">(달성 시 +${w.gainTo}점 · 산출물: ${esc(w.doc)})</span></p></div>`).join('') || '<p class="r-note">3점 이하 문항 없음</p>'}</div></div>
+  <div class="r-grid"><div><h3>강점</h3>${r.strengths.length ? r.strengths.map((s) => `<div class="r-it good"><b>${esc(s.q.title)}</b> <span class="r-note">${esc(CMAP[s.q.cat].name)}</span> ${rdots(s.v)}<p>${esc(s.text)}${s.ev ? '' : ' · 근거 자료 확인 필요'}</p></div>`).join('') : `<p class="r-note">${STRONG_MIN}점 이상 문항 없음</p>`}</div>
+    <div><h3>먼저 보완할 ${TOP_N}가지</h3>${r.weaknesses.map((w) => `<div class="r-it need"><b>${esc(w.q.title)}</b> <span class="r-note">${esc(CMAP[w.q.cat].name)}</span> ${rdots(w.v)}<p>지금: ${esc(w.now)}</p><p class="nx"><em>목표</em> ${esc(w.next)} <span class="r-note">(달성 시 +${w.gainTo}점 · 산출물: ${esc(w.doc)})</span></p></div>`).join('') || `<p class="r-note">${WEAK_MAX}점 이하 문항 없음</p>`}</div></div>
   ${r.checks.length ? `<h3>응답과 재무제표 확인</h3><ul class="r-chk">${r.checks.map((x) => `<li>${esc(x.text)}</li>`).join('')}</ul>` : ''}
 
   <h2>재무</h2>
@@ -58,23 +59,23 @@ export function renderReport(st, r, { id, date, version }) {
     : '<p><b>재무제표 미반영</b> — 재무·자금 점수는 대표 응답만으로 계산했습니다. 투자자는 표준재무제표를 가장 먼저 요청합니다. 홈택스에서 표준재무제표증명을 발급해 반영하면 매출 성장률·영업이익률·부채비율·유동비율과 응답 교차 확인이 추가됩니다.</p>'}
 
   <h2>보완 로드맵</h2>
-  <div class="r-road">${roadCol('지금 ~ 2주', r.roadmap.now)}${roadCol('30일 안에', r.roadmap.d30)}${roadCol('90일 안에', r.roadmap.d90)}</div>
-  <p class="r-note">종합 점수에 영향이 큰 순서(남은 단계 × 단계당 상승폭)로 고른 뒤 보완 난이도(2주·30일·90일)에 배치했습니다. 목표는 현재 응답의 다음 단계(2단계 이하는 최소 3단계·문서화 수준)입니다.</p>
+  <div class="r-road">${ROADMAP_BUCKETS.map((b) => roadCol(b.label, r.roadmap[b.key])).join('')}</div>
+  <p class="r-note">종합 점수에 영향이 큰 순서(남은 단계 × 단계당 상승폭)로 고른 뒤 보완 난이도(${ROADMAP_BUCKETS.map((b) => b.label).join(' · ')})에 배치했습니다. 목표는 현재 응답의 다음 단계(${GOAL_FLOOR - 1}단계 이하는 최소 ${GOAL_FLOOR}단계·문서화 수준)입니다.</p>
 
   <h2 class="r-break">영역별 상세 진단</h2>
   <table class="r-tbl r-ana"><thead><tr><th>영역</th><th class="r-c">점수/기대</th><th>지금 상태</th><th>보완 목표(난이도 · 산출물)</th></tr></thead><tbody>
-  ${r.analysis.map((a) => `<tr><td class="r-nw"><b>${esc(a.c.name)}</b><br><span class="r-note">${esc(a.status)}</span></td><td class="r-c r-num">${a.score ?? '—'} / ${a.expect}</td><td>${a.diag ? esc(a.diag) : '—'}</td><td>${a.actions.length ? `<ul class="r-chk">${a.actions.slice(0, 2).map((x) => `<li>${esc(x.q.title)}: ${esc(x.action)} <span class="r-note">(${EFFORT[x.effort]} · ${esc(x.doc)})</span></li>`).join('')}</ul>` : '모든 문항 4점 이상'}</td></tr>`).join('')}
+  ${r.analysis.map((a) => `<tr><td class="r-nw"><b>${esc(a.c.name)}</b><br><span class="r-note">${esc(a.status)}</span></td><td class="r-c r-num">${a.score ?? '—'} / ${a.expect}</td><td>${a.diag ? esc(a.diag) : '—'}</td><td>${a.actions.length ? `<ul class="r-chk">${a.actions.slice(0, 2).map((x) => `<li>${esc(x.q.title)}: ${esc(x.action)} <span class="r-note">(${EFFORT[x.effort]} · ${esc(x.doc)})</span></li>`).join('')}</ul>` : `모든 문항 ${STRONG_MIN}점 이상`}</td></tr>`).join('')}
   </tbody></table>
 
   <h2>진단 방법</h2>
   <table class="r-tbl"><thead><tr><th>투자 단계</th>${CATEGORIES.map((x) => `<th class="r-c">${esc(x.name)}</th>`).join('')}</tr></thead><tbody>
   ${STAGES.map((s) => `<tr${s.id === r.stage ? ' style="background:#eef5ff;font-weight:700"' : ''}><td class="r-nw">${esc(s.label)}</td>${CATEGORIES.map((x) => `<td class="r-c">${WEIGHTS[s.id][x.id]}%</td>`).join('')}</tr>`).join('')}</tbody></table>
   <table class="r-tbl"><thead><tr><th>등급</th>${GRADES.map((g) => `<th class="r-c">${g.g}</th>`).join('')}</tr></thead><tbody><tr><td>기준</td>${GRADES.map((g) => `<td class="r-c">${g.min}점 이상<br><span class="r-note">${esc(g.label)}</span></td>`).join('')}</tr></tbody></table>
-  <p class="r-note">영역 구성 참고: ${Object.values(SOURCES).map((s) => `${esc(s.publisher)} 「${esc(s.title)}」`).join(' · ')} (기관이 이 진단을 승인·인증한 것이 아님). 가중치·업종 보정·단계 기대 수준·등급 구간은 비코닉 설계값(실증 검증 전), 문항 ${MODEL_VERSION} · 점수 ${SCORE_VERSION} · 앱 ${esc(version)}. 재무 참고 구간(부채비율 100%/200%, 유동비율 100%/150%, 영업이익률 0%/10%)은 일반적으로 쓰이는 기준선이며 공식 기준이 아닙니다.</p>
+  <p class="r-note">영역 구성 참고: ${Object.values(SOURCES).map((s) => `${esc(s.publisher)} 「${esc(s.title)}」`).join(' · ')} (기관이 이 진단을 승인·인증한 것이 아님). 가중치·업종 보정·단계 기대 수준·등급 구간은 비코닉 설계값(실증 검증 전), 문항 ${MODEL_VERSION} · 점수 ${SCORE_VERSION} · 앱 ${esc(version)}. 재무 참고 구간(${finBandSummary()})은 일반적으로 쓰이는 기준선이며 공식 기준이 아닙니다.</p>
 
   <h2>문항별 응답</h2>
   <table class="r-tbl r-qtbl"><thead><tr><th>영역</th><th>문항</th><th>응답(가장 가까운 문장)</th><th class="r-c">점수</th><th class="r-c">근거</th></tr></thead><tbody>
-  ${QUESTIONS.map((q) => { const a = st.answers[q.id] || {}; return `<tr><td class="r-nw">${esc(CMAP[q.cat].name)}</td><td><b>${esc(q.title)}</b></td><td>${typeof a.v !== 'number' ? '미응답' : a.v === 0 ? '잘 모르겠어요(1점으로 계산)' : esc(q.opts[a.v - 1])}</td><td class="r-c r-nw">${rdots(a.v)}</td><td class="r-c">${a.ev ? '있음' : '—'}</td></tr>`; }).join('')}
+  ${QUESTIONS.map((q) => { const a = st.answers[q.id] || {}; return `<tr><td class="r-nw">${esc(CMAP[q.cat].name)}</td><td><b>${esc(q.title)}</b></td><td>${typeof a.v !== 'number' ? '미응답' : a.v === 0 ? `잘 모르겠어요(${UNKNOWN_AS}점으로 계산)` : esc(q.opts[a.v - 1])}</td><td class="r-c r-nw">${rdots(a.v)}</td><td class="r-c">${a.ev ? '있음' : '—'}</td></tr>`; }).join('')}
   </tbody></table>
 
   <div class="r-foot">이 보고서는 대표 응답과 제출한 재무제표를 바탕으로 한 IR 준비도 자가진단 결과입니다. 투자 권유, 투자 유치 여부·기업가치 판단, 회계감사, 법률 의견이 아닙니다. 보고서 ID ${esc(id)}는 입력 내용의 지문으로 원본 일치 확인용입니다.<br>${COMPANY.name} · 중소벤처기업부 인증 중소기업상담회사 ${COMPANY.cert} · ${COMPANY.tel} · ${COMPANY.email} · ${COMPANY.web}</div>

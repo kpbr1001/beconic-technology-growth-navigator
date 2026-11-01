@@ -46,8 +46,8 @@ ok((await p.textContent('#s-err')).includes('투자 단계'), '투자 단계 필
 await p.click('[data-act=stage][data-v=prea]'); ok((await p.inputValue('#s-company')) === '테스트랩', '단계 선택 후에도 회사명 유지');
 await p.click('[data-act=start-go]'); await p.waitForTimeout(150);
 ok(new URL(p.url()).pathname === '/q/1' && (await p.textContent('.qtitle')).includes('고객 문제'), '1번 문항 진입');
-const N = 36;
-const plan = Array.from({ length: N }, (_, i) => [3, 4, 2, 5, 1][i % 5]); plan[31] = 0; // FN4 = 모르겠어요
+const { N, qids } = await p.evaluate(() => ({ N: window.__IR.N_Q, qids: window.__IR.qids })); // 문항 수·순서는 앱(모델)에서 읽는다
+const plan = Array.from({ length: N }, (_, i) => [3, 4, 2, 5, 1][i % 5]); plan[qids.indexOf('FN4')] = 0; // FN4 = 모르겠어요
 // 선택하면 표시만 되고 넘어가지 않는다
 await p.click('.opt[data-v="3"]'); await p.waitForTimeout(500);
 ok(new URL(p.url()).pathname === '/q/1' && (await p.textContent('.opt.on .ck')) === '선택됨', '선택 표시가 보이고 자동으로 넘어가지 않음');
@@ -61,7 +61,7 @@ for (let i = 0; i < N; i++) {
 }
 ok(new URL(p.url()).pathname === '/finance', `${N}문항 후 재무 단계로 이동`);
 const st = await p.evaluate(() => window.__IR.state);
-ok(Object.keys(st.answers).length === 36 && st.answers.FN4.v === 0 && st.answers.PC1.ev === true && st.answers.TC1.v === plan[8], '응답(기술역량 포함)·모르겠어요·근거 체크 저장');
+ok(Object.keys(st.answers).length === N && st.answers.FN4.v === 0 && st.answers.PC1.ev === true && st.answers.TC1.v === plan[qids.indexOf('TC1')], '응답(기술역량 포함)·모르겠어요·근거 체크 저장');
 await nav(p, 'q/2'); await p.keyboard.press('5'); await p.waitForTimeout(100); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
 ok((await p.evaluate(() => window.__IR.state.answers.PC2.v)) === 5 && new URL(p.url()).pathname === '/q/3', '키보드(1~5·Enter)로 응답 수정');
 // 스캔본 → 직접 입력 안내
@@ -80,8 +80,8 @@ ok(fin.confirmed && fin.cur.cash === 300000000 && fin.source === 'upload', '확�
 const ev = await p.evaluate(() => window.__IR.evaluate());
 ok(new URL(p.url()).pathname === '/result' && (await p.textContent('.ch-gauge text:nth-of-type(2)')).includes(String(ev.overall)), `결과 게이지 = 엔진 점수(${ev.overall})`);
 ok((await p.textContent('.sum-lines')).includes('표준재무제표 반영') && (await p.locator('.kpi').count()) >= 5 && (await p.locator('.ch-radar').count()) === 1 && (await p.locator('.ch-fin').count()) === 1, '요약·지표·레이더·재무 차트');
-ok((await p.textContent('main')).includes('산출물:') && (await p.locator('.lens').count()) === 6 && (await p.locator('.ana').count()) === 9, '투자자 관점 6개·영역별 상세 9개·로드맵 산출물');
-ok((await p.locator('.flags li').count()) >= 1 && (await p.locator('.cbar .track s').count()) === 9, '경계 신호·단계 기대 표시');
+ok((await p.textContent('main')).includes('산출물:') && (await p.locator('.lens').count()) === 6 && (await p.locator('.ana').count()) === (await p.locator('.cbar .track s').count()), '투자자 관점 6개·영역별 상세(영역 수만큼)·로드맵 산출물');
+ok((await p.locator('.flags li').count()) >= 1 && (await p.locator('.cbar .track s').count()) >= 1, '경계 신호·단계 기대 표시');
 // 뒤로 가기·결과 파일 왕복
 const [dl] = await Promise.all([p.waitForEvent('download'), p.click('[data-act=export]')]);
 const file = path.join(OUT, 'result.json'); await dl.saveAs(file);
@@ -119,6 +119,9 @@ await q.close();
 const u = await newPage(); await u.goto(BASE + '#/result'); await u.waitForTimeout(200);
 ok(!u.url().includes('#'), '예전 #/ 주소 → 일반 경로');
 if (/^https:/.test(BASE)) { await u.goto(BASE + 'q/5', { waitUntil: 'networkidle' }); ok((await u.textContent('.qtitle')).length > 5, '배포본 직접 접속·새로고침(/q/5)'); }
+const meta = await u.evaluate(() => document.querySelector('meta[name=description]').content);
+const nq = await u.evaluate(() => window.__IR.N_Q);
+ok(meta.includes(`${nq}문항`) && !/\{\{/.test(meta), `메타 설명 문항 수 = 모델(${nq}문항)`);
 const og = await u.evaluate(() => Object.fromEntries([...document.querySelectorAll('meta[property^="og:"]')].map((m) => [m.getAttribute('property'), m.content])));
 ok(og['og:url'] === 'https://beconic-diagnosis-ir.netlify.app/' && /og-ir-banner-1200x630\.jpg/.test(og['og:image']), 'OG(카카오) 메타');
 ok((await u.request.get(BASE + 'vendor/pdfjs/pdf.worker.min.mjs')).ok(), 'pdf.js 워커 배포본 포함');

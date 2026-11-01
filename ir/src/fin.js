@@ -78,21 +78,37 @@ export function fmtWon(n, compact) {
 }
 const pct = (a, b) => Math.round((a / b) * 1000) / 10;
 
+// 참고 구간(일반적으로 쓰이는 기준선, 공식 기준 아님) — 계산·설명 문구·보고서 방법론이 모두 여기서 가져간다
+// hi=true: 클수록 좋음(good 이상 양호, mid 이상 보통) / hi=false: 작을수록 좋음(good 이하 양호, mid 이하 보통)
+export const FIN_BANDS = {
+  growth: { hi: true, good: 0, mid: 0, unit: '%' },
+  opm: { hi: true, good: 10, mid: 0, unit: '%' },
+  npm: { hi: true, good: 5, mid: 0, unit: '%' },
+  debt: { hi: false, good: 100, mid: 200, unit: '%' },
+  current: { hi: true, good: 150, mid: 100, unit: '%' },
+  burn: { hi: true, good: 12, mid: 6, unit: '개월' },
+};
+const bandOf = (k, v) => { const b = FIN_BANDS[k]; return b.hi ? (v >= b.good ? 'good' : v >= b.mid ? 'mid' : 'warn') : (v <= b.good ? 'good' : v <= b.mid ? 'mid' : 'warn'); };
+const bandNote = (k) => { const b = FIN_BANDS[k]; return b.hi ? `참고: ${b.good}${b.unit} 이상 양호 · ${b.mid}${b.unit} 미만 주의` : `참고: ${b.good}${b.unit} 이하 양호 · ${b.mid}${b.unit} 초과 주의`; };
+export const FIN_LABELS = { growth: '매출 성장률', opm: '영업이익률', npm: '순이익률', debt: '부채비율', current: '유동비율', burn: '현금 보유 개월 수' };
+/** 보고서 방법론용: 참고 구간 한 줄 요약 */
+export const finBandSummary = () => Object.entries(FIN_BANDS).map(([k, b]) => `${FIN_LABELS[k]} ${b.hi ? `${b.good}${b.unit}↑ 양호/${b.mid}${b.unit} 미만 주의` : `${b.good}${b.unit}↓ 양호/${b.mid}${b.unit} 초과 주의`}`).join(', ');
+
 /** 지표 + 참고 구간(일반 참고선, 업종별 차이 큼) */
 export function indicators(fin) {
   const c = fin?.cur || {}; const p = fin?.prev || {}; const out = [];
   const has = (o, k) => typeof o[k] === 'number' && !Number.isNaN(o[k]);
   if (has(c, 'rev') && has(p, 'rev') && p.rev > 0) {
     const v = pct(c.rev - p.rev, p.rev);
-    out.push({ k: 'growth', label: '매출 성장률', value: v, unit: '%', band: v >= 0 ? 'good' : 'warn', formula: '(당기 매출 - 전기 매출) ÷ 전기 매출', note: '과거 실적이며 전망이 아니에요' });
+    out.push({ k: 'growth', label: FIN_LABELS.growth, value: v, unit: '%', band: bandOf('growth', v), formula: '(당기 매출 - 전기 매출) ÷ 전기 매출', note: '과거 실적이며 전망이 아니에요' });
   }
-  if (has(c, 'rev') && has(c, 'op') && c.rev > 0) { const v = pct(c.op, c.rev); out.push({ k: 'opm', label: '영업이익률', value: v, unit: '%', band: v >= 10 ? 'good' : v >= 0 ? 'mid' : 'warn', formula: '영업이익 ÷ 매출액', note: '참고: 10% 이상 양호 · 0% 미만 적자' }); }
-  if (has(c, 'rev') && has(c, 'net') && c.rev > 0) { const v = pct(c.net, c.rev); out.push({ k: 'npm', label: '순이익률', value: v, unit: '%', band: v >= 5 ? 'good' : v >= 0 ? 'mid' : 'warn', formula: '당기순이익 ÷ 매출액', note: '참고: 0% 미만은 순손실' }); }
+  if (has(c, 'rev') && has(c, 'op') && c.rev > 0) { const v = pct(c.op, c.rev); out.push({ k: 'opm', label: FIN_LABELS.opm, value: v, unit: '%', band: bandOf('opm', v), formula: '영업이익 ÷ 매출액', note: bandNote('opm') }); }
+  if (has(c, 'rev') && has(c, 'net') && c.rev > 0) { const v = pct(c.net, c.rev); out.push({ k: 'npm', label: FIN_LABELS.npm, value: v, unit: '%', band: bandOf('npm', v), formula: '당기순이익 ÷ 매출액', note: bandNote('npm') }); }
   if (has(c, 'liab') && has(c, 'equity')) {
-    if (c.equity > 0) { const v = pct(c.liab, c.equity); out.push({ k: 'debt', label: '부채비율', value: v, unit: '%', band: v <= 100 ? 'good' : v <= 200 ? 'mid' : 'warn', formula: '부채총계 ÷ 자본총계', note: '참고: 100% 이하 양호 · 200% 초과 주의' }); }
-    else out.push({ k: 'debt', label: '부채비율', value: null, unit: '', band: 'warn', formula: '부채총계 ÷ 자본총계', note: '자본총계가 0 이하(완전 자본잠식)라 계산하지 않아요' });
+    if (c.equity > 0) { const v = pct(c.liab, c.equity); out.push({ k: 'debt', label: FIN_LABELS.debt, value: v, unit: '%', band: bandOf('debt', v), formula: '부채총계 ÷ 자본총계', note: bandNote('debt') }); }
+    else out.push({ k: 'debt', label: FIN_LABELS.debt, value: null, unit: '', band: 'warn', formula: '부채총계 ÷ 자본총계', note: '자본총계가 0 이하(완전 자본잠식)라 계산하지 않아요' });
   }
-  if (has(c, 'ca') && has(c, 'cl') && c.cl > 0) { const v = pct(c.ca, c.cl); out.push({ k: 'current', label: '유동비율', value: v, unit: '%', band: v >= 150 ? 'good' : v >= 100 ? 'mid' : 'warn', formula: '유동자산 ÷ 유동부채', note: '참고: 150% 이상 양호 · 100% 미만 주의' }); }
+  if (has(c, 'ca') && has(c, 'cl') && c.cl > 0) { const v = pct(c.ca, c.cl); out.push({ k: 'current', label: FIN_LABELS.current, value: v, unit: '%', band: bandOf('current', v), formula: '유동자산 ÷ 유동부채', note: bandNote('current') }); }
   if (has(c, 'equity') && has(c, 'capital') && c.capital > 0) {
     const st = c.equity <= 0 ? '완전 자본잠식' : c.equity < c.capital ? '부분 자본잠식' : '자본잠식 없음';
     out.push({ k: 'impair', label: '자본잠식', value: null, text: st, unit: '', band: st === '자본잠식 없음' ? 'good' : 'warn', formula: '자본총계와 자본금 비교', note: '자본총계 < 자본금이면 부분 잠식' });
@@ -100,7 +116,7 @@ export function indicators(fin) {
   // 참고 계산: 현금 ÷ (직전 연도 영업손실 ÷ 12) — 과거 기준 산술이며 앞으로의 지출 전망이 아님
   if (has(c, 'cash') && has(c, 'op') && c.op < 0) {
     const v = Math.round((c.cash / (-c.op / 12)) * 10) / 10;
-    out.push({ k: 'burn', label: '현금 보유 개월 수(참고)', value: v, unit: '개월', band: v >= 12 ? 'good' : v >= 6 ? 'mid' : 'warn', formula: '현금및현금성자산 ÷ (영업손실 ÷ 12)', note: '직전 연도 영업손실 기준 참고 계산이에요. 앞으로의 지출 전망이 아니에요' });
+    out.push({ k: 'burn', label: `${FIN_LABELS.burn}(참고)`, value: v, unit: '개월', band: bandOf('burn', v), formula: '현금및현금성자산 ÷ (영업손실 ÷ 12)', note: `직전 연도 영업손실 기준 참고 계산이에요(${bandNote('burn').replace('참고: ', '')}). 앞으로의 지출 전망이 아니에요` });
   }
   return out;
 }
