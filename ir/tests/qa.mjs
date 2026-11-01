@@ -46,16 +46,24 @@ ok((await p.textContent('#s-err')).includes('투자 단계'), '투자 단계 필
 await p.click('[data-act=stage][data-v=prea]'); ok((await p.inputValue('#s-company')) === '테스트랩', '단계 선택 후에도 회사명 유지');
 await p.click('[data-act=start-go]'); await p.waitForTimeout(150);
 ok(new URL(p.url()).pathname === '/q/1' && (await p.textContent('.qtitle')).includes('고객 문제'), '1번 문항 진입');
-const plan = Array.from({ length: 32 }, (_, i) => [3, 4, 2, 5, 1][i % 5]); plan[27] = 0; // FN4 = 모르겠어요
-for (let i = 0; i < 32; i++) {
+const N = 36;
+const plan = Array.from({ length: N }, (_, i) => [3, 4, 2, 5, 1][i % 5]); plan[31] = 0; // FN4 = 모르겠어요
+// 선택하면 표시만 되고 넘어가지 않는다
+await p.click('.opt[data-v="3"]'); await p.waitForTimeout(500);
+ok(new URL(p.url()).pathname === '/q/1' && (await p.textContent('.opt.on .ck')) === '선택됨', '선택 표시가 보이고 자동으로 넘어가지 않음');
+await p.click('.opt[data-v="3"]'); await p.waitForTimeout(150);
+ok(new URL(p.url()).pathname === '/q/2', '같은 보기를 다시 누르면 다음 문항');
+await p.click('[data-act=prev]');
+for (let i = 0; i < N; i++) {
   if (i % 7 === 0) await p.check('[data-act=ev]');
-  await p.click(`.opt[data-v="${plan[i]}"]`); await p.waitForTimeout(320);
+  if (!(await p.locator(`.opt.on[data-v="${plan[i]}"]`).count())) await p.click(`.opt[data-v="${plan[i]}"]`); // 이미 고른 보기를 다시 누르면 다음으로 넘어가므로 건너뜀
+  await p.click('[data-act=next]'); await p.waitForTimeout(60);
 }
-ok(new URL(p.url()).pathname === '/finance', '32문항 후 재무 단계로 자동 이동');
+ok(new URL(p.url()).pathname === '/finance', `${N}문항 후 재무 단계로 이동`);
 const st = await p.evaluate(() => window.__IR.state);
-ok(Object.keys(st.answers).length === 32 && st.answers.FN4.v === 0 && st.answers.PC1.ev === true, '응답·모르겠어요·근거 체크 저장');
-await nav(p, 'q/2'); await p.keyboard.press('5'); await p.waitForTimeout(350);
-ok((await p.evaluate(() => window.__IR.state.answers.PC2.v)) === 5 && new URL(p.url()).pathname === '/q/3', '키보드로 응답 수정');
+ok(Object.keys(st.answers).length === 36 && st.answers.FN4.v === 0 && st.answers.PC1.ev === true && st.answers.TC1.v === plan[8], '응답(기술역량 포함)·모르겠어요·근거 체크 저장');
+await nav(p, 'q/2'); await p.keyboard.press('5'); await p.waitForTimeout(100); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
+ok((await p.evaluate(() => window.__IR.state.answers.PC2.v)) === 5 && new URL(p.url()).pathname === '/q/3', '키보드(1~5·Enter)로 응답 수정');
 // 스캔본 → 직접 입력 안내
 await nav(p, 'finance'); await p.setInputFiles('[data-act=fin-file]', SCAN); await p.waitForSelector('.stat', { timeout: 15000 });
 ok((await p.textContent('.stat')).includes('글자를 읽을 수 없는'), '스캔 PDF → 직접 입력 안내');
@@ -72,7 +80,8 @@ ok(fin.confirmed && fin.cur.cash === 300000000 && fin.source === 'upload', '확�
 const ev = await p.evaluate(() => window.__IR.evaluate());
 ok(new URL(p.url()).pathname === '/result' && (await p.textContent('.ch-gauge text:nth-of-type(2)')).includes(String(ev.overall)), `결과 게이지 = 엔진 점수(${ev.overall})`);
 ok((await p.textContent('.sum-lines')).includes('표준재무제표 반영') && (await p.locator('.kpi').count()) >= 5 && (await p.locator('.ch-radar').count()) === 1 && (await p.locator('.ch-fin').count()) === 1, '요약·지표·레이더·재무 차트');
-ok((await p.textContent('main')).includes('목표 달성 시'), '로드맵 목표 단계 표시');
+ok((await p.textContent('main')).includes('산출물:') && (await p.locator('.lens').count()) === 6 && (await p.locator('.ana').count()) === 9, '투자자 관점 6개·영역별 상세 9개·로드맵 산출물');
+ok((await p.locator('.flags li').count()) >= 1 && (await p.locator('.cbar .track s').count()) === 9, '경계 신호·단계 기대 표시');
 // 뒤로 가기·결과 파일 왕복
 const [dl] = await Promise.all([p.waitForEvent('download'), p.click('[data-act=export]')]);
 const file = path.join(OUT, 'result.json'); await dl.saveAs(file);
@@ -98,8 +107,8 @@ await q.emulateMedia({ media: 'screen' });
 try {
   const text = execFileSync('pdftotext', ['-layout', RP, '-'], { encoding: 'utf8' }); const pages = Number(execFileSync('pdfinfo', [RP], { encoding: 'utf8' }).match(/Pages:\s+(\d+)/)[1]);
   const compact = text.replace(/\s+/g, '');
-  ok(pages >= 2 && pages <= 4, `보고서 ${pages}쪽(2~4쪽)`);
-  ok(['핵심요약', '영역별점수', '강점과먼저보완할점', '실행로드맵', '문항별응답', '진단방법', '합성예시'].every((s) => compact.includes(s)), '보고서 주요 섹션·합성 예시 표시');
+  ok(pages >= 2 && pages <= 5, `보고서 ${pages}쪽(2~5쪽)`);
+  ok(['핵심요약', '투자자관점진단', '영역별점수', '강점과먼저보완할점', '보완로드맵', '영역별상세진단', '문항별응답', '진단방법', '기술역량', '합성예시'].every((s) => compact.includes(s)), '보고서 주요 섹션(투자자 관점·영역별 상세)·합성 예시 표시');
   ok(new RegExp(`1\\s*/\\s*${pages}`).test(text) && /IR-\d{8}-[0-9A-F]{6}/.test(compact), '쪽 번호·보고서 ID');
   ok(![...text.matchAll(/예측|확률|성공률/g)].some((m) => !/않|없|아닙/.test(text.slice(m.index - 40, m.index + 200))), '금지 표현 없음');
   const fonts = execFileSync('pdffonts', [RP], { encoding: 'utf8' }); ok(!/Type 3/.test(fonts) && /Pretendard/.test(fonts), 'Pretendard 일반 글꼴 임베딩');

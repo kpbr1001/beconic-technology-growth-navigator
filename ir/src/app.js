@@ -1,5 +1,5 @@
 // BECONIC IR 진단 v2 — 화면. 입력 내용과 업로드한 파일은 이 브라우저 안에서만 처리하며 서버로 보내지 않는다.
-import { CATEGORIES, QUESTIONS, STAGES, INDUSTRIES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SOURCES } from './model.js';
+import { CATEGORIES, QUESTIONS, STAGES, INDUSTRIES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SOURCES, N_Q, EFFORT, INDUSTRY_ADJ } from './model.js';
 import { evaluate, SCORE_VERSION } from './score.js';
 import { ACCOUNTS, CORE, parseStatements, parseWon } from './fin.js';
 import { blank, load, save, clear, hasLegacy, today, validate } from './store.js';
@@ -7,13 +7,12 @@ import { sampleState } from './sample.js';
 import { gauge, radar, finBars, dots } from './charts.js';
 import { renderReport, reportId } from './report.js';
 
-export const APP = { version: 'v2.0.0', updated: '2026-11-01' };
+export const APP = { version: 'v2.1.0', updated: '2026-11-01' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const nb = (t) => esc(t).replace(/·/g, '⁠·⁠');
 let st = load();
 let finDraft = null; // 재무 확인 화면의 임시 값
-let advTimer = null;
 
 const commit = () => { if (st) save(st); };
 const toast = (msg) => { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600); };
@@ -56,8 +55,8 @@ function homeHtml() {
   <section class="hero"><div class="wrap hero-in"><div>
     <p class="eyebrow">근거로 준비하고, 실행으로 연결합니다</p>
     <h1>우리 회사 IR,<br><em>투자자 관점에서</em><br>준비되어 있나요?</h1>
-    <p class="lead">8개 영역 32문항에서 "우리 회사에 맞는 문장"을 고르고 표준재무제표를 올리면, IR 준비도 점수와 강점·보완점, 재무 지표, 실행 로드맵을 한눈에 보여 드려요.</p>
-    <div class="cta-row">${resume ? `<button class="btn primary lg" data-act="resume">이어서 하기 · ${esc(st.meta.company)} (${n}/32)</button><button class="btn ghost lg" data-act="new">새로 시작</button>` : '<button class="btn primary lg" data-act="new">IR 진단 시작하기 · 약 10분</button>'}</div>
+    <p class="lead">9개 영역 36문항에서 "우리 회사에 맞는 문장"을 고르고 표준재무제표를 올리면, IR 준비도 점수와 강점·보완점, 재무 지표, 실행 로드맵을 한눈에 보여 드려요.</p>
+    <div class="cta-row">${resume ? `<button class="btn primary lg" data-act="resume">이어서 하기 · ${esc(st.meta.company)} (${n}/${N_Q})</button><button class="btn ghost lg" data-act="new">새로 시작</button>` : '<button class="btn primary lg" data-act="new">IR 진단 시작하기 · 약 10분</button>'}</div>
     <p class="micro">회원가입 없음 · 입력 내용과 파일은 이 브라우저에만 저장 · <button class="link sm" data-act="sample">합성 예시 결과 보기</button></p>
   </div>
   <div class="hero-card" aria-label="결과 화면 예시"><div class="hc-top"><span>IR 진단 결과</span><small>합성 예시</small></div>
@@ -65,7 +64,7 @@ function homeHtml() {
     <div class="cbars">${CATEGORIES.slice(0, 4).map((c) => catBar(demo.cats[c.id])).join('')}</div></div></div></section>
 
   <section class="wrap"><h2 class="sec-t">이렇게 진단해요</h2><div class="cards4">
-    ${[['1', '5점 척도 진단', '문제·제품·시장·실적·경쟁·팀·재무·IR 자료 8개 영역, 문항마다 행동 기준 문장 5개 중 하나만 고르면 돼요.'],
+    ${[['1', '5점 척도 진단', '문제·제품·기술·시장·실적·경쟁·팀·재무·IR 자료 9개 영역, 문항마다 행동 기준 문장 5개 중 하나만 고르면 돼요.'],
        ['2', '표준재무제표 분석', '홈택스 표준재무제표증명 PDF를 올리면 매출·이익·부채를 읽어 지표로 보여 드려요. 파일은 업로드되지 않아요.'],
        ['3', '강점·보완점', '종합 점수에 영향이 큰 순서로 보완할 문항과 다음 단계를 짚어 드려요.'],
        ['4', '실행 로드맵·PDF', '2주·30일·90일 할 일과 결과 보고서 PDF로 바로 실행에 옮길 수 있어요.']]
@@ -77,7 +76,7 @@ function homeHtml() {
   </section>
 
   <section class="wrap steps"><h2 class="sec-t">진행 순서</h2><ol>
-    <li><b>기본 정보 3가지</b><span>회사명·투자 단계·업종 (30초)</span></li><li><b>32문항 진단</b><span>한 화면에 한 문항, 탭 한 번 (약 8분)</span></li>
+    <li><b>기본 정보 3가지</b><span>회사명·투자 단계·업종 (30초)</span></li><li><b>36문항 진단</b><span>한 화면에 한 문항 (약 10분)</span></li>
     <li><b>재무제표 올리기</b><span>표준재무제표 PDF 또는 직접 입력 (선택)</span></li><li><b>결과·PDF</b><span>대시보드와 결과 보고서</span></li></ol></section>
 
   <section class="wrap consult"><div class="cbox"><div><b>결과를 보고 IR을 함께 준비하고 싶다면</b><p>그로스벤처스는 중기부 인증 중소기업상담회사(제2025-684호)예요. 15년 경력 컨설턴트가 진단 결과를 바탕으로 IR 자료와 투자 준비를 함께 설계해 드려요.</p></div>
@@ -96,27 +95,27 @@ function startHtml() {
     <div class="fld">업종 <span class="muted" style="font-weight:500">(선택)</span><div class="chips">${INDUSTRIES.map((x) => `<button class="${m.industry === x ? 'on' : ''}" data-act="industry" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div></div>
     <p class="err" id="s-err" role="alert"></p>
   </div></main>
-  <div class="bottom-bar"><div class="wrap narrow bb"><button class="btn primary lg block" data-act="start-go">${Object.keys(st?.answers || {}).length ? '진단 이어서 하기' : '진단 시작하기 · 32문항'}</button></div></div>`;
+  <div class="bottom-bar"><div class="wrap narrow bb"><button class="btn primary lg block" data-act="start-go">${Object.keys(st?.answers || {}).length ? '진단 이어서 하기' : `진단 시작하기 · ${N_Q}문항`}</button></div></div>`;
 }
 
 // ───────────────────────── 문항(한 화면 한 문항)
 function questionHtml(n) {
-  const i = Math.max(1, Math.min(32, n)) - 1; const q = QUESTIONS[i]; const c = CMAP[q.cat];
+  const i = Math.max(1, Math.min(N_Q, n)) - 1; const q = QUESTIONS[i]; const c = CMAP[q.cat];
   const a = st.answers[q.id] || {}; const ci = CATEGORIES.findIndex((x) => x.id === q.cat);
   const inCat = QUESTIONS.filter((x) => x.cat === q.cat); const k = inCat.indexOf(q) + 1;
   const done = Object.values(st.answers).filter((x) => typeof x.v === 'number').length;
   return `${headerHtml()}<main class="wrap narrow">
-  <div class="qtop"><div class="qtop-r"><button class="back" style="margin:0" data-act="${i === 0 ? 'to-start' : 'prev'}">← ${i === 0 ? '기본 정보' : '이전'}</button><span>${i + 1} / 32</span></div><div class="qbar" aria-hidden="true"><i style="width:${Math.round((done / 32) * 100)}%"></i></div></div>
+  <div class="qtop"><div class="qtop-r"><button class="back" style="margin:0" data-act="${i === 0 ? 'to-start' : 'prev'}">← ${i === 0 ? '기본 정보' : '이전'}</button><span>${i + 1} / ${N_Q}</span></div><div class="qbar" aria-hidden="true"><i style="width:${Math.round((done / N_Q) * 100)}%"></i></div></div>
   ${st.meta.synthetic ? '<div class="syn-band">합성 예시 데이터예요.</div>' : ''}
   <span class="qcat">${ci + 1}. ${nb(c.name)} · ${k}/${inCat.length}</span>
   <h1 class="qtitle">${nb(q.q)}</h1><p class="qwhy">${esc(q.why)}</p>
   <label class="evtog"><input type="checkbox" data-act="ev" ${a.ev ? 'checked' : ''}> 이 내용을 보여 줄 문서·데이터가 있어요 <span class="muted" style="font-weight:500">(선택)</span></label>
   <div class="opts" role="radiogroup" aria-label="가장 가까운 문장 고르기">
-    ${q.opts.map((t, j) => `<button role="radio" aria-checked="${a.v === j + 1}" class="opt ${a.v === j + 1 ? 'on' : ''}" data-act="pick" data-v="${j + 1}"><span class="n">${j + 1}</span><span>${esc(t)}</span></button>`).join('')}
-    <button role="radio" aria-checked="${a.v === 0}" class="opt unk ${a.v === 0 ? 'on' : ''}" data-act="pick" data-v="0">잘 모르겠어요</button>
+    ${q.opts.map((t, j) => `<button role="radio" aria-checked="${a.v === j + 1}" class="opt ${a.v === j + 1 ? 'on' : ''}" data-act="pick" data-v="${j + 1}"><span class="n">${j + 1}</span><span class="ot">${esc(t)}</span><span class="ck" aria-hidden="true">${a.v === j + 1 ? '선택됨' : ''}</span></button>`).join('')}
+    <button role="radio" aria-checked="${a.v === 0}" class="opt unk ${a.v === 0 ? 'on' : ''}" data-act="pick" data-v="0">잘 모르겠어요${a.v === 0 ? ' · 선택됨' : ''}</button>
   </div>
-  <p class="hint">가장 가까운 문장을 고르면 다음 문항으로 넘어가요. 키보드 1~5로도 고를 수 있어요.</p></main>
-  <div class="bottom-bar"><div class="wrap narrow bb"><a class="btn ghost" href="/answers">전체 문항</a><button class="btn primary" data-act="next">${i === 31 ? '재무제표 단계로 ›' : '다음 ›'}</button></div></div>`;
+  <p class="hint">${typeof a.v === 'number' ? '선택했어요. "다음"을 누르거나 같은 보기를 한 번 더 누르면 넘어가요(Enter 키도 돼요).' : '가장 가까운 문장을 골라 주세요. 키보드 1~5로도 고를 수 있어요.'}</p></main>
+  <div class="bottom-bar"><div class="wrap narrow bb"><a class="btn ghost" href="/answers">전체 문항</a><button class="btn ${typeof a.v === 'number' ? 'primary' : 'ghost'}" data-act="next">${i === N_Q - 1 ? '재무제표 단계로 ›' : '다음 ›'}</button></div></div>`;
 }
 
 // ───────────────────────── 재무
@@ -150,11 +149,13 @@ function financeHtml() {
 // ───────────────────────── 결과
 function resultHtml() {
   const r = evaluate(st);
-  if (!r.answered) return `${headerHtml()}<main class="wrap narrow"><div class="card" style="margin-top:24px;text-align:center"><h3>아직 응답이 없어요</h3><p class="hint">32문항에 답하면 결과를 보여 드려요.</p><a class="btn primary" href="/q/1">진단 시작하기</a></div></main>`;
-  const stage = STAGES.find((s) => s.id === r.stage)?.label || '';
+  if (!r.answered) return `${headerHtml()}<main class="wrap narrow"><div class="card" style="margin-top:24px;text-align:center"><h3>아직 응답이 없어요</h3><p class="hint">${N_Q}문항에 답하면 결과를 보여 드려요.</p><a class="btn primary" href="/q/1">진단 시작하기</a></div></main>`;
+  const stage = r.stageLabel;
   const ind = r.indicators; const c = st.fin?.cur || {}; const p = st.fin?.prev || {};
   const qn = (id) => QUESTIONS.findIndex((q) => q.id === id) + 1;
-  const roadCol = (t, list) => `<div><h4>${t}</h4>${list.length ? `<ol>${list.map((x) => `<li>${x.q ? `<b>${esc(x.q.title)}</b> — ${esc(x.action)}<small>${x.q.id} · 목표 달성 시 종합 +${x.gainTo}점</small>` : esc(x.action)}</li>`).join('')}</ol>` : '<p class="sm muted">없음</p>'}</div>`;
+  const adj = INDUSTRY_ADJ[r.industry] ? ` · ${esc(r.industry)} 업종 보정` : '';
+  const roadCol = (t, sub, list) => `<div><h4>${t} <span class="muted sm">${sub}</span></h4>${list.length ? `<ol>${list.map((x) => `<li>${x.q ? `<b>${esc(x.q.title)}</b> — ${esc(x.action)}<small>산출물: ${esc(x.doc)} · ${x.q.id} · 달성 시 +${x.gainTo}점</small>` : `${esc(x.action)}<small>산출물: ${esc(x.doc)}</small>`}</li>`).join('')}</ol>` : '<p class="sm muted">없음</p>'}</div>`;
+  const ansText = (q) => { const a = st.answers[q.id] || {}; return typeof a.v !== 'number' ? '미응답' : a.v === 0 ? '잘 모르겠어요' : esc(q.opts[a.v - 1]); };
   return `${headerHtml()}<main class="wrap">
   ${st.meta.synthetic ? '<div class="syn-band">합성 예시 결과예요. 실제 기업 자료가 아니에요.</div>' : ''}
   <div class="res-h"><div><small>${esc(stage)} · ${esc(st.meta.industry || '업종 미선택')} · ${today()}</small><h1>${esc(st.meta.company)} IR 진단 결과</h1></div>
@@ -162,17 +163,25 @@ function resultHtml() {
 
   <section class="card"><div class="sum-card"><div class="ch-wrap">${gauge(r.overall, r.grade, { size: 250 })}</div>
     <div><ul class="sum-lines">${r.summary.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-    <div class="badges"><span class="bdg ${r.complete ? 'ok' : 'warn'}">응답 ${r.answered}/32</span><span class="bdg info">근거 자료 ${r.evidenceRate}%</span><span class="bdg ${r.fin.has ? 'ok' : 'warn'}">${r.fin.has ? '재무제표 반영' : '재무제표 미반영'}</span>${r.unknown.length ? `<span class="bdg warn">모르겠어요 ${r.unknown.length}</span>` : ''}</div></div></div></section>
+    <div class="badges"><span class="bdg ${r.complete ? 'ok' : 'warn'}">응답 ${r.answered}/${N_Q}</span><span class="bdg info">근거 자료 ${r.evidenceRate}%</span><span class="bdg ${r.fin.has ? 'ok' : 'warn'}">${r.fin.has ? '재무제표 반영' : '재무제표 미반영'}</span>${r.unknown.length ? `<span class="bdg warn">모르겠어요 ${r.unknown.length}</span>` : ''}${r.flags.length ? `<span class="bdg bad">경계 신호 ${r.flags.length}</span>` : ''}</div></div></div></section>
+
+  ${r.flags.length ? `<section class="card flags"><h3>투자자 경계 신호</h3><p class="hint">투자 검토에서 멈칫하게 되는 지점이에요. 미팅 전에 먼저 정리하세요.</p><ul class="chk-l">${r.flags.map((f) => `<li class="warn">${esc(f.text)}${f.qid ? ` <a href="/q/${qn(f.qid)}">응답 보기</a>` : ''}</li>`).join('')}</ul></section>` : ''}
+
+  <section class="card"><h3>투자자 관점 진단</h3><p class="hint">투자 심사에서 묻는 6가지 질문으로 다시 묶어 봤어요. 질문마다 실사에서 확인하는 자료도 함께 적었어요.</p>
+    <div class="lenses">${r.lenses.map((l) => `<div class="lens ${l.verdict?.tone || ''}"><div class="lh"><b>${esc(l.name)}</b><em>${l.score ?? '—'}</em></div><p class="lq">${esc(l.q)}</p>
+      <div class="track"><i style="width:${l.score ?? 0}%;background:${barColor(l.score ?? 0)}"></i></div>
+      <p class="lv">${l.verdict ? esc(l.verdict.text) : '응답 없음'}${l.note ? ` · <span class="muted">${esc(l.note)}</span>` : ''}</p>
+      ${l.weakest && (l.score ?? 100) < 80 ? `<p class="lw">가장 약한 부분: <a href="/q/${qn(l.weakest.id)}">${esc(l.weakest.title)}</a></p>` : ''}<p class="ld">실사 확인 자료: ${esc(l.docs)}</p></div>`).join('')}</div></section>
 
   <div class="grid2">
     <section class="card"><h3>영역별 점수</h3><div class="ch-wrap">${radar(CATEGORIES.map((x) => ({ name: x.short, score: r.cats[x.id].score })), { size: 320 })}</div></section>
-    <section class="card"><h3>영역별 점수·비중</h3><p class="hint">${esc(stage)} 단계 비중으로 종합 점수를 계산해요.</p><div class="cbars">
-      ${CATEGORIES.map((x) => { const cc = r.cats[x.id]; return `${catBar(cc)}<div class="cbar" style="margin-top:-8px"><small>비중 ${cc.weight}% · 근거 ${cc.ev}/${cc.total}${cc.unknown ? ` · 모르겠어요 ${cc.unknown}` : ''}</small></div>`; }).join('')}</div></section>
+    <section class="card"><h3>단계 기대 수준 대비</h3><p class="hint">세로선은 ${esc(stage)} 단계에서 갖추면 좋은 수준(비코닉 기준)이에요. 비중으로 종합 점수를 계산해요${adj}.</p><div class="cbars">
+      ${CATEGORIES.map((x) => { const cc = r.cats[x.id]; return `<div class="cbar"><b>${nb(x.name)}</b><div class="track"><i style="width:${cc.score ?? 0}%;background:${barColor(cc.score ?? 0)}"></i><s style="left:${cc.expect}%"></s></div><em>${cc.score ?? '—'}</em><small>비중 ${cc.weight}% · 기대 ${cc.expect} · ${cc.gap === null ? '미응답' : cc.gap >= 0 ? '충족' : `<span class="gap">${cc.gap}</span>`} · 근거 ${cc.ev}/${cc.total}</small></div>`; }).join('')}</div></section>
   </div>
 
   <div class="grid2">
     <section class="card"><h3>강점</h3><div class="lst">${r.strengths.length ? r.strengths.map((s) => `<div class="it good"><div class="h"><span>${esc(s.q.title)} <span class="muted sm">${esc(CMAP[s.q.cat].name)}</span></span>${dots(s.v)}</div><p>${esc(s.text)}${s.ev ? '' : ' · 근거 자료 확인 필요'}</p></div>`).join('') : '<p class="hint">4점 이상인 문항이 아직 없어요.</p>'}</div></section>
-    <section class="card"><h3>먼저 보완할 3가지</h3><p class="hint">점수를 올릴 여지가 크고 비중이 높은 순서예요.</p><div class="lst">${r.weaknesses.map((w) => `<div class="it need"><div class="h"><span>${esc(w.q.title)} <span class="muted sm">${esc(CMAP[w.q.cat].name)}</span></span>${dots(w.v)}</div><p>지금: ${esc(w.now)}</p><p class="nx"><b>목표</b> ${esc(w.next)} <span class="muted sm">(달성 시 +${w.gainTo}점)</span></p></div>`).join('') || '<p class="hint">3점 이하 문항이 없어요.</p>'}</div></section>
+    <section class="card"><h3>먼저 보완할 3가지</h3><p class="hint">점수를 올릴 여지가 크고 비중이 높은 순서예요.</p><div class="lst">${r.weaknesses.map((w) => `<div class="it need"><div class="h"><span>${esc(w.q.title)} <span class="muted sm">${esc(CMAP[w.q.cat].name)}</span></span>${dots(w.v)}</div><p>지금: ${esc(w.now)}</p><p class="nx"><b>목표</b> ${esc(w.next)} <span class="muted sm">(달성 시 +${w.gainTo}점)</span></p><p class="sm muted">산출물: ${esc(w.doc)}</p></div>`).join('') || '<p class="hint">3점 이하 문항이 없어요.</p>'}</div></section>
   </div>
 
   ${r.checks.length ? `<section class="card"><h3>응답과 재무제표 확인</h3><ul class="chk-l">${r.checks.map((x) => `<li class="${x.type}">${esc(x.text)}${x.qid ? ` <a href="/q/${qn(x.qid)}">응답 보기</a>` : ''}</li>`).join('')}</ul></section>` : ''}
@@ -181,28 +190,31 @@ function resultHtml() {
     <div class="kpis">${ind.map((x) => `<div class="kpi ${x.band || ''}"><span>${esc(x.label)}</span><b>${x.value === null ? esc(x.text || '계산 불가') : `${x.value}${x.unit}`}</b><small>${esc(x.note)}</small></div>`).join('')}</div>
     <div class="ch-wrap" style="margin-top:12px">${finBars([{ label: '매출액', prev: p.rev, cur: c.rev }, { label: '영업이익', prev: p.op, cur: c.op }, { label: '당기순이익', prev: p.net, cur: c.net }])}</div>
     <div class="res-act"><a class="btn white sm" href="/finance">재무 수정</a></div>`
-    : `<div class="stat warn">재무제표가 반영되지 않았어요. 재무·자금 점수는 대표 응답만으로 계산했어요.</div><p class="hint">투자자는 표준재무제표를 가장 먼저 요청해요. 올리면 매출 성장률·영업이익률·부채비율·유동비율과 응답 교차 확인이 추가돼요.</p><a class="btn primary" href="/finance">표준재무제표 올리기</a>`}</section>
+    : `<div class="stat warn">재무제표가 반영되지 않았어요. 재무·자금 점수는 대표 응답만으로 계산했어요.</div><p class="hint">투자자는 표준재무제표를 가장 먼저 요청해요. 올리면 매출 성장률·영업이익률·부채비율·유동비율·현금 보유 개월 수와 응답 교차 확인이 추가돼요.</p><a class="btn primary" href="/finance">표준재무제표 올리기</a>`}</section>
 
-  <section class="card"><h3>실행 로드맵</h3><p class="hint">종합 점수에 영향이 큰 순서로 나눴어요. 각 항목은 바로 다음 목표 단계(최소 문서화 수준)예요.</p>
-    <div class="road">${roadCol('지금 ~ 2주', r.roadmap.now)}${roadCol('30일 안에', r.roadmap.d30)}${roadCol('90일 안에', r.roadmap.d90)}</div></section>
+  <section class="card"><h3>보완 로드맵</h3><p class="hint">종합 점수에 영향이 큰 순서로 고른 뒤, 보완 난이도에 맞춰 기간에 배치했어요. 항목마다 만들어야 할 산출물을 적었어요.</p>
+    <div class="road">${roadCol('지금 ~ 2주', '빠르게 정리', r.roadmap.now)}${roadCol('30일 안에', '자료·실적 보강', r.roadmap.d30)}${roadCol('90일 안에', '구조·실적 만들기', r.roadmap.d90)}</div></section>
 
-  <section class="card"><h3>문항별 응답</h3>${CATEGORIES.map((x) => `<details class="qd"><summary><span>${nb(x.name)}</span><span>${r.cats[x.id].score ?? '—'}점 ›</span></summary>
-    ${QUESTIONS.filter((q) => q.cat === x.id).map((q) => { const a = st.answers[q.id] || {};
-      return `<div class="qrow"><div><b>${esc(q.title)} ${dots(a.v)}</b><span>${typeof a.v !== 'number' ? '미응답' : a.v === 0 ? '잘 모르겠어요' : esc(q.opts[a.v - 1])}${a.ev ? ' · 근거 있음' : ''}</span></div><a href="/q/${qn(q.id)}">수정</a></div>`; }).join('')}</details>`).join('')}</section>
+  <section class="card"><h3>영역별 상세 진단</h3><p class="hint">영역마다 투자자가 보는 포인트, 지금 상태, 보완 목표와 준비할 자료예요.</p>
+  ${r.analysis.map((a) => `<details class="qd"><summary><span>${nb(a.c.name)} <span class="bdg ${a.gap === null ? '' : a.gap >= 0 ? 'ok' : 'warn'}">${esc(a.status)}</span></span><span>${a.score ?? '—'}점 ›</span></summary>
+    <div class="ana"><p class="av"><b>투자자가 보는 포인트</b> ${esc(a.c.view)}</p>${a.diag ? `<p><b>지금 상태</b> ${esc(a.diag)}</p>` : ''}
+    ${a.actions.length ? `<p><b>보완 목표</b></p><ul>${a.actions.map((x) => `<li>${esc(x.q.title)} — ${esc(x.action)} <span class="muted sm">(${EFFORT[x.effort]} · 산출물: ${esc(x.doc)})</span></li>`).join('')}</ul>` : ''}
+    ${qByCatLocal(a.c.id).map((q) => `<div class="qrow"><div><b>${esc(q.title)} ${dots(st.answers[q.id]?.v)}</b><span>${ansText(q)}${st.answers[q.id]?.ev ? ' · 근거 있음' : ''}</span></div><a href="/q/${qn(q.id)}">수정</a></div>`).join('')}</div></details>`).join('')}</section>
 
   <section class="card method"><h3>점수는 이렇게 계산해요</h3>
-    <p>문항은 1~5점(잘 모르겠어요 = 1점), 영역 점수 = 문항 평균 × 20, 종합 = 투자 단계별 영역 비중으로 가중 평균해요. 대표 응답과 제출한 재무제표 기반의 자가진단이며, 투자 유치 여부나 기업가치를 판단·보장하지 않아요.</p>
+    <p>문항은 1~5점(잘 모르겠어요 = 1점), 영역 점수 = 문항 평균 × 20, 종합 = 투자 단계별 영역 비중(기술 집약 업종은 기술역량 비중 보정)으로 가중 평균해요. 대표 응답과 제출한 재무제표 기반의 자가진단이며, 투자 유치 여부나 기업가치를 판단·보장하지 않아요.</p>
     <div class="tw"><table><thead><tr><th>등급</th>${GRADES.map((g) => `<th>${g.g}</th>`).join('')}</tr></thead><tbody><tr><td>기준</td>${GRADES.map((g) => `<td>${g.min}+</td>`).join('')}</tr></tbody></table></div>
-    <p class="sm">영역 구성은 ${Object.values(SOURCES).slice(0, 2).map((s) => `${esc(s.publisher)} 「${esc(s.title)}」`).join(', ')}의 투자 설명 항목을 참고했어요. 가중치는 비코닉 설계값(실증 검증 전)이에요.</p></section>
+    <p class="sm">영역 구성은 ${Object.values(SOURCES).slice(0, 2).map((s) => `${esc(s.publisher)} 「${esc(s.title)}」`).join(', ')}의 투자 설명 항목을 참고했어요. 가중치·단계 기대 수준·업종 보정은 비코닉 설계값(실증 검증 전)이에요.</p></section>
 
   <div class="res-act"><button class="btn primary" data-act="print">결과 보고서 PDF</button><a class="btn white" href="/finance">재무 ${r.fin.has ? '수정' : '올리기'}</a><button class="btn white" data-act="export">결과 파일 저장</button><label class="btn white file">결과 파일 열기<input type="file" accept="application/json,.json" data-act="import" hidden></label><button class="link danger" data-act="reset">모두 지우기</button></div>
   <section class="consult" style="margin-top:24px"><div class="cbox"><div><b>보완 항목을 함께 준비하고 싶다면</b><p>진단 결과를 바탕으로 IR 덱·재무 자료·투자 전략을 함께 설계해 드려요.</p></div><div class="cbtn"><a class="btn primary" href="tel:070-4103-4177">070-4103-4177</a><a class="btn ghost" href="mailto:start@gven.kr?subject=IR 진단 결과 상담">이메일 상담</a></div></div></section>
   </main>${footerHtml()}`;
 }
+const qByCatLocal = (cid) => QUESTIONS.filter((q) => q.cat === cid);
 
 function answersHtml() {
   const r = evaluate(st);
-  return `${headerHtml()}<main class="wrap narrow"><button class="back" data-act="result-or-home">← 돌아가기</button><h1 class="pg-t">전체 문항</h1><p class="pg-s">${r.answered}/32 응답 · 누르면 해당 문항으로 가요.</p>
+  return `${headerHtml()}<main class="wrap narrow"><button class="back" data-act="result-or-home">← 돌아가기</button><h1 class="pg-t">전체 문항</h1><p class="pg-s">${r.answered}/${N_Q} 응답 · 누르면 해당 문항으로 가요.</p>
   ${CATEGORIES.map((c) => `<section class="card"><h3>${nb(c.name)} <span class="muted sm">${r.cats[c.id].score ?? '—'}점</span></h3>${QUESTIONS.filter((q) => q.cat === c.id).map((q) => { const a = st.answers[q.id] || {};
     return `<div class="qrow"><div><b>${esc(q.title)} ${dots(a.v)}</b><span>${typeof a.v !== 'number' ? '<b style="color:var(--warn);display:inline">미응답</b>' : a.v === 0 ? '잘 모르겠어요' : esc(q.opts[a.v - 1])}</span></div><a href="/q/${QUESTIONS.indexOf(q) + 1}">${typeof a.v === 'number' ? '수정' : '답하기'}</a></div>`; }).join('')}</section>`).join('')}
   </main><div class="bottom-bar"><div class="wrap narrow bb"><a class="btn ghost" href="/finance">재무제표</a><a class="btn primary" href="/result">결과 보기 ›</a></div></div>`;
@@ -250,11 +262,14 @@ async function handlePdf(file) {
 document.addEventListener('keydown', (e) => {
   if (route()[0] !== 'q' || e.target.closest('input,textarea,select')) return;
   if (/^[1-5]$/.test(e.key)) { e.preventDefault(); pick(Number(e.key)); }
+  else if (e.key === 'Enter' && !e.target.closest('button,a')) { const n = Number(route()[1]) || 1; if (typeof st.answers[QUESTIONS[n - 1].id]?.v === 'number') { e.preventDefault(); go(n < N_Q ? `q/${n + 1}` : 'finance'); } }
 });
+// 고르면 선택만 표시하고 넘어가지 않는다(자동 이동 시 선택 확인·근거 체크가 어려웠음). 같은 보기를 다시 누르거나 '다음'·Enter로 진행
 function pick(v) {
   const n = Number(route()[1]) || 1; const q = QUESTIONS[n - 1];
+  if (st.answers[q.id]?.v === v) { go(n < N_Q ? `q/${n + 1}` : 'finance'); return; }
   st.answers[q.id] = { ...(st.answers[q.id] || {}), v }; commit(); render();
-  clearTimeout(advTimer); advTimer = setTimeout(() => (n < 32 ? go(`q/${n + 1}`) : go('finance')), 260);
+  const nx = $('[data-act=next]'); if (nx) nx.focus({ preventScroll: true });
 }
 document.addEventListener('input', (e) => {
   const el = e.target;
@@ -291,9 +306,9 @@ document.addEventListener('click', (e) => {
     }
     case 'to-start': go('start'); break;
     case 'pick': pick(Number(b.dataset.v)); break;
-    case 'prev': clearTimeout(advTimer); go(`q/${Math.max(1, n - 1)}`); break;
-    case 'next': clearTimeout(advTimer); go(n < 32 ? `q/${n + 1}` : 'finance'); break;
-    case 'to-last': go('q/32'); break;
+    case 'prev': go(`q/${Math.max(1, n - 1)}`); break;
+    case 'next': go(n < N_Q ? `q/${n + 1}` : 'finance'); break;
+    case 'to-last': go(`q/${N_Q}`); break;
     case 'to-result': go('result'); break;
     case 'result-or-home': go(Object.keys(st.answers).length ? 'result' : ''); break;
     case 'fin-manual': finDraft = { source: 'manual', fileName: '', cur: { ...(st.fin?.cur || {}) }, prev: { ...(st.fin?.prev || {}) }, found: {} }; render(); break;
