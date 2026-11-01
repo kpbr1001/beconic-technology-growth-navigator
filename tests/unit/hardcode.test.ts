@@ -56,6 +56,13 @@ describe('연락처(전화·주소·인증번호·이메일)는 앱마다 한 �
   });
 });
 
+describe('진단 툴 주소 비공개', () => {
+  it('인사(HR) 진단은 다른 진단 사이트 주소로 연결하지 않음', () => {
+    const html = readFileSync('hr/index.html', 'utf8');
+    expect(html.match(/https?:\/\/beconic-diagnosis-(?!hr\b)[a-z-]+\.netlify\.app/g) ?? []).toEqual([]);
+  });
+});
+
 describe('부록 Knowledge Base = 실제 원문 색인', () => {
   beforeAll(() => setRoadmapIndex(raw as unknown as AppIndex));
   afterAll(() => setRoadmapIndex(null));

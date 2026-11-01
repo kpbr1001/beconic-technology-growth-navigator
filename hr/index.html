@@ -904,8 +904,9 @@ button.sc{font-family:inherit;cursor:pointer;width:100%}
    점수·우선순위·로드맵 = 공개 규칙(결정론 코드). AI는 운영자가 켠 경우에만 '해석 초안'을 덧붙임.
    ============================================================ */
 const APP={ver:'v3.2.0', updated:'2026-10-26', qbank:'HRH-QB-3.0', lawBase:'2026-10-26'};
-/* 연계 Tool 주소 — 비어 있으면 링크 없이 'BECONIC 허브에서 이용' 안내만 표시 */
-const TOOL_LINKS={ceo:'', finance:'https://beconic-diagnosis-finance.netlify.app'};
+/* 연계 Tool 주소 — 비어 있으면 링크 없이 'BECONIC 허브에서 이용' 안내만 표시.
+   다른 진단 사이트 주소는 연결하지 않는다(진단 툴 주소 비공개 원칙 — 저장소 테스트가 확인) */
+const TOOL_LINKS={ceo:'', finance:''};
 /* 발행사·상담 연락처 — 화면·보고서의 번호·주소는 모두 여기서([data-ct] 자리에 채움). 소스에 직접 쓰지 않는다 */
 const CONTACT={tel:'02-6124-5960', mail:'start@gven.kr', web:'www.beconic.kr', addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호'};
 
