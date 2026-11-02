@@ -4,7 +4,7 @@ import { CATEGORIES, QUESTIONS, STAGES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SO
   bandColor, SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS, qByCat, FIN_YEARS_GOOD } from './model.js';
 import { SCORE_VERSION } from './score.js';
 import { ACCOUNTS, SLOTS, slotLabel, fmtWon, finBandSummary } from './fin.js';
-import { gauge, radar, trend, lineChart } from './charts.js';
+import { gauge, radar, trend, lineChart, hbars } from './charts.js';
 import { COMPANY } from './contact.js';
 
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -58,11 +58,15 @@ export function renderReport(st, r, { id, date, version }) {
   <div class="r-bdg"><span class="${r.complete ? 'ok' : 'warn'}">응답 ${r.answered}/${N_Q}</span><span>근거 자료 ${r.evidenceRate}%</span>${r.unknown.length ? `<span class="warn">모르겠어요 ${r.unknown.length}</span>` : ''}${r.flags.length ? `<span class="warn">경계 신호 ${r.flags.length}</span>` : ''}</div>
   <div class="r-grid"><div><h3>이 보고서 읽는 법</h3><ol class="r-chk"><li>핵심 진단에서 강점과 먼저 보완할 점을 확인해요.</li><li>투자자 관점·영역별 진단에서 투자자가 어떤 눈으로 보는지, 무엇이 부족한지 봐요.</li><li>재무·물어볼 질문·로드맵으로 미팅 전 할 일을 정해요.</li></ol></div>
     <div><h3>목차</h3><ol class="r-toc">${TOC.map((t) => `<li>${t}</li>`).join('')}</ol></div></div>
+  <div class="r-grid"><div><h3>영역별 점수 한눈에 <span class="r-note">세로선 = 단계 기대 수준</span></h3>${hbars(CATEGORIES.map((x) => ({ name: x.name, score: r.cats[x.id].score, expect: r.cats[x.id].expect })), { width: 340, row: 19, label: 112, color: bandColor })}</div>
+    <div><h3>지금 바로 할 일</h3><ol class="r-chk">${r.roadmap[ROADMAP_BUCKETS[0].key].slice(0, TOP_N + 1).map((x) => `<li>${x.q ? `<b>${esc(x.q.title)}</b> — ${esc(x.action)}` : esc(x.action)} <span class="r-note">(만들 자료: ${esc(x.doc)})</span></li>`).join('')}</ol>
+    ${r.uplift.full > 0 ? `<div class="r-box"><b>보완 효과(계산상)</b> ${esc(ROADMAP_BUCKETS[0].label)} 할 일을 마치면 종합 ${r.overall} → ${r.uplift.nowTo}점, 로드맵 전체를 마치면 ${r.uplift.fullTo}점이 돼요. 실제 투자 결과를 뜻하지 않아요.</div>` : ''}</div></div>
   ${end}
 
   ${pg(2, '핵심 진단', '투자자에게 먼저 보여 줄 강점과, 점수에 영향이 가장 큰 보완점이에요.')}
   <div class="r-grid"><div><h3>투자자에게 먼저 보여 줄 강점</h3>${r.strengths.length ? r.strengths.map((s) => `<div class="r-it good"><b>${esc(s.q.title)}</b> <span class="r-note">${esc(CMAP[s.q.cat].name)}</span> ${rdots(s.v)}<p>${esc(s.text)}${s.ev ? '' : ' · 근거 자료를 함께 준비하세요'}</p></div>`).join('') : `<p class="r-note">${STRONG_MIN}점 이상 문항 없음 — 아래 보완점부터 정리하세요.</p>`}</div>
     <div><h3>먼저 보완할 ${TOP_N}가지</h3>${r.weaknesses.map((w) => `<div class="r-it need"><b>${esc(w.q.title)}</b> <span class="r-note">${esc(CMAP[w.q.cat].name)}</span> ${rdots(w.v)}<p>지금: ${esc(w.now)}</p><p class="nx"><em>목표</em> ${esc(w.next)} <span class="r-note">(달성 시 +${w.gainTo}점 · 만들 자료: ${esc(w.doc)})</span></p></div>`).join('') || `<p class="r-note">${WEAK_MAX}점 이하 문항 없음</p>`}</div></div>
+  ${r.uplift.top > 0 ? `<div class="r-box"><b>먼저 보완할 ${TOP_N}가지를 목표 단계로 올리면</b> 종합 점수가 ${r.overall}점에서 ${r.uplift.topTo}점(+${Math.round(r.uplift.top)})이 돼요(계산상). 비중이 큰 영역의 낮은 문항부터 올리는 것이 가장 효율적이에요.</div>` : ''}
   <h3>투자자가 멈칫할 수 있는 부분</h3>${r.flags.length ? `<ul class="r-chk r-flag">${r.flags.map((f) => `<li>${esc(f.text)}</li>`).join('')}</ul>` : '<p class="r-note">응답·재무제표에서 두드러진 경계 신호는 없어요.</p>'}
   ${r.checks.length ? `<h3>응답과 재무제표 확인</h3><ul class="r-chk">${r.checks.map((x) => `<li>${esc(x.text)}</li>`).join('')}</ul>` : ''}
   ${r.gaps.length ? `<h3>${esc(stage)} 단계 기대에 못 미치는 영역</h3><table class="r-tbl"><thead><tr><th>영역</th><th class="r-c">점수</th><th class="r-c">기대</th><th class="r-c">차이</th><th>투자자가 보는 포인트</th></tr></thead><tbody>${r.gaps.map((c) => `<tr><td class="r-nw"><b>${esc(c.name)}</b></td><td class="r-c r-num">${c.score}</td><td class="r-c">${c.expect}</td><td class="r-c r-gap">${c.gap}</td><td>${esc(CMAP[c.id].view)}</td></tr>`).join('')}</tbody></table>` : ''}
@@ -72,6 +76,7 @@ export function renderReport(st, r, { id, date, version }) {
   <table class="r-tbl"><thead><tr><th>투자자 질문</th><th>점수</th><th>판단</th><th>가장 약한 부분</th><th>실사 확인 자료</th></tr></thead><tbody>
   ${r.lenses.map((l) => `<tr><td><b>${esc(l.name)}</b><br><span class="r-note">${esc(l.q)}</span></td><td class="r-nw"><span class="r-bar-t r-bar-s"><span class="r-bar" style="width:${l.score ?? 0}%;background:${bandColor(l.score)}"></span></span><b class="r-num">${l.score ?? '—'}</b></td><td>${l.verdict ? esc(l.verdict.text) : '—'}${l.note ? `<br><span class="r-note">${esc(l.note)}</span>` : ''}</td><td>${l.weakest && l.verdict?.tone !== 'good' ? esc(l.weakest.title) : '—'}</td><td>${esc(l.docs)}</td></tr>`).join('')}
   </tbody></table>
+  <div class="r-lensbar">${hbars(r.lenses.map((l) => ({ name: l.name, score: l.score })), { width: 900, row: 24, label: 130, marks: LENS_VERDICT.filter((v) => v.min).map((v) => v.min), color: bandColor })}</div>
   <div class="r-box"><b>읽는 법</b> ${LENS_VERDICT.map((v) => `${v.min ? `${v.min}점 이상` : '그 아래'}: ${esc(v.text)}`).join(' · ')}. 점수가 낮은 질문부터 "실사 확인 자료"를 준비하세요.</div>
   ${end}
 
@@ -89,10 +94,10 @@ export function renderReport(st, r, { id, date, version }) {
   <div class="r-box"><b>요약</b> 기대 수준을 넘은 영역 ${met}개, 못 미친 영역 ${r.gaps.length}개예요.${r.gaps.length ? ` 차이가 가장 큰 영역은 ${r.gaps.slice(0, TOP_N).map((c) => `${esc(c.name)}(${c.gap})`).join(', ')}이에요.` : ''} 비중이 큰 영역일수록 한 단계만 올려도 종합 점수가 많이 올라요.</div>
   ${end}
 
-  ${pg(5, '영역별 상세 진단 ①', '영역마다 투자자가 보는 포인트, 문항별 응답, 보완 목표와 투자자가 물어볼 질문이에요.')}
+  ${pg(5, '영역별 상세 진단 (1/2)', '영역마다 투자자가 보는 포인트, 문항별 응답, 보완 목표와 투자자가 물어볼 질문이에요.')}
   ${r.analysis.slice(0, half).map(catBlock).join('')}
   ${end}
-  ${pg(6, '영역별 상세 진단 ②', '')}
+  ${pg(6, '영역별 상세 진단 (2/2)', '')}
   ${r.analysis.slice(half).map(catBlock).join('')}
   ${end}
 
@@ -100,9 +105,9 @@ export function renderReport(st, r, { id, date, version }) {
   ${r.fin.has ? `${r.finStory.length ? `<ul class="r-story">${r.finStory.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
     <table class="r-tbl"><thead><tr><th>재무 영역</th><th class="r-c">판단</th><th>의미</th><th>근거 지표(최근 연도)</th></tr></thead><tbody>
     ${r.finAreas.map((a) => `<tr><td class="r-nw"><b>${a.name}</b><br><span class="r-note">${esc(a.q)}</span></td><td class="r-c"><span class="r-st ${a.tone === 'good' ? 'ok' : a.tone === 'warn' ? 'warn' : 'mid'}">${a.tone === 'good' ? '양호' : a.tone === 'warn' ? '주의' : a.tone ? '보통' : '자료 없음'}</span></td><td>${esc(a.verdict)}</td><td>${a.items.map((x) => `${esc(x.label)} ${x.value === null ? esc(x.text || '—') : `${x.value}${x.unit}`}`).join(' · ') || '—'}</td></tr>`).join('')}</tbody></table>
-    ${rows.length >= FIN_YEARS_GOOD ? `<div class="r-fin3"><div>${trend(rows.map((x) => ({ label: x.label.replace(/.*\((\d{4})년\)/, '$1'), rev: x.rev, op: x.op, net: x.net })), { width: 380, height: 190 })}</div>
-      <div>${lineChart(rows.map((x) => x.label.replace(/.*\((\d{4})년\)/, '$1')), [{ name: '영업이익률', color: '#00a37a', vals: rows.map((x) => x.opm) }, { name: '순이익률', color: '#f0a43a', vals: rows.map((x) => x.npm) }], { width: 300, height: 190, label: '이익률 추이' })}</div>
-      <div>${lineChart(rows.map((x) => x.label.replace(/.*\((\d{4})년\)/, '$1')), [{ name: '부채비율', color: '#e5484d', vals: rows.map((x) => x.debt) }, { name: '유동비율', color: '#3182f6', vals: rows.map((x) => x.current) }], { width: 300, height: 190, label: '부채비율·유동비율 추이' })}</div></div>` : ''}
+    ${rows.length >= FIN_YEARS_GOOD ? `<div class="r-fin3"><div><p class="r-cap">매출·영업이익·순이익</p>${trend(rows.map((x) => ({ label: x.label.replace(/.*\((\d{4})년\)/, '$1'), rev: x.rev, op: x.op, net: x.net })), { width: 380, height: 190 })}</div>
+      <div><p class="r-cap">이익률 추이 <span>높을수록 좋음</span></p>${lineChart(rows.map((x) => x.label.replace(/.*\((\d{4})년\)/, '$1')), [{ name: '영업이익률', color: '#00a37a', vals: rows.map((x) => x.opm) }, { name: '순이익률', color: '#f0a43a', vals: rows.map((x) => x.npm) }], { width: 300, height: 190, label: '이익률 추이' })}</div>
+      <div><p class="r-cap">부채비율·유동비율 <span>부채↓ 유동↑ 좋음</span></p>${lineChart(rows.map((x) => x.label.replace(/.*\((\d{4})년\)/, '$1')), [{ name: '부채비율', color: '#e5484d', vals: rows.map((x) => x.debt) }, { name: '유동비율', color: '#3182f6', vals: rows.map((x) => x.current) }], { width: 300, height: 190, label: '부채비율·유동비율 추이' })}</div></div>` : ''}
     <h3>연도별 계정·비율</h3>${finFull()}
     <p class="r-note">참고 구간(${finBandSummary()})은 일반적으로 쓰이는 기준선이며 업종별 차이가 커요. 과거 실적이며 전망이 아니에요.</p>`
     : `<div class="r-box warn"><b>투자자는 표준재무제표를 가장 먼저 요청해요.</b> 재무제표가 없으면 매출·이익·부채를 대표 설명으로만 판단하게 되고, 숫자 일관성 확인도 할 수 없어요.</div>

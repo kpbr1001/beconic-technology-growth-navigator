@@ -76,5 +76,18 @@ export function lineChart(cats, series, { width = 360, height = 200, unit = '%',
   ${cats.map((c, i) => `<text x="${xOf(i).toFixed(1)}" y="${height - 8}" text-anchor="middle" font-size="11" font-weight="700" fill="#333d4b">${esc(c)}</text>`).join('')}${lines}</svg>`;
 }
 
+/** 가로 막대(0~100) — items: [{name, score, expect?}], marks: 세로 기준선 값들(예: 판단 구간) */
+export function hbars(items, { width = 520, row = 22, label = 110, marks = [], color = () => '#3182f6' } = {}) {
+  const pw = width - label - 44, h = items.length * row + 18;
+  const x = (v) => label + (pw * Math.max(0, Math.min(100, v ?? 0))) / 100;
+  return `<svg class="ch-hbar" viewBox="0 0 ${width} ${h}" width="${width}" height="${h}" role="img" aria-label="점수 막대 차트">
+  ${marks.map((m) => `<line x1="${x(m).toFixed(1)}" y1="2" x2="${x(m).toFixed(1)}" y2="${h - 14}" stroke="#d1d6db" stroke-dasharray="3 3"/><text x="${x(m).toFixed(1)}" y="${h - 3}" text-anchor="middle" font-size="9" fill="#8b95a1">${m}</text>`).join('')}
+  ${items.map((it, i) => { const y = 4 + i * row; return `<text x="${label - 8}" y="${y + row / 2 + 1}" text-anchor="end" font-size="11" font-weight="600" fill="#333d4b">${esc(it.name)}</text>
+    <rect x="${label}" y="${y + 4}" width="${pw}" height="${row - 10}" rx="${(row - 10) / 2}" fill="#f2f4f6"/>
+    <rect x="${label}" y="${y + 4}" width="${(x(it.score) - label).toFixed(1)}" height="${row - 10}" rx="${(row - 10) / 2}" fill="${color(it.score)}"/>
+    ${typeof it.expect === 'number' ? `<line x1="${x(it.expect).toFixed(1)}" y1="${y + 1}" x2="${x(it.expect).toFixed(1)}" y2="${y + row - 3}" stroke="#4e5968" stroke-width="2"/>` : ''}
+    <text x="${label + pw + 8}" y="${y + row / 2 + 1}" font-size="11" font-weight="800" fill="${typeof it.expect === 'number' && it.score < it.expect ? '#d22030' : '#191f28'}">${it.score ?? '—'}</text>`; }).join('')}</svg>`;
+}
+
 /** 점수 점(●●●○○) */
 export const dots = (v) => `<span class="dots" aria-label="${v || 0}/5">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= (v || 0) ? 'on' : ''}"></i>`).join('')}</span>`;

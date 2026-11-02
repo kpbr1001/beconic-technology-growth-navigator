@@ -56,7 +56,7 @@ export function evaluate(st0) {
   res.gaps = CATEGORIES.map((c) => cats[c.id]).filter((c) => c.gap !== null && c.gap < 0).sort((a, b) => a.gap - b.gap);
   res.lenses = lenses(st, res); res.flags = redFlags(st, res);
   res.strengths = strengths(st, res); res.weaknesses = weaknesses(st, res);
-  res.analysis = catAnalysis(st, res); res.roadmap = roadmap(st, res); res.checks = crossChecks(st, res); res.dataRoom = dataRoom(st, res); res.asks = asks(st, res); res.summary = summary(st, res);
+  res.analysis = catAnalysis(st, res); res.roadmap = roadmap(st, res); res.checks = crossChecks(st, res); res.dataRoom = dataRoom(st, res); res.asks = asks(st, res); res.uplift = uplift(res); res.summary = summary(st, res);
   return res;
 }
 
@@ -183,6 +183,14 @@ export function summary(st, res) {
   if (res.flags.length) lines.push(`투자자가 멈칫할 수 있는 경계 신호 ${res.flags.length}개가 있어요. 아래에서 먼저 확인하세요.`);
   if (!res.complete) lines.push(`${N_Q}문항 중 ${res.answered}문항만 답했어요. 남은 문항을 답하면 결과가 정확해져요.`);
   return lines;
+}
+/** 보완 효과(계산상): 먼저 보완할 항목·2주 할 일·로드맵 전체를 목표 단계로 올렸을 때 종합 점수 */
+export function uplift(res) {
+  const sum = (xs) => r1(xs.filter((x) => x.q).reduce((a, x) => a + (x.gainTo || 0), 0));
+  const to = (d) => (res.overall === null ? null : Math.min(100, Math.round(res.overall + d)));
+  const all = Object.values(res.roadmap || {}).flat();
+  const top = sum(res.weaknesses), now = sum(res.roadmap?.[ROADMAP_BUCKETS[0].key] || []), full = sum(all);
+  return { top, topTo: to(top), now, nowTo: to(now), full, fullTo: to(full) };
 }
 /** 투자 준비 서류 — 연결 문항 응답·근거 체크·재무제표 업로드로 준비 상태 판단(ready 준비됨 / partial 보완 필요 / todo 준비 전) */
 export function dataRoom(st, res) {
