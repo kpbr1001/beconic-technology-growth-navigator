@@ -21,7 +21,9 @@ export function validate(raw) {
   // v2.1 → v2.2: 재무 2개년(cur·prev) → 3개년(cur·prev·pp) + 최근 연도(y0)·파일 목록
   if (st.fin) {
     const f = st.fin; const num = (o) => (isObj(o) ? Object.fromEntries(Object.entries(o).filter(([, v]) => typeof v === 'number' && Number.isFinite(v))) : {});
-    st.fin = { ...f, cur: num(f.cur), prev: num(f.prev), pp: num(f.pp), y0: /^20\d{2}$/.test(String(f.y0 || '')) ? String(f.y0) : (Array.isArray(f.years) && /^20\d{2}$/.test(String(f.years[0])) ? String(f.years[0]) : ''),
+    // v2.2 이전 읽기 오류로 모든 값이 0으로 저장된 해는 비움(다시 올리면 채워짐)
+    const clean = (o) => { const v = num(o); return Object.keys(v).length && Object.values(v).every((x) => x === 0) ? {} : v; };
+    st.fin = { ...f, cur: clean(f.cur), prev: clean(f.prev), pp: clean(f.pp), y0: /^20\d{2}$/.test(String(f.y0 || '')) ? String(f.y0) : (Array.isArray(f.years) && /^20\d{2}$/.test(String(f.years[0])) ? String(f.years[0]) : ''),
       files: Array.isArray(f.files) ? f.files.filter(isObj).slice(0, 6) : (f.fileName ? [{ name: String(f.fileName), type: 'ok', text: '' }] : []) };
   }
   return st;

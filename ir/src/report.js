@@ -4,7 +4,7 @@ import { CATEGORIES, QUESTIONS, STAGES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SO
   bandColor, SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS, qByCat, FIN_YEARS_GOOD } from './model.js';
 import { SCORE_VERSION } from './score.js';
 import { ACCOUNTS, SLOTS, slotLabel, fmtWon, finBandSummary } from './fin.js';
-import { gauge, radar, trend } from './charts.js';
+import { gauge, radar, trend, lineChart } from './charts.js';
 import { COMPANY } from './contact.js';
 
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -40,7 +40,7 @@ export function renderReport(st, r, { id, date, version }) {
   const finFull = () => { const f = st.fin; const slots = SLOTS.map((s, i) => ({ s, i })).filter(({ s }) => Object.values(f[s.k] || {}).some((v) => typeof v === 'number')).reverse();
     return `<table class="r-tbl"><thead><tr><th>계정</th>${slots.map(({ i }) => `<th class="r-r">${esc(slotLabel(f, i))}</th>`).join('')}</tr></thead><tbody>
     ${ACCOUNTS.filter((a) => slots.some(({ s }) => typeof f[s.k]?.[a.k] === 'number')).map((a) => `<tr><td>${esc(a.label)}</td>${slots.map(({ s }) => `<td class="r-r r-num">${typeof f[s.k]?.[a.k] === 'number' ? fmtWon(f[s.k][a.k]) : '—'}</td>`).join('')}</tr>`).join('')}
-    ${[['영업이익률', 'opm'], ['부채비율', 'debt'], ['유동비율', 'current']].map(([l, k]) => `<tr class="r-pri"><td>${l}</td>${rows.map((x) => `<td class="r-r r-num">${pctTxt(x[k])}</td>`).join('')}</tr>`).join('')}</tbody></table>`; };
+    ${[['매출 성장률', 'growth'], ['영업이익률', 'opm'], ['순이익률', 'npm'], ['부채비율', 'debt'], ['유동비율', 'current']].map(([l, k]) => `<tr class="r-pri"><td>${l}</td>${rows.map((x) => `<td class="r-r r-num">${pctTxt(x[k])}</td>`).join('')}</tr>`).join('')}</tbody></table>`; };
 
   return `<article class="r-doc">
   ${st.meta.synthetic ? '<div class="r-water">합성 예시 — 실제 기업 자료 아님</div>' : ''}
@@ -93,8 +93,11 @@ export function renderReport(st, r, { id, date, version }) {
 
   ${pg(7, '재무 진단', r.fin.has ? `표준재무제표 ${r.fin.years}개년(${st.fin.source === 'upload' ? '파일에서 읽고 대표가 확인한 값' : '대표가 직접 입력한 값'})을 바탕으로 했어요.` : '재무제표가 반영되지 않아 재무·자금 점수는 대표 응답만으로 계산했어요.')}
   ${r.fin.has ? `${r.finStory.length ? `<ul class="r-story">${r.finStory.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-    ${rows.length >= FIN_YEARS_GOOD ? `<div class="r-fin">${trend(rows.map((x) => ({ label: x.label, rev: x.rev, op: x.op, net: x.net })), { width: 560, height: 170 })}</div>` : ''}
-    <h3>최근 연도 지표</h3><div class="r-kpis">${r.indicators.map((x) => `<div class="r-kpi ${x.band || ''}"><span>${esc(x.label)}</span><b>${x.value === null ? esc(x.text || '계산 불가') : `${x.value}${x.unit}`}</b><small>${esc(x.note)}</small></div>`).join('')}</div>
+    <table class="r-tbl"><thead><tr><th>재무 영역</th><th class="r-c">판단</th><th>의미</th><th>근거 지표(최근 연도)</th></tr></thead><tbody>
+    ${r.finAreas.map((a) => `<tr><td class="r-nw"><b>${a.name}</b><br><span class="r-note">${esc(a.q)}</span></td><td class="r-c"><span class="r-st ${a.tone === 'good' ? 'ok' : a.tone === 'warn' ? 'warn' : 'mid'}">${a.tone === 'good' ? '양호' : a.tone === 'warn' ? '주의' : a.tone ? '보통' : '자료 없음'}</span></td><td>${esc(a.verdict)}</td><td>${a.items.map((x) => `${esc(x.label)} ${x.value === null ? esc(x.text || '—') : `${x.value}${x.unit}`}`).join(' · ') || '—'}</td></tr>`).join('')}</tbody></table>
+    ${rows.length >= FIN_YEARS_GOOD ? `<div class="r-fin3"><div>${trend(rows.map((x) => ({ label: x.label.replace(/.*\((\d{4})년\)/, '$1'), rev: x.rev, op: x.op, net: x.net })), { width: 380, height: 190 })}</div>
+      <div>${lineChart(rows.map((x) => x.label.replace(/.*\((\d{4})년\)/, '$1')), [{ name: '영업이익률', color: '#00a37a', vals: rows.map((x) => x.opm) }, { name: '순이익률', color: '#f0a43a', vals: rows.map((x) => x.npm) }], { width: 300, height: 190, label: '이익률 추이' })}</div>
+      <div>${lineChart(rows.map((x) => x.label.replace(/.*\((\d{4})년\)/, '$1')), [{ name: '부채비율', color: '#e5484d', vals: rows.map((x) => x.debt) }, { name: '유동비율', color: '#3182f6', vals: rows.map((x) => x.current) }], { width: 300, height: 190, label: '부채비율·유동비율 추이' })}</div></div>` : ''}
     <h3>연도별 계정·비율</h3>${finFull()}
     <p class="r-note">참고 구간(${finBandSummary()})은 일반적으로 쓰이는 기준선이며 업종별 차이가 커요. 과거 실적이며 전망이 아니에요.</p>`
     : `<div class="r-box warn"><b>투자자는 표준재무제표를 가장 먼저 요청해요.</b> 재무제표가 없으면 매출·이익·부채를 대표 설명으로만 판단하게 되고, 숫자 일관성 확인도 할 수 없어요.</div>

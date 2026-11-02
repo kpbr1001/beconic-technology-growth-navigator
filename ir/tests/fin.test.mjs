@@ -1,7 +1,7 @@
 // 표준재무제표 추출·지표 — 형식 변형·부호·단위·0/음수 처리.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseStatements, parseFile, mergeParsed, normalizeFin, filledYears, fiscalYear, isStatement, yearRows, finStory, indicators, parseWon, fmtWon, balanceCheck } from '../src/fin.js';
+import { segmentsOf, normLabel, finAreas, parseStatements, parseFile, mergeParsed, normalizeFin, filledYears, fiscalYear, isStatement, yearRows, finStory, indicators, parseWon, fmtWon, balanceCheck } from '../src/fin.js';
 
 test('추출: 로마 숫자·코드·글자 간격·괄호/△ 음수(공백 분리 포함)·당기/전기', () => {
   const r = parseStatements(['표준손익계산서', '코드 계정과목 당기 전기', '1000 Ⅰ. 매 출 액 1,200,000,000 800,000,000', 'Ⅳ. 영업이익(손실) ( 120,000,000 ) △ 50,000,000', '당기순이익(손실) -150,000,000 -60,000,000', '(1) 자산총계 900,000,000', '부채총계 600,000,000', '자본총계 300,000,000']);
@@ -79,4 +79,25 @@ test('3개년 지표·연도표·해석 문장', () => {
   const s = finStory(fin).join(' ');
   assert.match(s, /3개년 연속 늘었어요/); assert.match(s, /전년도보다 줄었어요/);
   assert.equal(yearRows({ cur: {}, prev: {}, pp: {} }).length, 0); assert.deepEqual(finStory(null), []);
+});
+
+test('홈택스 표준재무제표 줄: 글자 결합 칸·국세청 코드·2단 배치·번호 붙은 계정명', () => {
+  assert.deepEqual(segmentsOf('Ⅰ.유동자산  001  400,000,000  자본총계(Ⅲ+～Ⅶ)  382  300,000,000').map((x) => [normLabel(x.label), x.code, x.nums[0]]), [['유동자산', '001', '400,000,000'], ['자본총계', '382', '300,000,000']]);
+  assert.equal(normLabel(' 1.현금 및 현금성자산'), '현금및현금성자산'); assert.equal(normLabel('Ⅴ.영업손익'), '영업손익');
+  const r = parseStatements(['표 준 재 무 상 태 표', '2025년12월31일 현재', 'Ⅰ.유동자산  001  400,000,000  자본총계(Ⅲ+～Ⅶ)  382  300,000,000', '자산총계(Ⅰ+Ⅱ)  228  1,000,000,000', '부채총계(Ⅰ+Ⅱ)  333  700,000,000',
+    '표준손익계산서', '2025년 12월 31일 까지', 'I.매출액  001  1,500,000,000', 'Ⅴ.영업손익  129  -50,000,000', 'Ⅹ.당기순손익  219  -70,000,000', '기타코드만  180  12,000']);
+  assert.deepEqual([r.year, r.cur.ca, r.cur.equity, r.cur.assets, r.cur.liab, r.cur.rev, r.cur.op, r.cur.net], ['2025', 400000000, 300000000, 1000000000, 700000000, 1500000000, -50000000, -70000000]);
+  // 계정명이 없거나 낯설어도 국세청 코드로 인식(손익계산서 001 = 매출액, 재무상태표 001 = 유동자산)
+  const c = parseStatements(['표준손익계산서', '(가)  001  900,000', '표준재무상태표', '(나)  001  500,000']);
+  assert.equal(c.cur.rev, 900000); assert.equal(c.cur.ca, 500000);
+});
+test('예전 읽기 방식(글자마다 공백)으로 깨진 0원 값은 저장 기록에서 비움', async () => {
+  const { validate } = await import('../src/store.js');
+  const v = validate({ app: 'beconic-ir', schema: 2, meta: { company: 'x' }, answers: {}, fin: { y0: '2025', cur: { rev: 0, cogs: 0, liab: 0 }, prev: { rev: 5 }, pp: {} } });
+  assert.deepEqual(v.fin.cur, {}); assert.equal(v.fin.prev.rev, 5);
+});
+test('재무 4대 영역: 지표 묶음과 판단', () => {
+  const a = finAreas({ cur: { rev: 120, op: -10, net: -12, liab: 50, equity: 100, capital: 50, ca: 200, cl: 100 }, prev: { rev: 100 }, pp: {} });
+  assert.deepEqual(a.map((x) => [x.k, x.tone]), [['growth', 'good'], ['profit', 'warn'], ['stable', 'good'], ['liquid', 'good']]);
+  assert.equal(finAreas({ cur: {}, prev: {}, pp: {} }).every((x) => x.tone === null), true);
 });

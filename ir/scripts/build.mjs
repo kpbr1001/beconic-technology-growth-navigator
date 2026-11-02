@@ -15,7 +15,8 @@ if (/\{\{\w+\}\}/.test(html)) { console.error('채우지 못한 자리표시자:
 const out = path.join(root, 'dist');
 rmSync(out, { recursive: true, force: true }); mkdirSync(path.join(out, 'src'), { recursive: true });
 writeFileSync(path.join(out, 'index.html'), html);
-for (const f of readdirSync(path.join(root, 'src'))) if (f.endsWith('.js')) cpSync(path.join(root, 'src', f), path.join(out, 'src', f));
+// 모듈 사이 import에도 버전을 붙여, 배포 후 예전 파일이 브라우저에 남아 섞이지 않게 한다
+for (const f of readdirSync(path.join(root, 'src'))) if (f.endsWith('.js')) writeFileSync(path.join(out, 'src', f), readFileSync(path.join(root, 'src', f), 'utf8').replace(/(from\s+|import\()(['"])(\.\/[\w-]+\.js)\2/g, `$1$2$3?v=${version}$2`));
 cpSync(path.join(root, 'assets'), path.join(out, 'assets'), { recursive: true });
 cpSync(path.join(root, 'vendor'), path.join(out, 'vendor'), { recursive: true }); // pdf.js(표준재무제표 읽기)
 // 수동 업로드(드래그 앤 드롭·CLI deploy)에도 보안 헤더가 적용되도록 _headers 생성 — netlify.toml [[headers]]와 같은 값

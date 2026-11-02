@@ -4,9 +4,9 @@
 import { CATEGORIES, QUESTIONS, GRADES, STAGES, CMAP, QMAP, LENSES, LENS_VERDICT, EXPECT, EFFORT, N_Q, weightsFor, qByCat,
   SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS, TECH_INDUSTRIES, FLAG_RULES, FLAG_LIMITS, FIN_LINK,
   ASKS, DATAROOM, FIN_YEARS_GOOD } from './model.js';
-import { indicators, balanceCheck, fmtWon, CORE, SLOTS, normalizeFin, filledYears, yearRows, finStory } from './fin.js';
+import { indicators, balanceCheck, fmtWon, CORE, SLOTS, normalizeFin, filledYears, yearRows, finStory, finAreas } from './fin.js';
 
-export const SCORE_VERSION = 'SC-2.2';
+export const SCORE_VERSION = 'SC-2.3';
 export const gradeOf = (s) => GRADES.find((g) => s >= g.min) || GRADES[GRADES.length - 1];
 export const verdictOf = (s) => LENS_VERDICT.find((v) => s >= v.min);
 const r1 = (x) => Math.round(x * 10) / 10;
@@ -50,7 +50,7 @@ export function evaluate(st0) {
     noEvidenceHigh: QUESTIONS.filter((q) => (ans[q.id]?.v || 0) >= STRONG_MIN && !ans[q.id]?.ev).map((q) => q.id),
     cats, overall, grade: overall === null ? null : gradeOf(overall), fin,
     indicators: fin.has ? indicators(st.fin) : [], balance: fin.has ? balanceCheck(st.fin) : null,
-    years: fin.has ? yearRows(st.fin) : [], finStory: fin.has ? finStory(st.fin) : [],
+    years: fin.has ? yearRows(st.fin) : [], finStory: fin.has ? finStory(st.fin) : [], finAreas: fin.has ? finAreas(st.fin) : [],
   };
   res.evidenceRate = res.answered ? Math.round((res.evidence / res.answered) * 100) : 0;
   res.gaps = CATEGORIES.map((c) => cats[c.id]).filter((c) => c.gap !== null && c.gap < 0).sort((a, b) => a.gap - b.gap);

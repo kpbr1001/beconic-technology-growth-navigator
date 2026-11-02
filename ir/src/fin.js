@@ -2,11 +2,12 @@
 // 파일은 브라우저 안에서만 읽는다(서버 전송 없음). 추출값은 사용자가 확인·수정한 뒤 반영한다.
 // 참고 구간은 일반적으로 쓰이는 참고선이며 업종별 차이가 크다(공식 기준 아님).
 
+// alt = 정규화한 계정명(공백·번호·괄호·기호 제거, finance/와 같은 규칙). lossAlt = 손실 표기(양수도 손실)
 export const ACCOUNTS = [
-  { k: 'rev', label: '매출액', alt: ['매출액', '영업수익', '수익(매출액)'] },
-  { k: 'cogs', label: '매출원가', alt: ['매출원가', '영업비용'] },
-  { k: 'op', label: '영업이익', alt: ['영업이익(손실)', '영업이익', '영업손실'], lossAlt: ['영업손실'] },
-  { k: 'net', label: '당기순이익', alt: ['당기순이익(손실)', '당기순이익', '당기순손실'], lossAlt: ['당기순손실'] },
+  { k: 'rev', label: '매출액', alt: ['매출액', '수익매출액', '영업수익'] },
+  { k: 'cogs', label: '매출원가', alt: ['매출원가'] },
+  { k: 'op', label: '영업이익', alt: ['영업이익', '영업이익손실', '영업손익', '영업손실'], lossAlt: ['영업손실'] },
+  { k: 'net', label: '당기순이익', alt: ['당기순이익', '당기순이익손실', '당기순손익', '당기순손실'], lossAlt: ['당기순손실'] },
   { k: 'assets', label: '자산총계', alt: ['자산총계'] },
   { k: 'liab', label: '부채총계', alt: ['부채총계'] },
   { k: 'equity', label: '자본총계', alt: ['자본총계'] },
@@ -15,15 +16,23 @@ export const ACCOUNTS = [
   { k: 'cl', label: '유동부채', alt: ['유동부채'] },
   { k: 'cash', label: '현금및현금성자산', alt: ['현금및현금성자산', '현금및현금등가물', '현금및예금'] },
 ];
+// 국세청 표준재무제표(일반법인용) 코드 — finance/에서 실제 발급 증명서로 확인한 코드만 사용
+export const NTS_CODES = {
+  bs: { '001': 'ca', '003': 'cash', '228': 'assets', '229': 'cl', '333': 'liab', '334': 'capital', '382': 'equity' },
+  is: { '001': 'rev', '035': 'cogs', '129': 'op', '219': 'net' },
+};
 export const AMAP = Object.fromEntries(ACCOUNTS.map((a) => [a.k, a]));
 export const CORE = ['rev', 'op', 'net', 'assets', 'liab', 'equity'];
 // 3개년 칸: cur = 최근 연도, prev = 전년도, pp = 전전년도
 export const SLOTS = [{ k: 'cur', label: '최근 연도' }, { k: 'prev', label: '전년도' }, { k: 'pp', label: '전전년도' }];
 export const slotLabel = (fin, i) => { const y = fin?.y0 ? Number(fin.y0) - i : null; return y ? `${SLOTS[i].label}(${y}년)` : SLOTS[i].label; };
 
-const norm = (s) => String(s).replace(/\s+/g, '').replace(/^\d+(?=[^\d,])/, '').replace(/^[(（]?[ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩIVX0-9]+[.)）]\s*/, '').replace(/^[·\-•]/, '');
-// 금액 후보: 쉼표 구분 숫자·일반 숫자(괄호·△·- 음수 포함)
-const AMT_ALL = /[(（△▲-]?\d{1,3}(?:,\d{3})+[)）]?|[(（△▲-]?\d+[)）]?/g;
+export function normLabel(v) {
+  let t = String(v ?? '').replace(/[\s\u3000\u00a0]/g, '');
+  for (let i = 0; i < 3; i++) t = t.replace(/^(?:[ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅪⅫ]+\.?|[IVX]+\.|\(?\d{1,2}[.)]|\(\d{1,2}\)|[가-하]\.|[①-⑳]|[-·•])/, '');
+  return t.replace(/[^가-힣A-Za-z]/g, '');
+}
+const LABEL = new Map(ACCOUNTS.flatMap((a) => a.alt.map((x) => [x, a])));
 const SHORT = /^\d{1,3}$/; // 부호·쉼표 없는 1~3자리
 function toNum(tok) {
   const neg = /^[(（△▲-]/.test(tok) || /[)）]$/.test(tok);
@@ -32,15 +41,16 @@ function toNum(tok) {
 }
 /** 재무제표인지 판별 — 손익계산서·재무상태표(대차대조표) 표제가 있어야 한다 */
 export const isStatement = (text) => /손익계산서|재무상태표|대차대조표/.test(String(text).replace(/\s+/g, ''));
-/** 사업연도(당기) 끝 연도 — "2025년 01월 01일부터 2025년 12월 31일까지", "2025.01.01 ~ 2025.12.31". 발급일은 기간이 아니라 무시 */
+/** 사업연도(당기) 끝 연도 — 기간(…부터 …까지, ~), "…현재"(재무상태표), "…까지"(손익계산서), "~ 2025.12.31"(증명서 1쪽). 발급일은 표시가 없어 제외 */
 export function fiscalYear(text) {
   const t = String(text).replace(/\s+/g, '');
-  const re = /(20\d{2})[년.\-/]0?\d{1,2}[월.\-/]0?\d{1,2}일?(?:부터|~|-|∼)(20\d{2})[년.\-/]0?\d{1,2}[월.\-/]0?\d{1,2}일?/g;
-  let ends = [...t.matchAll(re)].map((m) => Number(m[2]));
-  // 재무상태표만 있는 문서: "2025년 12월 31일 현재"
-  if (!ends.length) ends = [...t.matchAll(/(20\d{2})[년.\-/]0?\d{1,2}[월.\-/]0?\d{1,2}일?현재/g)].map((m) => Number(m[1]));
-  ends = ends.filter((y) => y > 2000 && y < 2100);
-  return ends.length ? String(Math.max(...ends)) : '';
+  const D = '(20\\d{2})[년.\\-/]0?\\d{1,2}[월.\\-/]0?\\d{1,2}일?';
+  const res = [new RegExp(`${D}(?:부터|~|∼|-)${D}`, 'g'), new RegExp(`${D}(?:현재|까지)`, 'g'), new RegExp(`[~∼]${D}`, 'g')];
+  const ends = [];
+  res.forEach((re, i) => { for (const m of t.matchAll(re)) ends.push(Number(i === 0 ? m[2] : m[1])); });
+  const ys = ends.filter((y) => y > 2000 && y < 2100); if (!ys.length) return '';
+  const cnt = {}; ys.forEach((y) => { cnt[y] = (cnt[y] || 0) + 1; });
+  return String(Object.entries(cnt).sort((x, y) => y[1] - x[1] || y[0] - x[0])[0][0]);
 }
 /** 한 파일에 여러 사업연도가 들어 있으면(홈택스에서 여러 해를 한 번에 발급) 연도별로 나눠 읽는다 */
 export function parseFile(lines) {
@@ -55,6 +65,25 @@ export function parseFile(lines) {
   return whole.isFS ? [whole] : [];
 }
 
+const IS_AMT = /^[(（△▲-]?\d{1,3}(?:,\d{3})+[)）]?$|^[(（△▲-]?\d+[)）]?$/;
+const tokensOf = (line) => String(line).replace(/([(（△▲-])\s+(?=\d)/g, '$1').replace(/(\d)\s+([)）])/g, '$1$2').split(/\s+/).filter(Boolean);
+/** 한 줄 → [{label, code, nums}] — "계정명 [코드] 금액 [금액]"이 한 줄에 여러 번(2단 배치) 나와도 나눠 읽는다 */
+export function segmentsOf(line) {
+  const toks = tokensOf(line); const segs = []; let lab = [];
+  for (let i = 0; i < toks.length; i++) {
+    const t = toks[i];
+    if (!IS_AMT.test(t)) { lab.push(t); continue; }
+    if (!lab.length) continue; // 계정명 앞의 번호·코드
+    let j = i; let code = '';
+    if ((/^\d{3}$/.test(t) || /^0\d+$/.test(t)) && j + 1 < toks.length && IS_AMT.test(toks[j + 1])) { code = t; j++; } // 코드 뒤에 금액
+    else if (/^0\d+$/.test(t)) { lab = []; continue; } // 금액 없는 코드
+    const nums = []; while (j < toks.length && IS_AMT.test(toks[j])) nums.push(toks[j++]);
+    segs.push({ label: lab.join(''), code, nums }); lab = []; i = j - 1;
+  }
+  return segs;
+}
+const stType = (line) => { const c = String(line).replace(/\s+/g, ''); if (c.length > 40) return null; const bs = /재무상태표|대차대조표/.test(c); const is = /손익계산서/.test(c); return bs && !is ? 'bs' : is && !bs ? 'is' : null; };
+
 /** 문서 텍스트 줄 → { isFS, year, cur, prev, found, unit } (cur = 문서의 당기, prev = 문서의 전기) */
 export function parseStatements(lines) {
   const text = lines.join('\n');
@@ -62,27 +91,20 @@ export function parseStatements(lines) {
   const unit = /단위\s*[:：]?\s*천\s*원/.test(text) ? 1000 : /단위\s*[:：]?\s*백만\s*원/.test(text) ? 1000000 : 1;
   const cur = {}; const prev = {}; const found = {};
   if (!isFS) return { isFS, year: '', cur, prev, found, unit };
-  for (const a of ACCOUNTS) {
-    for (const line of lines) {
-      const n = norm(line);
-      const hit = a.alt.find((x) => n.startsWith(x));
-      if (!hit) continue;
-      // 계정명(글자 사이 공백 허용) 뒤에 오는 금액만 사용 — 앞쪽 코드 번호 제외
-      const re = new RegExp(hit.split('').map((ch) => ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s*'));
-      const m = re.exec(line); if (!m) continue;
-      const tailTxt = line.slice(m.index + m[0].length).replace(/([(（△▲-])\s+(?=\d)/g, '$1').replace(/(\d)\s+([)）])/g, '$1$2');
-      // 계정명 바로 뒤의 짧은 숫자(코드 01·228 등)는 금액이 아님. 천원·백만원 단위 문서에선 짧은 금액(예: 300)도 금액으로 본다
-      let toks = (tailTxt.match(AMT_ALL) || []).filter((t) => !/^0\d+$/.test(t)); // 01·02처럼 0으로 시작하는 건 코드
-      if (toks.length > 1 && SHORT.test(toks[0])) toks = toks.slice(1);
-      if (unit === 1) toks = toks.filter((t) => !SHORT.test(t) || t === '0');
-      const nums = toks.map(toNum);
+  let type = null;
+  for (const line of lines) {
+    type = stType(line) || type;
+    for (const sg of segmentsOf(line)) {
+      const n = normLabel(sg.label);
+      const a = LABEL.get(n) || (sg.code && type && AMAP[NTS_CODES[type][sg.code]]) || null; // 계정명 우선, 없으면 국세청 코드
+      if (!a || typeof cur[a.k] === 'number') continue; // 처음 나온 값(합계 행) 사용
+      let nums = sg.nums;
+      if (unit === 1) nums = nums.filter((x) => !SHORT.test(x) || x === '0'); // 원 단위 문서의 1~3자리는 금액 아님
       if (!nums.length) continue;
-      const loss = (a.lossAlt || []).includes(hit); // '영업손실'처럼 손실 계정명이면 양수도 손실로
-      const val = (x) => (loss && x > 0 ? -x : x) * unit;
-      cur[a.k] = val(nums[0]);
-      if (nums.length > 1) prev[a.k] = val(nums[1]);
-      found[a.k] = hit;
-      break;
+      const loss = (a.lossAlt || []).includes(n);
+      const val = (x) => { const v = toNum(x); return (loss && v > 0 ? -v : v) * unit; };
+      cur[a.k] = val(nums[0]); if (nums.length > 1) prev[a.k] = val(nums[1]);
+      found[a.k] = sg.label + (sg.code ? `(${sg.code})` : '');
     }
   }
   return { isFS, year: fiscalYear(text), cur, prev, found, unit };
@@ -196,10 +218,32 @@ export function yearRows(fin) {
   return SLOTS.map((s, i) => ({ s, i, v: fin?.[s.k] || {} })).filter((r) => hasData(r.v)).map(({ s, i, v }) => ({
     key: s.k, label: slotLabel(fin, i), rev: v.rev, op: v.op, net: v.net,
     opm: has(v, 'rev') && has(v, 'op') && v.rev > 0 ? pct(v.op, v.rev) : null,
+    npm: has(v, 'rev') && has(v, 'net') && v.rev > 0 ? pct(v.net, v.rev) : null,
+    growth: (() => { const o = SLOTS[i + 1] && fin?.[SLOTS[i + 1].k]; return has(v, 'rev') && o && has(o, 'rev') && o.rev > 0 ? pct(v.rev - o.rev, o.rev) : null; })(),
     debt: has(v, 'liab') && has(v, 'equity') && v.equity > 0 ? pct(v.liab, v.equity) : null,
     current: has(v, 'ca') && has(v, 'cl') && v.cl > 0 ? pct(v.ca, v.cl) : null,
     equity: v.equity,
   }));
+}
+
+// 재무 4대 영역(재무진단 도구 finance/와 같은 구분) — 지표 묶음과 영역 판단 문장
+export const FIN_AREAS = [
+  { k: 'growth', name: '성장성', q: '매출이 늘고 있나요?', ind: ['growth', 'cagr'],
+    text: { good: '매출이 늘고 있어요. 성장 숫자를 IR 첫 장에 보여 주세요.', mid: '성장 폭이 크지 않아요. 성장 동력을 숫자로 설명할 준비가 필요해요.', warn: '매출이 줄었어요. 감소 이유와 회복 계획을 먼저 정리하세요.' } },
+  { k: 'profit', name: '수익성', q: '팔아서 남기고 있나요?', ind: ['opm', 'npm'],
+    text: { good: '본업에서 이익을 내고 있어요.', mid: '손익분기점 근처예요. 이익이 커지는 시점을 설명할 수 있어야 해요.', warn: '영업손실 상태예요. 손실이 줄어드는 경로(단위 경제성)를 보여 줘야 해요.' } },
+  { k: 'stable', name: '안정성', q: '빚과 자본 구조가 건전한가요?', ind: ['debt', 'impair'],
+    text: { good: '부채가 자본에 비해 적고 자본잠식이 없어요.', mid: '부채 부담이 보통 수준이에요. 차입 내역을 정리해 두세요.', warn: '부채가 많거나 자본잠식 상태예요. 투자 검토에서 반드시 설명을 요구받아요.' } },
+  { k: 'liquid', name: '유동성', q: '1년 안에 갚을 돈과 현금이 충분한가요?', ind: ['current', 'burn'],
+    text: { good: '단기 지급 여력이 충분해요.', mid: '단기 지급 여력이 빠듯해요. 월별 현금 계획을 준비하세요.', warn: '단기 부채보다 현금화 자산이 적거나 현금이 빠르게 줄고 있어요. 투자 시점을 앞당겨야 할 수 있어요.' } },
+];
+export function finAreas(fin) {
+  const ind = indicators(fin);
+  return FIN_AREAS.map((a) => {
+    const items = ind.filter((x) => a.ind.includes(x.k));
+    const tone = !items.length ? null : items.some((x) => x.band === 'warn') ? 'warn' : items.every((x) => x.band === 'good') ? 'good' : 'mid';
+    return { ...a, items, tone, verdict: tone ? a.text[tone] : '계산할 자료가 없어요(해당 계정을 입력하면 진단해요).' };
+  });
 }
 
 /** 사용자 말로 쓴 재무 해석(관찰 사실 + 의미, 원인 단정 없음) */

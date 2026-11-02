@@ -5,6 +5,7 @@ import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ntsHtml, fixtureYear } from './nts-fixture.mjs';
 
 const BASE = process.argv[2] || 'http://127.0.0.1:8794/';
 const OUT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'out'); mkdirSync(OUT, { recursive: true });
@@ -25,6 +26,9 @@ const STD25 = await mkPdf('std-2025.pdf', `<h3>표준재무상태표</h3>${perio
   <h3>표준손익계산서</h3>${period(2025)}${tbl([['Ⅰ. 매출액', '01', '950,000,000', '600,000,000'], ['Ⅳ. 영업이익(손실)', '03', '(80,000,000)', '△ 120,000,000'], ['당기순이익(손실)', '04', '-90,000,000', '-130,000,000']], true)}`);
 const STD23 = await mkPdf('std-2023.pdf', `<h3>표준손익계산서</h3>${period(2023)}${tbl([['매출액', '01', '210,000,000'], ['영업손실', '03', '150,000,000'], ['당기순손실', '04', '155,000,000']])}<h3>표준재무상태표</h3>${period(2023)}${tbl([['자산총계', '228', '500,000,000'], ['부채총계', '229', '200,000,000'], ['자본총계', '230', '300,000,000']])}`);
 const STD24 = await mkPdf('std-2024.pdf', `<h3>표준손익계산서</h3>${period(2024)}${tbl([['매출액', '01', '600,000,000'], ['영업손실', '03', '120,000,000'], ['당기순손실', '04', '130,000,000']])}`);
+// 홈택스 표준재무제표증명과 같은 구조(글자 1개 = 텍스트 조각 1개, 재무상태표 2단, 코드 열, 연도별 1파일)
+const NTS = {}; const NK = { 2023: 0.6, 2024: 0.8, 2025: 1 };
+for (const y of [2023, 2024, 2025]) { const fx = fixtureYear(y, NK[y]); await g.setContent(ntsHtml({ year: y, bs: fx.bs, is: fx.is })); NTS[y] = path.join(OUT, `nts-${y}.pdf`); await g.pdf({ path: NTS[y] }); NTS[`e${y}`] = fx.expect; }
 const NOTFS = await mkPdf('business-plan.pdf', '<h3>사업계획서</h3><p>2025년 목표 매출액 01 3,000,000,000 · 영업이익 500,000,000</p>');
 const shot = (await g.screenshot()).toString('base64');
 const SCAN = await mkPdf('scanned.pdf', `<img src="data:image/png;base64,${shot}" style="width:100%">`); await g.close();
@@ -145,6 +149,23 @@ await q.evaluate(() => { window.__noPrint = true; }); await q.click('[data-act=p
 const RP2 = path.join(OUT, 'report-nofin.pdf'); await q.pdf({ path: RP2, preferCSSPageSize: true, printBackground: true }); await q.emulateMedia({ media: 'screen' });
 try { const t2 = execFileSync('pdftotext', [RP2, '-'], { encoding: 'utf8' }).replace(/\s+/g, ''); ok(t2.includes('투자자는표준재무제표를가장먼저요청해요') && t2.includes('준비방법'), '재무 미반영 보고서: 영향·준비 방법 안내'); } catch { /* pdftotext 없음 */ }
 await q.close();
+
+// 2b) 홈택스 표준재무제표증명(글자 단위) 3개년 — 실제 발급본 구조
+{
+  const n = await newPage(1280, 900); await n.goto(BASE, { waitUntil: 'networkidle' }); await n.click('[data-act=sample]'); await n.waitForTimeout(200);
+  await n.evaluate(() => { const s = window.__IR.state; s.fin = null; localStorage.setItem('beconic-ir:v2', JSON.stringify(s)); }); await n.reload(); await n.waitForFunction(() => window.__IR);
+  await nav(n, 'finance'); await n.setInputFiles('[data-act=fin-file]', [NTS[2024], NTS[2025], NTS[2023]]);
+  await n.waitForFunction(() => window.__IR.state.fin?.pp?.rev && window.__IR.state.fin?.cur?.rev, null, { timeout: 30000 }); await n.waitForTimeout(300);
+  const F = await n.evaluate(() => window.__IR.state.fin); const E = (y) => NTS[`e${y}`];
+  const same = (o, e) => o.rev === e.revenue && o.op === e.operatingIncome && o.net === e.netIncome && o.assets === e.assets && o.liab === e.liabilities && o.equity === e.equity;
+  ok(F.y0 === '2025' && same(F.cur, E(2025)) && same(F.prev, E(2024)) && same(F.pp, E(2023)), `홈택스 표준재무제표(글자 단위 조각) 3개년: 매출·영업손익·순손익·자산·부채·자본 정확${same(F.cur, E(2025)) ? '' : ` (읽은 값 ${JSON.stringify(F.cur)})`}`);
+  ok(F.cur.ca === 400000000 && F.cur.cash === 120000000 && F.cur.cl === 350000000 && F.cur.capital === 300000000 && F.cur.cogs === 1100000000, '유동자산·현금·유동부채·자본금·매출원가(국세청 코드 001·003·229·334·035, 2단 배치의 자본총계)');
+  const notes = await n.$$eval('.flist li', (ls) => ls.map((l) => l.textContent).join(' | '));
+  ok(/2025년 자료/.test(notes) && /2023년 자료/.test(notes) && !/0개 계정/.test(notes), '파일별 결과: 연도·계정 수 안내');
+  await n.click('[data-act=to-result]'); await n.waitForTimeout(300);
+  ok((await n.locator('.fscore .fs').count()) === 4 && (await n.locator('#r-fin .ch-line').count()) >= 1, '재무 4대 영역(성장성·수익성·안정성·유동성) 진단·비율 추이 차트');
+  await n.close();
+}
 
 // 4) 주소·OG
 const u = await newPage(); await u.goto(BASE + '#/result'); await u.waitForTimeout(200);
