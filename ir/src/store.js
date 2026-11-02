@@ -18,6 +18,12 @@ export function validate(raw) {
   delete st.answers.SP3;
   for (const [k, a] of Object.entries(st.answers)) if (!isObj(a) || !(a.v === undefined || [0, 1, 2, 3, 4, 5].includes(a.v))) delete st.answers[k];
   if (st.fin !== null && !isObj(st.fin)) st.fin = null;
+  // v2.1 → v2.2: 재무 2개년(cur·prev) → 3개년(cur·prev·pp) + 최근 연도(y0)·파일 목록
+  if (st.fin) {
+    const f = st.fin; const num = (o) => (isObj(o) ? Object.fromEntries(Object.entries(o).filter(([, v]) => typeof v === 'number' && Number.isFinite(v))) : {});
+    st.fin = { ...f, cur: num(f.cur), prev: num(f.prev), pp: num(f.pp), y0: /^20\d{2}$/.test(String(f.y0 || '')) ? String(f.y0) : (Array.isArray(f.years) && /^20\d{2}$/.test(String(f.years[0])) ? String(f.years[0]) : ''),
+      files: Array.isArray(f.files) ? f.files.filter(isObj).slice(0, 6) : (f.fileName ? [{ name: String(f.fileName), type: 'ok', text: '' }] : []) };
+  }
   return st;
 }
 export function load(storage = globalThis.localStorage) { try { const s = storage?.getItem(STORE_KEY); return s ? validate(JSON.parse(s)) : null; } catch { return null; } }

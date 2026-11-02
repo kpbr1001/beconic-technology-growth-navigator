@@ -1,39 +1,43 @@
 // BECONIC IR 진단 v2 — 화면. 입력 내용과 업로드한 파일은 이 브라우저 안에서만 처리하며 서버로 보내지 않는다.
 import { CATEGORIES, QUESTIONS, STAGES, INDUSTRIES, WEIGHTS, GRADES, CMAP, MODEL_VERSION, SOURCES, N_Q, EFFORT, INDUSTRY_ADJ, LENSES,
-  estMinutes, bandColor, SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS } from './model.js';
+  estMinutes, bandColor, SCALE_MAX, UNKNOWN_AS, SCORE_FACTOR, STRONG_MIN, WEAK_MAX, GOAL_FLOOR, TOP_N, ROADMAP_BUCKETS, FIN_YEARS_GOOD } from './model.js';
 import { evaluate, SCORE_VERSION } from './score.js';
-import { ACCOUNTS, CORE, parseStatements, parseWon } from './fin.js';
+import { ACCOUNTS, CORE, SLOTS, slotLabel, parseFile, mergeParsed, normalizeFin, filledYears, parseWon, fmtWon } from './fin.js';
 import { blank, load, save, clear, hasLegacy, today, validate } from './store.js';
 import { sampleState } from './sample.js';
-import { gauge, radar, finBars, dots } from './charts.js';
+import { gauge, radar, trend, dots } from './charts.js';
 import { renderReport, reportId } from './report.js';
 import { COMPANY, telHref } from './contact.js';
 
-export const APP = { version: 'v2.1.1', updated: '2026-11-01' };
+export const APP = { version: 'v2.2.0', updated: '2026-11-02' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const nb = (t) => esc(t).replace(/·/g, '⁠·⁠');
 let st = load();
-let finDraft = null; // 재무 확인 화면의 임시 값
 
 const commit = () => { if (st) save(st); };
 const toast = (msg) => { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600); };
 
-// ───────────────────────── 라우팅(일반 경로)
-if (location.hash.startsWith('#/')) history.replaceState(null, '', `/${location.hash.slice(2)}`);
-const route = () => location.pathname.replace(/^\/+|\/+$/g, '').split('/');
-const go = (h) => { const to = `/${h}`; if (location.pathname !== to) history.pushState(null, '', to); render(); window.scrollTo(0, 0); };
-window.addEventListener('popstate', () => { render(); window.scrollTo(0, 0); });
+// ───────────────────────── 화면 전환 — 주소는 항상 '/'로 고정(경로를 붙이지 않음)
+// 화면 위치는 history.state.view로만 관리: 뒤로 가기·새로고침(같은 화면 유지)이 동작하고 주소창은 바뀌지 않는다.
+// 예전 주소(/result, /#/q/5 등)로 들어와도 해당 화면을 열고 주소는 '/'로 되돌린다.
+const legacy = location.hash.startsWith('#/') ? location.hash.slice(2) : location.pathname.replace(/^\/+|\/+$/g, '');
+let view = history.state?.view ?? legacy;
+history.replaceState({ view }, '', '/');
+const route = () => view.split('/');
+const go = (h) => { if (h !== view) { view = h; history.pushState({ view }, '', '/'); } render(); window.scrollTo(0, 0); };
+window.addEventListener('popstate', (e) => { view = e.state?.view ?? ''; render(); window.scrollTo(0, 0); });
+// 앱 안 링크: <a href="/" data-go="화면"> — 주소에는 '/'만 보인다
 document.addEventListener('click', (e) => {
-  const a = e.target.closest('a[href^="/"]');
-  if (!a || a.target || a.hasAttribute('download') || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-  e.preventDefault(); go(a.getAttribute('href').slice(1));
+  const a = e.target.closest('a[data-go], a.brand');
+  if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+  e.preventDefault(); go(a.dataset.go || '');
 });
 
 // ───────────────────────── 공통
 const firstUnanswered = () => QUESTIONS.findIndex((q) => typeof st?.answers?.[q.id]?.v !== 'number');
 function headerHtml() {
-  const act = st && st.meta.company && Object.keys(st.answers).length ? '<div class="hd-act"><a class="btn white sm" href="/result">결과 보기</a></div>' : '';
+  const act = st && st.meta.company && Object.keys(st.answers).length ? '<div class="hd-act"><a class="btn white sm" href="/" data-go="result">결과 보기</a></div>' : '';
   return `<header class="site"><div class="wrap hd"><a class="brand" href="/" aria-label="BECONIC IR 진단 처음으로"><img src="/assets/shield.png" alt="" width="34" height="34"><span class="txt"><b>BECONIC</b><small>IR 진단 · by Growth Ventures</small></span></a>${act}</div></header>`;
 }
 function footerHtml() {
@@ -121,98 +125,124 @@ function questionHtml(n) {
     <button role="radio" aria-checked="${a.v === 0}" class="opt unk ${a.v === 0 ? 'on' : ''}" data-act="pick" data-v="0">잘 모르겠어요${a.v === 0 ? ' · 선택됨' : ''}</button>
   </div>
   <p class="hint">${typeof a.v === 'number' ? '선택했어요. "다음"을 누르거나 같은 보기를 한 번 더 누르면 넘어가요(Enter 키도 돼요).' : '가장 가까운 문장을 골라 주세요. 키보드 1~${SCALE_MAX}로도 고를 수 있어요.'}</p></main>
-  <div class="bottom-bar"><div class="wrap narrow bb"><a class="btn ghost" href="/answers">전체 문항</a><button class="btn ${typeof a.v === 'number' ? 'primary' : 'ghost'}" data-act="next">${i === N_Q - 1 ? '재무제표 단계로 ›' : '다음 ›'}</button></div></div>`;
+  <div class="bottom-bar"><div class="wrap narrow bb"><a class="btn ghost" href="/" data-go="answers">전체 문항</a><button class="btn ${typeof a.v === 'number' ? 'primary' : 'ghost'}" data-act="next">${i === N_Q - 1 ? '재무제표 단계로 ›' : '다음 ›'}</button></div></div>`;
 }
 
-// ───────────────────────── 재무
-function finRow(a, d) {
-  const v = (o) => (typeof o?.[a.k] === 'number' ? o[a.k].toLocaleString('ko-KR') : '');
-  const miss = CORE.includes(a.k) && typeof d.cur?.[a.k] !== 'number';
-  const src = d.found?.[a.k] && d.found[a.k].replace(/\s/g, '') !== a.label ? `<span class="src">읽은 항목: ${esc(d.found[a.k])}</span>` : '';
-  return `<div class="frow ${miss ? 'miss' : ''}"><div class="fl">${esc(a.label)}${CORE.includes(a.k) ? ' <i>*</i>' : ''}${src}</div>
-  <label><span>당기</span><input inputmode="numeric" data-fin="cur" data-k="${a.k}" value="${v(d.cur)}" aria-label="${esc(a.label)} 당기"></label><label><span>전기</span><input inputmode="numeric" data-fin="prev" data-k="${a.k}" value="${v(d.prev)}" aria-label="${esc(a.label)} 전기"></label></div>`;
-}
+// ───────────────────────── 재무(3개년: 최근 연도·전년도·전전년도) — 읽은 값과 고친 값은 바로 이 브라우저에 저장된다
+const MAX_FILES = SLOTS.length * 2; // 파일 목록에 남길 개수
+const finBlank = (source = 'upload') => ({ source, confirmed: true, y0: '', cur: {}, prev: {}, pp: {}, files: [] });
+const slotHas = (f, k) => CORE.some((a) => typeof f?.[k]?.[a] === 'number');
 function financeHtml() {
-  const has = st.fin && st.fin.confirmed;
-  const d = finDraft;
-  const table = d ? `<div class="card"><h3>읽은 값을 확인해 주세요</h3>
-    ${d.status ? `<div class="stat ${d.status.type}">${esc(d.status.text)}</div>` : ''}
-    <p class="hint">원 단위 숫자예요. 틀린 값은 고치고, 비어 있는 값은 재무제표를 보고 채워 주세요(* 표시는 핵심 항목). 손실은 앞에 -를 붙여요.</p>
-    <div class="fgrid">${ACCOUNTS.map((a) => finRow(a, d)).join('')}</div>
-    <div class="res-act"><button class="btn primary" data-act="fin-save">이 값으로 반영하고 결과 보기</button><button class="btn ghost" data-act="fin-cancel">취소</button></div></div>` : '';
+  const f = st.fin; const n = f ? filledYears(f) : 0;
+  const cell = (a, s) => { const v = f[s.k]?.[a.k]; return `<td><input inputmode="decimal" data-fin="${s.k}" data-k="${a.k}" value="${typeof v === 'number' ? v.toLocaleString('ko-KR') : ''}" aria-label="${esc(a.label)} ${s.label}" placeholder="—"></td>`; };
+  const files = f?.files?.length ? `<ul class="flist">${f.files.map((x) => `<li class="${x.type}"><b>${esc(x.name)}</b><span>${esc(x.text)}</span></li>`).join('')}</ul>` : '';
+  const grid = f ? `<section class="card"><div class="fhd"><h3>연도별 값 <span class="muted sm">${n ? `${n}개년 입력됨` : '아직 비어 있어요'}</span></h3>
+      <label class="y0">최근 연도<input data-act="fin-y0" inputmode="numeric" maxlength="4" value="${esc(f.y0 || '')}" placeholder="예: ${Number(today().slice(0, 4)) - 1}" aria-label="최근 연도(귀속 연도)">년</label></div>
+    <p class="hint">원 단위예요. "1.2억", "3,500만"처럼 써도 되고, 손실은 앞에 -를 붙여요. 고친 값은 바로 저장돼요. <b>*</b> 표시는 꼭 필요한 항목이에요.<span class="m-only"> 표를 옆으로 밀면 전년도·전전년도 칸이 나와요.</span></p>
+    <div class="tw ftw"><table class="ftbl3"><thead><tr><th>계정</th>${SLOTS.map((s, i) => `<th>${esc(slotLabel(f, i))}${slotHas(f, s.k) ? '' : '<small>비어 있음</small>'}</th>`).join('')}</tr></thead>
+    <tbody>${ACCOUNTS.map((a) => `<tr><th scope="row">${esc(a.label)}${CORE.includes(a.k) ? ' <i>*</i>' : ''}</th>${SLOTS.map((s) => cell(a, s)).join('')}</tr>`).join('')}</tbody></table></div>
+    <div class="res-act"><button class="link danger" data-act="fin-clear">재무 정보 모두 지우기</button></div></section>` : '';
   return `${headerHtml()}<main class="wrap narrow"><button class="back" data-act="to-last">← 문항으로</button>
-  <h1 class="pg-t">재무제표를 올려 주세요</h1><p class="pg-s">투자자가 가장 먼저 요청하는 자료예요. 올리면 재무 지표와 응답 교차 확인이 결과에 반영돼요.</p>
-  ${has && !d ? `<div class="stat ok">재무 정보가 반영돼 있어요 (${esc(st.fin.source === 'upload' ? st.fin.fileName : '직접 입력')}). 다시 올리거나 수정할 수 있어요.</div>` : ''}
-  ${d ? '' : `<label class="drop" id="drop"><input type="file" accept="application/pdf,.pdf" data-act="fin-file" hidden><b>표준재무제표증명 PDF 선택</b><span>여기로 끌어다 놓거나 눌러서 고르세요 · 파일은 업로드되지 않고 이 기기 안에서만 읽어요</span></label>
+  <h1 class="pg-t">재무제표를 올려 주세요 <span class="muted" style="font-size:.6em;font-weight:600">(선택)</span></h1>
+  <p class="pg-s">최근 연도·전년도·전전년도까지 최대 ${SLOTS.length}개년을 넣을 수 있어요. 1개년만 넣어도, 하나도 없어도 결과를 볼 수 있어요 — 넣은 만큼 재무 해석이 더해져요.</p>
+  ${n ? `<div class="stat ok">재무제표 ${n}개년이 결과에 반영돼요${n < SLOTS.length ? ` · ${SLOTS.slice(n).map((s) => s.label).join('·')}를 더 넣으면 추이를 볼 수 있어요` : ''}.</div>` : ''}
+  <label class="drop" id="drop"><input type="file" accept="application/pdf,.pdf" multiple data-act="fin-file" hidden><b>표준재무제표증명 PDF 고르기</b><span>연도별 파일 여러 개를 한 번에 골라도 돼요 · 연도를 읽어 알맞은 칸에 넣어요 · 파일은 이 기기 안에서만 읽어요</span></label>
+  ${files}
+  ${f ? '' : '<div class="res-act"><button class="btn white" data-act="fin-manual">숫자 직접 입력하기</button></div>'}
   <details class="how"><summary>표준재무제표증명은 어디서 받나요?</summary><ol>
     <li>국세청 홈택스(www.hometax.go.kr)에 로그인해요(법인은 법인 인증서).</li><li>민원증명 → <b>표준재무제표증명</b>을 선택해요.</li>
-    <li>귀속 연도를 고르고 발급한 뒤, 인쇄 화면에서 <b>PDF로 저장</b>해요.</li><li>저장한 PDF를 위에 올려 주세요. 스캔한 이미지 PDF는 글자를 읽을 수 없어 직접 입력으로 안내해요.</li></ol></details>
-  <div class="res-act"><button class="btn white" data-act="fin-manual">숫자 직접 입력하기</button>${has ? '<button class="link danger" data-act="fin-clear">재무 정보 지우기</button>' : ''}</div>`}
-  ${table}</main>
-  <div class="bottom-bar"><div class="wrap narrow bb"><span class="sm muted">${has ? '재무 반영됨' : '없어도 결과는 볼 수 있어요'}</span><button class="btn primary" data-act="to-result">${has ? '결과 보기 ›' : '건너뛰고 결과 보기 ›'}</button></div></div>`;
+    <li>귀속 연도를 하나씩(최근 연도·전년도·전전년도) 발급해 인쇄 화면에서 <b>PDF로 저장</b>해요.</li><li>저장한 PDF를 위에 올려 주세요. 스캔한 이미지 PDF는 글자를 읽을 수 없어 직접 입력으로 안내해요.</li></ol></details>
+  ${grid}</main>
+  <div class="bottom-bar"><div class="wrap narrow bb"><span class="sm muted">${n ? `${n}개년 반영` : '없어도 결과는 볼 수 있어요'}</span><button class="btn primary" data-act="to-result">${n ? '결과 보기 ›' : '건너뛰고 결과 보기 ›'}</button></div></div>`;
 }
 
-// ───────────────────────── 결과
+// ───────────────────────── 결과 — 대표가 읽는 순서: 결론 → 투자자 눈 → 영역 → 재무 → 물어볼 질문 → 할 일 → 서류 → 상세
+const RNAV = [['r-sum', '요약'], ['r-lens', '투자자 관점'], ['r-cat', '영역 점수'], ['r-sw', '강점·보완'], ['r-fin', '재무'], ['r-ask', '나올 질문'], ['r-road', '로드맵'], ['r-room', '준비 서류'], ['r-detail', '영역 상세']];
+const ROOM_STATE = { ready: ['ok', '준비됨'], partial: ['info', '보완 필요'], todo: ['warn', '준비 전'] };
+const pctTxt = (v) => (v === null || v === undefined ? '—' : `${v}%`);
+function finSection(r) {
+  if (!r.fin.has) {
+    return `<div class="stat warn">재무제표가 반영되지 않았어요. 재무·자금 점수는 대표 응답만으로 계산했어요.</div>
+    <p class="hint">투자자는 미팅 전후로 표준재무제표를 가장 먼저 요청해요. 최근 연도·전년도·전전년도를 올리면 아래 내용이 결과에 더해져요.</p>
+    <ul class="plain"><li>연도별 매출·영업이익·순이익 추이 차트와 표</li><li>매출 성장률·영업이익률·부채비율·유동비율·자본잠식 여부</li><li>"매출이 있다"는 응답과 재무제표가 맞는지 교차 확인</li></ul>
+    <a class="btn primary" href="/" data-go="finance">표준재무제표 올리기</a>`;
+  }
+  const rows = r.years; const old = rows.slice().reverse();
+  const src = st.fin.source === 'upload' ? `표준재무제표에서 읽고 확인한 값${r.fin.fileName ? `(${esc(r.fin.fileName)})` : ''}` : '직접 입력한 값';
+  return `<p class="hint">${src} · ${r.fin.years}개년 반영. 참고 구간은 일반적인 기준선이며 업종별 차이가 커요.</p>
+    ${r.finStory.length ? `<ul class="story">${r.finStory.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+    ${rows.length >= FIN_YEARS_GOOD ? `<div class="ch-wrap">${trend(old.map((x) => ({ label: x.label.replace(/\((\d{4})년\)/, ' $1'), rev: x.rev, op: x.op, net: x.net })))}</div>` : ''}
+    <div class="tw"><table class="ytbl"><thead><tr><th>구분</th>${old.map((x) => { const m = x.label.match(/^(.+?)\((\d{4})년\)$/); return `<th>${m ? `${esc(m[1])}<small>${m[2]}년</small>` : esc(x.label)}</th>`; }).join('')}</tr></thead><tbody>
+      ${[['매출액', 'rev'], ['영업이익', 'op'], ['당기순이익', 'net'], ['자본총계', 'equity']].map(([l, k]) => `<tr><th scope="row">${l}</th>${old.map((x) => `<td class="${typeof x[k] === 'number' && x[k] < 0 ? 'neg' : ''}">${fmtWon(x[k], true)}</td>`).join('')}</tr>`).join('')}
+      ${[['영업이익률', 'opm'], ['부채비율', 'debt'], ['유동비율', 'current']].map(([l, k]) => `<tr><th scope="row">${l}</th>${old.map((x) => `<td>${pctTxt(x[k])}</td>`).join('')}</tr>`).join('')}
+    </tbody></table></div>
+    <h4 class="sub-t">최근 연도 지표</h4>
+    <div class="kpis">${r.indicators.map((x) => `<div class="kpi ${x.band || ''}"><span>${esc(x.label)}</span><b>${x.value === null ? esc(x.text || '계산 불가') : `${x.value}${x.unit}`}</b><small>${esc(x.note)}</small></div>`).join('')}</div>
+    <div class="res-act"><a class="btn white sm" href="/" data-go="finance">재무 ${r.fin.years < SLOTS.length ? '연도 추가·' : ''}수정</a></div>`;
+}
 function resultHtml() {
   const r = evaluate(st);
-  if (!r.answered) return `${headerHtml()}<main class="wrap narrow"><div class="card" style="margin-top:24px;text-align:center"><h3>아직 응답이 없어요</h3><p class="hint">${N_Q}문항에 답하면 결과를 보여 드려요.</p><a class="btn primary" href="/q/1">진단 시작하기</a></div></main>`;
+  if (!r.answered) return `${headerHtml()}<main class="wrap narrow"><div class="card" style="margin-top:24px;text-align:center"><h3>아직 응답이 없어요</h3><p class="hint">${N_Q}문항에 답하면 결과를 보여 드려요.</p><a class="btn primary" href="/" data-go="q/1">진단 시작하기</a></div></main>`;
   const stage = r.stageLabel;
-  const ind = r.indicators; const c = st.fin?.cur || {}; const p = st.fin?.prev || {};
   const qn = (id) => QUESTIONS.findIndex((q) => q.id === id) + 1;
   const adj = INDUSTRY_ADJ[r.industry] ? ` · ${esc(r.industry)} 업종 보정` : '';
-  const roadCol = (t, sub, list) => `<div><h4>${t} <span class="muted sm">${sub}</span></h4>${list.length ? `<ol>${list.map((x) => `<li>${x.q ? `<b>${esc(x.q.title)}</b> — ${esc(x.action)}<small>산출물: ${esc(x.doc)} · ${x.q.id} · 달성 시 +${x.gainTo}점</small>` : `${esc(x.action)}<small>산출물: ${esc(x.doc)}</small>`}</li>`).join('')}</ol>` : '<p class="sm muted">없음</p>'}</div>`;
+  const roadCol = (t, sub, list) => `<div><h4>${t} <span class="muted sm">${sub}</span></h4>${list.length ? `<ol>${list.map((x) => `<li>${x.q ? `<b>${esc(x.q.title)}</b> — ${esc(x.action)}<small>만들 자료: ${esc(x.doc)} · 달성 시 +${x.gainTo}점</small>` : `${esc(x.action)}<small>만들 자료: ${esc(x.doc)}</small>`}</li>`).join('')}</ol>` : '<p class="sm muted">없음</p>'}</div>`;
   const ansText = (q) => { const a = st.answers[q.id] || {}; return typeof a.v !== 'number' ? '미응답' : a.v === 0 ? '잘 모르겠어요' : esc(q.opts[a.v - 1]); };
+  const sec = (id, t, hint, body, cls = '') => `<section class="card ${cls}" id="${id}"><h3>${t}</h3>${hint ? `<p class="hint">${hint}</p>` : ''}${body}</section>`;
+  const room = r.dataRoom; const ready = room.filter((d) => d.state === 'ready').length;
   return `${headerHtml()}<main class="wrap">
   ${st.meta.synthetic ? '<div class="syn-band">합성 예시 결과예요. 실제 기업 자료가 아니에요.</div>' : ''}
   <div class="res-h"><div><small>${esc(stage)} · ${esc(st.meta.industry || '업종 미선택')} · ${today()}</small><h1>${esc(st.meta.company)} IR 진단 결과</h1></div>
-    <div class="res-act" style="margin:0"><button class="btn primary" data-act="print">결과 보고서 PDF</button><a class="btn white" href="/answers">답변 수정</a></div></div>
+    <div class="res-act" style="margin:0"><button class="btn primary" data-act="print">결과 보고서 PDF</button><a class="btn white" href="/" data-go="answers">답변 수정</a></div></div>
+  <nav class="rnav" aria-label="결과 바로 가기">${RNAV.map(([id, t]) => `<button data-act="jump" data-to="${id}">${t}</button>`).join('')}</nav>
 
-  <section class="card"><div class="sum-card"><div class="ch-wrap">${gauge(r.overall, r.grade, { size: 250 })}</div>
+  <section class="card" id="r-sum"><div class="sum-card"><div class="ch-wrap">${gauge(r.overall, r.grade, { size: 250 })}</div>
     <div><ul class="sum-lines">${r.summary.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-    <div class="badges"><span class="bdg ${r.complete ? 'ok' : 'warn'}">응답 ${r.answered}/${N_Q}</span><span class="bdg info">근거 자료 ${r.evidenceRate}%</span><span class="bdg ${r.fin.has ? 'ok' : 'warn'}">${r.fin.has ? '재무제표 반영' : '재무제표 미반영'}</span>${r.unknown.length ? `<span class="bdg warn">모르겠어요 ${r.unknown.length}</span>` : ''}${r.flags.length ? `<span class="bdg bad">경계 신호 ${r.flags.length}</span>` : ''}</div></div></div></section>
+    <div class="badges"><span class="bdg ${r.complete ? 'ok' : 'warn'}">응답 ${r.answered}/${N_Q}</span><span class="bdg info">근거 자료 ${r.evidenceRate}%</span><span class="bdg ${r.fin.has ? 'ok' : 'warn'}">${r.fin.has ? `재무제표 ${r.fin.years}개년 반영` : '재무제표 미반영'}</span><span class="bdg info">준비 서류 ${ready}/${room.length}</span>${r.unknown.length ? `<span class="bdg warn">모르겠어요 ${r.unknown.length}</span>` : ''}${r.flags.length ? `<span class="bdg bad">경계 신호 ${r.flags.length}</span>` : ''}</div></div></div></section>
 
-  ${r.flags.length ? `<section class="card flags"><h3>투자자 경계 신호</h3><p class="hint">투자 검토에서 멈칫하게 되는 지점이에요. 미팅 전에 먼저 정리하세요.</p><ul class="chk-l">${r.flags.map((f) => `<li class="warn">${esc(f.text)}${f.qid ? ` <a href="/q/${qn(f.qid)}">응답 보기</a>` : ''}</li>`).join('')}</ul></section>` : ''}
+  ${r.flags.length ? sec('r-flag', '투자자가 멈칫할 수 있는 부분', '투자 검토에서 질문이 몰리는 지점이에요. 미팅 전에 먼저 정리해 두세요.', `<ul class="chk-l">${r.flags.map((f) => `<li class="warn">${esc(f.text)}${f.qid ? ` <a href="/" data-go="q/${qn(f.qid)}">응답 보기</a>` : ''}</li>`).join('')}</ul>`, 'flags') : ''}
 
-  <section class="card"><h3>투자자 관점 진단</h3><p class="hint">투자 심사에서 묻는 ${LENSES.length}가지 질문으로 다시 묶어 봤어요. 질문마다 실사에서 확인하는 자료도 함께 적었어요.</p>
-    <div class="lenses">${r.lenses.map((l) => `<div class="lens ${l.verdict?.tone || ''}"><div class="lh"><b>${esc(l.name)}</b><em>${l.score ?? '—'}</em></div><p class="lq">${esc(l.q)}</p>
+  ${sec('r-lens', '투자자 관점 진단', `투자 심사에서 실제로 묻는 ${LENSES.length}가지 질문으로 응답을 다시 묶었어요. 질문마다 실사에서 확인하는 자료도 적었어요.`,
+    `<div class="lenses">${r.lenses.map((l) => `<div class="lens ${l.verdict?.tone || ''}"><div class="lh"><b>${esc(l.name)}</b><em>${l.score ?? '—'}</em></div><p class="lq">${esc(l.q)}</p>
       <div class="track"><i style="width:${l.score ?? 0}%;background:${barColor(l.score ?? 0)}"></i></div>
       <p class="lv">${l.verdict ? esc(l.verdict.text) : '응답 없음'}${l.note ? ` · <span class="muted">${esc(l.note)}</span>` : ''}</p>
-      ${l.weakest && l.verdict?.tone !== 'good' ? `<p class="lw">가장 약한 부분: <a href="/q/${qn(l.weakest.id)}">${esc(l.weakest.title)}</a></p>` : ''}<p class="ld">실사 확인 자료: ${esc(l.docs)}</p></div>`).join('')}</div></section>
+      ${l.weakest && l.verdict?.tone !== 'good' ? `<p class="lw">가장 약한 부분: <a href="/" data-go="q/${qn(l.weakest.id)}">${esc(l.weakest.title)}</a></p>` : ''}<p class="ld">실사 확인 자료: ${esc(l.docs)}</p></div>`).join('')}</div>`)}
 
-  <div class="grid2">
+  <div class="grid2" id="r-cat">
     <section class="card"><h3>영역별 점수</h3><div class="ch-wrap">${radar(CATEGORIES.map((x) => ({ name: x.short, score: r.cats[x.id].score })), { size: 320 })}</div></section>
-    <section class="card"><h3>단계 기대 수준 대비</h3><p class="hint">세로선은 ${esc(stage)} 단계에서 갖추면 좋은 수준(비코닉 기준)이에요. 비중으로 종합 점수를 계산해요${adj}.</p><div class="cbars">
+    <section class="card"><h3>${esc(stage)} 단계 기대 수준과 비교</h3><p class="hint">세로선은 ${esc(stage)} 단계 투자 검토에서 갖추면 좋은 수준(비코닉 기준)이에요. 비중으로 종합 점수를 계산해요${adj}.</p><div class="cbars">
       ${CATEGORIES.map((x) => { const cc = r.cats[x.id]; return `<div class="cbar"><b>${nb(x.name)}</b><div class="track"><i style="width:${cc.score ?? 0}%;background:${barColor(cc.score ?? 0)}"></i><s style="left:${cc.expect}%"></s></div><em>${cc.score ?? '—'}</em><small>비중 ${cc.weight}% · 기대 ${cc.expect} · ${cc.gap === null ? '미응답' : cc.gap >= 0 ? '충족' : `<span class="gap">${cc.gap}</span>`} · 근거 ${cc.ev}/${cc.total}</small></div>`; }).join('')}</div></section>
   </div>
 
-  <div class="grid2">
-    <section class="card"><h3>강점</h3><div class="lst">${r.strengths.length ? r.strengths.map((s) => `<div class="it good"><div class="h"><span>${esc(s.q.title)} <span class="muted sm">${esc(CMAP[s.q.cat].name)}</span></span>${dots(s.v)}</div><p>${esc(s.text)}${s.ev ? '' : ' · 근거 자료 확인 필요'}</p></div>`).join('') : `<p class="hint">${STRONG_MIN}점 이상인 문항이 아직 없어요.</p>`}</div></section>
-    <section class="card"><h3>먼저 보완할 ${TOP_N}가지</h3><p class="hint">점수를 올릴 여지가 크고 비중이 높은 순서예요.</p><div class="lst">${r.weaknesses.map((w) => `<div class="it need"><div class="h"><span>${esc(w.q.title)} <span class="muted sm">${esc(CMAP[w.q.cat].name)}</span></span>${dots(w.v)}</div><p>지금: ${esc(w.now)}</p><p class="nx"><b>목표</b> ${esc(w.next)} <span class="muted sm">(달성 시 +${w.gainTo}점)</span></p><p class="sm muted">산출물: ${esc(w.doc)}</p></div>`).join('') || `<p class="hint">${WEAK_MAX}점 이하 문항이 없어요.</p>`}</div></section>
+  <div class="grid2" id="r-sw">
+    <section class="card"><h3>투자자에게 먼저 보여 줄 강점</h3><div class="lst">${r.strengths.length ? r.strengths.map((x) => `<div class="it good"><div class="h"><span>${esc(x.q.title)} <span class="muted sm">${esc(CMAP[x.q.cat].name)}</span></span>${dots(x.v)}</div><p>${esc(x.text)}${x.ev ? '' : ' · 근거 자료를 함께 준비하세요'}</p></div>`).join('') : `<p class="hint">${STRONG_MIN}점 이상인 문항이 아직 없어요.</p>`}</div></section>
+    <section class="card"><h3>먼저 보완할 ${TOP_N}가지</h3><p class="hint">점수를 올릴 여지가 크고 비중이 높은 순서예요.</p><div class="lst">${r.weaknesses.map((w) => `<div class="it need"><div class="h"><span>${esc(w.q.title)} <span class="muted sm">${esc(CMAP[w.q.cat].name)}</span></span>${dots(w.v)}</div><p>지금: ${esc(w.now)}</p><p class="nx"><b>목표</b> ${esc(w.next)} <span class="muted sm">(달성 시 +${w.gainTo}점)</span></p><p class="sm muted">만들 자료: ${esc(w.doc)}</p></div>`).join('') || `<p class="hint">${WEAK_MAX}점 이하 문항이 없어요.</p>`}</div></section>
   </div>
 
-  ${r.checks.length ? `<section class="card"><h3>응답과 재무제표 확인</h3><ul class="chk-l">${r.checks.map((x) => `<li class="${x.type}">${esc(x.text)}${x.qid ? ` <a href="/q/${qn(x.qid)}">응답 보기</a>` : ''}</li>`).join('')}</ul></section>` : ''}
+  ${sec('r-fin', '재무', '', `${finSection(r)}${r.checks.length ? `<h4 class="sub-t">응답과 재무제표 확인</h4><ul class="chk-l">${r.checks.map((x) => `<li class="${x.type}">${esc(x.text)}${x.qid ? ` <a href="/" data-go="q/${qn(x.qid)}">응답 보기</a>` : ''}</li>`).join('')}</ul>` : ''}`)}
 
-  <section class="card"><h3>재무</h3>${r.fin.has ? `<p class="hint">${st.fin.source === 'upload' ? `표준재무제표에서 읽은 값(${esc(st.fin.fileName)})` : '직접 입력한 값'} 기준이에요. 참고 구간은 일반적인 기준선이며 업종별 차이가 커요.</p>
-    <div class="kpis">${ind.map((x) => `<div class="kpi ${x.band || ''}"><span>${esc(x.label)}</span><b>${x.value === null ? esc(x.text || '계산 불가') : `${x.value}${x.unit}`}</b><small>${esc(x.note)}</small></div>`).join('')}</div>
-    <div class="ch-wrap" style="margin-top:12px">${finBars([{ label: '매출액', prev: p.rev, cur: c.rev }, { label: '영업이익', prev: p.op, cur: c.op }, { label: '당기순이익', prev: p.net, cur: c.net }])}</div>
-    <div class="res-act"><a class="btn white sm" href="/finance">재무 수정</a></div>`
-    : `<div class="stat warn">재무제표가 반영되지 않았어요. 재무·자금 점수는 대표 응답만으로 계산했어요.</div><p class="hint">투자자는 표준재무제표를 가장 먼저 요청해요. 올리면 매출 성장률·영업이익률·부채비율·유동비율·현금 보유 개월 수와 응답 교차 확인이 추가돼요.</p><a class="btn primary" href="/finance">표준재무제표 올리기</a>`}</section>
+  ${sec('r-ask', '투자자가 물어볼 질문', '점수가 낮은 영역부터, 미팅에서 실제로 자주 나오는 질문이에요. 답을 한두 문장과 숫자로 미리 적어 두세요.',
+    `<div class="asks">${r.asks.map((a) => `<div class="ask"><div class="lh"><b>${nb(a.c.name)}</b><em>${a.score}</em></div><ol>${a.qs.map((x) => `<li>${esc(x)}</li>`).join('')}</ol>${a.weak.length ? `<p class="sm muted">답을 준비하며 함께 보완할 문항: ${a.weak.map(esc).join(', ')}</p>` : ''}</div>`).join('')}</div>`)}
 
-  <section class="card"><h3>보완 로드맵</h3><p class="hint">종합 점수에 영향이 큰 순서로 고른 뒤, 보완 난이도에 맞춰 기간에 배치했어요. 목표는 바로 다음 단계(최소 ${GOAL_FLOOR}단계·문서화 수준)이고, 항목마다 만들어야 할 산출물을 적었어요.</p>
-    <div class="road">${ROADMAP_BUCKETS.map((b) => roadCol(b.label, b.sub, r.roadmap[b.key])).join('')}</div></section>
+  ${sec('r-road', '보완 로드맵', `종합 점수에 영향이 큰 순서로 고른 뒤, 보완 난이도에 맞춰 기간에 배치했어요. 목표는 바로 다음 단계(최소 ${GOAL_FLOOR}단계·문서화 수준)예요.`,
+    `<div class="road">${ROADMAP_BUCKETS.map((b) => roadCol(b.label, b.sub, r.roadmap[b.key])).join('')}</div>`)}
 
-  <section class="card"><h3>영역별 상세 진단</h3><p class="hint">영역마다 투자자가 보는 포인트, 지금 상태, 보완 목표와 준비할 자료예요.</p>
-  ${r.analysis.map((a) => `<details class="qd"><summary><span>${nb(a.c.name)} <span class="bdg ${a.gap === null ? '' : a.gap >= 0 ? 'ok' : 'warn'}">${esc(a.status)}</span></span><span>${a.score ?? '—'}점 ›</span></summary>
+  ${sec('r-room', '투자 준비 서류 체크리스트', `투자자가 실사에서 요청하는 서류예요. 응답과 근거 체크로 준비 상태를 판단했어요(준비됨 ${ready}/${room.length}).`,
+    `<div class="room">${room.map((d) => `<div class="rm ${d.state}"><span class="bdg ${ROOM_STATE[d.state][0]}">${ROOM_STATE[d.state][1]}</span><b>${esc(d.name)}</b><small>${esc(d.note)}</small></div>`).join('')}</div>`)}
+
+  ${sec('r-detail', '영역별 상세 진단', '영역마다 투자자가 보는 포인트, 지금 상태, 보완 목표와 투자자가 물어볼 질문이에요.',
+    r.analysis.map((a) => `<details class="qd"><summary><span>${nb(a.c.name)} <span class="bdg ${a.gap === null ? '' : a.gap >= 0 ? 'ok' : 'warn'}">${esc(a.status)}</span></span><span>${a.score ?? '—'}점 ›</span></summary>
     <div class="ana"><p class="av"><b>투자자가 보는 포인트</b> ${esc(a.c.view)}</p>${a.diag ? `<p><b>지금 상태</b> ${esc(a.diag)}</p>` : ''}
-    ${a.actions.length ? `<p><b>보완 목표</b></p><ul>${a.actions.map((x) => `<li>${esc(x.q.title)} — ${esc(x.action)} <span class="muted sm">(${EFFORT[x.effort]} · 산출물: ${esc(x.doc)})</span></li>`).join('')}</ul>` : ''}
-    ${qByCatLocal(a.c.id).map((q) => `<div class="qrow"><div><b>${esc(q.title)} ${dots(st.answers[q.id]?.v)}</b><span>${ansText(q)}${st.answers[q.id]?.ev ? ' · 근거 있음' : ''}</span></div><a href="/q/${qn(q.id)}">수정</a></div>`).join('')}</div></details>`).join('')}</section>
+    ${a.actions.length ? `<p><b>보완 목표</b></p><ul>${a.actions.map((x) => `<li>${esc(x.q.title)} — ${esc(x.action)} <span class="muted sm">(${EFFORT[x.effort]} · 만들 자료: ${esc(x.doc)})</span></li>`).join('')}</ul>` : ''}
+    ${a.asks.length ? `<p><b>투자자가 물어볼 질문</b></p><ul>${a.asks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+    ${qByCatLocal(a.c.id).map((q) => `<div class="qrow"><div><b>${esc(q.title)} ${dots(st.answers[q.id]?.v)}</b><span>${ansText(q)}${st.answers[q.id]?.ev ? ' · 근거 있음' : ''}</span></div><a href="/" data-go="q/${qn(q.id)}">수정</a></div>`).join('')}</div></details>`).join(''))}
 
   <section class="card method"><h3>점수는 이렇게 계산해요</h3>
     <p>문항은 1~${SCALE_MAX}점(잘 모르겠어요 = ${UNKNOWN_AS}점), 영역 점수 = 문항 평균 × ${SCORE_FACTOR}, 종합 = 투자 단계별 영역 비중(기술 집약 업종은 기술역량 비중 보정)으로 가중 평균해요. 대표 응답과 제출한 재무제표 기반의 자가진단이며, 투자 유치 여부나 기업가치를 판단·보장하지 않아요.</p>
     <div class="tw"><table><thead><tr><th>등급</th>${GRADES.map((g) => `<th>${g.g}</th>`).join('')}</tr></thead><tbody><tr><td>기준</td>${GRADES.map((g) => `<td>${g.min}+</td>`).join('')}</tr></tbody></table></div>
-    <p class="sm">영역 구성은 ${Object.values(SOURCES).slice(0, 2).map((s) => `${esc(s.publisher)} 「${esc(s.title)}」`).join(', ')}의 투자 설명 항목을 참고했어요. 가중치·단계 기대 수준·업종 보정은 비코닉 설계값(실증 검증 전)이에요.</p></section>
+    <p class="sm">영역 구성은 ${Object.values(SOURCES).slice(0, 2).map((x) => `${esc(x.publisher)} 「${esc(x.title)}」`).join(', ')}의 투자 설명 항목을 참고했어요. 가중치·단계 기대 수준·업종 보정은 비코닉 설계값(실증 검증 전)이에요.</p></section>
 
-  <div class="res-act"><button class="btn primary" data-act="print">결과 보고서 PDF</button><a class="btn white" href="/finance">재무 ${r.fin.has ? '수정' : '올리기'}</a><button class="btn white" data-act="export">결과 파일 저장</button><label class="btn white file">결과 파일 열기<input type="file" accept="application/json,.json" data-act="import" hidden></label><button class="link danger" data-act="reset">모두 지우기</button></div>
+  <div class="res-act"><button class="btn primary" data-act="print">결과 보고서 PDF</button><a class="btn white" href="/" data-go="finance">재무 ${r.fin.has ? '수정' : '올리기'}</a><button class="btn white" data-act="export">결과 파일 저장</button><label class="btn white file">결과 파일 열기<input type="file" accept="application/json,.json" data-act="import" hidden></label><button class="link danger" data-act="reset">모두 지우기</button></div>
   <section class="consult" style="margin-top:24px"><div class="cbox"><div><b>보완 항목을 함께 준비하고 싶다면</b><p>진단 결과를 바탕으로 IR 덱·재무 자료·투자 전략을 함께 설계해 드려요.</p></div><div class="cbtn"><a class="btn primary" href="${telHref}">${COMPANY.tel}</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 결과 상담">이메일 상담</a></div></div></section>
   </main>${footerHtml()}`;
 }
@@ -222,8 +252,8 @@ function answersHtml() {
   const r = evaluate(st);
   return `${headerHtml()}<main class="wrap narrow"><button class="back" data-act="result-or-home">← 돌아가기</button><h1 class="pg-t">전체 문항</h1><p class="pg-s">${r.answered}/${N_Q} 응답 · 누르면 해당 문항으로 가요.</p>
   ${CATEGORIES.map((c) => `<section class="card"><h3>${nb(c.name)} <span class="muted sm">${r.cats[c.id].score ?? '—'}점</span></h3>${QUESTIONS.filter((q) => q.cat === c.id).map((q) => { const a = st.answers[q.id] || {};
-    return `<div class="qrow"><div><b>${esc(q.title)} ${dots(a.v)}</b><span>${typeof a.v !== 'number' ? '<b style="color:var(--warn);display:inline">미응답</b>' : a.v === 0 ? '잘 모르겠어요' : esc(q.opts[a.v - 1])}</span></div><a href="/q/${QUESTIONS.indexOf(q) + 1}">${typeof a.v === 'number' ? '수정' : '답하기'}</a></div>`; }).join('')}</section>`).join('')}
-  </main><div class="bottom-bar"><div class="wrap narrow bb"><a class="btn ghost" href="/finance">재무제표</a><a class="btn primary" href="/result">결과 보기 ›</a></div></div>`;
+    return `<div class="qrow"><div><b>${esc(q.title)} ${dots(a.v)}</b><span>${typeof a.v !== 'number' ? '<b style="color:var(--warn);display:inline">미응답</b>' : a.v === 0 ? '잘 모르겠어요' : esc(q.opts[a.v - 1])}</span></div><a href="/" data-go="q/${QUESTIONS.indexOf(q) + 1}">${typeof a.v === 'number' ? '수정' : '답하기'}</a></div>`; }).join('')}</section>`).join('')}
+  </main><div class="bottom-bar"><div class="wrap narrow bb"><a class="btn ghost" href="/" data-go="finance">재무제표</a><a class="btn primary" href="/" data-go="result">결과 보기 ›</a></div></div>`;
 }
 
 // ───────────────────────── 렌더
@@ -236,7 +266,7 @@ function render() {
   else if (r0 === 'finance' && ok) html = financeHtml();
   else if (r0 === 'result' && ok) html = resultHtml();
   else if (r0 === 'answers' && ok) html = answersHtml();
-  else { page = 'home'; html = homeHtml(); if (r0) history.replaceState(null, '', '/'); }
+  else { page = 'home'; html = homeHtml(); if (view) { view = ''; history.replaceState({ view }, '', '/'); } }
   $('#app').innerHTML = html;
   document.body.dataset.route = page || 'home';
   bindDrop();
@@ -245,24 +275,43 @@ function bindDrop() {
   const d = $('#drop'); if (!d) return;
   ['dragenter', 'dragover'].forEach((ev) => d.addEventListener(ev, (e) => { e.preventDefault(); d.classList.add('over'); }));
   ['dragleave', 'drop'].forEach((ev) => d.addEventListener(ev, (e) => { e.preventDefault(); d.classList.remove('over'); }));
-  d.addEventListener('drop', (e) => { const f = e.dataTransfer?.files?.[0]; if (f) handlePdf(f); });
+  d.addEventListener('drop', (e) => { if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files); });
 }
 
-// ───────────────────────── 재무 처리
-async function handlePdf(file) {
-  if (!/\.pdf$/i.test(file.name) && file.type !== 'application/pdf') { toast('PDF 파일을 골라 주세요.'); return; }
-  toast('재무제표를 읽고 있어요…');
-  try {
-    const { readPdfLines } = await import('./pdfread.js');
-    const { lines, textless } = await readPdfLines(file);
-    if (textless) { finDraft = { source: 'manual', fileName: file.name, cur: {}, prev: {}, found: {}, status: { type: 'warn', text: '글자를 읽을 수 없는 PDF예요(스캔 이미지일 수 있어요). 재무제표를 보고 직접 입력해 주세요.' } }; render(); return; }
-    const p = parseStatements(lines); const n = Object.keys(p.found).length; const coreN = CORE.filter((k) => typeof p.cur[k] === 'number').length;
-    finDraft = { source: 'upload', fileName: file.name, cur: p.cur, prev: p.prev, found: p.found, years: p.years,
-      status: n ? { type: coreN === CORE.length ? 'ok' : 'info', text: `${ACCOUNTS.length}개 계정 중 ${n}개를 읽었어요${p.unit !== 1 ? ` (단위 ${p.unit === 1000 ? '천원' : '백만원'} → 원으로 바꿈)` : ''}. ${coreN < CORE.length ? '빈 핵심 항목을 채워 주세요.' : '값이 맞는지 확인해 주세요.'}` }
-        : { type: 'warn', text: '표준재무제표 형식의 계정을 찾지 못했어요. 직접 입력해 주세요.' } };
-    render();
-  } catch { finDraft = { source: 'manual', fileName: file.name, cur: {}, prev: {}, found: {}, status: { type: 'warn', text: 'PDF를 여는 중 문제가 생겼어요. 직접 입력해 주세요.' } }; render(); }
+// ───────────────────────── 재무 처리 — 여러 파일을 차례로 읽어 연도 칸에 넣고 바로 저장
+async function handleFiles(list) {
+  const files = [...list]; if (!files.length) return;
+  toast(`재무제표 ${files.length}개를 읽고 있어요…`);
+  st.fin ||= finBlank();
+  let { readPdfLines } = {};
+  for (const file of files) {
+    let note;
+    if (!/\.pdf$/i.test(file.name) && file.type !== 'application/pdf') note = { type: 'warn', text: 'PDF 파일이 아니라 읽지 않았어요.' };
+    else {
+      try {
+        readPdfLines ||= (await import('./pdfread.js')).readPdfLines;
+        const { lines, textless } = await readPdfLines(file);
+        const parts = textless ? [] : parseFile(lines);
+        if (textless) note = { type: 'warn', text: '글자를 읽을 수 없는 PDF예요(스캔 이미지일 수 있어요). 아래 표에 직접 입력해 주세요.' };
+        else if (!parts.length) note = { type: 'warn', text: '재무제표가 아니에요(손익계산서·재무상태표 표제나 계정을 찾지 못했어요). 표준재무제표증명 PDF인지 확인해 주세요.' };
+        else {
+          const placed = [];
+          for (const p of parts) {
+            const { draft, slot } = mergeParsed(st.fin, p); const cnt = Object.keys(p.found).length;
+            if (slot < 0) { placed.push(`${p.year ? `${p.year}년` : '연도 미상'} 자료는 ${SLOTS.length}개년 범위를 벗어나 넣지 않았어요`); continue; }
+            Object.assign(st.fin, draft);
+            placed.push(`${p.year ? `${p.year}년 · ` : ''}${cnt}개 계정 → ${slotLabel(st.fin, slot)}${p.unit !== 1 ? `(${p.unit === 1000 ? '천원' : '백만원'} 단위를 원으로 바꿈)` : ''}`);
+          }
+          note = { type: placed.some((x) => x.includes('→')) ? 'ok' : 'warn', text: placed.join(' / ') };
+        }
+      } catch { note = { type: 'warn', text: 'PDF를 여는 중 문제가 생겼어요. 아래 표에 직접 입력해 주세요.' }; }
+    }
+    st.fin.files = [...(st.fin.files || []).filter((x) => x.name !== file.name), { name: file.name, ...note }].slice(-MAX_FILES);
+  }
+  st.fin.source = 'upload'; commit(); render();
+  const n = filledYears(st.fin); toast(n ? `재무제표 ${n}개년이 저장됐어요. 값을 확인해 주세요.` : '읽은 값이 없어요. 파일 안내를 확인해 주세요.');
 }
+const finTidy = () => { if (!st?.fin) return; st.fin = filledYears(st.fin) || st.fin.files?.length ? normalizeFin(st.fin) : null; if (st.fin && !filledYears(st.fin) && !st.fin.files?.length) st.fin = null; commit(); };
 
 // ───────────────────────── 이벤트
 document.addEventListener('keydown', (e) => {
@@ -279,12 +328,20 @@ function pick(v) {
 }
 document.addEventListener('input', (e) => {
   const el = e.target;
-  if (el.dataset.fin && finDraft) { const v = parseWon(el.value); finDraft[el.dataset.fin] ||= {}; if (v === null) delete finDraft[el.dataset.fin][el.dataset.k]; else if (!Number.isNaN(v)) finDraft[el.dataset.fin][el.dataset.k] = v; }
+  if (el.dataset.fin && st?.fin) {
+    const v = parseWon(el.value); const o = (st.fin[el.dataset.fin] ||= {});
+    el.classList.toggle('bad', Number.isNaN(v));
+    if (v === null) delete o[el.dataset.k]; else if (!Number.isNaN(v)) o[el.dataset.k] = v;
+    commit();
+  }
+  if (el.dataset.act === 'fin-y0' && st?.fin) { const y = el.value.replace(/\D/g, ''); if (y.length === 4 || !y) { st.fin.y0 = y; commit(); } }
 });
 document.addEventListener('change', async (e) => {
   const el = e.target;
   if (el.dataset.act === 'ev') { const q = QUESTIONS[(Number(route()[1]) || 1) - 1]; st.answers[q.id] = { ...(st.answers[q.id] || {}), ev: el.checked }; commit(); return; }
-  if (el.dataset.act === 'fin-file' && el.files[0]) { await handlePdf(el.files[0]); return; }
+  if (el.dataset.act === 'fin-file' && el.files.length) { const fs = [...el.files]; el.value = ''; await handleFiles(fs); return; } // 같은 파일을 다시 골라도 읽도록 비움
+  if (el.dataset.act === 'fin-y0') { render(); return; } // 머리글(연도) 갱신
+  if (el.dataset.fin) { const v = parseWon(el.value); if (typeof v === 'number' && !Number.isNaN(v)) el.value = v.toLocaleString('ko-KR'); return; } // 다시 그리지 않음(Tab으로 다음 칸 이동 유지)
   if (el.dataset.act === 'import' && el.files[0]) {
     try { const d = validate(JSON.parse(await el.files[0].text()));
       if (!d) { toast('IR 진단 결과 파일이 아니에요.'); return; }
@@ -298,7 +355,7 @@ document.addEventListener('click', (e) => {
   const act = b.dataset.act; const n = Number(route()[1]) || 1;
   switch (act) {
     case 'home': go(''); break;
-    case 'new': if (st?.meta.company && Object.keys(st.answers).length && !confirm('저장된 진단을 지우고 새로 시작할까요? 먼저 "결과 파일 저장"을 권해요.')) return; st = blank(); finDraft = null; go('start'); break;
+    case 'new': if (st?.meta.company && Object.keys(st.answers).length && !confirm('저장된 진단을 지우고 새로 시작할까요? 먼저 "결과 파일 저장"을 권해요.')) return; st = blank(); go('start'); break;
     case 'resume': { const i = firstUnanswered(); go(i === -1 ? 'result' : `q/${i + 1}`); break; }
     case 'sample': st = sampleState(); commit(); go('result'); break;
     case 'stage': st ||= blank(); st.meta.company = ($('#s-company')?.value || st.meta.company).slice(0, 60); st.meta.stage = b.dataset.v; render(); break;
@@ -315,25 +372,18 @@ document.addEventListener('click', (e) => {
     case 'prev': go(`q/${Math.max(1, n - 1)}`); break;
     case 'next': go(n < N_Q ? `q/${n + 1}` : 'finance'); break;
     case 'to-last': go(`q/${N_Q}`); break;
-    case 'to-result': go('result'); break;
+    case 'to-result': finTidy(); go('result'); break;
     case 'result-or-home': go(Object.keys(st.answers).length ? 'result' : ''); break;
-    case 'fin-manual': finDraft = { source: 'manual', fileName: '', cur: { ...(st.fin?.cur || {}) }, prev: { ...(st.fin?.prev || {}) }, found: {} }; render(); break;
-    case 'fin-cancel': finDraft = null; render(); break;
-    case 'fin-clear': if (confirm('재무 정보를 지울까요?')) { st.fin = null; commit(); render(); } break;
-    case 'fin-save': {
-      const d = finDraft; const bad = [...document.querySelectorAll('[data-fin]')].filter((i) => Number.isNaN(parseWon(i.value)));
-      if (bad.length) { bad[0].focus(); toast('숫자 형식을 확인해 주세요.'); return; }
-      if (!CORE.some((k) => typeof d.cur?.[k] === 'number')) { toast('당기 값을 하나 이상 입력해 주세요.'); return; }
-      st.fin = { source: d.source, fileName: d.fileName, cur: d.cur, prev: d.prev, years: d.years || [], confirmed: true };
-      finDraft = null; commit(); go('result'); toast('재무 정보를 반영했어요.'); break;
-    }
+    case 'fin-manual': st.fin = finBlank('manual'); commit(); render(); break;
+    case 'fin-clear': if (confirm('재무 정보를 모두 지울까요?')) { st.fin = null; commit(); render(); } break;
     case 'print': printReport(); break;
+    case 'jump': { const t = document.getElementById(b.dataset.to); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); break; } // 주소(#)를 바꾸지 않고 이동
     case 'export': {
       const blob = new Blob([JSON.stringify(st, null, 2)], { type: 'application/json' }); const a = document.createElement('a');
       a.href = URL.createObjectURL(blob); a.download = `BECONIC_IR진단_${(st.meta.company || 'company').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 40)}_${today()}.json`;
       document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); toast('결과 파일을 저장했어요.'); break;
     }
-    case 'reset': if (confirm('이 브라우저에 저장된 IR 진단을 모두 지울까요? 되돌릴 수 없어요.')) { clear(); st = null; finDraft = null; go(''); } break;
+    case 'reset': if (confirm('이 브라우저에 저장된 IR 진단을 모두 지울까요? 되돌릴 수 없어요.')) { clear(); st = null; go(''); } break;
   }
 });
 
@@ -350,4 +400,4 @@ export function printReport() {
 }
 
 render();
-window.__IR = { get state() { return st; }, evaluate: () => evaluate(st), go, APP, hasLegacy, WEIGHTS, N_Q, qids: QUESTIONS.map((q) => q.id) };
+window.__IR = { get view() { return view; }, get state() { return st; }, evaluate: () => evaluate(st), go, APP, hasLegacy, WEIGHTS, N_Q, qids: QUESTIONS.map((q) => q.id) };
