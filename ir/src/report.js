@@ -76,11 +76,16 @@ export function renderReport(st, r, { id, date, version }) {
   ${end}
 
   ${pg(4, '영역별 점수', `${CATEGORIES.length}개 영역 점수를 ${esc(stage)} 단계에서 갖추면 좋은 수준(기대)과 비교했어요.`)}
-  <div class="r-grid"><div class="r-radar">${radar(CATEGORIES.map((x) => ({ name: x.short, score: r.cats[x.id].score })), { size: 300 })}</div>
+  <div class="r-grid"><div class="r-radar">${radar(CATEGORIES.map((x) => ({ name: x.short, score: r.cats[x.id].score, expect: r.cats[x.id].expect })), { size: 340, font: 10.5 })}</div>
     <table class="r-tbl"><thead><tr><th>영역</th><th>점수</th><th class="r-c">기대</th><th class="r-c">비중</th><th class="r-c">근거</th></tr></thead><tbody>
     ${CATEGORIES.map((x) => { const cc = r.cats[x.id]; return `<tr><td class="r-nw">${esc(x.name)}</td><td class="r-nw"><span class="r-bar-t"><span class="r-bar" style="width:${cc.score ?? 0}%;background:${bandColor(cc.score)}"></span></span><b class="r-num">${cc.score ?? '—'}</b></td><td class="r-c ${cc.gap !== null && cc.gap < 0 ? 'r-gap' : ''}">${cc.expect}</td><td class="r-c">${cc.weight}%</td><td class="r-c">${cc.ev}/${cc.total}</td></tr>`; }).join('')}
     </tbody></table></div>
   <p class="r-note">기대 = ${esc(stage)} 단계에서 갖추면 좋은 수준(비코닉 기준, 빨간색은 미달). 비중 = 이 단계에서 종합 점수에 반영하는 비율${INDUSTRY_ADJ[r.industry] ? `(${esc(r.industry)} 업종 보정)` : ''}. 근거 = "보여 줄 문서·데이터가 있어요"를 체크한 문항 수.</p>
+  <h3>영역별 한 줄 진단</h3>
+  <table class="r-tbl"><thead><tr><th>영역</th><th class="r-c">점수 / 기대</th><th>강점 문항</th><th>먼저 보완할 문항</th></tr></thead><tbody>
+  ${r.analysis.map((a) => { const vq = (q) => { const v = st.answers[q.id]?.v; return typeof v !== 'number' ? null : v === 0 ? UNKNOWN_AS : v; }; const qs = qByCat(a.c.id).filter((q) => vq(q) !== null).sort((x, y) => vq(y) - vq(x)); const best = qs[0]; const worst = qs[qs.length - 1];
+    return `<tr><td class="r-nw"><b>${esc(a.c.name)}</b></td><td class="r-c r-num ${a.gap !== null && a.gap < 0 ? 'r-gap' : ''}">${a.score ?? '—'} / ${a.expect}</td><td>${best && vq(best) >= STRONG_MIN ? `${esc(best.title)} ${rdots(st.answers[best.id].v)}` : '—'}</td><td>${worst && vq(worst) <= WEAK_MAX ? `${esc(worst.title)} ${rdots(st.answers[worst.id].v)}` : '—'}</td></tr>`; }).join('')}
+  </tbody></table>
   <div class="r-box"><b>요약</b> 기대 수준을 넘은 영역 ${met}개, 못 미친 영역 ${r.gaps.length}개예요.${r.gaps.length ? ` 차이가 가장 큰 영역은 ${r.gaps.slice(0, TOP_N).map((c) => `${esc(c.name)}(${c.gap})`).join(', ')}이에요.` : ''} 비중이 큰 영역일수록 한 단계만 올려도 종합 점수가 많이 올라요.</div>
   ${end}
 
