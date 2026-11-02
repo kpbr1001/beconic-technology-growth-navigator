@@ -9,7 +9,7 @@ import { gauge, radar, trend, lineChart, dots } from './charts.js';
 import { renderReport, reportId } from './report.js';
 import { COMPANY, telHref } from './contact.js';
 
-export const APP = { version: 'v2.3.1', updated: '2026-11-02' };
+export const APP = { version: 'v2.3.2', updated: '2026-11-02' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const nb = (t) => esc(t).replace(/·/g, '⁠·⁠');
@@ -237,7 +237,7 @@ function resultHtml() {
 
   <div class="grid2" id="r-sw">
     <section class="card"><h3>투자자에게 먼저 보여 줄 강점</h3><div class="lst">${r.strengths.length ? r.strengths.map((x) => `<div class="it good"><div class="h"><span>${esc(x.q.title)} <span class="muted sm">${esc(CMAP[x.q.cat].name)}</span></span>${dots(x.v)}</div><p>${esc(x.text)}${x.ev ? '' : ' · 근거 자료를 함께 준비하세요'}</p></div>`).join('') : `<p class="hint">${STRONG_MIN}점 이상인 문항이 아직 없어요.</p>`}</div></section>
-    <section class="card"><h3>먼저 보완할 ${TOP_N}가지</h3><p class="hint">점수를 올릴 여지가 크고 비중이 높은 순서예요.</p><div class="lst">${r.weaknesses.map((w) => `<div class="it need"><div class="h"><span>${esc(w.q.title)} <span class="muted sm">${esc(CMAP[w.q.cat].name)}</span></span>${dots(w.v)}</div><p>지금: ${esc(w.now)}</p><p class="nx"><b>목표</b> ${esc(w.next)} <span class="muted sm">(달성 시 +${w.gainTo}점)</span></p><p class="sm muted">만들 자료: ${esc(w.doc)}</p></div>`).join('') || `<p class="hint">${WEAK_MAX}점 이하 문항이 없어요.</p>`}</div></section>
+    <section class="card"><h3>먼저 보완할 ${TOP_N}가지</h3><p class="hint">점수를 올릴 여지가 크고 비중이 높은 순서예요.${r.uplift.top > 0 ? ` <b class="up">${TOP_N}가지를 목표 단계로 올리면 종합 ${r.overall} → ${r.uplift.topTo}점</b>(계산상)` : ''}</p><div class="lst">${r.weaknesses.map((w) => `<div class="it need"><div class="h"><span>${esc(w.q.title)} <span class="muted sm">${esc(CMAP[w.q.cat].name)}</span></span>${dots(w.v)}</div><p>지금: ${esc(w.now)}</p><p class="nx"><b>목표</b> ${esc(w.next)} <span class="muted sm">(달성 시 +${w.gainTo}점)</span></p><p class="sm muted">만들 자료: ${esc(w.doc)}</p></div>`).join('') || `<p class="hint">${WEAK_MAX}점 이하 문항이 없어요.</p>`}</div></section>
   </div>
 
   ${sec('r-fin', '재무', '', `${finSection(r)}${r.checks.length ? `<h4 class="sub-t">응답과 재무제표 확인</h4><ul class="chk-l">${r.checks.map((x) => `<li class="${x.type}">${esc(x.text)}${x.qid ? ` <a href="/" data-go="q/${qn(x.qid)}">응답 보기</a>` : ''}</li>`).join('')}</ul>` : ''}`)}
@@ -408,7 +408,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-export function printReport() {
+export async function printReport() {
   const r = evaluate(st); const id = reportId(st);
   const pr = $('#print-root');
   pr.innerHTML = `<style>@page{@bottom-left{content:"${id} · BECONIC IR 진단";font-size:8pt;color:#6b7684;font-family:'Pretendard',sans-serif}@bottom-right{content:counter(page) " / " counter(pages);font-size:8pt;color:#6b7684;font-family:'Pretendard',sans-serif}}</style>${renderReport(st, r, { id, date: today(), version: APP.version })}`;
@@ -417,7 +417,10 @@ export function printReport() {
   document.body.classList.add('printing');
   const done = () => { document.body.classList.remove('printing'); document.title = prev; window.removeEventListener('afterprint', done); };
   window.addEventListener('afterprint', done);
+  // 글꼴(Pretendard)은 쓰인 글자만 나눠 받는 방식이라, 인쇄 전에 보고서 글자·굵기를 모두 받아 둔다(대체 글꼴로 찍히는 것 방지)
+  try { const txt = pr.textContent; await Promise.race([Promise.all([400, 500, 600, 700, 800].map((w) => document.fonts.load(`${w} 12px Pretendard`, txt))), new Promise((ok) => setTimeout(ok, 4000))]); await document.fonts.ready; } catch { /* 글꼴 대기 실패 시 그대로 인쇄 */ }
   if (!window.__noPrint) window.print();
+  else window.__printReady = true;
 }
 
 render();
