@@ -662,8 +662,8 @@ header.site{border-bottom-color:transparent;box-shadow:0 1px 0 rgba(23,37,68,.06
   .nav-btns .btn-back{flex:0 0 auto;padding:13px 18px}
   .progress{margin-bottom:20px}
   /* 결과 */
-  .res-actions{width:100%}
-  .res-actions .btn{flex:1;padding:9px 10px}
+  .res-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .res-actions .btn{padding:9px 10px}
   .name-search{flex:1 1 100%;max-width:none}
   .seg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;width:100%}
   .seg::-webkit-scrollbar{display:none}
@@ -803,6 +803,7 @@ header.site{border-bottom-color:transparent;box-shadow:0 1px 0 rgba(23,37,68,.06
       <div class="res-actions" id="resActions">
         <button type="button" class="btn btn-back btn-sm" onclick="App.editInputs()">← 조건 수정</button>
         <button type="button" class="btn btn-ghost btn-sm" id="pdfBtn" onclick="App.printReport()">📄 PDF 저장</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="linkBtn" onclick="App.copyLink()">🔗 링크 복사</button>
         <button type="button" class="btn btn-ghost btn-sm" onclick="App.goHome()">홈</button>
       </div>
     </div>

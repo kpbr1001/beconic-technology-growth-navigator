@@ -487,7 +487,7 @@ test('공고문 시·군 나열: 대상 지역을 알리는 말 뒤 같은 시·
 
 // ---------- 카카오 챗봇 허브(오픈빌더 스킬 v2.0) ----------
 import kakaoSkill, { _resetBotCache } from '../netlify/functions/kakao-skill.mjs';
-import { route, searchPrograms, ddayKst } from '../netlify/lib/bot/kakao.mjs';
+import { route, searchPrograms, ddayKst, aliasOf } from '../netlify/lib/bot/kakao.mjs';
 import { TOOLS } from '../netlify/lib/bot/tools.mjs';
 
 const BOT_NOW = Date.parse('2026-10-29T03:00:00Z'); // 한국시간 10-29 12:00
@@ -621,4 +621,62 @@ test('상담 연락처: 카카오 챗봇(CONTACT)과 화면(app.js HELP_CONTACT)
   // 화면·인쇄 HTML에는 번호·주소·인증번호를 직접 쓰지 않는다([data-ct] 자리에 HELP_CONTACT로 채움)
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   for (const k of ['tel', 'email', 'addr', 'cert']) assert.ok(!html.includes(val(k)), `index.html에 ${k} 직접 표기`);
+});
+
+test('카카오 챗봇: 줄임말 검색(예창패·청창사·소진공 등) — 공고명·기관명에서 찾고 제목은 원래 이름', () => {
+  const ps = [
+    { programName: '2026년 예비창업패키지 일반분야 예비창업자 모집', agency: '중소벤처기업부', applicationEnd: '2026-11-20' },
+    { programName: '2026년 청년창업사관학교 입교생 모집', agency: '중소벤처기업부', applicationEnd: '2026-11-10' },
+    { programName: '2026년 스마트상점 기술보급사업', agency: '중소벤처기업부', executingAgency: '소상공인시장진흥공단', applicationEnd: '2026-11-05' },
+    { programName: '2026년 예비창업자 교육', agency: '창업진흥원', applicationEnd: '2026-11-03' }
+  ];
+  assert.deepEqual(searchPrograms(ps, '예창패', BOT_NOW).map((p) => p.programName.includes('예비창업패키지')), [true]);
+  assert.equal(searchPrograms(ps, '청창사', BOT_NOW).length, 1);
+  assert.deepEqual(searchPrograms(ps, '소진공', BOT_NOW).map((p) => p.executingAgency), ['소상공인시장진흥공단']);
+  assert.equal(searchPrograms(ps, '창진원', BOT_NOW).length, 1);
+  assert.equal(searchPrograms(ps, '예비창업', BOT_NOW).length, 2, '줄임말이 아니면 그대로 공고명 검색');
+  assert.equal(aliasOf('예 창 패'), '예비창업패키지');
+  assert.equal(aliasOf('정책자금'), null);
+  const r = route('예창패', ps, BOT_NOW);
+  assertKakao(r);
+  assert.match(r.template.outputs[0].listCard.header.title, /예비창업패키지/);
+  const none = route('초창패', ps, BOT_NOW);
+  assert.match(none.template.outputs[0].simpleText.text, /초기창업패키지/, '결과 없음 안내도 원래 이름');
+});
+
+test('이용 측정: 허용한 이벤트 이름만 날짜별 건수로, 조회는 토큰이 있을 때만', async () => {
+  const { default: metrics, record, read, kstDay } = await import('../netlify/functions/metrics.mjs');
+  _setStore(memStore());
+  const now = Date.parse('2026-11-01T15:30:00Z'); // 한국시간 11-02 00:30
+  assert.equal(kstDay(now), '2026-11-02');
+  assert.equal(await record('results', now), true);
+  await record('results', now); await record('call_click', now);
+  assert.equal(await record('회사명: 비코닉 010-1234-5678', now), false, '허용 밖 문자열(입력값 등)은 저장하지 않음');
+  assert.deepEqual(await read(1, now), { '2026-11-02': { results: 2, call_click: 1 } });
+  const post = await metrics(new Request('https://x.netlify.app/api/e', { method: 'POST', body: 'visit' }), {});
+  assert.equal(post.status, 204);
+  delete process.env.METRICS_TOKEN;
+  assert.equal((await metrics(new Request('https://x.netlify.app/api/metrics'), {})).status, 404, '토큰 미설정이면 조회 불가');
+  process.env.METRICS_TOKEN = 'test-token';
+  assert.equal((await metrics(new Request('https://x.netlify.app/api/metrics', { headers: { 'x-beconic-metrics-token': 'wrong' } }), {})).status, 404);
+  const ok = await metrics(new Request('https://x.netlify.app/api/metrics?days=2', { headers: { 'x-beconic-metrics-token': 'test-token' } }), {});
+  assert.equal(ok.status, 200);
+  assert.equal((await ok.json()).days, 2);
+  delete process.env.METRICS_TOKEN;
+});
+
+test('이용 측정: 화면이 보내는 이벤트 이름은 모두 서버 허용 목록에 있음(입력값을 보내는 호출 없음)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { EVENTS } = await import('../netlify/functions/metrics.mjs');
+  const app = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const calls = [...app.matchAll(/track\(([^)]*)\)/g)].map((m) => m[1].trim()).filter((a) => a !== 'ev');
+  const names = new Set();
+  for (const a of calls) {
+    if (/^'[a-z_]+'$/.test(a)) names.add(a.slice(1, -1));
+    else if (a === "'persona_'+p") ['founder', 'retail', 'maker', 'sme'].forEach((k) => names.add('persona_' + k));
+    else if (/^via==='results_link' \? 'results_link' : 'results'$/.test(a)) { names.add('results_link'); names.add('results'); }
+    else assert.fail(`허용 형태가 아닌 track 호출: track(${a})`);
+  }
+  for (const n of names) assert.ok(EVENTS.includes(n), n);
+  assert.match(app, /sendBeacon\('\/api\/e', ev\)/, '이벤트 이름만 전송');
 });

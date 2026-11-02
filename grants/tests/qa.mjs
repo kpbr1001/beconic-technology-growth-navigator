@@ -122,6 +122,27 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
         const shopC = C({ ...sme, companyType: '소상인', bizRegType: '개인사업자', industry: '도소매업' });
         const ms = runMatching(progs, shopC), mm = runMatching(progs, C(sme));
         return [ms.map((x) => x.state).join(','), buildDashboard(ms, shopC).loanMax, buildDashboard(mm, C(sme)).loanMax]; })(),
+      // v3.27 정밀도 규칙: 필요한 지원과 성격이 다른 공고·대상 한정 공고
+      prec: (() => { const shop = { companyType: '소상인', bizRegType: '개인사업자', region: '부산', industry: '음식점업(F&B)', establishedYear: '2021', businessAge: 5, supportNeeds: ['fund'] };
+        const pre = { companyType: '예비창업자', region: '서울', industry: 'AI·빅데이터', representativeAge: '30대', supportNeeds: ['grant'] };
+        const old = { ...sme, establishedYear: '2015', businessAge: 11, supportNeeds: ['rnd'] };
+        // 지원분야가 원하는 지원과 맞는(관련도 1) 공고여도 성격이 다르면 낮춘다
+        const fp = (name, c, sp = []) => runMatching([P({ programName: name, supportPurposes: sp, applicationEnd: plus(30) })], C(c))[0].fitParts;
+        const cd = (name, c, label) => hardEligibility(P({ programName: name }), C(c)).conds.find((x) => x.label === label) || null;
+        return {
+          preShop: !!fp('[부산] 2026년 소상공인 경영전략 컨설팅 소상공인 모집 공고', pre)._misfit,
+          preReturn: !!fp('2026년 희망리턴패키지(재창업) 소상공인 모집', pre)._misfit,
+          corp: cd('2026년 소상공인(법인사업자) 비즈플러스카드 지원사업', shop, '사업자 형태')?.result,
+          indiv: cd('2026년 소상공인(개인사업자) 비즈플러스카드 지원사업', shop, '사업자 형태')?.result,
+          eventMoney: !!fp('2026 생성형 AI 활용 기초 과정 참여자 모집', pre, ['창업'])._eventForMoney,
+          eventKw: !!fp('2026 예비창업패키지 창업준비 아카데미 참여자 모집', pre, ['창업'])._eventForMoney,
+          lips: !!fp('2026년 소상공인 투자연계 지원사업 립스(LIPS) 모집 공고', shop, ['정책자금/금융'])._investLink,
+          baby: cd('[대구] 소상공인 맞춤형 출산ㆍ양육지원 사업 모집', shop, '대상 한정'),
+          startupOld: cd('[대전] 창업도시 프로젝트 딥테크 스튜디오 플러스 참여기업 모집', old, '업력 조건'),
+          restartOld: cd('2026 재창업 지원사업 모집', old, '업력 조건')?.result,
+          award: !!fp('2026년 산업기술 정책금융 지원 유공자 포상 신청 공고', shop)._notSupport,
+          agriFood: !!fp('2026년 농식품 크라우드펀딩 지원사업 공고', shop)._misfit };
+      })(),
       specialSan: sanitizeCompany({ specialStatus: ['disabled', 'x', 'disabled'] }).specialStatus,
       // 업종 추론(공고명): 도입·활용 사업은 업종 제한 아님, 업종 그룹 일치/불일치
       sector: [cond({ programName: '2026 AI 바우처 지원사업' }, { ...sme, industry: '음식점업(F&B)' }, '업종 조건').result,
@@ -171,6 +192,13 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('업종 추론: AI 바우처(도입)·에너지 효율 자금은 제한 아님, 게임 기업 사업은 음식점 확인 필요·추천 아님, 스마트공장은 제조 충족', r.sector[0] === 'na' && r.sector[1] === 'unknown' && r.sector[2] === 'pass' && r.sector[3] === 'na' && r.sector[4] !== '추천', r.sector.join('/'));
   check('산업 시설·설비 자금: 음식점 소상인 분야 한정·추천 아님, 기계 소공인 해당, 유통 시설투자 제외', r.facility[0] === 'unknown' && r.facility[1] === 'unknown' && r.facility[2] !== '추천' && r.facility[3] === null && r.facility[4] === null, JSON.stringify(r.facility));
   check('첫 화면 최대액: 소상인은 10억 초과 한도 제외(300억 → 7천만), 중소기업은 300억 그대로', r.amountCap[0] === '추천,추천' && r.amountCap[1] === 7e7 && r.amountCap[2] === 3e10, JSON.stringify(r.amountCap));
+  check('정밀도 규칙: 예비창업자에게 소상공인 사업 낮춤(재창업·희망리턴 제외)', r.prec.preShop && !r.prec.preReturn, JSON.stringify([r.prec.preShop, r.prec.preReturn]));
+  check('정밀도 규칙: 공고명 (법인사업자)는 개인사업자 미충족, (개인사업자)는 충족', r.prec.corp === 'fail' && r.prec.indiv === 'pass', `${r.prec.corp}/${r.prec.indiv}`);
+  check('정밀도 규칙: 자금만 원하면 행사·교육 낮춤, 공고명에 원하는 지원 키워드가 있으면 유지', r.prec.eventMoney && !r.prec.eventKw);
+  check('정밀도 규칙: 융자를 원하면 투자 연계(LIPS) 낮춤', r.prec.lips);
+  check('정밀도 규칙: 출산·양육 대상 사업은 확인 필요(대상 한정)', r.prec.baby && r.prec.baby.result === 'unknown' && r.prec.baby.restricted === true);
+  check('정밀도 규칙: 업력 상한 없는 창업 사업은 업력 8년 이상이면 확인 필요, 재창업은 제외', r.prec.startupOld && r.prec.startupOld.result === 'unknown' && r.prec.startupOld.restricted === true && r.prec.restartOld === 'na', JSON.stringify([r.prec.startupOld && r.prec.startupOld.result, r.prec.restartOld]));
+  check('정밀도 규칙: 유공자 포상은 지원사업 아님, 농식품 사업은 음식점과 거리 있음', r.prec.award && r.prec.agriFood);
   check('해당되는 항목 저장값 정제(허용 키·중복 제거)', JSON.stringify(r.specialSan) === '["disabled"]', JSON.stringify(r.specialSan));
   check('저장값 정제: 허용 밖 값 제거', r.sanitize.region === null && r.sanitize.establishedYear === null && r.sanitize.exportHistory === null && r.sanitize.industry === '제조업');
   await page.context().close();
@@ -520,12 +548,32 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('카카오톡 안: PDF 버튼 → 결과 복사', (await page.locator('#pdfBtn').innerText()).includes('결과 복사'));
   await page.locator('#pdfBtn').click(); await page.waitForTimeout(150);
   const clip = await page.evaluate(() => navigator.clipboard.readText());
-  check('카카오톡 안: 결과 요약(조건·추천 사업·다시 매칭 주소) 복사', /BECONIC 지원사업 매칭 결과/.test(clip) && /서울/.test(clip) && /다시 매칭: http/.test(clip), clip.split('\n').slice(0, 3).join(' | '));
+  check('카카오톡 안: 결과 요약(조건·추천 사업·같은 조건 링크) 복사', /BECONIC 지원사업 매칭 결과/.test(clip) && /서울/.test(clip) && /같은 조건으로 다시 보기: http\S+\?t=sme&r=/.test(clip), clip.split('\n').slice(0, 3).join(' | '));
   const mf = await page.request.get(new URL('assets/manifest.webmanifest', BASE).href);
   const man = await mf.json();
   const icons = await Promise.all(man.icons.map(async (i) => [i.sizes, i.purpose || 'any', (await page.request.get(new URL(i.src, mf.url()).href)).status()]));
   check('홈 화면 아이콘: 512(일반·maskable) 포함, 모든 아이콘 주소 열림', icons.some(([s, p]) => s === '512x512' && p === 'any') && icons.some(([s, p]) => s === '512x512' && p === 'maskable') && icons.every(([, , st]) => st === 200), JSON.stringify(icons));
   await ctx.close();
+}
+
+// ---------- 6-2. 결과 링크(조건을 주소에 담아 다시 열기) ----------
+{
+  const page = await newPage({ width: 375, height: 812 });
+  await page.addInitScript(() => { window.__beacons = []; navigator.sendBeacon = (u, d) => { window.__beacons.push([u, d]); return true; }; });
+  const view = () => page.evaluate(() => ['landing', 'form', 'results'].find((v) => !document.getElementById('view-' + v).classList.contains('hidden')));
+  await page.goto(BASE + '?t=retail&r=' + encodeURIComponent('서울') + '&i=' + encodeURIComponent('음식점업(F&B)') + '&y=2021&b=' + encodeURIComponent('개인사업자') + '&n=fund,online');
+  await page.waitForSelector('#view-results:not(.hidden)', { timeout: 30000 });
+  const c = await page.evaluate(() => ({ ...App.company(), url: location.search }));
+  check('결과 링크: 조건이 담긴 주소로 열면 바로 결과·주소에서 조건 지움', c.region === '서울' && c.industry === '음식점업(F&B)' && c.businessAge === 5 && c.supportNeeds.join() === 'fund,online' && c.url === '', JSON.stringify({ r: c.region, n: c.supportNeeds, url: c.url }));
+  const link = await page.evaluate(() => { const c = App.company(); return [c.region, c.bizRegType]; });
+  check('결과 링크: 모바일 결과 버튼 4개 2줄 배치·가로 넘침 없음', await page.locator('#resActions .btn').count() === 4 && await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), link.join());
+  await page.goto(BASE + '?t=retail&r=' + encodeURIComponent('서울') + '&i=' + encodeURIComponent('<img src=x onerror=window.__x=1>') + '&n=fund,zzz');
+  await page.waitForTimeout(300);
+  check('결과 링크: 허용 밖 값은 버리고 빠진 단계부터 입력(스크립트 미실행)', (await view()) === 'form' && await page.evaluate(() => App.company().industry === null && App.company().supportNeeds.join() === 'fund' && window.__x === undefined));
+  await page.goto(BASE + '?t=__proto__&r=x');
+  check('결과 링크: 알 수 없는 유형이면 첫 화면', (await view()) === 'landing');
+  check('이용 측정: 개발·테스트(https 아님)에서는 아무것도 보내지 않음', (await page.evaluate(() => window.__beacons.length)) === 0);
+  await page.context().close();
 }
 
 // ---------- 7. PDF (DEMO) ----------
