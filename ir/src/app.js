@@ -9,7 +9,7 @@ import { gauge, radar, trend, lineChart, dots } from './charts.js';
 import { renderReport, reportId } from './report.js';
 import { COMPANY, telHref } from './contact.js';
 
-export const APP = { version: 'v2.3.0', updated: '2026-11-02' };
+export const APP = { version: 'v2.3.1', updated: '2026-11-02' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const nb = (t) => esc(t).replace(/·/g, '⁠·⁠');
@@ -175,9 +175,10 @@ function finSection(r) {
     ${r.finStory.length ? `<ul class="story">${r.finStory.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
     <h4 class="sub-t">재무 4대 영역 진단</h4>
     <div class="fscore">${r.finAreas.map((a) => `<div class="fs ${a.tone || 'none'}"><div class="lh"><b>${a.name}</b><span class="bdg ${a.tone === 'good' ? 'ok' : a.tone === 'warn' ? 'bad' : a.tone ? 'info' : ''}">${a.tone === 'good' ? '양호' : a.tone === 'warn' ? '주의' : a.tone ? '보통' : '자료 없음'}</span></div><p class="lq">${esc(a.q)}</p><p>${esc(a.verdict)}</p>${a.items.length ? `<p class="sm muted">${a.items.map((x) => `${esc(x.label)} ${x.value === null ? esc(x.text || '—') : `${x.value}${x.unit}`}`).join(' · ')}</p>` : ''}</div>`).join('')}</div>
-    ${rows.length >= FIN_YEARS_GOOD ? `<div class="fcharts"><div class="ch-wrap">${trend(old.map((x) => ({ label: yl(x.label), rev: x.rev, op: x.op, net: x.net })), { width: 380, height: 230 })}</div>
-      <div class="ch-wrap">${lineChart(old.map((x) => yl(x.label)), [{ name: '영업이익률', color: '#00a37a', vals: old.map((x) => x.opm) }, { name: '순이익률', color: '#f0a43a', vals: old.map((x) => x.npm) }], { label: '이익률 추이' })}</div>
-      <div class="ch-wrap">${lineChart(old.map((x) => yl(x.label)), [{ name: '부채비율', color: '#e5484d', vals: old.map((x) => x.debt) }, { name: '유동비율', color: '#3182f6', vals: old.map((x) => x.current) }], { label: '부채비율·유동비율 추이' })}</div></div>` : ''}
+    ${rows.length >= FIN_YEARS_GOOD ? `<div class="fcharts">
+      <figure class="chbox"><figcaption><b>매출·영업이익·순이익</b><small>연도별 금액 · 0선 아래는 손실</small></figcaption>${trend(old.map((x) => ({ label: yl(x.label), rev: x.rev, op: x.op, net: x.net })), { width: 380, height: 230 })}</figure>
+      <figure class="chbox"><figcaption><b>이익률 추이</b><small>영업이익률·순이익률 · 높을수록 좋음</small></figcaption>${lineChart(old.map((x) => yl(x.label)), [{ name: '영업이익률', color: '#00a37a', vals: old.map((x) => x.opm) }, { name: '순이익률', color: '#f0a43a', vals: old.map((x) => x.npm) }], { label: '이익률 추이' })}</figure>
+      <figure class="chbox"><figcaption><b>부채비율·유동비율 추이</b><small>부채비율은 낮을수록, 유동비율은 높을수록 좋음</small></figcaption>${lineChart(old.map((x) => yl(x.label)), [{ name: '부채비율', color: '#e5484d', vals: old.map((x) => x.debt) }, { name: '유동비율', color: '#3182f6', vals: old.map((x) => x.current) }], { label: '부채비율·유동비율 추이' })}</figure></div>` : ''}
     <div class="tw"><table class="ytbl"><thead><tr><th>구분</th>${old.map((x) => { const m = x.label.match(/^(.+?)\((\d{4})년\)$/); return `<th>${m ? `${esc(m[1])}<small>${m[2]}년</small>` : esc(x.label)}</th>`; }).join('')}</tr></thead><tbody>
       ${[['매출액', 'rev'], ['영업이익', 'op'], ['당기순이익', 'net'], ['자본총계', 'equity']].map(([l, k]) => `<tr><th scope="row">${l}</th>${old.map((x) => `<td class="${typeof x[k] === 'number' && x[k] < 0 ? 'neg' : ''}">${fmtWon(x[k], true)}</td>`).join('')}</tr>`).join('')}
       ${[['매출 성장률', 'growth'], ['영업이익률', 'opm'], ['순이익률', 'npm'], ['부채비율', 'debt'], ['유동비율', 'current']].map(([l, k]) => `<tr><th scope="row">${l}</th>${old.map((x) => `<td>${pctTxt(x[k])}</td>`).join('')}</tr>`).join('')}
@@ -185,6 +186,20 @@ function finSection(r) {
     <h4 class="sub-t">최근 연도 지표</h4>
     <div class="kpis">${r.indicators.map((x) => `<div class="kpi ${x.band || ''}"><span>${esc(x.label)}</span><b>${x.value === null ? esc(x.text || '계산 불가') : `${x.value}${x.unit}`}</b><small>${esc(x.note)}</small></div>`).join('')}</div>
     <div class="res-act"><a class="btn white sm" href="/" data-go="finance">재무 ${r.fin.years < SLOTS.length ? '연도 추가·' : ''}수정</a></div>`;
+}
+// 영역 상세: 행마다 한 줄 요약(강점·보완 문항), 섹션 위 핵심 요약
+const vOf = (q) => { const v = st.answers[q.id]?.v; return typeof v !== 'number' ? null : v === 0 ? UNKNOWN_AS : v; };
+function catKey(a) {
+  const qs = qByCatLocal(a.c.id).filter((q) => vOf(q) !== null).sort((x, y) => vOf(y) - vOf(x));
+  if (!qs.length) return '<span class="muted">미응답</span>';
+  const best = qs[0]; const worst = qs[qs.length - 1];
+  return `${vOf(best) >= STRONG_MIN ? `<em class="kg">강점</em> ${esc(best.title)}` : ''}${vOf(worst) <= WEAK_MAX ? `${vOf(best) >= STRONG_MIN ? ' · ' : ''}<em class="kw">보완</em> ${esc(worst.title)}` : ''}` || '<em class="kg">고르게 양호</em>';
+}
+function detailSummary(r) {
+  const sc = r.analysis.filter((a) => a.score !== null); if (!sc.length) return '';
+  const met = sc.filter((a) => a.gap >= 0).length; const best = [...sc].sort((x, y) => y.score - x.score)[0]; const worst = [...sc].sort((x, y) => x.gap - y.gap || x.score - y.score)[0];
+  return `<div class="dsum"><div><span>단계 기대 충족</span><b>${met}/${sc.length}</b><small>영역</small></div><div><span>가장 강한 영역</span><b>${nb(best.c.name)}</b><small>${best.score}점</small></div><div><span>가장 시급한 영역</span><b>${nb(worst.c.name)}</b><small>${worst.gap < 0 ? `기대보다 ${-worst.gap}점 낮음` : `${worst.score}점`}</small></div>
+  <p>${worst.gap < 0 ? `${esc(worst.c.name)} 영역부터 보완하세요. ${worst.actions[0] ? `첫 할 일은 <b>${esc(worst.actions[0].q.title)}</b>을(를) "${esc(worst.actions[0].action)}" 수준으로 만드는 거예요.` : ''}` : '모든 영역이 단계 기대 수준을 넘었어요. 근거 자료를 갖춰 강점을 증명하세요.'}</p></div>`;
 }
 function resultHtml() {
   const r = evaluate(st);
@@ -215,7 +230,7 @@ function resultHtml() {
       ${l.weakest && l.verdict?.tone !== 'good' ? `<p class="lw">가장 약한 부분: <a href="/" data-go="q/${qn(l.weakest.id)}">${esc(l.weakest.title)}</a></p>` : ''}<p class="ld">실사 확인 자료: ${esc(l.docs)}</p></div>`).join('')}</div>`)}
 
   <div class="grid2" id="r-cat">
-    <section class="card"><h3>영역별 점수</h3><div class="ch-wrap">${radar(CATEGORIES.map((x) => ({ name: x.short, score: r.cats[x.id].score })), { size: 320 })}</div></section>
+    <section class="card"><h3>영역별 점수</h3><p class="hint">파란 면이 우리 점수, 주황 점선이 ${esc(stage)} 단계 기대 수준이에요. 점선 안쪽으로 들어간 영역(빨간 숫자)이 먼저 보완할 곳이에요.</p><div class="ch-wrap radar-wrap">${radar(CATEGORIES.map((x) => ({ name: x.short, score: r.cats[x.id].score, expect: r.cats[x.id].expect })), { size: 440, font: 14 })}</div></section>
     <section class="card"><h3>${esc(stage)} 단계 기대 수준과 비교</h3><p class="hint">세로선은 ${esc(stage)} 단계 투자 검토에서 갖추면 좋은 수준(비코닉 기준)이에요. 비중으로 종합 점수를 계산해요${adj}.</p><div class="cbars">
       ${CATEGORIES.map((x) => { const cc = r.cats[x.id]; return `<div class="cbar"><b>${nb(x.name)}</b><div class="track"><i style="width:${cc.score ?? 0}%;background:${barColor(cc.score ?? 0)}"></i><s style="left:${cc.expect}%"></s></div><em>${cc.score ?? '—'}</em><small>비중 ${cc.weight}% · 기대 ${cc.expect} · ${cc.gap === null ? '미응답' : cc.gap >= 0 ? '충족' : `<span class="gap">${cc.gap}</span>`} · 근거 ${cc.ev}/${cc.total}</small></div>`; }).join('')}</div></section>
   </div>
@@ -236,8 +251,8 @@ function resultHtml() {
   ${sec('r-room', '투자 준비 서류 체크리스트', `투자자가 실사에서 요청하는 서류예요. 응답과 근거 체크로 준비 상태를 판단했어요(준비됨 ${ready}/${room.length}).`,
     `<div class="room">${room.map((d) => `<div class="rm ${d.state}"><span class="bdg ${ROOM_STATE[d.state][0]}">${ROOM_STATE[d.state][1]}</span><b>${esc(d.name)}</b><small>${esc(d.note)}</small></div>`).join('')}</div>`)}
 
-  ${sec('r-detail', '영역별 상세 진단', '영역마다 투자자가 보는 포인트, 지금 상태, 보완 목표와 투자자가 물어볼 질문이에요.',
-    r.analysis.map((a) => `<details class="qd"><summary><span>${nb(a.c.name)} <span class="bdg ${a.gap === null ? '' : a.gap >= 0 ? 'ok' : 'warn'}">${esc(a.status)}</span></span><span>${a.score ?? '—'}점 ›</span></summary>
+  ${sec('r-detail', '영역별 상세 진단', '영역마다 투자자가 보는 포인트, 지금 상태, 보완 목표와 투자자가 물어볼 질문이에요. 누르면 펼쳐져요.',
+    `${detailSummary(r)}` + r.analysis.map((a) => `<details class="qd"><summary><span class="qn">${nb(a.c.name)}</span><span class="bdg ${a.gap === null ? '' : a.gap >= 0 ? 'ok' : 'warn'}">${esc(a.status)}</span><span class="qk">${catKey(a)}</span><span class="qbar" aria-hidden="true"><i style="width:${a.score ?? 0}%;background:${barColor(a.score ?? 0)}"></i><s style="left:${a.expect}%"></s></span><span class="qsc">${a.score ?? '—'}점 ›</span></summary>
     <div class="ana"><p class="av"><b>투자자가 보는 포인트</b> ${esc(a.c.view)}</p>${a.diag ? `<p><b>지금 상태</b> ${esc(a.diag)}</p>` : ''}
     ${a.actions.length ? `<p><b>보완 목표</b></p><ul>${a.actions.map((x) => `<li>${esc(x.q.title)} — ${esc(x.action)} <span class="muted sm">(${EFFORT[x.effort]} · 만들 자료: ${esc(x.doc)})</span></li>`).join('')}</ul>` : ''}
     ${a.asks.length ? `<p><b>투자자가 물어볼 질문</b></p><ul>${a.asks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}

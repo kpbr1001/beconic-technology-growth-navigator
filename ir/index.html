@@ -297,6 +297,20 @@ input.bad{border-color:var(--bad);background:var(--bad-soft)}
 /* ───────── 결과 보고서(인쇄 전용) ───────── */
 #print-root{display:none}
 /* v2.2.1 */
+.radar-wrap svg{width:100%;max-width:500px;height:auto}
+.chbox{margin:0;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 12px 6px}
+.chbox figcaption{margin-bottom:4px}.chbox figcaption b{display:block;font-size:14.5px}.chbox figcaption small{color:var(--muted);font-size:12px}
+.fcharts{background:var(--line-2);border-radius:16px;padding:10px;gap:10px}
+.dsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:var(--blue-soft);border-radius:14px;padding:12px;margin:6px 0 10px}
+.dsum div{background:#fff;border-radius:10px;padding:9px 11px}.dsum span{display:block;font-size:12.5px;color:var(--muted)}.dsum b{font-size:16px}.dsum small{margin-left:6px;color:var(--sub);font-size:12.5px}
+.dsum p{grid-column:1/-1;margin:2px 2px 0;font-size:14px;color:var(--ink)}
+.qd summary{display:grid;grid-template-columns:minmax(120px,auto) auto 1fr 120px 64px;gap:10px;align-items:center;border-bottom:1px solid var(--line-2)}
+.qd summary .qk{font-weight:500;font-size:13.5px;color:var(--sub);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qk em{font-style:normal;font-weight:700;font-size:12px;border-radius:5px;padding:1px 5px}.qk .kg{background:var(--ok-soft);color:var(--ok)}.qk .kw{background:var(--warn-soft);color:var(--warn)}
+.qbar{position:relative;height:8px;background:var(--line-2);border-radius:99px;overflow:visible}.qbar i{display:block;height:100%;border-radius:99px}.qbar s{position:absolute;top:-3px;width:2px;height:14px;background:#4e5968}
+.qd summary .qsc{text-align:right}
+@media (max-width:760px){.qd summary{grid-template-columns:1fr auto;row-gap:6px}.qd summary .qk{grid-column:1/-1;white-space:normal}.qd summary .qbar{grid-column:1/2}.dsum{grid-template-columns:1fr}}
+
 .fscore{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:6px}
 .fs{border-radius:14px;padding:13px 14px;background:var(--line-2);border-top:4px solid #c5cbd3}.fs.good{border-top-color:var(--ok)}.fs.mid{border-top-color:var(--blue)}.fs.warn{border-top-color:var(--bad)}
 .fs .lh{display:flex;justify-content:space-between;align-items:center}.fs b{font-size:16px}.fs .lq{font-size:12.5px;color:var(--muted);margin:2px 0 6px}.fs p{margin:3px 0;font-size:14px}

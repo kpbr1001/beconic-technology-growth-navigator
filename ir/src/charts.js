@@ -17,22 +17,27 @@ export function gauge(score, grade, { size = 220, label = 'IR 준비도' } = {})
   </svg>`;
 }
 
-/** 레이더(방사형) — cats: [{name, score}] */
-export function radar(cats, { size = 300 } = {}) {
-  const n = cats.length, cx = size / 2, cy = size / 2, R = size / 2 - 60;
+/** 레이더(방사형) — cats: [{name, score, expect?}]. expect가 있으면 단계 기대 수준을 점선으로 겹쳐 그린다 */
+export function radar(cats, { size = 300, font = 11 } = {}) {
+  const n = cats.length, cx = size / 2, cy = size / 2, R = size / 2 - font * 5.4;
   const ang = (i) => -Math.PI / 2 + (2 * Math.PI * i) / n;
   const ring = (f) => cats.map((_, i) => pt(cx, cy, R * f, ang(i)).map((v) => v.toFixed(1)).join(',')).join(' ');
-  const poly = cats.map((c, i) => pt(cx, cy, R * ((c.score ?? 0) / 100), ang(i)).map((v) => v.toFixed(1)).join(',')).join(' ');
+  const polyOf = (key) => cats.map((c, i) => pt(cx, cy, R * ((c[key] ?? 0) / 100), ang(i)).map((v) => v.toFixed(1)).join(',')).join(' ');
+  const hasExp = cats.some((c) => typeof c.expect === 'number');
   const labels = cats.map((c, i) => {
-    const [x, y] = pt(cx, cy, R + 22, ang(i)); const anchor = Math.abs(x - cx) < 6 ? 'middle' : x > cx ? 'start' : 'end';
-    return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}" font-size="11" fill="#333d4b" font-weight="600">${esc(c.name)}<tspan x="${x.toFixed(1)}" dy="13" font-size="11.5" font-weight="800" fill="#1b64da">${c.score ?? '—'}</tspan></text>`;
+    const [x, y] = pt(cx, cy, R + font * 2, ang(i)); const anchor = Math.abs(x - cx) < 6 ? 'middle' : x > cx ? 'start' : 'end';
+    const low = hasExp && typeof c.score === 'number' && c.score < c.expect;
+    return `<text x="${x.toFixed(1)}" y="${(y - font * 0.2).toFixed(1)}" text-anchor="${anchor}" font-size="${font}" fill="#333d4b" font-weight="600">${esc(c.name)}<tspan x="${x.toFixed(1)}" dy="${(font * 1.2).toFixed(1)}" font-size="${(font * 1.08).toFixed(1)}" font-weight="800" fill="${low ? '#d22030' : '#1b64da'}">${c.score ?? '—'}${hasExp ? `<tspan font-size="${(font * 0.85).toFixed(1)}" font-weight="600" fill="#8b95a1"> / ${c.expect}</tspan>` : ''}</tspan></text>`;
   }).join('');
-  return `<svg class="ch-radar" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="카테고리별 점수 레이더 차트">
+  const legend = hasExp ? `<g font-size="${font}" fill="#4e5968"><rect x="8" y="${size - font * 1.6}" width="${font}" height="${font * 0.8}" fill="rgba(49,130,246,.25)" stroke="#3182f6"/><text x="${8 + font * 1.4}" y="${size - font * 0.85}">우리 점수</text>
+    <line x1="${8 + font * 6.6}" y1="${size - font * 1.2}" x2="${8 + font * 8}" y2="${size - font * 1.2}" stroke="#e8921a" stroke-width="2" stroke-dasharray="4 3"/><text x="${8 + font * 8.4}" y="${size - font * 0.85}">단계 기대 수준</text></g>` : '';
+  return `<svg class="ch-radar" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="영역별 점수 레이더 차트${hasExp ? '(단계 기대 수준 비교)' : ''}">
   ${[0.2, 0.4, 0.6, 0.8, 1].map((f) => `<polygon points="${ring(f)}" fill="${f === 1 ? '#f9fafb' : 'none'}" stroke="#e5e8eb" stroke-width="1"/>`).join('')}
   ${cats.map((_, i) => { const [x, y] = pt(cx, cy, R, ang(i)); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#e5e8eb"/>`; }).join('')}
-  <polygon points="${poly}" fill="rgba(49,130,246,.18)" stroke="#3182f6" stroke-width="2"/>
-  ${cats.map((c, i) => { const [x, y] = pt(cx, cy, R * ((c.score ?? 0) / 100), ang(i)); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#1b64da"/>`; }).join('')}
-  ${labels}</svg>`;
+  ${hasExp ? `<polygon points="${polyOf('expect')}" fill="none" stroke="#e8921a" stroke-width="2" stroke-dasharray="5 4"/>` : ''}
+  <polygon points="${polyOf('score')}" fill="rgba(49,130,246,.2)" stroke="#3182f6" stroke-width="2.4"/>
+  ${cats.map((c, i) => { const [x, y] = pt(cx, cy, R * ((c.score ?? 0) / 100), ang(i)); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(font * 0.32).toFixed(1)}" fill="#1b64da"/>`; }).join('')}
+  ${labels}${legend}</svg>`;
 }
 
 /** 연도별 재무 추이 막대(음수 지원) — rows: 오래된 해 → 최근 해 [{label, rev, op, net}] */
@@ -41,7 +46,7 @@ export function trend(rows, { width = 520, height = 230 } = {}) {
   const S = TREND_SERIES; const vals = rows.flatMap((r) => S.map((x) => r[x.k])).filter((v) => typeof v === 'number');
   if (!vals.length) return '';
   const max = Math.max(0, ...vals), min = Math.min(0, ...vals), span = max - min || 1;
-  const top = 26, bottom = 30, ph = height - top - bottom, yOf = (v) => top + ((max - v) / span) * ph, y0 = yOf(0);
+  const top = 26, bottom = min < 0 ? 46 : 30, ph = height - top - bottom, yOf = (v) => top + ((max - v) / span) * ph, y0 = yOf(0);
   const gw = (width - 20) / rows.length, bw = Math.min(30, (gw - 24) / S.length);
   const fmt = (v) => (Math.abs(v) >= 1e8 ? `${(v / 1e8).toFixed(1).replace(/\.0$/, '')}억` : `${Math.round(v / 1e4).toLocaleString('ko-KR')}만`);
   const bars = rows.map((r, i) => {
@@ -60,7 +65,7 @@ export function lineChart(cats, series, { width = 360, height = 200, unit = '%',
   const vals = series.flatMap((x) => x.vals).filter((v) => typeof v === 'number' && Number.isFinite(v));
   if (!vals.length || cats.length < 2) return '';
   const max = Math.max(0, ...vals), min = Math.min(0, ...vals), span = max - min || 1;
-  const L = 34, R = 18, top = 30, bottom = 36, pw = width - L - R, ph = height - top - bottom;
+  const L = 34, R = 18, top = 44, bottom = 36, pw = width - L - R, ph = height - top - bottom;
   const xOf = (i) => L + (cats.length === 1 ? pw / 2 : (pw * i) / (cats.length - 1)), yOf = (v) => top + ((max - v) / span) * ph;
   const fmt = (v) => `${Math.round(v * 10) / 10}${unit}`;
   const lines = series.map((x, si) => { const pts = x.vals.map((v, i) => (typeof v === 'number' ? [xOf(i), yOf(v), v] : null)).filter(Boolean);
