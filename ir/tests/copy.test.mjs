@@ -18,7 +18,7 @@ test('화면·모델·보고서 원본 문구', () => {
 });
 test('생성 보고서(재무 반영/미반영)', () => {
   const st = sampleState(); check('report', renderReport(st, evaluate(st), { id: 'IR-X', date: '2026-11-01', version: 'v' }));
-  st.fin = null; const html = renderReport(st, evaluate(st), { id: 'IR-X', date: '2026-11-01', version: 'v' }); check('report-nofin', html); assert.match(html, /재무제표 미반영/);
+  st.fin = null; const html = renderReport(st, evaluate(st), { id: 'IR-X', date: '2026-11-01', version: 'v' }); check('report-nofin', html); assert.match(html, /재무제표 미반영/); assert.doesNotMatch(html, /\$\{/);
 });
 test('사용자 입력 이스케이프', () => {
   const st = sampleState(); st.meta.company = '<script>x</script>'; st.fin.fileName = '<img src=x onerror=1>';
