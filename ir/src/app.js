@@ -9,12 +9,13 @@ import { gauge, radar, trend, dots } from './charts.js';
 import { renderReport, reportId } from './report.js';
 import { COMPANY, telHref } from './contact.js';
 
-export const APP = { version: 'v2.2.0', updated: '2026-11-02' };
+export const APP = { version: 'v2.2.1', updated: '2026-11-02' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const nb = (t) => esc(t).replace(/·/g, '⁠·⁠');
 let st = load();
 
+const PHONE_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z"/></svg>';
 const commit = () => { if (st) save(st); };
 const toast = (msg) => { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600); };
 
@@ -37,7 +38,8 @@ document.addEventListener('click', (e) => {
 // ───────────────────────── 공통
 const firstUnanswered = () => QUESTIONS.findIndex((q) => typeof st?.answers?.[q.id]?.v !== 'number');
 function headerHtml() {
-  const act = st && st.meta.company && Object.keys(st.answers).length ? '<div class="hd-act"><a class="btn white sm" href="/" data-go="result">결과 보기</a></div>' : '';
+  const res = st && st.meta.company && Object.keys(st.answers).length && view !== 'result' ? '<a class="btn white sm" href="/" data-go="result">결과 보기</a>' : '';
+  const act = `<div class="hd-act">${res}<a class="btn call sm" href="${telHref}" aria-label="전화 상담 ${COMPANY.tel}">${PHONE_ICON}<span>상담</span></a></div>`;
   return `<header class="site"><div class="wrap hd"><a class="brand" href="/" aria-label="BECONIC IR 진단 처음으로"><img src="/assets/shield.png" alt="" width="34" height="34"><span class="txt"><b>BECONIC</b><small>IR 진단 · by Growth Ventures</small></span></a>${act}</div></header>`;
 }
 function footerHtml() {
@@ -66,7 +68,7 @@ function homeHtml() {
     <p class="eyebrow">근거로 준비하고, 실행으로 연결합니다</p>
     <h1>우리 회사 IR,<br><em>투자자 관점에서</em><br>준비되어 있나요?</h1>
     <p class="lead">${N_CAT}개 영역 ${N_Q}문항에서 "우리 회사에 맞는 문장"을 고르고 표준재무제표를 올리면, IR 준비도 점수와 강점·보완점, 재무 지표, 실행 로드맵을 한눈에 보여 드려요.</p>
-    <div class="cta-row">${resume ? `<button class="btn primary lg" data-act="resume">이어서 하기 · ${esc(st.meta.company)} (${n}/${N_Q})</button><button class="btn ghost lg" data-act="new">새로 시작</button>` : '<button class="btn primary lg" data-act="new">IR 진단 시작하기 · 약 ${estMinutes()}분</button>'}</div>
+    <div class="cta-row">${resume ? `<button class="btn primary lg" data-act="resume">이어서 하기 · ${esc(st.meta.company)} (${n}/${N_Q})</button><button class="btn outline lg" data-act="new">처음부터 새로 시작</button>` : `<button class="btn primary lg" data-act="new">IR 진단 시작하기 · 약 ${estMinutes()}분</button>`}</div>
     <p class="micro">회원가입 없음 · 입력 내용과 파일은 이 브라우저에만 저장 · <button class="link sm" data-act="sample">합성 예시 결과 보기</button></p>
   </div>
   <div class="hero-card" aria-label="결과 화면 예시"><div class="hc-top"><span>IR 진단 결과</span><small>합성 예시</small></div>
@@ -90,7 +92,7 @@ function homeHtml() {
     <li><b>재무제표 올리기</b><span>표준재무제표 PDF 또는 직접 입력 (선택)</span></li><li><b>결과·PDF</b><span>대시보드와 결과 보고서</span></li></ol></section>
 
   <section class="wrap consult"><div class="cbox"><div><b>결과를 보고 IR을 함께 준비하고 싶다면</b><p>그로스벤처스는 중기부 인증 중소기업상담회사(${COMPANY.cert})예요. 15년 경력 컨설턴트가 진단 결과를 바탕으로 IR 자료와 투자 준비를 함께 설계해 드려요.</p></div>
-    <div class="cbtn"><a class="btn primary" href="${telHref}">${COMPANY.tel} 전화</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 상담 문의">이메일 문의</a></div></div></section>
+    <div class="cbtn"><a class="btn primary" href="${telHref}">${PHONE_ICON}전화 상담 ${COMPANY.tel}</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 상담 문의">이메일 문의</a></div></div></section>
   </main>${footerHtml()}`;
 }
 
@@ -115,16 +117,15 @@ function questionHtml(n) {
   const inCat = QUESTIONS.filter((x) => x.cat === q.cat); const k = inCat.indexOf(q) + 1;
   const done = Object.values(st.answers).filter((x) => typeof x.v === 'number').length;
   return `${headerHtml()}<main class="wrap narrow">
-  <div class="qtop"><div class="qtop-r"><button class="back" style="margin:0" data-act="${i === 0 ? 'to-start' : 'prev'}">← ${i === 0 ? '기본 정보' : '이전'}</button><span>${i + 1} / ${N_Q}</span></div><div class="qbar" aria-hidden="true"><i style="width:${Math.round((done / N_Q) * 100)}%"></i></div></div>
-  ${st.meta.synthetic ? '<div class="syn-band">합성 예시 데이터예요.</div>' : ''}
+  <div class="qtop"><div class="qtop-r"><button class="back" style="margin:0" data-act="${i === 0 ? 'to-start' : 'prev'}">← ${i === 0 ? '기본 정보' : '이전'}</button><span>${st.meta.synthetic ? '<em class="syn-tag">합성 예시</em> ' : ''}${i + 1} / ${N_Q}</span></div><div class="qbar" aria-hidden="true"><i style="width:${Math.round((done / N_Q) * 100)}%"></i></div></div>
   <span class="qcat">${ci + 1}. ${nb(c.name)} · ${k}/${inCat.length}</span>
   <h1 class="qtitle">${nb(q.q)}</h1><p class="qwhy">${esc(q.why)}</p>
-  <label class="evtog"><input type="checkbox" data-act="ev" ${a.ev ? 'checked' : ''}> 이 내용을 보여 줄 문서·데이터가 있어요 <span class="muted" style="font-weight:500">(선택)</span></label>
   <div class="opts" role="radiogroup" aria-label="가장 가까운 문장 고르기">
     ${q.opts.map((t, j) => `<button role="radio" aria-checked="${a.v === j + 1}" class="opt ${a.v === j + 1 ? 'on' : ''}" data-act="pick" data-v="${j + 1}"><span class="n">${j + 1}</span><span class="ot">${esc(t)}</span><span class="ck" aria-hidden="true">${a.v === j + 1 ? '선택됨' : ''}</span></button>`).join('')}
     <button role="radio" aria-checked="${a.v === 0}" class="opt unk ${a.v === 0 ? 'on' : ''}" data-act="pick" data-v="0">잘 모르겠어요${a.v === 0 ? ' · 선택됨' : ''}</button>
   </div>
-  <p class="hint">${typeof a.v === 'number' ? '선택했어요. "다음"을 누르거나 같은 보기를 한 번 더 누르면 넘어가요(Enter 키도 돼요).' : '가장 가까운 문장을 골라 주세요. 키보드 1~${SCALE_MAX}로도 고를 수 있어요.'}</p></main>
+  <label class="evtog"><input type="checkbox" data-act="ev" ${a.ev ? 'checked' : ''}><span>이 내용을 보여 줄 문서·데이터가 있어요</span><small>선택</small></label>
+  <p class="hint qhint">${typeof a.v === 'number' ? '선택했어요. "다음"을 누르거나 같은 보기를 한 번 더 누르면 넘어가요.' : `가장 가까운 문장을 골라 주세요.<span class="pc-only"> 키보드 1~${SCALE_MAX}, Enter로도 돼요.</span>`}</p></main>
   <div class="bottom-bar"><div class="wrap narrow bb"><a class="btn ghost" href="/" data-go="answers">전체 문항</a><button class="btn ${typeof a.v === 'number' ? 'primary' : 'ghost'}" data-act="next">${i === N_Q - 1 ? '재무제표 단계로 ›' : '다음 ›'}</button></div></div>`;
 }
 
@@ -171,7 +172,7 @@ function finSection(r) {
   const src = st.fin.source === 'upload' ? `표준재무제표에서 읽고 확인한 값${r.fin.fileName ? `(${esc(r.fin.fileName)})` : ''}` : '직접 입력한 값';
   return `<p class="hint">${src} · ${r.fin.years}개년 반영. 참고 구간은 일반적인 기준선이며 업종별 차이가 커요.</p>
     ${r.finStory.length ? `<ul class="story">${r.finStory.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-    ${rows.length >= FIN_YEARS_GOOD ? `<div class="ch-wrap">${trend(old.map((x) => ({ label: x.label.replace(/\((\d{4})년\)/, ' $1'), rev: x.rev, op: x.op, net: x.net })))}</div>` : ''}
+    ${rows.length >= FIN_YEARS_GOOD ? `<div class="ch-wrap">${trend(old.map((x) => ({ label: x.label.replace(/\((\d{4})년\)/, ' $1'), rev: x.rev, op: x.op, net: x.net })), { width: 380, height: 230 })}</div>` : ''}
     <div class="tw"><table class="ytbl"><thead><tr><th>구분</th>${old.map((x) => { const m = x.label.match(/^(.+?)\((\d{4})년\)$/); return `<th>${m ? `${esc(m[1])}<small>${m[2]}년</small>` : esc(x.label)}</th>`; }).join('')}</tr></thead><tbody>
       ${[['매출액', 'rev'], ['영업이익', 'op'], ['당기순이익', 'net'], ['자본총계', 'equity']].map(([l, k]) => `<tr><th scope="row">${l}</th>${old.map((x) => `<td class="${typeof x[k] === 'number' && x[k] < 0 ? 'neg' : ''}">${fmtWon(x[k], true)}</td>`).join('')}</tr>`).join('')}
       ${[['영업이익률', 'opm'], ['부채비율', 'debt'], ['유동비율', 'current']].map(([l, k]) => `<tr><th scope="row">${l}</th>${old.map((x) => `<td>${pctTxt(x[k])}</td>`).join('')}</tr>`).join('')}
@@ -243,7 +244,7 @@ function resultHtml() {
     <p class="sm">영역 구성은 ${Object.values(SOURCES).slice(0, 2).map((x) => `${esc(x.publisher)} 「${esc(x.title)}」`).join(', ')}의 투자 설명 항목을 참고했어요. 가중치·단계 기대 수준·업종 보정은 비코닉 설계값(실증 검증 전)이에요.</p></section>
 
   <div class="res-act"><button class="btn primary" data-act="print">결과 보고서 PDF</button><a class="btn white" href="/" data-go="finance">재무 ${r.fin.has ? '수정' : '올리기'}</a><button class="btn white" data-act="export">결과 파일 저장</button><label class="btn white file">결과 파일 열기<input type="file" accept="application/json,.json" data-act="import" hidden></label><button class="link danger" data-act="reset">모두 지우기</button></div>
-  <section class="consult" style="margin-top:24px"><div class="cbox"><div><b>보완 항목을 함께 준비하고 싶다면</b><p>진단 결과를 바탕으로 IR 덱·재무 자료·투자 전략을 함께 설계해 드려요.</p></div><div class="cbtn"><a class="btn primary" href="${telHref}">${COMPANY.tel}</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 결과 상담">이메일 상담</a></div></div></section>
+  <section class="consult" style="margin-top:24px"><div class="cbox"><div><b>보완 항목을 함께 준비하고 싶다면</b><p>진단 결과를 바탕으로 IR 덱·재무 자료·투자 전략을 함께 설계해 드려요.</p></div><div class="cbtn"><a class="btn primary" href="${telHref}">${PHONE_ICON}전화 상담 ${COMPANY.tel}</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 결과 상담">이메일 상담</a></div></div></section>
   </main>${footerHtml()}`;
 }
 const qByCatLocal = (cid) => QUESTIONS.filter((q) => q.cat === cid);

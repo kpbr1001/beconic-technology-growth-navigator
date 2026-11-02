@@ -32,19 +32,23 @@ const atRoot = (pg) => new URL(pg.url()).pathname === '/' && !pg.url().includes(
 const viewOf = (pg) => pg.evaluate(() => window.__IR.view);
 
 // 1) 레이아웃
-for (const [w, h] of [[360, 740], [390, 844], [768, 1024], [1280, 900]]) {
+for (const [w, h] of [[360, 640], [390, 844], [768, 1024], [1280, 900]]) {
   const p = await newPage(w, h); await p.goto(BASE, { waitUntil: 'networkidle' }); await p.click('[data-act=sample]'); await p.waitForTimeout(150);
   for (const r of ['', 'start', 'q/1', 'q/23', 'finance', 'result', 'answers']) {
     await nav(p, r); const sw = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     if (sw > 0) ok(false, `${w}px ${r || 'home'} 가로 넘침 ${sw}px`);
     if (!atRoot(p)) ok(false, `${w}px ${r || 'home'} 주소가 '/'가 아님: ${p.url()}`);
+    if ((await p.evaluate(() => document.body.innerText)).includes('${')) ok(false, `${w}px ${r || 'home'} 화면에 코드(\${…})가 그대로 보임`);
+    if (r === 'q/1' && w <= 412) { const f = await p.evaluate(() => document.querySelector('.opt.unk').getBoundingClientRect().bottom <= document.querySelector('.bottom-bar').getBoundingClientRect().top); if (!f) ok(false, `${w}×${h} 문항 보기가 한 화면에 다 안 보임`); }
   }
-  ok(true, `${w}px 화면별 가로 넘침·주소 '/' 검사`); await p.close();
+  ok(true, `${w}px 화면별 가로 넘침·주소 '/'·코드 노출·문항 한 화면 검사`); await p.close();
 }
 
 // 2) 전체 흐름
 const p = await newPage(390, 844);
 await p.goto(BASE, { waitUntil: 'networkidle' }); await p.evaluate(() => { localStorage.clear(); localStorage.setItem('beconic-ir:v1', '{"legacy":true}'); }); await p.reload();
+ok(!(await p.textContent('[data-act=new]')).includes('${') && /약 \d+분/.test(await p.textContent('[data-act=new]')), '첫 화면 시작 버튼에 소요 시간 표시(코드 노출 없음)');
+ok((await p.getAttribute('.hd-act .btn.call', 'href')).startsWith('tel:'), '모든 화면 상단 전화 상담 버튼');
 await p.click('[data-act=new]'); await p.click('[data-act=start-go]');
 ok((await p.textContent('#s-err')).includes('회사명'), '회사명 필수');
 await p.fill('#s-company', '테스트랩'); await p.click('[data-act=start-go]');
