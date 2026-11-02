@@ -5,11 +5,11 @@ import { evaluate, SCORE_VERSION } from './score.js';
 import { ACCOUNTS, CORE, SLOTS, slotLabel, parseFile, mergeParsed, normalizeFin, filledYears, parseWon, fmtWon } from './fin.js';
 import { blank, load, save, clear, hasLegacy, today, validate } from './store.js';
 import { sampleState } from './sample.js';
-import { gauge, radar, trend, dots } from './charts.js';
+import { gauge, radar, trend, lineChart, dots } from './charts.js';
 import { renderReport, reportId } from './report.js';
 import { COMPANY, telHref } from './contact.js';
 
-export const APP = { version: 'v2.2.1', updated: '2026-11-02' };
+export const APP = { version: 'v2.3.0', updated: '2026-11-02' };
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const nb = (t) => esc(t).replace(/·/g, '⁠·⁠');
@@ -39,7 +39,7 @@ document.addEventListener('click', (e) => {
 const firstUnanswered = () => QUESTIONS.findIndex((q) => typeof st?.answers?.[q.id]?.v !== 'number');
 function headerHtml() {
   const res = st && st.meta.company && Object.keys(st.answers).length && view !== 'result' ? '<a class="btn white sm" href="/" data-go="result">결과 보기</a>' : '';
-  const act = `<div class="hd-act">${res}<a class="btn call sm" href="${telHref}" aria-label="전화 상담 ${COMPANY.tel}">${PHONE_ICON}<span>상담</span></a></div>`;
+  const act = `<div class="hd-act">${res}<a class="btn call sm" href="${telHref}" aria-label="상담전화 ${COMPANY.tel}">${PHONE_ICON}<span>상담전화</span></a></div>`;
   return `<header class="site"><div class="wrap hd"><a class="brand" href="/" aria-label="BECONIC IR 진단 처음으로"><img src="/assets/shield.png" alt="" width="34" height="34"><span class="txt"><b>BECONIC</b><small>IR 진단 · by Growth Ventures</small></span></a>${act}</div></header>`;
 }
 function footerHtml() {
@@ -92,7 +92,7 @@ function homeHtml() {
     <li><b>재무제표 올리기</b><span>표준재무제표 PDF 또는 직접 입력 (선택)</span></li><li><b>결과·PDF</b><span>대시보드와 결과 보고서</span></li></ol></section>
 
   <section class="wrap consult"><div class="cbox"><div><b>결과를 보고 IR을 함께 준비하고 싶다면</b><p>그로스벤처스는 중기부 인증 중소기업상담회사(${COMPANY.cert})예요. 15년 경력 컨설턴트가 진단 결과를 바탕으로 IR 자료와 투자 준비를 함께 설계해 드려요.</p></div>
-    <div class="cbtn"><a class="btn primary" href="${telHref}">${PHONE_ICON}전화 상담 ${COMPANY.tel}</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 상담 문의">이메일 문의</a></div></div></section>
+    <div class="cbtn"><a class="btn primary" href="${telHref}">${PHONE_ICON}상담전화 ${COMPANY.tel}</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 상담 문의">이메일 문의</a></div></div></section>
   </main>${footerHtml()}`;
 }
 
@@ -160,6 +160,7 @@ function financeHtml() {
 // ───────────────────────── 결과 — 대표가 읽는 순서: 결론 → 투자자 눈 → 영역 → 재무 → 물어볼 질문 → 할 일 → 서류 → 상세
 const RNAV = [['r-sum', '요약'], ['r-lens', '투자자 관점'], ['r-cat', '영역 점수'], ['r-sw', '강점·보완'], ['r-fin', '재무'], ['r-ask', '나올 질문'], ['r-road', '로드맵'], ['r-room', '준비 서류'], ['r-detail', '영역 상세']];
 const ROOM_STATE = { ready: ['ok', '준비됨'], partial: ['info', '보완 필요'], todo: ['warn', '준비 전'] };
+const yl = (l) => (l.match(/(\d{4})년/) || [])[1] || l.replace(/\(.*\)/, ''); // 차트용 짧은 연도 라벨
 const pctTxt = (v) => (v === null || v === undefined ? '—' : `${v}%`);
 function finSection(r) {
   if (!r.fin.has) {
@@ -172,10 +173,14 @@ function finSection(r) {
   const src = st.fin.source === 'upload' ? `표준재무제표에서 읽고 확인한 값${r.fin.fileName ? `(${esc(r.fin.fileName)})` : ''}` : '직접 입력한 값';
   return `<p class="hint">${src} · ${r.fin.years}개년 반영. 참고 구간은 일반적인 기준선이며 업종별 차이가 커요.</p>
     ${r.finStory.length ? `<ul class="story">${r.finStory.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-    ${rows.length >= FIN_YEARS_GOOD ? `<div class="ch-wrap">${trend(old.map((x) => ({ label: x.label.replace(/\((\d{4})년\)/, ' $1'), rev: x.rev, op: x.op, net: x.net })), { width: 380, height: 230 })}</div>` : ''}
+    <h4 class="sub-t">재무 4대 영역 진단</h4>
+    <div class="fscore">${r.finAreas.map((a) => `<div class="fs ${a.tone || 'none'}"><div class="lh"><b>${a.name}</b><span class="bdg ${a.tone === 'good' ? 'ok' : a.tone === 'warn' ? 'bad' : a.tone ? 'info' : ''}">${a.tone === 'good' ? '양호' : a.tone === 'warn' ? '주의' : a.tone ? '보통' : '자료 없음'}</span></div><p class="lq">${esc(a.q)}</p><p>${esc(a.verdict)}</p>${a.items.length ? `<p class="sm muted">${a.items.map((x) => `${esc(x.label)} ${x.value === null ? esc(x.text || '—') : `${x.value}${x.unit}`}`).join(' · ')}</p>` : ''}</div>`).join('')}</div>
+    ${rows.length >= FIN_YEARS_GOOD ? `<div class="fcharts"><div class="ch-wrap">${trend(old.map((x) => ({ label: yl(x.label), rev: x.rev, op: x.op, net: x.net })), { width: 380, height: 230 })}</div>
+      <div class="ch-wrap">${lineChart(old.map((x) => yl(x.label)), [{ name: '영업이익률', color: '#00a37a', vals: old.map((x) => x.opm) }, { name: '순이익률', color: '#f0a43a', vals: old.map((x) => x.npm) }], { label: '이익률 추이' })}</div>
+      <div class="ch-wrap">${lineChart(old.map((x) => yl(x.label)), [{ name: '부채비율', color: '#e5484d', vals: old.map((x) => x.debt) }, { name: '유동비율', color: '#3182f6', vals: old.map((x) => x.current) }], { label: '부채비율·유동비율 추이' })}</div></div>` : ''}
     <div class="tw"><table class="ytbl"><thead><tr><th>구분</th>${old.map((x) => { const m = x.label.match(/^(.+?)\((\d{4})년\)$/); return `<th>${m ? `${esc(m[1])}<small>${m[2]}년</small>` : esc(x.label)}</th>`; }).join('')}</tr></thead><tbody>
       ${[['매출액', 'rev'], ['영업이익', 'op'], ['당기순이익', 'net'], ['자본총계', 'equity']].map(([l, k]) => `<tr><th scope="row">${l}</th>${old.map((x) => `<td class="${typeof x[k] === 'number' && x[k] < 0 ? 'neg' : ''}">${fmtWon(x[k], true)}</td>`).join('')}</tr>`).join('')}
-      ${[['영업이익률', 'opm'], ['부채비율', 'debt'], ['유동비율', 'current']].map(([l, k]) => `<tr><th scope="row">${l}</th>${old.map((x) => `<td>${pctTxt(x[k])}</td>`).join('')}</tr>`).join('')}
+      ${[['매출 성장률', 'growth'], ['영업이익률', 'opm'], ['순이익률', 'npm'], ['부채비율', 'debt'], ['유동비율', 'current']].map(([l, k]) => `<tr><th scope="row">${l}</th>${old.map((x) => `<td>${pctTxt(x[k])}</td>`).join('')}</tr>`).join('')}
     </tbody></table></div>
     <h4 class="sub-t">최근 연도 지표</h4>
     <div class="kpis">${r.indicators.map((x) => `<div class="kpi ${x.band || ''}"><span>${esc(x.label)}</span><b>${x.value === null ? esc(x.text || '계산 불가') : `${x.value}${x.unit}`}</b><small>${esc(x.note)}</small></div>`).join('')}</div>
@@ -244,7 +249,7 @@ function resultHtml() {
     <p class="sm">영역 구성은 ${Object.values(SOURCES).slice(0, 2).map((x) => `${esc(x.publisher)} 「${esc(x.title)}」`).join(', ')}의 투자 설명 항목을 참고했어요. 가중치·단계 기대 수준·업종 보정은 비코닉 설계값(실증 검증 전)이에요.</p></section>
 
   <div class="res-act"><button class="btn primary" data-act="print">결과 보고서 PDF</button><a class="btn white" href="/" data-go="finance">재무 ${r.fin.has ? '수정' : '올리기'}</a><button class="btn white" data-act="export">결과 파일 저장</button><label class="btn white file">결과 파일 열기<input type="file" accept="application/json,.json" data-act="import" hidden></label><button class="link danger" data-act="reset">모두 지우기</button></div>
-  <section class="consult" style="margin-top:24px"><div class="cbox"><div><b>보완 항목을 함께 준비하고 싶다면</b><p>진단 결과를 바탕으로 IR 덱·재무 자료·투자 전략을 함께 설계해 드려요.</p></div><div class="cbtn"><a class="btn primary" href="${telHref}">${PHONE_ICON}전화 상담 ${COMPANY.tel}</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 결과 상담">이메일 상담</a></div></div></section>
+  <section class="consult" style="margin-top:24px"><div class="cbox"><div><b>보완 항목을 함께 준비하고 싶다면</b><p>진단 결과를 바탕으로 IR 덱·재무 자료·투자 전략을 함께 설계해 드려요.</p></div><div class="cbtn"><a class="btn primary" href="${telHref}">${PHONE_ICON}상담전화 ${COMPANY.tel}</a><a class="btn ghost" href="mailto:${COMPANY.email}?subject=IR 진단 결과 상담">이메일 상담</a></div></div></section>
   </main>${footerHtml()}`;
 }
 const qByCatLocal = (cid) => QUESTIONS.filter((q) => q.cat === cid);
@@ -301,7 +306,7 @@ async function handleFiles(list) {
             const { draft, slot } = mergeParsed(st.fin, p); const cnt = Object.keys(p.found).length;
             if (slot < 0) { placed.push(`${p.year ? `${p.year}년` : '연도 미상'} 자료는 ${SLOTS.length}개년 범위를 벗어나 넣지 않았어요`); continue; }
             Object.assign(st.fin, draft);
-            placed.push(`${p.year ? `${p.year}년 · ` : ''}${cnt}개 계정 → ${slotLabel(st.fin, slot)}${p.unit !== 1 ? `(${p.unit === 1000 ? '천원' : '백만원'} 단위를 원으로 바꿈)` : ''}`);
+            placed.push(`${p.year ? `${p.year}년 자료` : `연도 미상 자료(${SLOTS[slot].label} 칸)`} · ${cnt}개 계정 읽음${p.unit !== 1 ? `(${p.unit === 1000 ? '천원' : '백만원'} 단위를 원으로 바꿈)` : ''}`);
           }
           note = { type: placed.some((x) => x.includes('→')) ? 'ok' : 'warn', text: placed.join(' / ') };
         }

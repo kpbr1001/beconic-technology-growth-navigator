@@ -55,5 +55,21 @@ export function trend(rows, { width = 520, height = 230 } = {}) {
   ${legend}<line x1="6" y1="${y0.toFixed(1)}" x2="${width - 6}" y2="${y0.toFixed(1)}" stroke="#b0b8c1"/>${bars}</svg>`;
 }
 
+/** 비율 추이 꺾은선 — cats: 연도 라벨(오래된 해 → 최근 해), series: [{name, color, vals}], 값 없음은 건너뜀 */
+export function lineChart(cats, series, { width = 360, height = 200, unit = '%', label = '비율 추이' } = {}) {
+  const vals = series.flatMap((x) => x.vals).filter((v) => typeof v === 'number' && Number.isFinite(v));
+  if (!vals.length || cats.length < 2) return '';
+  const max = Math.max(0, ...vals), min = Math.min(0, ...vals), span = max - min || 1;
+  const L = 34, R = 18, top = 30, bottom = 36, pw = width - L - R, ph = height - top - bottom;
+  const xOf = (i) => L + (cats.length === 1 ? pw / 2 : (pw * i) / (cats.length - 1)), yOf = (v) => top + ((max - v) / span) * ph;
+  const fmt = (v) => `${Math.round(v * 10) / 10}${unit}`;
+  const lines = series.map((x, si) => { const pts = x.vals.map((v, i) => (typeof v === 'number' ? [xOf(i), yOf(v), v] : null)).filter(Boolean);
+    return `<polyline points="${pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}" fill="none" stroke="${x.color}" stroke-width="2.4"/>${pts.map((p) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="${x.color}"/><text x="${p[0].toFixed(1)}" y="${(si % 2 ? p[1] + 15 : p[1] - 7).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="${x.color}">${fmt(p[2])}</text>`).join('')}`; }).join('');
+  const legend = series.map((x, j) => `<rect x="${L + j * 92}" y="4" width="10" height="10" rx="2" fill="${x.color}"/><text x="${L + 14 + j * 92}" y="13" font-size="10.5" fill="#4e5968">${esc(x.name)}</text>`).join('');
+  return `<svg class="ch-line" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="${esc(label)}">${legend}
+  <line x1="${L}" y1="${yOf(0).toFixed(1)}" x2="${width - R}" y2="${yOf(0).toFixed(1)}" stroke="#b0b8c1"/>
+  ${cats.map((c, i) => `<text x="${xOf(i).toFixed(1)}" y="${height - 8}" text-anchor="middle" font-size="11" font-weight="700" fill="#333d4b">${esc(c)}</text>`).join('')}${lines}</svg>`;
+}
+
 /** 점수 점(●●●○○) */
 export const dots = (v) => `<span class="dots" aria-label="${v || 0}/5">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= (v || 0) ? 'on' : ''}"></i>`).join('')}</span>`;
