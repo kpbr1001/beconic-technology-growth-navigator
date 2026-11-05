@@ -232,8 +232,8 @@ const W={'제조':[15,25,20,10,20,10],'IT·SaaS':[20,10,20,25,10,15],'유통·�
 const LEVELS=[[0,'인식 시작'],[30,'기초'],[50,'관리'],[70,'통합'],[85,'증빙기반']];
 const PTS=[0,33,67,100], UNKNOWN=20;
 /* 숫자 문항(K1) 3단계 사다리 — 설정값은 운영 시 최신 공식값으로 갱신 */
-const PRICE=180;      // 원/kWh, 평균 판매단가 설정값(예시) · 한전 전력통계로 연 1회 갱신
-const EF=0.4567;      // tCO2e/MWh, 국가 전력 배출계수 설정값 · 최신 고시값 확인 필요
+const PRICE=221.6;    // 원/kWh, 실효 단가 = 산업용(을) 개편 후 고압A 선택II 전력량요금 + 기본요금 환산 + 기후환경·연료비조정 + 부가세·기금 (문항마스터 '전력단가산정' 시트)
+const EF=0.4541;      // tCO2e/MWh, GIR 최신 승인 국가 전력 배출계수(CO2e·소비단, 2020~2022 평균)
 const ERR=0.3;        // 요금 기반 추정 오차 ±30%
 const DUE_DAYS=7;     // 잠정 결과 보완 기한
 const BILLS=[['50만 원 미만',300000],['50만~200만 원',1250000],['200만~500만 원',3500000],['500만~1,000만 원',7500000],['1,000만 원 이상',15000000]];
@@ -559,7 +559,7 @@ function rResult(){
   <section class="card" style="display:flex;flex-direction:column;gap:6px">
     <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><b style="font-size:14.5px">참고 탄소량 · 전력(Scope 2)</b><span class="qtag">${kTag}</span></div>
     ${R.tco2!=null?`<div><b class="num" style="font-size:24px">약 ${tTxt}</b> <span class="muted">tCO₂e / 년</span></div>
-    <div class="tiny">월 ${R.kd.kwh.toLocaleString()} kWh × 12개월 × 배출계수 ${EF} tCO₂e/MWh${R.kd.q==='추정'?` · 요금 ÷ 평균단가 ${PRICE}원/kWh로 역산`:''} (설정값). 공식 배출량 산정이 아닌 참고값이에요.</div>`
+    <div class="tiny">월 ${R.kd.kwh.toLocaleString()} kWh × 12개월 × 배출계수 ${EF} tCO₂e/MWh${R.kd.q==='추정'?` · 요금 ÷ 실효단가 ${PRICE}원/kWh로 역산`:''} · 배출계수는 GIR 최신 승인값. 공식 배출량 산정이 아닌 참고값이에요.</div>`
     :`<div class="tiny">전기 사용량을 넣으면 연간 참고 탄소량을 보여드려요. 요금 구간만 알아도 추정할 수 있어요.</div>`}
   </section>
   ${R.flags.map(f=>`<div class="flag"><span><b>${f[0]}</b> ${esc(f[1])}</span></div>`).join('')}
