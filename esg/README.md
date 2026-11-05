@@ -1,4 +1,4 @@
-# BECONIC ESG 경영준비도 진단 (v2.2.2)
+# BECONIC ESG 경영준비도 진단 (v2.2.4)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소(예정): https://beconic-diagnosis-esg.netlify.app
@@ -29,7 +29,7 @@ esg/
 ├─ logo-mark.png       # 헤더·푸터·인쇄 머리말 로고 (v0.9 원본에서 추출)
 ├─ og-esg.png          # 카카오톡·SNS 공유 이미지 1200×630
 ├─ netlify.toml · package.json
-├─ tests/qa.mjs        # Chromium QA 53항목 (엔진·플로우·레드팀 회귀·이어하기·위임·인쇄·모바일·A4 PDF·외부 요청)
+├─ tests/qa.mjs        # Chromium QA 55항목 (엔진·플로우·레드팀 회귀·이어하기·위임·인쇄·모바일·A4 PDF·외부 요청)
 └─ docs/  CHANGELOG.md · REDTEAM_2026-11-05.md
 ```
 
@@ -42,7 +42,7 @@ esg/
 | 산식 상수(점수·유효 응답률·노출·Phase 용량·신호등·리스크 등급 등) | `RULES` — 화면 '산출 방식' 표·시작 화면 수치도 자동 반영 |
 | 리포트 섹션 | `SECTIONS` |
 | 회사명·브랜드·바이라인·전화·이메일·주소·인증번호 | `COMPANY` |
-| 추천 후속 진단 링크 | `TOOLS` |
+| 극초기 1인 창업 안내 모달의 링크 | `TOOLS` |
 | 문항·보기·참조 기준 | `Q` · `REF` |
 | 업종 가중치 | `W` |
 | 리스크 라이브러리·근거 | `RISKS` · `RREF` |

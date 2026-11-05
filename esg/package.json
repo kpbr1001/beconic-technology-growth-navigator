@@ -1,6 +1,6 @@
 {
   "name": "beconic-esg-diagnosis",
-  "version": "2.2.2",
+  "version": "2.2.4",
   "private": true,
   "type": "module",
   "description": "BECONIC ESG 경영준비도 진단 — 단일 HTML 웹앱(규칙 기반, 서버 전송 없음)",

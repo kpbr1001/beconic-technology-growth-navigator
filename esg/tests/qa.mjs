@@ -94,8 +94,7 @@ const bodyText = (page) => page.locator('body').innerText();
   const evc = await page.evaluate(() => { const R = ESG.analyze(), E = ESG.RULES.EV, want = R.evidence >= E.high ? 'good' : R.evidence >= E.mid ? 'warn' : 'bad'; return document.querySelector('.kpis .kpi:nth-child(2) b').getAttribute('style').includes(`--${want}`); });
   check('증빙 신뢰도 색 = 해석 문장 기준(RULES.EV)', evc);
   check('리스크 등급 = 등급 규칙', g);
-  const tools = await page.$$eval('.tool', (as) => as.map((a) => a.href));
-  check('추천 후속 진단 2~4개 · BECONIC 도메인', tools.length >= 2 && tools.length <= 4 && tools.every((h) => /beconic-(diagnosis|grant)/.test(h)), String(tools.length));
+  check('리포트에 추천 후속 진단 섹션 없음', !(await page.$('.tools')) && !(await bodyText(page)).includes('추천 후속'));
   await page.screenshot({ path: path.join(OUT, 'report-desktop.png'), fullPage: true });
   // 이어하기: 새로고침 후 저장값
   await page.reload();
@@ -231,7 +230,34 @@ const bodyText = (page) => page.locator('body').innerText();
   await ctx.close();
 }
 
-// 7. 외부 요청: 폰트 CDN 외 없음
+// 7. 모바일 320px(가장 좁은 폰): 가로 스크롤·하단 버튼 한 줄·누름 영역 44px·최소 글자 12px
+{
+  const { ctx, page } = await fresh({ width: 320, height: 658 });
+  const mob = () => page.evaluate(() => {
+    const vw = document.documentElement.clientWidth, bad = { scroll: document.documentElement.scrollWidth > vw, small: [], tiny: [] };
+    for (const el of document.querySelectorAll('body *')) {
+      const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+      const r = el.getBoundingClientRect(); if (!r.width) continue;
+      if (el.matches('button,.chip,.opt,input') && !el.closest('.print-only') && (r.height < 44 || r.width < 44)) bad.small.push((el.id || el.className || el.tagName) + ':' + Math.round(r.width) + 'x' + Math.round(r.height));
+      if ([...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) && parseFloat(cs.fontSize) < 12 && !el.closest('svg') && !el.closest('.print-only')) bad.tiny.push((el.className || el.tagName) + ':' + cs.fontSize);
+    }
+    return bad;
+  });
+  const issues = [];
+  const note = async (name) => { const m = await mob(); if (m.scroll) issues.push(name + ':가로스크롤'); if (m.small.length) issues.push(name + ':' + m.small[0]); if (m.tiny.length) issues.push(name + ':' + m.tiny[0]); };
+  await note('시작');
+  await fillProfile(page, PROFILE); await note('질문');
+  for (let i = 0; i < 6 && !(await page.$('[data-mode]')); i++) { await page.click('.opt[data-v="1"]'); await page.click('#nxt'); }
+  await page.click('[data-mode="exact"]'); await page.fill('#kwh', '3200'); await note('숫자문항');
+  const nav = await page.evaluate(() => { const a = document.getElementById('prev').getBoundingClientRect(), b = document.getElementById('nxt').getBoundingClientRect(); return Math.abs(a.top - b.top) < 2; });
+  await page.goto(BASE + '#kwh-request'); await page.reload(); await page.fill('#dkwh', '3200'); await note('담당자');
+  await page.goto(BASE); await page.click('#sampleBtn'); await note('리포트');
+  check('모바일 320px: 가로 스크롤·작은 버튼(44px 미만)·12px 미만 글자 없음', issues.length === 0, issues.slice(0, 4).join(' | ') || '0건');
+  check('모바일 320px: 하단 이전·다음 버튼 한 줄', nav);
+  await ctx.close();
+}
+
+// 8. 외부 요청: 폰트 CDN 외 없음
 {
   const ext = [...new Set(requests.filter((u) => /^https?:/.test(u)).map((u) => new URL(u).host))];
   const self = /^https?:/.test(BASE) ? new URL(BASE).host : '';   // 배포 주소로 검사할 때 자기 사이트는 제외

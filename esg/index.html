@@ -335,6 +335,21 @@ th,td{border-bottom-color:var(--line)}
 .cta{background:var(--primary)}
 footer.site{border-top:0;background:transparent}
 .toast{border-radius:14px;padding:12px 18px}
+/* ===== 모바일 점검 v2.2.3 (320~412px) ===== */
+.kwh{flex-direction:row;align-items:center}                 /* 숫자칸·kWh 한 줄 (가로 스크롤 버그) */
+.kwh input{width:100%;min-width:0}
+.steps button,.homebtn,.chip,.linkbtn,.rep-nav button,.alt-btn{min-height:44px}   /* 누름 영역 44px */
+.homebtn{min-width:44px;padding:0 6px}
+.chip{min-width:44px}
+.cta .tel button{min-height:44px;padding:0 14px}
+.heat .rk{font-size:12px}
+.qtag,.status,.tag,.rk,.heat .ax,.lvl-ladder div,.ring .v small,.pill{font-size:12px}   /* 최소 글자 12px */
+.row.bottom{flex-wrap:nowrap}                                /* 이전·다음 한 줄 유지 */
+.row.bottom>*{flex:1 1 0;min-width:0}
+.row.bottom>#prev,.row.bottom>#back{flex:0 0 36%}
+.fact b{white-space:nowrap}
+@media (max-width:480px){ .chart text{font-size:15px} .radar text{font-size:15px} }
+@media (max-width:360px){ .fact b{font-size:16px} .facts{gap:6px} .fact{padding:14px 4px} .hero h1{font-size:24px} }
 /* 모바일: 다음 단계 버튼을 화면 아래에 고정 */
 @media (max-width:640px){
   .bottom{position:sticky;bottom:0;z-index:4;padding-block:16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,transparent,var(--bg) 22%)}
@@ -391,15 +406,13 @@ footer.site{border-top:0;background:transparent}
 <script>
 (function(){
 /* ================= 운영 설정 (여기서만 수정) ================= */
-const APP_VERSION='v2.2.2', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
+const APP_VERSION='v2.2.4', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
 const APP_NAME='ESG 경영준비도 진단';
 const SITE='https://beconic-diagnosis-esg.netlify.app/';   // <head> og:url·og:image 와 같아야 함 (QA 검사)
 const COMPANY={name:'그로스벤처스 주식회사',brand:'BECONIC',tel:'02-6124-5960',mail:'start@gven.kr',web:'www.beconic.kr',
   addr:'서울시 구로구 디지털로27길 24, 209호',byline:'by Growth Ventures',cert:'중소벤처기업부 공식 인증 중소기업상담회사 (제2025-684호)',copy:'© 2023~2026 Copyright ⓒ growthventures Co., Ltd. All rights reserved.'};
 const LS_KEY='beconic_esg_v2';   // v0.9(beconic_esg_poc_v1) 저장값은 문항 구조가 달라 읽지 않음
-const TOOLS={grants:['지원사업 MATCH','https://beconic-grant-matching.netlify.app'],hr:['HR Health Navigator','https://beconic-diagnosis-hr.netlify.app'],
-  finance:['기업 재무진단','https://beconic-diagnosis-finance.netlify.app'],ir:['IR 진단','https://beconic-diagnosis-ir.netlify.app'],
-  tech:['기업 기술진단','https://beconic-diagnosis-tech.netlify.app'],growth:['기업 성장활동 진단 내비게이터','https://beconic-diagnosis-business-growth.netlify.app']};
+const TOOLS={growth:['기업 성장활동 진단 내비게이터','https://beconic-diagnosis-business-growth.netlify.app']};   // 극초기 1인 창업 안내 모달에서만 사용
 /* ================= 산식 상수 (한 곳에서만 수정) =================
    화면의 '산출 방식' 표·시작 화면 수치·안내 문구도 이 값으로 자동 생성된다. 문항마스터 xlsx '리포트산출규칙'과 같게 유지. */
 const RULES={
@@ -737,17 +750,6 @@ function rDelegate(){
   inp.oninput=()=>{ const ok=+inp.value>0&&+inp.value<=KWH_MAX; btn.disabled=!ok; msg.hidden=!ok; if(ok) msg.textContent=text(); };
   btn.onclick=()=>copyText(text(),'메시지를 복사했어요');
   document.getElementById('dHome').onclick=()=>{ history.replaceState(null,'',location.pathname+location.search); S=blank(); go('start'); };
-}
-
-/* ================= 추천 후속 진단 ================= */
-function recommendTools(R){
-  const out=[['grants','ESG 가점·탄소중립·안전 관련 지원사업을 찾아 로드맵 비용을 줄일 수 있어요.']];
-  if(R.dom.C!=null&&R.dom.C<RULES.DEEP) out.push(['hr','근로조건·안전·고충처리 등 인사 체계를 함께 점검해요.']);
-  if((R.dom.D!=null&&R.dom.D<RULES.DEEP)||R.t.Funding) out.push(['finance','재무 투명성과 내부통제를 숫자로 점검해요.']);
-  if(R.t.Funding) out.push(['ir','투자자에게 보여줄 ESG·리스크 설명을 IR 관점에서 점검해요.']);
-  if(S.p.mfg==='예') out.push(['tech','공정·기술 수준을 진단해 에너지·안전 개선 과제와 연결해요.']);
-  out.push(['growth','ESG를 포함한 전사 성장활동의 우선순위를 정해요.']);
-  return out.slice(0,4);
 }
 
 /* ================= 시작 ================= */
@@ -1196,12 +1198,6 @@ function rResult(){
     </div></details>
   </div>
 
-  <section class="card" style="display:flex;flex-direction:column;gap:10px">
-    <b style="font-size:15px">추천 후속 ${COMPANY.brand} 진단</b>
-    <div class="tools">${recommendTools(R).map(([k,why])=>`<a class="tool" href="${TOOLS[k][1]}" target="_blank" rel="noopener"><b>${TOOLS[k][0]}</b><span>${why}</span></a>`).join('')}</div>
-    ${R.deep.length?`<p class="tiny" style="margin:0">${RULES.DEEP}점 미만 영역(${R.deep.map(k=>DSHORT[k]).join('·')})은 컨설턴트 상담 때 영역별 심화 질문 3~4개와 증빙 확인으로 정밀 진단해요.</p>`:''}
-  </section>
-
   <section class="card cta">
     <b style="font-size:16.5px">이 리포트로 전문가와 실행계획을 확정하세요</b>
     <p>${COMPANY.brand} 컨설턴트가 리스크별 대응, 서류 준비, 지원사업 연계까지 로드맵을 함께 정리해 드려요.</p>
@@ -1235,7 +1231,7 @@ document.getElementById('foot').innerHTML=`<div class="fb"><img src="logo-mark.p
   <div>${COMPANY.cert}</div><div>${APP_VERSION} · 업데이트 ${APP_UPDATED} · ${COMPANY.copy}</div>`;
 document.querySelector('.brand .t b').textContent=COMPANY.brand; document.querySelector('.brand .t span').textContent=APP_NAME;
 document.getElementById('homeBtn').onclick=()=>{ if(location.hash) history.replaceState(null,'',location.pathname+location.search); if(S.sample) S=blank(); go('start'); };
-window.ESG={Q,QI,RISKS,PHASES,W,COMPANY,APP_VERSION,APP_NAME,SITE,RULES,SECTIONS,YN,LS_KEY,analyze,core,flow,triggers,gradeOf,recommendTools,get S(){return S;},set S(x){S=x;}};
+window.ESG={Q,QI,RISKS,PHASES,W,COMPANY,APP_VERSION,APP_NAME,SITE,RULES,SECTIONS,YN,LS_KEY,analyze,core,flow,triggers,gradeOf,get S(){return S;},set S(x){S=x;}};
 if(location.hash==='#kwh-request') rDelegate(); else render();
 })();
 
