@@ -335,6 +335,21 @@ th,td{border-bottom-color:var(--line)}
 .cta{background:var(--primary)}
 footer.site{border-top:0;background:transparent}
 .toast{border-radius:14px;padding:12px 18px}
+/* ===== 모바일 점검 v2.2.3 (320~412px) ===== */
+.kwh{flex-direction:row;align-items:center}                 /* 숫자칸·kWh 한 줄 (가로 스크롤 버그) */
+.kwh input{width:100%;min-width:0}
+.steps button,.homebtn,.chip,.linkbtn,.rep-nav button,.alt-btn{min-height:44px}   /* 누름 영역 44px */
+.homebtn{min-width:44px;padding:0 6px}
+.chip{min-width:44px}
+.cta .tel button{min-height:44px;padding:0 14px}
+.heat .rk{font-size:12px}
+.qtag,.status,.tag,.rk,.heat .ax,.lvl-ladder div,.ring .v small,.pill{font-size:12px}   /* 최소 글자 12px */
+.row.bottom{flex-wrap:nowrap}                                /* 이전·다음 한 줄 유지 */
+.row.bottom>*{flex:1 1 0;min-width:0}
+.row.bottom>#prev,.row.bottom>#back{flex:0 0 36%}
+.fact b{white-space:nowrap}
+@media (max-width:480px){ .chart text{font-size:15px} .radar text{font-size:15px} }
+@media (max-width:360px){ .fact b{font-size:16px} .facts{gap:6px} .fact{padding:14px 4px} .hero h1{font-size:24px} }
 /* 모바일: 다음 단계 버튼을 화면 아래에 고정 */
 @media (max-width:640px){
   .bottom{position:sticky;bottom:0;z-index:4;padding-block:16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,transparent,var(--bg) 22%)}
@@ -391,7 +406,7 @@ footer.site{border-top:0;background:transparent}
 <script>
 (function(){
 /* ================= 운영 설정 (여기서만 수정) ================= */
-const APP_VERSION='v2.2.2', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
+const APP_VERSION='v2.2.3', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
 const APP_NAME='ESG 경영준비도 진단';
 const SITE='https://beconic-diagnosis-esg.netlify.app/';   // <head> og:url·og:image 와 같아야 함 (QA 검사)
 const COMPANY={name:'그로스벤처스 주식회사',brand:'BECONIC',tel:'02-6124-5960',mail:'start@gven.kr',web:'www.beconic.kr',
