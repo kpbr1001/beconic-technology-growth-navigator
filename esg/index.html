@@ -260,7 +260,7 @@ footer.site .fb img{width:22px;height:22px;border-radius:5px}
 .tool span{font-size:12.5px;color:var(--ink-2)}
 @media (max-width:640px){.tools{grid-template-columns:1fr}}
 @page{size:A4;margin:14mm 12mm}
-@media print{.print-only{display:block!important}.no-print{display:none!important}.sh,.lead{break-after:avoid;page-break-after:avoid}.rsec{break-before:auto}main{padding-block:0}.wrap.wide{max-width:none}.tool::after{content:" " attr(href);font-size:10px;color:#666}}
+@media print{.print-only{display:block!important}.no-print{display:none!important}.sh,.lead{break-after:avoid;page-break-after:avoid}.rsec{break-before:auto}main{padding-block:0}.wrap.wide{max-width:none}}
 /* ===== Design v2.1 — 토스 스타일 컴포넌트 ===== */
 body{font-size:16px;letter-spacing:-0.01em}
 .num,.kpi b,.ring .v b,.domrow b{font-variant-numeric:tabular-nums}
@@ -341,6 +341,21 @@ footer.site{border-top:0;background:transparent}
   .hero h1{font-size:26px} .qtitle{font-size:22px}
 }
 @media print{.card{box-shadow:none}.bottom{position:static;background:none}}
+/* ===== 인쇄물(A4 PDF) 레이아웃 v2.2.1 ===== */
+@media print{
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tool{text-decoration:none}                                  /* 추천 진단: 주소 인쇄 안 함 */
+  .tbl{overflow:visible} table{min-width:0!important}         /* 표가 잘리거나 스크롤바가 찍히지 않게 */
+  #s3 .two{grid-template-columns:1fr;gap:12px}               /* 매트릭스와 구분표를 위아래로 */
+  #s3 .two>div:first-child{max-width:420px;margin:0 auto;width:100%}
+  .phases{display:block}                                       /* Phase 카드 한 줄에 하나 */
+  .phase{break-inside:auto;margin-bottom:12px;box-shadow:none!important;border-top:4px solid var(--primary-line)!important}
+  .phase.p1{border-top-color:var(--bad)!important} .phase.p2{border-top-color:var(--warn)!important} .phase.p3{border-top-color:var(--accent)!important} .phase.p4{border-top-color:var(--good)!important}
+  .phase h3,.phase .goal{break-after:avoid}
+  .phase li,.act,.domrow,.qline,.icard,.kpis,.flag,.qw{break-inside:avoid}
+  #s1 .card{break-inside:auto}                                 /* '이번 주 3가지'는 과제 단위로 나눔 → 빈 쪽 감소 */
+  .heat,.stack,.legend,svg{break-inside:avoid}
+}
 .fade{animation:fade .25s ease}
 @keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}.bar i{transition:none}}
@@ -369,7 +384,7 @@ footer.site{border-top:0;background:transparent}
 <script>
 (function(){
 /* ================= 운영 설정 (여기서만 수정) ================= */
-const APP_VERSION='v2.2.0', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
+const APP_VERSION='v2.2.1', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
 const APP_NAME='ESG 경영준비도 진단';
 const SITE='https://beconic-diagnosis-esg.netlify.app/';   // <head> og:url·og:image 와 같아야 함 (QA 검사)
 const COMPANY={name:'그로스벤처스 주식회사',brand:'BECONIC',tel:'02-6124-5960',mail:'start@gven.kr',web:'www.beconic.kr',

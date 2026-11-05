@@ -107,6 +107,12 @@ const bodyText = (page) => page.locator('body').innerText();
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
   const pr = await page.evaluate(() => ({ ref: [...document.querySelectorAll('.ref')].filter((e) => getComputedStyle(e).display !== 'none').length, fold: document.querySelector('details.fold').open, head: getComputedStyle(document.querySelector('.print-only')).display, top: getComputedStyle(document.querySelector('.top')).display, law: [...document.querySelectorAll('.ref-line')].filter((e) => getComputedStyle(e).display !== 'none').length }));
   check('인쇄: 참조 기준 제외 · 산출 방식표 포함 · 근거 법령 포함 · 머리말 표시', pr.ref === 0 && pr.fold && pr.head === 'block' && pr.top === 'none' && pr.law > 0, JSON.stringify(pr));
+  const pp = await page.evaluate(() => ({
+    url: [...document.querySelectorAll('.tool')].every((t) => { const c = getComputedStyle(t, '::after').content; return c === 'none' || c === 'normal' || c === '""'; }),
+    tbl: [...document.querySelectorAll('.tbl')].every((t) => t.scrollWidth <= t.clientWidth + 1),
+    phases: getComputedStyle(document.querySelector('.phases')).display === 'block',
+    matrix: getComputedStyle(document.querySelector('#s3 .two')).gridTemplateColumns.split(' ').length === 1 }));
+  check('인쇄: 추천 진단 주소 미표시 · 표 잘림 없음 · Phase 1열 · 매트릭스 세로 배치', Object.values(pp).every(Boolean), JSON.stringify(pp));
   const pdf = await page.pdf({ path: path.join(OUT, 'report-a4.pdf'), format: 'A4', printBackground: true, preferCSSPageSize: true });
   const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
   check('A4 PDF 생성', pages >= 3, `${pages}쪽`);
