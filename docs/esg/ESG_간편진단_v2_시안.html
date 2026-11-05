@@ -1,0 +1,529 @@
+<title>BECONIC ESG 간편진단</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 모바일 우선 단일 컬럼(최대 560px). 상단 고정 바(브랜드 + 화면 단계), 한 화면에 한 질문. */
+:root{
+  --bg:#f2f4f8; --surface:#ffffff; --surface-2:#f6f7fa; --line:#e1e5ed;
+  --ink:#1c2333; --ink-2:#4a5468; --ink-3:#7d869a;
+  --primary:#1b2a4a; --on-primary:#ffffff; --primary-soft:#e8edf6; --primary-line:#9fb1d3;
+  --good:#2f8f6b; --good-soft:#e5f3ec; --warn:#b97a14; --warn-soft:#fbf0dc; --bad:#c14b4b; --bad-soft:#f8e9e9;
+  --font:'Pretendard','IBM Plex Sans KR',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --r:14px; --r-sm:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e1422; --surface:#161f33; --surface-2:#1b2640; --line:#2a3653;
+  --ink:#e8ecf4; --ink-2:#b5bdcd; --ink-3:#8791a7;
+  --primary:#a9c0f2; --on-primary:#0e1a33; --primary-soft:#22304f; --primary-line:#4c6496;
+  --good:#58c49a; --good-soft:#173329; --warn:#e3a846; --warn-soft:#3a2d14; --bad:#e58585; --bad-soft:#3a1d22;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0e1422; --surface:#161f33; --surface-2:#1b2640; --line:#2a3653;
+  --ink:#e8ecf4; --ink-2:#b5bdcd; --ink-3:#8791a7;
+  --primary:#a9c0f2; --on-primary:#0e1a33; --primary-soft:#22304f; --primary-line:#4c6496;
+  --good:#58c49a; --good-soft:#173329; --warn:#e3a846; --warn-soft:#3a2d14; --bad:#e58585; --bad-soft:#3a1d22;
+  color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.num{font-variant-numeric:tabular-nums}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.top-in{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand b{font-size:15px;letter-spacing:.06em;color:var(--primary)}
+.brand span{font-size:12px;color:var(--ink-3)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.steps button{border:0;background:transparent;padding:6px 2px 4px;font-size:12px;color:var(--ink-3);border-bottom:2px solid var(--line);text-align:center}
+.steps button[aria-current="step"]{color:var(--primary);border-color:var(--primary);font-weight:600}
+.proto{font-size:11px;color:var(--ink-3);text-align:center}
+
+/* page */
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--ink-3)}
+.muted{color:var(--ink-2)}
+.tiny{font-size:12.5px;color:var(--ink-3)}
+.btn{border:0;border-radius:12px;padding:14px 18px;font-weight:600;font-size:15.5px;background:var(--primary);color:var(--on-primary);width:100%}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--primary);border:1px solid var(--primary-line)}
+.linkbtn{border:0;background:none;color:var(--ink-2);font-size:14px;text-decoration:underline;text-underline-offset:3px;padding:6px 4px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1 1 160px}
+
+/* start */
+.hero h1{font-size:26px;line-height:1.3;font-weight:700;letter-spacing:-.01em}
+.hero p{margin:10px 0 0;color:var(--ink-2)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+.fact{background:var(--surface-2);border-radius:var(--r-sm);padding:12px 10px;text-align:center}
+.fact b{display:block;font-size:20px;color:var(--primary)}
+.fact span{font-size:12px;color:var(--ink-3)}
+.how{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.how li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.how i{font-style:normal;width:28px;height:28px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;font-weight:700;font-size:13px}
+.how b{display:block;font-size:14.5px}
+.how span{font-size:13px;color:var(--ink-2)}
+.sample{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+
+/* profile */
+.field{display:flex;flex-direction:column;gap:8px}
+.field>label,.field>.lab{font-weight:600;font-size:14.5px}
+.field input{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-sm);padding:12px;font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 13px;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--on-primary);font-weight:600}
+.yn{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.yn .chips{flex-wrap:nowrap}
+.yn small{display:block;color:var(--ink-3);font-size:12px;font-weight:400}
+
+/* quiz */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
+.dom{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--primary);background:var(--primary-soft);padding:4px 10px;border-radius:999px}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--primary);border-radius:99px;transition:width .3s ease}
+.qtitle{font-size:21px;line-height:1.4;font-weight:700;letter-spacing:-.01em}
+.help{background:var(--surface-2);border-radius:var(--r-sm);padding:10px 12px;font-size:13.5px;color:var(--ink-2)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;text-align:left;width:100%;
+  border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:14px 14px;font-size:15.5px;line-height:1.45;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--primary-line)}
+.opt[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft);font-weight:600}
+.ladder{display:flex;gap:2px;align-items:flex-end;height:20px}
+.ladder s{display:block;width:6px;border-radius:2px;background:var(--line)}
+.ladder s:nth-child(1){height:6px}.ladder s:nth-child(2){height:10px}.ladder s:nth-child(3){height:15px}.ladder s:nth-child(4){height:20px}
+.ladder s.on{background:var(--primary)}
+.qfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.estnote{font-size:12.5px;color:var(--warn);background:var(--warn-soft);padding:8px 10px;border-radius:8px}
+.kwh{display:flex;align-items:center;gap:8px}
+.kwh input{flex:1;min-width:0;font-size:22px;font-weight:600;text-align:right}
+.kwh span{font-weight:600;color:var(--ink-2)}
+
+/* result */
+.res-top{display:grid;grid-template-columns:120px 1fr;gap:18px;align-items:center}
+.ring{position:relative;width:120px;height:120px}
+.ring svg{width:120px;height:120px;transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .v b{font-size:34px;line-height:1;font-weight:700}
+.ring .v small{display:block;font-size:11px;color:var(--ink-3);margin-top:2px}
+.lvl{display:inline-block;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:4px 10px;border-radius:999px;font-size:13px}
+.lvl-ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:10px}
+.lvl-ladder div{font-size:10.5px;text-align:center;color:var(--ink-3);padding-top:6px;border-top:4px solid var(--line)}
+.lvl-ladder div.on{border-color:var(--primary);color:var(--primary);font-weight:700}
+.sec{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--ink-2);margin:6px 2px -6px}
+.domrow{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:11px 0;border-top:1px solid var(--line)}
+.domrow:first-child{border-top:0;padding-top:0}
+.domrow .nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14.5px;min-width:0}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.pill{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px}
+.p-good{color:var(--good);background:var(--good-soft)} .p-warn{color:var(--warn);background:var(--warn-soft)} .p-bad{color:var(--bad);background:var(--bad-soft)}
+.d-good{background:var(--good)} .d-warn{background:var(--warn)} .d-bad{background:var(--bad)}
+.domrow .bar{grid-column:1/-1;height:5px}
+.domrow .bar i.good{background:var(--good)} .domrow .bar i.warn{background:var(--warn)} .domrow .bar i.bad{background:var(--bad)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;min-width:0}
+.kpi b{display:block;font-size:20px;line-height:1.2}
+.kpi span{font-size:12px;color:var(--ink-3)}
+.act{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.act:first-of-type{border-top:0;padding-top:4px}
+.act .n{width:30px;height:30px;border-radius:8px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:700}
+.act h3{font-size:15.5px;line-height:1.45}
+.act .from{font-size:12.5px;color:var(--ink-3);margin-top:4px}
+.act .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.act .meta span{font-size:11.5px;background:var(--surface-2);color:var(--ink-2);padding:3px 8px;border-radius:6px}
+.flag{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;padding:10px 12px;border-radius:var(--r-sm);background:var(--warn-soft);color:var(--ink)}
+.flag b{color:var(--warn)}
+.deep{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px dashed var(--primary-line);border-radius:var(--r-sm);padding:12px 14px;width:100%;background:transparent;text-align:left}
+.deep b{font-size:14.5px}
+.deep span{font-size:12.5px;color:var(--ink-3)}
+.cta{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.cta p{margin:6px 0 14px;opacity:.85;font-size:14px}
+.cta .tel{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cta .tel b{font-size:20px;letter-spacing:.02em;user-select:all}
+.cta .tel button{border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:6px 10px;font-size:13px}
+.disc{font-size:12px;color:var(--ink-3);line-height:1.6}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13.5px;max-width:calc(100% - 32px);z-index:20}
+.fade{animation:fade .25s ease}
+@keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fade{animation:none}.bar i{transition:none}}
+@media (max-width:420px){.res-top{grid-template-columns:1fr;justify-items:center;text-align:center}.kpis{grid-template-columns:1fr 1fr}.kpis .kpi:last-child{grid-column:1/-1}.hero h1{font-size:23px}}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><b>BECONIC</b><span>ESG 간편진단 v2 · 화면 시안</span></div>
+    <nav class="steps" aria-label="화면 단계">
+      <button data-go="start">시작</button>
+      <button data-go="profile">기업정보</button>
+      <button data-go="quiz">질문</button>
+      <button data-go="result">결과</button>
+    </nav>
+  </div>
+</header>
+<main><div class="wrap" id="app"></div></main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+/* ---------------- 데이터 (문항 마스터 xlsx와 동일) ---------------- */
+const DOMS={A:'ESG 전략·책임',B:'환경·에너지',C:'사람·안전',D:'윤리·투명경영',E:'거래처·고객 대응',F:'자료·기록'};
+const OWNER={A:'대표',B:'총무·생산',C:'인사·안전',D:'경영지원',E:'영업·구매',F:'경영지원'};
+const Q=[
+ {id:'A1',d:'A',ev:1,q:'회사에서 ESG를 챙기는 사람이 정해져 있나요?',h:'대표님이 겸임하셔도 괜찮아요. 누가 챙기는지가 정해져 있는지가 핵심이에요.',
+  o:['정해진 사람이 없어요','대표가 필요할 때마다 챙겨요','담당자(겸임 포함)가 정해져 있고 사내에 알렸어요','담당자가 있고, 경영진이 분기 1회 이상 함께 점검해요']},
+ {id:'A2',d:'A',ev:1,q:'우리 회사에 중요한 ESG 이슈와 목표가 정리돼 있나요?',h:'예: 에너지 비용 줄이기, 안전사고 0건, 협력사 관리처럼 우리 사업에 실제로 영향을 주는 것이요.',
+  o:['생각해 본 적 없어요','머릿속으로는 알고 있어요','중요 이슈를 문서(1장)로 정리했어요','이슈별 목표와 점검 주기까지 정해 관리해요']},
+ {id:'X5',d:'A',ev:1,cond:'Funding',q:'투자자·금융기관이 ESG나 내부관리를 물으면 설명할 수 있나요?',h:'IR 자료에 ESG·리스크 1장이 있으면 질의 대응이 훨씬 쉬워져요.',
+  o:['준비가 안 돼 있어요','말로는 설명할 수 있어요','1~2장짜리 설명 자료가 있어요','리스크·내부통제·ESG 계획을 담은 자료와 근거가 있어요']},
+ {id:'B1',d:'B',ev:1,q:'전기·연료(회사 차 기름, 보일러 가스 등)를 얼마나 쓰는지 알고 있나요?',h:'요금이 아니라 사용량(kWh, 리터)이 기준이에요. 한전 고지서에 kWh가 적혀 있어요.',
+  o:['따로 본 적 없어요','요금 정도만 알아요','고지서·주유 영수증을 모아두고 있어요','월별 사용량을 표(엑셀 등)로 정리하고 있어요']},
+ {id:'K1',d:'B',kind:'kwh'},
+ {id:'B2',d:'B',ev:0,q:'에너지·폐기물·물 사용을 줄이려고 하고 있는 게 있나요?',h:'거창하지 않아도 돼요. LED 교체, 분리배출, 공회전 줄이기도 포함이에요.',
+  o:['특별히 없어요','아끼자고 말하는 정도예요','구체적인 절감 활동을 하고 있어요','절감 목표를 세우고 실적을 기록·확인해요']},
+ {id:'X1',d:'B',ev:1,cond:'Env',na:1,q:'사업장에 필요한 환경 인허가(대기·폐수·폐기물 등)를 알고, 지키고 있나요?',h:'어떤 인허가가 필요한지부터 확인하는 게 첫 단계예요.',
+  o:['무엇이 필요한지 잘 몰라요','받긴 했는데 관리는 안 해요','필요한 인허가 목록이 있고 갱신일을 챙겨요','목록과 정기 자체점검 기록이 있어요']},
+ {id:'X2',d:'B',ev:1,cond:'Export',q:'수출 제품의 탄소 정보를 달라는 요청에 대비하고 있나요?',h:'EU 탄소국경조정제도(CBAM) 대상 품목(철강·알루미늄·시멘트·비료 등)이면 특히 중요해요.',
+  o:['생각해 본 적 없어요','필요성은 알지만 준비는 못 했어요','우리 제품이 대상인지 확인했고, 필요한 데이터를 알아요','제품별 에너지·원재료 데이터를 모으고 있어요']},
+ {id:'C1',d:'C',ev:1,solo:1,q:'근로계약서·근로시간·임금을 법에 맞게 관리하고 있나요?',h:'전 직원 근로계약서가 있는지, 근로시간 기록이 남는지를 봐요.',
+  o:['잘 챙기지 못하고 있어요','대부분 하지만 빠진 직원이 있어요','전 직원 근로계약서를 쓰고 보관해요','계약서 보관에 근로시간 기록까지 하고, 노무사 등 점검도 받아요']},
+ {id:'C2',d:'C',ev:1,solo:1,q:'직원이 다치거나 괴롭힘을 당하지 않게 예방하고, 고충을 들을 통로가 있나요?',h:'사무실 기업도 해당돼요. 안전·괴롭힘 예방 교육과 고충 접수 방법을 봐요.',
+  o:['문제가 생기면 그때 대응해요','필요하다고 생각하지만 정해진 건 없어요','예방 교육을 하고, 고충 접수 방법이 정해져 있어요','교육·고충 처리 기록을 남기고 정기적으로 점검해요']},
+ {id:'X4',d:'C',ev:1,cond:'Social',q:'작업장의 위험 요인을 찾아 미리 줄이는 활동(위험성평가)을 하나요?',h:'위험성평가는 사고를 미리 막기 위한 기본 활동이에요. 결과를 기록해 두는 게 중요해요.',
+  o:['하지 않아요','사고가 나면 원인만 살펴봐요','위험성평가를 하고 결과를 기록해요','정기적으로 평가·개선하고, 근로자 의견도 반영해요']},
+ {id:'X6',d:'C',ev:1,cond:'Data',q:'고객·직원 개인정보를 안전하게 관리하나요?',h:'누가 볼 수 있는지(권한), 언제 지우는지(파기)가 정해져 있는지 봐요.',
+  o:['따로 관리하지 않아요','비밀번호 정도만 걸어둬요','접근 권한을 나누고, 보관·파기 기준이 있어요','권한·기준에 더해 정기 점검(또는 보안 인증)을 해요']},
+ {id:'D1',d:'D',ev:1,q:'부정·뇌물·법 위반을 막는 회사 원칙과 신고 통로가 있나요?',h:'구두 방침도 출발점이에요. 문서로 만들고 직원에게 알렸는지가 다음 단계예요.',
+  o:['따로 없어요','대표가 말로 강조하는 정도예요','윤리 원칙을 문서로 만들어 직원에게 알렸어요','원칙 문서와 신고 통로가 있고, 주요 법규 준수를 정기 점검해요']},
+ {id:'D2',d:'D',ev:1,q:'돈 관리와 주요 결정이 투명하게 기록되나요?',h:'세무 기장 외에, 회사 안에서 지출 승인·결재 기록이 남는지를 봐요.',
+  o:['대표 혼자 결정·관리하고 기록은 거의 없어요','세무사에게 장부만 맡기고 내부 기록은 부족해요','지출 승인·결재 기준이 있고 기록이 남아요','결재·권한 규정이 있고, 정기적으로 재무를 보고·검토해요']},
+ {id:'E1',d:'E',ev:0,q:'주요 거래처·협력사를 어떻게 관리하나요?',h:'고를 때 품질·가격 말고 안전·환경·노동도 보는지가 포인트예요.',
+  o:['따로 정리된 게 없어요','거래처 목록 정도만 있어요','목록·거래정보를 정리하고, 선정 시 안전·환경도 봐요','주요 협력사의 환경·노동 상황을 정기적으로 확인해요']},
+ {id:'E2',d:'E',ev:1,cust:1,q:"고객사가 'ESG 자료를 보내 달라'고 하면 어떻게 하나요?",h:'방침·담당자·주요 데이터 같은 기본 자료를 바로 보낼 수 있는지가 핵심이에요.',
+  o:['무엇을 줘야 할지 몰라요','요청이 오면 그때 급하게 만들어요','기본 자료(방침·담당자·주요 데이터)는 바로 보낼 수 있어요','자주 묻는 항목별 답변·증빙 패키지가 준비돼 있어요']},
+ {id:'X3',d:'E',ev:0,cond:'Export',q:'해외 원재료·부품이 어디서 오는지, 위험은 없는지 알고 있나요?',h:'원산지·공급처를 아는 것만으로도 고객사 질문의 절반은 답할 수 있어요.',
+  o:['잘 몰라요','주요 공급처 국가 정도만 알아요','주요 원재료의 원산지·공급처를 정리했어요','원산지·인권·분쟁 위험까지 확인하고 대체 공급처도 검토했어요']},
+ {id:'F1',d:'F',ev:1,q:'ESG 관련 자료(교육 기록, 에너지 고지서, 방침 문서 등)를 한곳에 모아두나요?',h:'고객·투자자·기관이 요청하면 바로 꺼낼 수 있는 자료 폴더가 있는지 봐요.',
+  o:['흩어져 있거나 없어요','있긴 한데 찾는 데 시간이 걸려요','공유 폴더 한곳에 모아두고 있어요','폴더와 담당자가 있어서, 요청이 오면 하루 안에 낼 수 있어요']},
+ {id:'F2',d:'F',ev:0,q:'그 자료를 얼마나 자주 업데이트하나요?',h:'정해진 주기가 있는지, 언제 무엇을 바꿨는지 남기는지를 봐요.',
+  o:['업데이트하지 않아요','생각날 때 가끔 해요','정해진 주기(분기·반기)로 업데이트해요','주기적으로 업데이트하고, 개선 이력(언제 무엇을)도 남겨요']}
+];
+const QI=Object.fromEntries(Q.map(q=>[q.id,q]));
+const INDUSTRIES=['제조','IT·SaaS','유통·도소매','서비스','식품·외식','건설','바이오·헬스','물류·운수','관광·문화','기타'];
+const SIZES=['1인·프리랜서','2~9인','10~49인','50~299인','300인 이상'];
+const W={'제조':[15,25,20,10,20,10],'IT·SaaS':[20,10,20,25,10,15],'유통·도소매':[15,15,15,15,25,15],'서비스':[20,10,25,20,10,15],
+ '식품·외식':[15,20,25,15,15,10],'건설':[15,20,30,15,10,10],'바이오·헬스':[15,15,25,20,10,15],'물류·운수':[15,30,20,10,15,10],
+ '관광·문화':[20,15,25,15,10,15],'기타':[20,20,15,15,15,15]};
+const LEVELS=[[0,'인식 시작'],[30,'기초'],[50,'관리'],[70,'통합'],[85,'증빙기반']];
+const PTS=[0,33,67,100], UNKNOWN=20;
+const YN=[['mfg','제조 사업장(공장·작업장)을 운영하나요?','환경 인허가·위험성평가 문항이 추가돼요'],
+ ['export','해외로 수출하나요?','제품 탄소정보·해외 공급망 문항이 추가돼요'],
+ ['big','대기업·중견기업에 납품하거나 협력사로 거래하나요?','고객사 ESG 요청 대응을 더 무겁게 봐요'],
+ ['asked','고객사에서 ESG 자료·질문지를 받은 적이 있나요?',''],
+ ['invest','투자유치·정책금융·IPO를 준비 중인가요?','투자자 설명자료 문항이 추가돼요']];
+
+/* ---------------- 상태 ---------------- */
+const blank=()=>({screen:'start',p:{company:'',industry:'',size:'',mfg:'',export:'',big:'',asked:'',invest:''},a:{},kwh:'',idx:0});
+let S=blank();
+const SAMPLE={company:'예시) 그린텍정밀',industry:'제조',size:'10~49인',mfg:'예',export:'아니오',big:'예',asked:'예',invest:'아니오'};
+const SAMPLE_A={A1:1,A2:0,B1:2,B2:1,X1:2,C1:2,C2:1,X4:1,D1:1,D2:2,E1:1,E2:0,F1:1,F2:1};
+function loadSample(){ S.p={...SAMPLE}; S.a={}; Object.entries(SAMPLE_A).forEach(([k,v])=>S.a[k]={v}); S.kwh=''; S.sample=true; }
+
+/* ---------------- 규칙 ---------------- */
+function triggers(p){
+  return {Env:p.mfg==='예',Export:p.export==='예',Social:p.mfg==='예'||['50~299인','300인 이상'].includes(p.size),
+    Funding:p.invest==='예',Data:['IT·SaaS','유통·도소매','바이오·헬스'].includes(p.industry),Customer:p.big==='예'||p.asked==='예'};
+}
+const solo=()=>S.p.size==='1인·프리랜서';
+function flow(){  // 실제로 화면에 보여줄 단계
+  const t=triggers(S.p);
+  return Q.filter(q=>{
+    if(q.cond && !t[q.cond]) return false;
+    if(q.solo && solo()) return false;                            // G2
+    if(q.id==='K1') return S.a.B1 && typeof S.a.B1.v==='number' && S.a.B1.v>=2; // 기록이 있는 기업에만 숫자 질문
+    if(q.id==='F2' && S.a.F1 && S.a.F1.v===0) return false;      // G1
+    return true;
+  });
+}
+function answersForScoring(){
+  const t=triggers(S.p), out={};
+  Q.forEach(q=>{
+    if(q.kind) return;
+    if(q.cond && !t[q.cond]) return;
+    if(q.solo && solo()){ out[q.id]={v:'na',auto:'1인 기업 · 자동 해당없음'}; return; }
+    if(q.id==='F2' && S.a.F1 && S.a.F1.v===0){ out[q.id]={v:0,auto:'F1 응답 기준 추정'}; return; }
+    if(S.a[q.id]) out[q.id]=S.a[q.id];
+  });
+  return out;
+}
+function score(){
+  const A=answersForScoring(), w=W[S.p.industry]||W['기타'], keys=Object.keys(DOMS);
+  const dom={}; let tw=0,tv=0, evN=0,evY=0, unk=0, scored=0, shown=0, dCount=0;
+  keys.forEach((k,i)=>{
+    const vals=[];
+    Object.entries(A).forEach(([id,a])=>{
+      const q=QI[id]; if(q.d!==k) return;
+      if(a.v==='na') return;
+      shown++;
+      if(a.v==='u'){ vals.push(UNKNOWN); unk++; if(q.ev) evN++; return; }
+      vals.push(PTS[a.v]); scored++; if(a.v===3) dCount++;
+      if(q.ev){ evN++; if(a.v>=2) evY++; }
+    });
+    dom[k]=vals.length?Math.round(vals.reduce((x,y)=>x+y,0)/vals.length):null;
+    if(dom[k]!=null){ tw+=w[i]; tv+=dom[k]*w[i]; }
+  });
+  const overall=tw?Math.round(tv/tw):0;
+  const level=LEVELS.reduce((acc,l,i)=>overall>=l[0]?i:acc,0);
+  const evidence=evN?Math.round(evY/evN*100):0;
+  const valid=shown>0 && scored>=Math.ceil(shown*0.6);            // V1
+  const flags=[];
+  if(A.B1&&A.B1.v===3&&!S.kwh) flags.push(['증빙 확인 필요','월별 사용량을 정리한다고 답했는데 kWh 숫자는 비어 있어요. 고지서 숫자를 넣으면 탄소 데이터 준비도가 더 정확해져요.']); // K1
+  if(A.F1&&A.F1.v===0&&dCount>=3) flags.push(['자료 확인 필요','잘하고 있다고 답한 항목이 많은데 자료를 모아둔 곳이 없어요. 고객사 실사에서는 자료가 없으면 안 한 것으로 봐요.']); // K2
+  if(unk>=3) flags.push(['담당자 확인 권장',`'잘 모르겠어요'가 ${unk}개예요. 실무 담당자와 함께 다시 응답하면 결과가 더 정확해져요.`]); // K3
+  let carbon='데이터 준비 필요';
+  if(A.B1&&typeof A.B1.v==='number'){ if(A.B1.v>=2&&S.kwh) carbon='기초 데이터 확보'; else if(A.B1.v>=2) carbon='일부 데이터 보유'; }
+  // 우선 과제: 다음 단계 행동을 그대로 처방으로
+  const t=triggers(S.p), cand=[];
+  Object.entries(A).forEach(([id,a])=>{
+    const q=QI[id]; if(a.v==='na'||a.v===3) return;
+    const cur=a.v==='u'?UNKNOWN:PTS[a.v];
+    const wi=w[keys.indexOf(q.d)];
+    const boost=(q.cond||(q.id==='E2'&&t.Customer))?1.2:1;
+    cand.push({q,a,pri:(100-cur)*wi*boost});
+  });
+  cand.sort((x,y)=>y.pri-x.pri);
+  const top=[],used=new Set();
+  for(const c of cand){ if(top.length>=3)break; if(used.has(c.q.d))continue; top.push(c); used.add(c.q.d); }
+  for(const c of cand){ if(top.length>=3)break; if(!top.includes(c)) top.push(c); }
+  const deep=keys.filter(k=>dom[k]!=null&&dom[k]<50);
+  return {dom,overall,level,evidence,valid,flags,carbon,top,deep,w,unk};
+}
+
+/* ---------------- 렌더 ---------------- */
+const app=document.getElementById('app');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function go(sc){ S.screen=sc; render(); window.scrollTo({top:0}); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2200); }
+function profileOk(){ const p=S.p; return p.industry&&p.size&&YN.every(([k])=>p[k]); }
+
+function render(){
+  document.querySelectorAll('[data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===S.screen?'step':'false'));
+  ({start:rStart,profile:rProfile,quiz:rQuiz,result:rResult})[S.screen]();
+  app.firstElementChild&&app.firstElementChild.classList.add('fade');
+}
+
+function rStart(){
+  app.innerHTML=`
+  <section class="card hero">
+    <div class="eyebrow">중소기업·스타트업 ESG 간편진단</div>
+    <h1 style="margin-top:8px">우리 회사 ESG,<br>무엇부터 하면 될까요?</h1>
+    <p>점수를 매기는 시험이 아니에요. 지금 우리 회사 모습을 고르기만 하면, 이번 주에 할 일 3가지를 알려드려요.</p>
+    <div class="facts">
+      <div class="fact"><b class="num">5분</b><span>예상 소요</span></div>
+      <div class="fact"><b class="num">12~18</b><span>질문 수</span></div>
+      <div class="fact"><b class="num">0개</b><span>증빙 업로드</span></div>
+    </div>
+    <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px">
+      <button class="btn" id="startBtn">진단 시작하기</button>
+      <button class="btn btn-ghost" id="sampleBtn">예시 결과 먼저 보기</button>
+    </div>
+  </section>
+  <section class="card">
+    <ol class="how">
+      <li><i>1</i><div><b>기업정보 7가지</b><span>업종·규모·수출·납품 여부로 우리 회사에 필요한 질문만 골라요.</span></div></li>
+      <li><i>2</i><div><b>우리 회사 모습 고르기</b><span>점수 대신 실제 모습 4개 중 하나를 탭하면 다음 질문으로 넘어가요.</span></div></li>
+      <li><i>3</i><div><b>결과 한 장</b><span>준비도 단계, 6개 영역 신호등, 이번 주에 할 일 3가지를 보여드려요.</span></div></li>
+    </ol>
+  </section>
+  <p class="disc">공식 ESG 평가등급이나 인증이 아닌 실행 준비도 자가진단이에요. 응답은 이 브라우저 밖으로 보내지 않아요.</p>`;
+  document.getElementById('startBtn').onclick=()=>{ if(S.sample){ S=blank(); } go('profile'); };
+  document.getElementById('sampleBtn').onclick=()=>{ loadSample(); go('result'); };
+}
+
+function rProfile(){
+  const p=S.p;
+  const chip=(k,v)=>`<button type="button" class="chip" data-k="${k}" data-v="${esc(v)}" aria-pressed="${p[k]===v}">${esc(v)}</button>`;
+  app.innerHTML=`
+  <section class="card" style="display:flex;flex-direction:column;gap:18px">
+    <div><div class="eyebrow">기업정보 · 1분</div><h2 style="font-size:20px;margin-top:6px">우리 회사에 맞는 질문만 골라드릴게요</h2></div>
+    <div class="field"><label for="co">회사명 <span class="tiny">(선택)</span></label>
+      <input id="co" type="text" placeholder="예: 그린텍정밀" value="${esc(p.company)}"></div>
+    <div class="field"><div class="lab">업종</div><div class="chips">${INDUSTRIES.map(v=>chip('industry',v)).join('')}</div></div>
+    <div class="field"><div class="lab">직원 수</div><div class="chips">${SIZES.map(v=>chip('size',v)).join('')}</div></div>
+    <div>${YN.map(([k,l,h])=>`<div class="yn"><div><b style="font-size:14.5px;font-weight:600">${l}</b>${h?`<small>${h}</small>`:''}</div>
+      <div class="chips">${chip(k,'예')}${chip(k,'아니오')}</div></div>`).join('')}</div>
+  </section>
+  <div class="row"><button class="btn btn-ghost" id="back">이전</button><button class="btn" id="next" ${profileOk()?'':'disabled'}>질문 시작</button></div>
+  <button class="linkbtn" id="fill">예시 기업정보로 채우기</button>`;
+  app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ S.p[b.dataset.k]=b.dataset.v; rProfile(); });
+  document.getElementById('co').oninput=e=>S.p.company=e.target.value;
+  document.getElementById('back').onclick=()=>go('start');
+  document.getElementById('fill').onclick=()=>{ S.p={...SAMPLE}; rProfile(); };
+  document.getElementById('next').onclick=()=>{ if(!profileOk())return; S.idx=0; go('quiz'); };
+}
+
+function rQuiz(){
+  if(!profileOk()){ app.innerHTML=`<section class="card"><h2 style="font-size:19px">기업정보를 먼저 입력해 주세요</h2><p class="muted">업종과 규모에 따라 질문이 달라져요.</p><button class="btn" id="toP">기업정보 입력</button></section>`; document.getElementById('toP').onclick=()=>go('profile'); return; }
+  const F=flow();
+  if(S.idx>=F.length){ go('result'); return; }
+  const q=F[S.idx];
+  const remainSec=(F.length-S.idx)*15, remain=remainSec<=60?'1분 안에 끝나요':`약 ${Math.ceil(remainSec/60)}분 남았어요`;
+  const pct=Math.round(S.idx/F.length*100);
+  const head=`<div class="qhead"><span class="dom">${q.d} · ${DOMS[q.d]}</span><span class="tiny num">${S.idx+1} / ${F.length} · ${remain}</span></div>
+    <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>`;
+  if(q.kind==='kwh'){
+    app.innerHTML=`${head}
+    <section class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div class="eyebrow">선택 · 숫자 하나만</div>
+      <h2 class="qtitle">최근 한 달 전기 사용량은 몇 kWh인가요?</h2>
+      <div class="help">한전 고지서의 '사용량' 칸 숫자 그대로 적어 주세요. 모르면 건너뛰어도 점수에는 영향이 없어요.</div>
+      <div class="kwh field"><input id="kwh" type="number" inputmode="numeric" min="0" placeholder="예: 3200" value="${esc(S.kwh)}" aria-label="전기 사용량 kWh"><span>kWh</span></div>
+    </section>
+    <div class="row"><button class="btn btn-ghost" id="prev">이전</button><button class="btn" id="nxt">다음</button></div>
+    <div style="text-align:center"><button class="linkbtn" id="skip">건너뛰기</button></div>`;
+    document.getElementById('kwh').oninput=e=>S.kwh=e.target.value;
+    document.getElementById('prev').onclick=()=>{ S.idx=Math.max(0,S.idx-1); rQuiz(); };
+    document.getElementById('nxt').onclick=()=>{ S.idx++; rQuiz(); };
+    document.getElementById('skip').onclick=()=>{ S.kwh=''; S.idx++; rQuiz(); };
+    return;
+  }
+  const a=S.a[q.id]||{};
+  const allowNa=q.na||(q.cust&&!triggers(S.p).Customer);
+  app.innerHTML=`${head}
+  <section class="card" style="display:flex;flex-direction:column;gap:14px">
+    <h2 class="qtitle">${esc(q.q)}</h2>
+    <div class="help">${esc(q.h)}</div>
+    <div class="opts" role="group" aria-label="우리 회사 모습">
+      ${q.o.map((t,i)=>`<button type="button" class="opt" data-v="${i}" aria-pressed="${a.v===i}">
+        <span class="ladder" aria-hidden="true">${[0,1,2,3].map(j=>`<s class="${j<=i?'on':''}"></s>`).join('')}</span><span>${esc(t)}</span></button>`).join('')}
+    </div>
+    ${q.id==='F1'?`<div class="tiny">'흩어져 있거나 없어요'를 고르면 다음 질문(업데이트 주기)은 건너뛰어요.</div>`:''}
+  </section>
+  <div class="qfoot">
+    <button class="linkbtn" id="prev" ${S.idx===0?'style="visibility:hidden"':''}>← 이전</button>
+    <div style="display:flex;gap:4px">
+      <button class="linkbtn" data-v="u" ${a.v==='u'?'style="font-weight:700;color:var(--primary)"':''}>잘 모르겠어요</button>
+      ${allowNa?`<button class="linkbtn" data-v="na" ${a.v==='na'?'style="font-weight:700;color:var(--primary)"':''}>해당 없음</button>`:''}
+    </div>
+  </div>
+  <p class="tiny" style="text-align:center">키보드 1~4로도 고를 수 있어요</p>`;
+  const pickV=v=>{
+    S.a[q.id]={v}; S.sample=false;
+    app.querySelectorAll('.opt').forEach(b=>b.setAttribute('aria-pressed',String(String(v)===b.dataset.v)));
+    setTimeout(()=>{ S.idx++; rQuiz(); window.scrollTo({top:0}); },220);
+  };
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pickV(+b.dataset.v));
+  app.querySelectorAll('.linkbtn[data-v]').forEach(b=>b.onclick=()=>pickV(b.dataset.v));
+  document.getElementById('prev').onclick=()=>{ S.idx=Math.max(0,S.idx-1); rQuiz(); };
+  rQuiz._key=pickV;
+}
+document.addEventListener('keydown',e=>{
+  if(S.screen!=='quiz'||e.target.tagName==='INPUT')return;
+  const n=+e.key; if(n>=1&&n<=4&&rQuiz._key) rQuiz._key(n-1);
+});
+
+const tone=v=>v>=70?'good':v>=40?'warn':'bad';
+const toneTxt={good:'양호',warn:'보완',bad:'우선'};
+function rResult(){
+  if(!Object.keys(S.a).length) loadSample();
+  const R=score();
+  if(!R.valid){
+    app.innerHTML=`<section class="card"><h2 style="font-size:19px">결과를 내기엔 응답이 부족해요</h2>
+      <p class="muted">'잘 모르겠어요'나 '해당 없음'이 많아서 믿을 만한 점수를 계산할 수 없어요. 담당자와 확인한 뒤 다시 응답해 주세요.</p>
+      <button class="btn" id="redo">응답 다시 하기</button></section>`;
+    document.getElementById('redo').onclick=()=>{ S.idx=0; go('quiz'); }; return;
+  }
+  const C=2*Math.PI*52, off=C*(1-R.overall/100);
+  const name=S.p.company||'우리 회사';
+  const domRows=Object.keys(DOMS).map((k,i)=>{
+    const v=R.dom[k]; if(v==null) return '';
+    const t=tone(v);
+    return `<div class="domrow"><div class="nm"><span class="dot d-${t}"></span><span>${DOMS[k]}</span><span class="tiny">가중 ${R.w[i]}%</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="pill p-${t}">${toneTxt[t]}</span><b class="num" style="min-width:2.2em;text-align:right">${v}</b></div>
+      <div class="bar"><i class="${t}" style="width:${Math.max(v,3)}%"></i></div></div>`;
+  }).join('');
+  const acts=R.top.map((c,i)=>{
+    const {q,a}=c;
+    const now=a.v==='u'?'현재 상태를 모름':q.o[a.v];
+    // 목표는 최소 '증빙 있는 단계(C)' — B(구두·임시대응)는 처방으로 권하지 않음
+    const target=a.v==='u'?null:Math.min(3,Math.max(a.v+1,2));
+    const nextStep=a.v==='u'?`먼저 확인하기: ${q.q.replace(/\?$/,'')}`:q.o[target];
+    const dur=a.v==='u'||a.v<=1?'30일 안에':'90일 안에';
+    return `<div class="act"><span class="n num">${i+1}</span><div><div class="tiny" style="font-weight:600;color:var(--primary)">목표 모습</div><h3>${esc(nextStep)}</h3>
+      <div class="from">지금: ${esc(now)}</div>
+      <div class="meta"><span>${DOMS[q.d]}</span><span>담당 ${OWNER[q.d]}</span><span>${dur}</span>${a.auto?`<span>${esc(a.auto)}</span>`:''}</div></div></div>`;
+  }).join('');
+  const carbonTone=R.carbon==='기초 데이터 확보'?'good':R.carbon==='일부 데이터 보유'?'warn':'bad';
+  app.innerHTML=`
+  ${S.sample?`<div class="flag" style="background:var(--primary-soft)"><span><b style="color:var(--primary)">예시 결과</b> 가상의 제조기업(10~49인, 대기업 납품) 응답으로 만든 화면이에요. 실제 진단은 '진단 시작하기'에서 해보세요.</span></div>`:''}
+  <section class="card">
+    <div class="eyebrow">${esc(name)} · ${esc(S.p.industry)} · ${esc(S.p.size)}</div>
+    <div class="res-top" style="margin-top:14px">
+      <div class="ring" role="img" aria-label="ESG 준비도 ${R.overall}점">
+        <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="10"/>
+        <circle cx="60" cy="60" r="52" fill="none" stroke="var(--primary)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}"/></svg>
+        <div class="v"><div><b class="num">${R.overall}</b><small>/ 100</small></div></div>
+      </div>
+      <div style="min-width:0">
+        <span class="lvl">Level ${R.level+1} · ${LEVELS[R.level][1]}</span>
+        <p style="margin:10px 0 0;font-size:15px">${levelMsg(R)}</p>
+      </div>
+    </div>
+    <div class="lvl-ladder" aria-hidden="true">${LEVELS.map((l,i)=>`<div class="${i===R.level?'on':''}">${l[1]}</div>`).join('')}</div>
+  </section>
+
+  <div class="sec">이번 주에 할 일 3가지</div>
+  <section class="card">${acts}</section>
+
+  <div class="sec">6개 영역 신호등</div>
+  <section class="card">${domRows}
+    <p class="tiny" style="margin:10px 0 0">${esc(S.p.industry)} 업종 기준으로 영역별 가중치를 다르게 적용했어요.</p></section>
+
+  <div class="kpis">
+    <div class="kpi"><b class="num" style="color:var(--${tone(R.evidence)})">${R.evidence}</b><span>증빙 신뢰도</span></div>
+    <div class="kpi"><b style="font-size:15px;color:var(--${carbonTone})">${R.carbon}</b><span>탄소 데이터 준비</span></div>
+    <div class="kpi"><b style="font-size:15px;color:var(--ink-3)">파일럿 후 제공</b><span>동종업계 비교</span></div>
+  </div>
+  ${R.flags.map(f=>`<div class="flag"><span><b>${f[0]}</b> ${esc(f[1])}</span></div>`).join('')}
+
+  ${R.deep.length?`<div class="sec">더 정확히 보기</div>
+  <section class="card" style="display:flex;flex-direction:column;gap:8px">
+    <p class="tiny" style="margin:0">50점 미만 영역만 질문 3~4개로 더 자세히 볼 수 있어요.</p>
+    ${R.deep.map(k=>`<button class="deep" data-deep="${k}"><div><b>${DOMS[k]}</b><br><span>질문 3~4개 · 약 1분</span></div><span>→</span></button>`).join('')}
+  </section>`:''}
+
+  <section class="card cta">
+    <b style="font-size:16.5px">이 결과로 전문가와 실행계획을 잡아보세요</b>
+    <p>BECONIC 컨설턴트가 우선 과제별 증빙 준비와 90일 로드맵을 함께 정리해 드려요.</p>
+    <div class="tel"><b class="num">070-4103-4177</b><button id="copy">번호 복사</button></div>
+  </section>
+
+  <div class="row"><button class="btn btn-ghost" id="edit">응답 수정</button><button class="btn btn-ghost" id="again">처음부터 다시</button></div>
+  <p class="disc">본 결과는 공식 ESG 평가등급·인증이 아닌 실행 준비도 자가진단이며, 법률·노무·회계 자문을 대신하지 않아요. 문항 설계는 K-ESG 가이드라인 v2.0 범주를 참고했어요.</p>`;
+  app.querySelectorAll('[data-deep]').forEach(b=>b.onclick=()=>toast(`시안: '${DOMS[b.dataset.deep]}' 심화 질문으로 연결될 자리예요`));
+  document.getElementById('copy').onclick=()=>{ const done=()=>toast('번호를 복사했어요'); try{ navigator.clipboard.writeText('070-4103-4177').then(done,()=>toast('번호를 길게 눌러 복사해 주세요')); }catch(e){ toast('번호를 길게 눌러 복사해 주세요'); } };
+  document.getElementById('edit').onclick=()=>{ S.idx=0; go('quiz'); };
+  document.getElementById('again').onclick=()=>{ S=blank(); go('start'); };
+}
+function levelMsg(R){
+  const weak=Object.keys(DOMS).filter(k=>R.dom[k]!=null).sort((a,b)=>R.dom[a]-R.dom[b])[0];
+  const m=['ESG를 챙기기 시작하는 단계예요.','일부는 하고 있지만 따로따로 관리되고 있어요.','주요 담당자와 자료가 갖춰지기 시작했어요.','ESG가 실제 운영과 연결돼 있어요.','데이터와 증빙으로 증명할 수 있는 수준이에요.'][R.level];
+  return `${m} 가장 먼저 볼 영역은 <b>${DOMS[weak]}</b>이에요.`;
+}
+
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{
+  const sc=b.dataset.go;
+  if(sc==='quiz'&&!profileOk()){ S.p={...SAMPLE}; toast('시안 확인용으로 예시 기업정보를 채웠어요'); S.idx=0; }
+  if(sc==='result'&&!Object.keys(S.a).length) loadSample();
+  go(sc);
+});
+render();
+})();
+</script>
