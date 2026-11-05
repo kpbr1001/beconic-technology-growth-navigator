@@ -41,6 +41,16 @@ describe('checkHealth', () => {
     expect([r.evidence.light, r.claude.light, r.jobs.light]).toEqual(['red', 'red', 'red']);
     expect(r.claude.detail).toContain('키 오류');
     expect(JSON.stringify(r)).not.toMatch(/sk-test|aaa\.bbb|demo\.supabase/);
+  });  it('원문 DB 원인 구분: 접속 불가(삭제·일시정지)·테이블 없음 — 조치까지 표시', async () => {
+    const netErr = Object.assign(new TypeError('fetch failed'), { cause: { code: 'ENOTFOUND' } });
+    vi.stubGlobal('fetch', vi.fn(async () => { throw netErr; }));
+    const r1 = await checkHealth(SB, deps());
+    expect(r1.evidence.light).toBe('red');
+    expect(r1.evidence.detail).toMatch(/접속 불가\(ENOTFOUND\).*삭제·일시정지|예전 주소/);
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('{"code":"PGRST202","message":"Could not find the function public.search_roadmap_keyword"}', { status: 404 })));
+    const r2 = await checkHealth(SB, deps());
+    expect(r2.evidence.detail).toMatch(/테이블·함수 없음.*마이그레이션/);
+    expect(JSON.stringify([r1, r2])).not.toMatch(/aaa\.bbb|demo\.supabase/);
   });
 });
 

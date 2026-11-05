@@ -189,6 +189,33 @@ describe('서버 함수 /api/roadmap-evidence', () => {
   });
 });
 
+describe('원문 DB 설정 문제', () => {
+  const req = (body: unknown) => new Request('http://x/api/roadmap-evidence', { method: 'POST', body: JSON.stringify(body) });
+  const env = { SUPABASE_URL: 'https://secret-project.supabase.co', SUPABASE_SERVICE_ROLE_KEY: SERVICE_JWT };
+  const call = async (impl: () => Promise<Response>) => {
+    const orig = globalThis.fetch;
+    globalThis.fetch = vi.fn(impl) as typeof fetch;
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const res = await handle(req({ query: '예지보전', itemUids: ['SMESTR-2025-B-03-08@p279'] }), env);
+      return { status: res.status, text: await res.text() };
+    } finally {
+      globalThis.fetch = orig;
+      err.mockRestore();
+    }
+  };
+  it('DB 접속 불가(프로젝트 삭제·주소 오류)는 200 unavailable — 화면이 재시도하지 않고 점검 안내', async () => {
+    const r = await call(async () => { throw Object.assign(new TypeError('fetch failed'), { cause: { code: 'ENOTFOUND' } }); });
+    expect(r.status).toBe(200);
+    expect(JSON.parse(r.text)).toEqual({ status: 'unavailable', reason: 'unreachable', items: {} });
+    expect(r.text).not.toContain('secret-project');
+  });
+  it('검색 함수 없음(마이그레이션 미적용)·키 거부도 unavailable', async () => {
+    expect(JSON.parse((await call(async () => new Response('{"code":"PGRST202"}', { status: 404 }))).text).reason).toBe('no_schema');
+    expect(JSON.parse((await call(async () => new Response('denied', { status: 401 }))).text).reason).toBe('auth');
+  });
+});
+
 describe('적재 변환', () => {
   const c: Chunk = { chunk_id: 'A#item', chunk_type: 'item', kb_version: 'kb-v2', contextual_prefix: '[문서] X', content: '', technology_no: 3, trl_by_year: [1] };
   it('DB 컬럼만, 품목 문단의 기술번호 제거, 빈 내용 허용', () => {

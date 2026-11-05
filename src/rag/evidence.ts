@@ -28,7 +28,10 @@ export interface EvidenceQuote {
 }
 
 export interface EvidenceResponse {
-  status: 'ok' | 'not_configured';
+  /** unavailable: 원문 DB 설정 문제(접속 불가·테이블 없음·키 거부) — 재시도해도 같아 화면은 '점검 중' 안내 */
+  status: 'ok' | 'not_configured' | 'unavailable';
+  /** unavailable일 때 원인 종류(키·주소는 넣지 않음) */
+  reason?: 'unreachable' | 'no_schema' | 'auth';
   mode?: 'hybrid' | 'keyword_only';
   semanticDisabledReason?: string;
   items: Record<string, EvidenceQuote[]>;
