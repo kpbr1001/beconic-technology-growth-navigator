@@ -210,7 +210,7 @@ details.ref>summary::-webkit-details-marker{display:none}
 details.ref>summary::before{content:"▸";font-size:10px;transition:transform .15s}
 details.ref[open]>summary::before{transform:rotate(90deg)}
 details.ref.card>summary{font-size:14px;font-weight:600;color:var(--ink-2)}
-@media print{.ref,.ref-line,.top,.rep-nav,.btn,.deep,.linkbtn,.cta .tel button,.toast{display:none!important}body{background:#fff}.card,.phase,tr{break-inside:avoid}}
+@media print{.ref,.top,.rep-nav,.btn,.deep,.linkbtn,.cta .tel button,.toast{display:none!important}body{background:#fff}.card,.phase,tr{break-inside:avoid}}
 .fade{animation:fade .25s ease}
 @keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}.bar i{transition:none}}
@@ -689,7 +689,7 @@ function projSVG(proj){
     ${bands}
     <polygon points="${X(0)},${y1} ${line} ${X(4)},${y1}" style="fill:var(--accent);fill-opacity:.1"/>
     <polyline points="${line}" style="fill:none;stroke:var(--accent);stroke-width:2.5"/>
-    ${proj.map((v,i)=>`<circle cx="${X(i)}" cy="${Y(v)}" r="${i===4?6:4}" style="fill:${i===0?'var(--primary)':'var(--accent)'}"/><text x="${X(i)}" y="${Y(v)-10}" text-anchor="middle" class="lbl-b">${v}</text><text x="${X(i)}" y="${y1+18}" text-anchor="middle">${lab[i]}</text>`).join('')}
+    ${proj.map((v,i)=>`<circle cx="${X(i)}" cy="${Y(v)}" r="${i===4?5:3.5}" style="fill:${i===0?'var(--primary)':'var(--accent)'}"/><text x="${X(i)}" y="${Y(v)-10}" text-anchor="middle" class="lbl-b">${v}</text><text x="${X(i)}" y="${y1+18}" text-anchor="middle">${lab[i]}</text>`).join('')}
     <line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" style="stroke:var(--ink-3)"/>
   </svg>`;
 }
@@ -787,6 +787,8 @@ function rResult(){
       <div style="display:flex;justify-content:space-between;font-size:12.5px"><span class="tiny">완료 시 예상 점수</span><b class="num">${R.proj[pi]} → ${R.proj[pi+1]}점</b></div>
       <ul>${pi===0?qwItem:''}${items.map(it=>`<li><b>${esc(it.q.o[it.to])}</b><div class="meta"><span class="tag">${DSHORT[it.q.d]}</span><span class="tag">담당 ${OWNER[it.q.d]}</span><span class="tag">산출물: ${esc(it.q.doc)}</span></div></li>`).join('')||'<li class="tiny">해당 과제 없음 · 현 수준 유지</li>'}${extra}</ul></section>`; }).join('');
 
+  const lvOf=v=>LEVELS.reduce((acc,l,i)=>v>=l[0]?i:acc,0);
+  const projTbl=`<div class="tbl"><table style="min-width:0"><thead><tr><th>시점</th><th>예상 점수</th><th>Level</th></tr></thead><tbody>${['현재','1개월 · Phase 1','3개월 · Phase 2','6개월 · Phase 3','12개월 · Phase 4'].map((t,i)=>`<tr><td>${t}</td><td class="num"><b>${R.proj[i]}</b>${i?` <span class="tiny">+${R.proj[i]-R.proj[i-1]}</span>`:''}</td><td>${LEVELS[lvOf(R.proj[i])][1]}</td></tr>`).join('')}</tbody></table></div>`;
   const kTag={'실측':'고지서 실측','추정':`요금 기반 추정 ±${ERR*100}%`,'미확보':'미확보'}[R.kd.q];
   const fmt=v=>v<10?v.toFixed(1):Math.round(v).toLocaleString();
   const tTxt=R.tco2==null?'':(R.kd.q==='추정'?`${fmt(R.tco2*(1-ERR))}~${fmt(R.tco2*(1+ERR))}`:fmt(R.tco2));
@@ -876,7 +878,7 @@ function rResult(){
   <div class="rsec" id="s7">
     <h2 class="sh"><span>07</span>12개월 실행 로드맵</h2>
     <p class="lead">리스크가 크고 외부 노출이 높은 과제부터 배치했어요. 각 과제의 목표는 응답 보기의 다음 단계 모습 그대로라, 완료 여부를 바로 판단할 수 있어요.</p>
-    <section class="card">${projSVG(R.proj)}<p class="tiny" style="margin:6px 0 0">단계별 과제를 완료했을 때의 예상 점수예요. 점선은 준비도 Level 경계예요.${R.later.length?` 12개월 이후 지속 개선 과제 ${R.later.length}건(${R.later.map(it=>it.q.s).join(', ')})은 전망에서 제외했어요.`:''}</p></section>
+    <section class="card two"><div style="max-width:380px;width:100%;justify-self:center">${projSVG(R.proj)}</div><div style="min-width:0">${projTbl}<p class="tiny" style="margin:8px 0 0">단계별 과제를 완료했을 때의 예상 점수예요. 점선은 준비도 Level 경계예요.${R.later.length?` 12개월 이후 지속 개선 과제 ${R.later.length}건(${R.later.map(it=>it.q.s).join(', ')})은 전망에서 제외했어요.`:''}</p></div></section>
     <div class="phases">${phases}</div>
     <section class="card" style="display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><b style="font-size:14.5px">참고 탄소량 · 전력(Scope 2)</b><span class="qtag">${kTag}</span></div>
