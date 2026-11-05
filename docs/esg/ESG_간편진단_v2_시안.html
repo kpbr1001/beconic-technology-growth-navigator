@@ -901,15 +901,17 @@ function rResult(){
     <section class="card" style="display:flex;flex-direction:column;gap:12px">
       <p style="margin:0;font-size:14px;line-height:1.75;color:var(--ink-2)">본 진단은 국내 K-ESG 가이드라인 v2.0과 공급망 대응 K-ESG 가이드라인, EFRAG VSME, IFRS S1·S2, GHG Protocol, GRI, OECD·UN·ILO 원칙, ISO 14001/45001/26000/37001, EU CBAM 등 <b>공개된 방법론과 평가 철학을 교차 참조</b>해 설계했어요. 특정 평가기관의 문항·점수 알고리즘·등급 체계를 복제하지 않아요.
       모든 점수는 응답에 대한 <b>고정된 계산식(deterministic)</b>으로 산출되며, AI가 점수를 임의로 정하지 않아요.</p>
-      <div class="tbl"><table style="min-width:520px"><thead><tr><th>구성 요소</th><th>산출 방식</th></tr></thead><tbody>
+      <details class="ref fold"><summary>산출 방식 보기 · 7개 구성 요소</summary>
+      <div class="tbl" style="margin-top:10px"><table style="min-width:520px"><thead><tr><th>구성 요소</th><th>산출 방식</th></tr></thead><tbody>
         <tr><td>문항 점수</td><td>행동기반 4단계 보기 · 미흡 0 / 초기 33 / 관리 67 / 체계 100 · 잘 모르겠어요 20 · 해당 없음은 제외</td></tr>
         <tr><td>영역·종합 점수</td><td>영역 내 문항 평균 → 업종별 중대성 가중치(${esc(S.p.industry)}: ${R.w.join('/')})로 가중 평균</td></tr>
         <tr><td>증빙 신뢰도</td><td>증빙 판정 문항 중 '관리' 이상 비율 + 전기 사용량 데이터 품질(실측 1.0 · 추정 0.5 · 미확보 0)</td></tr>
         <tr><td>외부 요구 노출</td><td>업종 가중치 × 2.5 + 노출 신호(납품·수출·제조·투자·개인정보)당 15점, 최대 100</td></tr>
-        <tr><td>리스크 등급</td><td>가능성(응답 수준 + 노출 신호, 1~3) × 영향도(리스크 고유값, 1~3) · 6 이상 높음 / 4~5 중간</td></tr>
+        <tr><td>리스크 등급</td><td>가능성(응답 수준 + 노출 신호, 1~3) × 영향도(리스크 고유값, 1~3) · 9 이상 또는 6 이상이면서 가능성 3이면 높음 / 4 이상 중간 / 그 외 낮음</td></tr>
         <tr><td>로드맵·점수 전망</td><td>관리 미만 과제를 리스크·노출 순으로 먼저, 체계 전환 과제를 나중에 배치 · Phase별 최대 4/6/6/5개(중소기업 실행 용량), 넘치면 12개월 이후 · 완료 가정 시 같은 계산식으로 재산출</td></tr>
         <tr><td>참고 탄소량</td><td>월 kWh × 12 × 배출계수 ${EF} tCO₂e/MWh · 요금 추정은 실효단가(갑 ${PRICE.gap} / 을 ${PRICE.eul}원/kWh)로 역산</td></tr>
       </tbody></table></div>
+      </details>
     </section>
     <details class="ref card"><summary>참조 기준 보기 · 문항별 기준과 기준·자료 ${REFS.length}종</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
       <div style="display:flex;flex-wrap:wrap;gap:6px">${REFS.map(r=>`<span class="tag" title="${esc(r[1])}">${esc(r[0])}</span>`).join('')}</div>
