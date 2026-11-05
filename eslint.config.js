@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'reference/**', 'tests/e2e/out/**', 'src/app/legacy-ui.ts', 'finance/vendor/**', 'finance/tests/out/**', 'finance/dist/**', 'hr/dist/**', 'hr/tests/out/**', 'growth/dist/**', 'growth/tests/out/**', 'grants/dist/**', 'grants/dist-demo/**', 'grants/tests/out/**', 'ir/dist/**', 'ir/tests/out/**', 'ir/vendor/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'reference/**', 'tests/e2e/out/**', 'src/app/legacy-ui.ts', 'finance/vendor/**', 'finance/tests/out/**', 'finance/dist/**', 'hr/dist/**', 'hr/tests/out/**', 'growth/dist/**', 'growth/tests/out/**', 'grants/dist/**', 'grants/dist-demo/**', 'grants/tests/out/**', 'ir/dist/**', 'ir/tests/out/**', 'ir/vendor/**', 'esg/dist/**', 'esg/tests/out/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
