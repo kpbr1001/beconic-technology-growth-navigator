@@ -213,7 +213,11 @@ details.ref>summary::-webkit-details-marker{display:none}
 details.ref>summary::before{content:"▸";font-size:10px;transition:transform .15s}
 details.ref[open]>summary::before{transform:rotate(90deg)}
 details.ref.card>summary{font-size:14px;font-weight:600;color:var(--ink-2)}
-@media print{.ref,.top,.rep-nav,.btn,.deep,.linkbtn,.cta .tel button,.toast{display:none!important}body{background:#fff}.card,.phase,tr{break-inside:avoid}}
+details.fold>summary{cursor:pointer;font-size:12.5px;color:var(--ink-3);list-style:none;display:inline-flex;align-items:center;gap:6px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::before{content:"▸";font-size:10px;transition:transform .15s}
+details.fold[open]>summary::before{transform:rotate(90deg)}
+@media print{.ref,.top,.rep-nav,.btn,.deep,.linkbtn,.cta .tel button,.toast{display:none!important}body{background:#fff}.card,.phase,tr{break-inside:avoid}details.fold>summary{display:none}}
 .fade{animation:fade .25s ease}
 @keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}.bar i{transition:none}}
@@ -901,7 +905,7 @@ function rResult(){
     <section class="card" style="display:flex;flex-direction:column;gap:12px">
       <p style="margin:0;font-size:14px;line-height:1.75;color:var(--ink-2)">본 진단은 국내 K-ESG 가이드라인 v2.0과 공급망 대응 K-ESG 가이드라인, EFRAG VSME, IFRS S1·S2, GHG Protocol, GRI, OECD·UN·ILO 원칙, ISO 14001/45001/26000/37001, EU CBAM 등 <b>공개된 방법론과 평가 철학을 교차 참조</b>해 설계했어요. 특정 평가기관의 문항·점수 알고리즘·등급 체계를 복제하지 않아요.
       모든 점수는 응답에 대한 <b>고정된 계산식(deterministic)</b>으로 산출되며, AI가 점수를 임의로 정하지 않아요.</p>
-      <details class="ref fold"><summary>산출 방식 보기 · 7개 구성 요소</summary>
+      <details class="fold"><summary>산출 방식 보기 · 7개 구성 요소</summary>
       <div class="tbl" style="margin-top:10px"><table style="min-width:520px"><thead><tr><th>구성 요소</th><th>산출 방식</th></tr></thead><tbody>
         <tr><td>문항 점수</td><td>행동기반 4단계 보기 · 미흡 0 / 초기 33 / 관리 67 / 체계 100 · 잘 모르겠어요 20 · 해당 없음은 제외</td></tr>
         <tr><td>영역·종합 점수</td><td>영역 내 문항 평균 → 업종별 중대성 가중치(${esc(S.p.industry)}: ${R.w.join('/')})로 가중 평균</td></tr>
@@ -954,6 +958,9 @@ document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{
   if(sc==='result'&&!Object.keys(S.a).length) loadSample();
   go(sc);
 });
+/* 인쇄: 접힌 산출 방식표(.fold)는 펼쳐서 인쇄하고, 끝나면 원래 상태로 */
+window.addEventListener('beforeprint',()=>document.querySelectorAll('details.fold').forEach(d=>{ d.dataset.wasOpen=d.open?'1':''; d.open=true; }));
+window.addEventListener('afterprint',()=>document.querySelectorAll('details.fold').forEach(d=>{ d.open=d.dataset.wasOpen==='1'; }));
 render();
 })();
 </script>
