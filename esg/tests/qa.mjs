@@ -94,8 +94,7 @@ const bodyText = (page) => page.locator('body').innerText();
   const evc = await page.evaluate(() => { const R = ESG.analyze(), E = ESG.RULES.EV, want = R.evidence >= E.high ? 'good' : R.evidence >= E.mid ? 'warn' : 'bad'; return document.querySelector('.kpis .kpi:nth-child(2) b').getAttribute('style').includes(`--${want}`); });
   check('증빙 신뢰도 색 = 해석 문장 기준(RULES.EV)', evc);
   check('리스크 등급 = 등급 규칙', g);
-  const tools = await page.$$eval('.tool', (as) => as.map((a) => a.href));
-  check('추천 후속 진단 2~4개 · BECONIC 도메인', tools.length >= 2 && tools.length <= 4 && tools.every((h) => /beconic-(diagnosis|grant)/.test(h)), String(tools.length));
+  check('리포트에 추천 후속 진단 섹션 없음', !(await page.$('.tools')) && !(await bodyText(page)).includes('추천 후속'));
   await page.screenshot({ path: path.join(OUT, 'report-desktop.png'), fullPage: true });
   // 이어하기: 새로고침 후 저장값
   await page.reload();
