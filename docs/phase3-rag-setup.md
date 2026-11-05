@@ -49,7 +49,7 @@
 | DB 키 거부(HTTP 401/403) | 서버 키가 다른 프로젝트 것이거나 폐기됨 | 같은 프로젝트의 service_role(또는 sb_secret_) 키로 교체 |
 
 **새 프로젝트로 옮기기**(2026-11 사례: 원문 DB 프로젝트가 사라지고 `beconic-core-prod`만 남음)
-1. 새 프로젝트 SQL Editor에서 `supabase/migrations/20261003000000_roadmap_kb.sql` 실행(기존 테이블은 건드리지 않고 `roadmap_chunks`·검색 함수만 추가, 브라우저 키로는 읽을 수 없음).
+1. 새 프로젝트 SQL Editor에서 `supabase/migrations/` 의 `20261003000000_roadmap_kb.sql` → `20261105000000_roadmap_kb_search_path.sql` 순서로 실행(기존 테이블은 건드리지 않고 `roadmap_chunks`·검색 함수만 추가, 브라우저 키로는 읽을 수 없음).
 2. Netlify 환경변수 `SUPABASE_URL`(Project URL)·`SUPABASE_SERVICE_ROLE_KEY`(서버 키)를 새 프로젝트 값으로 교체 → 재배포.
 3. KB 저장소(beconic-roadmap-kb) GitHub Secrets의 `SUPABASE_URL`·`SUPABASE_SERVICE_ROLE_KEY`를 같은 값으로 교체 → Actions '로드맵 원문 임베딩 적재'를 **처음부터 다시**로 실행(문단 3,520개·의미 검색 임베딩).
 4. `/api/health?refresh`에서 '원문 근거'가 초록(정상)인지 확인.
