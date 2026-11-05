@@ -355,6 +355,13 @@ footer.site{border-top:0;background:transparent}
   .phase li,.act,.domrow,.qline,.icard,.kpis,.flag,.qw{break-inside:avoid}
   #s1 .card{break-inside:auto}                                 /* '이번 주 3가지'는 과제 단위로 나눔 → 빈 쪽 감소 */
   .heat,.stack,.legend,svg{break-inside:avoid}
+  /* Phase 카드: 색 줄을 제목에 붙이고, 제목·목표·예상 점수·첫 과제를 한 쪽에 묶어 '머리만 남는' 현상 방지 */
+  .phase{padding-top:0;border-top:0!important}
+  .phase>h3{margin:0 -24px;padding:18px 24px 0;border-top:4px solid var(--primary-line);border-radius:var(--r) var(--r) 0 0}
+  .phase.p1>h3{border-top-color:var(--bad)} .phase.p2>h3{border-top-color:var(--warn)} .phase.p3>h3{border-top-color:var(--accent)} .phase.p4>h3{border-top-color:var(--good)}
+  .phase>h3,.phase>.goal,.phase>div{break-after:avoid;page-break-after:avoid}
+  .phase>ul,.phase li:first-child{break-before:avoid;page-break-before:avoid}
+  .cta{break-before:avoid}
 }
 .fade{animation:fade .25s ease}
 @keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -384,7 +391,7 @@ footer.site{border-top:0;background:transparent}
 <script>
 (function(){
 /* ================= 운영 설정 (여기서만 수정) ================= */
-const APP_VERSION='v2.2.1', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
+const APP_VERSION='v2.2.2', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
 const APP_NAME='ESG 경영준비도 진단';
 const SITE='https://beconic-diagnosis-esg.netlify.app/';   // <head> og:url·og:image 와 같아야 함 (QA 검사)
 const COMPANY={name:'그로스벤처스 주식회사',brand:'BECONIC',tel:'02-6124-5960',mail:'start@gven.kr',web:'www.beconic.kr',
