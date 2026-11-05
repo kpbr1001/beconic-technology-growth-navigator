@@ -205,6 +205,12 @@ td .sub{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
 .cta .tel button{border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:6px 10px;font-size:13px}
 .disc{font-size:12px;color:var(--ink-3);line-height:1.6}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13.5px;max-width:calc(100% - 32px);z-index:20}
+details.ref>summary{cursor:pointer;font-size:12.5px;color:var(--ink-3);list-style:none;display:inline-flex;align-items:center;gap:6px}
+details.ref>summary::-webkit-details-marker{display:none}
+details.ref>summary::before{content:"▸";font-size:10px;transition:transform .15s}
+details.ref[open]>summary::before{transform:rotate(90deg)}
+details.ref.card>summary{font-size:14px;font-weight:600;color:var(--ink-2)}
+@media print{.ref,.ref-line,.top,.rep-nav,.btn,.deep,.linkbtn,.cta .tel button,.toast{display:none!important}body{background:#fff}.card,.phase,tr{break-inside:avoid}}
 .fade{animation:fade .25s ease}
 @keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}.bar i{transition:none}}
@@ -605,7 +611,7 @@ function rQuiz(){
   <section class="card" style="display:flex;flex-direction:column;gap:14px">
     <h2 class="qtitle">${esc(q.q)}</h2>
     <div class="help">${esc(q.h)}</div>
-    <div class="tiny">참조 기준 · ${esc(q.r.join(' · '))}</div>
+    <details class="ref"><summary>참조 기준</summary><div class="tiny" style="margin-top:4px">${esc(q.r.join(' · '))}</div></details>
     <div class="opts" role="group" aria-label="우리 회사 모습">
       ${q.o.map((t,i)=>`<button type="button" class="opt" data-v="${i}" aria-pressed="${a.v===i}">
         <span class="ladder" aria-hidden="true">${[0,1,2,3].map(j=>`<s class="${j<=i?'on':''}"></s>`).join('')}</span><span>${esc(t)}</span></button>`).join('')}
@@ -756,7 +762,7 @@ function rResult(){
     <div></div>${['낮음','중간','높음'].map(x=>`<div class="ax">가능성 ${x}</div>`).join('')}</div>`;
   const riskRows=R.risks.map(r=>{ const wa=A[r.wq]; const ph=R.phaseOf[r.wq];
     return `<tr><td><span class="pill ${r.grade==='높음'?'p-bad':r.grade==='중간'?'p-warn':'p-good'}">${r.grade}</span></td>
-      <td><b>${r.id} ${esc(r.n)}</b><span class="sub">${esc(r.d)}</span><span class="sub">근거: ${esc(r.ref)}</span></td>
+      <td><b>${r.id} ${esc(r.n)}</b><span class="sub">${esc(r.d)}</span><span class="sub ref-line">근거: ${esc(r.ref)}</span></td>
       <td>${esc(QI[r.wq].s)}<span class="sub">지금: ${esc(wa.v==='u'?'현재 상태 모름':QI[r.wq].o[wa.v])}</span></td>
       <td>${r.area}</td><td class="num">${r.L}×${r.I}=${r.S}</td>
       <td>${esc(r.m)}<span class="sub">${ph!=null?PHASES[ph].t.split(' · ')[0]+' · '+PHASES[ph].when:''}</span></td></tr>`; }).join('');
@@ -894,14 +900,16 @@ function rResult(){
         <tr><td>로드맵·점수 전망</td><td>관리 미만 과제를 리스크·노출 순으로 Phase 1·2에, 체계 전환 과제를 Phase 3·4에 배치 · 완료 가정 시 같은 계산식으로 재산출</td></tr>
         <tr><td>참고 탄소량</td><td>월 kWh × 12 × 배출계수 ${EF} tCO₂e/MWh · 요금 추정은 실효단가(갑 ${PRICE.gap} / 을 ${PRICE.eul}원/kWh)로 역산</td></tr>
       </tbody></table></div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px">${REFS.map(r=>`<span class="tag" title="${esc(r[1])}">${esc(r[0])}</span>`).join('')}</div>
     </section>
+    <details class="ref card"><summary>참조 기준 보기 · 문항별 기준과 기준·자료 ${REFS.length}종</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${REFS.map(r=>`<span class="tag" title="${esc(r[1])}">${esc(r[0])}</span>`).join('')}</div>
     <div class="tbl"><table><thead><tr><th>문항</th><th>영역</th><th>참조 기준</th></tr></thead><tbody>
       ${Q.filter(q=>q.kind||A[q.id]).map(q=>`<tr><td><b>${q.kind?'K1 전기 사용량':q.id+' '+esc(q.s)}</b></td><td>${DSHORT[q.d]}</td><td>${esc(q.r.join(' · '))}</td></tr>`).join('')}
     </tbody></table></div>
     <div class="tbl"><table><thead><tr><th>기준·자료</th><th>발행</th><th>구분</th></tr></thead><tbody>
       ${REFS.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${r[2]}</td></tr>`).join('')}
     </tbody></table></div>
+    </div></details>
   </div>
 
   ${R.deep.length?`<section class="card" style="display:flex;flex-direction:column;gap:8px">
