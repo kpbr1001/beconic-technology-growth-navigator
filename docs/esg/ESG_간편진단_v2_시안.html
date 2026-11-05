@@ -338,7 +338,7 @@ const TRIG_LABEL={Customer:'원청·고객사 ESG 요구',Export:'수출·탄소
 const TRIG_DOM={Customer:['E','F'],Export:['B','E'],Env:['B','C'],Social:['C'],Funding:['A','D'],Data:['C','D']};
 /* 리스크 라이브러리: 관련 문항 중 가장 낮은 응답이 '초기' 이하이면 활성. 가능성(L)=응답 수준+노출 신호, 영향(I)=리스크 고유값 */
 const RISKS=[
- {id:'R1',n:'중대재해·산업재해',q:['C2','C3','X4'],i:3,trig:'Social',area:'법적·운영',d:'사고 1건이 형사처벌·작업중지·거래중단으로 번질 수 있어요.',m:'위험성평가와 아차사고 기록부터 시작해 예방 이력을 남기기'},
+ {id:'R1',n:'중대재해·산업재해',q:['C2','C3','X4'],i:3,trig:'Social',area:'법적·운영',d:'사고 1건이 작업중지·과태료·거래중단으로, 상시 5인 이상 사업장은 형사처벌까지 번질 수 있어요.',m:'위험성평가와 아차사고 기록부터 시작해 예방 이력을 남기기'},
  {id:'R2',n:'노동법 위반·노무 분쟁',q:['C1'],i:3,area:'법적',d:'근로계약서 미작성·근로시간 미기록은 과태료와 임금 분쟁의 직접 원인이에요.',m:'전 직원 근로계약서·근로시간 기록 점검'},
  {id:'R3',n:'원청 ESG 실사 대응 실패',q:['E2','F1'],i:3,trig:'Customer',area:'매출',d:'협력사 ESG 평가에서 자료를 못 내면 신규 수주 제외나 거래 축소로 이어질 수 있어요.',m:'자주 묻는 항목 답변·증빙 패키지 준비'},
  {id:'R4',n:'수출 탄소정보 요구 대응 불가',q:['X2','B1'],i:3,trig:'Export',need:'Export',area:'매출',d:'EU 등 수출 시 제품 탄소정보를 못 내면 통관 비용 증가나 거래 제한이 생길 수 있어요.',m:'대상 품목 확인 후 제품별 에너지·원재료 데이터 수집'},
@@ -351,7 +351,7 @@ const RISKS=[
  {id:'R11',n:'ESG 책임 공백',q:['A1','A2','A3'],i:2,area:'전략',d:'챙기는 사람이 없으면 다른 과제가 시작되지 않고, 외부 질의에 답할 창구도 없어요.',m:'담당자 1명 지정과 중요 이슈 1장 정리'},
  {id:'R12',n:'증빙 부재로 평가 감점',q:['F1','F2','F3'],i:2,area:'평판·평가',d:'실제로 하고 있어도 자료가 없으면 고객사·지원사업 평가에서 하지 않은 것으로 봐요.',m:'공유 폴더 하나에 자료 모으고 분기 업데이트'}
 ];
-const RREF={R1:'중대재해처벌법 · 산업안전보건법',R2:'근로기준법',R3:'공급망 대응 K-ESG',R4:'EU CBAM',R5:'IFRS S2 · GHG Protocol',R6:'대기·물환경·폐기물 관련 법령',
+const RREF={R1:'산업안전보건법 · 중대재해처벌법(상시 5인 이상)',R2:'근로기준법',R3:'공급망 대응 K-ESG',R4:'EU CBAM',R5:'IFRS S2 · GHG Protocol',R6:'대기·물환경·폐기물 관련 법령',
  R7:'ISO 37001 · 청탁금지법',R8:'IFRS S1 거버넌스',R9:'개인정보 보호법',R10:'OECD 실사 지침 · 하도급법',R11:'K-ESG 환경·사회 목표',R12:'K-ESG 정보공시'};
 RISKS.forEach(r=>r.ref=RREF[r.id]);
 const PHASES=[
@@ -369,7 +369,7 @@ const YN=[['mfg','제조 사업장(공장·작업장)을 운영하나요?','환�
 const PRICE={eul:221.6,gap:168.1}; // 원/kWh 실효 단가 · 을=고압A 선택II(2026.4.16 개편) · 갑=갑I 고압A 선택II(2024.10.24 인상분)
 const CONTRACT=[['gap','소규모 · 300kW 미만(갑)'],['eul','대규모 · 300kW 이상(을)'],['auto','잘 모르겠어요']];
 const EF=0.4541;      // tCO2e/MWh, GIR 최신 승인 국가 전력 배출계수(CO2e·소비단, 2020~2022 평균)
-const ERR=0.3, DUE_DAYS=7;
+const ERR=0.3, DUE_DAYS=7, KWH_MAX=5000000;   // 월 500만 kWh 초과는 입력 오류로 간주
 const BILLS=[['50만 원 미만',300000],['50만~200만 원',1250000],['200만~500만 원',3500000],['500만~1,000만 원',7500000],['1,000만 원 이상',15000000]];
 const NONE=[['delegate','담당자에게 물어볼게요'],['later','나중에 입력할게요'],['guide','확인하는 방법 보기']];
 const DELEGATE_MSG='[BECONIC ESG 간편진단]\n대표님이 질문 1개를 부탁하셨어요.\n최근 한 달 전기 사용량(kWh)을 한전 고지서나 한전ON에서 확인해 아래 링크에 입력해 주세요.\n(입력 링크는 운영 버전에서 자동 생성)';
@@ -440,7 +440,8 @@ function analyze(){
   });
   const kd=k1Data(); evN++; evY+=kd.w;
   const evidence=evN?Math.round(evY/evN*100):0;
-  const valid=shown>0 && scored>=Math.ceil(shown*0.6);
+  const total=flow().filter(q=>!q.kind).length;   // 노출된 전체 문항 기준으로 유효성 판정 (일부만 응답한 리포트 방지)
+  const valid=shown>0 && scored>=Math.ceil(Math.max(shown,total)*0.6);
   // 노출도: 업종 가중치 + 노출 신호
   const expo={}, expoTags={};
   keys.forEach((k,i)=>{ expoTags[k]=Object.keys(TRIG_DOM).filter(tk=>t[tk]&&TRIG_DOM[tk].includes(k)); expo[k]=Math.min(100,Math.round(C.w[i]*2.5+15*expoTags[k].length)); });
@@ -462,19 +463,23 @@ function analyze(){
     if(cur<3) adv.push({q,a,to:3,pr:ex+(rs[id]||0)*5});
   });
   base.sort((x,y)=>y.pr-x.pr); adv.sort((x,y)=>y.pr-x.pr);
-  const P=[[],[],[],[]];
-  base.forEach((it,i)=>P[i<4?0:1].push(it));
-  const later=[]; adv.forEach((it,i)=>(i<4?P[2]:i<8?P[3]:later).push(it));   // 12개월 안 현실적 범위: Phase3·4 각 4개
-  const phaseOf={}; P.forEach((p,pi)=>p.forEach(it=>{ if(it.to===2||phaseOf[it.q.id]==null) phaseOf[it.q.id]=pi; }));
-  base.forEach(it=>phaseOf[it.q.id]=P[0].includes(it)?0:1);
+  // 중소기업 실행 용량 반영: Phase별 최대 과제 수 4/6/6/5, Phase 1·2는 '관리' 도달 과제만, 넘치는 과제는 다음 Phase → 12개월 이후
+  const CAPS=[4,6,6,5], P=[[],[],[],[]], later=[]; let pi=0;
+  for(const it of [...base,...adv]){
+    while(pi<4&&(P[pi].length>=CAPS[pi]||(it.to===3&&pi<2))) pi++;
+    (pi<4?P[pi]:later).push(it);
+  }
+  const phaseOf={}; P.forEach((p,i)=>p.forEach(it=>{ if(phaseOf[it.q.id]==null) phaseOf[it.q.id]=i; }));
   const proj=[C.overall]; let cur={...A};
   P.forEach(p=>{ p.forEach(it=>cur[it.q.id]={v:it.to}); proj.push(core(cur).overall); });
-  const projDom=core(cur).dom, d3=core((()=>{ let c={...A}; P[0].concat(P[1]).forEach(it=>c[it.q.id]={v:it.to}); return c; })()).dom;
+  const projDom=core(cur).dom;
   // 기타 지표
   const b1hi=!!(A.B1&&typeof A.B1.v==='number'&&A.B1.v>=2);
   const flags=[];
   if(b1hi&&kd.q==='미확보') flags.push(['증빙 확인 필요','사용량을 기록하고 있다고 답했는데 숫자는 아직 없어요. 고지서 숫자를 넣으면 결과가 확정돼요.']);
   if(A.F1&&A.F1.v===0&&dCount>=3) flags.push(['자료 확인 필요','잘하고 있다고 답한 항목이 많은데 자료를 모아둔 곳이 없어요. 고객사 실사에서는 자료가 없으면 안 한 것으로 봐요.']);
+  const missing=flow().filter(q=>!q.kind&&!S.a[q.id]).length;
+  if(missing) flags.unshift(['미응답 '+missing+'문항','응답하지 않은 문항은 빼고 계산했어요. 마저 응답하면 리스크와 로드맵이 더 정확해져요.']);
   if(unk>=3) flags.push(['담당자 확인 권장',`'잘 모르겠어요'가 ${unk}개예요. 실무 담당자와 함께 다시 응답하면 결과가 더 정확해져요.`]);
   const CM=b1hi?{'실측':['기초 데이터 확보','good'],'추정':['일부 확보','warn'],'미확보':['확인 필요','warn']}
                :{'실측':['일부 확보','warn'],'추정':['추정 가능','warn'],'미확보':['준비 필요','bad']};
@@ -482,7 +487,7 @@ function analyze(){
   const tco2=kd.kwh?kd.kwh*12*EF/1000:null;
   const provisional=kd.q==='미확보'&&['later','delegate'].includes(S.k1.none);
   const deep=keys.filter(k=>C.dom[k]!=null&&C.dom[k]<50);
-  return {...C,A,t,evidence,valid,expo,expoTags,risks,P,later,phaseOf,proj,projDom,d3,flags,carbon,carbonTone,tco2,provisional,kd,deep,unk};
+  return {...C,A,t,evidence,valid,expo,expoTags,risks,P,later,phaseOf,proj,projDom,flags,carbon,carbonTone,tco2,provisional,kd,deep,unk};
 }
 
 /* ================= 공통 ================= */
@@ -495,8 +500,6 @@ function copyText(t,ok){ try{ navigator.clipboard.writeText(t).then(()=>toast(ok
 function profileOk(){ const p=S.p; return p.industry&&p.size&&YN.every(([k])=>p[k]); }
 const tone=v=>v>=70?'good':v>=40?'warn':'bad';
 const toneTxt={good:'양호',warn:'보완',bad:'우선'};
-const ansTxt=a=>!a?'미응답':a.v==='u'?'현재 상태 모름':a.v==='na'?'해당 없음':QI_TXT(a);
-function QI_TXT(a){ return a._q?a._q.o[a.v]:''; }
 
 function render(){
   document.querySelectorAll('[data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===S.screen?'step':'false'));
@@ -579,10 +582,10 @@ function rQuiz(){
     rQuiz._key=null;
     const k=S.k1;
     const modes=[['exact','고지서 숫자 그대로 알아요','실측'],['bill','숫자는 모르지만 요금은 대충 알아요','추정'],['none','지금은 모르겠어요','미확보']];
-    const okK1=()=>(k.mode==='exact'&&+k.kwh>0)||(k.mode==='bill'&&k.bill>=0)||(k.mode==='none'&&!!k.none);
+    const okK1=()=>(k.mode==='exact'&&+k.kwh>0&&+k.kwh<=KWH_MAX)||(k.mode==='bill'&&k.bill>=0)||(k.mode==='none'&&!!k.none);
     let panel='';
     if(k.mode==='exact') panel=`<div class="kwh field"><input id="kwh" type="number" inputmode="numeric" min="0" placeholder="예: 3200" value="${esc(k.kwh)}" aria-label="전기 사용량 kWh"><span>kWh</span></div>
-      <div class="tiny">한전 고지서의 '당월 사용량' 칸 숫자예요.</div>`;
+      <div class="tiny">한전 고지서의 '당월 사용량' 칸 숫자예요. 월 ${KWH_MAX.toLocaleString()} kWh 이하로 입력해 주세요.</div>`;
     if(k.mode==='bill') panel=`<div style="font-weight:600;font-size:14px">한 달 전기요금은 대략 얼마인가요?</div>
       <div class="chips">${BILLS.map((b,i)=>`<button type="button" class="chip" data-bill="${i}" aria-pressed="${k.bill===i}">${b[0]}</button>`).join('')}</div>
       <div style="font-weight:600;font-size:14px;margin-top:4px">전기 계약은 어떤 종류인가요?</div>
@@ -653,18 +656,18 @@ function radarSVG(dom,proj){
   const axes=ks.map((k,i)=>{ const [x,y]=pt(i,100); return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" style="stroke:var(--line)"/>`; }).join('');
   const labels=ks.map((k,i)=>{ const [x,y]=pt(i,116); const c=Math.cos((-90+60*i)*Math.PI/180);
     const anc=c>0.3?'start':c<-0.3?'end':'middle'; const dy=y<cy-60?-2:y>cy+60?10:4;
-    return `<text x="${x}" y="${y+dy}" text-anchor="${anc}" class="lbl-b">${DSHORT[k]}</text><text x="${x}" y="${y+dy+14}" text-anchor="${anc}">${dom[k]} → ${proj[k]}</text>`; }).join('');
+    return `<text x="${x}" y="${y+dy}" text-anchor="${anc}" class="lbl-b">${DSHORT[k]}</text><text x="${x}" y="${y+dy+14}" text-anchor="${anc}">${dom[k]==null?'해당 없음':dom[k]+' → '+proj[k]}</text>`; }).join('');
   return `<svg class="chart radar" viewBox="0 0 400 345" style="max-width:460px;margin:0 auto" role="img" aria-label="6개 영역 현재 점수와 12개월 목표 레이더 차트">
     ${rings}${axes}
     <polygon points="${poly(proj)}" style="fill:var(--good);fill-opacity:.08;stroke:var(--good);stroke-width:2;stroke-dasharray:5 4"/>
     <polygon points="${poly(dom)}" style="fill:var(--primary);fill-opacity:.18;stroke:var(--primary);stroke-width:2.5"/>
-    ${ks.map((k,i)=>{ const [x,y]=pt(i,dom[k]||0); return `<circle cx="${x}" cy="${y}" r="3.5" style="fill:var(--primary)"/>`; }).join('')}
+    ${ks.filter(k=>dom[k]!=null).map(k=>{ const i=ks.indexOf(k); const [x,y]=pt(i,dom[k]); return `<circle cx="${x}" cy="${y}" r="3.5" style="fill:var(--primary)"/>`; }).join('')}
     <text x="${cx+4}" y="${cy-R*0.5-3}" style="font-size:9px;fill:var(--ink-3)">50</text>
     ${labels}</svg>`;
 }
 function matrixSVG(dom,expo){
   const x0=48,x1=348,y0=12,y1=252, X=v=>x0+(x1-x0)*v/100, Y=v=>y1-(y1-y0)*v/100, mx=X(50), my=Y(50);
-  const ks=Object.keys(DOMS);
+  const ks=Object.keys(DOMS).filter(k=>dom[k]!=null);
   const pts=ks.map(k=>({k,x:X(dom[k]),y:Y(expo[k])}));
   pts.sort((a,b)=>a.y-b.y).forEach((p,i)=>pts.slice(0,i).forEach(q=>{ if(Math.abs(p.x-q.x)<80&&Math.abs(p.y-q.y)<20) p.y=q.y+20; }));
   return `<svg class="chart" viewBox="0 0 360 290" role="img" aria-label="외부 요구 노출과 준비도 매트릭스">
@@ -708,8 +711,10 @@ function rResult(){
     document.getElementById('redo').onclick=()=>{ S.idx=0; go('quiz'); }; return;
   }
   const ks=Object.keys(DOMS), name=S.p.company||'우리 회사';
-  const A=R.A; Object.entries(A).forEach(([id,a])=>a._q=QI[id]);
-  const sorted=ks.filter(k=>R.dom[k]!=null).sort((a,b)=>R.dom[a]-R.dom[b]);
+  const A=R.A;
+  const ksv=ks.filter(k=>R.dom[k]!=null);   // 해당 없음 영역(예: 1인 기업의 사람·안전) 제외
+  const sorted=ksv.slice().sort((a,b)=>R.dom[a]-R.dom[b]);
+  const spread=R.dom[sorted[sorted.length-1]]-R.dom[sorted[0]];
   const weak=sorted.slice(0,2), strong=sorted[sorted.length-1];
   const hiRisk=R.risks.filter(r=>r.grade==='높음');
   const lvl12=LEVELS.reduce((acc,l,i)=>R.proj[4]>=l[0]?i:acc,0);
@@ -719,9 +724,9 @@ function rResult(){
 
   /* 01 요약 */
   const summary=`<b>${esc(name)}</b>의 ESG 실행 준비도는 <b>${R.overall}점(Level ${R.level+1} · ${LEVELS[R.level][1]})</b>이에요.
-    6개 영역 중 가장 앞선 곳은 <b>${DOMS[strong]}</b>(${R.dom[strong]}점), 가장 취약한 곳은 <b>${DOMS[weak[0]]}</b>(${R.dom[weak[0]]}점)·<b>${DOMS[weak[1]]}</b>(${R.dom[weak[1]]}점)이에요.
-    ${expoOn.length?`${expoOn.join('·')} 신호가 있어 외부 요구에 노출된 상태이고, `:''}${R.risks.length?`특히 <b>'${R.risks[0].n}'</b> 리스크를 가장 먼저 관리해야 해요(높음 ${hiRisk.length}건 · 전체 ${R.risks.length}건).`:'두드러진 리스크는 없어요.'}
-    증빙 신뢰도는 ${R.evidence}점으로 ${evTxt}. 제안 로드맵대로 실행하면 <b>12개월 후 약 ${R.proj[4]}점(Level ${lvl12+1} · ${LEVELS[lvl12][1]})</b>까지 올라갈 수 있어요.`;
+    ${spread<10?`${ksv.length}개 영역 점수가 고르게 분포해 있어요(최고·최저 차이 ${spread}점).`:`${ksv.length}개 영역 중 가장 앞선 곳은 <b>${DOMS[strong]}</b>(${R.dom[strong]}점), 가장 취약한 곳은 <b>${DOMS[weak[0]]}</b>(${R.dom[weak[0]]}점)${weak[1]&&R.dom[weak[1]]<R.dom[strong]-9?`·<b>${DOMS[weak[1]]}</b>(${R.dom[weak[1]]}점)`:''}이에요.`}
+    ${expoOn.length?`${expoOn.join('·')} 신호가 있어 외부 요구에 노출된 상태이고, `:''}${hiRisk.length?`특히 <b>'${hiRisk[0].n}'</b> 리스크를 가장 먼저 관리해야 해요(높음 ${hiRisk.length}건 · 전체 ${R.risks.length}건).`:R.risks.length?`높음 등급 리스크는 없고, 중간 이하 리스크 ${R.risks.length}건을 로드맵에 따라 단계적으로 관리하면 돼요.`:'두드러진 리스크는 없어요.'}
+    증빙 신뢰도는 ${R.evidence}점으로 ${evTxt}. ${R.proj[4]>R.overall?`제안 로드맵을 계획대로 실행하면 <b>12개월 후 약 ${R.proj[4]}점(Level ${lvl12+1} · ${LEVELS[lvl12][1]})</b>까지 올라갈 수 있어요.`:`지금 수준을 유지하면서 외부 검증·인증으로 대외 신뢰도를 높이는 단계예요.`}`;
   const top3=R.P[0].slice(0,3).map((it,i)=>`<div class="act"><span class="n num">${i+1}</span><div><div class="tiny" style="font-weight:600;color:var(--primary)">목표 모습</div><h3>${esc(it.q.o[it.to])}</h3>
       <div class="from">지금: ${esc(it.a.v==='u'?'현재 상태 모름':it.q.o[it.a.v])}</div>
       <div class="tags" style="margin-top:6px"><span class="tag">${DOMS[it.q.d]}</span><span class="tag">담당 ${OWNER[it.q.d]}</span><span class="tag">산출물: ${esc(it.q.doc)}</span></div></div></div>`).join('');
@@ -734,19 +739,19 @@ function rResult(){
 
   /* 03 매트릭스 해석 */
   const quad=k=>R.expo[k]>=50?(R.dom[k]<50?'즉시 대응':'강점 · 대외 활용'):(R.dom[k]<50?'기본 정비':'현 수준 유지');
-  const urgent=ks.filter(k=>quad(k)==='즉시 대응');
+  const urgent=ksv.filter(k=>quad(k)==='즉시 대응');
   const quadTbl=`<div class="tbl"><table><thead><tr><th>영역</th><th>준비도</th><th>외부 노출</th><th>구분</th><th>노출 원인</th></tr></thead><tbody>
-    ${ks.map(k=>`<tr><td><b>${k}</b> ${DSHORT[k]}</td><td class="num">${R.dom[k]}</td><td class="num">${R.expo[k]}</td><td><span class="pill ${quad(k)==='즉시 대응'?'p-bad':quad(k)==='기본 정비'?'p-warn':'p-good'}">${quad(k)}</span></td>
+    ${ksv.map(k=>`<tr><td><b>${k}</b> ${DSHORT[k]}</td><td class="num">${R.dom[k]}</td><td class="num">${R.expo[k]}</td><td><span class="pill ${quad(k)==='즉시 대응'?'p-bad':quad(k)==='기본 정비'?'p-warn':'p-good'}">${quad(k)}</span></td>
       <td>${R.expoTags[k].length?R.expoTags[k].map(x=>TRIG_LABEL[x]).join(', '):'업종 가중치 기준'}</td></tr>`).join('')}</tbody></table></div>`;
 
   /* 04 영역별 해석 */
-  const interp=ks.map(k=>{
+  const interp=ksv.map(k=>{
     const v=R.dom[k], t=tone(v);
     const qs=Object.entries(A).filter(([id,a])=>QI[id].d===k);
     const num=qs.filter(([,a])=>typeof a.v==='number'||a.v==='u').map(([id,a])=>({q:QI[id],v:a.v==='u'?0.5:a.v,a}));
     const best=num.slice().sort((x,y)=>y.v-x.v)[0], worst=num.slice().sort((x,y)=>x.v-y.v)[0];
     let txt=t==='good'?`운영 체계가 갖춰진 강점 영역이에요. 지금 자료를 외부 제출용으로 정리하면 고객사·지원사업 평가에 바로 쓸 수 있어요.`
-      :t==='warn'?`기본 활동은 있지만 기록과 체계가 부족해요. '${best?best.q.s:''}' 항목은 앞서 있고, '${worst?worst.q.s:''}' 항목을 먼저 끌어올려야 해요.`
+      :t==='warn'?(best&&worst&&best.v>worst.v?`기본 활동은 있지만 기록과 체계가 부족해요. '${best.q.s}' 항목은 앞서 있고, '${worst.q.s}' 항목을 먼저 끌어올려야 해요.`:`기본 활동은 있지만 기록과 체계가 부족해요. 문항 수준이 비슷해서 증빙이 필요한 항목부터 '관리' 수준으로 올리는 게 효과적이에요.`)
       :`아직 관리가 시작되지 않은 영역이에요. '${worst?worst.q.s:''}' 항목부터 기록이 남는 수준으로 바꾸는 게 가장 빠른 개선이에요.`;
     if(R.expo[k]>=60) txt+=` ${R.expoTags[k].length?R.expoTags[k].map(x=>TRIG_LABEL[x]).join('·')+' 때문에 ':''}외부 요구가 큰 영역이라 우선순위가 높아요.`;
     const lines=qs.map(([id,a])=>{ const q=QI[id];
@@ -768,7 +773,7 @@ function rResult(){
       <td><b>${r.id} ${esc(r.n)}</b><span class="sub">${esc(r.d)}</span><span class="sub ref-line">근거: ${esc(r.ref)}</span></td>
       <td>${esc(QI[r.wq].s)}<span class="sub">지금: ${esc(wa.v==='u'?'현재 상태 모름':QI[r.wq].o[wa.v])}</span></td>
       <td>${r.area}</td><td class="num">${r.L}×${r.I}=${r.S}</td>
-      <td>${esc(r.m)}<span class="sub">${ph!=null?PHASES[ph].t.split(' · ')[0]+' · '+PHASES[ph].when:''}</span></td></tr>`; }).join('');
+      <td>${esc(r.m)}<span class="sub">${ph!=null?PHASES[ph].t.split(' · ')[0]+' · '+PHASES[ph].when:'12개월 이후'}</span></td></tr>`; }).join('');
 
   /* 06 준비 서류 */
   const docs=Object.entries(A).filter(([,a])=>a.v!=='na').map(([id,a])=>{ const q=QI[id];
@@ -779,7 +784,7 @@ function rResult(){
   const tot=docs.length;
   const stCls={보유:'p-good','보완 필요':'p-warn',미보유:'p-bad'};
   const docRows=docs.map(d=>`<tr><td>${d.q.d}. ${DSHORT[d.q.d]}</td><td><b>${esc(d.q.doc)}</b><span class="sub">관련 문항: ${esc(d.q.s)}</span></td>
-    <td><span class="pill ${stCls[d.st]}">${d.st}</span></td><td>${d.st==='보유'?'유지·최신화':d.ph!=null?PHASES[d.ph].when:'—'}</td></tr>`).join('');
+    <td><span class="pill ${stCls[d.st]}">${d.st}</span></td><td>${d.st==='보유'?'유지·최신화':d.ph!=null?PHASES[d.ph].when:'12개월 이후'}</td></tr>`).join('');
 
   /* 07 로드맵 */
   const qwItem=R.kd.q!=='실측'?`<li><b>최근 3개월 전기 고지서의 kWh를 표 한 장에 옮겨 적기</b><div class="meta"><span class="tag">환경·에너지</span><span class="tag">담당 총무·생산</span><span class="tag">10분 Quick Win</span></div></li>`:'';
@@ -834,7 +839,7 @@ function rResult(){
       <button class="btn" id="fixBtn">반영하고 확정하기</button></section>`:''}
     <section class="card"><div class="eyebrow" style="margin-bottom:6px">이번 주에 시작할 3가지</div>
       ${R.kd.q!=='실측'?`<div class="qw" style="margin-bottom:10px"><b class="num">10분</b><span><b>Quick Win</b> · 최근 3개월 전기 고지서의 kWh를 표 한 장에 옮겨 적기</span></div>`:''}
-      ${top3||'<p class="tiny">시급한 과제가 없어요. 로드맵의 Phase 3부터 진행하세요.</p>'}</section>
+      ${top3||`<p class="tiny">${R.P[2].length||R.P[3].length?'관리 수준 미만 과제가 없어요. 로드맵의 Phase 3부터 진행하세요.':'모든 문항이 체계 수준이에요. 정기 업데이트와 외부 검증으로 유지하세요.'}</p>`}</section>
   </div>
 
   <div class="rsec" id="s2">
@@ -881,7 +886,7 @@ function rResult(){
   <div class="rsec" id="s7">
     <h2 class="sh"><span>07</span>12개월 실행 로드맵</h2>
     <p class="lead">리스크가 크고 외부 노출이 높은 과제부터 배치했어요. 각 과제의 목표는 응답 보기의 다음 단계 모습 그대로라, 완료 여부를 바로 판단할 수 있어요.</p>
-    <section class="card two"><div style="max-width:380px;width:100%;justify-self:center">${projSVG(R.proj)}</div><div style="min-width:0">${projTbl}<p class="tiny" style="margin:8px 0 0">단계별 과제를 완료했을 때의 예상 점수예요. 점선은 준비도 Level 경계예요.${R.later.length?` 12개월 이후 지속 개선 과제 ${R.later.length}건(${R.later.map(it=>it.q.s).join(', ')})은 전망에서 제외했어요.`:''}</p></div></section>
+    <section class="card two"><div style="max-width:380px;width:100%;justify-self:center">${projSVG(R.proj)}</div><div style="min-width:0">${projTbl}<p class="tiny" style="margin:8px 0 0">단계별 과제를 계획대로 완료한다고 가정한 추정치이며 보장값이 아니에요. 점선은 준비도 Level 경계예요.${R.later.length?` 12개월 이후 지속 개선 과제 ${R.later.length}건(${R.later.map(it=>it.q.s).join(', ')})은 전망에서 제외했어요.`:''}</p></div></section>
     <div class="phases">${phases}</div>
     <section class="card" style="display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><b style="font-size:14.5px">참고 탄소량 · 전력(Scope 2)</b><span class="qtag">${kTag}</span></div>
@@ -902,7 +907,7 @@ function rResult(){
         <tr><td>증빙 신뢰도</td><td>증빙 판정 문항 중 '관리' 이상 비율 + 전기 사용량 데이터 품질(실측 1.0 · 추정 0.5 · 미확보 0)</td></tr>
         <tr><td>외부 요구 노출</td><td>업종 가중치 × 2.5 + 노출 신호(납품·수출·제조·투자·개인정보)당 15점, 최대 100</td></tr>
         <tr><td>리스크 등급</td><td>가능성(응답 수준 + 노출 신호, 1~3) × 영향도(리스크 고유값, 1~3) · 6 이상 높음 / 4~5 중간</td></tr>
-        <tr><td>로드맵·점수 전망</td><td>관리 미만 과제를 리스크·노출 순으로 Phase 1·2에, 체계 전환 과제를 Phase 3·4에 배치 · 완료 가정 시 같은 계산식으로 재산출</td></tr>
+        <tr><td>로드맵·점수 전망</td><td>관리 미만 과제를 리스크·노출 순으로 먼저, 체계 전환 과제를 나중에 배치 · Phase별 최대 4/6/6/5개(중소기업 실행 용량), 넘치면 12개월 이후 · 완료 가정 시 같은 계산식으로 재산출</td></tr>
         <tr><td>참고 탄소량</td><td>월 kWh × 12 × 배출계수 ${EF} tCO₂e/MWh · 요금 추정은 실효단가(갑 ${PRICE.gap} / 을 ${PRICE.eul}원/kWh)로 역산</td></tr>
       </tbody></table></div>
     </section>
@@ -934,7 +939,7 @@ function rResult(){
   app.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
   app.querySelectorAll('[data-deep]').forEach(b=>b.onclick=()=>toast(`시안: '${DOMS[b.dataset.deep]}' 심화 질문으로 연결될 자리예요`));
   const fb=document.getElementById('fixBtn');
-  if(fb) fb.onclick=()=>{ const v=+document.getElementById('fixKwh').value; if(!(v>0)){ toast('kWh 숫자를 넣어 주세요'); return; }
+  if(fb) fb.onclick=()=>{ const v=+document.getElementById('fixKwh').value; if(!(v>0)||v>KWH_MAX){ toast(`kWh는 1~${KWH_MAX.toLocaleString()} 사이 숫자로 넣어 주세요`); return; }
     S.k1={mode:'exact',kwh:String(v),bill:-1,none:'',contract:'auto'}; rResult(); window.scrollTo({top:0}); toast('반영했어요. 리포트가 확정됐어요'); };
   document.getElementById('copy').onclick=()=>copyText('070-4103-4177','번호를 복사했어요');
   document.getElementById('edit').onclick=()=>{ S.idx=0; go('quiz'); };
