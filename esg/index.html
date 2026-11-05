@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ESG 경영준비도 진단 | BECONIC</title>
+<meta name="description" content="중소기업·스타트업용 ESG 경영준비도 자가진단. 18~24개 행동 기준 문항으로 준비도·리스크·준비 서류·12개월 로드맵을 공개 산식으로 제시합니다. 공식 ESG 등급이 아닌 참고용입니다.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ESG 경영준비도 진단 | BECONIC">
+<meta property="og:description" content="7분 진단으로 ESG 준비도, 리스크 히트맵, 준비 서류, 12개월 로드맵까지. 공식 등급이 아닌 실행 준비도 자가진단입니다.">
+<meta property="og:image" content="https://beconic-diagnosis-esg.netlify.app/og-esg.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ESG 경영준비도 진단 — BECONIC">
+<meta property="og:url" content="https://beconic-diagnosis-esg.netlify.app/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="logo-mark.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<style>
+/* Layout: 질문은 모바일 우선 단일 컬럼(560px), 결과는 컨설팅 리포트형(760px) 7개 섹션. 상단 고정 바(브랜드 + 화면 단계). */
+:root{
+  --bg:#f2f4f8; --surface:#ffffff; --surface-2:#f6f7fa; --line:#e1e5ed;
+  --ink:#1c2333; --ink-2:#4a5468; --ink-3:#7d869a;
+  --primary:#1b2a4a; --on-primary:#ffffff; --primary-soft:#e8edf6; --primary-line:#9fb1d3; --accent:#3a6fd8;
+  --good:#2f8f6b; --good-soft:#e5f3ec; --warn:#b97a14; --warn-soft:#fbf0dc; --bad:#c14b4b; --bad-soft:#f8e9e9;
+  --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --r:14px; --r-sm:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e1422; --surface:#161f33; --surface-2:#1b2640; --line:#2a3653;
+  --ink:#e8ecf4; --ink-2:#b5bdcd; --ink-3:#8791a7;
+  --primary:#a9c0f2; --on-primary:#0e1a33; --primary-soft:#22304f; --primary-line:#4c6496; --accent:#7fa6f5;
+  --good:#58c49a; --good-soft:#173329; --warn:#e3a846; --warn-soft:#3a2d14; --bad:#e58585; --bad-soft:#3a1d22;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0e1422; --surface:#161f33; --surface-2:#1b2640; --line:#2a3653;
+  --ink:#e8ecf4; --ink-2:#b5bdcd; --ink-3:#8791a7;
+  --primary:#a9c0f2; --on-primary:#0e1a33; --primary-soft:#22304f; --primary-line:#4c6496; --accent:#7fa6f5;
+  --good:#58c49a; --good-soft:#173329; --warn:#e3a846; --warn-soft:#3a2d14; --bad:#e58585; --bad-soft:#3a1d22;
+  color-scheme:dark }
+
+*{box-sizing:border-box}
+html,body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.num{font-variant-numeric:tabular-nums}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.top-in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand b{font-size:15px;letter-spacing:.06em;color:var(--primary)}
+.brand span{font-size:12px;color:var(--ink-3)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.steps button{border:0;background:transparent;padding:6px 2px 4px;font-size:12px;color:var(--ink-3);border-bottom:2px solid var(--line);text-align:center}
+.steps button[aria-current="step"]{color:var(--primary);border-color:var(--primary);font-weight:600}
+
+/* page */
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.wrap.wide{max-width:760px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-width:0}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--ink-3)}
+.muted{color:var(--ink-2)}
+.tiny{font-size:12.5px;color:var(--ink-3)}
+.btn{border:0;border-radius:12px;padding:14px 18px;font-weight:600;font-size:15.5px;background:var(--primary);color:var(--on-primary);width:100%}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--primary);border:1px solid var(--primary-line)}
+.linkbtn{border:0;background:none;color:var(--ink-2);font-size:14px;text-decoration:underline;text-underline-offset:3px;padding:6px 4px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1 1 160px}
+
+/* start */
+.hero h1{font-size:26px;line-height:1.3;font-weight:700;letter-spacing:-.01em}
+.hero p{margin:10px 0 0;color:var(--ink-2)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+.fact{background:var(--surface-2);border-radius:var(--r-sm);padding:12px 10px;text-align:center}
+.fact b{display:block;font-size:20px;color:var(--primary)}
+.fact span{font-size:12px;color:var(--ink-3)}
+.how{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.how li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.how i{font-style:normal;width:28px;height:28px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;font-weight:700;font-size:13px}
+.how b{display:block;font-size:14.5px}
+.how span{font-size:13px;color:var(--ink-2)}
+
+/* profile */
+.field{display:flex;flex-direction:column;gap:8px}
+.field>label,.field>.lab{font-weight:600;font-size:14.5px}
+.field input{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-sm);padding:12px;font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 13px;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--on-primary);font-weight:600}
+.yn{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.yn .chips{flex-wrap:nowrap}
+.yn small{display:block;color:var(--ink-3);font-size:12px;font-weight:400}
+
+/* quiz */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}
+.dom{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--primary);background:var(--primary-soft);padding:4px 10px;border-radius:999px}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--primary);border-radius:99px;transition:width .3s ease}
+.qtitle{font-size:21px;line-height:1.4;font-weight:700;letter-spacing:-.01em}
+.help{background:var(--surface-2);border-radius:var(--r-sm);padding:10px 12px;font-size:13.5px;color:var(--ink-2)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;text-align:left;width:100%;
+  border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:14px;font-size:15.5px;line-height:1.45;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--primary-line)}
+.opt[aria-pressed="true"]{border-color:var(--primary);background:var(--primary-soft);font-weight:600}
+.opt.mode{grid-template-columns:1fr auto}
+.ladder{display:flex;gap:2px;align-items:flex-end;height:20px}
+.ladder s{display:block;width:6px;border-radius:2px;background:var(--line)}
+.ladder s:nth-child(1){height:6px}.ladder s:nth-child(2){height:10px}.ladder s:nth-child(3){height:15px}.ladder s:nth-child(4){height:20px}
+.ladder s.on{background:var(--primary)}
+.qfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.kwh{display:flex;align-items:center;gap:8px}
+.kwh input{flex:1;min-width:0;font-size:22px;font-weight:600;text-align:right}
+.kwh span{font-weight:600;color:var(--ink-2)}
+.qtag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-3);white-space:nowrap}
+.panel{border-left:3px solid var(--primary-line);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:10px}
+.msg{background:var(--surface-2);border-radius:var(--r-sm);padding:12px;font-size:13.5px;white-space:pre-line}
+.guide{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
+
+/* report */
+.rep-nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.rep-nav button{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--ink-2)}
+.rsec{scroll-margin-top:120px;display:flex;flex-direction:column;gap:12px}
+.sh{display:flex;align-items:baseline;gap:10px;font-size:19px;font-weight:700;letter-spacing:-.01em;margin-top:10px}
+.sh span{font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.lead{margin:0;color:var(--ink-2);font-size:14px}
+.cover{display:grid;grid-template-columns:132px 1fr;gap:20px;align-items:center}
+.ring{position:relative;width:132px;height:132px}
+.ring svg{width:132px;height:132px;transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .v b{font-size:38px;line-height:1;font-weight:700}
+.ring .v small{display:block;font-size:11px;color:var(--ink-3);margin-top:2px}
+.lvl{display:inline-block;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:4px 10px;border-radius:999px;font-size:13px}
+.status{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px}
+.lvl-ladder{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:14px}
+.lvl-ladder div{font-size:10.5px;text-align:center;color:var(--ink-3);padding-top:6px;border-top:4px solid var(--line)}
+.lvl-ladder div.on{border-color:var(--primary);color:var(--primary);font-weight:700}
+.lvl-ladder div.goal{border-color:var(--good);color:var(--good)}
+.summary{font-size:15px;line-height:1.75;margin:0}
+.summary b{color:var(--primary)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px;min-width:0}
+.kpi b{display:block;font-size:22px;line-height:1.2}
+.kpi b.s{font-size:15px;padding:3px 0}
+.kpi span{font-size:12px;color:var(--ink-3)}
+.pill{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.p-good{color:var(--good);background:var(--good-soft)} .p-warn{color:var(--warn);background:var(--warn-soft)} .p-bad{color:var(--bad);background:var(--bad-soft)}
+.d-good{background:var(--good)} .d-warn{background:var(--warn)} .d-bad{background:var(--bad)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--ink-2);font-family:var(--font);font-size:12px}
+.chart .lbl-b{font-weight:700;fill:var(--ink)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.domrow{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:9px 0;border-top:1px solid var(--line)}
+.domrow:first-child{border-top:0;padding-top:0}
+.domrow .nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;min-width:0}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.domrow .bar{grid-column:1/-1;height:6px;position:relative;overflow:visible}
+.domrow .bar i.good{background:var(--good)} .domrow .bar i.warn{background:var(--warn)} .domrow .bar i.bad{background:var(--bad)}
+.domrow .bar em{position:absolute;top:-3px;width:2px;height:12px;background:var(--ink-3)}
+.interp{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.icard{display:flex;flex-direction:column;gap:10px}
+.icard h3{font-size:15.5px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.icard p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.tags{display:flex;gap:4px;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 7px;border-radius:6px;background:var(--surface-2);color:var(--ink-2)}
+.tag.hot{background:var(--bad-soft);color:var(--bad);font-weight:600}
+.qline{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;font-size:12.5px}
+.qline .cells{display:flex;gap:2px}
+.qline .cells i{width:14px;height:8px;border-radius:2px;background:var(--line)}
+.qline .cells i.on{background:var(--primary)}
+.qline .lv{width:44px;text-align:right;color:var(--ink-3)}
+.heat{display:grid;grid-template-columns:54px repeat(3,1fr);gap:4px;font-size:11.5px}
+.heat .ax{display:grid;place-items:center;color:var(--ink-3);text-align:center}
+.heat .cell{min-height:58px;border-radius:8px;padding:6px;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start}
+.heat .c1{background:var(--surface-2)} .heat .c2{background:var(--warn-soft)} .heat .c3{background:var(--bad-soft)}
+.heat .rk{font-size:11px;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--ink-3);font-weight:600;white-space:nowrap;background:var(--surface-2)}
+tr:last-child td{border-bottom:0}
+td .sub{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line)}
+.stack i{display:block;height:100%}
+.phases{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.phase{display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--primary-line)}
+.phase.p1{border-top-color:var(--bad)} .phase.p2{border-top-color:var(--warn)} .phase.p3{border-top-color:var(--accent)} .phase.p4{border-top-color:var(--good)}
+.phase h3{font-size:15px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.phase .goal{font-size:12.5px;color:var(--ink-2);margin:0}
+.phase ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.phase li{font-size:13.5px;line-height:1.5;padding-top:8px;border-top:1px solid var(--line)}
+.phase li:first-child{border-top:0;padding-top:0}
+.phase li .meta{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.act{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.act:first-child{border-top:0;padding-top:0}
+.act .n{width:30px;height:30px;border-radius:8px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:700}
+.act h3{font-size:15px;line-height:1.45}
+.act .from{font-size:12.5px;color:var(--ink-3);margin-top:3px}
+.flag{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;padding:10px 12px;border-radius:var(--r-sm);background:var(--warn-soft);color:var(--ink)}
+.flag b{color:var(--warn)}
+.qw{display:flex;gap:12px;align-items:center;background:var(--good-soft);border-radius:var(--r-sm);padding:12px 14px;font-size:14px}
+.qw>b{color:var(--good);font-size:16px;white-space:nowrap}
+.deep{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px dashed var(--primary-line);border-radius:var(--r-sm);padding:12px 14px;width:100%;background:transparent;text-align:left}
+.deep b{font-size:14.5px}
+.deep span{font-size:12.5px;color:var(--ink-3)}
+.cta{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.cta p{margin:6px 0 14px;opacity:.85;font-size:14px}
+.cta .tel{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cta .tel b{font-size:20px;letter-spacing:.02em;user-select:all}
+.cta .tel button{border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:6px 10px;font-size:13px}
+.disc{font-size:12px;color:var(--ink-3);line-height:1.6}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13.5px;max-width:calc(100% - 32px);z-index:20}
+.two.wide-l{grid-template-columns:1.3fr 1fr}
+@media (max-width:640px){.two.wide-l{grid-template-columns:1fr}}
+.radar text{font-size:13px}
+details.ref>summary{cursor:pointer;font-size:12.5px;color:var(--ink-3);list-style:none;display:inline-flex;align-items:center;gap:6px}
+details.ref>summary::-webkit-details-marker{display:none}
+details.ref>summary::before{content:"▸";font-size:10px;transition:transform .15s}
+details.ref[open]>summary::before{transform:rotate(90deg)}
+details.ref.card>summary{font-size:14px;font-weight:600;color:var(--ink-2)}
+details.fold>summary{cursor:pointer;font-size:12.5px;color:var(--ink-3);list-style:none;display:inline-flex;align-items:center;gap:6px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::before{content:"▸";font-size:10px;transition:transform .15s}
+details.fold[open]>summary::before{transform:rotate(90deg)}
+@media print{.ref,.top,.rep-nav,.btn,.deep,.linkbtn,.cta .tel button,.toast{display:none!important}body{background:#fff}.card,.phase,tr{break-inside:avoid}details.fold>summary{display:none}}
+.brand .logo{display:flex;align-items:center;gap:8px;min-width:0}
+.brand img{width:28px;height:28px;border-radius:6px;flex:none}
+.brand .t{display:flex;flex-direction:column;line-height:1.2}
+.homebtn{border:0;background:none;color:var(--ink-3);font-size:12.5px;padding:4px 0}
+footer.site{border-top:1px solid var(--line);background:var(--surface);color:var(--ink-3);font-size:12px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px calc(24px + env(safe-area-inset-bottom,0px))}
+footer.site .in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:4px}
+footer.site a{color:inherit}
+footer.site .fb{display:flex;align-items:center;gap:8px;color:var(--ink-2)}
+footer.site .fb img{width:22px;height:22px;border-radius:5px}
+.print-only{display:none}
+.ph{display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--primary);padding-bottom:10px;margin-bottom:6px}
+.ph img{width:36px;height:36px}
+.ph b{font-size:16px;color:var(--primary)}
+.modal{position:fixed;inset:0;background:rgba(10,16,30,.55);display:grid;place-items:center;z-index:30;padding:16px}
+.modal-box{background:var(--surface);color:var(--ink);border-radius:var(--r);padding:22px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:12px}
+.modal-box h2{font-size:18px}
+.resume{display:flex;flex-direction:column;gap:10px;border-color:var(--primary-line);background:var(--primary-soft)}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tool{display:block;border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;text-decoration:none;color:var(--ink);background:var(--surface)}
+.tool b{display:block;font-size:14.5px}
+.tool span{font-size:12.5px;color:var(--ink-2)}
+@media (max-width:640px){.tools{grid-template-columns:1fr}}
+@page{size:A4;margin:14mm 12mm}
+@media print{.print-only{display:block!important}.no-print{display:none!important}.sh,.lead{break-after:avoid;page-break-after:avoid}.rsec{break-before:auto}main{padding-block:0}.wrap.wide{max-width:none}.tool::after{content:" " attr(href);font-size:10px;color:#666}}
+.fade{animation:fade .25s ease}
+@keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fade{animation:none}.bar i{transition:none}}
+@media (max-width:640px){.two,.interp,.phases{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}}
+@media (max-width:420px){.cover{grid-template-columns:1fr;justify-items:center;text-align:center}.hero h1{font-size:23px}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><div class="logo"><img src="logo-mark.png" alt="" width="28" height="28"><div class="t"><b>BECONIC</b><span>ESG 경영준비도 진단</span></div></div><button class="homebtn" id="homeBtn">처음으로</button></div>
+    <nav class="steps" aria-label="화면 단계">
+      <button data-go="start">시작</button>
+      <button data-go="profile">기업정보</button>
+      <button data-go="quiz">질문</button>
+      <button data-go="result">결과 리포트</button>
+    </nav>
+  </div>
+</header>
+<main><div class="wrap" id="app"></div></main>
+<footer class="site"><div class="in" id="foot"></div></footer>
+<div class="modal no-print" id="modal" hidden><div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="mTitle" id="mBox"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+/* ================= 운영 설정 (여기서만 수정) ================= */
+const APP_VERSION='v2.0.0', APP_UPDATED='2026.11.05';
+const COMPANY={name:'그로스벤처스 주식회사',brand:'BECONIC',tel:'070-4103-4177',mail:'start@gven.kr',web:'www.beconic.kr',
+  addr:'서울시 구로구 디지털로27길 24, 209호',cert:'중소벤처기업부 공식 인증 중소기업상담회사 (제2025-684호)',copy:'© 2023~2026 Copyright ⓒ growthventures Co., Ltd. All rights reserved.'};
+const LS_KEY='beconic_esg_v2';   // v0.9(beconic_esg_poc_v1) 저장값은 문항 구조가 달라 읽지 않음
+const TOOLS={grants:['지원사업 MATCH','https://beconic-grant-matching.netlify.app'],hr:['HR Health Navigator','https://beconic-diagnosis-hr.netlify.app'],
+  finance:['기업 재무진단','https://beconic-diagnosis-finance.netlify.app'],ir:['IR 진단','https://beconic-diagnosis-ir.netlify.app'],
+  tech:['기업 기술진단','https://beconic-diagnosis-tech.netlify.app'],growth:['기업 성장활동 진단 내비게이터','https://beconic-diagnosis-business-growth.netlify.app']};
+/* ================= 데이터 (문항 마스터 xlsx와 동일) ================= */
+const DOMS={A:'ESG 전략·책임',B:'환경·에너지',C:'사람·안전',D:'윤리·투명경영',E:'거래처·고객 대응',F:'자료·기록'};
+const DSHORT={A:'전략·책임',B:'환경·에너지',C:'사람·안전',D:'윤리·투명',E:'거래처·고객',F:'자료·기록'};
+const OWNER={A:'대표',B:'총무·생산',C:'인사·안전',D:'경영지원',E:'영업·구매',F:'경영지원'};
+const LV_OPT=['미흡','초기','관리','체계'];
+const Q=[
+ {id:'A1',d:'A',ev:1,s:'ESG 책임자',doc:'ESG 담당자 지정 공지',q:'회사에서 ESG를 챙기는 사람이 정해져 있나요?',h:'대표님이 겸임하셔도 괜찮아요. 누가 챙기는지가 정해져 있는지가 핵심이에요.',
+  o:['정해진 사람이 없어요','대표가 필요할 때마다 챙겨요','담당자(겸임 포함)가 정해져 있고 사내에 알렸어요','담당자가 있고, 경영진이 분기 1회 이상 함께 점검해요']},
+ {id:'A2',d:'A',ev:1,s:'중요 이슈·목표',doc:'ESG 중대이슈·목표 1장',q:'우리 회사에 중요한 ESG 이슈와 목표가 정리돼 있나요?',h:'예: 에너지 비용 줄이기, 안전사고 0건, 협력사 관리처럼 우리 사업에 실제로 영향을 주는 것이요.',
+  o:['생각해 본 적 없어요','머릿속으로는 알고 있어요','중요 이슈를 문서(1장)로 정리했어요','이슈별 목표와 점검 주기까지 정해 관리해요']},
+ {id:'A3',d:'A',ev:1,s:'이해관계자 요구',doc:'고객·직원·거래처 요구 정리표',q:'고객·직원·거래처가 ESG와 관련해 무엇을 원하는지 확인한 적 있나요?',h:'고객사 요청 메일, 직원 건의, 거래처 질문지도 모두 해당돼요.',
+  o:['확인해 본 적 없어요','요청이 오면 그때그때 들어요','주요 요구를 목록으로 정리해 두었어요','정기적으로 의견을 듣고 경영 계획에 반영해요']},
+ {id:'X5',d:'A',ev:1,cond:'Funding',s:'투자자 설명자료',doc:'ESG·리스크 IR 설명자료',q:'투자자·금융기관이 ESG나 내부관리를 물으면 설명할 수 있나요?',h:'IR 자료에 ESG·리스크 1장이 있으면 질의 대응이 훨씬 쉬워져요.',
+  o:['준비가 안 돼 있어요','말로는 설명할 수 있어요','1~2장짜리 설명 자료가 있어요','리스크·내부통제·ESG 계획을 담은 자료와 근거가 있어요']},
+ {id:'B1',d:'B',ev:1,s:'에너지 사용량',doc:'월별 전력·연료 사용량 기록표',q:'전기·연료(회사 차 기름, 보일러 가스 등)를 얼마나 쓰는지 알고 있나요?',h:'요금이 아니라 사용량(kWh, 리터)이 기준이에요. 한전 고지서에 kWh가 적혀 있어요.',
+  o:['따로 본 적 없어요','요금 정도만 알아요','고지서·주유 영수증을 모아두고 있어요','월별 사용량을 표(엑셀 등)로 정리하고 있어요']},
+ {id:'K1',d:'B',kind:'kwh'},
+ {id:'B2',d:'B',ev:0,s:'절감 활동',doc:'에너지·폐기물 절감 활동 기록',q:'에너지·폐기물·물 사용을 줄이려고 하고 있는 게 있나요?',h:'거창하지 않아도 돼요. LED 교체, 분리배출, 공회전 줄이기도 포함이에요.',
+  o:['특별히 없어요','아끼자고 말하는 정도예요','구체적인 절감 활동을 하고 있어요','절감 목표를 세우고 실적을 기록·확인해요']},
+ {id:'B3',d:'B',ev:1,s:'기후·비용 리스크',doc:'에너지 비용·기후 영향 검토 메모',q:'전기요금 인상, 폭염·홍수, 탄소 규제가 우리 사업에 줄 영향을 따져본 적 있나요?',h:'요금이 10% 오르면 이익이 얼마나 줄지 계산해 보는 수준도 포함이에요.',
+  o:['생각해 본 적 없어요','막연히 걱정만 하고 있어요','영향을 따져보고 메모로 정리했어요','영향을 숫자로 계산하고 대응 계획을 세웠어요']},
+ {id:'X1',d:'B',ev:1,cond:'Env',na:1,s:'환경 인허가',doc:'환경 인허가 목록·갱신일 관리표',q:'사업장에 필요한 환경 인허가(대기·폐수·폐기물 등)를 알고, 지키고 있나요?',h:'어떤 인허가가 필요한지부터 확인하는 게 첫 단계예요.',
+  o:['무엇이 필요한지 잘 몰라요','받긴 했는데 관리는 안 해요','필요한 인허가 목록이 있고 갱신일을 챙겨요','목록과 정기 자체점검 기록이 있어요']},
+ {id:'X2',d:'B',ev:1,cond:'Export',s:'제품 탄소정보',doc:'제품별 에너지·원재료 데이터',q:'수출 제품의 탄소 정보를 달라는 요청에 대비하고 있나요?',h:'EU 탄소국경조정제도(CBAM) 대상 품목(철강·알루미늄·시멘트·비료 등)이면 특히 중요해요.',
+  o:['생각해 본 적 없어요','필요성은 알지만 준비는 못 했어요','우리 제품이 대상인지 확인했고, 필요한 데이터를 알아요','제품별 에너지·원재료 데이터를 모으고 있어요']},
+ {id:'C1',d:'C',ev:1,solo:1,s:'근로조건',doc:'근로계약서·근로시간 기록',q:'근로계약서·근로시간·임금을 법에 맞게 관리하고 있나요?',h:'전 직원 근로계약서가 있는지, 근로시간 기록이 남는지를 봐요.',
+  o:['잘 챙기지 못하고 있어요','대부분 하지만 빠진 직원이 있어요','전 직원 근로계약서를 쓰고 보관해요','계약서 보관에 근로시간 기록까지 하고, 노무사 등 점검도 받아요']},
+ {id:'C2',d:'C',ev:1,solo:1,s:'안전·괴롭힘 예방',doc:'예방교육 기록·고충처리 절차',q:'직원이 다치거나 괴롭힘을 당하지 않게 예방하고, 고충을 들을 통로가 있나요?',h:'사무실 기업도 해당돼요. 안전·괴롭힘 예방 교육과 고충 접수 방법을 봐요.',
+  o:['문제가 생기면 그때 대응해요','필요하다고 생각하지만 정해진 건 없어요','예방 교육을 하고, 고충 접수 방법이 정해져 있어요','교육·고충 처리 기록을 남기고 정기적으로 점검해요']},
+ {id:'C3',d:'C',ev:1,solo:1,s:'사고 기록·개선',doc:'산재·아차사고 기록부',q:'다치거나 다칠 뻔한 일(아차사고)을 기록하고 원인을 고치나요?',h:'사무실의 넘어짐·끼임 사고도 포함이에요. 기록이 있어야 재발을 막을 수 있어요.',
+  o:['기록하지 않아요','큰 사고만 기억하고 있어요','사고·아차사고를 기록하고 있어요','기록한 원인을 고치고 결과를 직원과 공유해요']},
+ {id:'X4',d:'C',ev:1,cond:'Social',s:'위험성평가',doc:'위험성평가 결과표',q:'작업장의 위험 요인을 찾아 미리 줄이는 활동(위험성평가)을 하나요?',h:'위험성평가는 사고를 미리 막기 위한 기본 활동이에요. 결과를 기록해 두는 게 중요해요.',
+  o:['하지 않아요','사고가 나면 원인만 살펴봐요','위험성평가를 하고 결과를 기록해요','정기적으로 평가·개선하고, 근로자 의견도 반영해요']},
+ {id:'X6',d:'C',ev:1,cond:'Data',s:'개인정보 보호',doc:'개인정보 접근권한·파기 기준',q:'고객·직원 개인정보를 안전하게 관리하나요?',h:'누가 볼 수 있는지(권한), 언제 지우는지(파기)가 정해져 있는지 봐요.',
+  o:['따로 관리하지 않아요','비밀번호 정도만 걸어둬요','접근 권한을 나누고, 보관·파기 기준이 있어요','권한·기준에 더해 정기 점검(또는 보안 인증)을 해요']},
+ {id:'D1',d:'D',ev:1,s:'윤리·신고 통로',doc:'윤리강령·신고 채널 안내',q:'부정·뇌물·이해상충을 막는 회사 원칙과 신고 통로가 있나요?',h:'구두 방침도 출발점이에요. 문서로 만들고 직원에게 알렸는지가 다음 단계예요.',
+  o:['따로 없어요','대표가 말로 강조하는 정도예요','윤리 원칙을 문서로 만들어 직원에게 알렸어요','원칙 문서와 신고 통로가 있고, 신고 처리 기록도 남겨요']},
+ {id:'D2',d:'D',ev:1,s:'재무·결재 투명성',doc:'전결 규정·결재 기록',q:'돈 관리와 주요 결정이 투명하게 기록되나요?',h:'세무 기장 외에, 회사 안에서 지출 승인·결재 기록이 남는지를 봐요.',
+  o:['대표 혼자 결정·관리하고 기록은 거의 없어요','세무사에게 장부만 맡기고 내부 기록은 부족해요','지출 승인·결재 기준이 있고 기록이 남아요','결재·권한 규정이 있고, 정기적으로 재무를 보고·검토해요']},
+ {id:'D3',d:'D',ev:1,s:'법규 준수 점검',doc:'법규 점검표·제재 이력',q:'우리 회사에 적용되는 법(노무·안전·환경·세무)을 지키는지 점검하나요?',h:'최근 3년 과태료·행정처분 같은 제재가 있었는지도 함께 봐요.',
+  o:['점검해 본 적 없어요','문제가 생기면 그때 확인해요','법규 목록을 만들고 연 1회 점검해요','정기 점검에 더해, 최근 3년 제재 0건을 기록으로 관리해요']},
+ {id:'E1',d:'E',ev:0,s:'협력사 관리',doc:'협력사 목록·선정 기준',q:'주요 거래처·협력사를 어떻게 관리하나요?',h:'고를 때 품질·가격 말고 안전·환경·노동도 보는지가 포인트예요.',
+  o:['따로 정리된 게 없어요','거래처 목록 정도만 있어요','목록·거래정보를 정리하고, 선정 시 안전·환경도 봐요','주요 협력사의 환경·노동 상황을 정기적으로 확인해요']},
+ {id:'E2',d:'E',ev:1,cust:1,s:'고객 ESG 요청 대응',doc:'고객 ESG 대응 패키지',q:"고객사가 'ESG 자료를 보내 달라'고 하면 어떻게 하나요?",h:'방침·담당자·주요 데이터 같은 기본 자료를 바로 보낼 수 있는지가 핵심이에요.',
+  o:['무엇을 줘야 할지 몰라요','요청이 오면 그때 급하게 만들어요','기본 자료(방침·담당자·주요 데이터)는 바로 보낼 수 있어요','자주 묻는 항목별 답변·증빙 패키지가 준비돼 있어요']},
+ {id:'E3',d:'E',ev:1,s:'공정거래·대금 지급',doc:'대금 지급·거래 기준',q:'협력사에 대금을 제때 지급하고, 공정하게 거래하고 있나요?',h:'대금 지급 기한, 단가 결정 기준, 계약서 작성 여부를 봐요.',
+  o:['지급이 늦어지는 일이 잦아요','대체로 지키지만 정해진 기준은 없어요','지급 기한·계약서 작성 기준이 정해져 있어요','기준을 지키고, 협력사 의견을 듣는 창구도 있어요']},
+ {id:'X3',d:'E',ev:0,cond:'Export',s:'해외 공급망',doc:'원재료 원산지·공급처 목록',q:'해외 원재료·부품이 어디서 오는지, 위험은 없는지 알고 있나요?',h:'원산지·공급처를 아는 것만으로도 고객사 질문의 절반은 답할 수 있어요.',
+  o:['잘 몰라요','주요 공급처 국가 정도만 알아요','주요 원재료의 원산지·공급처를 정리했어요','원산지·인권·분쟁 위험까지 확인하고 대체 공급처도 검토했어요']},
+ {id:'F1',d:'F',ev:1,s:'자료 보관',doc:'ESG 자료 공유 폴더',q:'ESG 관련 자료(교육 기록, 에너지 고지서, 방침 문서 등)를 한곳에 모아두나요?',h:'고객·투자자·기관이 요청하면 바로 꺼낼 수 있는 자료 폴더가 있는지 봐요.',
+  o:['흩어져 있거나 없어요','있긴 한데 찾는 데 시간이 걸려요','공유 폴더 한곳에 모아두고 있어요','폴더와 담당자가 있어서, 요청이 오면 하루 안에 낼 수 있어요']},
+ {id:'F2',d:'F',ev:0,s:'자료 업데이트',doc:'자료 업데이트·개선 이력',q:'그 자료를 얼마나 자주 업데이트하나요?',h:'정해진 주기가 있는지, 언제 무엇을 바꿨는지 남기는지를 봐요.',
+  o:['업데이트하지 않아요','생각날 때 가끔 해요','정해진 주기(분기·반기)로 업데이트해요','주기적으로 업데이트하고, 개선 이력(언제 무엇을)도 남겨요']},
+ {id:'F3',d:'F',ev:1,s:'외부 제출·검증',doc:'외부 제출·인증 이력',q:'ESG 자료를 고객사·지원사업·인증기관에 내본 적이 있나요?',h:'고객사 ESG 평가, 지원사업 가점 서류, ISO 인증 심사 모두 해당돼요.',
+  o:['낸 적 없어요','냈지만 보완 요청을 많이 받았어요','큰 문제 없이 제출했어요','외부 인증(ISO 등)이나 검증을 받았어요']}
+];
+const QI=Object.fromEntries(Q.map(q=>[q.id,q]));
+/* 문항별 참조 기준 (K-ESG v2.0 범주명 · 글로벌 기준 · 관련 법령) */
+const REF={
+ A1:['K-ESG 환경·사회 목표, 이사회 활동','EFRAG VSME B2','ISO 26000 조직 거버넌스'],
+ A2:['K-ESG 환경경영 목표·사회 목표','GRI 3 중대 주제','EFRAG VSME B2'],
+ A3:['GRI 2 이해관계자 참여','ISO 26000','OECD 책임있는 기업행동 지침'],
+ X5:['IFRS S1 일반 요구사항','K-ESG 정보공시'],
+ B1:['K-ESG 에너지·온실가스','GHG Protocol Scope 1·2','EFRAG VSME B3'],
+ K1:['GHG Protocol Scope 2','GIR 국가 전력 배출계수','한전 기본공급약관 전기요금표(2026)'],
+ B2:['K-ESG 원부자재·용수·폐기물','EFRAG VSME B6·B7','ISO 14001'],
+ B3:['IFRS S2 기후 관련 공시','K-ESG 환경경영 목표'],
+ X1:['K-ESG 오염물질·환경 법/규제 위반','EFRAG VSME B4','ISO 14001'],
+ X2:['EU CBAM','GHG Protocol'],
+ C1:['K-ESG 노동','EFRAG VSME B8·B10','ILO 핵심협약','근로기준법'],
+ C2:['K-ESG 산업안전·인권','ISO 45001','UN 기업과 인권 이행원칙'],
+ C3:['K-ESG 산업안전','EFRAG VSME B9','ISO 45001'],
+ X4:['K-ESG 산업안전','ISO 45001','산업안전보건법(위험성평가)'],
+ X6:['K-ESG 정보보호','개인정보 보호법'],
+ D1:['K-ESG 윤리경영','ISO 37001','UNGC 원칙 10'],
+ D2:['K-ESG 감사기구·이사회 구성','IFRS S1 거버넌스'],
+ D3:['K-ESG 환경·사회·지배구조 법/규제 위반','EFRAG VSME B11'],
+ E1:['공급망 대응 K-ESG','K-ESG 동반성장','OECD 실사 지침'],
+ E2:['공급망 대응 K-ESG','K-ESG 정보공시','EFRAG VSME'],
+ E3:['K-ESG 동반성장','공급망 대응 K-ESG','하도급법'],
+ X3:['OECD 실사 지침','UN 기업과 인권 이행원칙','공급망 대응 K-ESG'],
+ F1:['K-ESG 정보공시 형식','EFRAG VSME B1','GRI 1'],
+ F2:['K-ESG 정보공시 내용','GRI 2'],
+ F3:['K-ESG 정보공시 검증','ISO 14001 / 45001 인증']
+};
+Q.forEach(q=>q.r=REF[q.id]||[]);
+const REFS=[['K-ESG 가이드라인 v2.0','관계부처 합동','국내'],['공급망 대응 K-ESG 가이드라인','관계부처','국내'],['EFRAG VSME (Basic/Comprehensive)','EFRAG','글로벌'],
+ ['IFRS S1 / S2','ISSB','글로벌'],['GHG Protocol','WRI·WBCSD','글로벌'],['GRI Standards','GRI','글로벌'],['OECD 책임있는 기업행동 지침','OECD','글로벌'],
+ ['UN 기업과 인권 이행원칙 · UNGC · ILO','UN·ILO','글로벌'],['ISO 14001 / 45001 / 26000 / 37001','ISO','글로벌'],['EU CBAM','EU','글로벌'],
+ ['국가 온실가스 배출계수(전력, 2020~2022 평균)','온실가스종합정보센터(GIR)','데이터'],['산업용(갑·을) 전기요금표 2026','한국전력공사 기본공급약관','데이터']];
+const INDUSTRIES=['제조','IT·SaaS','유통·도소매','서비스','식품·외식','건설','바이오·헬스','물류·운수','관광·문화','기타'];
+const SIZES=['1인·프리랜서','2~9인','10~49인','50~299인','300인 이상'];
+const W={'제조':[15,25,20,10,20,10],'IT·SaaS':[20,10,20,25,10,15],'유통·도소매':[15,15,15,15,25,15],'서비스':[20,10,25,20,10,15],
+ '식품·외식':[15,20,25,15,15,10],'건설':[15,20,30,15,10,10],'바이오·헬스':[15,15,25,20,10,15],'물류·운수':[15,30,20,10,15,10],
+ '관광·문화':[20,15,25,15,10,15],'기타':[20,20,15,15,15,15]};
+const LEVELS=[[0,'인식 시작'],[30,'기초'],[50,'관리'],[70,'통합'],[85,'증빙기반']];
+const PTS=[0,33,67,100], UNKNOWN=20;
+const TRIG_LABEL={Customer:'원청·고객사 ESG 요구',Export:'수출·탄소국경제도',Env:'환경 규제',Social:'산업안전·노동 규제',Funding:'투자·정책금융 심사',Data:'개인정보 규제'};
+const TRIG_DOM={Customer:['E','F'],Export:['B','E'],Env:['B','C'],Social:['C'],Funding:['A','D'],Data:['C','D']};
+/* 리스크 라이브러리: 관련 문항 중 가장 낮은 응답이 '초기' 이하이면 활성. 가능성(L)=응답 수준+노출 신호, 영향(I)=리스크 고유값 */
+const RISKS=[
+ {id:'R1',n:'중대재해·산업재해',q:['C2','C3','X4'],i:3,trig:'Social',area:'법적·운영',d:'사고 1건이 작업중지·과태료·거래중단으로, 상시 5인 이상 사업장은 형사처벌까지 번질 수 있어요.',m:'위험성평가와 아차사고 기록부터 시작해 예방 이력을 남기기'},
+ {id:'R2',n:'노동법 위반·노무 분쟁',q:['C1'],i:3,area:'법적',d:'근로계약서 미작성·근로시간 미기록은 과태료와 임금 분쟁의 직접 원인이에요.',m:'전 직원 근로계약서·근로시간 기록 점검'},
+ {id:'R3',n:'원청 ESG 실사 대응 실패',q:['E2','F1'],i:3,trig:'Customer',area:'매출',d:'협력사 ESG 평가에서 자료를 못 내면 신규 수주 제외나 거래 축소로 이어질 수 있어요.',m:'자주 묻는 항목 답변·증빙 패키지 준비'},
+ {id:'R4',n:'수출 탄소정보 요구 대응 불가',q:['X2','B1'],i:3,trig:'Export',need:'Export',area:'매출',d:'EU 등 수출 시 제품 탄소정보를 못 내면 통관 비용 증가나 거래 제한이 생길 수 있어요.',m:'대상 품목 확인 후 제품별 에너지·원재료 데이터 수집'},
+ {id:'R5',n:'에너지 비용·탄소 데이터 공백',q:['B1','B3'],i:2,trig:'Customer',area:'재무',d:'요금 인상 영향을 관리하지 못하고, 고객사 탄소 질의에 답할 기초 데이터가 없어요.',m:'월별 kWh 기록 시작, 요금 10% 인상 시 영향 계산'},
+ {id:'R6',n:'환경 인허가 위반',q:['X1'],i:3,trig:'Env',area:'법적·운영',d:'인허가 누락·갱신 지연은 행정처분과 조업 차질로 이어질 수 있어요.',m:'인허가 목록·갱신일 관리표 작성'},
+ {id:'R7',n:'부패·법규 위반',q:['D1','D3'],i:2,area:'법적·평판',d:'윤리 기준과 법규 점검이 없으면 위반을 사전에 발견하지 못해요.',m:'윤리강령 1장과 연 1회 법규 점검표 운영'},
+ {id:'R8',n:'재무 불투명·내부통제 미흡',q:['D2','X5'],i:2,trig:'Funding',area:'재무',d:'투자·정책자금 심사에서 신뢰도가 떨어지고, 횡령·오류를 늦게 발견해요.',m:'전결 규정과 지출 결재 기록 정비'},
+ {id:'R9',n:'개인정보 유출',q:['X6'],i:3,trig:'Data',area:'법적·평판',d:'유출 시 과징금과 고객 이탈이 동시에 발생할 수 있어요.',m:'접근 권한 분리와 보관·파기 기준 수립'},
+ {id:'R10',n:'공급망 불공정·중단',q:['E1','E3','X3'],i:2,trig:'Customer',area:'매출·운영',d:'협력사 리스크를 모르면 원청 평가 감점과 공급 차질에 대비할 수 없어요.',m:'협력사 목록·대금 지급 기준 정비'},
+ {id:'R11',n:'ESG 책임 공백',q:['A1','A2','A3'],i:2,area:'전략',d:'챙기는 사람이 없으면 다른 과제가 시작되지 않고, 외부 질의에 답할 창구도 없어요.',m:'담당자 1명 지정과 중요 이슈 1장 정리'},
+ {id:'R12',n:'증빙 부재로 평가 감점',q:['F1','F2','F3'],i:2,area:'평판·평가',d:'실제로 하고 있어도 자료가 없으면 고객사·지원사업 평가에서 하지 않은 것으로 봐요.',m:'공유 폴더 하나에 자료 모으고 분기 업데이트'}
+];
+const RREF={R1:'산업안전보건법 · 중대재해처벌법(상시 5인 이상)',R2:'근로기준법',R3:'공급망 대응 K-ESG',R4:'EU CBAM',R5:'IFRS S2 · GHG Protocol',R6:'대기·물환경·폐기물 관련 법령',
+ R7:'ISO 37001 · 청탁금지법',R8:'IFRS S1 거버넌스',R9:'개인정보 보호법',R10:'OECD 실사 지침 · 하도급법',R11:'K-ESG 환경·사회 목표',R12:'K-ESG 정보공시'};
+RISKS.forEach(r=>r.ref=RREF[r.id]);
+const PHASES=[
+ {k:'p1',t:'Phase 1 · 기반 정비',when:'0~30일',goal:'책임자 지정과 가장 큰 리스크의 공백 메우기'},
+ {k:'p2',t:'Phase 2 · 체계화',when:'31~90일',goal:'모든 영역을 기록이 남는 수준(관리)으로 올리기'},
+ {k:'p3',t:'Phase 3 · 데이터·증빙 고도화',when:'4~6개월',goal:'외부 요구가 큰 영역부터 정기 관리(체계)로 전환'},
+ {k:'p4',t:'Phase 4 · 외부 대응·검증',when:'7~12개월',goal:'고객사 실사·지원사업·인증에 바로 쓰는 수준 완성'}
+];
+const YN=[['mfg','제조 사업장(공장·작업장)을 운영하나요?','환경 인허가·위험성평가 문항이 추가돼요'],
+ ['export','해외로 수출하나요?','제품 탄소정보·해외 공급망 문항이 추가돼요'],
+ ['big','대기업·중견기업에 납품하거나 협력사로 거래하나요?','고객사 ESG 요청 대응을 더 무겁게 봐요'],
+ ['asked','고객사에서 ESG 자료·질문지를 받은 적이 있나요?',''],
+ ['invest','투자유치·정책금융·IPO를 준비 중인가요?','투자자 설명자료 문항이 추가돼요']];
+/* 숫자 문항(K1) 3단계 사다리 — 설정값은 문항마스터 '전력단가산정'·'데이터품질규칙' 시트와 동일 */
+const PRICE={eul:221.6,gap:168.1}; // 원/kWh 실효 단가 · 을=고압A 선택II(2026.4.16 개편) · 갑=갑I 고압A 선택II(2024.10.24 인상분)
+const CONTRACT=[['gap','소규모 · 300kW 미만(갑)'],['eul','대규모 · 300kW 이상(을)'],['auto','잘 모르겠어요']];
+const EF=0.4541;      // tCO2e/MWh, GIR 최신 승인 국가 전력 배출계수(CO2e·소비단, 2020~2022 평균)
+const ERR=0.3, DUE_DAYS=7, KWH_MAX=5000000;   // 월 500만 kWh 초과는 입력 오류로 간주
+const BILLS=[['50만 원 미만',300000],['50만~200만 원',1250000],['200만~500만 원',3500000],['500만~1,000만 원',7500000],['1,000만 원 이상',15000000]];
+const NONE=[['delegate','담당자에게 물어볼게요'],['later','나중에 입력할게요'],['guide','확인하는 방법 보기']];
+const DELEGATE_MSG=()=>'[BECONIC ESG 간편진단]\n대표님이 질문 1개를 부탁하셨어요.\n최근 한 달 전기 사용량(kWh)을 한전 고지서나 한전ON에서 확인해 아래 링크에서 정리한 뒤, 대표님께 숫자를 보내 주세요.\n'+location.origin+location.pathname+'#kwh-request';
+
+/* ================= 상태 ================= */
+const blank=()=>({screen:'start',p:{company:'',industry:'',size:'',mfg:'',export:'',big:'',asked:'',invest:''},a:{},k1:{mode:'',kwh:'',bill:-1,none:'',contract:'auto'},idx:0});
+let S=blank();
+const SAMPLE={company:'예시) 그린텍정밀',industry:'제조',size:'10~49인',mfg:'예',export:'아니오',big:'예',asked:'예',invest:'아니오'};
+const SAMPLE_A={A1:1,A2:0,A3:0,B1:2,B2:1,B3:1,X1:2,C1:2,C2:1,C3:0,X4:1,D1:1,D2:2,D3:1,E1:1,E2:0,E3:2,F1:1,F2:1,F3:0};
+function loadSample(){ S.p={...SAMPLE}; S.a={}; Object.entries(SAMPLE_A).forEach(([k,v])=>S.a[k]={v}); S.k1={mode:'bill',kwh:'',bill:2,none:'',contract:'auto'}; S.sample=true; }
+
+/* ================= 규칙 ================= */
+function triggers(p){
+  return {Env:p.mfg==='예',Export:p.export==='예',Social:p.mfg==='예'||['50~299인','300인 이상'].includes(p.size),
+    Funding:p.invest==='예',Data:['IT·SaaS','유통·도소매','바이오·헬스'].includes(p.industry),Customer:p.big==='예'||p.asked==='예'};
+}
+const solo=()=>S.p.size==='1인·프리랜서';
+function flow(){
+  const t=triggers(S.p);
+  return Q.filter(q=>{
+    if(q.cond && !t[q.cond]) return false;
+    if(q.solo && solo()) return false;
+    if(q.id==='F2' && S.a.F1 && S.a.F1.v===0) return false;
+    return true;
+  });
+}
+function answersForScoring(){
+  const t=triggers(S.p), out={};
+  Q.forEach(q=>{
+    if(q.kind) return;
+    if(q.cond && !t[q.cond]) return;
+    if(q.solo && solo()){ out[q.id]={v:'na',auto:'1인 기업 · 자동 해당없음'}; return; }
+    if(q.id==='F2' && S.a.F1 && S.a.F1.v===0){ out[q.id]={v:0,auto:'F1 응답 기준 추정'}; return; }
+    if(S.a[q.id]) out[q.id]=S.a[q.id];
+  });
+  return out;
+}
+function k1Data(){
+  const k=S.k1;
+  if(k.mode==='exact'&&+k.kwh>0) return {q:'실측',kwh:Math.round(+k.kwh),w:1};
+  if(k.mode==='bill'&&k.bill>=0){
+    const known=k.contract==='gap'||k.contract==='eul';
+    const c=known?k.contract:(['50~299인','300인 이상'].includes(S.p.size)?'eul':'gap');
+    return {q:'추정',kwh:Math.round(BILLS[k.bill][1]/PRICE[c]),w:.5,contract:c,assumed:!known};
+  }
+  return {q:'미확보',kwh:null,w:0};
+}
+/* 점수 코어: 응답 맵 → 영역/종합 점수 (로드맵 전망에도 재사용) */
+function core(A){
+  const w=W[S.p.industry]||W['기타'], keys=Object.keys(DOMS), dom={}; let tw=0,tv=0;
+  keys.forEach((k,i)=>{
+    const vals=[];
+    Object.entries(A).forEach(([id,a])=>{ if(QI[id].d!==k||a.v==='na')return; vals.push(a.v==='u'?UNKNOWN:PTS[a.v]); });
+    dom[k]=vals.length?Math.round(vals.reduce((x,y)=>x+y,0)/vals.length):null;
+    if(dom[k]!=null){ tw+=w[i]; tv+=dom[k]*w[i]; }
+  });
+  const overall=tw?Math.round(tv/tw):0;
+  return {dom,overall,level:LEVELS.reduce((acc,l,i)=>overall>=l[0]?i:acc,0),w};
+}
+function analyze(){
+  const A=answersForScoring(), t=triggers(S.p), C=core(A), keys=Object.keys(DOMS);
+  let evN=0,evY=0,unk=0,scored=0,shown=0,dCount=0;
+  Object.entries(A).forEach(([id,a])=>{
+    const q=QI[id]; if(a.v==='na')return; shown++;
+    if(a.v==='u'){ unk++; if(q.ev) evN++; return; }
+    scored++; if(a.v===3) dCount++;
+    if(q.ev){ evN++; if(a.v>=2) evY++; }
+  });
+  const kd=k1Data(); evN++; evY+=kd.w;
+  const evidence=evN?Math.round(evY/evN*100):0;
+  const total=flow().filter(q=>!q.kind).length;   // 노출된 전체 문항 기준으로 유효성 판정 (일부만 응답한 리포트 방지)
+  const valid=shown>0 && scored>=Math.ceil(Math.max(shown,total)*0.6);
+  // 노출도: 업종 가중치 + 노출 신호
+  const expo={}, expoTags={};
+  keys.forEach((k,i)=>{ expoTags[k]=Object.keys(TRIG_DOM).filter(tk=>t[tk]&&TRIG_DOM[tk].includes(k)); expo[k]=Math.min(100,Math.round(C.w[i]*2.5+15*expoTags[k].length)); });
+  // 리스크
+  const risks=RISKS.map(r=>{
+    if(r.need&&!t[r.need]) return null;
+    const qs=r.q.filter(id=>A[id]&&A[id].v!=='na'); if(!qs.length) return null;
+    const vals=qs.map(id=>A[id].v==='u'?1:A[id].v); const worst=Math.min(...vals); if(worst>1) return null;
+    const wq=qs[vals.indexOf(worst)];
+    let L=worst===0?3:2; if(r.trig&&t[r.trig]) L=Math.min(3,L+1);
+    const sc=L*r.i; return {...r,L,I:r.i,S:sc,grade:gradeOf(L,sc),wq};
+  }).filter(Boolean).sort((a,b)=>b.S-a.S||b.I-a.I);
+  // 로드맵: 관리(C) 미만 → Phase1·2, 관리 → 체계(D) → Phase3·4
+  const rs={}; risks.forEach(r=>r.q.forEach(id=>rs[id]=Math.max(rs[id]||0,r.S)));
+  const base=[],adv=[];
+  Object.entries(A).forEach(([id,a])=>{
+    if(a.v==='na')return; const q=QI[id], cur=a.v==='u'?-1:a.v, ex=expo[q.d];
+    if(cur<2) base.push({q,a,to:2,pr:(rs[id]||0)*10+ex/10+(q.ev?2:0)});
+    if(cur<3) adv.push({q,a,to:3,pr:ex+(rs[id]||0)*5});
+  });
+  base.sort((x,y)=>y.pr-x.pr); adv.sort((x,y)=>y.pr-x.pr);
+  // 중소기업 실행 용량 반영: Phase별 최대 과제 수 4/6/6/5, Phase 1·2는 '관리' 도달 과제만, 넘치는 과제는 다음 Phase → 12개월 이후
+  const CAPS=[4,6,6,5], P=[[],[],[],[]], later=[]; let pi=0;
+  for(const it of [...base,...adv]){
+    while(pi<4&&(P[pi].length>=CAPS[pi]||(it.to===3&&pi<2))) pi++;
+    (pi<4?P[pi]:later).push(it);
+  }
+  const phaseOf={}; P.forEach((p,i)=>p.forEach(it=>{ if(phaseOf[it.q.id]==null) phaseOf[it.q.id]=i; }));
+  const proj=[C.overall]; let cur={...A};
+  P.forEach(p=>{ p.forEach(it=>cur[it.q.id]={v:it.to}); proj.push(core(cur).overall); });
+  const projDom=core(cur).dom;
+  // 기타 지표
+  const b1hi=!!(A.B1&&typeof A.B1.v==='number'&&A.B1.v>=2);
+  const flags=[];
+  if(b1hi&&kd.q==='미확보') flags.push(['증빙 확인 필요','사용량을 기록하고 있다고 답했는데 숫자는 아직 없어요. 고지서 숫자를 넣으면 결과가 확정돼요.']);
+  if(A.F1&&A.F1.v===0&&dCount>=3) flags.push(['자료 확인 필요','잘하고 있다고 답한 항목이 많은데 자료를 모아둔 곳이 없어요. 고객사 실사에서는 자료가 없으면 안 한 것으로 봐요.']);
+  const missing=flow().filter(q=>!q.kind&&!S.a[q.id]).length;
+  if(missing) flags.unshift(['미응답 '+missing+'문항','응답하지 않은 문항은 빼고 계산했어요. 마저 응답하면 리스크와 로드맵이 더 정확해져요.']);
+  if(unk>=3) flags.push(['담당자 확인 권장',`'잘 모르겠어요'가 ${unk}개예요. 실무 담당자와 함께 다시 응답하면 결과가 더 정확해져요.`]);
+  const CM=b1hi?{'실측':['기초 데이터 확보','good'],'추정':['일부 확보','warn'],'미확보':['확인 필요','warn']}
+               :{'실측':['일부 확보','warn'],'추정':['추정 가능','warn'],'미확보':['준비 필요','bad']};
+  const [carbon,carbonTone]=CM[kd.q];
+  const tco2=kd.kwh?kd.kwh*12*EF/1000:null;
+  const expired=!!(kd.q==='미확보'&&S.k1.dueAt&&Date.now()>S.k1.dueAt);
+  if(expired) flags.push(['보완 기한 경과','전기 사용량 보완 기한이 지나 \'미확보\'로 확정했어요. 지금이라도 숫자를 넣으면 다시 계산돼요.']);
+  const provisional=kd.q==='미확보'&&['later','delegate'].includes(S.k1.none)&&!expired;
+  const deep=keys.filter(k=>C.dom[k]!=null&&C.dom[k]<50);
+  return {...C,A,t,evidence,valid,expo,expoTags,risks,P,later,phaseOf,proj,projDom,flags,carbon,carbonTone,tco2,provisional,kd,deep,unk};
+}
+
+/* ================= 공통 ================= */
+function gradeOf(L,sc){ return sc>=9||(sc>=6&&L===3)?'높음':sc>=4?'중간':'낮음'; }
+const app=document.getElementById('app');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function go(sc){ S.screen=sc; render(); window.scrollTo({top:0}); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2200); }
+function copyText(t,ok){ try{ navigator.clipboard.writeText(t).then(()=>toast(ok),()=>toast('길게 눌러 복사해 주세요')); }catch(e){ toast('길게 눌러 복사해 주세요'); } }
+function profileOk(){ const p=S.p; return p.industry&&p.size&&YN.every(([k])=>p[k]); }
+const tone=v=>v>=70?'good':v>=40?'warn':'bad';
+const toneTxt={good:'양호',warn:'보완',bad:'우선'};
+
+function hasData(x){ return !!(x&&(x.p&&x.p.industry||x.a&&Object.keys(x.a).length)); }
+function save(){ if(S.sample||!hasData(S)) return; try{ localStorage.setItem(LS_KEY,JSON.stringify({v:APP_VERSION,t:Date.now(),S:{...S,screen:'start'}})); }catch(e){} }
+function loadSaved(){ try{ const o=JSON.parse(localStorage.getItem(LS_KEY)||'null'); return o&&hasData(o.S)?o:null; }catch(e){ return null; } }
+function clearSaved(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
+function render(){
+  document.querySelectorAll('[data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===S.screen?'step':'false'));
+  app.classList.toggle('wide',S.screen==='result');
+  ({start:rStart,profile:rProfile,quiz:rQuiz,result:rResult})[S.screen]();
+  app.firstElementChild&&app.firstElementChild.classList.add('fade');
+  save();
+}
+
+/* ================= 모달 ================= */
+function showModal(title,html,btns){
+  const m=document.getElementById('modal'), b=document.getElementById('mBox');
+  b.innerHTML=`<h2 id="mTitle">${esc(title)}</h2>${html}<div class="row">${btns.map(([l],i)=>`<button class="btn ${i?'btn-ghost':''}" data-mb="${i}">${esc(l)}</button>`).join('')}</div>`;
+  b.querySelectorAll('[data-mb]').forEach(x=>x.onclick=btns[+x.dataset.mb][1]);
+  m.hidden=false; b.querySelector('button').focus();
+}
+function closeModal(){ document.getElementById('modal').hidden=true; }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!document.getElementById('modal').hidden) closeModal(); });
+
+/* ================= 담당자 입력 화면 (#kwh-request) ================= */
+function rDelegate(){
+  document.querySelectorAll('[data-go]').forEach(b=>b.setAttribute('aria-current','false'));
+  app.innerHTML=`<section class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div class="eyebrow">ESG 간편진단 · 담당자 확인 요청</div>
+    <h2 class="qtitle">최근 한 달 전기 사용량을 확인해 주세요</h2>
+    <ul class="guide"><li>한전ON(online.kepco.co.kr) 로그인 → 요금·사용량 조회에서 월별 kWh 확인</li><li>종이 고지서: '당월 사용량(kWh)' 칸</li><li>임차 사무실이라 관리비에 포함된 경우: 관리사무소에 호실별 사용량 요청</li></ul>
+    <div class="kwh field"><input id="dkwh" type="number" inputmode="numeric" min="0" placeholder="예: 3200" aria-label="전기 사용량 kWh"><span>kWh</span></div>
+    <button class="btn" id="dcopy" disabled>대표님께 보낼 메시지 복사</button>
+    <div class="msg" id="dmsg" hidden></div>
+    <p class="tiny" style="margin:0">입력한 숫자는 이 화면에서만 쓰이고 저장·전송되지 않아요. 복사한 메시지를 카톡·문자로 보내 주세요.</p></section>`;
+  const inp=document.getElementById('dkwh'), btn=document.getElementById('dcopy'), msg=document.getElementById('dmsg');
+  const text=()=>`[ESG 간편진단] 최근 한 달 전기 사용량: ${(+inp.value).toLocaleString()} kWh (한전 고지서 기준)`;
+  inp.oninput=()=>{ const ok=+inp.value>0&&+inp.value<=KWH_MAX; btn.disabled=!ok; msg.hidden=!ok; if(ok) msg.textContent=text(); };
+  btn.onclick=()=>copyText(text(),'메시지를 복사했어요');
+}
+
+/* ================= 추천 후속 진단 ================= */
+function recommendTools(R){
+  const out=[['grants','ESG 가점·탄소중립·안전 관련 지원사업을 찾아 로드맵 비용을 줄일 수 있어요.']];
+  if(R.dom.C!=null&&R.dom.C<50) out.push(['hr','근로조건·안전·고충처리 등 인사 체계를 함께 점검해요.']);
+  if((R.dom.D!=null&&R.dom.D<50)||R.t.Funding) out.push(['finance','재무 투명성과 내부통제를 숫자로 점검해요.']);
+  if(R.t.Funding) out.push(['ir','투자자에게 보여줄 ESG·리스크 설명을 IR 관점에서 점검해요.']);
+  if(S.p.mfg==='예') out.push(['tech','공정·기술 수준을 진단해 에너지·안전 개선 과제와 연결해요.']);
+  out.push(['growth','ESG를 포함한 전사 성장활동의 우선순위를 정해요.']);
+  return out.slice(0,4);
+}
+
+/* ================= 시작 ================= */
+function rStart(){
+  const sv=S.sample?null:loadSaved();
+  const nAns=sv?Object.keys(sv.S.a||{}).length:0, svDate=sv?new Date(sv.t):null;
+  app.innerHTML=`
+  ${sv?`<section class="card resume"><b>진행 중이던 진단이 있어요</b><span class="tiny">${esc(sv.S.p.company||'회사명 미입력')} · ${nAns}문항 응답 · ${svDate.getMonth()+1}월 ${svDate.getDate()}일 저장</span>
+    <div class="row"><button class="btn" id="resumeBtn">이어하기</button><button class="btn btn-ghost" id="freshBtn">새로 시작</button></div></section>`:''}
+  <section class="card hero">
+    <div class="eyebrow">중소기업·스타트업 ESG 간편진단</div>
+    <h1 style="margin-top:8px">우리 회사 ESG,<br>무엇부터 하면 될까요?</h1>
+    <p>점수를 매기는 시험이 아니에요. 지금 우리 회사 모습을 고르기만 하면, 리스크와 준비 서류, 12개월 로드맵까지 리포트로 정리해 드려요.</p>
+    <div class="facts">
+      <div class="fact"><b class="num">약 7분</b><span>예상 소요</span></div>
+      <div class="fact"><b class="num">18~24</b><span>질문 수</span></div>
+      <div class="fact"><b class="num">7장</b><span>결과 리포트</span></div>
+    </div>
+    <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px">
+      <button class="btn" id="startBtn">${sv?'새로 진단하기':'진단 시작하기'}</button>
+      <button class="btn btn-ghost" id="sampleBtn">예시 리포트 먼저 보기</button>
+    </div>
+  </section>
+  <section class="card">
+    <ol class="how">
+      <li><i>1</i><div><b>기업정보 7가지</b><span>업종·규모·수출·납품 여부로 우리 회사에 필요한 질문만 골라요.</span></div></li>
+      <li><i>2</i><div><b>우리 회사 모습 고르기</b><span>점수 대신 실제 모습 4개 중 하나를 탭하면 다음 질문으로 넘어가요. 증빙 업로드는 없어요.</span></div></li>
+      <li><i>3</i><div><b>컨설팅 리포트</b><span>준비도·노출 매트릭스·리스크 히트맵·준비 서류·12개월 로드맵과 점수 전망까지 보여드려요.</span></div></li>
+    </ol>
+  </section>
+  <section class="card" style="display:flex;flex-direction:column;gap:6px"><b style="font-size:14.5px">이런 기업에 도움이 돼요</b>
+    <span class="tiny" style="color:var(--ink-2)">대기업·중견기업 납품, 수출, 제조 사업장 운영, 투자유치·공공조달을 준비하는 중소기업·스타트업</span></section>
+  <p class="disc">공식 ESG 평가등급·인증이 아닌 실행 준비도 자가진단이에요. 응답은 이어하기를 위해 이 브라우저에만 저장되고 서버로 보내지 않아요. 결과 PDF는 직접 저장·공유해요.</p>`;
+  document.getElementById('startBtn').onclick=()=>{ if(sv){ clearSaved(); } S=blank(); go('profile'); };
+  if(sv){
+    document.getElementById('resumeBtn').onclick=()=>{ S={...blank(),...sv.S}; const F=flow(); const i=F.findIndex(q=>q.kind?!(S.k1&&S.k1.mode):!S.a[q.id]); S.idx=i<0?0:i; go(i<0?'result':'quiz'); };
+    document.getElementById('freshBtn').onclick=()=>{ clearSaved(); S=blank(); go('profile'); };
+  }
+  document.getElementById('sampleBtn').onclick=()=>{ loadSample(); go('result'); };
+}
+
+/* ================= 기업정보 ================= */
+function rProfile(){
+  const p=S.p;
+  const chip=(k,v)=>`<button type="button" class="chip" data-k="${k}" data-v="${esc(v)}" aria-pressed="${p[k]===v}">${esc(v)}</button>`;
+  app.innerHTML=`
+  <section class="card" style="display:flex;flex-direction:column;gap:18px">
+    <div><div class="eyebrow">기업정보 · 1분</div><h2 style="font-size:20px;margin-top:6px">우리 회사에 맞는 질문만 골라드릴게요</h2></div>
+    <div class="field"><label for="co">회사명 <span class="tiny">(선택)</span></label>
+      <input id="co" type="text" placeholder="예: 그린텍정밀" value="${esc(p.company)}"></div>
+    <div class="field"><div class="lab">업종</div><div class="chips">${INDUSTRIES.map(v=>chip('industry',v)).join('')}</div></div>
+    <div class="field"><div class="lab">직원 수</div><div class="chips">${SIZES.map(v=>chip('size',v)).join('')}</div></div>
+    <div>${YN.map(([k,l,h])=>`<div class="yn"><div><b style="font-size:14.5px;font-weight:600">${l}</b>${h?`<small>${h}</small>`:''}</div>
+      <div class="chips">${chip(k,'예')}${chip(k,'아니오')}</div></div>`).join('')}</div>
+  </section>
+  <div class="row"><button class="btn btn-ghost" id="back">이전</button><button class="btn" id="next" ${profileOk()?'':'disabled'}>질문 시작</button></div>
+  <button class="linkbtn" id="fill">예시 기업정보로 채우기</button>`;
+  app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ S.p[b.dataset.k]=b.dataset.v; rProfile(); });
+  document.getElementById('co').oninput=e=>{ S.p.company=e.target.value; save(); };
+  document.getElementById('back').onclick=()=>go('start');
+  document.getElementById('fill').onclick=()=>{ S.p={...SAMPLE}; rProfile(); };
+  document.getElementById('next').onclick=()=>{ if(!profileOk())return; S.idx=0;
+    const p=S.p; const early=p.size==='1인·프리랜서'&&['mfg','export','big','asked','invest'].every(k=>p[k]==='아니오');
+    if(!early){ go('quiz'); return; }
+    showModal('ESG보다 먼저 볼 진단이 있어요',`<p class="muted" style="margin:0">지금 단계에서는 ESG 대응보다 아이템·비즈니스모델·시장검증이 우선이에요. 그래도 ESG 진단을 진행할 수 있어요.</p>
+      <a class="tool" href="${TOOLS.growth[1]}" target="_blank" rel="noopener"><b>${TOOLS.growth[0]}</b><span>성장 단계별로 지금 먼저 할 일을 정리해요</span></a>`,
+      [['그래도 진행',()=>{ closeModal(); go('quiz'); }],['닫기',closeModal]]);
+  };
+}
+
+/* ================= 질문 ================= */
+function noneDetail(v){
+  if(v==='delegate') return `<div class="msg">${esc(DELEGATE_MSG())}</div><button class="btn btn-ghost" id="cpMsg" style="padding:10px">메시지 복사</button>
+    <div class="tiny">카톡·문자로 보내면 담당자가 링크에서 사용량을 정리해 숫자를 보내 줘요. 그동안 결과는 '잠정'으로 나오고, 받은 숫자를 결과 화면 보완 칸에 넣으면 확정돼요.</div>`;
+  if(v==='later') return `<div class="tiny">결과는 '잠정'으로 나와요. ${DUE_DAYS}일 안에 결과 화면에서 숫자만 넣으면 바로 확정돼요.</div>`;
+  if(v==='guide') return `<ul class="guide"><li>한전ON(online.kepco.co.kr) 로그인 → 요금·사용량 조회에서 월별 kWh 확인</li><li>종이 고지서: '당월 사용량(kWh)' 칸</li><li>임차 사무실이라 관리비에 포함된 경우: 관리사무소에 호실별 사용량 요청</li></ul>
+    <div class="tiny">확인되면 위에서 '고지서 숫자 그대로 알아요'를 골라 입력해 주세요. 지금 어렵다면 '나중에 입력할게요'를 고르시면 돼요.</div>`;
+  return '';
+}
+function rQuiz(){
+  if(!profileOk()){ app.innerHTML=`<section class="card"><h2 style="font-size:19px">기업정보를 먼저 입력해 주세요</h2><p class="muted">업종과 규모에 따라 질문이 달라져요.</p><button class="btn" id="toP">기업정보 입력</button></section>`; document.getElementById('toP').onclick=()=>go('profile'); return; }
+  const F=flow();
+  if(S.idx>=F.length){ go('result'); return; }
+  const q=F[S.idx];
+  const remainSec=(F.length-S.idx)*15, remain=remainSec<=60?'1분 안에 끝나요':`약 ${Math.ceil(remainSec/60)}분 남았어요`;
+  const pct=Math.round(S.idx/F.length*100);
+  const head=`<div class="qhead"><span class="dom">${q.d} · ${DOMS[q.d]}</span><span class="tiny num">${S.idx+1} / ${F.length} · ${remain}</span></div>
+    <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>`;
+  if(q.kind==='kwh'){
+    rQuiz._key=null;
+    const k=S.k1;
+    const modes=[['exact','고지서 숫자 그대로 알아요','실측'],['bill','숫자는 모르지만 요금은 대충 알아요','추정'],['none','지금은 모르겠어요','미확보']];
+    const okK1=()=>(k.mode==='exact'&&+k.kwh>0&&+k.kwh<=KWH_MAX)||(k.mode==='bill'&&k.bill>=0)||(k.mode==='none'&&!!k.none);
+    let panel='';
+    if(k.mode==='exact') panel=`<div class="kwh field"><input id="kwh" type="number" inputmode="numeric" min="0" placeholder="예: 3200" value="${esc(k.kwh)}" aria-label="전기 사용량 kWh"><span>kWh</span></div>
+      <div class="tiny">한전 고지서의 '당월 사용량' 칸 숫자예요. 월 ${KWH_MAX.toLocaleString()} kWh 이하로 입력해 주세요.</div>`;
+    if(k.mode==='bill') panel=`<div style="font-weight:600;font-size:14px">한 달 전기요금은 대략 얼마인가요?</div>
+      <div class="chips">${BILLS.map((b,i)=>`<button type="button" class="chip" data-bill="${i}" aria-pressed="${k.bill===i}">${b[0]}</button>`).join('')}</div>
+      <div style="font-weight:600;font-size:14px;margin-top:4px">전기 계약은 어떤 종류인가요?</div>
+      <div class="chips">${CONTRACT.map(([v,l])=>`<button type="button" class="chip" data-contract="${v}" aria-pressed="${(k.contract||'auto')===v}">${l}</button>`).join('')}</div>
+      <div class="tiny">고지서의 '계약전력'을 보면 알 수 있어요. 모르면 직원 수로 추정해요(49인 이하 갑, 50인 이상 을). 결과에는 '추정치'로 표시돼요.</div>`;
+    if(k.mode==='none') panel=`<div class="chips">${NONE.map(([v,l])=>`<button type="button" class="chip" data-none="${v}" aria-pressed="${k.none===v}">${l}</button>`).join('')}</div>${noneDetail(k.none)}`;
+    app.innerHTML=`${head}
+    <section class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div class="eyebrow">숫자 문항 · 모르셔도 괜찮아요</div>
+      <h2 class="qtitle">최근 한 달 전기 사용량을 알려주세요</h2>
+      <div class="help">숫자를 모른다고 점수가 깎이지 않아요. 아는 만큼만 골라 주세요.</div>
+      <div class="opts" role="group" aria-label="아는 정도">${modes.map(([v,l,t])=>`<button type="button" class="opt mode" data-mode="${v}" aria-pressed="${k.mode===v}"><span>${l}</span><span class="qtag">${t}</span></button>`).join('')}</div>
+      ${panel?`<div class="panel">${panel}</div>`:''}
+    </section>
+    <div class="row"><button class="btn btn-ghost" id="prev">이전</button><button class="btn" id="nxt" ${okK1()?'':'disabled'}>다음</button></div>`;
+    app.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{ k.mode=b.dataset.mode; rQuiz(); const i=document.getElementById('kwh'); if(i) i.focus(); });
+    app.querySelectorAll('[data-bill]').forEach(b=>b.onclick=()=>{ k.bill=+b.dataset.bill; rQuiz(); });
+    app.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>{ k.contract=b.dataset.contract; rQuiz(); });
+    app.querySelectorAll('[data-none]').forEach(b=>b.onclick=()=>{ k.none=b.dataset.none; if(['later','delegate'].includes(k.none)&&!k.dueAt) k.dueAt=Date.now()+DUE_DAYS*864e5; rQuiz(); });
+    const inp=document.getElementById('kwh'); if(inp) inp.oninput=e=>{ k.kwh=e.target.value; document.getElementById('nxt').disabled=!okK1(); save(); };
+    const cp=document.getElementById('cpMsg'); if(cp) cp.onclick=()=>copyText(DELEGATE_MSG(),'메시지를 복사했어요');
+    document.getElementById('prev').onclick=()=>{ S.idx=Math.max(0,S.idx-1); rQuiz(); };
+    document.getElementById('nxt').onclick=()=>{ if(!okK1())return; S.sample=false; S.idx++; rQuiz(); window.scrollTo({top:0}); };
+    return;
+  }
+  const a=S.a[q.id]||{};
+  const allowNa=q.na||(q.cust&&!triggers(S.p).Customer);
+  app.innerHTML=`${head}
+  <section class="card" style="display:flex;flex-direction:column;gap:14px">
+    <h2 class="qtitle">${esc(q.q)}</h2>
+    <div class="help">${esc(q.h)}</div>
+    <details class="ref"><summary>참조 기준</summary><div class="tiny" style="margin-top:4px">${esc(q.r.join(' · '))}</div></details>
+    <div class="opts" role="group" aria-label="우리 회사 모습">
+      ${q.o.map((t,i)=>`<button type="button" class="opt" data-v="${i}" aria-pressed="${a.v===i}">
+        <span class="ladder" aria-hidden="true">${[0,1,2,3].map(j=>`<s class="${j<=i?'on':''}"></s>`).join('')}</span><span>${esc(t)}</span></button>`).join('')}
+    </div>
+    ${q.id==='F1'?`<div class="tiny">'흩어져 있거나 없어요'를 고르면 다음 질문(업데이트 주기)은 건너뛰어요.</div>`:''}
+  </section>
+  <div class="qfoot">
+    <button class="linkbtn" id="prev" ${S.idx===0?'style="visibility:hidden"':''}>← 이전</button>
+    <div style="display:flex;gap:4px">
+      <button class="linkbtn" data-v="u" ${a.v==='u'?'style="font-weight:700;color:var(--primary)"':''}>잘 모르겠어요</button>
+      ${allowNa?`<button class="linkbtn" data-v="na" ${a.v==='na'?'style="font-weight:700;color:var(--primary)"':''}>해당 없음</button>`:''}
+    </div>
+  </div>
+  <p class="tiny" style="text-align:center">키보드 1~4로도 고를 수 있어요</p>`;
+  const pickV=v=>{
+    S.a[q.id]={v}; S.sample=false;
+    app.querySelectorAll('.opt').forEach(b=>b.setAttribute('aria-pressed',String(String(v)===b.dataset.v)));
+    setTimeout(()=>{ S.idx++; rQuiz(); window.scrollTo({top:0}); },220);
+  };
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pickV(+b.dataset.v));
+  app.querySelectorAll('.linkbtn[data-v]').forEach(b=>b.onclick=()=>pickV(b.dataset.v));
+  document.getElementById('prev').onclick=()=>{ S.idx=Math.max(0,S.idx-1); rQuiz(); };
+  rQuiz._key=pickV;
+}
+document.addEventListener('keydown',e=>{
+  if(S.screen!=='quiz'||e.target.tagName==='INPUT')return;
+  const n=+e.key; if(n>=1&&n<=4&&rQuiz._key) rQuiz._key(n-1);
+});
+
+/* ================= 차트 ================= */
+function radarSVG(dom,proj){
+  const ks=Object.keys(DOMS), cx=200, cy=168, R=124;
+  const pt=(i,v)=>{ const a=(-90+60*i)*Math.PI/180; return [cx+R*v/100*Math.cos(a), cy+R*v/100*Math.sin(a)]; };
+  const poly=(vals)=>ks.map((k,i)=>pt(i,vals[k]||0).map(n=>n.toFixed(1)).join(',')).join(' ');
+  const rings=[25,50,75,100].map(v=>`<polygon points="${ks.map((k,i)=>pt(i,v).join(',')).join(' ')}" style="fill:none;stroke:var(--line);stroke-width:1"/>`).join('');
+  const axes=ks.map((k,i)=>{ const [x,y]=pt(i,100); return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" style="stroke:var(--line)"/>`; }).join('');
+  const labels=ks.map((k,i)=>{ const [x,y]=pt(i,116); const c=Math.cos((-90+60*i)*Math.PI/180);
+    const anc=c>0.3?'start':c<-0.3?'end':'middle'; const dy=y<cy-60?-2:y>cy+60?10:4;
+    return `<text x="${x}" y="${y+dy}" text-anchor="${anc}" class="lbl-b">${DSHORT[k]}</text><text x="${x}" y="${y+dy+14}" text-anchor="${anc}">${dom[k]==null?'해당 없음':dom[k]+' → '+proj[k]}</text>`; }).join('');
+  return `<svg class="chart radar" viewBox="0 0 400 345" style="max-width:460px;margin:0 auto" role="img" aria-label="6개 영역 현재 점수와 12개월 목표 레이더 차트">
+    ${rings}${axes}
+    <polygon points="${poly(proj)}" style="fill:var(--good);fill-opacity:.08;stroke:var(--good);stroke-width:2;stroke-dasharray:5 4"/>
+    <polygon points="${poly(dom)}" style="fill:var(--primary);fill-opacity:.18;stroke:var(--primary);stroke-width:2.5"/>
+    ${ks.filter(k=>dom[k]!=null).map(k=>{ const i=ks.indexOf(k); const [x,y]=pt(i,dom[k]); return `<circle cx="${x}" cy="${y}" r="3.5" style="fill:var(--primary)"/>`; }).join('')}
+    <text x="${cx+4}" y="${cy-R*0.5-3}" style="font-size:9px;fill:var(--ink-3)">50</text>
+    ${labels}</svg>`;
+}
+function matrixSVG(dom,expo){
+  const x0=48,x1=348,y0=12,y1=252, X=v=>x0+(x1-x0)*v/100, Y=v=>y1-(y1-y0)*v/100, mx=X(50), my=Y(50);
+  const ks=Object.keys(DOMS).filter(k=>dom[k]!=null);
+  const pts=ks.map(k=>({k,x:X(dom[k]),y:Y(expo[k])}));
+  pts.sort((a,b)=>a.y-b.y).forEach((p,i)=>pts.slice(0,i).forEach(q=>{ if(Math.abs(p.x-q.x)<80&&Math.abs(p.y-q.y)<20) p.y=q.y+20; }));
+  return `<svg class="chart" viewBox="0 0 360 290" role="img" aria-label="외부 요구 노출과 준비도 매트릭스">
+    <rect x="${x0}" y="${y0}" width="${mx-x0}" height="${my-y0}" style="fill:var(--bad-soft)"/>
+    <rect x="${mx}" y="${y0}" width="${x1-mx}" height="${my-y0}" style="fill:var(--good-soft)"/>
+    <rect x="${x0}" y="${my}" width="${mx-x0}" height="${y1-my}" style="fill:var(--warn-soft)"/>
+    <rect x="${mx}" y="${my}" width="${x1-mx}" height="${y1-my}" style="fill:var(--surface-2)"/>
+    <text x="${x0+8}" y="${y0+16}" class="lbl-b" style="fill:var(--bad)">즉시 대응</text>
+    <text x="${x1-8}" y="${y0+16}" text-anchor="end" class="lbl-b" style="fill:var(--good)">강점 · 대외 활용</text>
+    <text x="${x0+8}" y="${y1-8}" class="lbl-b" style="fill:var(--warn)">기본 정비</text>
+    <text x="${x1-8}" y="${y1-8}" text-anchor="end" class="lbl-b">현 수준 유지</text>
+    <line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" style="stroke:var(--ink-3)"/><line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" style="stroke:var(--ink-3)"/>
+    <text x="${(x0+x1)/2}" y="${y1+20}" text-anchor="middle">준비도 (영역 점수) →</text>
+    <text x="14" y="${(y0+y1)/2}" text-anchor="middle" transform="rotate(-90 14 ${(y0+y1)/2})">외부 요구 노출 →</text>
+    <text x="${x0}" y="${y1+12}" text-anchor="middle" style="font-size:9px">0</text><text x="${mx}" y="${y1+12}" text-anchor="middle" style="font-size:9px">50</text><text x="${x1}" y="${y1+12}" text-anchor="middle" style="font-size:9px">100</text>
+    ${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="11" style="fill:var(--primary)"/><text x="${p.x}" y="${p.y+4}" text-anchor="middle" style="fill:var(--on-primary);font-weight:700">${p.k}</text>
+      <text x="${p.x+15}" y="${p.y+4}" ${p.x>290?`text-anchor="end" dx="-30"`:''}>${DSHORT[p.k]}</text>`).join('')}
+  </svg>`;
+}
+function projSVG(proj){
+  const lab=['현재','1개월','3개월','6개월','12개월'], x0=44,x1=336,y0=12,y1=176, X=i=>x0+(x1-x0)*i/4, Y=v=>y1-(y1-y0)*v/100;
+  const bands=LEVELS.slice(1).map(l=>`<line x1="${x0}" y1="${Y(l[0])}" x2="${x1}" y2="${Y(l[0])}" style="stroke:var(--line);stroke-dasharray:3 3"/><text x="${x0-6}" y="${Y(l[0])+4}" text-anchor="end" style="font-size:9.5px">${l[1]}</text>`).join('');
+  const line=proj.map((v,i)=>`${X(i)},${Y(v)}`).join(' ');
+  return `<svg class="chart" viewBox="0 0 352 206" role="img" aria-label="로드맵 실행 시 점수 전망">
+    ${bands}
+    <polygon points="${X(0)},${y1} ${line} ${X(4)},${y1}" style="fill:var(--accent);fill-opacity:.1"/>
+    <polyline points="${line}" style="fill:none;stroke:var(--accent);stroke-width:2.5"/>
+    ${proj.map((v,i)=>`<circle cx="${X(i)}" cy="${Y(v)}" r="${i===4?5:3.5}" style="fill:${i===0?'var(--primary)':'var(--accent)'}"/><text x="${X(i)}" y="${Y(v)-10}" text-anchor="middle" class="lbl-b">${v}</text><text x="${X(i)}" y="${y1+18}" text-anchor="middle">${lab[i]}</text>`).join('')}
+    <line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" style="stroke:var(--ink-3)"/>
+  </svg>`;
+}
+
+/* ================= 결과 리포트 ================= */
+function rResult(){
+  if(!Object.keys(S.a).length){ app.innerHTML=`<section class="card"><h2 style="font-size:19px">아직 진단 응답이 없어요</h2><p class="muted">기업정보와 질문에 응답하면 리포트를 만들어 드려요. 예시 리포트는 시작 화면에서 볼 수 있어요.</p><button class="btn" id="toStart">진단 시작하기</button></section>`; document.getElementById('toStart').onclick=()=>go('profile'); return; }
+  const R=analyze();
+  if(!R.valid){
+    app.innerHTML=`<section class="card"><h2 style="font-size:19px">리포트를 만들기엔 응답이 부족해요</h2>
+      <p class="muted">'잘 모르겠어요'나 '해당 없음'이 많아서 믿을 만한 점수를 계산할 수 없어요. 담당자와 확인한 뒤 다시 응답해 주세요.</p>
+      <button class="btn" id="redo">응답 다시 하기</button></section>`;
+    document.getElementById('redo').onclick=()=>{ S.idx=0; go('quiz'); }; return;
+  }
+  const ks=Object.keys(DOMS), name=S.p.company||'우리 회사';
+  const A=R.A;
+  const ksv=ks.filter(k=>R.dom[k]!=null);   // 해당 없음 영역(예: 1인 기업의 사람·안전) 제외
+  const sorted=ksv.slice().sort((a,b)=>R.dom[a]-R.dom[b]);
+  const spread=R.dom[sorted[sorted.length-1]]-R.dom[sorted[0]];
+  const weak=sorted.slice(0,2), strong=sorted[sorted.length-1];
+  const hiRisk=R.risks.filter(r=>r.grade==='높음');
+  const lvl12=LEVELS.reduce((acc,l,i)=>R.proj[4]>=l[0]?i:acc,0);
+  const due=new Date(S.k1.dueAt||Date.now()+DUE_DAYS*864e5), dueTxt=`${due.getMonth()+1}월 ${due.getDate()}일`;
+  const expoOn=Object.keys(TRIG_LABEL).filter(k=>R.t[k]).map(k=>TRIG_LABEL[k]);
+  const evTxt=R.evidence>=60?'활동을 자료로 증명할 수 있는 수준이에요':R.evidence>=35?'일부 활동만 자료로 증명할 수 있어요':'실제로 하고 있어도 자료로 증명하기 어려운 상태예요';
+
+  /* 01 요약 */
+  const summary=`<b>${esc(name)}</b>의 ESG 실행 준비도는 <b>${R.overall}점(Level ${R.level+1} · ${LEVELS[R.level][1]})</b>이에요.
+    ${spread<10?`${ksv.length}개 영역 점수가 고르게 분포해 있어요(최고·최저 차이 ${spread}점).`:`${ksv.length}개 영역 중 가장 앞선 곳은 <b>${DOMS[strong]}</b>(${R.dom[strong]}점), 가장 취약한 곳은 <b>${DOMS[weak[0]]}</b>(${R.dom[weak[0]]}점)${weak[1]&&R.dom[weak[1]]<R.dom[strong]-9?`·<b>${DOMS[weak[1]]}</b>(${R.dom[weak[1]]}점)`:''}이에요.`}
+    ${expoOn.length?`${expoOn.join('·')} 신호가 있어 외부 요구에 노출된 상태이고, `:''}${hiRisk.length?`특히 <b>'${hiRisk[0].n}'</b> 리스크를 가장 먼저 관리해야 해요(높음 ${hiRisk.length}건 · 전체 ${R.risks.length}건).`:R.risks.length?`높음 등급 리스크는 없고, 중간 이하 리스크 ${R.risks.length}건을 로드맵에 따라 단계적으로 관리하면 돼요.`:'두드러진 리스크는 없어요.'}
+    증빙 신뢰도는 ${R.evidence}점으로 ${evTxt}. ${R.proj[4]>R.overall?`제안 로드맵을 계획대로 실행하면 <b>12개월 후 약 ${R.proj[4]}점(Level ${lvl12+1} · ${LEVELS[lvl12][1]})</b>까지 올라갈 수 있어요.`:`지금 수준을 유지하면서 외부 검증·인증으로 대외 신뢰도를 높이는 단계예요.`}`;
+  const top3=R.P[0].slice(0,3).map((it,i)=>`<div class="act"><span class="n num">${i+1}</span><div><div class="tiny" style="font-weight:600;color:var(--primary)">목표 모습</div><h3>${esc(it.q.o[it.to])}</h3>
+      <div class="from">지금: ${esc(it.a.v==='u'?'현재 상태 모름':it.q.o[it.a.v])}</div>
+      <div class="tags" style="margin-top:6px"><span class="tag">${DOMS[it.q.d]}</span><span class="tag">담당 ${OWNER[it.q.d]}</span><span class="tag">산출물: ${esc(it.q.doc)}</span></div></div></div>`).join('');
+
+  /* 02 영역 */
+  const domRows=ks.map((k,i)=>{ const v=R.dom[k]; if(v==null) return ''; const t=tone(v);
+    return `<div class="domrow"><div class="nm"><span class="dot d-${t}"></span><span>${DOMS[k]}</span><span class="tiny">가중 ${R.w[i]}%</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="pill p-${t}">${toneTxt[t]}</span><b class="num" style="min-width:2.2em;text-align:right">${v}</b></div>
+      <div class="bar"><i class="${t}" style="width:${Math.max(v,3)}%"></i><em style="left:calc(${R.projDom[k]}% - 1px)" title="12개월 목표"></em></div></div>`; }).join('');
+
+  /* 03 매트릭스 해석 */
+  const quad=k=>R.expo[k]>=50?(R.dom[k]<50?'즉시 대응':'강점 · 대외 활용'):(R.dom[k]<50?'기본 정비':'현 수준 유지');
+  const urgent=ksv.filter(k=>quad(k)==='즉시 대응');
+  const quadTbl=`<div class="tbl"><table><thead><tr><th>영역</th><th>준비도</th><th>외부 노출</th><th>구분</th><th>노출 원인</th></tr></thead><tbody>
+    ${ksv.map(k=>`<tr><td><b>${k}</b> ${DSHORT[k]}</td><td class="num">${R.dom[k]}</td><td class="num">${R.expo[k]}</td><td><span class="pill ${quad(k)==='즉시 대응'?'p-bad':quad(k)==='기본 정비'?'p-warn':'p-good'}">${quad(k)}</span></td>
+      <td>${R.expoTags[k].length?R.expoTags[k].map(x=>TRIG_LABEL[x]).join(', '):'업종 가중치 기준'}</td></tr>`).join('')}</tbody></table></div>`;
+
+  /* 04 영역별 해석 */
+  const interp=ksv.map(k=>{
+    const v=R.dom[k], t=tone(v);
+    const qs=Object.entries(A).filter(([id,a])=>QI[id].d===k);
+    const num=qs.filter(([,a])=>typeof a.v==='number'||a.v==='u').map(([id,a])=>({q:QI[id],v:a.v==='u'?0.5:a.v,a}));
+    const best=num.slice().sort((x,y)=>y.v-x.v)[0], worst=num.slice().sort((x,y)=>x.v-y.v)[0];
+    let txt=t==='good'?`운영 체계가 갖춰진 강점 영역이에요. 지금 자료를 외부 제출용으로 정리하면 고객사·지원사업 평가에 바로 쓸 수 있어요.`
+      :t==='warn'?(best&&worst&&best.v>worst.v?`기본 활동은 있지만 기록과 체계가 부족해요. '${best.q.s}' 항목은 앞서 있고, '${worst.q.s}' 항목을 먼저 끌어올려야 해요.`:`기본 활동은 있지만 기록과 체계가 부족해요. 문항 수준이 비슷해서 증빙이 필요한 항목부터 '관리' 수준으로 올리는 게 효과적이에요.`)
+      :`아직 관리가 시작되지 않은 영역이에요. '${worst?worst.q.s:''}' 항목부터 기록이 남는 수준으로 바꾸는 게 가장 빠른 개선이에요.`;
+    if(R.expo[k]>=60) txt+=` ${R.expoTags[k].length?R.expoTags[k].map(x=>TRIG_LABEL[x]).join('·')+' 때문에 ':''}외부 요구가 큰 영역이라 우선순위가 높아요.`;
+    const lines=qs.map(([id,a])=>{ const q=QI[id];
+      const lv=a.v==='na'?'해당없음':a.v==='u'?'모름':LV_OPT[a.v];
+      const n=typeof a.v==='number'?a.v:-1;
+      return `<div class="qline"><span>${esc(q.s)}${a.auto?` <span class="tiny">(${a.auto.includes('추정')?'추정':'자동'})</span>`:''}</span><span class="cells" aria-hidden="true">${[0,1,2,3].map(j=>`<i class="${j<=n?'on':''}"></i>`).join('')}</span><span class="lv">${lv}</span></div>`; }).join('');
+    return `<section class="card icard"><h3><span>${k}. ${DOMS[k]}</span><span style="display:flex;gap:6px;align-items:center"><span class="pill p-${t}">${toneTxt[t]}</span><b class="num">${v}</b></span></h3>
+      <div class="tags">${R.expoTags[k].map(x=>`<span class="tag hot">${TRIG_LABEL[x]}</span>`).join('')}<span class="tag">가중 ${R.w[ks.indexOf(k)]}%</span><span class="tag">12개월 목표 ${R.projDom[k]}점</span></div>
+      <p>${esc(txt)}</p><div style="display:flex;flex-direction:column;gap:6px">${lines}</div></section>`;
+  }).join('');
+
+  /* 05 리스크 */
+  const cellCls=(L,I)=>({'높음':'c3','중간':'c2','낮음':'c1'})[gradeOf(L,L*I)];
+  const heat=`<div class="heat" role="img" aria-label="리스크 히트맵: 가능성과 영향도">
+    ${[3,2,1].map(I=>`<div class="ax">${['','낮음','중간','높음'][I]}<br><span class="tiny">영향</span></div>${[1,2,3].map(L=>`<div class="cell ${cellCls(L,I)}">${R.risks.filter(r=>r.L===L&&r.I===I).map(r=>`<span class="rk" title="${esc(r.n)}">${r.id}</span>`).join('')}</div>`).join('')}`).join('')}
+    <div></div>${['낮음','중간','높음'].map(x=>`<div class="ax">가능성 ${x}</div>`).join('')}</div>`;
+  const riskRows=R.risks.map(r=>{ const wa=A[r.wq]; const ph=R.phaseOf[r.wq];
+    return `<tr><td><span class="pill ${r.grade==='높음'?'p-bad':r.grade==='중간'?'p-warn':'p-good'}">${r.grade}</span></td>
+      <td><b>${r.id} ${esc(r.n)}</b><span class="sub">${esc(r.d)}</span><span class="sub ref-line">근거: ${esc(r.ref)}</span></td>
+      <td>${esc(QI[r.wq].s)}<span class="sub">지금: ${esc(wa.v==='u'?'현재 상태 모름':QI[r.wq].o[wa.v])}</span></td>
+      <td>${r.area}</td><td class="num">${r.L}×${r.I}=${r.S}</td>
+      <td>${esc(r.m)}<span class="sub">${ph!=null?PHASES[ph].t.split(' · ')[0]+' · '+PHASES[ph].when:'12개월 이후'}</span></td></tr>`; }).join('');
+
+  /* 06 준비 서류 */
+  const docs=Object.entries(A).filter(([,a])=>a.v!=='na').map(([id,a])=>{ const q=QI[id];
+    const st=typeof a.v==='number'&&a.v>=2?'보유':a.v===1?'보완 필요':'미보유';
+    return {q,st,ph:R.phaseOf[id]}; });
+  docs.splice(docs.findIndex(x=>x.q.id==='B1')+1,0,{q:{d:'B',doc:'전기 사용량(kWh) 데이터',s:'전기 사용량'},st:R.kd.q==='실측'?'보유':R.kd.q==='추정'?'보완 필요':'미보유',ph:R.kd.q==='실측'?null:0});
+  const cnt={보유:0,'보완 필요':0,미보유:0}; docs.forEach(d=>cnt[d.st]++);
+  const tot=docs.length;
+  const stCls={보유:'p-good','보완 필요':'p-warn',미보유:'p-bad'};
+  const docRows=docs.map(d=>`<tr><td>${d.q.d}. ${DSHORT[d.q.d]}</td><td><b>${esc(d.q.doc)}</b><span class="sub">관련 문항: ${esc(d.q.s)}</span></td>
+    <td><span class="pill ${stCls[d.st]}">${d.st}</span></td><td>${d.st==='보유'?'유지·최신화':d.ph!=null?PHASES[d.ph].when:'12개월 이후'}</td></tr>`).join('');
+
+  /* 07 로드맵 */
+  const qwItem=R.kd.q!=='실측'?`<li><b>최근 3개월 전기 고지서의 kWh를 표 한 장에 옮겨 적기</b><div class="meta"><span class="tag">환경·에너지</span><span class="tag">담당 총무·생산</span><span class="tag">10분 Quick Win</span></div></li>`:'';
+  const phases=PHASES.map((ph,pi)=>{ const items=R.P[pi];
+    const extra=pi===3&&(!A.F3||A.F3.v!=='na')?`<li><b>고객사 ESG 질의서 모의 응답, 지원사업 ESG 가점 서류 제출</b><div class="meta"><span class="tag">자료·기록</span><span class="tag">담당 경영지원</span></div></li>`:'';
+    return `<section class="card phase ${ph.k}"><h3><span>${ph.t}</span><span class="tiny">${ph.when}</span></h3>
+      <p class="goal">${ph.goal}</p>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px"><span class="tiny">완료 시 예상 점수</span><b class="num">${R.proj[pi]} → ${R.proj[pi+1]}점</b></div>
+      <ul>${pi===0?qwItem:''}${items.map(it=>`<li><b>${esc(it.q.o[it.to])}</b><div class="meta"><span class="tag">${DSHORT[it.q.d]}</span><span class="tag">담당 ${OWNER[it.q.d]}</span><span class="tag">산출물: ${esc(it.q.doc)}</span></div></li>`).join('')||'<li class="tiny">해당 과제 없음 · 현 수준 유지</li>'}${extra}</ul></section>`; }).join('');
+
+  const lvOf=v=>LEVELS.reduce((acc,l,i)=>v>=l[0]?i:acc,0);
+  const projTbl=`<div class="tbl"><table style="min-width:0"><thead><tr><th>시점</th><th>예상 점수</th><th>Level</th></tr></thead><tbody>${['현재','1개월 · Phase 1','3개월 · Phase 2','6개월 · Phase 3','12개월 · Phase 4'].map((t,i)=>`<tr><td>${t}</td><td class="num"><b>${R.proj[i]}</b>${i?` <span class="tiny">+${R.proj[i]-R.proj[i-1]}</span>`:''}</td><td>${LEVELS[lvOf(R.proj[i])][1]}</td></tr>`).join('')}</tbody></table></div>`;
+  const kTag={'실측':'고지서 실측','추정':`요금 기반 추정 ±${ERR*100}%`,'미확보':'미확보'}[R.kd.q];
+  const fmt=v=>v<10?v.toFixed(1):Math.round(v).toLocaleString();
+  const tTxt=R.tco2==null?'':(R.kd.q==='추정'?`${fmt(R.tco2*(1-ERR))}~${fmt(R.tco2*(1+ERR))}`:fmt(R.tco2));
+
+  const today=new Date();
+  app.innerHTML=`
+  <div class="print-only"><div class="ph"><img src="logo-mark.png" alt=""><div><b>BECONIC ESG 경영준비도 진단 리포트</b><div class="tiny">${esc(name)} · ${esc(S.p.industry)} · ${esc(S.p.size)} · 진단일 ${today.getFullYear()}.${today.getMonth()+1}.${today.getDate()} · ${APP_VERSION} (업데이트 ${APP_UPDATED})</div></div></div></div>
+  ${S.sample?`<div class="flag" style="background:var(--primary-soft)"><span><b style="color:var(--primary)">예시 리포트</b> 가상의 제조기업(10~49인, 대기업 납품) 응답으로 만든 화면이에요. 실제 진단은 '진단 시작하기'에서 해보세요.</span></div>`:''}
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="eyebrow">ESG 실행 준비도 진단 리포트 · ${esc(name)} · ${esc(S.p.industry)} · ${esc(S.p.size)}</div>
+      <span class="status ${R.provisional?'p-warn':'p-good'}">${R.provisional?`잠정 · ${dueTxt}까지 보완`:'확정'}</span></div>
+    <div class="cover" style="margin-top:16px">
+      <div class="ring" role="img" aria-label="ESG 준비도 ${R.overall}점">
+        <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" style="fill:none;stroke:var(--line);stroke-width:10"/>
+        <circle cx="60" cy="60" r="52" style="fill:none;stroke:var(--primary);stroke-width:10;stroke-linecap:round" stroke-dasharray="${2*Math.PI*52}" stroke-dashoffset="${2*Math.PI*52*(1-R.overall/100)}"/></svg>
+        <div class="v"><div><b class="num">${R.overall}</b><small>/ 100</small></div></div>
+      </div>
+      <div style="min-width:0">
+        <span class="lvl">Level ${R.level+1} · ${LEVELS[R.level][1]}</span>
+        <p style="margin:10px 0 0;font-size:15px">12개월 로드맵 실행 시 <b class="num">${R.proj[4]}점</b> · Level ${lvl12+1} ${LEVELS[lvl12][1]} 예상</p>
+        <div class="lvl-ladder" aria-hidden="true">${LEVELS.map((l,i)=>`<div class="${i===R.level?'on':i===lvl12&&lvl12!==R.level?'goal':''}">${l[1]}</div>`).join('')}</div>
+      </div>
+    </div>
+  </section>
+  <nav class="rep-nav" aria-label="리포트 목차">${[['s1','요약'],['s2','영역 진단'],['s3','노출 매트릭스'],['s4','영역별 해석'],['s5','리스크'],['s6','준비 서류'],['s7','로드맵'],['s8','방법론·출처']].map(([id,t])=>`<button data-jump="${id}">${t}</button>`).join('')}</nav>
+
+  <div class="rsec" id="s1">
+    <h2 class="sh"><span>01</span>진단 요약</h2>
+    <section class="card"><p class="summary">${summary}</p></section>
+    <div class="kpis">
+      <div class="kpi"><b class="num">${R.overall}<span style="font-size:13px;color:var(--ink-3)"> → ${R.proj[4]}</span></b><span>준비도 (현재 → 12개월)</span></div>
+      <div class="kpi"><b class="num" style="color:var(--${tone(R.evidence)})">${R.evidence}</b><span>증빙 신뢰도</span></div>
+      <div class="kpi"><b class="num" style="color:var(--${hiRisk.length?'bad':'good'})">${hiRisk.length}<span style="font-size:13px;color:var(--ink-3)"> / ${R.risks.length}</span></b><span>높음 리스크 / 전체</span></div>
+      <div class="kpi"><b class="s" style="color:var(--${R.carbonTone})">${R.carbon}</b><span>탄소 데이터 준비</span></div>
+    </div>
+    ${R.flags.map(f=>`<div class="flag"><span><b>${f[0]}</b> ${esc(f[1])}</span></div>`).join('')}
+    ${R.provisional?`<section class="card" style="display:flex;flex-direction:column;gap:10px;border-color:var(--warn)">
+      <b style="font-size:15.5px">숫자 1개만 보완하면 리포트가 확정돼요</b>
+      <p class="tiny" style="margin:0">${S.k1.none==='delegate'?'담당자 입력을 기다리는 중이에요. ':''}${dueTxt}까지 전기 사용량(kWh)을 넣으면 탄소 데이터 준비도와 증빙 신뢰도를 다시 계산해요.</p>
+      <div class="kwh field"><input id="fixKwh" type="number" inputmode="numeric" min="0" placeholder="예: 3200" aria-label="전기 사용량 kWh 보완 입력"><span>kWh</span></div>
+      <button class="btn" id="fixBtn">반영하고 확정하기</button></section>`:''}
+    <section class="card"><div class="eyebrow" style="margin-bottom:6px">이번 주에 시작할 3가지</div>
+      ${R.kd.q!=='실측'?`<div class="qw" style="margin-bottom:10px"><b class="num">10분</b><span><b>Quick Win</b> · 최근 3개월 전기 고지서의 kWh를 표 한 장에 옮겨 적기</span></div>`:''}
+      ${top3||`<p class="tiny">${R.P[2].length||R.P[3].length?'관리 수준 미만 과제가 없어요. 로드맵의 Phase 3부터 진행하세요.':'모든 문항이 체계 수준이에요. 정기 업데이트와 외부 검증으로 유지하세요.'}</p>`}</section>
+  </div>
+
+  <div class="rsec" id="s2">
+    <h2 class="sh"><span>02</span>영역별 준비도</h2>
+    <p class="lead">파란 면이 현재, 초록 점선이 12개월 로드맵 완료 시 예상 수준이에요. ${esc(S.p.industry)} 업종 기준으로 영역별 가중치를 다르게 적용했어요.</p>
+    <section class="card two wide-l">
+      <div>${radarSVG(R.dom,R.projDom)}<div class="legend" style="justify-content:center"><span><i style="background:var(--primary)"></i>현재</span><span><i style="background:var(--good)"></i>12개월 목표</span></div></div>
+      <div>${domRows}<p class="tiny" style="margin:10px 0 0">막대 위 세로선 = 12개월 목표 점수</p></div>
+    </section>
+  </div>
+
+  <div class="rsec" id="s3">
+    <h2 class="sh"><span>03</span>외부 요구 노출 × 준비도</h2>
+    <p class="lead">외부에서 요구가 많은데 준비가 덜 된 영역(왼쪽 위)이 가장 먼저 손봐야 할 곳이에요. ${urgent.length?`현재 <b>${urgent.map(k=>DSHORT[k]).join('·')}</b> 영역이 즉시 대응 구간에 있어요.`:'즉시 대응 구간에 있는 영역은 없어요.'}</p>
+    <section class="card two"><div>${matrixSVG(R.dom,R.expo)}</div><div style="min-width:0">${quadTbl}</div></section>
+  </div>
+
+  <div class="rsec" id="s4">
+    <h2 class="sh"><span>04</span>영역별 진단 해석</h2>
+    <p class="lead">문항별 막대는 '미흡 → 초기 → 관리 → 체계' 4단계 중 현재 위치예요. 관리(3칸) 이상이면 증빙이 있는 상태로 봐요.</p>
+    <div class="interp">${interp}</div>
+  </div>
+
+  <div class="rsec" id="s5">
+    <h2 class="sh"><span>05</span>리스크 진단</h2>
+    <p class="lead">응답에서 확인된 관리 공백을 리스크로 바꿨어요. 가능성은 응답 수준과 노출 신호로, 영향도는 리스크 특성으로 매겨요. ${R.risks.length?`높음 ${hiRisk.length}건, 중간 ${R.risks.filter(r=>r.grade==='중간').length}건이에요.`:''}</p>
+    ${R.risks.length?`<section class="card two"><div>${heat}</div>
+      <div style="display:flex;flex-direction:column;gap:8px">${R.risks.slice(0,4).map(r=>`<div style="display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start"><span class="rk pill ${r.grade==='높음'?'p-bad':r.grade==='중간'?'p-warn':'p-good'}">${r.id}</span><div><b style="font-size:14px">${esc(r.n)}</b><div class="tiny">${esc(r.d)}</div></div></div>`).join('')}</div></section>
+    <div class="tbl"><table><thead><tr><th>등급</th><th>리스크</th><th>원인 (관련 응답)</th><th>영향 영역</th><th>가능성×영향</th><th>대응 방향 · 시점</th></tr></thead><tbody>${riskRows}</tbody></table></div>`
+    :'<section class="card"><p class="tiny" style="margin:0">응답 기준으로 활성화된 리스크가 없어요.</p></section>'}
+  </div>
+
+  <div class="rsec" id="s6">
+    <h2 class="sh"><span>06</span>준비 서류 체크리스트</h2>
+    <p class="lead">고객사 실사·지원사업·인증 심사에서 요구되는 서류 기준이에요. 응답에서 '관리' 이상이면 보유로 봐요.</p>
+    <section class="card" style="display:flex;flex-direction:column;gap:10px">
+      <div class="stack" role="img" aria-label="서류 보유 ${cnt['보유']}건, 보완 ${cnt['보완 필요']}건, 미보유 ${cnt['미보유']}건">
+        <i style="width:${cnt['보유']/tot*100}%;background:var(--good)"></i><i style="width:${cnt['보완 필요']/tot*100}%;background:var(--warn)"></i><i style="width:${cnt['미보유']/tot*100}%;background:var(--bad)"></i></div>
+      <div class="legend"><span><i style="background:var(--good)"></i>보유 ${cnt['보유']}</span><span><i style="background:var(--warn)"></i>보완 필요 ${cnt['보완 필요']}</span><span><i style="background:var(--bad)"></i>미보유 ${cnt['미보유']}</span><span class="tiny">총 ${tot}종 · 확보율 ${Math.round(cnt['보유']/tot*100)}%</span></div>
+    </section>
+    <div class="tbl"><table><thead><tr><th>영역</th><th>준비 서류</th><th>상태</th><th>확보 시점</th></tr></thead><tbody>${docRows}</tbody></table></div>
+  </div>
+
+  <div class="rsec" id="s7">
+    <h2 class="sh"><span>07</span>12개월 실행 로드맵</h2>
+    <p class="lead">리스크가 크고 외부 노출이 높은 과제부터 배치했어요. 각 과제의 목표는 응답 보기의 다음 단계 모습 그대로라, 완료 여부를 바로 판단할 수 있어요.</p>
+    <section class="card two"><div style="max-width:380px;width:100%;justify-self:center">${projSVG(R.proj)}</div><div style="min-width:0">${projTbl}<p class="tiny" style="margin:8px 0 0">단계별 과제를 계획대로 완료한다고 가정한 추정치이며 보장값이 아니에요. 점선은 준비도 Level 경계예요.${R.later.length?` 12개월 이후 지속 개선 과제 ${R.later.length}건(${R.later.map(it=>it.q.s).join(', ')})은 전망에서 제외했어요.`:''}</p></div></section>
+    <div class="phases">${phases}</div>
+    <section class="card" style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><b style="font-size:14.5px">참고 탄소량 · 전력(Scope 2)</b><span class="qtag">${kTag}</span></div>
+      ${R.tco2!=null?`<div><b class="num" style="font-size:24px">약 ${tTxt}</b> <span class="muted">tCO₂e / 년</span></div>
+      <div class="tiny">월 ${R.kd.kwh.toLocaleString()} kWh × 12개월 × 배출계수 ${EF} tCO₂e/MWh${R.kd.q==='추정'?` · 요금 ÷ 실효단가 ${PRICE[R.kd.contract]}원/kWh(${R.kd.contract==='gap'?'산업용 갑':'산업용 을'}${R.kd.assumed?', 직원 수로 추정':''})로 역산`:''} · 배출계수는 GIR 최신 승인값. 공식 배출량 산정이 아닌 참고값이에요.</div>`
+      :`<div class="tiny">전기 사용량을 넣으면 연간 참고 탄소량을 보여드려요. 요금 구간만 알아도 추정할 수 있어요.</div>`}
+    </section>
+  </div>
+
+  <div class="rsec" id="s8">
+    <h2 class="sh"><span>08</span>진단 방법론 & 참고 기준</h2>
+    <section class="card" style="display:flex;flex-direction:column;gap:12px">
+      <p style="margin:0;font-size:14px;line-height:1.75;color:var(--ink-2)">본 진단은 국내 K-ESG 가이드라인 v2.0과 공급망 대응 K-ESG 가이드라인, EFRAG VSME, IFRS S1·S2, GHG Protocol, GRI, OECD·UN·ILO 원칙, ISO 14001/45001/26000/37001, EU CBAM 등 <b>공개된 방법론과 평가 철학을 교차 참조</b>해 설계했어요. 특정 평가기관의 문항·점수 알고리즘·등급 체계를 복제하지 않아요.
+      모든 점수는 응답에 대한 <b>고정된 계산식(deterministic)</b>으로 산출되며, AI가 점수를 임의로 정하지 않아요.</p>
+      <details class="fold"><summary>산출 방식 보기 · 7개 구성 요소</summary>
+      <div class="tbl" style="margin-top:10px"><table style="min-width:520px"><thead><tr><th>구성 요소</th><th>산출 방식</th></tr></thead><tbody>
+        <tr><td>문항 점수</td><td>행동기반 4단계 보기 · 미흡 0 / 초기 33 / 관리 67 / 체계 100 · 잘 모르겠어요 20 · 해당 없음은 제외</td></tr>
+        <tr><td>영역·종합 점수</td><td>영역 내 문항 평균 → 업종별 중대성 가중치(${esc(S.p.industry)}: ${R.w.join('/')})로 가중 평균</td></tr>
+        <tr><td>증빙 신뢰도</td><td>증빙 판정 문항 중 '관리' 이상 비율 + 전기 사용량 데이터 품질(실측 1.0 · 추정 0.5 · 미확보 0)</td></tr>
+        <tr><td>외부 요구 노출</td><td>업종 가중치 × 2.5 + 노출 신호(납품·수출·제조·투자·개인정보)당 15점, 최대 100</td></tr>
+        <tr><td>리스크 등급</td><td>가능성(응답 수준 + 노출 신호, 1~3) × 영향도(리스크 고유값, 1~3) · 9 이상 또는 6 이상이면서 가능성 3이면 높음 / 4 이상 중간 / 그 외 낮음</td></tr>
+        <tr><td>로드맵·점수 전망</td><td>관리 미만 과제를 리스크·노출 순으로 먼저, 체계 전환 과제를 나중에 배치 · Phase별 최대 4/6/6/5개(중소기업 실행 용량), 넘치면 12개월 이후 · 완료 가정 시 같은 계산식으로 재산출</td></tr>
+        <tr><td>참고 탄소량</td><td>월 kWh × 12 × 배출계수 ${EF} tCO₂e/MWh · 요금 추정은 실효단가(갑 ${PRICE.gap} / 을 ${PRICE.eul}원/kWh)로 역산</td></tr>
+      </tbody></table></div>
+      </details>
+    </section>
+    <details class="ref card"><summary>참조 기준 보기 · 문항별 기준과 기준·자료 ${REFS.length}종</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${REFS.map(r=>`<span class="tag" title="${esc(r[1])}">${esc(r[0])}</span>`).join('')}</div>
+    <div class="tbl"><table><thead><tr><th>문항</th><th>영역</th><th>참조 기준</th></tr></thead><tbody>
+      ${Q.filter(q=>q.kind||A[q.id]).map(q=>`<tr><td><b>${q.kind?'K1 전기 사용량':q.id+' '+esc(q.s)}</b></td><td>${DSHORT[q.d]}</td><td>${esc(q.r.join(' · '))}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="tbl"><table><thead><tr><th>기준·자료</th><th>발행</th><th>구분</th></tr></thead><tbody>
+      ${REFS.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${r[2]}</td></tr>`).join('')}
+    </tbody></table></div>
+    </div></details>
+  </div>
+
+  <section class="card" style="display:flex;flex-direction:column;gap:10px">
+    <b style="font-size:15px">추천 후속 BECONIC 진단</b>
+    <div class="tools">${recommendTools(R).map(([k,why])=>`<a class="tool" href="${TOOLS[k][1]}" target="_blank" rel="noopener"><b>${TOOLS[k][0]}</b><span>${why}</span></a>`).join('')}</div>
+    ${R.deep.length?`<p class="tiny" style="margin:0">50점 미만 영역(${R.deep.map(k=>DSHORT[k]).join('·')})은 컨설턴트 상담 때 영역별 심화 질문 3~4개와 증빙 확인으로 정밀 진단해요.</p>`:''}
+  </section>
+
+  <section class="card cta">
+    <b style="font-size:16.5px">이 리포트로 전문가와 실행계획을 확정하세요</b>
+    <p>BECONIC 컨설턴트가 리스크별 대응, 서류 준비, 지원사업 연계까지 로드맵을 함께 정리해 드려요.</p>
+    <div class="tel"><b class="num">${COMPANY.tel}</b><button id="copy">번호 복사</button></div>
+    <p style="margin:10px 0 0;font-size:13px">이메일 <a href="mailto:${COMPANY.mail}?subject=${encodeURIComponent('ESG 진단 결과 상담 요청')}" style="color:inherit">${COMPANY.mail}</a> · ${COMPANY.web}</p>
+  </section>
+  <div class="row"><button class="btn" id="pdf">PDF 저장·인쇄</button><button class="btn btn-ghost" id="edit">응답 수정</button><button class="btn btn-ghost" id="again">처음부터 다시</button></div>
+  <p class="disc">본 리포트는 공식 ESG 평가등급·인증이 아닌 실행 준비도 자가진단이며, 법률·노무·회계 자문을 대신하지 않아요. 문항 설계는 K-ESG 가이드라인 v2.0 범주를 참고했고, 리스크 등급과 점수 전망은 응답 기반 추정이에요.</p>`;
+
+  app.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
+  document.getElementById('pdf').onclick=()=>window.print();
+  const fb=document.getElementById('fixBtn');
+  if(fb) fb.onclick=()=>{ const v=+document.getElementById('fixKwh').value; if(!(v>0)||v>KWH_MAX){ toast(`kWh는 1~${KWH_MAX.toLocaleString()} 사이 숫자로 넣어 주세요`); return; }
+    S.k1={mode:'exact',kwh:String(v),bill:-1,none:'',contract:'auto'}; rResult(); window.scrollTo({top:0}); toast('반영했어요. 리포트가 확정됐어요'); };
+  document.getElementById('copy').onclick=()=>copyText(COMPANY.tel,'번호를 복사했어요');
+  document.getElementById('edit').onclick=()=>{ S.idx=0; go('quiz'); };
+  document.getElementById('again').onclick=()=>{ if(!S.sample) clearSaved(); S=blank(); go('start'); };
+}
+
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{
+  const sc=b.dataset.go;
+  if(location.hash) history.replaceState(null,'',location.pathname+location.search);
+  if(sc==='quiz'&&!profileOk()){ toast('기업정보를 먼저 입력해 주세요'); go('profile'); return; }
+  go(sc);
+});
+/* 인쇄: 접힌 산출 방식표(.fold)는 펼쳐서 인쇄하고, 끝나면 원래 상태로 */
+window.addEventListener('beforeprint',()=>document.querySelectorAll('details.fold').forEach(d=>{ d.dataset.wasOpen=d.open?'1':''; d.open=true; }));
+window.addEventListener('afterprint',()=>document.querySelectorAll('details.fold').forEach(d=>{ d.open=d.dataset.wasOpen==='1'; }));
+document.getElementById('foot').innerHTML=`<div class="fb"><img src="logo-mark.png" alt=""><span><b>${COMPANY.brand}</b> by Growth Ventures</span></div>
+  <div>${COMPANY.addr} · 전화 ${COMPANY.tel} · 이메일 <a href="mailto:${COMPANY.mail}">${COMPANY.mail}</a> · <a href="https://${COMPANY.web}" target="_blank" rel="noopener">${COMPANY.web}</a></div>
+  <div>${COMPANY.cert}</div><div>${APP_VERSION} · 업데이트 ${APP_UPDATED} · ${COMPANY.copy}</div>`;
+document.getElementById('homeBtn').onclick=()=>{ if(location.hash) history.replaceState(null,'',location.pathname+location.search); if(S.sample) S=blank(); go('start'); };
+window.ESG={Q,QI,RISKS,PHASES,W,COMPANY,APP_VERSION,LS_KEY,analyze,core,flow,triggers,gradeOf,recommendTools,get S(){return S;},set S(x){S=x;}};
+if(location.hash==='#kwh-request') rDelegate(); else render();
+})();
+
+</script>
+</body>
+</html>
