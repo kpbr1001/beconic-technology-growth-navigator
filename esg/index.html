@@ -260,7 +260,7 @@ footer.site .fb img{width:22px;height:22px;border-radius:5px}
 .tool span{font-size:12.5px;color:var(--ink-2)}
 @media (max-width:640px){.tools{grid-template-columns:1fr}}
 @page{size:A4;margin:14mm 12mm}
-@media print{.print-only{display:block!important}.no-print{display:none!important}.sh,.lead{break-after:avoid;page-break-after:avoid}.rsec{break-before:auto}main{padding-block:0}.wrap.wide{max-width:none}.tool::after{content:" " attr(href);font-size:10px;color:#666}}
+@media print{.print-only{display:block!important}.no-print{display:none!important}.sh,.lead{break-after:avoid;page-break-after:avoid}.rsec{break-before:auto}main{padding-block:0}.wrap.wide{max-width:none}}
 /* ===== Design v2.1 — 토스 스타일 컴포넌트 ===== */
 body{font-size:16px;letter-spacing:-0.01em}
 .num,.kpi b,.ring .v b,.domrow b{font-variant-numeric:tabular-nums}
@@ -294,6 +294,16 @@ body{font-size:16px;letter-spacing:-0.01em}
 .opt:hover{background:var(--line)}
 .opt[aria-pressed="true"]{background:var(--primary-soft);box-shadow:inset 0 0 0 2px var(--primary);font-weight:700}
 .ladder s.on{background:var(--primary)}
+.opt{grid-template-columns:34px 1fr 22px}
+.opt::after{content:"";width:22px;height:22px;border-radius:50%;justify-self:end}
+.opt[aria-pressed="true"]::after{content:"✓";display:grid;place-items:center;background:var(--primary);color:var(--on-primary);font-size:13px;font-weight:800}
+.opt.mode{grid-template-columns:1fr auto 22px}
+.alt{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.alt-btn{border:0;background:transparent;color:var(--ink-3);font-size:14px;font-weight:500;padding:8px 12px;border-radius:10px}
+.alt-btn:hover{background:var(--surface)}
+.alt-btn[aria-pressed="true"]{background:var(--primary-soft);color:var(--primary-strong);font-weight:700}
+.alt-btn[aria-pressed="true"]::before{content:"✓ "}
+@media (hover:none){.kbd-hint{display:none}}
 .panel{border-left:0;padding:14px;background:var(--surface-2);border-radius:16px}
 .panel .chip{background:var(--surface)}
 .panel .chip[aria-pressed="true"]{background:var(--primary-soft)}
@@ -331,6 +341,21 @@ footer.site{border-top:0;background:transparent}
   .hero h1{font-size:26px} .qtitle{font-size:22px}
 }
 @media print{.card{box-shadow:none}.bottom{position:static;background:none}}
+/* ===== 인쇄물(A4 PDF) 레이아웃 v2.2.1 ===== */
+@media print{
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tool{text-decoration:none}                                  /* 추천 진단: 주소 인쇄 안 함 */
+  .tbl{overflow:visible} table{min-width:0!important}         /* 표가 잘리거나 스크롤바가 찍히지 않게 */
+  #s3 .two{grid-template-columns:1fr;gap:12px}               /* 매트릭스와 구분표를 위아래로 */
+  #s3 .two>div:first-child{max-width:420px;margin:0 auto;width:100%}
+  .phases{display:block}                                       /* Phase 카드 한 줄에 하나 */
+  .phase{break-inside:auto;margin-bottom:12px;box-shadow:none!important;border-top:4px solid var(--primary-line)!important}
+  .phase.p1{border-top-color:var(--bad)!important} .phase.p2{border-top-color:var(--warn)!important} .phase.p3{border-top-color:var(--accent)!important} .phase.p4{border-top-color:var(--good)!important}
+  .phase h3,.phase .goal{break-after:avoid}
+  .phase li,.act,.domrow,.qline,.icard,.kpis,.flag,.qw{break-inside:avoid}
+  #s1 .card{break-inside:auto}                                 /* '이번 주 3가지'는 과제 단위로 나눔 → 빈 쪽 감소 */
+  .heat,.stack,.legend,svg{break-inside:avoid}
+}
 .fade{animation:fade .25s ease}
 @keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}.bar i{transition:none}}
@@ -359,7 +384,7 @@ footer.site{border-top:0;background:transparent}
 <script>
 (function(){
 /* ================= 운영 설정 (여기서만 수정) ================= */
-const APP_VERSION='v2.1.0', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
+const APP_VERSION='v2.2.1', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
 const APP_NAME='ESG 경영준비도 진단';
 const SITE='https://beconic-diagnosis-esg.netlify.app/';   // <head> og:url·og:image 와 같아야 함 (QA 검사)
 const COMPANY={name:'그로스벤처스 주식회사',brand:'BECONIC',tel:'02-6124-5960',mail:'start@gven.kr',web:'www.beconic.kr',
@@ -514,6 +539,8 @@ const YN=[['mfg','제조 사업장(공장·작업장)을 운영하나요?','환�
  ['invest','투자유치·정책금융·IPO를 준비 중인가요?','투자자 설명자료 문항이 추가돼요']];
 /* 숫자 문항(K1) 3단계 사다리 — 설정값은 문항마스터 '전력단가산정'·'데이터품질규칙' 시트와 동일 */
 const PRICE={eul:221.6,gap:168.1}; // 원/kWh 실효 단가 · 을=고압A 선택II(2026.4.16 개편) · 갑=갑I 고압A 선택II(2024.10.24 인상분)
+// 부가요금(2026.11 확인): 기후환경요금 9.0원 · 연료비조정요금 +5.0원(2026년 4분기) · 전력산업기반기금 2.7% — 분기마다 연료비조정요금 재확인
+const SURCHARGE_NOTE='기후환경 9원·연료비조정 +5원(2026년 4분기)·전력기금 2.7% 포함';
 const CONTRACT=[['gap','소규모 · 300kW 미만(갑)'],['eul','대규모 · 300kW 이상(을)'],['auto','잘 모르겠어요']];
 const EF=0.4541;      // tCO2e/MWh, GIR 최신 승인 국가 전력 배출계수(CO2e·소비단, 2020~2022 평균)
 const ERR=0.3, DUE_DAYS=7, KWH_MAX=5000000;   // 월 500만 kWh 초과는 입력 오류로 간주
@@ -643,7 +670,14 @@ function analyze(){
 function gradeOf(L,sc){ const G=RULES.RISK; return sc>=G.high||(sc>=G.highL3&&L===3)?'높음':sc>=G.mid?'중간':'낮음'; }
 const app=document.getElementById('app');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function go(sc){ S.screen=sc; render(); window.scrollTo({top:0}); }
+function go(sc){ S.screen=sc; render(); }
+function navTo(idx){ S.idx=idx; render(); }          // 문항 이동(기록 남김)
+const navKey=()=>S.screen+':'+(S.screen==='quiz'?S.idx:'');
+let fromPop=false, replaceNext=false;
+window.addEventListener('popstate',e=>{               // 휴대폰·브라우저 뒤로가기 → 이전 화면·문항
+  const st=e.state; if(!st||!st.k||location.hash==='#kwh-request') return;
+  closeModal(); fromPop=true; S.screen=st.screen; S.idx=st.idx||0; render(); fromPop=false;
+});
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2200); }
 function copyText(t,ok){ try{ navigator.clipboard.writeText(t).then(()=>toast(ok),()=>toast('길게 눌러 복사해 주세요')); }catch(e){ toast('길게 눌러 복사해 주세요'); } }
 function profileOk(){ const p=S.p; return p.industry&&p.size&&YN.every(([k])=>p[k]); }
@@ -656,6 +690,12 @@ function save(){ if(S.sample||!hasData(S)) return; try{ localStorage.setItem(LS_
 function loadSaved(){ try{ const o=JSON.parse(localStorage.getItem(LS_KEY)||'null'); return o&&hasData(o.S)?o:null; }catch(e){ return null; } }
 function clearSaved(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
 function render(){
+  const k=navKey(), cur=history.state&&history.state.k;
+  if(k!==cur){
+    try{ if(!cur||replaceNext) history.replaceState({k,screen:S.screen,idx:S.idx},''); else if(!fromPop) history.pushState({k,screen:S.screen,idx:S.idx},''); }catch(e){}
+    if(!fromPop) window.scrollTo({top:0});
+  }
+  replaceNext=false;
   document.querySelectorAll('[data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===S.screen?'step':'false'));
   app.classList.toggle('wide',S.screen==='result');
   ({start:rStart,profile:rProfile,quiz:rQuiz,result:rResult})[S.screen]();
@@ -683,11 +723,13 @@ function rDelegate(){
     <div class="kwh field"><input id="dkwh" type="number" inputmode="numeric" min="0" placeholder="예: 3200" aria-label="전기 사용량 kWh"><span>kWh</span></div>
     <button class="btn" id="dcopy" disabled>대표님께 보낼 메시지 복사</button>
     <div class="msg" id="dmsg" hidden></div>
-    <p class="tiny" style="margin:0">입력한 숫자는 이 화면에서만 쓰이고 저장·전송되지 않아요. 복사한 메시지를 카톡·문자로 보내 주세요.</p></section>`;
+    <p class="tiny" style="margin:0">입력한 숫자는 이 화면에서만 쓰이고 저장·전송되지 않아요. 복사한 메시지를 카톡·문자로 보내 주세요.</p></section>
+  <button class="btn btn-ghost" id="dHome">우리 회사도 ESG 진단해 보기</button>`;
   const inp=document.getElementById('dkwh'), btn=document.getElementById('dcopy'), msg=document.getElementById('dmsg');
   const text=()=>`[${APP_NAME}] 최근 한 달 전기 사용량: ${(+inp.value).toLocaleString()} kWh (한전 고지서 기준)`;
   inp.oninput=()=>{ const ok=+inp.value>0&&+inp.value<=KWH_MAX; btn.disabled=!ok; msg.hidden=!ok; if(ok) msg.textContent=text(); };
   btn.onclick=()=>copyText(text(),'메시지를 복사했어요');
+  document.getElementById('dHome').onclick=()=>{ history.replaceState(null,'',location.pathname+location.search); S=blank(); go('start'); };
 }
 
 /* ================= 추천 후속 진단 ================= */
@@ -779,10 +821,18 @@ function noneDetail(v){
     <div class="tiny">확인되면 위에서 '고지서 숫자 그대로 알아요'를 골라 입력해 주세요. 지금 어렵다면 '나중에 입력할게요'를 고르시면 돼요.</div>`;
   return '';
 }
+function navBar(can,last){
+  return `<div class="row bottom qnav"><button class="btn btn-ghost" id="prev">${S.idx===0?'기업정보':'이전'}</button><button class="btn" id="nxt" ${can?'':'disabled'}>${last?'결과 보기':'다음'}</button></div>`;
+}
+function bindNav(can,last){
+  document.getElementById('prev').onclick=()=>{ if(S.idx===0) go('profile'); else navTo(S.idx-1); };
+  document.getElementById('nxt').onclick=()=>{ if(!can()) return; S.sample=false; if(last){ S.idx++; go('result'); } else navTo(S.idx+1); };
+}
 function rQuiz(){
   if(!profileOk()){ app.innerHTML=`<section class="card"><h2 style="font-size:19px">기업정보를 먼저 입력해 주세요</h2><p class="muted">업종과 규모에 따라 질문이 달라져요.</p><button class="btn" id="toP">기업정보 입력</button></section>`; document.getElementById('toP').onclick=()=>go('profile'); return; }
   const F=flow();
-  if(S.idx>=F.length){ go('result'); return; }
+  if(S.idx>=F.length){ replaceNext=true; go('result'); return; }   // 범위를 넘은 기록은 결과로 교체(뒤로가기 갇힘 방지)
+  save();
   const q=F[S.idx];
   const remainSec=(F.length-S.idx)*RULES.SEC_PER_Q, remain=remainSec<=60?'1분 안에 끝나요':`약 ${Math.ceil(remainSec/60)}분 남았어요`;
   const pct=Math.round(S.idx/F.length*100);
@@ -810,15 +860,14 @@ function rQuiz(){
       <div class="opts" role="group" aria-label="아는 정도">${modes.map(([v,l,t])=>`<button type="button" class="opt mode" data-mode="${v}" aria-pressed="${k.mode===v}"><span>${l}</span><span class="qtag">${t}</span></button>`).join('')}</div>
       ${panel?`<div class="panel">${panel}</div>`:''}
     </section>
-    <div class="row bottom"><button class="btn btn-ghost" id="prev">이전</button><button class="btn" id="nxt" ${okK1()?'':'disabled'}>다음</button></div>`;
+    ${navBar(okK1(),S.idx===F.length-1)}`;
     app.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{ k.mode=b.dataset.mode; rQuiz(); const i=document.getElementById('kwh'); if(i) i.focus(); });
     app.querySelectorAll('[data-bill]').forEach(b=>b.onclick=()=>{ k.bill=+b.dataset.bill; rQuiz(); });
     app.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>{ k.contract=b.dataset.contract; rQuiz(); });
     app.querySelectorAll('[data-none]').forEach(b=>b.onclick=()=>{ k.none=b.dataset.none; if(['later','delegate'].includes(k.none)&&!k.dueAt) k.dueAt=Date.now()+DUE_DAYS*864e5; rQuiz(); });
     const inp=document.getElementById('kwh'); if(inp) inp.oninput=e=>{ k.kwh=e.target.value; document.getElementById('nxt').disabled=!okK1(); save(); };
     const cp=document.getElementById('cpMsg'); if(cp) cp.onclick=()=>copyText(DELEGATE_MSG(),'메시지를 복사했어요');
-    document.getElementById('prev').onclick=()=>{ S.idx=Math.max(0,S.idx-1); rQuiz(); };
-    document.getElementById('nxt').onclick=()=>{ if(!okK1())return; S.sample=false; S.idx++; rQuiz(); window.scrollTo({top:0}); };
+    bindNav(okK1,S.idx===F.length-1);
     return;
   }
   const a=S.a[q.id]||{};
@@ -834,27 +883,27 @@ function rQuiz(){
     </div>
     ${q.id==='F1'?`<div class="tiny">'흩어져 있거나 없어요'를 고르면 다음 질문(업데이트 주기)은 건너뛰어요.</div>`:''}
   </section>
-  <div class="qfoot">
-    <button class="linkbtn" id="prev" ${S.idx===0?'style="visibility:hidden"':''}>← 이전</button>
-    <div style="display:flex;gap:4px">
-      <button class="linkbtn" data-v="u" ${a.v==='u'?'style="font-weight:700;color:var(--primary-strong)"':''}>잘 모르겠어요</button>
-      ${allowNa?`<button class="linkbtn" data-v="na" ${a.v==='na'?'style="font-weight:700;color:var(--primary-strong)"':''}>해당 없음</button>`:''}
-    </div>
+  <div class="alt" role="group" aria-label="기타 응답">
+    <button type="button" class="alt-btn" data-v="u" aria-pressed="${a.v==='u'}">잘 모르겠어요</button>
+    ${allowNa?`<button type="button" class="alt-btn" data-v="na" aria-pressed="${a.v==='na'}">해당 없음</button>`:''}
   </div>
-  <p class="tiny" style="text-align:center">키보드 1~4로도 고를 수 있어요</p>`;
+  <p class="tiny kbd-hint" style="text-align:center;margin:0">키보드: 1~4로 고르고 Enter로 다음</p>
+  ${navBar(a.v!=null,S.idx===F.length-1)}`;
+  // 보기를 골라도 자동으로 넘어가지 않음 → 선택 확인 후 '다음'
   const pickV=v=>{
     S.a[q.id]={v}; S.sample=false;
-    app.querySelectorAll('.opt').forEach(b=>b.setAttribute('aria-pressed',String(String(v)===b.dataset.v)));
-    setTimeout(()=>{ S.idx++; rQuiz(); window.scrollTo({top:0}); },220);
+    rQuiz();                                           // 선택 표시·다음 버튼 활성화(같은 문항 유지)
+    const n=document.getElementById('nxt'); if(n) n.focus({preventScroll:true});
   };
   app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pickV(+b.dataset.v));
-  app.querySelectorAll('.linkbtn[data-v]').forEach(b=>b.onclick=()=>pickV(b.dataset.v));
-  document.getElementById('prev').onclick=()=>{ S.idx=Math.max(0,S.idx-1); rQuiz(); };
+  app.querySelectorAll('.alt-btn').forEach(b=>b.onclick=()=>pickV(b.dataset.v));
+  bindNav(()=>!!S.a[q.id],S.idx===F.length-1);
   rQuiz._key=pickV;
 }
 document.addEventListener('keydown',e=>{
-  if(S.screen!=='quiz'||e.target.tagName==='INPUT')return;
-  const n=+e.key; if(n>=1&&n<=4&&rQuiz._key) rQuiz._key(n-1);
+  if(S.screen!=='quiz'||e.target.tagName==='INPUT'||!document.getElementById('modal').hidden)return;
+  const n=+e.key; if(n>=1&&n<=4&&rQuiz._key){ rQuiz._key(n-1); return; }
+  if(e.key==='Enter'&&e.target.tagName!=='BUTTON'){ const b=document.getElementById('nxt'); if(b&&!b.disabled) b.click(); }
 });
 
 /* ================= 차트 ================= */
@@ -1013,7 +1062,7 @@ function rResult(){
     ['외부 요구 노출',`업종 가중치 × ${RULES.EXPO_W} + 노출 신호(납품·수출·제조·투자·개인정보)당 ${RULES.EXPO_TRIG}점, 최대 100`],
     ['리스크 등급',`가능성(응답 수준 + 노출 신호, 1~3) × 영향도(리스크 고유값, 1~3) · ${G.high} 이상 또는 ${G.highL3} 이상이면서 가능성 3이면 높음 / ${G.mid} 이상 중간 / 그 외 낮음`],
     ['로드맵·점수 전망',`관리 미만 과제를 리스크·노출 순으로 먼저, 체계 전환 과제를 나중에 배치 · Phase별 최대 ${RULES.CAPS.join('/')}개(중소기업 실행 용량), 넘치면 12개월 이후 · 완료 가정 시 같은 계산식으로 재산출`],
-    ['참고 탄소량',`월 kWh × 12 × 배출계수 ${EF} tCO₂e/MWh · 요금 추정은 실효단가(갑 ${PRICE.gap} / 을 ${PRICE.eul}원/kWh)로 역산`]
+    ['참고 탄소량',`월 kWh × 12 × 배출계수 ${EF} tCO₂e/MWh · 요금 추정은 실효단가(갑 ${PRICE.gap} / 을 ${PRICE.eul}원/kWh, ${SURCHARGE_NOTE})로 역산`]
   ];
   const lvOf=v=>LEVELS.reduce((acc,l,i)=>v>=l[0]?i:acc,0);
   const projTbl=`<div class="tbl"><table style="min-width:0"><thead><tr><th>시점</th><th>예상 점수</th><th>Level</th></tr></thead><tbody>${['현재','1개월 · Phase 1','3개월 · Phase 2','6개월 · Phase 3','12개월 · Phase 4'].map((t,i)=>`<tr><td>${t}</td><td class="num"><b>${R.proj[i]}</b>${i?` <span class="tiny">+${R.proj[i]-R.proj[i-1]}</span>`:''}</td><td>${LEVELS[lvOf(R.proj[i])][1]}</td></tr>`).join('')}</tbody></table></div>`;

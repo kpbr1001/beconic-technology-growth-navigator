@@ -38,8 +38,8 @@ async function answerAll(page, ans, k1) {
     if (await page.$('[data-mode]')) { await k1(page); const nx = await page.$('#nxt'); if (nx && await nx.isEnabled()) { await nx.click(); continue; } return 'k1-blocked'; }
     if (!(await page.$('.qhead'))) return 'done';
     const r = ans(n++); if (r === null) return 'stopped';
-    await page.click(r === 'u' ? '.linkbtn[data-v="u"]' : `.opt[data-v="${r}"]`);
-    await page.waitForTimeout(240);
+    await page.click(r === 'u' ? '.alt-btn[data-v="u"]' : `.opt[data-v="${r}"]`);
+    await page.click('#nxt');
   }
   return 'loop';
 }
@@ -107,6 +107,12 @@ const bodyText = (page) => page.locator('body').innerText();
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
   const pr = await page.evaluate(() => ({ ref: [...document.querySelectorAll('.ref')].filter((e) => getComputedStyle(e).display !== 'none').length, fold: document.querySelector('details.fold').open, head: getComputedStyle(document.querySelector('.print-only')).display, top: getComputedStyle(document.querySelector('.top')).display, law: [...document.querySelectorAll('.ref-line')].filter((e) => getComputedStyle(e).display !== 'none').length }));
   check('인쇄: 참조 기준 제외 · 산출 방식표 포함 · 근거 법령 포함 · 머리말 표시', pr.ref === 0 && pr.fold && pr.head === 'block' && pr.top === 'none' && pr.law > 0, JSON.stringify(pr));
+  const pp = await page.evaluate(() => ({
+    url: [...document.querySelectorAll('.tool')].every((t) => { const c = getComputedStyle(t, '::after').content; return c === 'none' || c === 'normal' || c === '""'; }),
+    tbl: [...document.querySelectorAll('.tbl')].every((t) => t.scrollWidth <= t.clientWidth + 1),
+    phases: getComputedStyle(document.querySelector('.phases')).display === 'block',
+    matrix: getComputedStyle(document.querySelector('#s3 .two')).gridTemplateColumns.split(' ').length === 1 }));
+  check('인쇄: 추천 진단 주소 미표시 · 표 잘림 없음 · Phase 1열 · 매트릭스 세로 배치', Object.values(pp).every(Boolean), JSON.stringify(pp));
   const pdf = await page.pdf({ path: path.join(OUT, 'report-a4.pdf'), format: 'A4', printBackground: true, preferCSSPageSize: true });
   const pages = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
   check('A4 PDF 생성', pages >= 3, `${pages}쪽`);
@@ -182,10 +188,50 @@ const bodyText = (page) => page.locator('body').innerText();
   check('#kwh-request → 담당자 입력 화면', (await bodyText(page)).includes('담당자 확인 요청'));
   await page.fill('#dkwh', '4100');
   check('담당자 입력 → 대표님께 보낼 메시지', (await page.textContent('#dmsg')).includes('4,100 kWh') && await page.isEnabled('#dcopy'));
+  await page.click('#dHome');
+  check('담당자 화면 → 진단 시작 화면으로 이동', (await bodyText(page)).includes('진단 시작하기'));
   await ctx.close();
 }
 
-// 6. 외부 요청: 폰트 CDN 외 없음
+// 6. 내비게이션: 선택 확인·다음 버튼·이전·뒤로가기·키보드·결과 보기
+{
+  const { ctx, page } = await fresh({ width: 390, height: 860 });
+  await fillProfile(page, PROFILE);
+  const q1 = await page.textContent('.qtitle');
+  check('첫 문항: 응답 전 다음 버튼 비활성 · 이전 = 기업정보', await page.isDisabled('#nxt') && (await page.textContent('#prev')).includes('기업정보'));
+  await page.click('.opt[data-v="2"]'); await page.waitForTimeout(700);
+  check('보기 선택 후 자동으로 넘어가지 않음 · 선택 표시(✓) · 다음 활성', (await page.textContent('.qtitle')) === q1 && await page.getAttribute('.opt[data-v="2"]', 'aria-pressed') === 'true' && await page.isEnabled('#nxt'));
+  await page.click('#nxt'); const q2 = await page.textContent('.qtitle');
+  check('다음 → 다음 문항', q2 !== q1);
+  await page.goBack(); await page.waitForTimeout(200);
+  check('휴대폰·브라우저 뒤로가기 → 이전 문항(사이트 이탈 없음) · 선택 유지', (await page.textContent('.qtitle')) === q1 && await page.getAttribute('.opt[data-v="2"]', 'aria-pressed') === 'true');
+  await page.goForward(); await page.waitForTimeout(200);
+  check('앞으로가기 → 다시 다음 문항', (await page.textContent('.qtitle')) === q2);
+  await page.click('#prev'); await page.click('#prev');
+  check('첫 문항에서 이전 → 기업정보 화면', !!(await page.$('#next')) && (await bodyText(page)).includes('우리 회사에 맞는 질문만'));
+  await page.goBack(); await page.waitForTimeout(200);
+  check('기업정보에서 뒤로가기 → 첫 문항', (await page.textContent('.qtitle')) === q1);
+  await page.keyboard.press('3'); await page.keyboard.press('Enter'); await page.waitForTimeout(150);
+  check('키보드: 3 선택 + Enter → 다음 문항', (await page.textContent('.qtitle')) === q2);
+  await page.reload(); await page.click('#resumeBtn');
+  check('새로고침 후 이어하기 → 고른 문항 다음부터', (await page.textContent('.qtitle')) !== q1);
+  // 마지막 문항: '결과 보기' 후 뒤로가기 → 마지막 문항(결과에 갇히지 않음)
+  for (let i = 0; i < 40; i++) {
+    if (await page.$('[data-mode]')) { await k1Bill(page); }
+    else if (await page.$('.qhead')) { if (!(await page.isEnabled('#nxt'))) await page.click('.opt[data-v="1"]'); }
+    else break;
+    if ((await page.textContent('#nxt')).includes('결과 보기')) break;
+    await page.click('#nxt');
+  }
+  const lastLabel = await page.textContent('#nxt'), lastQ = await page.textContent('.qtitle');
+  await page.click('#nxt');
+  const atResult = !!(await page.$('#s1'));
+  await page.goBack(); await page.waitForTimeout(200);
+  check("마지막 문항 버튼 '결과 보기' → 리포트 → 뒤로가기 시 마지막 문항", lastLabel.includes('결과 보기') && atResult && (await page.textContent('.qtitle')) === lastQ);
+  await ctx.close();
+}
+
+// 7. 외부 요청: 폰트 CDN 외 없음
 {
   const ext = [...new Set(requests.filter((u) => /^https?:/.test(u)).map((u) => new URL(u).host))];
   const self = /^https?:/.test(BASE) ? new URL(BASE).host : '';   // 배포 주소로 검사할 때 자기 사이트는 제외
