@@ -1,4 +1,4 @@
-# BECONIC ESG 경영준비도 진단 (v2.2.1)
+# BECONIC ESG 경영준비도 진단 (v2.2.2)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소(예정): https://beconic-diagnosis-esg.netlify.app
