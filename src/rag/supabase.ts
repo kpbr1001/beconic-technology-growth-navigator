@@ -59,6 +59,33 @@ export class SupabaseRequestError extends Error {
   }
 }
 
+/** 원문 DB 오류 원인(화면·점검용). 설정 문제(unreachable·no_schema·auth)는 재시도해도 같아서 '점검 필요'로 본다 */
+export type SupabaseErrorKind = 'unreachable' | 'no_schema' | 'auth' | 'http' | 'unknown';
+export interface SupabaseErrorInfo {
+  kind: SupabaseErrorKind;
+  /** 대표·관리자가 읽는 원인과 조치(키 값·프로젝트 주소는 넣지 않는다) */
+  detail: string;
+  /** 설정을 고쳐야 해결되는 오류(재시도 무의미) */
+  persistent: boolean;
+}
+const NET_CODES = new Set(['ENOTFOUND', 'EAI_AGAIN', 'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'UND_ERR_CONNECT_TIMEOUT', 'CERT_HAS_EXPIRED']);
+export function classifySupabaseError(e: unknown): SupabaseErrorInfo {
+  if (e instanceof SupabaseRequestError) {
+    const m = e.message;
+    if (e.status === 401 || e.status === 403)
+      return { kind: 'auth', persistent: true, detail: `DB 키 거부(HTTP ${e.status}) — SUPABASE_SERVICE_ROLE_KEY가 SUPABASE_URL 프로젝트의 서버 키인지 확인` };
+    if (e.status === 404 || /PGRST202|42P01|42883|Could not find the function|does not exist/i.test(m))
+      return { kind: 'no_schema', persistent: true, detail: `원문 검색 테이블·함수 없음(HTTP ${e.status}) — 이 프로젝트에 roadmap_kb 마이그레이션 적용 후 원문 적재 필요` };
+    return { kind: 'http', persistent: false, detail: `DB 응답 오류(HTTP ${e.status})` };
+  }
+  const code = (e as { cause?: { code?: string } })?.cause?.code ?? (e as { code?: string })?.code;
+  if ((code && NET_CODES.has(code)) || (e instanceof TypeError && /fetch failed|getaddrinfo|network/i.test(e.message)))
+    return { kind: 'unreachable', persistent: true, detail: `DB 서버 접속 불가${code ? `(${code})` : ''} — Supabase 프로젝트가 삭제·일시정지됐거나 SUPABASE_URL이 예전 주소` };
+  if (e instanceof TypeError && /Invalid URL|URL/i.test(e.message))
+    return { kind: 'unreachable', persistent: true, detail: 'SUPABASE_URL 형식 오류 — https://<프로젝트ID>.supabase.co 형태로 입력' };
+  return { kind: 'unknown', persistent: false, detail: e instanceof Error ? e.name : '오류' };
+}
+
 function headers(cfg: SupabaseConfig): Record<string, string> {
   const h: Record<string, string> = { apikey: cfg.serviceKey, 'content-type': 'application/json' };
   // 기존 JWT 형식 키(service_role)는 Authorization에도 넣는다. 새 sb_secret_ 키는 apikey 헤더만 사용.

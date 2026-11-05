@@ -2,7 +2,7 @@
 //  green: 연결·실조회 성공 / yellow: 대체 동작 중(예: 키워드만) / red: 설정됐는데 오류 / gray: 꺼짐(미설정)
 import type Anthropic from '@anthropic-ai/sdk';
 import { createEmbeddingProvider } from '../rag/embedding';
-import { supabaseConfigFromEnv, supabaseKeywordRetriever } from '../rag/supabase';
+import { classifySupabaseError, supabaseConfigFromEnv, supabaseKeywordRetriever } from '../rag/supabase';
 import { DEFAULT_MODEL } from './interpret';
 import type { JobStore } from './jobs';
 
@@ -46,7 +46,7 @@ export async function checkHealth(env: Env, deps: HealthDeps): Promise<HealthRep
         ? { light: 'green', label: '정상', detail: '로드맵 원문 DB 조회 성공' }
         : { light: 'yellow', label: '데이터 확인', detail: 'DB 연결은 되지만 원문 문단 검색 결과 없음(적재 확인)' };
     } catch (e) {
-      return { light: 'red', label: '오류', detail: `로드맵 원문 DB 조회 실패(${errKind(e)})` };
+      return { light: 'red', label: '오류', detail: `로드맵 원문 DB 조회 실패 — ${classifySupabaseError(e).detail}` };
     }
   })();
 

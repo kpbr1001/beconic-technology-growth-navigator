@@ -5,7 +5,7 @@
 import { createEmbeddingProvider } from '../../src/rag/embedding';
 import { disabledEmbeddingProvider } from '../../src/rag/embedding/disabled';
 import { findEvidence } from '../../src/rag/evidence';
-import { supabaseConfigFromEnv } from '../../src/rag/supabase';
+import { classifySupabaseError, supabaseConfigFromEnv } from '../../src/rag/supabase';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -55,7 +55,10 @@ export async function handle(req: Request, env: Record<string, string | undefine
   } catch (e) {
     // 내부 오류 상세(키·URL)는 응답에 넣지 않는다
     const cause = e instanceof Error && e.cause instanceof Error ? ` (원인: ${(e.cause as Error & { code?: string }).code ?? e.cause.message})` : '';
-    console.error('roadmap-evidence 실패', e instanceof Error ? e.message : e, cause, urlHint(env.SUPABASE_URL));
+    const info = classifySupabaseError(e);
+    console.error('roadmap-evidence 실패', info.kind, e instanceof Error ? e.message : e, cause, urlHint(env.SUPABASE_URL));
+    // 설정 문제(접속 불가·테이블 없음·키 거부)는 재시도해도 같으므로 200 + unavailable(화면은 원문 쪽 번호 안내로 대체)
+    if (info.persistent) return json({ status: 'unavailable', reason: info.kind, items: {} });
     return json({ status: 'error', items: {} }, 502);
   }
 }
