@@ -167,7 +167,8 @@ const bodyText = (page) => page.locator('body').innerText();
 // 6. 외부 요청: 폰트 CDN 외 없음
 {
   const ext = [...new Set(requests.filter((u) => /^https?:/.test(u)).map((u) => new URL(u).host))];
-  check('외부 요청은 폰트 CDN(cdn.jsdelivr.net)만', ext.every((h) => h === 'cdn.jsdelivr.net'), ext.join(',') || '없음');
+  const self = /^https?:/.test(BASE) ? new URL(BASE).host : '';   // 배포 주소로 검사할 때 자기 사이트는 제외
+  check('외부 요청은 폰트 CDN(cdn.jsdelivr.net)만', ext.every((h) => h === 'cdn.jsdelivr.net' || h === self), ext.filter((h) => h !== self).join(',') || '없음');
 }
 
 check('스크립트 오류 0건', errors.length === 0, errors.slice(0, 3).join(' | '));

@@ -937,7 +937,7 @@ function rResult(){
   <section class="card cta">
     <b style="font-size:16.5px">이 리포트로 전문가와 실행계획을 확정하세요</b>
     <p>BECONIC 컨설턴트가 리스크별 대응, 서류 준비, 지원사업 연계까지 로드맵을 함께 정리해 드려요.</p>
-    <div class="tel"><b class="num">070-4103-4177</b><button id="copy">번호 복사</button></div>
+    <div class="tel"><b class="num">02-6124-5960</b><button id="copy">번호 복사</button></div>
   </section>
   <div class="row"><button class="btn btn-ghost" id="edit">응답 수정</button><button class="btn btn-ghost" id="again">처음부터 다시</button></div>
   <p class="disc">본 리포트는 공식 ESG 평가등급·인증이 아닌 실행 준비도 자가진단이며, 법률·노무·회계 자문을 대신하지 않아요. 문항 설계는 K-ESG 가이드라인 v2.0 범주를 참고했고, 리스크 등급과 점수 전망은 응답 기반 추정이에요.</p>`;
@@ -947,7 +947,7 @@ function rResult(){
   const fb=document.getElementById('fixBtn');
   if(fb) fb.onclick=()=>{ const v=+document.getElementById('fixKwh').value; if(!(v>0)||v>KWH_MAX){ toast(`kWh는 1~${KWH_MAX.toLocaleString()} 사이 숫자로 넣어 주세요`); return; }
     S.k1={mode:'exact',kwh:String(v),bill:-1,none:'',contract:'auto'}; rResult(); window.scrollTo({top:0}); toast('반영했어요. 리포트가 확정됐어요'); };
-  document.getElementById('copy').onclick=()=>copyText('070-4103-4177','번호를 복사했어요');
+  document.getElementById('copy').onclick=()=>copyText('02-6124-5960','번호를 복사했어요');
   document.getElementById('edit').onclick=()=>{ S.idx=0; go('quiz'); };
   document.getElementById('again').onclick=()=>{ S=blank(); go('start'); };
 }
