@@ -2,7 +2,7 @@
 // BECONIC ESG 경영준비도 진단 QA — 실제 Chromium으로 엔진 원칙·사용자 플로우·레드팀 회귀·이어하기·위임·인쇄·모바일·A4 PDF를 확인한다.
 // 실행: node esg/tests/qa.mjs [baseUrl]   (baseUrl 생략 시 esg/index.html 을 file:// 로 연다)
 import { chromium } from 'playwright';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -51,11 +51,26 @@ const bodyText = (page) => page.locator('body').innerText();
   const { ctx, page } = await fresh();
   const t = await bodyText(page);
   check('홈 렌더 · 시안 문구 없음', t.includes('진단 시작하기') && !/시안/.test(t));
-  check('푸터: 회사 정보·인증번호·버전', /제2025-684호/.test(t) && t.includes('v2.0.0') && t.includes('start@gven.kr'));
+  const co = await page.evaluate(() => ({ ver: ESG.APP_VERSION, cert: ESG.COMPANY.cert, mail: ESG.COMPANY.mail, tel: ESG.COMPANY.tel }));
+  check('푸터: 회사 정보·인증번호·버전 = COMPANY·APP_VERSION', t.includes(co.cert) && t.includes(co.ver) && t.includes(co.mail) && t.includes(co.tel));
   const meta = await page.evaluate(() => ({ core: ESG.Q.filter((q) => !q.kind && !q.cond).length, cond: ESG.Q.filter((q) => q.cond).length, refs: ESG.Q.every((q) => q.r && q.r.length), docs: ESG.Q.filter((q) => !q.kind).every((q) => q.doc && q.s), w: Object.values(ESG.W).every((r) => r.reduce((a, b) => a + b, 0) === 100) }));
   check('문항 수: 핵심 18 · 조건부 6', meta.core === 18 && meta.cond === 6, JSON.stringify(meta));
   check('모든 문항에 참조 기준·준비 서류·짧은 이름', meta.refs && meta.docs);
   check('업종 가중치 합계 = 100 (10개 업종)', meta.w);
+  // 하드코딩 회귀: 화면·메타·패키지 표기가 설정값(RULES·SECTIONS·Q·APP_VERSION·SITE)과 일치
+  const cfg = await page.evaluate(() => ({ qMin: ESG.Q.filter((q) => !q.kind && !q.cond).length, qMax: ESG.Q.filter((q) => !q.kind).length, nSec: ESG.SECTIONS.length, est: Math.ceil((ESG.Q.filter((q) => !q.kind).length + 1) * ESG.RULES.SEC_PER_Q / 60), nProf: 2 + ESG.YN.length, ver: ESG.APP_VERSION, site: ESG.SITE, name: ESG.APP_NAME, brand: ESG.COMPANY.brand,
+    desc: document.querySelector('meta[name=description]').content, ogUrl: document.querySelector('meta[property="og:url"]').content, ogImg: document.querySelector('meta[property="og:image"]').content, head: document.querySelector('.brand .t').innerText }));
+  check('시작 화면 수치 = 설정값(문항 수·섹션 수·소요 시간·기업정보 수)', t.includes(`${cfg.qMin}~${cfg.qMax}`) && t.includes(`${cfg.nSec}개 섹션`) && t.includes(`약 ${cfg.est}분`) && t.includes(`기업정보 ${cfg.nProf}가지`), JSON.stringify(cfg).slice(0, 80));
+  check('메타 설명 문항 수 = 문항 데이터', cfg.desc.includes(`${cfg.qMin}~${cfg.qMax}`));
+  check('og:url·og:image = SITE', cfg.ogUrl === cfg.site && cfg.ogImg.startsWith(cfg.site));
+  const pkg = JSON.parse(readFileSync(path.join(here, '..', 'package.json'), 'utf8'));
+  check('package.json 버전 = APP_VERSION', 'v' + pkg.version === cfg.ver, `${pkg.version} / ${cfg.ver}`);
+  check('헤더 브랜드·이름 = COMPANY.brand·APP_NAME', cfg.head.includes(cfg.brand) && cfg.head.includes(cfg.name));
+  const src = readFileSync(path.join(here, '..', 'index.html'), 'utf8');
+  const script = src.slice(src.indexOf('<script>'), src.lastIndexOf('</script>'));
+  const lines = script.split('\n').filter((l) => !/^const (COMPANY|TOOLS|APP_|SITE|RULES)|^\s*(tech|finance|growth):|^\s*addr:/.test(l));
+  const bad = lines.filter((l) => /BECONIC|070-|02-6124|start@gven|7장/.test(l));
+  check('스크립트에 회사명·연락처·잘못된 섹션 수 하드코딩 없음(설정 블록 제외)', bad.length === 0, bad.map((l) => l.trim().slice(0, 50)).join(' | '));
   await ctx.close();
 }
 
@@ -72,6 +87,10 @@ const bodyText = (page) => page.locator('body').innerText();
   check('Phase 용량 4/6/6/5 이하', caps.len.every((n, i) => n <= [4, 6, 6, 5][i]), caps.len.join('/'));
   check('점수 전망 단조 증가(감소 없음)', caps.proj.every((v, i) => !i || v >= caps.proj[i - 1]), caps.proj.join('→'));
   const g = await page.evaluate(() => ESG.analyze().risks.every((r) => r.grade === ESG.gradeOf(r.L, r.S)));
+  const mt = await page.evaluate(() => { const tx = document.querySelector('details.fold').textContent; /* 접힌 상태에서도 내용 검사 */ const R = ESG.RULES; return { caps: tx.includes(R.CAPS.join('/')), expo: tx.includes(`× ${R.EXPO_W}`) && tx.includes(`${R.EXPO_TRIG}점`), pts: tx.includes(`관리 ${R.PTS[2]}`) && tx.includes(`잘 모르겠어요 ${R.UNKNOWN}`), risk: tx.includes(`${R.RISK.high} 이상`), valid: tx.includes(`${Math.round(R.VALID_RATIO * 100)}%`) }; });
+  check('산출 방식 표 = RULES 상수', Object.values(mt).every(Boolean), JSON.stringify(mt));
+  const evc = await page.evaluate(() => { const R = ESG.analyze(), E = ESG.RULES.EV, want = R.evidence >= E.high ? 'good' : R.evidence >= E.mid ? 'warn' : 'bad'; return document.querySelector('.kpis .kpi:nth-child(2) b').getAttribute('style').includes(`--${want}`); });
+  check('증빙 신뢰도 색 = 해석 문장 기준(RULES.EV)', evc);
   check('리스크 등급 = 등급 규칙', g);
   const tools = await page.$$eval('.tool', (as) => as.map((a) => a.href));
   check('추천 후속 진단 2~4개 · BECONIC 도메인', tools.length >= 2 && tools.length <= 4 && tools.every((h) => /beconic-(diagnosis|grant)/.test(h)), String(tools.length));
