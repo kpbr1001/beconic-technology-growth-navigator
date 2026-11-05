@@ -15,28 +15,30 @@
 <meta property="og:url" content="https://beconic-diagnosis-esg.netlify.app/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="logo-mark.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <style>
-/* Layout: 질문은 모바일 우선 단일 컬럼(560px), 결과는 컨설팅 리포트형(760px) 7개 섹션. 상단 고정 바(브랜드 + 화면 단계). */
+/* Layout: 질문은 모바일 우선 단일 컬럼(560px), 결과는 컨설팅 리포트형(760px) 8개 섹션. 상단 고정 바(브랜드 + 화면 단계).
+   Design v2.1: 토스 디자인 시스템 원칙 참고 — 회색 바탕 + 테두리 없는 흰 카드, 파랑 단일 강조, 큰 굵은 제목, 56px 버튼, 모바일 하단 고정 CTA. 글꼴 Pretendard. */
 :root{
-  --bg:#f2f4f8; --surface:#ffffff; --surface-2:#f6f7fa; --line:#e1e5ed;
-  --ink:#1c2333; --ink-2:#4a5468; --ink-3:#7d869a;
-  --primary:#1b2a4a; --on-primary:#ffffff; --primary-soft:#e8edf6; --primary-line:#9fb1d3; --accent:#3a6fd8;
-  --good:#2f8f6b; --good-soft:#e5f3ec; --warn:#b97a14; --warn-soft:#fbf0dc; --bad:#c14b4b; --bad-soft:#f8e9e9;
+  --bg:#f2f4f6; --surface:#ffffff; --surface-2:#f2f4f6; --line:#e5e8eb;
+  --ink:#191f28; --ink-2:#4e5968; --ink-3:#8b95a1;
+  --primary:#3182f6; --primary-strong:#1b64da; --on-primary:#ffffff; --primary-soft:#e8f3ff; --primary-line:#90c2ff; --accent:#3182f6;
+  --good:#00a661; --good-soft:#e5f8ee; --warn:#d96b00; --warn-soft:#fff3e0; --bad:#f04452; --bad-soft:#ffeeee;
   --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
-  --r:14px; --r-sm:10px;
+  --r:20px; --r-sm:14px;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#0e1422; --surface:#161f33; --surface-2:#1b2640; --line:#2a3653;
-  --ink:#e8ecf4; --ink-2:#b5bdcd; --ink-3:#8791a7;
-  --primary:#a9c0f2; --on-primary:#0e1a33; --primary-soft:#22304f; --primary-line:#4c6496; --accent:#7fa6f5;
-  --good:#58c49a; --good-soft:#173329; --warn:#e3a846; --warn-soft:#3a2d14; --bad:#e58585; --bad-soft:#3a1d22;
+  --bg:#101013; --surface:#1d1d22; --surface-2:#2b2b33; --line:#34343d;
+  --ink:#f2f3f5; --ink-2:#b0b8c1; --ink-3:#7e8590;
+  --primary:#3182f6; --primary-strong:#7ab4ff; --on-primary:#ffffff; --primary-soft:#1b2a43; --primary-line:#3a6bb5; --accent:#5c9dff;
+  --good:#2bc48a; --good-soft:#12302a; --warn:#ffa94d; --warn-soft:#3a2a12; --bad:#ff6b78; --bad-soft:#3b1c22;
   color-scheme:dark }}
 :root[data-theme="dark"]{
-  --bg:#0e1422; --surface:#161f33; --surface-2:#1b2640; --line:#2a3653;
-  --ink:#e8ecf4; --ink-2:#b5bdcd; --ink-3:#8791a7;
-  --primary:#a9c0f2; --on-primary:#0e1a33; --primary-soft:#22304f; --primary-line:#4c6496; --accent:#7fa6f5;
-  --good:#58c49a; --good-soft:#173329; --warn:#e3a846; --warn-soft:#3a2d14; --bad:#e58585; --bad-soft:#3a1d22;
+  --bg:#101013; --surface:#1d1d22; --surface-2:#2b2b33; --line:#34343d;
+  --ink:#f2f3f5; --ink-2:#b0b8c1; --ink-3:#7e8590;
+  --primary:#3182f6; --primary-strong:#7ab4ff; --on-primary:#ffffff; --primary-soft:#1b2a43; --primary-line:#3a6bb5; --accent:#5c9dff;
+  --good:#2bc48a; --good-soft:#12302a; --warn:#ffa94d; --warn-soft:#3a2a12; --bad:#ff6b78; --bad-soft:#3b1c22;
   color-scheme:dark }
 
 *{box-sizing:border-box}
@@ -259,6 +261,76 @@ footer.site .fb img{width:22px;height:22px;border-radius:5px}
 @media (max-width:640px){.tools{grid-template-columns:1fr}}
 @page{size:A4;margin:14mm 12mm}
 @media print{.print-only{display:block!important}.no-print{display:none!important}.sh,.lead{break-after:avoid;page-break-after:avoid}.rsec{break-before:auto}main{padding-block:0}.wrap.wide{max-width:none}.tool::after{content:" " attr(href);font-size:10px;color:#666}}
+/* ===== Design v2.1 — 토스 스타일 컴포넌트 ===== */
+body{font-size:16px;letter-spacing:-0.01em}
+.num,.kpi b,.ring .v b,.domrow b{font-variant-numeric:tabular-nums}
+.top{border-bottom:0;box-shadow:0 1px 0 var(--line)}
+.brand b,.ph b{color:var(--primary-strong)}
+.steps button{border-bottom-width:2px;font-weight:500}
+.steps button[aria-current="step"]{color:var(--primary-strong);border-color:var(--primary);font-weight:700}
+.card{border:0;border-radius:var(--r);padding:24px}
+.btn{min-height:56px;padding:0 20px;border-radius:16px;font-size:17px;font-weight:700;letter-spacing:-0.01em;transition:background .15s,transform .1s}
+.btn:active{transform:scale(.98)}
+.btn:not(.btn-ghost):not([disabled]):hover{background:var(--primary-strong)}
+.btn-ghost{background:var(--primary-soft);color:var(--primary-strong);border:0}
+.linkbtn{color:var(--ink-3);text-decoration:none;font-weight:500}
+.linkbtn:hover{color:var(--ink-2)}
+.hero h1{font-size:30px;line-height:1.3;letter-spacing:-0.03em}
+.hero p{font-size:16px;line-height:1.6}
+.eyebrow{letter-spacing:0;font-size:13px;color:var(--primary-strong)}
+.fact{background:var(--surface-2);border-radius:16px;padding:16px 10px}
+.fact b{color:var(--ink);font-size:20px;letter-spacing:-0.02em}
+.how i{background:var(--primary-soft);color:var(--primary-strong)}
+.field input{border:0;background:var(--surface-2);border-radius:14px;padding:15px 16px;font-size:16px}
+.field input:focus{outline:2px solid var(--primary);outline-offset:0}
+.chip{border:0;background:var(--surface-2);border-radius:12px;padding:10px 14px;font-size:15px;font-weight:500;color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--primary-soft);color:var(--primary-strong);font-weight:700;box-shadow:inset 0 0 0 1.5px var(--primary)}
+.yn{border-top:0;padding:14px 0}
+.dom{background:var(--primary-soft);color:var(--primary-strong)}
+.bar{height:4px}
+.qtitle{font-size:24px;line-height:1.38;letter-spacing:-0.03em}
+.help{border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.55}
+.opt{border:0;background:var(--surface-2);border-radius:16px;padding:18px 16px;font-size:16px;box-shadow:inset 0 0 0 2px transparent;transition:background .15s,box-shadow .15s}
+.opt:hover{background:var(--line)}
+.opt[aria-pressed="true"]{background:var(--primary-soft);box-shadow:inset 0 0 0 2px var(--primary);font-weight:700}
+.ladder s.on{background:var(--primary)}
+.panel{border-left:0;padding:14px;background:var(--surface-2);border-radius:16px}
+.panel .chip{background:var(--surface)}
+.panel .chip[aria-pressed="true"]{background:var(--primary-soft)}
+.msg{background:var(--surface)}
+.qtag{background:var(--surface)}
+.sh{font-size:22px;letter-spacing:-0.03em;margin-top:18px}
+.sh span{color:var(--primary)}
+.lead{font-size:15px;line-height:1.6}
+.rep-nav button{border:0;background:var(--surface);font-weight:600;padding:8px 14px}
+.lvl{background:var(--primary-soft);color:var(--primary-strong)}
+.lvl-ladder div.on{color:var(--primary-strong)}
+.summary{font-size:16px;line-height:1.8}
+.summary b{color:var(--primary-strong)}
+.kpi{border:0;border-radius:16px;padding:16px}
+.kpi b{font-size:24px;letter-spacing:-0.02em}
+.tbl{border:0;border-radius:16px}
+th{background:var(--surface-2);color:var(--ink-3)}
+th,td{border-bottom-color:var(--line)}
+.flag{border-radius:14px;padding:12px 14px}
+.qw{border-radius:14px}
+.tag{border-radius:8px}
+.tool{border:0;background:var(--surface-2);border-radius:16px;padding:16px}
+.tool:hover{background:var(--line)}
+.act .n{background:var(--primary);border-radius:10px}
+.phase{border-top-width:0;box-shadow:inset 0 4px 0 var(--primary-line)}
+.phase.p1{box-shadow:inset 0 4px 0 var(--bad)} .phase.p2{box-shadow:inset 0 4px 0 var(--warn)} .phase.p3{box-shadow:inset 0 4px 0 var(--accent)} .phase.p4{box-shadow:inset 0 4px 0 var(--good)}
+.modal-box{border-radius:24px;padding:26px}
+.resume{background:var(--primary-soft)}
+.cta{background:var(--primary)}
+footer.site{border-top:0;background:transparent}
+.toast{border-radius:14px;padding:12px 18px}
+/* 모바일: 다음 단계 버튼을 화면 아래에 고정 */
+@media (max-width:640px){
+  .bottom{position:sticky;bottom:0;z-index:4;padding-block:16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,transparent,var(--bg) 22%)}
+  .hero h1{font-size:26px} .qtitle{font-size:22px}
+}
+@media print{.card{box-shadow:none}.bottom{position:static;background:none}}
 .fade{animation:fade .25s ease}
 @keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}.bar i{transition:none}}
@@ -287,7 +359,7 @@ footer.site .fb img{width:22px;height:22px;border-radius:5px}
 <script>
 (function(){
 /* ================= 운영 설정 (여기서만 수정) ================= */
-const APP_VERSION='v2.0.1', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
+const APP_VERSION='v2.1.0', APP_UPDATED='2026.11.05';   // package.json version 과 같아야 함 (QA 검사)
 const APP_NAME='ESG 경영준비도 진단';
 const SITE='https://beconic-diagnosis-esg.netlify.app/';   // <head> og:url·og:image 와 같아야 함 (QA 검사)
 const COMPANY={name:'그로스벤처스 주식회사',brand:'BECONIC',tel:'02-6124-5960',mail:'start@gven.kr',web:'www.beconic.kr',
@@ -683,7 +755,7 @@ function rProfile(){
     <div>${YN.map(([k,l,h])=>`<div class="yn"><div><b style="font-size:14.5px;font-weight:600">${l}</b>${h?`<small>${h}</small>`:''}</div>
       <div class="chips">${chip(k,'예')}${chip(k,'아니오')}</div></div>`).join('')}</div>
   </section>
-  <div class="row"><button class="btn btn-ghost" id="back">이전</button><button class="btn" id="next" ${profileOk()?'':'disabled'}>질문 시작</button></div>
+  <div class="row bottom"><button class="btn btn-ghost" id="back">이전</button><button class="btn" id="next" ${profileOk()?'':'disabled'}>질문 시작</button></div>
   <button class="linkbtn" id="fill">예시 기업정보로 채우기</button>`;
   app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ S.p[b.dataset.k]=b.dataset.v; rProfile(); });
   document.getElementById('co').oninput=e=>{ S.p.company=e.target.value; save(); };
@@ -738,7 +810,7 @@ function rQuiz(){
       <div class="opts" role="group" aria-label="아는 정도">${modes.map(([v,l,t])=>`<button type="button" class="opt mode" data-mode="${v}" aria-pressed="${k.mode===v}"><span>${l}</span><span class="qtag">${t}</span></button>`).join('')}</div>
       ${panel?`<div class="panel">${panel}</div>`:''}
     </section>
-    <div class="row"><button class="btn btn-ghost" id="prev">이전</button><button class="btn" id="nxt" ${okK1()?'':'disabled'}>다음</button></div>`;
+    <div class="row bottom"><button class="btn btn-ghost" id="prev">이전</button><button class="btn" id="nxt" ${okK1()?'':'disabled'}>다음</button></div>`;
     app.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{ k.mode=b.dataset.mode; rQuiz(); const i=document.getElementById('kwh'); if(i) i.focus(); });
     app.querySelectorAll('[data-bill]').forEach(b=>b.onclick=()=>{ k.bill=+b.dataset.bill; rQuiz(); });
     app.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>{ k.contract=b.dataset.contract; rQuiz(); });
@@ -765,8 +837,8 @@ function rQuiz(){
   <div class="qfoot">
     <button class="linkbtn" id="prev" ${S.idx===0?'style="visibility:hidden"':''}>← 이전</button>
     <div style="display:flex;gap:4px">
-      <button class="linkbtn" data-v="u" ${a.v==='u'?'style="font-weight:700;color:var(--primary)"':''}>잘 모르겠어요</button>
-      ${allowNa?`<button class="linkbtn" data-v="na" ${a.v==='na'?'style="font-weight:700;color:var(--primary)"':''}>해당 없음</button>`:''}
+      <button class="linkbtn" data-v="u" ${a.v==='u'?'style="font-weight:700;color:var(--primary-strong)"':''}>잘 모르겠어요</button>
+      ${allowNa?`<button class="linkbtn" data-v="na" ${a.v==='na'?'style="font-weight:700;color:var(--primary-strong)"':''}>해당 없음</button>`:''}
     </div>
   </div>
   <p class="tiny" style="text-align:center">키보드 1~4로도 고를 수 있어요</p>`;
@@ -952,7 +1024,7 @@ function rResult(){
   const today=new Date();
   app.innerHTML=`
   <div class="print-only"><div class="ph"><img src="logo-mark.png" alt=""><div><b>${COMPANY.brand} ${APP_NAME} 리포트</b><div class="tiny">${esc(name)} · ${esc(S.p.industry)} · ${esc(S.p.size)} · 진단일 ${today.getFullYear()}.${today.getMonth()+1}.${today.getDate()} · ${APP_VERSION} (업데이트 ${APP_UPDATED})</div></div></div></div>
-  ${S.sample?`<div class="flag" style="background:var(--primary-soft)"><span><b style="color:var(--primary)">예시 리포트</b> 가상의 ${SAMPLE.industry}기업(${SAMPLE.size}${SAMPLE.big==='예'?', 대기업 납품':''}) 응답으로 만든 화면이에요. 실제 진단은 '진단 시작하기'에서 해보세요.</span></div>`:''}
+  ${S.sample?`<div class="flag" style="background:var(--primary-soft)"><span><b style="color:var(--primary-strong)">예시 리포트</b> 가상의 ${SAMPLE.industry}기업(${SAMPLE.size}${SAMPLE.big==='예'?', 대기업 납품':''}) 응답으로 만든 화면이에요. 실제 진단은 '진단 시작하기'에서 해보세요.</span></div>`:''}
   <section class="card">
     <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
       <div class="eyebrow">ESG 실행 준비도 진단 리포트 · ${esc(name)} · ${esc(S.p.industry)} · ${esc(S.p.size)}</div>

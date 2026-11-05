@@ -57,6 +57,8 @@ const bodyText = (page) => page.locator('body').innerText();
   check('문항 수: 핵심 18 · 조건부 6', meta.core === 18 && meta.cond === 6, JSON.stringify(meta));
   check('모든 문항에 참조 기준·준비 서류·짧은 이름', meta.refs && meta.docs);
   check('업종 가중치 합계 = 100 (10개 업종)', meta.w);
+  const font = await page.evaluate(async () => { await document.fonts.ready; return { family: getComputedStyle(document.body).fontFamily, loaded: [...document.fonts].some((f) => /Pretendard/.test(f.family) && f.status === 'loaded'), btn: getComputedStyle(document.querySelector('.btn')).fontFamily }; });
+  check('글꼴: Pretendard 지정·실제 로드·버튼 상속', /^"?Pretendard Variable/.test(font.family) && font.loaded && /Pretendard/.test(font.btn), font.loaded ? 'loaded' : 'not loaded');
   // 하드코딩 회귀: 화면·메타·패키지 표기가 설정값(RULES·SECTIONS·Q·APP_VERSION·SITE)과 일치
   const cfg = await page.evaluate(() => ({ qMin: ESG.Q.filter((q) => !q.kind && !q.cond).length, qMax: ESG.Q.filter((q) => !q.kind).length, nSec: ESG.SECTIONS.length, est: Math.ceil((ESG.Q.filter((q) => !q.kind).length + 1) * ESG.RULES.SEC_PER_Q / 60), nProf: 2 + ESG.YN.length, ver: ESG.APP_VERSION, site: ESG.SITE, name: ESG.APP_NAME, brand: ESG.COMPANY.brand,
     desc: document.querySelector('meta[name=description]').content, ogUrl: document.querySelector('meta[property="og:url"]').content, ogImg: document.querySelector('meta[property="og:image"]').content, head: document.querySelector('.brand .t').innerText }));
