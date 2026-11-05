@@ -232,7 +232,8 @@ const W={'제조':[15,25,20,10,20,10],'IT·SaaS':[20,10,20,25,10,15],'유통·�
 const LEVELS=[[0,'인식 시작'],[30,'기초'],[50,'관리'],[70,'통합'],[85,'증빙기반']];
 const PTS=[0,33,67,100], UNKNOWN=20;
 /* 숫자 문항(K1) 3단계 사다리 — 설정값은 운영 시 최신 공식값으로 갱신 */
-const PRICE=221.6;    // 원/kWh, 실효 단가 = 산업용(을) 개편 후 고압A 선택II 전력량요금 + 기본요금 환산 + 기후환경·연료비조정 + 부가세·기금 (문항마스터 '전력단가산정' 시트)
+const PRICE={eul:221.6,gap:168.1}; // 원/kWh 실효 단가 · 을=고압A 선택II(2026.4.16 개편) · 갑=갑I 고압A 선택II(2024.10.24 인상분) · 문항마스터 '전력단가산정' 시트
+const CONTRACT=[['gap','소규모 · 300kW 미만(갑)'],['eul','대규모 · 300kW 이상(을)'],['auto','잘 모르겠어요']];
 const EF=0.4541;      // tCO2e/MWh, GIR 최신 승인 국가 전력 배출계수(CO2e·소비단, 2020~2022 평균)
 const ERR=0.3;        // 요금 기반 추정 오차 ±30%
 const DUE_DAYS=7;     // 잠정 결과 보완 기한
@@ -242,7 +243,11 @@ const DELEGATE_MSG='[BECONIC ESG 간편진단]\n대표님이 질문 1개를 부�
 function k1Data(){
   const k=S.k1;
   if(k.mode==='exact'&&+k.kwh>0) return {q:'실측',kwh:Math.round(+k.kwh),w:1};
-  if(k.mode==='bill'&&k.bill>=0) return {q:'추정',kwh:Math.round(BILLS[k.bill][1]/PRICE),w:.5};
+  if(k.mode==='bill'&&k.bill>=0){
+    const known=k.contract==='gap'||k.contract==='eul';
+    const c=known?k.contract:(['50~299인','300인 이상'].includes(S.p.size)?'eul':'gap');   // 모르면 직원 수로 추정
+    return {q:'추정',kwh:Math.round(BILLS[k.bill][1]/PRICE[c]),w:.5,contract:c,assumed:!known};
+  }
   return {q:'미확보',kwh:null,w:0};
 }
 function copyText(t,ok){ try{ navigator.clipboard.writeText(t).then(()=>toast(ok),()=>toast('길게 눌러 복사해 주세요')); }catch(e){ toast('길게 눌러 복사해 주세요'); } }
@@ -261,11 +266,11 @@ const YN=[['mfg','제조 사업장(공장·작업장)을 운영하나요?','환�
  ['invest','투자유치·정책금융·IPO를 준비 중인가요?','투자자 설명자료 문항이 추가돼요']];
 
 /* ---------------- 상태 ---------------- */
-const blank=()=>({screen:'start',p:{company:'',industry:'',size:'',mfg:'',export:'',big:'',asked:'',invest:''},a:{},k1:{mode:'',kwh:'',bill:-1,none:''},idx:0});
+const blank=()=>({screen:'start',p:{company:'',industry:'',size:'',mfg:'',export:'',big:'',asked:'',invest:''},a:{},k1:{mode:'',kwh:'',bill:-1,none:'',contract:'auto'},idx:0});
 let S=blank();
 const SAMPLE={company:'예시) 그린텍정밀',industry:'제조',size:'10~49인',mfg:'예',export:'아니오',big:'예',asked:'예',invest:'아니오'};
 const SAMPLE_A={A1:1,A2:0,B1:2,B2:1,X1:2,C1:2,C2:1,X4:1,D1:1,D2:2,E1:1,E2:0,F1:1,F2:1};
-function loadSample(){ S.p={...SAMPLE}; S.a={}; Object.entries(SAMPLE_A).forEach(([k,v])=>S.a[k]={v}); S.k1={mode:'bill',kwh:'',bill:2,none:''}; S.sample=true; }
+function loadSample(){ S.p={...SAMPLE}; S.a={}; Object.entries(SAMPLE_A).forEach(([k,v])=>S.a[k]={v}); S.k1={mode:'bill',kwh:'',bill:2,none:'',contract:'auto'}; S.sample=true; }
 
 /* ---------------- 규칙 ---------------- */
 function triggers(p){
@@ -426,7 +431,9 @@ function rQuiz(){
       <div class="tiny">한전 고지서의 '당월 사용량' 칸 숫자예요.</div>`;
     if(k.mode==='bill') panel=`<div style="font-weight:600;font-size:14px">한 달 전기요금은 대략 얼마인가요?</div>
       <div class="chips">${BILLS.map((b,i)=>`<button type="button" class="chip" data-bill="${i}" aria-pressed="${k.bill===i}">${b[0]}</button>`).join('')}</div>
-      <div class="tiny">요금을 평균 단가로 나눠 사용량을 추정해요. 결과에는 '추정치'로 표시돼요.</div>`;
+      <div style="font-weight:600;font-size:14px;margin-top:4px">전기 계약은 어떤 종류인가요?</div>
+      <div class="chips">${CONTRACT.map(([v,l])=>`<button type="button" class="chip" data-contract="${v}" aria-pressed="${(k.contract||'auto')===v}">${l}</button>`).join('')}</div>
+      <div class="tiny">고지서의 '계약전력'을 보면 알 수 있어요. 모르면 직원 수로 추정해요(49인 이하 갑, 50인 이상 을). 결과에는 '추정치'로 표시돼요.</div>`;
     if(k.mode==='none') panel=`<div class="chips">${NONE.map(([v,l])=>`<button type="button" class="chip" data-none="${v}" aria-pressed="${k.none===v}">${l}</button>`).join('')}</div>${noneDetail(k.none)}`;
     app.innerHTML=`${head}
     <section class="card" style="display:flex;flex-direction:column;gap:14px">
@@ -439,6 +446,7 @@ function rQuiz(){
     <div class="row"><button class="btn btn-ghost" id="prev">이전</button><button class="btn" id="nxt" ${okK1()?'':'disabled'}>다음</button></div>`;
     app.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{ k.mode=b.dataset.mode; rQuiz(); const i=document.getElementById('kwh'); if(i) i.focus(); });
     app.querySelectorAll('[data-bill]').forEach(b=>b.onclick=()=>{ k.bill=+b.dataset.bill; rQuiz(); });
+    app.querySelectorAll('[data-contract]').forEach(b=>b.onclick=()=>{ k.contract=b.dataset.contract; rQuiz(); });
     app.querySelectorAll('[data-none]').forEach(b=>b.onclick=()=>{ k.none=b.dataset.none; rQuiz(); });
     const inp=document.getElementById('kwh'); if(inp) inp.oninput=e=>{ k.kwh=e.target.value; document.getElementById('nxt').disabled=!okK1(); };
     const cp=document.getElementById('cpMsg'); if(cp) cp.onclick=()=>copyText(DELEGATE_MSG,'메시지를 복사했어요');
@@ -559,7 +567,7 @@ function rResult(){
   <section class="card" style="display:flex;flex-direction:column;gap:6px">
     <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><b style="font-size:14.5px">참고 탄소량 · 전력(Scope 2)</b><span class="qtag">${kTag}</span></div>
     ${R.tco2!=null?`<div><b class="num" style="font-size:24px">약 ${tTxt}</b> <span class="muted">tCO₂e / 년</span></div>
-    <div class="tiny">월 ${R.kd.kwh.toLocaleString()} kWh × 12개월 × 배출계수 ${EF} tCO₂e/MWh${R.kd.q==='추정'?` · 요금 ÷ 실효단가 ${PRICE}원/kWh로 역산`:''} · 배출계수는 GIR 최신 승인값. 공식 배출량 산정이 아닌 참고값이에요.</div>`
+    <div class="tiny">월 ${R.kd.kwh.toLocaleString()} kWh × 12개월 × 배출계수 ${EF} tCO₂e/MWh${R.kd.q==='추정'?` · 요금 ÷ 실효단가 ${PRICE[R.kd.contract]}원/kWh(${R.kd.contract==='gap'?'산업용 갑':'산업용 을'}${R.kd.assumed?', 직원 수로 추정':''})로 역산`:''} · 배출계수는 GIR 최신 승인값. 공식 배출량 산정이 아닌 참고값이에요.</div>`
     :`<div class="tiny">전기 사용량을 넣으면 연간 참고 탄소량을 보여드려요. 요금 구간만 알아도 추정할 수 있어요.</div>`}
   </section>
   ${R.flags.map(f=>`<div class="flag"><span><b>${f[0]}</b> ${esc(f[1])}</span></div>`).join('')}
