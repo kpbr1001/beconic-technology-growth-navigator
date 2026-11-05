@@ -151,6 +151,14 @@ main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px
 .cta .tel button{border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:6px 10px;font-size:13px}
 .disc{font-size:12px;color:var(--ink-3);line-height:1.6}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13.5px;max-width:calc(100% - 32px);z-index:20}
+.opt.mode{grid-template-columns:1fr auto}
+.qtag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-3);white-space:nowrap}
+.panel{border-left:3px solid var(--primary-line);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:10px}
+.msg{background:var(--surface-2);border-radius:var(--r-sm);padding:12px;font-size:13.5px;white-space:pre-line}
+.guide{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
+.status{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px}
+.qw{display:flex;gap:12px;align-items:center;background:var(--good-soft);border-radius:var(--r-sm);padding:12px 14px;font-size:14px}
+.qw>b{color:var(--good);font-size:16px;white-space:nowrap}
 .fade{animation:fade .25s ease}
 @keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.fade{animation:none}.bar i{transition:none}}
@@ -223,6 +231,29 @@ const W={'제조':[15,25,20,10,20,10],'IT·SaaS':[20,10,20,25,10,15],'유통·�
  '관광·문화':[20,15,25,15,10,15],'기타':[20,20,15,15,15,15]};
 const LEVELS=[[0,'인식 시작'],[30,'기초'],[50,'관리'],[70,'통합'],[85,'증빙기반']];
 const PTS=[0,33,67,100], UNKNOWN=20;
+/* 숫자 문항(K1) 3단계 사다리 — 설정값은 운영 시 최신 공식값으로 갱신 */
+const PRICE=180;      // 원/kWh, 평균 판매단가 설정값(예시) · 한전 전력통계로 연 1회 갱신
+const EF=0.4567;      // tCO2e/MWh, 국가 전력 배출계수 설정값 · 최신 고시값 확인 필요
+const ERR=0.3;        // 요금 기반 추정 오차 ±30%
+const DUE_DAYS=7;     // 잠정 결과 보완 기한
+const BILLS=[['50만 원 미만',300000],['50만~200만 원',1250000],['200만~500만 원',3500000],['500만~1,000만 원',7500000],['1,000만 원 이상',15000000]];
+const NONE=[['delegate','담당자에게 물어볼게요'],['later','나중에 입력할게요'],['guide','확인하는 방법 보기']];
+const DELEGATE_MSG='[BECONIC ESG 간편진단]\n대표님이 질문 1개를 부탁하셨어요.\n최근 한 달 전기 사용량(kWh)을 한전 고지서나 한전ON에서 확인해 아래 링크에 입력해 주세요.\n(입력 링크는 운영 버전에서 자동 생성)';
+function k1Data(){
+  const k=S.k1;
+  if(k.mode==='exact'&&+k.kwh>0) return {q:'실측',kwh:Math.round(+k.kwh),w:1};
+  if(k.mode==='bill'&&k.bill>=0) return {q:'추정',kwh:Math.round(BILLS[k.bill][1]/PRICE),w:.5};
+  return {q:'미확보',kwh:null,w:0};
+}
+function copyText(t,ok){ try{ navigator.clipboard.writeText(t).then(()=>toast(ok),()=>toast('길게 눌러 복사해 주세요')); }catch(e){ toast('길게 눌러 복사해 주세요'); } }
+function noneDetail(v){
+  if(v==='delegate') return `<div class="msg">${esc(DELEGATE_MSG)}</div><button class="btn btn-ghost" id="cpMsg" style="padding:10px">메시지 복사</button>
+    <div class="tiny">운영 버전에서는 담당자 전용 입력 링크가 함께 만들어져요. 결과는 '잠정'으로 나오고, 담당자가 입력하면 자동으로 확정돼요.</div>`;
+  if(v==='later') return `<div class="tiny">결과는 '잠정'으로 나와요. ${DUE_DAYS}일 안에 결과 화면에서 숫자만 넣으면 바로 확정돼요.</div>`;
+  if(v==='guide') return `<ul class="guide"><li>한전ON(online.kepco.co.kr) 로그인 → 요금·사용량 조회에서 월별 kWh 확인</li><li>종이 고지서: '당월 사용량(kWh)' 칸</li><li>임차 사무실이라 관리비에 포함된 경우: 관리사무소에 호실별 사용량 요청</li></ul>
+    <div class="tiny">확인되면 위에서 '고지서 숫자 그대로 알아요'를 골라 입력해 주세요. 지금 어렵다면 '나중에 입력할게요'를 고르시면 돼요.</div>`;
+  return '';
+}
 const YN=[['mfg','제조 사업장(공장·작업장)을 운영하나요?','환경 인허가·위험성평가 문항이 추가돼요'],
  ['export','해외로 수출하나요?','제품 탄소정보·해외 공급망 문항이 추가돼요'],
  ['big','대기업·중견기업에 납품하거나 협력사로 거래하나요?','고객사 ESG 요청 대응을 더 무겁게 봐요'],
@@ -230,11 +261,11 @@ const YN=[['mfg','제조 사업장(공장·작업장)을 운영하나요?','환�
  ['invest','투자유치·정책금융·IPO를 준비 중인가요?','투자자 설명자료 문항이 추가돼요']];
 
 /* ---------------- 상태 ---------------- */
-const blank=()=>({screen:'start',p:{company:'',industry:'',size:'',mfg:'',export:'',big:'',asked:'',invest:''},a:{},kwh:'',idx:0});
+const blank=()=>({screen:'start',p:{company:'',industry:'',size:'',mfg:'',export:'',big:'',asked:'',invest:''},a:{},k1:{mode:'',kwh:'',bill:-1,none:''},idx:0});
 let S=blank();
 const SAMPLE={company:'예시) 그린텍정밀',industry:'제조',size:'10~49인',mfg:'예',export:'아니오',big:'예',asked:'예',invest:'아니오'};
 const SAMPLE_A={A1:1,A2:0,B1:2,B2:1,X1:2,C1:2,C2:1,X4:1,D1:1,D2:2,E1:1,E2:0,F1:1,F2:1};
-function loadSample(){ S.p={...SAMPLE}; S.a={}; Object.entries(SAMPLE_A).forEach(([k,v])=>S.a[k]={v}); S.kwh=''; S.sample=true; }
+function loadSample(){ S.p={...SAMPLE}; S.a={}; Object.entries(SAMPLE_A).forEach(([k,v])=>S.a[k]={v}); S.k1={mode:'bill',kwh:'',bill:2,none:''}; S.sample=true; }
 
 /* ---------------- 규칙 ---------------- */
 function triggers(p){
@@ -247,7 +278,7 @@ function flow(){  // 실제로 화면에 보여줄 단계
   return Q.filter(q=>{
     if(q.cond && !t[q.cond]) return false;
     if(q.solo && solo()) return false;                            // G2
-    if(q.id==='K1') return S.a.B1 && typeof S.a.B1.v==='number' && S.a.B1.v>=2; // 기록이 있는 기업에만 숫자 질문
+    if(q.id==='K1') return true;                                  // 3단계 사다리라 모든 기업에 노출
     if(q.id==='F2' && S.a.F1 && S.a.F1.v===0) return false;      // G1
     return true;
   });
@@ -279,16 +310,23 @@ function score(){
     dom[k]=vals.length?Math.round(vals.reduce((x,y)=>x+y,0)/vals.length):null;
     if(dom[k]!=null){ tw+=w[i]; tv+=dom[k]*w[i]; }
   });
+  const kd=k1Data(); evN++; evY+=kd.w;   // 숫자 문항은 점수 대신 증빙 신뢰도에만 반영 (실측 1.0 · 추정 0.5 · 미확보 0)
   const overall=tw?Math.round(tv/tw):0;
   const level=LEVELS.reduce((acc,l,i)=>overall>=l[0]?i:acc,0);
   const evidence=evN?Math.round(evY/evN*100):0;
   const valid=shown>0 && scored>=Math.ceil(shown*0.6);            // V1
   const flags=[];
-  if(A.B1&&A.B1.v===3&&!S.kwh) flags.push(['증빙 확인 필요','월별 사용량을 정리한다고 답했는데 kWh 숫자는 비어 있어요. 고지서 숫자를 넣으면 탄소 데이터 준비도가 더 정확해져요.']); // K1
+  const b1hi=!!(A.B1&&typeof A.B1.v==='number'&&A.B1.v>=2);
+  if(b1hi&&kd.q==='미확보') flags.push(['증빙 확인 필요','사용량을 기록하고 있다고 답했는데 숫자는 아직 없어요. 고지서 숫자를 넣으면 결과가 확정돼요.']); // K1
   if(A.F1&&A.F1.v===0&&dCount>=3) flags.push(['자료 확인 필요','잘하고 있다고 답한 항목이 많은데 자료를 모아둔 곳이 없어요. 고객사 실사에서는 자료가 없으면 안 한 것으로 봐요.']); // K2
   if(unk>=3) flags.push(['담당자 확인 권장',`'잘 모르겠어요'가 ${unk}개예요. 실무 담당자와 함께 다시 응답하면 결과가 더 정확해져요.`]); // K3
-  let carbon='데이터 준비 필요';
-  if(A.B1&&typeof A.B1.v==='number'){ if(A.B1.v>=2&&S.kwh) carbon='기초 데이터 확보'; else if(A.B1.v>=2) carbon='일부 데이터 보유'; }
+  // 탄소 데이터 준비도 = 관리 수준(B1) × 데이터 품질(K1)
+  const CM=b1hi?{'실측':['기초 데이터 확보','good'],'추정':['일부 확보','warn'],'미확보':['확인 필요','warn']}
+               :{'실측':['일부 확보','warn'],'추정':['추정 가능','warn'],'미확보':['준비 필요','bad']};
+  const [carbon,carbonTone]=CM[kd.q];
+  const tco2=kd.kwh?kd.kwh*12*EF/1000:null;
+  const provisional=kd.q==='미확보'&&['later','delegate'].includes(S.k1.none);
+  const quick=kd.q!=='실측';
   // 우선 과제: 다음 단계 행동을 그대로 처방으로
   const t=triggers(S.p), cand=[];
   Object.entries(A).forEach(([id,a])=>{
@@ -303,7 +341,7 @@ function score(){
   for(const c of cand){ if(top.length>=3)break; if(used.has(c.q.d))continue; top.push(c); used.add(c.q.d); }
   for(const c of cand){ if(top.length>=3)break; if(!top.includes(c)) top.push(c); }
   const deep=keys.filter(k=>dom[k]!=null&&dom[k]<50);
-  return {dom,overall,level,evidence,valid,flags,carbon,top,deep,w,unk};
+  return {dom,overall,level,evidence,valid,flags,carbon,carbonTone,tco2,provisional,quick,kd,top,deep,w,unk};
 }
 
 /* ---------------- 렌더 ---------------- */
@@ -379,19 +417,33 @@ function rQuiz(){
   const head=`<div class="qhead"><span class="dom">${q.d} · ${DOMS[q.d]}</span><span class="tiny num">${S.idx+1} / ${F.length} · ${remain}</span></div>
     <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>`;
   if(q.kind==='kwh'){
+    rQuiz._key=null;
+    const k=S.k1;
+    const modes=[['exact','고지서 숫자 그대로 알아요','실측'],['bill','숫자는 모르지만 요금은 대충 알아요','추정'],['none','지금은 모르겠어요','미확보']];
+    const okK1=()=>(k.mode==='exact'&&+k.kwh>0)||(k.mode==='bill'&&k.bill>=0)||(k.mode==='none'&&!!k.none);
+    let panel='';
+    if(k.mode==='exact') panel=`<div class="kwh field"><input id="kwh" type="number" inputmode="numeric" min="0" placeholder="예: 3200" value="${esc(k.kwh)}" aria-label="전기 사용량 kWh"><span>kWh</span></div>
+      <div class="tiny">한전 고지서의 '당월 사용량' 칸 숫자예요.</div>`;
+    if(k.mode==='bill') panel=`<div style="font-weight:600;font-size:14px">한 달 전기요금은 대략 얼마인가요?</div>
+      <div class="chips">${BILLS.map((b,i)=>`<button type="button" class="chip" data-bill="${i}" aria-pressed="${k.bill===i}">${b[0]}</button>`).join('')}</div>
+      <div class="tiny">요금을 평균 단가로 나눠 사용량을 추정해요. 결과에는 '추정치'로 표시돼요.</div>`;
+    if(k.mode==='none') panel=`<div class="chips">${NONE.map(([v,l])=>`<button type="button" class="chip" data-none="${v}" aria-pressed="${k.none===v}">${l}</button>`).join('')}</div>${noneDetail(k.none)}`;
     app.innerHTML=`${head}
     <section class="card" style="display:flex;flex-direction:column;gap:14px">
-      <div class="eyebrow">선택 · 숫자 하나만</div>
-      <h2 class="qtitle">최근 한 달 전기 사용량은 몇 kWh인가요?</h2>
-      <div class="help">한전 고지서의 '사용량' 칸 숫자 그대로 적어 주세요. 모르면 건너뛰어도 점수에는 영향이 없어요.</div>
-      <div class="kwh field"><input id="kwh" type="number" inputmode="numeric" min="0" placeholder="예: 3200" value="${esc(S.kwh)}" aria-label="전기 사용량 kWh"><span>kWh</span></div>
+      <div class="eyebrow">숫자 문항 · 모르셔도 괜찮아요</div>
+      <h2 class="qtitle">최근 한 달 전기 사용량을 알려주세요</h2>
+      <div class="help">숫자를 모른다고 점수가 깎이지 않아요. 아는 만큼만 골라 주세요.</div>
+      <div class="opts" role="group" aria-label="아는 정도">${modes.map(([v,l,t])=>`<button type="button" class="opt mode" data-mode="${v}" aria-pressed="${k.mode===v}"><span>${l}</span><span class="qtag">${t}</span></button>`).join('')}</div>
+      ${panel?`<div class="panel">${panel}</div>`:''}
     </section>
-    <div class="row"><button class="btn btn-ghost" id="prev">이전</button><button class="btn" id="nxt">다음</button></div>
-    <div style="text-align:center"><button class="linkbtn" id="skip">건너뛰기</button></div>`;
-    document.getElementById('kwh').oninput=e=>S.kwh=e.target.value;
+    <div class="row"><button class="btn btn-ghost" id="prev">이전</button><button class="btn" id="nxt" ${okK1()?'':'disabled'}>다음</button></div>`;
+    app.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{ k.mode=b.dataset.mode; rQuiz(); const i=document.getElementById('kwh'); if(i) i.focus(); });
+    app.querySelectorAll('[data-bill]').forEach(b=>b.onclick=()=>{ k.bill=+b.dataset.bill; rQuiz(); });
+    app.querySelectorAll('[data-none]').forEach(b=>b.onclick=()=>{ k.none=b.dataset.none; rQuiz(); });
+    const inp=document.getElementById('kwh'); if(inp) inp.oninput=e=>{ k.kwh=e.target.value; document.getElementById('nxt').disabled=!okK1(); };
+    const cp=document.getElementById('cpMsg'); if(cp) cp.onclick=()=>copyText(DELEGATE_MSG,'메시지를 복사했어요');
     document.getElementById('prev').onclick=()=>{ S.idx=Math.max(0,S.idx-1); rQuiz(); };
-    document.getElementById('nxt').onclick=()=>{ S.idx++; rQuiz(); };
-    document.getElementById('skip').onclick=()=>{ S.kwh=''; S.idx++; rQuiz(); };
+    document.getElementById('nxt').onclick=()=>{ if(!okK1())return; S.sample=false; S.idx++; rQuiz(); window.scrollTo({top:0}); };
     return;
   }
   const a=S.a[q.id]||{};
@@ -460,11 +512,17 @@ function rResult(){
       <div class="from">지금: ${esc(now)}</div>
       <div class="meta"><span>${DOMS[q.d]}</span><span>담당 ${OWNER[q.d]}</span><span>${dur}</span>${a.auto?`<span>${esc(a.auto)}</span>`:''}</div></div></div>`;
   }).join('');
-  const carbonTone=R.carbon==='기초 데이터 확보'?'good':R.carbon==='일부 데이터 보유'?'warn':'bad';
+  const carbonTone=R.carbonTone;
+  const due=new Date(Date.now()+DUE_DAYS*864e5), dueTxt=`${due.getMonth()+1}월 ${due.getDate()}일`;
+  const fmt=v=>v<10?v.toFixed(1):Math.round(v).toLocaleString();
+  const tTxt=R.tco2==null?'':(R.kd.q==='추정'?`${fmt(R.tco2*(1-ERR))}~${fmt(R.tco2*(1+ERR))}`:fmt(R.tco2));
+  const kTag={'실측':'고지서 실측','추정':`요금 기반 추정 ±${ERR*100}%`,'미확보':'미확보'}[R.kd.q];
   app.innerHTML=`
   ${S.sample?`<div class="flag" style="background:var(--primary-soft)"><span><b style="color:var(--primary)">예시 결과</b> 가상의 제조기업(10~49인, 대기업 납품) 응답으로 만든 화면이에요. 실제 진단은 '진단 시작하기'에서 해보세요.</span></div>`:''}
   <section class="card">
-    <div class="eyebrow">${esc(name)} · ${esc(S.p.industry)} · ${esc(S.p.size)}</div>
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="eyebrow">${esc(name)} · ${esc(S.p.industry)} · ${esc(S.p.size)}</div>
+      <span class="status ${R.provisional?'p-warn':'p-good'}">${R.provisional?`잠정 · ${dueTxt}까지 보완`:'확정'}</span></div>
     <div class="res-top" style="margin-top:14px">
       <div class="ring" role="img" aria-label="ESG 준비도 ${R.overall}점">
         <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="10"/>
@@ -479,7 +537,14 @@ function rResult(){
     <div class="lvl-ladder" aria-hidden="true">${LEVELS.map((l,i)=>`<div class="${i===R.level?'on':''}">${l[1]}</div>`).join('')}</div>
   </section>
 
+  ${R.provisional?`<section class="card" style="display:flex;flex-direction:column;gap:10px;border-color:var(--warn)">
+    <b style="font-size:15.5px">숫자 1개만 보완하면 결과가 확정돼요</b>
+    <p class="tiny" style="margin:0">${S.k1.none==='delegate'?'담당자 입력을 기다리는 중이에요. ':''}${dueTxt}까지 전기 사용량(kWh)을 넣으면 탄소 데이터 준비도와 증빙 신뢰도를 다시 계산해요. 기한이 지나면 '미확보'로 확정돼요.</p>
+    <div class="kwh field"><input id="fixKwh" type="number" inputmode="numeric" min="0" placeholder="예: 3200" aria-label="전기 사용량 kWh 보완 입력"><span>kWh</span></div>
+    <button class="btn" id="fixBtn">반영하고 확정하기</button></section>`:''}
+
   <div class="sec">이번 주에 할 일 3가지</div>
+  ${R.quick?`<div class="qw"><b class="num">10분</b><span><b>Quick Win</b> · 최근 3개월 전기 고지서의 kWh를 표 한 장에 옮겨 적기</span></div>`:''}
   <section class="card">${acts}</section>
 
   <div class="sec">6개 영역 신호등</div>
@@ -491,6 +556,12 @@ function rResult(){
     <div class="kpi"><b style="font-size:15px;color:var(--${carbonTone})">${R.carbon}</b><span>탄소 데이터 준비</span></div>
     <div class="kpi"><b style="font-size:15px;color:var(--ink-3)">파일럿 후 제공</b><span>동종업계 비교</span></div>
   </div>
+  <section class="card" style="display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><b style="font-size:14.5px">참고 탄소량 · 전력(Scope 2)</b><span class="qtag">${kTag}</span></div>
+    ${R.tco2!=null?`<div><b class="num" style="font-size:24px">약 ${tTxt}</b> <span class="muted">tCO₂e / 년</span></div>
+    <div class="tiny">월 ${R.kd.kwh.toLocaleString()} kWh × 12개월 × 배출계수 ${EF} tCO₂e/MWh${R.kd.q==='추정'?` · 요금 ÷ 평균단가 ${PRICE}원/kWh로 역산`:''} (설정값). 공식 배출량 산정이 아닌 참고값이에요.</div>`
+    :`<div class="tiny">전기 사용량을 넣으면 연간 참고 탄소량을 보여드려요. 요금 구간만 알아도 추정할 수 있어요.</div>`}
+  </section>
   ${R.flags.map(f=>`<div class="flag"><span><b>${f[0]}</b> ${esc(f[1])}</span></div>`).join('')}
 
   ${R.deep.length?`<div class="sec">더 정확히 보기</div>
@@ -508,6 +579,9 @@ function rResult(){
   <div class="row"><button class="btn btn-ghost" id="edit">응답 수정</button><button class="btn btn-ghost" id="again">처음부터 다시</button></div>
   <p class="disc">본 결과는 공식 ESG 평가등급·인증이 아닌 실행 준비도 자가진단이며, 법률·노무·회계 자문을 대신하지 않아요. 문항 설계는 K-ESG 가이드라인 v2.0 범주를 참고했어요.</p>`;
   app.querySelectorAll('[data-deep]').forEach(b=>b.onclick=()=>toast(`시안: '${DOMS[b.dataset.deep]}' 심화 질문으로 연결될 자리예요`));
+  const fb=document.getElementById('fixBtn');
+  if(fb) fb.onclick=()=>{ const v=+document.getElementById('fixKwh').value; if(!(v>0)){ toast('kWh 숫자를 넣어 주세요'); return; }
+    S.k1={mode:'exact',kwh:String(v),bill:-1,none:''}; rResult(); window.scrollTo({top:0}); toast('반영했어요. 결과가 확정됐어요'); };
   document.getElementById('copy').onclick=()=>{ const done=()=>toast('번호를 복사했어요'); try{ navigator.clipboard.writeText('070-4103-4177').then(done,()=>toast('번호를 길게 눌러 복사해 주세요')); }catch(e){ toast('번호를 길게 눌러 복사해 주세요'); } };
   document.getElementById('edit').onclick=()=>{ S.idx=0; go('quiz'); };
   document.getElementById('again').onclick=()=>{ S=blank(); go('start'); };
