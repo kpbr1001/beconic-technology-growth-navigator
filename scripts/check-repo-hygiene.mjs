@@ -2,7 +2,8 @@
 import { execSync } from 'node:child_process';
 import { readFileSync, statSync } from 'node:fs';
 
-const files = execSync('git ls-files', { encoding: 'utf8' }).split('\n').filter(Boolean);
+// -z: 한글 등 비ASCII 경로를 따옴표·8진수로 바꾸지 않고 그대로 받는다
+const files = execSync('git ls-files -z', { encoding: 'utf8' }).split('\0').filter(Boolean);
 const MAX_BYTES = 2 * 1024 * 1024;
 const SECRET = [
   /sk-ant-[A-Za-z0-9_-]{10,}/, /sk-[A-Za-z0-9]{32,}/, /pa-[A-Za-z0-9_-]{30,}/, /AKIA[0-9A-Z]{16}/,
