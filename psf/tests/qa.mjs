@@ -1,4 +1,4 @@
-/* global collectInput, fitReport, currentStep:writable, sampleData, runDiagnosis, generateConsultingReport, generateTableOfContents, STAGE_DEFS, judgeStage, TYPE_ORDER, showChecklist, closeModal, openConsult, resumeDraft, esc, renderDashboard, goScreen, diagnosisResult:writable, REPORT_SECTION_COUNT, DOMAIN_META, fieldQuality, GUIDE, TEXT_KEYS, DOMAIN_META, EVIDENCE_LEVELS, loadSampleAndStart, completeDiagnosis, openReportMetaModal, generateReportFlow, proceedAfterQA, loadDiagnosisHistory, LS_KEY, startDiagnosis, renderStep -- page.evaluate 안에서 앱 전역을 호출 */
+/* global saveDraft, readDraft, isSampleInput, diagnosisInput:writable, clearDraft, consultingReport, collectInput, fitReport, currentStep:writable, sampleData, runDiagnosis, generateConsultingReport, generateTableOfContents, STAGE_DEFS, judgeStage, TYPE_ORDER, showChecklist, closeModal, openConsult, resumeDraft, esc, renderDashboard, goScreen, diagnosisResult:writable, REPORT_SECTION_COUNT, DOMAIN_META, fieldQuality, GUIDE, TEXT_KEYS, DOMAIN_META, EVIDENCE_LEVELS, loadSampleAndStart, completeDiagnosis, openReportMetaModal, generateReportFlow, proceedAfterQA, loadDiagnosisHistory, LS_KEY, startDiagnosis, renderStep -- page.evaluate 안에서 앱 전역을 호출 */
 // BECONIC 고객문제·솔루션 적합성 진단(20번) QA — 실제 Chromium으로 PSF Engine v2 원칙·작성 가이드·사용자 플로우·모바일·A4 PDF를 확인한다.
 // 실행: (psf 폴더를 정적 서버로 띄운 뒤) node psf/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -219,7 +219,6 @@ const allText = (v) => page.evaluate((v) => {
     const d = JSON.parse(JSON.stringify(sampleData)); const bad = '<img src=x onerror="window.__xss=1">';
     d.execution.keyMetrics = bad + ' 전환율 0%→30%'; d.execution.mainRisk = bad + ' → ' + bad; d.execution.nextExperiment = bad; d.customer.userPersona = bad;
     Object.keys(d).forEach((sec) => Object.keys(d[sec]).forEach((k) => { if (typeof d[sec][k] === 'string') d[sec][k] = esc(d[sec][k]); }));
-    // eslint-disable-next-line no-undef -- 앱 전역 let(diagnosisInput)에 직접 대입(window 속성이 아님)
     diagnosisInput = d; diagnosisResult = runDiagnosis(d); goScreen('dashboard'); renderDashboard(d, diagnosisResult);
     openReportMetaModal(); generateReportFlow(); proceedAfterQA();
     return { imgs: document.querySelectorAll('img[src="x"]').length };
@@ -313,6 +312,32 @@ const allText = (v) => page.evaluate((v) => {
   check('데스크톱 1440: 본문 1200px 이상, 입력 화면 900px 이상', wrapW >= 1200 && g.shell >= 900, `wrap ${Math.round(wrapW)} · form ${Math.round(g.shell)}`);
   check('문항: 작성 체크(n/m)가 입력칸 바로 아래, 그다음 가이드 카드', g.meterFirst && g.count);
   check('문항 가이드 여백: 안쪽 14px↑ · 항목 간격 12px↑ · 문항 간격 28px↑', g.pad >= 14 && g.gap >= 12 && g.mb >= 28, JSON.stringify(g));
+}
+
+// 14. v2.5 샘플 미리보기·내비게이션
+{
+  await page.goto(BASE, { waitUntil: 'load' });
+  await page.evaluate(() => { localStorage.clear(); });
+  await page.reload({ waitUntil: 'load' });
+  await page.evaluate(() => { startDiagnosis({ fresh: true }); document.querySelector('[data-k="companyName"]').value = '내기업'; saveDraft(); goScreen('landing'); });
+  await page.click('.hero .btn-ghost'); await page.waitForTimeout(250);
+  const pv = await page.evaluate(() => ({ scr: document.querySelector('.screen.active').id, bar: !document.getElementById('previewBar').classList.contains('hidden'), hist: loadDiagnosisHistory().length, draft: (readDraft() || { values: {} }).values.companyName, sample: isSampleInput(diagnosisInput), btn: document.querySelector('.dash-actions [data-restart]').textContent }));
+  check('랜딩 샘플 버튼 → 입력 1단계가 아니라 샘플 결과 화면', pv.scr === 'screen-dashboard' && pv.bar, pv.scr);
+  check('샘플 미리보기: 이력 저장 없음 · 작성 중인 임시저장 유지 · AI 샘플 차단 인식', pv.hist === 0 && pv.draft === '내기업' && pv.sample, JSON.stringify(pv));
+  check("샘플 미리보기: 버튼 '우리 기업 진단 시작'", pv.btn === '우리 기업 진단 시작');
+  await page.evaluate(() => { openReportMetaModal(); generateReportFlow(); proceedAfterQA(); }); await page.waitForTimeout(250);
+  const h2 = await page.evaluate(() => loadDiagnosisHistory().length);
+  await page.goBack(); await page.waitForTimeout(150);
+  const s1 = await page.evaluate(() => document.querySelector('.screen.active').id);
+  check('샘플 보고서 생성 후에도 이력 0 · 뒤로 → 결과', h2 === 0 && s1 === 'screen-dashboard', `${h2} ${s1}`);
+  await page.evaluate(() => { clearDraft(); startDiagnosis(); loadSampleAndStart(); }); await page.waitForTimeout(150);
+  await page.evaluate(() => completeDiagnosis()); await page.waitForTimeout(150);
+  const done = await page.evaluate(() => ({ bar: !document.getElementById('previewBar').classList.contains('hidden'), rep: consultingReport, hist: loadDiagnosisHistory().length }));
+  check('실제 진단 완료: 배너 숨김 · 이전 보고서 비움 · 이력 1건', !done.bar && done.rep === null && done.hist === 1, JSON.stringify(done));
+  await page.evaluate(() => goScreen('admin'));
+  await page.click('#screen-admin .btn-primary'); await page.waitForTimeout(150);
+  const nw = await page.evaluate(() => [document.querySelector('.screen.active').id, currentStep]);
+  check("이력 화면 '＋ 새 진단' → 입력 1단계", nw[0] === 'screen-form' && nw[1] === 1, String(nw));
 }
 
 // 11. PDF 품질 회귀 (pymupdf 있을 때)

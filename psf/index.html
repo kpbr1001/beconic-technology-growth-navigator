@@ -263,7 +263,7 @@ button:focus-visible,.chip-opt:focus-visible,.check-item:focus-visible{outline:3
         <p class="lead">문제정의, 고객검증, 가치제안, 솔루션 적합성, 실행 로드맵까지 한 번에 확인하는 근거 기반 비즈니스 진단 웹앱입니다.</p>
         <div class="hero-cta">
           <button class="btn btn-gold btn-lg" onclick="startDiagnosis()">진단 시작하기 →</button>
-          <button class="btn btn-ghost btn-lg" onclick="loadSampleAndStart()">샘플로 미리보기</button>
+          <button class="btn btn-ghost btn-lg" onclick="previewSample()">샘플 결과 미리보기</button>
         </div>
         <div class="resume-bar hidden" id="resumeBar"></div>
         <div class="hero-meta">
@@ -439,7 +439,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
   <div class="form-shell">
     <div class="form-help-bar">
       <span>💡 각 문항의 <b>✍️ 이렇게 쓰세요</b>대로 쓰면 입력칸 아래 <b>작성 체크</b>가 하나씩 채워져요. 이 체크가 곧 채점 기준입니다. 모르는 항목은 <b>“잘 모름”</b>으로 두어도 됩니다.</span>
-      <button class="btn btn-sm btn-ghost" onclick="fillSample()">샘플 데이터 채우기</button>
+      <button class="btn btn-sm btn-ghost" onclick="fillSampleSafe()">샘플 데이터 채우기</button>
     </div>
 
     <div class="form-topline">
@@ -781,6 +781,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
 <div id="screen-dashboard" class="screen">
   <div class="dash">
     <div class="wrap">
+      <!-- 샘플 미리보기 안내(샘플일 때만) -->
+      <div class="preview-bar hidden" id="previewBar" role="status">
+        <div><b>샘플 결과 미리보기</b> · 샘플 데이터(‘센서랩코리아’)로 진단한 예시예요. 이력에 저장되지 않고, 작성 중인 진단에도 영향이 없어요.</div>
+        <button class="btn btn-primary btn-sm" onclick="startDiagnosis()">우리 기업 진단 시작 →</button>
+      </div>
       <!-- 종합 진단 히어로 -->
       <div class="dash-hero">
         <div class="dash-hero-grid">
@@ -800,7 +805,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
           </div>
           <div class="dash-actions">
             <button class="btn btn-gold" onclick="openReportMetaModal()">📄 보고서 PDF</button>
-            <button class="btn btn-ghost" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)" onclick="restartDiagnosis()">다시 진단하기</button>
+            <button class="btn btn-ghost" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)" onclick="restartDiagnosis()" data-restart>다시 진단하기</button>
           </div>
         </div>
       </div>
@@ -921,7 +926,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
       <div class="dash-foot-actions">
         <button class="btn btn-primary" onclick="openReportMetaModal()">📄 컨설팅 보고서 생성 / PDF 저장</button>
         <button class="btn btn-ghost" onclick="goScreen('admin')">저장된 진단 이력</button>
-        <button class="btn btn-ghost" onclick="restartDiagnosis()">다시 진단하기</button>
+        <button class="btn btn-ghost" onclick="restartDiagnosis()" data-restart>다시 진단하기</button>
       </div>
     </div>
   </div>
@@ -1187,8 +1192,8 @@ table.rp-table tr:nth-child(even) td{background:#F8FAFC;}
       <div class="admin-head">
         <div><span class="eyebrow">Admin</span><h2>저장된 진단 이력</h2><p>이 기기·브라우저에만 저장된 진단 결과입니다. 서버로 보내지 않습니다.</p></div>
         <div style="display:flex;gap:10px">
-          <button class="btn btn-ghost btn-sm" onclick="loadSampleAndStart()">샘플 진단 실행</button>
-          <button class="btn btn-primary btn-sm" onclick="goScreen('landing')">＋ 새 진단</button>
+          <button class="btn btn-ghost btn-sm" onclick="previewSample()">샘플 결과 보기</button>
+          <button class="btn btn-primary btn-sm" onclick="startDiagnosis()">＋ 새 진단</button>
         </div>
       </div>
       <div id="adminBody"></div>
@@ -1434,6 +1439,13 @@ input:focus,select:focus,textarea:focus{background:#fff;border-color:var(--t-blu
 /* 보고서 미리보기: 휴대폰에서는 A4를 화면 폭에 맞춰 축소(인쇄는 원래 크기) */
 @media print{ .report-doc{zoom:1 !important;} }
 textarea.autogrow{overflow:hidden;resize:none;}
+/* 샘플 결과 미리보기 안내 */
+.preview-bar{display:flex;gap:12px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--t-blue-50);color:var(--t-g800);border-radius:16px;padding:14px 18px;margin-bottom:16px;font-size:14.5px;line-height:1.6;}
+.preview-bar b{color:var(--t-blue);}
+.preview-bar.hidden{display:none;}
+@media print{ .preview-bar{display:none !important;} }
+@media (max-width:720px){ .preview-bar{flex-direction:column;align-items:stretch;} }
+
 /* ===== v2.4 데스크톱 폭 확대 · 문항 가이드 개편 ===== */
 .wrap{max-width:1280px;padding:0 32px;}
 .form-shell{max-width:960px;padding:48px 32px 96px;}
@@ -1593,7 +1605,7 @@ function startDiagnosis(opts){
   }
   resetForm(); currentStep=1; renderStep(); goScreen('form');
 }
-function restartDiagnosis(){ if(confirm('새로운 진단을 시작할까요? 현재 결과는 이력에 저장되어 있습니다.')){ startDiagnosis(); } }
+function restartDiagnosis(){ if(isPreview) return startDiagnosis(); if(confirm('새로운 진단을 시작할까요? 현재 결과는 이력에 저장되어 있습니다.')){ startDiagnosis(); } }
 
 /* ---------- 스텝 렌더 ---------- */
 function renderStep(opts){
@@ -1754,7 +1766,23 @@ function fillSample(){
   if(typeof renderAllMeters==='function') renderAllMeters();
   if(typeof autoGrowAll==='function') setTimeout(autoGrowAll,0);
 }
-function loadSampleAndStart(){ startDiagnosis({fresh:true}); setTimeout(()=>{ fillSample(); },80); }
+function loadSampleAndStart(){ startDiagnosis({fresh:true}); setTimeout(()=>{ fillSample(); },80); }   // 테스트·폼 채우기용(임시저장을 덮어씀)
+/* 입력 화면의 '샘플 데이터 채우기': 이미 쓴 내용이 있으면 덮어쓰기 전에 확인 */
+function fillSampleSafe(){
+  const typed=[...document.querySelectorAll('#screen-form [data-k]')].some(el=>String(el.value).trim());
+  if(typed&&!confirm('지금까지 입력한 내용을 샘플 데이터로 바꿀까요?\n(바꾸면 작성한 내용은 사라집니다)')) return;
+  fillSample(); saveDraft();
+}
+/* 랜딩 '샘플 결과 미리보기': 입력 화면을 거치지 않고 샘플 결과를 바로 보여 준다.
+   작성 중인 임시저장·진단 이력은 건드리지 않는다. */
+const escDeep=v=>Array.isArray(v)?v.map(escDeep):(v&&typeof v==='object')?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,escDeep(x)])):(typeof v==='string'?esc(v):v);
+let isPreview=false;
+function previewSample(){
+  diagnosisInput=escDeep(JSON.parse(JSON.stringify(sampleData)));
+  diagnosisResult=runDiagnosis(diagnosisInput);
+  consultingReport=null; reportMeta=null; isPreview=true;
+  goScreen('dashboard'); renderDashboard(diagnosisInput,diagnosisResult);
+}
 
 
 /* ---------- 문항 작성 가이드 주입 (GUIDE 단일 출처 → 폼 안내·실시간 체크·채점 공통) ---------- */
@@ -1794,6 +1822,7 @@ document.addEventListener('DOMContentLoaded',mountGuides);   // GUIDE는 다음 
 function completeDiagnosis(){
   diagnosisInput = collectInput();
   diagnosisResult = runDiagnosis(diagnosisInput);
+  consultingReport = null; reportMeta = null; isPreview = false;
   clearDraft();
   saveDiagnosis(diagnosisInput, diagnosisResult, null);
   goScreen('dashboard');
@@ -2533,6 +2562,8 @@ const barColor = pct => pct>=0.75?'var(--ok)':pct>=0.5?'var(--gold-500)':'var(--
 const toneClass = t => t==='ok'?'badge-ok':t==='warn'?'badge-warn':'badge-bad';
 
 function renderDashboard(input,res){
+  const pv=document.getElementById('previewBar'); if(pv) pv.classList.toggle('hidden',!isPreview);
+  document.querySelectorAll('[data-restart]').forEach(b=>{ b.textContent=isPreview?'우리 기업 진단 시작':'다시 진단하기'; });
   const circ=2*Math.PI*74;
   const gfg=document.getElementById('gaugeFg');
   gfg.setAttribute('stroke-dasharray',circ);
@@ -2989,8 +3020,10 @@ const CERT=`중소벤처기업부 인증 중소기업상담회사 ${COMPANY.cert
                      아이디어 단계 문장·조사 보정, PWA 제거(옛 서비스 워커 자가 해제), OG 이미지 배포 포함
    V2.4 (2026-11-19) 데스크톱 폭 확대(본문 1280·입력 960px, 글자·여백 재조정), 문항 가이드 개편(작성 체크 n/m을 입력칸 바로 아래로,
         가이드 카드 여백·라벨 정리, 피할 예는 접어서 이유와 함께), 첫 화면 버튼 '진단 시작하기'.
+   V2.5 (2026-11-19) 내비 점검: 랜딩 '샘플 결과 미리보기'가 입력 1단계 대신 샘플 결과로 바로 이동(이력·임시저장 불변),
+        샘플 채우기 덮어쓰기 확인, 진단 완료 시 이전 보고서 비움, 이력 화면 '새 진단'이 입력으로 바로 이동.
 */
-const APP_VERSION="V2.4";
+const APP_VERSION="V2.5";
 const REPORT_TITLE="고객문제·솔루션 적합성 진단보고서";
 const APP_UPDATED="2026-11-19";               // 최종 업데이트 일자
 const COPYRIGHT=`© ${copyYears()} ${COMPANY.en} All rights reserved.`;
@@ -3021,7 +3054,7 @@ function generateReportFlow(){
   consultingReport=generateConsultingReport(diagnosisInput,diagnosisResult,reportMeta);
   const qa=runFinalQA(diagnosisInput,diagnosisResult,consultingReport);
   consultingReport.qaResult=qa;
-  saveDiagnosis(diagnosisInput,diagnosisResult,consultingReport); // 보고서 메타 반영 재저장
+  if(!isPreview) saveDiagnosis(diagnosisInput,diagnosisResult,consultingReport); // 보고서 메타 반영 재저장(샘플 미리보기는 저장 안 함)
   // QA 모달
   const body=document.getElementById('qaModalBody');
   if(qa.passed){
@@ -3928,7 +3961,7 @@ function saveDiagnosis(input,result,report){
 function renderAdmin(){
   const list=loadDiagnosisHistory();
   const box=document.getElementById('adminBody');
-  if(list.length===0){ box.innerHTML=`<div class="admin-empty"><b>저장된 진단이 없습니다.</b><br/>새 진단을 시작하거나 샘플 진단을 실행해 보세요.</div>`; return; }
+  if(list.length===0){ box.innerHTML=`<div class="admin-empty"><b>저장된 진단이 없습니다.</b><br/>새 진단을 시작하거나 샘플 결과를 먼저 둘러보세요.</div>`; return; }
   const gradeTone=g=>['S','A'].includes(g)?'badge-ok':['B','C'].includes(g)?'badge-warn':'badge-bad';
   box.innerHTML=`<table class="admin-table"><thead><tr>
     <th>기업명</th><th>진단일</th><th>총점</th><th>등급</th><th>주요 유형</th><th>수신처</th><th>목적</th><th>관리</th></tr></thead><tbody>
@@ -3943,7 +3976,7 @@ function renderAdmin(){
 }
 function viewHistory(id){
   const e=loadDiagnosisHistory().find(x=>x.id===id); if(!e)return;
-  diagnosisInput=e.input; diagnosisResult=e.result; consultingReport=e.report; reportMeta=null;
+  diagnosisInput=e.input; diagnosisResult=e.result; consultingReport=e.report; reportMeta=null; isPreview=false;
   goScreen('dashboard'); renderDashboard(diagnosisInput,diagnosisResult);
 }
 function deleteHistory(id){
