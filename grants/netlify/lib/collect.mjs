@@ -43,11 +43,14 @@ export function enrichLocal(p) {
     }
     return q;
   }
-  // 광역시 자치구: 광역시가 하나로 정해진 공고만(예: '[서울] 구로', '서울특별시 구로구')
+  // 광역시 자치구: 광역시가 하나로 정해진 공고만(예: '[서울] 구로', '서울특별시 구로구').
+  // 대상 지역이 둘 이상이어도(예: 광주·전남 통합) 공고명 머리의 [광역시]가 그중 하나면 그 광역시로 본다
   const regs = q.targetRegions || [];
-  if (!q.targetRegionsInferred && regs.length === 1) {
-    const gus = detectGus(q, regs[0]);
-    if (gus.length) q = { ...q, targetDistricts: gus };
+  const lead = /^\s*\[([가-힣]{2})\]/.exec(q.programName || '')?.[1];
+  const sido = regs.length === 1 ? regs[0] : (lead && regs.includes(lead) ? lead : null);
+  if (!q.targetRegionsInferred && sido) {
+    const gus = detectGus(q, sido);
+    if (gus.length) q = { ...q, targetRegions: [sido], targetDistricts: gus };
   }
   return q;
 }

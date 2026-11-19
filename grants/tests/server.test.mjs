@@ -680,3 +680,12 @@ test('이용 측정: 화면이 보내는 이벤트 이름은 모두 서버 허�
   for (const n of names) assert.ok(EVENTS.includes(n), n);
   assert.match(app, /sendBeacon\('\/api\/e', ev\)/, '이벤트 이름만 전송');
 });
+
+test('시·군·구: [광역시] + 자치구 공고는 대상 지역이 둘이어도(통합특별시 등) 그 광역시·자치구로', () => {
+  const a = enrichLocal({ programName: '[광주] 서구 2026년 소상공인 카드수수료 지원 사업 공고', agency: '전남광주통합특별시', targetRegions: ['광주', '전남'], targetRegionsInferred: false });
+  assert.deepEqual([a.targetRegions, a.targetDistricts], [['광주'], ['서구']]);
+  const b = enrichLocal({ programName: '[부산] 2026년 원부자재 공동구매 지원사업 신청기업 모집 공고', agency: '부산광역시', targetRegions: ['부산'], targetRegionsInferred: false });
+  assert.equal((b.targetDistricts || []).length, 0, "'공동구매'의 '동구'는 자치구 아님");
+  const c = enrichLocal({ programName: '2026 지역 상생 지원 공고', agency: '부산광역시', targetRegions: ['부산', '울산'], targetRegionsInferred: false });
+  assert.equal((c.targetDistricts || []).length, 0, '머리에 [광역시] 없으면 그대로');
+});
