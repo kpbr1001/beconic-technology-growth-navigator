@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.2.0';
+const VERSION = '1.3.0';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -31,7 +31,7 @@ function taxExpired(now){ const [y,m]=D.meta.taxNextCheck.split('-').map(Number)
 
 /* ---------- 저장(이 기기에만) ---------- */
 const STORE = 'beconic_prestartup_v1';
-const blank = () => ({me:{}, prog:{}, memo:{}, recent:[], meSkip:false, seen:{}});
+const blank = () => ({me:{}, prog:{}, memo:{}, recent:[], meSkip:false, seen:{}, track:false});
 let S = blank();
 function load(){
   try{
@@ -43,6 +43,7 @@ function load(){
       for(const id of Object.keys(p.memo||{})) if(BY_ID[id] && typeof p.memo[id]==='string') S.memo[id]=p.memo[id].slice(0,2000);
       S.recent = Array.isArray(p.recent) ? p.recent.filter(id=>BY_ID[id]).slice(0,8) : [];
       S.meSkip = p.meSkip===true;
+      S.track = p.track===true;
       S.seen = {};
       for(const id of Object.keys(p.seen||{})) if(BY_ID[id] && p.seen[id] && typeof p.seen[id]==='object') S.seen[id]={benefit:p.seen[id].benefit===true, finish:p.seen[id].finish===true};
     }
@@ -237,8 +238,8 @@ function renderHome(){
     <div id="homeResults"></div>
   </section>
 
-  ${recent.length?`<div class="sec-title"><h2>이어서 준비하기</h2><a class="small muted" href="#/my">내 준비함 ›</a></div>
-  <div class="recent">${recent.map(id=>{ const p=progressOf(id); return `<a class="rcard" href="#/guide/${id}"><span class="small muted">${esc(BY_ID[id].group)}</span><b>${esc(BY_ID[id].name)}</b><span class="small muted">${p.done}/${p.total} 완료</span><div class="bar"><i style="width:${p.pct}%"></i></div></a>`; }).join('')}</div>`:''}
+  ${recent.length?`<div class="sec-title"><h2>최근 본 업종</h2><a class="small muted" href="#/my">내 준비함 ›</a></div>
+  <div class="recent">${recent.map(id=>recentCard(id)).join('')}</div>`:''}
   <div class="sec-title"><h2>업태에서 고르기</h2><span class="small muted">${IND.length}개 업종 가이드</span></div>
   <div class="groups">${GROUPS.map(g=>`<a class="gcard" href="#/g/${encodeURIComponent(g)}"><span class="gi" aria-hidden="true">${D.groupMeta[g]}</span><b>${esc(g)}</b><span>${inGroup(g).length}개 업종</span></a>`).join('')}</div>
   <div class="sec-title"><h2>이 가이드는 이렇게 달라요</h2></div>
@@ -255,6 +256,16 @@ function renderHome(){
   inp.addEventListener('input', run);
   $('#homeSearch').addEventListener('submit', e=>{ e.preventDefault(); const r=searchGuides(inp.value); if(r.length===1) location.hash='#/start/'+r[0].id; else run(); inp.blur(); });
   document.querySelectorAll('.quick [data-q]').forEach(b=>b.addEventListener('click', ()=>{ inp.value=b.dataset.q; run(); box.scrollIntoView({behavior:'smooth', block:'nearest'}); }));
+}
+function recentCard(id){
+  const p=progressOf(id), tracked=p.done>0;
+  return `<div class="rcard"><a href="#/guide/${id}/prepare"><span class="small muted">${esc(BY_ID[id].group)}</span><b>${esc(BY_ID[id].name)}</b><span class="small muted">${tracked?`${p.done}/${p.total} 체크`:'결과 다시 보기'}</span>${tracked?`<div class="bar"><i style="width:${p.pct}%"></i></div>`:''}</a>
+    <button type="button" class="rdel" data-del="${id}" aria-label="${esc(BY_ID[id].name)} 목록에서 삭제">✕</button></div>`;
+}
+function deleteGuide(id){
+  const has=(S.prog[id]&&progressOf(id).done)||S.memo[id];
+  if(has && !confirm(`${BY_ID[id].name}의 체크·메모도 함께 지울까요?`)) return false;
+  S.recent=S.recent.filter(x=>x!==id); delete S.prog[id]; delete S.memo[id]; delete S.seen[id]; save(); return true;
 }
 function homeResults(v){
   const g=searchGuides(v).slice(0,8);
@@ -291,21 +302,21 @@ function renderGroup(g){
 
 /* ---------- 가이드 ---------- */
 /* 고객여정 5단계: ① 업종 → ② 내 상황 → ③ 준비 체크 → ④ 혜택·지원 → ⑤ 저장·마무리 */
+/* 입력은 단계(① 업종 → ② 내 상황 → ③ 결과), 결과는 탭(준비물 · 혜택·지원 · 저장·상담) */
 const GSTEPS = [
-  {k:'prepare', n:3, l:'준비 체크', d:'순서·서류·인허가를 하나씩 체크', secs:['me','steps','docs','license','ask','pit']},
-  {k:'benefit', n:4, l:'혜택·지원', d:'업종코드·세금 혜택·지원사업 확인', secs:['code','tax','support','expand']},
-  {k:'finish',  n:5, l:'저장·마무리', d:'PDF 저장·지원사업·전문가 확인', secs:['finish','sites','memo','about']}
+  {k:'prepare', n:1, l:'준비물', d:'진행 순서 · 준비 서류 · 인허가', secs:['me','steps','docs','license','ask','pit']},
+  {k:'benefit', n:2, l:'혜택·지원', d:'업종코드 · 세금 혜택 · 지원사업', secs:['code','tax','support','expand']},
+  {k:'finish',  n:3, l:'저장·상담', d:'PDF · 공유 · 전문가 확인 · 신청 사이트', secs:['finish','sites','memo','about']}
 ];
-const JOURNEY = [['pick','업종 고르기'],['me','내 상황'],['prepare','준비 체크'],['benefit','혜택·지원'],['finish','저장·마무리']];
+const JOURNEY = [['pick','업종 고르기'],['me','내 상황'],['result','결과 보기']];
 function stepState(id){
-  const pr=id?progressOf(id):null, seen=(id&&S.seen[id])||{};
-  return {pick:!!id, me:hasMe()||S.meSkip, prepare:!!pr&&pr.pct===100, benefit:!!seen.benefit, finish:!!seen.finish};
+  return {pick:!!id, me:hasMe()||S.meSkip, result:false};
 }
 function stepHref(k,id,group){
   if(k==='pick') return group?`#/g/${encodeURIComponent(group)}`:'#/';
   if(!id) return null;
   if(k==='me') return `#/me?next=${id}`;
-  return `#/guide/${id}/${k}`;
+  return `#/guide/${id}/prepare`;
 }
 function stepper(cur, id, group){
   const st=stepState(id);
@@ -313,7 +324,7 @@ function stepper(cur, id, group){
     const href=stepHref(k,id,group), on=k===cur, done=st[k]&&!on;
     const inner=`<b>${done?'✓':i+1}</b><em class="js-l">${l}</em>`;
     return `<li class="${on?'on':''} ${done?'done':''}">${href&&!on?`<a href="${href}">${inner}</a>`:`<span class="js-i" ${on?'aria-current="step"':''}>${inner}</span>`}</li>`;
-  }).join('')}</ol><p class="js-cur">${JOURNEY.findIndex(x=>x[0]===cur)+1}/5 단계 · <strong>${JOURNEY.find(x=>x[0]===cur)[1]}</strong></p></nav>`;
+  }).join('')}</ol><p class="js-cur">${JOURNEY.findIndex(x=>x[0]===cur)+1}/${JOURNEY.length} 단계 · <strong>${JOURNEY.find(x=>x[0]===cur)[1]}</strong></p></nav>`;
 }
 const NAV_EXTRA = [['me','맞춤 안내']];
 const SECS = [
@@ -338,13 +349,13 @@ function renderGuide(id, step){
   const reviewed = it.reviewStatus==='검수완료';
 
   mount(`
-  ${stepper(G.k, id, it.group)}
+  ${stepper('result', id, it.group)}
   <div class="guide">
     <aside class="lnav" aria-label="가이드 목차">
       <div class="ln-t">${esc(it.name)}</div>
-      ${GSTEPS.map(g=>`<a class="ln-step ${g.k===G.k?'cur':''}" href="#/guide/${id}/${g.k}"><i>${g.n}</i>${g.l}${g.k==='prepare'?`<em>${pr.pct}%</em>`:''}</a>${g.k!==G.k?'':[...NAV_EXTRA, ...SECS, ['finish','준비 마무리']].filter(([k])=>g.secs.includes(k)).map(([k,l])=>{
-        const done = (k==='steps'&&pr.ns&&pr.ds===pr.ns)||(k==='docs'&&pr.nd&&pr.dd===pr.nd);
-        const cnt = k==='steps'?`${pr.ds}/${pr.ns}`: k==='docs'?`${pr.dd}/${pr.nd}`: k==='license'?it.license.length: k==='me'?(hasMe()?notes.length:'선택'): '';
+      ${GSTEPS.map(g=>`<a class="ln-step ${g.k===G.k?'cur':''}" href="#/guide/${id}/${g.k}"><i>${g.n}</i>${g.l}${g.k==='prepare'&&S.track?`<em>${pr.pct}%</em>`:''}</a>${g.k!==G.k?'':[...NAV_EXTRA, ...SECS, ['finish','준비 마무리']].filter(([k])=>g.secs.includes(k)).map(([k,l])=>{
+        const done = S.track && (k==='steps'&&pr.ns&&pr.ds===pr.ns)||(S.track && k==='docs'&&pr.nd&&pr.dd===pr.nd);
+        const cnt = k==='steps'?(S.track?`${pr.ds}/${pr.ns}`:pr.ns): k==='docs'?(S.track?`${pr.dd}/${pr.nd}`:pr.nd): k==='license'?it.license.length: k==='me'?(hasMe()?notes.length:'선택'): '';
         return `<a class="ln-sub" href="#sec-${k}" data-sec="${k}">${l}${done?`<i class="dn" aria-label="완료">✓</i>`:cnt!==''?`<em>${cnt}</em>`:''}</a>`;
       }).join('')}`).join('')}
       <div class="ln-sep"></div>
@@ -356,7 +367,7 @@ function renderGuide(id, step){
     </aside>
     <div class="gbody">
       <div class="print-only phead"><b>BECONIC 창업 준비 체크리스트</b><span>출력 ${ymd(new Date())} · 자료 기준일 ${BASE} · 세제 ${TAX_BASE} 법령 기준 · 업종코드 2025년 귀속 연계표</span></div>
-      <section class="card ghero">
+      <section class="card ghero print-only">
         <div class="eyebrow">${D.groupMeta[it.group]||''} ${esc(it.group)} · 창업 준비 가이드</div>
         <h1 class="h-lg">${esc(it.name)}</h1>
         <p class="lead">${esc(it.summary)}</p>
@@ -370,18 +381,19 @@ function renderGuide(id, step){
       </section>
 
       ${printSummary(it, pr)}
-      <div class="step-h no-print"><span>STEP ${G.n}</span><h2>${G.l}</h2><p>${G.d}</p></div>
+      ${resultSummary(it, notes)}
+      <nav class="rtabs no-print" aria-label="결과 탭" role="tablist">${GSTEPS.map(g=>`<a role="tab" href="#/guide/${id}/${g.k}" class="${g.k===G.k?'on':''}" aria-selected="${g.k===G.k}"><b>${g.l}</b><span>${g.d}</span></a>`).join('')}</nav>
       ${G.k==='finish'?printSummary(it, pr, true):''}
-      <section class="card no-print" data-only="prepare" aria-label="준비 진행률">
+      ${S.track?'':'<!--'}<section class="card no-print" data-only="prepare" aria-label="준비 진행률">
         <div class="prog"><div class="pn">${pr.pct}<small>%</small></div><div class="pt"><b>${pr.pct===100?'준비를 모두 체크했어요':'준비 진행률'}</b><span>순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd} 체크 · 이 기기에 저장돼요</span></div>
         <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pr.pct}" aria-label="준비 진행률"><i style="width:${pr.pct}%"></i></div></div>
         ${nx?`<div class="next"><span class="nl">지금 할 일</span><span class="nt">${esc(nx.text)}</span><button class="btn btn-primary btn-sm" type="button" data-next="${nx.kind}${nx.i}">완료</button></div>`
-          :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open?`사업자등록은 <b>${ymd(addDays(S.me.open,20))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#/guide/${id}/benefit">다음 단계</a></div>`}
+          :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open?`사업자등록은 <b>${ymd(addDays(S.me.open,20))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#/guide/${id}/benefit">혜택·지원 보기</a></div>`}
         <div class="acts-row">
           <button class="btn btn-gray btn-sm" type="button" data-act="share">링크 복사</button>
           <button class="btn btn-gray btn-sm" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 저장'}</button>
         </div>
-      </section>
+      </section>${S.track?'':'-->'}
 
       ${notes.length?`<section class="card sec" id="sec-me" aria-label="내 상황 맞춤 안내"><div class="sec-h"><span class="sn">★</span><h2>내 상황 맞춤 안내</h2><a class="btn btn-soft btn-sm no-print" href="#/me?next=${it.id}">내 상황 수정</a></div>
         <div class="row mechips">${meChips().map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>
@@ -390,14 +402,16 @@ function renderGuide(id, step){
       :`<section class="card sec no-print" id="sec-me"><div class="expert"><div class="et"><b style="font-size:16px">내 상황을 넣으면 맞춤 안내가 붙어요</b><p class="small muted" style="margin-top:4px">나이·지역·사업장·예상 매출 — 30초, 전부 선택이에요. 세액감면 청년 기준, 자택 등록 가능 여부, 사업자등록 기한을 알려 드려요.</p></div>
         <a class="btn btn-soft" href="#/me?next=${it.id}">30초 입력</a></div></section>`}
 
-      <section class="card sec" id="sec-steps">${secHead('steps', `<span class="cnt">${pr.ds}/${pr.ns}</span>`)}
-        <div class="steps">${(it.licenseProcess||[]).map((s,i)=>chk('s',i,`<span class="sn2">STEP ${i+1}</span>${esc(stripNum(s))}`, p.s[i])).join('')}</div>
+      <section class="card sec" id="sec-steps">${secHead('steps', `<button type="button" class="tgl no-print" data-track aria-pressed="${S.track}"><i></i>체크하며 관리</button>`)}
+        <p class="sec-d no-print">${S.track?'끝낸 항목을 눌러 체크하세요. 이 기기에 저장돼요.':'순서대로 읽어 보세요. 진행 상황을 기록하려면 오른쪽 위 <b>체크하며 관리</b>를 켜세요. PDF에는 항상 체크 칸이 있어요.'}</p>
+        <div class="steps ${S.track?'':'read'}">${(it.licenseProcess||[]).map((s,i)=>S.track?chk('s',i,`<span class="sn2">STEP ${i+1}</span>${esc(stripNum(s))}`, p.s[i]):readRow(i+1, esc(stripNum(s)), false, p.s[i])).join('')}</div>
         <div class="dueline">사업자등록은 <b>사업 시작일부터 20일 안에</b> 신청해야 해요(시작 전에도 가능). 인허가 업종은 허가·신고증을 먼저 받아 함께 내요.${S.me.open?` 개업 예정일 기준 <b>${ymd(addDays(S.me.open,20))}까지</b>.`:''}</div>
       </section>
 
-      <section class="card sec" id="sec-docs">${secHead('docs', `<span class="cnt">${pr.dd}/${pr.nd}</span>`)}
+      <section class="card sec" id="sec-docs">${secHead('docs', `<span class="cnt">${S.track?`${pr.dd}/${pr.nd} 체크`:`${pr.nd}종`}</span>`)}
         <p class="sec-d"><span class="tag must" style="padding:2px 6px;border-radius:6px;font-size:11.5px;font-weight:800">필수</span> 등록·신고에 꼭 필요 · <span class="tag rec" style="padding:2px 6px;border-radius:6px;font-size:11.5px;font-weight:800">권장</span> 상황에 따라 필요 · <span class="tag opt" style="padding:2px 6px;border-radius:6px;font-size:11.5px;font-weight:800">해당 시</span> 해당할 때만</p>
-        ${it.docs.map((d,i)=>{ const [c,l]=docTag(d); return chk('d',i,esc(c==='opt'?d.replace(/^\(해당 시\)\s*/,''):d),p.d[i],`<span class="tag ${c}">${l}</span>`); }).join('')}
+        ${S.track ? it.docs.map((d,i)=>{ const [c,l]=docTag(d); return chk('d',i,esc(c==='opt'?d.replace(/^\(해당 시\)\s*/,''):d),p.d[i],`<span class="tag ${c}">${l}</span>`); }).join('')
+          : [['must','필수'],['rec','권장'],['opt','해당 시']].map(([c,l])=>{ const ds=it.docs.map((d,i)=>[d,i]).filter(([d])=>docTag(d)[0]===c); return ds.length?`<div class="dgrp"><div class="dgh"><span class="tag ${c}">${l}</span> ${ds.length}종</div>${ds.map(([d,i])=>readRow('', esc(c==='opt'?d.replace(/^\(해당 시\)\s*/,''):d), true, p.d[i])).join('')}</div>`:''; }).join('')}
       </section>
 
       <section class="card sec" id="sec-license">${secHead('license', `<span class="cnt">${it.license.length}건</span>`)}
@@ -481,7 +495,7 @@ function renderGuide(id, step){
     </div>
   </div>
   ${stepNav(G, id)}
-  `, 'home', `${G.l} · ${it.name}`);
+  `, 'home', `${it.name} · ${G.l}`);
   document.body.classList.add('has-cta','wizard');
   document.querySelectorAll('.gbody .sec').forEach(el=>{ if(!G.secs.includes(el.id.replace('sec-',''))) el.classList.add('stepoff'); });
   document.querySelectorAll('.gbody [data-only]').forEach(el=>{ if(el.dataset.only!==G.k) el.classList.add('stepoff'); });
@@ -490,13 +504,33 @@ function renderGuide(id, step){
   memo.addEventListener('input', ()=>{ S.memo[id]=memo.value.slice(0,2000); if(!S.memo[id]) delete S.memo[id]; save(); });
   setupSpy();
 }
+function readRow(num, html, bullet, done){
+  return `<div class="rrow">${bullet?'<span class="rb" aria-hidden="true"></span>':`<span class="rn">${num}</span>`}<span class="pbox print-only ${done?'on':''}" aria-hidden="true">${done?'✓':''}</span><span class="rt">${num?`<span class="sn2">STEP ${num}</span>`:''}${html}</span></div>`;
+}
+function resultSummary(it, notes){
+  const reviewed=it.reviewStatus==='검수완료';
+  const tc=it.docs.reduce((a,d)=>{ a[docTag(d)[0]]++; return a; }, {must:0,rec:0,opt:0});
+  const tax=(it.taxDetail||[]).map(t=>t.name);
+  return `<section class="card rsum no-print" aria-label="결과 요약">
+    <div class="rs-h"><div><span class="rs-e">${D.groupMeta[it.group]||''} ${esc(it.group)} · 결과 요약</span><h1 class="h-lg">${esc(it.name)}</h1><p class="rs-s">${esc(it.summary)}</p></div></div>
+    <div class="rs-g">
+      <div><span>업종코드</span><b>${isCode(it.nts)?`<span class="mono">${esc(it.nts)}</span> <button type="button" class="link-btn" data-copy="${esc(it.nts)}">복사</button>`:'홈택스 조회 필요'}</b></div>
+      <div><span>인허가·신고 ${it.license.length}건</span><b>${it.license.map(l=>esc(l.name)).join(', ')}</b></div>
+      <div><span>준비 서류 ${it.docs.length}종</span><b>필수 ${tc.must} · 권장 ${tc.rec} · 해당 시 ${tc.opt}</b></div>
+      <div><span>세금 혜택 ${tax.length}개</span><b>${tax.map(esc).join(', ')||'—'}</b></div>
+      ${S.me.open?`<div><span>사업자등록 기한</span><b>${ymd(addDays(S.me.open,20))}까지</b></div>`:''}
+      <div><span>맞춤 안내</span><b>${hasMe()?`${notes.length}개 <button type="button" class="link-btn" data-go="sec-me">보기</button>`:`<a class="link-btn" href="#/me?next=${it.id}">내 상황 넣기</a>`}</b></div>
+    </div>
+    <p class="rs-m">📅 자료 기준일 <b>${BASE}</b> · 세제 ${TAX_BASE} 법령 · 업종코드 2025년 귀속 연계표 · <span title="BECONIC 내부 정리 자료">${reviewed?'✓ 전문가 검수':'내부 정리·검수 전'}</span></p>
+    <div class="rs-a"><button class="btn btn-primary" type="button" data-act="print">${IN_APP?'체크리스트 복사':'PDF 받기'}</button><button class="btn btn-soft" type="button" data-act="share">링크 복사</button><a class="btn btn-gray" href="${esc(matchUrl(it))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a></div>
+  </section>`;
+}
 function stepNav(G, id){
   const i=GSTEPS.indexOf(G), prev=GSTEPS[i-1], next=GSTEPS[i+1];
-  const prevHref=prev?`#/guide/${id}/${prev.k}`:`#/me?next=${id}`, prevL=prev?prev.l:'내 상황';
-  return `<nav class="stepnav no-print" aria-label="단계 이동">
-    <a class="btn btn-gray" href="${prevHref}">‹ ${prevL}</a>
-    ${next?`<a class="btn btn-primary" href="#/guide/${id}/${next.k}">다음: ${next.l} ›</a>`:`<a class="btn btn-primary" href="#/my">내 준비함으로 ›</a>`}
-  </nav>`;
+  return `<nav class="stepnav no-print" aria-label="결과 이동">
+    <button class="btn btn-gray" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 받기'}</button>
+    ${next?`<a class="btn btn-primary" href="#/guide/${id}/${next.k}">다음 탭: ${next.l} ›</a>`:`<a class="btn btn-primary" href="${esc(matchUrl(BY_ID[id]))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a>`}
+  </nav>${prev?'':''}`;
 }
 function printSummary(it, pr, screen){
   const p=S.prog[it.id]||{d:{},s:{}};
@@ -512,7 +546,7 @@ function printSummary(it, pr, screen){
       ${S.me.open?`<div><span class="ps-l">사업자등록 기한</span><b>${ymd(addDays(S.me.open,20))}까지 (개업 예정 ${ymd(new Date(S.me.open+'T00:00:00'))} + 20일)</b></div>`:''}
       ${chips.length?`<div><span class="ps-l">내 상황</span><b>${chips.map(esc).join(' · ')}</b></div>`:''}
     </div>
-    <div class="ps-left"><b>${left.length?`남은 할 일 ${left.length}개`:'남은 필수·권장 할 일이 없어요'}</b>${left.length?`<ol>${left.slice(0,12).map(t=>`<li>${esc(t)}</li>`).join('')}</ol>${left.length>12?`<span>외 ${left.length-12}개는 아래 체크리스트 참고</span>`:''}`:''}</div>
+    <div class="ps-left"><b>${left.length?`${(pr.ds+pr.dd)?'남은 할 일':'준비할 것(필수·권장)'} ${left.length}개`:'남은 필수·권장 할 일이 없어요'}</b>${left.length?`<ol>${left.slice(0,12).map(t=>`<li>${esc(t)}</li>`).join('')}</ol>${left.length>12?`<span>외 ${left.length-12}개는 아래 체크리스트 참고</span>`:''}`:''}</div>
   </section>`;
 }
 function chk(kind,i,html,on,tail){
@@ -613,7 +647,7 @@ function renderMe(next){
       <input class="inp" id="open" type="date" value="${esc(m.open||'')}"></div>
     </section>
     <p class="small muted" style="margin:10px 4px 0">고른 걸 모두 지우려면 <button class="link-btn" type="button" id="meClear">선택 초기화</button> (저장해야 반영돼요)</p>
-    <div class="me-actions">${it?`<a class="btn btn-gray" href="${back}" id="meSkip">건너뛰기</a>`:''}<button class="btn btn-primary" type="button" id="meSave">${it?'저장하고 다음: 준비 체크 ›':'저장'}</button></div>
+    <div class="me-actions">${it?`<a class="btn btn-gray" href="${back}" id="meSkip">건너뛰기</a>`:''}<button class="btn btn-primary" type="button" id="meSave">${it?'저장하고 결과 보기 ›':'저장'}</button></div>
   </div>`, it?'home':'my', '내 상황');
   if(it) document.body.classList.add('wizard');
   const upd=()=>{ const pv=$('#mePreview'); if(pv) pv.lastElementChild.innerHTML=preview(); };
@@ -637,8 +671,8 @@ function renderMy(){
     <div style="margin:6px 4px 14px"><h1 class="h-lg">내 준비함</h1><p class="muted" style="margin-top:6px">가입 없이 이 기기에 저장돼요. 다른 기기에서는 '링크 복사'로 이어 보세요(체크 내용은 기기마다 따로예요).</p></div>
     <section class="card"><div class="sec-h"><h2>내 상황</h2><a class="btn btn-gray btn-sm" href="#/me">${hasMe()?'수정':'입력'}</a></div>
       ${meTxt.length?`<div class="row">${meTxt.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>`:'<p class="muted">아직 입력하지 않았어요. 넣으면 가이드마다 맞춤 안내가 붙어요.</p>'}</section>
-    <section class="card"><div class="sec-h"><h2>보고 있는 업종</h2><span class="cnt">${ids.length}개</span></div>
-      ${ids.length?`<div class="list" style="padding:0;margin:0 -10px">${ids.map(id=>{ const p=progressOf(id); return `<a class="item" href="#/guide/${id}"><span class="ii" aria-hidden="true">${D.groupMeta[BY_ID[id].group]}</span><span class="ib"><b>${esc(BY_ID[id].name)}</b><span>${p.done}/${p.total} 체크 · ${p.pct}%</span><div class="bar"><i style="width:${p.pct}%"></i></div></span><span class="ar">›</span></a>`; }).join('')}</div>`
+    <section class="card"><div class="sec-h"><h2>최근 본 업종</h2><span class="cnt">${ids.length}개</span></div>
+      ${ids.length?`<div class="list" style="padding:0;margin:0 -10px">${ids.map(id=>{ const p=progressOf(id); return `<div class="item-row"><a class="item" href="#/guide/${id}/prepare"><span class="ii" aria-hidden="true">${D.groupMeta[BY_ID[id].group]}</span><span class="ib"><b>${esc(BY_ID[id].name)}</b><span>${p.done}/${p.total} 체크 · ${p.pct}%</span><div class="bar"><i style="width:${p.pct}%"></i></div></span><span class="ar">›</span></a><button type="button" class="rdel" data-del="${id}" aria-label="${esc(BY_ID[id].name)} 삭제">✕</button></div>`; }).join('')}</div>`
       :`<p class="muted" style="margin-bottom:12px">아직 열어 본 업종 가이드가 없어요.</p><a class="btn btn-soft btn-sm" href="#/">업종 고르기</a>`}</section>
     <section class="card"><div class="sec-h"><h2>홈 화면에 추가</h2></div><p class="small muted">${IN_APP?'카카오톡 등 앱 안 브라우저에서는 추가가 안 돼요. 오른쪽 위 메뉴의 \'다른 브라우저로 열기\' 후 추가하세요.':'휴대폰 브라우저 메뉴의 \'홈 화면에 추가\'를 누르면 앱처럼 열려요. 한 번 열어 둔 가이드는 인터넷이 약해도 볼 수 있어요.'}</p>
       <button class="btn btn-gray btn-sm hidden" type="button" id="install" style="margin-top:10px">앱으로 설치</button></section>
@@ -652,7 +686,13 @@ function renderMy(){
 document.addEventListener('click', async e=>{
   const c=e.target.closest('[data-copy]');
   if(c){ const ok=await copyText(c.dataset.copy); toast(ok?`업종코드 ${c.dataset.copy}를 복사했어요.`:'복사가 안 되는 환경이에요. 길게 눌러 복사해 주세요.'); return; }
+  const del=e.target.closest('[data-del]');
+  if(del){ if(deleteGuide(del.dataset.del)){ toast('목록에서 지웠어요.'); const y=window.scrollY; render(); window.scrollTo(0,y); } return; }
   const {parts}=parse(); const id=parts[0]==='guide'?parts[1]:null; const stp=GSTEPS.some(x=>x.k===parts[2])?parts[2]:'prepare';
+  const tg=e.target.closest('[data-track]');
+  if(tg && id){ S.track=!S.track; save(); const y=window.scrollY; renderGuide(id, stp); window.scrollTo(0,y); toast(S.track?'체크하며 관리를 켰어요. 끝낸 항목을 눌러 체크하세요.':'읽기 모드로 바꿨어요. 체크한 내용은 그대로 남아 있어요.'); return; }
+  const go=e.target.closest('[data-go]');
+  if(go && id){ if(stp!=='prepare'){ pendingFocus=go.dataset.go; location.hash=`#/guide/${id}/prepare`; } else { const t=document.getElementById(go.dataset.go); if(t) t.scrollIntoView({behavior:'smooth'}); } return; }
   const k=e.target.closest('[data-chk]');
   if(k && id){
     toggleCheck(id, k.dataset.chk);
