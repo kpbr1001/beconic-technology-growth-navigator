@@ -3,7 +3,7 @@
 // 공통 파일(.github/·package.json·package-lock.json·scripts/ci/)이 바뀌면 전체. 문서(.md)만 바뀐 앱은 제외.
 import { execFileSync } from 'node:child_process';
 
-export const APPS = ['tech', 'hr', 'growth', 'grants', 'ir', 'prestartup', 'esg', 'finance'];
+export const APPS = ['tech', 'hr', 'growth', 'grants', 'ir', 'prestartup', 'esg', 'finance', 'psf'];
 const FOLDER_APPS = APPS.filter((a) => a !== 'tech');
 const SHARED = [/^\.github\//, /^package(-lock)?\.json$/, /^scripts\/ci\//];
 

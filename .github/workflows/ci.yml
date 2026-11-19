@@ -139,10 +139,10 @@ jobs:
             mkdir -p ~/fonts-noto-cjk && cp /usr/share/fonts/opentype/noto/NotoSansCJK* /usr/share/fonts/opentype/noto/NotoSerifCJK* ~/fonts-noto-cjk/ 2>/dev/null || true
           fi
           fc-cache -f >/dev/null
-      - name: PDF 도구 (기술진단·성장 pymupdf, IR·재무 poppler)
+      - name: PDF 도구 (기술진단·성장·PSF pymupdf, IR·재무 poppler)
         run: |
           case "${{ matrix.app }}" in
-            tech|growth) pip install pymupdf ;;
+            tech|growth|psf) pip install pymupdf ;;
             ir|finance) sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 poppler-utils ;;
           esac
       - name: QA

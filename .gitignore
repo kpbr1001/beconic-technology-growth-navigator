@@ -27,3 +27,5 @@ growth/tests/out/
 growth/dist/
 prestartup/dist/
 prestartup/tests/out/
+psf/tests/out/
+psf/dist/
