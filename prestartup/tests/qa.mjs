@@ -77,6 +77,10 @@ await page.goto(BASE);
 // 4. 체크리스트 저장·진행률·지금 할 일
 {
   await page.goto(BASE + '#/guide/cafe'); await page.evaluate(() => localStorage.clear()); await page.reload();
+  check('기본 = 읽기 모드(체크박스·진행률 없음, 순서·서류 목록 표시)', (await page.locator('.chk').count()) === 0 && (await page.locator('.prog').count()) === 0 && (await page.locator('#sec-steps .rrow').count()) === 4 && (await page.locator('#sec-docs .dgrp').count()) >= 2);
+  check('결과 요약: 업종코드·인허가·서류·세금·PDF 받기', await page.isVisible('.rsum') && (await page.locator('.rsum').innerText()).includes('552303') && (await page.locator('.rsum [data-act="print"]').count()) === 1);
+  await page.click('[data-track]');
+  check('체크하며 관리 켜기 → 체크박스·진행률·지금 할 일', (await page.locator('.chk').count()) > 5 && (await page.locator('.prog').count()) === 1);
   const first = await page.locator('.next .nt').innerText();
   check('지금 할 일 = 진행 순서 1단계', first.includes('위생교육'));
   await page.click('[data-next]');
@@ -181,7 +185,7 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await page.reload(); await page.emulateMedia({ media: 'print' });
   const pr = await page.evaluate(() => ({ head: getComputedStyle(document.querySelector('.phead')).display, sum: getComputedStyle(document.querySelector('.psum')).display, top: getComputedStyle(document.querySelector('.top')).display, lnav: getComputedStyle(document.querySelector('.lnav')).display, memoTa: getComputedStyle(document.querySelector('#memo')).display, sumText: document.querySelector('.psum').innerText, url: getComputedStyle(document.querySelector('.purl')).display, contact: document.querySelector('.pcontact').innerText }));
   check('인쇄: 머리말(기준일) 표시, 상단·좌측 내비 숨김', pr.head !== 'none' && pr.top === 'none' && pr.lnav === 'none');
-  check('인쇄: 한눈에 보기(업종코드·진행률·인허가·사업자등록 기한·남은 할 일)', pr.sum === 'block' && /552303/.test(pr.sumText) && /진행률/.test(pr.sumText) && /2027\.03\.22까지/.test(pr.sumText) && /남은 할 일 \d+개/.test(pr.sumText) && !/\[순서\] 위생교육/.test(pr.sumText));
+  check('인쇄: 한눈에 보기(업종코드·진행률·인허가·사업자등록 기한·남은 할 일)', pr.sum === 'block' && /552303/.test(pr.sumText) && /진행률/.test(pr.sumText) && /2027\.03\.22까지/.test(pr.sumText) && /(남은 할 일|준비할 것\(필수·권장\)) \d+개/.test(pr.sumText) && !/\[순서\] 위생교육/.test(pr.sumText));
   check('인쇄: 빈 메모는 예시 문구 대신 쓰기 줄', pr.memoTa === 'none' && (await page.locator('.pmemo i').count()) === 4);
   check('인쇄: 신청 사이트 주소 표시·전문가 연락처', pr.url === 'block' && pr.contact.includes('02-6124-5960'));
   const pdf = await page.pdf({ format: 'A4' });
@@ -196,7 +200,7 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
 // 11-2. 사용자 흐름: 홈 이용 순서 → 가이드 → 내 상황 수정 → 저장 후 맞춤 안내로 복귀
 {
   await page.goto(BASE);
-  check('홈: 5단계 표시, 1단계(업종 고르기) 현재', (await page.locator('.jstep li').count()) === 5 && (await page.locator('.jstep li.on').innerText()).includes('업종'));
+  check('홈: 3단계 표시(업종 → 내 상황 → 결과), 1단계 현재', (await page.locator('.jstep li').count()) === 3 && (await page.locator('.jstep li.on').innerText()).includes('업종'));
   await page.goto(BASE + '#/guide/cafe'); await page.waitForTimeout(100);
   check('가이드 목차에 "맞춤 안내" 포함', (await page.locator('.lnav a[data-sec="me"]').count()) === 1);
   await page.click('#sec-me a[href^="#/me"]'); await page.waitForTimeout(150);
@@ -208,17 +212,30 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await page.click('.opt[data-v="home"]');
   await page.click('#meSave'); await page.waitForTimeout(300);
   const top = await page.evaluate(() => Math.round(document.getElementById('sec-me').getBoundingClientRect().top));
-  check('저장 → 3단계(준비 체크)의 맞춤 안내로 이동(강조)', page.url().endsWith('#/guide/cafe/prepare') && top < 400 && (await page.locator('#sec-me .chip').count()) >= 1, `top=${top}`);
+  check('저장 → 3단계(결과 보기) 준비물 탭의 맞춤 안내로 이동(강조)', page.url().endsWith('#/guide/cafe/prepare') && top < 400 && (await page.locator('#sec-me .chip').count()) >= 1, `top=${top}`);
   check('맞춤 안내에 선택한 상황 칩 표시', (await page.locator('#sec-me .mechips').innerText()).includes('자택'));
+  check('결과 = 3단계 현재 표시', (await page.locator('.jstep li.on').innerText()).includes('결과'));
   await page.click('.stepnav .btn-primary'); await page.waitForTimeout(150);
-  check('다음 → 4단계(혜택·지원): 업종코드·세금·지원사업만 표시', page.url().endsWith('/benefit') && await page.isVisible('#sec-tax') && !(await page.isVisible('#sec-docs')) && (await page.locator('.jstep li.on').innerText()).includes('혜택'));
-  await page.click('.stepnav .btn-primary'); await page.waitForTimeout(150);
-  check('다음 → 5단계(저장·마무리): 한눈에 보기 + PDF·지원사업·전문가 3가지', page.url().endsWith('/finish') && await page.isVisible('.psum-screen') && (await page.locator('#sec-finish .fcard').count()) === 3);
-  check('이미 거친 단계는 ✓ 표시(1·2·4단계)', (await page.locator('.jstep li.done').count()) >= 3);
-  await page.click('.stepnav .btn-gray'); await page.waitForTimeout(150);
-  check('이전 → 4단계', page.url().endsWith('/benefit'));
-  await page.goBack(); await page.goBack(); await page.goBack(); await page.goBack(); await page.waitForTimeout(150);
+  check('다음 탭 → 혜택·지원: 업종코드·세금·지원사업만 표시', page.url().endsWith('/benefit') && await page.isVisible('#sec-tax') && !(await page.isVisible('#sec-docs')) && (await page.locator('.rtabs a.on').innerText()).includes('혜택'));
+  await page.click('.rtabs a[href$="/finish"]'); await page.waitForTimeout(150);
+  check('저장·상담 탭: 한눈에 보기 + PDF·지원사업·전문가 3가지', page.url().endsWith('/finish') && await page.isVisible('.psum-screen') && (await page.locator('#sec-finish .fcard').count()) === 3);
+  check('입력 단계 1·2는 ✓ 표시', (await page.locator('.jstep li.done').count()) === 2);
+  await page.goBack(); await page.goBack(); await page.goBack(); await page.waitForTimeout(150);
   check('뒤로가기 → 내 상황 화면', page.url().includes('#/me'));
+}
+
+// 11-4. 최근 본 업종 삭제
+{
+  await page.goto(BASE); await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ recent: ['cafe', 'ecommerce'], meSkip: true }))); await page.reload();
+  check('홈: 최근 본 업종 카드마다 삭제 버튼', (await page.locator('.recent .rdel').count()) === 2);
+  await page.click('.recent .rdel[data-del="cafe"]'); await page.waitForTimeout(100);
+  check('삭제(체크·메모 없으면 바로) → 목록·저장에서 제거', (await page.locator('.recent .rcard').count()) === 1 && await page.evaluate(() => !window.PS.S.recent.includes('cafe')));
+  await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ recent: ['cafe'], prog: { cafe: { s: { 0: true }, d: {} } }, meSkip: true }))); await page.reload();
+  page.once('dialog', (d) => d.accept());
+  await page.click('.recent .rdel[data-del="cafe"]'); await page.waitForTimeout(100);
+  check('체크가 있으면 확인 후 체크까지 삭제', await page.evaluate(() => !window.PS.S.prog.cafe && !window.PS.S.recent.length));
+  await page.goto(BASE + '#/my');
+  check('내 준비함에도 삭제 버튼(목록 비면 안내)', (await page.locator('main').innerText()).includes('열어 본 업종 가이드가 없어요'));
 }
 
 // 11-3. 단계 진입 규칙·인쇄는 전체
