@@ -1,16 +1,12 @@
-/* BECONIC 적합성 진단 — 앱 설치·오프라인용 서비스 워커.
-   화면은 네트워크 우선(새 버전 즉시 반영), 실패하면 캐시. AI 서버 함수(/api/)는 절대 캐시하지 않는다. */
-const CACHE = 'psf-' + (new URL(location.href).searchParams.get('v') || 'dev');   // 버전은 index.html APP_VERSION(등록 시 ?v=)
-const SHELL = ['./', 'index.html', 'assets/icon-192.png', 'assets/manifest.webmanifest'];
-self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
+/* 앱 설치(PWA)는 v2.3에서 제거했습니다. 이 파일은 v2.2에서 이미 등록된 서비스 워커를 스스로 해제하는 정리용입니다.
+   새로 등록되지 않으며(index.html에서 등록 코드 삭제), 기존 기기가 업데이트를 확인할 때 이 파일을 받아 캐시를 지우고 해제됩니다. */
+self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
-});
-self.addEventListener('fetch', e => {
-  const u = new URL(e.request.url);
-  if (e.request.method !== 'GET' || u.origin !== location.origin || u.pathname.startsWith('/api/') || u.pathname.startsWith('/.netlify/')) return;
-  e.respondWith(fetch(e.request).then(r => {
-    if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(e.request, cp)); }
-    return r;
-  }).catch(() => caches.match(e.request, { ignoreSearch: true }).then(r => r || caches.match('index.html'))));
+  e.waitUntil((async () => {
+    const ks = await caches.keys();
+    await Promise.all(ks.filter(k => k.startsWith('psf-')).map(k => caches.delete(k)));
+    await self.registration.unregister();
+    const cs = await self.clients.matchAll({ type: 'window' });
+    cs.forEach(c => c.navigate(c.url));   // 캐시가 아닌 최신 화면으로 다시 열기
+  })());
 });

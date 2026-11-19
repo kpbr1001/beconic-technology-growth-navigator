@@ -1,4 +1,4 @@
-/* global sampleData, runDiagnosis, generateConsultingReport, generateTableOfContents, STAGE_DEFS, judgeStage, TYPE_ORDER, showChecklist, closeModal, openConsult, resumeDraft, esc, renderDashboard, goScreen, diagnosisResult:writable, REPORT_SECTION_COUNT, DOMAIN_META, fieldQuality, GUIDE, TEXT_KEYS, DOMAIN_META, EVIDENCE_LEVELS, loadSampleAndStart, completeDiagnosis, openReportMetaModal, generateReportFlow, proceedAfterQA, loadDiagnosisHistory, LS_KEY, startDiagnosis, renderStep -- page.evaluate 안에서 앱 전역을 호출 */
+/* global collectInput, fitReport, currentStep:writable, sampleData, runDiagnosis, generateConsultingReport, generateTableOfContents, STAGE_DEFS, judgeStage, TYPE_ORDER, showChecklist, closeModal, openConsult, resumeDraft, esc, renderDashboard, goScreen, diagnosisResult:writable, REPORT_SECTION_COUNT, DOMAIN_META, fieldQuality, GUIDE, TEXT_KEYS, DOMAIN_META, EVIDENCE_LEVELS, loadSampleAndStart, completeDiagnosis, openReportMetaModal, generateReportFlow, proceedAfterQA, loadDiagnosisHistory, LS_KEY, startDiagnosis, renderStep -- page.evaluate 안에서 앱 전역을 호출 */
 // BECONIC 고객문제·솔루션 적합성 진단(20번) QA — 실제 Chromium으로 PSF Engine v2 원칙·작성 가이드·사용자 플로우·모바일·A4 PDF를 확인한다.
 // 실행: (psf 폴더를 정적 서버로 띄운 뒤) node psf/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -127,7 +127,6 @@ const allText = (v) => page.evaluate((v) => {
   check('진단 이력 저장(v2 키)', h.key.endsWith('_v2') && h.list >= 1);
 
   await page.evaluate(() => { document.querySelector('#screen-form [data-k="problemStatement"]').value = ''; });
-  // eslint-disable-next-line no-undef -- 앱 전역 let(currentStep)에 직접 대입
   await page.evaluate(() => { startDiagnosis(); currentStep = 2; renderStep(); });
   await page.fill('[data-k="problemStatement"]', '제조업의 디지털 전환이 필요하다.');
   const m1 = await page.locator('[data-meter="problemStatement"]').innerText();
@@ -231,10 +230,9 @@ const allText = (v) => page.evaluate((v) => {
   // 디자인·앱
   const font = await page.evaluate(() => getComputedStyle(document.body).fontFamily);
   check('본문 폰트 Pretendard', /Pretendard/.test(font), font.slice(0, 40));
-  const mf = await page.evaluate(async () => { const l = document.querySelector('link[rel=manifest]'); const r = await fetch(l.href); const j = await r.json(); return { ok: r.ok, icons: j.icons.length, name: j.short_name }; });
-  check('앱 설치: manifest·아이콘 제공', mf.ok && mf.icons >= 3, mf.name);
-  const sw = await page.evaluate(async () => (await fetch('sw.js')).ok);
-  check('앱 설치: 서비스 워커 파일 제공(/api/ 캐시 제외)', sw);
+  const pw = await page.evaluate(async () => ({ manifest: !!document.querySelector('link[rel=manifest]'), og: (await fetch('beconic-og.jpg')).headers.get('content-type'), sw: await (await fetch('sw.js')).text(), html: document.documentElement.outerHTML }));
+  check('앱 설치(PWA) 없음 — manifest·등록 코드 없음, 옛 서비스 워커는 자가 해제', !pw.manifest && !pw.html.includes("serviceWorker.register") && pw.sw.includes('unregister()'));
+  check('카톡 공유 이미지(beconic-og.jpg) 배포 포함', /image\/jpeg/.test(pw.og || ''), pw.og);
   const mob = await browser.newPage({ viewport: { width: 375, height: 800 } });
   await mob.goto(BASE, { waitUntil: 'load' });
   await mob.evaluate(() => { loadSampleAndStart(); });
@@ -245,6 +243,57 @@ const allText = (v) => page.evaluate((v) => {
   check('모바일: 결과 하단 고정 버튼 · 바로가기 대상 모두 존재 · 상단 메뉴 한 줄', mb.bar === 'flex' && mb.jump && mb.nav < 50, JSON.stringify(mb));
   await mob.close();
 }
+// 12. v2.3 모바일·여정 재점검 회귀
+{
+  // 음수 인원 입력 → 0
+  await page.goto(BASE, { waitUntil: 'load' });
+  const neg = await page.evaluate(() => { loadSampleAndStart(); return true; });
+  await page.waitForTimeout(150);
+  const nv = await page.evaluate(() => { document.querySelector('[data-k="customerInterviewCount"]').value = '-5'; document.querySelector('[data-k="surveyCount"]').value = '3.7'; const i = collectInput(); return [i.validation.customerInterviewCount, i.validation.surveyCount]; });
+  check('인원 수: 음수→0, 소수→정수', neg && nv[0] === 0 && nv[1] === 3, JSON.stringify(nv));
+
+  // 아이디어 단계 문장: 파일럿·LOI를 요구하지 않음, 조사 '으로'
+  const idea = await page.evaluate(() => { const d = JSON.parse(JSON.stringify(sampleData)); d.company.businessStage = '아이디어';
+    Object.assign(d.validation, { customerInterviewCount: 0, surveyCount: 0, pilotTest: '', paidCustomer: '', repeatUsage: '', letterOfIntent: '', revenueEvidence: '', feedbackSummary: '' });
+    Object.assign(d.problem, { problemFrequency: '잘 모름', problemSeverity: '잘 모름' }); const r = runDiagnosis(d);
+    return { risk: r.riskTable[0], risks: r.risks.join(' '), weak: r.weaknesses.join(' ') }; });
+  check('증거 L0: 리스크 대응 = 고객 인터뷰(파일럿·LOI 요구 안 함)', idea.risk.risk === '수요 검증 근거 부족' && /인터뷰/.test(idea.risk.resp) && !/파일럿 고객/.test(idea.risk.resp), idea.risk.resp.slice(0, 40));
+  check("조사: '잘 모름'으로는(받침)", idea.risks.includes("'잘 모름'으로는") && !idea.risks.includes("'잘 모름'로는"));
+
+  // 휴대폰 뒤로 버튼: 단계 → 이전 단계, 결과 → 입력, 랜딩까지
+  await page.goto(BASE, { waitUntil: 'load' });
+  await page.evaluate(() => { loadSampleAndStart(); });
+  await page.waitForTimeout(150);
+  await page.click('#btnNext'); await page.waitForTimeout(80); await page.click('#btnNext'); await page.waitForTimeout(80);
+  await page.goBack(); await page.waitForTimeout(150);
+  const b1 = await page.evaluate(() => [document.querySelector('.screen.active').id, currentStep]);
+  await page.evaluate(() => { completeDiagnosis(); }); await page.waitForTimeout(200);
+  await page.goBack(); await page.waitForTimeout(150);
+  const b2 = await page.evaluate(() => document.querySelector('.screen.active').id);
+  check('휴대폰 뒤로: 3단계→2단계, 결과→입력 화면(사이트 이탈 없음)', b1[0] === 'screen-form' && b1[1] === 2 && b2 === 'screen-form', `${b1} → ${b2}`);
+
+  // 모바일 320px: 결과·보고서·이력 가로 넘침 없음, 하단 시트 버튼 보임, 보고서 PDF는 축소와 무관
+  const m = await browser.newPage({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true });
+  await m.goto(BASE, { waitUntil: 'load' });
+  await m.evaluate(() => { loadSampleAndStart(); }); await m.waitForTimeout(150);
+  await m.evaluate(() => completeDiagnosis()); await m.waitForTimeout(500);
+  const ov1 = await m.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+  await m.evaluate(() => openReportMetaModal()); await m.waitForTimeout(200);
+  const foot = await m.evaluate(() => { const b = document.querySelector('#metaModal .modal-foot .btn-primary').getBoundingClientRect(); return b.bottom <= innerHeight && b.top >= 0; });
+  await m.evaluate(() => { generateReportFlow(); proceedAfterQA(); }); await m.waitForTimeout(400);
+  const ov2 = await m.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+  await m.evaluate(() => goScreen('admin')); await m.waitForTimeout(200);
+  const ov3 = await m.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+  check('모바일 320px: 결과·보고서 미리보기·이력 가로 넘침 없음', ov1 <= 1 && ov2 <= 1 && ov3 <= 1, `${ov1}/${ov2}/${ov3}`);
+  check('모바일: 보고서 정보 창(하단 시트) 생성 버튼이 화면 안', foot);
+  await m.evaluate(() => { goScreen('report'); fitReport(); });
+  await m.emulateMedia({ media: 'print' });
+  const mpdf = await m.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
+  const mpages = (mpdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+  check('모바일에서 인쇄해도 A4 원래 크기(축소 미적용, 10~24쪽)', mpages >= 10 && mpages <= 24, `${mpages}쪽`);
+  await m.close();
+}
+
 // 11. PDF 품질 회귀 (pymupdf 있을 때)
 {
   const py = spawnSync('python3', ['-c', `
