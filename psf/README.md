@@ -1,4 +1,4 @@
-# BECONIC 고객문제·솔루션 적합성 진단 (v2.1) — Tool 20
+# BECONIC 고객문제·솔루션 적합성 진단 (v2.2) — Tool 20
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-diagnosis-psf.netlify.app
@@ -37,14 +37,15 @@
 
 ```text
 psf/
-├─ index.html                                   # 화면 전체(CSS·JS 인라인). 점수 계산은 브라우저 안에서
+├─ index.html                                   # 화면 전체(CSS·JS 인라인). 점수 계산은 브라우저 안에서. 화면은 토스 스타일, 보고서는 컨설팅 톤
+├─ sw.js · assets/(manifest·아이콘)              # 홈 화면 설치(PWA). /api/ 는 캐시하지 않음
 ├─ lib/ai-core.mjs                              # AI 입력·출력 스키마, 시스템 프롬프트, Claude 호출, 인용 대조·수치 가림·금지 표현
 ├─ netlify/functions/psf-insights.mjs           # AI 접수·결과 조회(/api/psf-insights)
 ├─ netlify/functions/psf-insights-background.mjs # AI 처리(백그라운드, 최대 15분)
 ├─ netlify.toml · package.json · .env.example
-├─ tests/qa.mjs            # Chromium QA 37항목(엔진 원칙·무의미 입력·정합성·증거 관문·모순·작성 가이드 자기 일관성·클릭 플로우·모바일 375px·A4 PDF)
+├─ tests/qa.mjs            # Chromium QA 59항목(엔진 원칙·무의미 입력·정합성·증거 관문·모순·작성 가이드 자기 일관성·클릭 플로우·모바일 375px·A4 PDF·레드팀 회귀)
 ├─ tests/ai-contract.mjs   # AI 서버 함수 계약·키 노출·화면 연동 테스트 46항목(모의 API·카나리 키)
-└─ docs/CHANGELOG.md       # 개선 내역(v1.5 → v2.0 진단 대응표)
+└─ docs/CHANGELOG.md · REDTEAM_2026-11-19.md   # 개선 내역 · 자가부검·레드팀 점검
 ```
 
 ## 설정 고치는 곳 (index.html 엔진 스크립트)
@@ -58,13 +59,17 @@ psf/
 | 증거 등급·등급 관문 | `EVIDENCE_LEVELS` · `GRADE_GATES` |
 | 사업단계 기대수준 | `STAGE_EXPECT` |
 | 진단유형(10개) | `TYPE_CATALOG` · `TYPE_ORDER` |
+| 회사명·전화·메일·주소·인증번호 | `COMPANY` — 화면·보고서·PDF 머리글·상담 링크 공통 |
+| 증거 단계별 다음 행동(권고·KPI·12개월) | `EVIDENCE_NEXT` |
+| 화면 디자인(토스 스타일) | `<style id="toss-theme">` — 화면 영역에서만 토큰 재정의, 보고서 영향 없음 |
+| 안내용 소요 시간 · 보고서 섹션 수 | `EST_MINUTES` · `REPORT_SECTION_COUNT`(QA가 실제 목차와 대조) |
 
 ## Netlify 배포
 
 1. 새 사이트 `beconic-diagnosis-psf`를 이 저장소에 연결 → **Base directory: `psf`**. 나머지는 `psf/netlify.toml`이 지정합니다(`npm run build`로 `index.html`만 `dist/`에 복사).
 2. 화면만 쓸 때는 환경변수가 필요 없습니다(AI 해석은 기본 꺼짐 — 요청하면 '기능이 꺼져 있습니다' 안내, 규칙 진단·보고서는 그대로). CSP는 같은 사이트 호출만 허용합니다(`connect-src 'self'`).
    AI 해석을 켜려면 Environment variables(Scope: **Functions**)에 `BECONIC_AI_ENABLED=true`, `ANTHROPIC_API_KEY`, `BECONIC_ACCESS_CODE`(8자 이상), 선택 `ANTHROPIC_MODEL`(기본 `claude-opus-5-5`), `BECONIC_AI_EFFORT`(medium), `BECONIC_AI_DAILY_LIMIT`(200), `BECONIC_AI_IP_LIMIT`(10). Anthropic 콘솔에서 월 사용 한도도 함께 걸어 두세요.
-3. 공유 미리보기 이미지 `beconic-og.jpg`(1200×594)는 아직 저장소에 없습니다. 파일을 `psf/`에 넣고 `package.json`의 build에 추가하세요.
+3. 공유 미리보기 이미지 `beconic-og.jpg`(1200×594)는 아직 저장소에 없습니다. 파일을 `psf/`에 넣고 `package.json`의 build에 추가하세요. `<meta>` 공유 문구의 영역 수는 정적이라 영역 수를 바꾸면 직접 고칩니다.
 4. v1 진단 이력(브라우저 저장)은 배점 구조가 달라 읽지 않습니다(저장 키 `beconic_psf_diagnoses_v2`).
 
 ## 로컬 확인·QA
