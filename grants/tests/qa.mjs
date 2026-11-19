@@ -143,6 +143,16 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
           award: !!fp('2026년 산업기술 정책금융 지원 유공자 포상 신청 공고', shop)._notSupport,
           agriFood: !!fp('2026년 농식품 크라우드펀딩 지원사업 공고', shop)._misfit };
       })(),
+      // 시·군·구 판정(v3.28)
+      dist: (() => { const bz = (d) => C({ ...sme, region: '부산', district: d }), seoul = C({ ...sme, region: '서울', district: '마포구' });
+        const tier = (p, c) => runMatching([P({ applicationEnd: plus(30), ...p })], c)[0];
+        const reg = (m) => m.elig.conds.find((x) => x.label === '사업장 소재지');
+        const a = tier({ programName: '[부산] 2026년 원부자재 공동구매 지원사업', targetRegions: ['부산'] }, bz('동구'));
+        const b = tier({ programName: '[부산] 해운대구 2027년 직불제 신청안내', targetRegions: ['부산'] }, bz('동구'));
+        const b2 = tier({ programName: '[부산] 해운대구 2027년 직불제 신청안내', targetRegions: ['부산'] }, bz('해운대구'));
+        const c = tier({ programName: '[창업] 내 매장 자리 찾기', agency: '마포청년창업취업지원센터 나루', targetRegions: ['전국'], targetRegionsInferred: true }, seoul);
+        const c2 = tier({ programName: '[창업] 내 매장 자리 찾기', agency: '마포청년창업취업지원센터 나루', targetRegions: ['전국'], targetRegionsInferred: true }, bz('동구'));
+        return { gongdong: [a.regionTier, reg(a).result], other: [b.regionTier, reg(b).result, !!reg(b).restricted], same: b2.regionTier, agency: c.regionTier, agencyOther: reg(c2).result }; })(),
       specialSan: sanitizeCompany({ specialStatus: ['disabled', 'x', 'disabled'] }).specialStatus,
       // 업종 추론(공고명): 도입·활용 사업은 업종 제한 아님, 업종 그룹 일치/불일치
       sector: [cond({ programName: '2026 AI 바우처 지원사업' }, { ...sme, industry: '음식점업(F&B)' }, '업종 조건').result,
@@ -199,6 +209,9 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('정밀도 규칙: 출산·양육 대상 사업은 확인 필요(대상 한정)', r.prec.baby && r.prec.baby.result === 'unknown' && r.prec.baby.restricted === true);
   check('정밀도 규칙: 업력 상한 없는 창업 사업은 업력 8년 이상이면 확인 필요, 재창업은 제외', r.prec.startupOld && r.prec.startupOld.result === 'unknown' && r.prec.startupOld.restricted === true && r.prec.restartOld === 'na', JSON.stringify([r.prec.startupOld && r.prec.startupOld.result, r.prec.restartOld]));
   check('정밀도 규칙: 유공자 포상은 지원사업 아님, 농식품 사업은 음식점과 거리 있음', r.prec.award && r.prec.agriFood);
+  check('시·군·구: "공동구매"의 "동구"는 부산 동구 아님(광역시 단위 1)', r.dist.gongdong[0] === 1 && r.dist.gongdong[1] === 'pass', JSON.stringify(r.dist.gongdong));
+  check('시·군·구: 공고명에 같은 시·도의 다른 구(해운대구)면 동구 기업은 확인 필요, 해운대구 기업은 내 시군구(2)', r.dist.other[0] === 1 && r.dist.other[1] === 'unknown' && r.dist.other[2] && r.dist.same === 2, JSON.stringify(r.dist));
+  check('시·군·구: 기관명 앞머리 약칭(마포청년창업센터) → 마포구 기업 내 시군구(2), 다른 시·도 기업 확인 필요', r.dist.agency === 2 && r.dist.agencyOther === 'unknown', `${r.dist.agency}/${r.dist.agencyOther}`);
   check('해당되는 항목 저장값 정제(허용 키·중복 제거)', JSON.stringify(r.specialSan) === '["disabled"]', JSON.stringify(r.specialSan));
   check('저장값 정제: 허용 밖 값 제거', r.sanitize.region === null && r.sanitize.establishedYear === null && r.sanitize.exportHistory === null && r.sanitize.industry === '제조업');
   await page.context().close();

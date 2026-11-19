@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.27.0',
-  updated: '2026-11-01',
+  version: 'v3.28.0',
+  updated: '2026-11-19',
   changelog: [
+    { v:'v3.28.0', d:'2026-11-19', note:'토스 스타일 리디자인(BECONIC 진단 공통: 회색 바탕·흰 카드·파랑 하나만 강조·56px 버튼·모바일 하단 고정 버튼, 남색 요약·상담·바닥글을 흰 면으로, 글자 대비 AA·터치 40px 이상). 시·군·구 판정 보완: \'공동구매\'의 \'동구\' 같은 오탐 차단, 공고명·기관에 같은 시·도의 다른 시·군·구가 있으면 확인 필요, 기관명 앞머리 약칭(마포·관악 등)으로 지역·내 시·군·구 판정, [광역시] + 자치구 공고는 대상 지역이 둘이어도 그 자치구로' },
     { v:'v3.27.0', d:'2026-11-01', note:'정밀도 개선(상위 10건 42.3% → 51.3%): 예비창업자에게 소상공인 사업·자금만 원하면 행사·교육·투자 연계·유공자 포상 낮춤, 공고명 (법인/개인사업자) 판정, 출산·양육 대상 확인 필요, 업력 8년 이상은 창업 사업 확인 필요, 농식품 사업은 음식점·도소매와 거리, 넷제로·혁신제품·소프트웨어 분야 한정. 결과 링크(조건을 주소에 담아 같은 매칭 다시 열기·링크 복사), 이용 측정(이벤트 이름·건수만), 카카오 챗봇 줄임말 검색(예창패·청창사·소진공 등)' },
     { v:'v3.26.1', d:'2026-11-01', note:'상담 전화번호 변경: 070-4103-4177 → 02-6124-5960(상담 안내·신청 도움받기·인쇄 머리말·푸터·카카오 챗봇 상담 카드·전화 버튼)' },
     { v:'v3.26.0', d:'2026-10-30', note:'공장·설비 투자 자금(에너지이용합리화·산업재해예방시설·구조고도화·오염방지시설·시설자금 등)은 제조·에너지·바이오 등 업종일 때만 추천, 매장형 소상인·서비스업은 확인 필요로(유통·점포 시설자금은 제외). 녹색채권·SW 지식재산(IP) 평가보증도 분야 한정. 결과 첫 화면 최대액은 예비창업자·소상인·소공인이면 10억 초과 한도를 빼고 표시(음식점 소상인에게 최대 300억 표시되던 문제)' },
@@ -187,12 +188,19 @@ const INDUSTRY_GROUPS = [
 const INDUSTRIES = INDUSTRY_GROUPS.flatMap(g=>g.items.map(v=>({v, group:g.group})));
 
 // 시군구 매칭: 사용자 선택 시군구가 공고 텍스트에 있는지 (접미사 유연 비교)
+// 앞 글자가 한글이 아닐 때만(‘공동구매’의 ‘동구’, ‘집중구간’의 ‘중구’ 같은 오탐 방지)
+const wordAt = (hay, w) => new RegExp(`(?<![가-힣])${w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`).test(hay);
 function districtMatch(district, hay){
   if(!district || !hay) return false;
-  if(hay.includes(district)) return true;
+  if(wordAt(hay, district)) return true;
   const base = district.replace(/(특별자치시|특별자치도|특별시|광역시|시|군|구)$/,'');
   if(base.length < 2) return false;         // 중구·동구 등은 정확일치만(오탐 방지)
-  return hay.includes(base);
+  return wordAt(hay, base);
+}
+/* 공고명·기관명에 나온 같은 시·도의 시·군·구(정식 이름) — 서버가 대상 시·군·구를 못 정한 공고의 보완 */
+function namedDistricts(p, sido){
+  const t = `${p.programName||''} ${p.agency||''} ${p.executingAgency||''}`;
+  return (DISTRICTS[sido]||[]).filter(d=>wordAt(t, d));
 }
 
 // 세부산업 → 매칭용 대분류(공고 targetIndustries 값과 호환)
@@ -355,10 +363,19 @@ const SIDO_TOKEN = new RegExp('(?<![가-힣])('+REGIONS.join('|')+')(?=$|[^가-�
 const UNIQUE_DISTRICT = (()=>{ const n={}; for(const [sido,ds] of Object.entries(DISTRICTS)) for(const d of ds) (n[d]=n[d]||[]).push(sido);
   return Object.fromEntries(Object.entries(n).filter(([d,s])=>s.length===1 && d.length>=3 && d!=='세종시').map(([d,s])=>[d,s[0]])); })();
 const DISTRICT_TOKEN = new RegExp('(?<![가-힣])('+Object.keys(UNIQUE_DISTRICT).join('|')+')','g');
+/* 기관명 앞머리의 시·군·구 약칭(예: '마포청년창업센터' → 서울, '해운대구청' 아님 '해운대문화원' → 부산) */
+const DISTRICT_BASE = Object.fromEntries(Object.entries(UNIQUE_DISTRICT).map(([d,s])=>[d.replace(/(시|군|구)$/,''),[d,s]]).filter(([b])=>b.length>=2 && !REGIONS.includes(b)));
+function agencyDistrict(p){
+  for(const raw of [p.agency, p.executingAgency]){ if(!raw) continue;
+    const a=String(raw).replace(/^\s*(?:재단법인|사단법인|\((?:재|사)\)|㈔|㈜)\s*/,'');   // '재단법인 관악중소벤처진흥원' → '관악…'
+    for(const [b,[d,s]] of Object.entries(DISTRICT_BASE)) if(a.startsWith(b)) return {district:d, sido:s}; }
+  return null;
+}
 function regionHint(p){
   const s=`${p.programName||''} ${p.agency||''} ${p.executingAgency||''}`;
   const out=new Set([...s.matchAll(SIDO_TOKEN)].map(m=>m[1]));
   for(const m of s.matchAll(DISTRICT_TOKEN)) out.add(UNIQUE_DISTRICT[m[1]]);
+  const ad=agencyDistrict(p); if(ad) out.add(ad.sido);
   for(const [re,k] of SIDO_LONG) if(re.test(s)) out.add(k);
   return out.size>3 ? [] : [...out];   // 여러 시·도를 나열한 공고는 전국으로 둔다
 }
@@ -645,8 +662,10 @@ function hardEligibility(p, c){
     add('사업장 소재지','unknown',`전국 공고이지만 공고명·기관이 ${hint.join('·')} 지역 — ${c.region} 기업도 신청 가능한지 공고 확인`, true);
     regionTier = 0;
   } else if(hint.length && c.region){
-    add('사업장 소재지','pass',`${c.region} 기관·지역 사업(전국 공고)`);
-    regionTier = 1;
+    const nameHay=`${p.programName||''} ${p.agency||''} ${p.executingAgency||''}`, ad=agencyDistrict(p);
+    const mine = c.district && (districtMatch(c.district, nameHay) || (ad && ad.district===c.district));
+    add('사업장 소재지','pass', mine ? `${c.region} ${c.district} 기관·지역 사업(전국 공고)` : `${c.region} 기관·지역 사업(전국 공고)`);
+    regionTier = mine ? 2 : 1;
   } else if(!tr.length || tr.includes('전국')){
     add('사업장 소재지','pass', p.targetRegionsInferred ? '공고명·기관에 지역 표기 없음(전국으로 간주)' : '전국 대상');
     regionTier = 0;
@@ -660,7 +679,11 @@ function hardEligibility(p, c){
     else { add('사업장 소재지','fail',`대상: ${td.join('/')} (귀사 ${c.district})`); regionTier = -1; }
   } else if(tr.includes(c.region)){
     const hay = `${p.programName||''} ${tr.join(' ')} ${p._suptReginRaw||''} ${p.supportDescription||''}`;
+    // 대상 시·군·구가 정해지지 않았어도 공고명·기관에 같은 시·도의 시·군·구가 있으면 그 시·군·구 사업일 가능성이 크다
+    const named = tr.length===1 || /^\s*\[/.test(p.programName||'') ? namedDistricts(p, c.region) : [];
     if(c.district && districtMatch(c.district, hay)){ add('사업장 소재지','pass',`${c.region} ${c.district} 대상`); regionTier = 2; }
+    else if(named.length && c.district){ add('사업장 소재지','unknown',`공고명·기관이 ${named.join('·')} — ${c.district} 기업도 신청 가능한지 공고 확인`, true); regionTier = 1; }
+    else if(named.length){ add('사업장 소재지','unknown',`${named.join('·')} 사업으로 보여요 — 시·군·구를 입력하면 판정`); regionTier = 1; }
     else { add('사업장 소재지','pass',`${c.region} 포함`); regionTier = 1; }
   } else {
     add('사업장 소재지','fail',`대상지역: ${tr.slice(0,4).join('/')}${tr.length>4?'…':''} (${c.region} 미포함)`);
@@ -1525,7 +1548,7 @@ const App = (function(){
     const d=dash;
     const live = ProgramProvider.lastMode==='live';
     const fieldBuckets = chartBuckets(fieldBucketCounts(primaryOf(listed())));
-    const PALETTE=['#1f9d6b','#e8921a','#4666c4','#c0428a','#2a9d9d','#8a6d3b','#9b59b6','#e05252'];
+    const PALETTE=['#3182f6','#00a661','#ffb331','#8b5cf6','#00b8d9','#f04452','#6b7684','#b0d1fb'];   // 토스 계열(파랑 먼저)
     const segs = fieldBuckets.slice(0,8).map((f,i)=>({label:needLabel(f.field), value:f.count, color:PALETTE[i%PALETTE.length]}));
     // 판정 퍼널: 전체 공고가 어디서 걸러졌는지 한눈에(막대 폭은 첫 단계 대비, 너무 작으면 최소 폭)
     const steps = [
