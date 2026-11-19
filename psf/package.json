@@ -1,11 +1,11 @@
 {
   "name": "beconic-psf-diagnosis",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "type": "module",
   "description": "BECONIC 고객문제·솔루션 적합성 진단(Tool 20) — 단일 HTML 웹앱(규칙 엔진 PSF Engine v2) + AI 해석 초안 서버 함수(선택)",
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && cp index.html dist/",
+    "build": "rm -rf dist && mkdir -p dist/assets && cp index.html sw.js dist/ && cp assets/*.png assets/manifest.webmanifest dist/assets/",
     "qa": "node tests/qa.mjs",
     "ai-contract": "node tests/ai-contract.mjs"
   },

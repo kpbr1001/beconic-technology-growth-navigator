@@ -2,7 +2,13 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="적합성 진단" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png" />
+<link rel="apple-touch-icon" href="assets/icon-180.png" />
+<link rel="manifest" href="assets/manifest.webmanifest" />
 <title>고객문제·솔루션 적합성 진단 | Beconic</title>
 <meta name="description" content="문제·고객·솔루션 적합성을 9개 영역으로 진단하고, 컨설팅 수준의 결과보고서를 제공합니다. 그로스벤처스㈜ · Beconic" />
 
@@ -166,9 +172,9 @@ button:focus-visible,.chip-opt:focus-visible,.check-item:focus-visible{outline:3
       </div>
     </div>
     <nav class="topnav">
-      <button onclick="startDiagnosis()">진단 시작</button>
+      <button class="tn-hide-m" onclick="goScreen('landing')">소개</button>
       <button onclick="goScreen('admin')">진단 이력</button>
-      <button onclick="goScreen('landing')">소개</button>
+      <button class="tn-primary" onclick="startDiagnosis()">진단 시작</button>
     </nav>
   </div>
 </header>
@@ -256,16 +262,18 @@ button:focus-visible,.chip-opt:focus-visible,.check-item:focus-visible{outline:3
   <section class="hero">
     <div class="wrap hero-in">
       <div>
-        <span class="eyebrow" style="color:var(--gold-500)">Problem–Solution Fit Diagnostic</span>
+        <span class="eyebrow">Problem–Solution Fit Diagnostic</span>
         <h1 style="margin-top:14px">우리 기업의 <span class="hl">고객문제와 솔루션</span>이<br/>정말 연결되어 있는지 진단하세요</h1>
         <p class="lead">문제정의, 고객검증, 가치제안, 솔루션 적합성, 실행 로드맵까지 한 번에 확인하는 근거 기반 비즈니스 진단 웹앱입니다.</p>
         <div class="hero-cta">
           <button class="btn btn-gold btn-lg" onclick="startDiagnosis()">무료 진단 시작하기 →</button>
-          <button class="btn btn-ghost btn-lg" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.3)" onclick="loadSampleAndStart()">샘플로 미리보기</button>
+          <button class="btn btn-ghost btn-lg" onclick="loadSampleAndStart()">샘플로 미리보기</button>
         </div>
+        <div class="resume-bar hidden" id="resumeBar"></div>
         <div class="hero-meta">
-          <div><b>9개 영역</b> · 100점 정밀 진단</div>
-          <div><b>18개 섹션</b> · 컨설팅 보고서</div>
+          <div><b data-count="domains">9개 영역</b> · 100점 정밀 진단</div>
+          <div><b data-count="sections">18개 섹션</b> · 컨설팅 보고서</div>
+          <div><b data-count="minutes">약 15~20분</b> · 이 기기에 자동 저장</div>
           <div><b>PDF 저장</b> · A4 제출용 출력</div>
         </div>
       </div>
@@ -316,7 +324,7 @@ button:focus-visible,.chip-opt:focus-visible,.check-item:focus-visible{outline:3
   <!-- 프로세스 -->
   <section class="section" style="padding-top:0">
     <div class="wrap">
-      <div class="section-head"><span class="eyebrow">How it works</span><h2>6단계 입력 → 컨설팅 보고서</h2></div>
+      <div class="section-head"><span class="eyebrow">How it works</span><h2><span data-count="steps">6단계</span> 입력 → 컨설팅 보고서</h2></div>
       <div class="pipe" id="pipe">
         <div class="pipe-step"><div class="ps-n">01</div><div class="ps-t">문제 입력</div></div>
         <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
@@ -570,6 +578,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
         </div>
         <button class="btn btn-primary" id="btnNext" onclick="nextStep()">다음 →</button>
       </div>
+      <div class="save-note" id="saveNote" aria-live="polite">입력 내용은 이 기기에 자동 저장됩니다
+      </div>
     </div>
   </div>
 </div>
@@ -787,6 +797,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
           </div>
           <div class="dash-verdict">
             <span class="grade-badge" id="gradeBadge">— 등급</span>
+            <div class="cap-note" id="capNote"></div>
             <h2 id="verdictHeadline">진단 결과를 불러오는 중…</h2>
             <p id="verdictSummary"></p>
             <div class="dash-primary-type" id="primaryType"></div>
@@ -798,14 +809,18 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
         </div>
       </div>
 
+      <!-- 결과 바로가기(긴 결과 화면 길 찾기) -->
+      <nav class="dash-jump no-print" aria-label="결과 바로가기">
+        <a href="#snapshot">요약</a><a href="#secScores">영역 점수</a><a href="#secReliability">신뢰도·증거</a><a href="#aiCard">AI 해석</a><a href="#secTypes">진단 유형</a><a href="#secSwot">강점·약점</a><a href="#secRoadmap">로드맵</a><a href="#secConsult">상담</a>
+      </nav>
       <!-- 핵심 요약 (Executive Snapshot) -->
       <div class="snapshot" id="snapshot"></div>
 
       <!-- 영역 점수 + PSF 삼각형 -->
-      <div class="dash-grid">
+      <div class="dash-grid" id="secScores">
         <div class="d-card">
           <span class="exhibit-tag">EXHIBIT 1</span>
-          <h3>9개 영역 진단 점수</h3>
+          <h3><span data-count="domains">9개 영역</span> 진단 점수</h3>
           <div class="d-sub">단위: 점(영역 만점 대비) · 출처: 사용자 입력 기반 Rule-based Engine</div>
           <div id="barChart"></div>
         </div>
@@ -821,7 +836,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
       </div>
 
       <!-- 진단 신뢰도 · 점검 사항 + 증거 등급 · 정합성 (v2) -->
-      <div class="dash-grid">
+      <div class="dash-grid" id="secReliability">
         <div class="d-card">
           <span class="exhibit-tag">EXHIBIT 3</span>
           <h3>진단 신뢰도 · 점검 사항</h3>
@@ -840,7 +855,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
       <div class="d-card ai-card no-print" id="aiCard" style="margin-top:20px"></div>
 
       <!-- 리스크 매트릭스 + 유형 -->
-      <div class="dash-grid">
+      <div class="dash-grid" id="secTypes">
         <div class="d-card">
           <span class="exhibit-tag">EXHIBIT 5</span>
           <h3>리스크 매트릭스</h3>
@@ -850,7 +865,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
         </div>
         <div class="d-card">
           <h3>진단 유형 <span style="font-size:12px;font-weight:600;color:var(--ink-400)">해당 유형 · 신호 · 처방</span></h3>
-          <div class="d-sub">가장 위험한 유형을 ⚑Primary로 표시(복수 가능). 아래 '10대 유형 지도'에서 전체 위치를 확인하세요.</div>
+          <div class="d-sub">가장 위험한 유형을 ⚑Primary로 표시(복수 가능). 아래 '진단유형 지도'에서 전체 위치를 확인하세요.</div>
           <div id="typeDetail" style="margin-bottom:18px"></div>
           <h3 style="margin-top:8px">핵심 개선 제안</h3>
           <div class="rec-list" id="recList" style="margin-top:12px"></div>
@@ -858,7 +873,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
       </div>
 
       <!-- SWOT -->
-      <div class="d-card" style="margin-top:20px">
+      <div class="d-card" style="margin-top:20px" id="secSwot">
         <h3>강점 · 약점 · 리스크</h3>
         <div class="d-sub">진단 점수와 입력 근거를 바탕으로 자동 도출</div>
         <div class="swot-grid">
@@ -870,7 +885,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
 
       <!-- 10대 진단유형 지도 -->
       <div class="d-card" style="margin-top:20px">
-        <h3>10대 진단유형 지도 <span style="font-size:12px;font-weight:600;color:var(--ink-400)">문제탐색 → 사업화 단계별</span></h3>
+        <h3><span data-count="types">10대</span> 진단유형 지도 <span style="font-size:12px;font-weight:600;color:var(--ink-400)">문제탐색 → 사업화 단계별</span></h3>
         <div class="d-sub">진단 결과가 위치한 유형을 강조 표시합니다. 리스크가 낮은 오른쪽(🚀🏆)으로 갈수록 사업화 성숙도가 높습니다.</div>
         <div class="typemap" id="typeMap"></div>
       </div>
@@ -884,7 +899,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
       </div>
 
       <!-- 로드맵 -->
-      <div class="d-card" style="margin-top:20px">
+      <div class="d-card" style="margin-top:20px" id="secRoadmap">
         <span class="exhibit-tag">EXHIBIT 4</span>
         <h3>실행 로드맵</h3>
         <div class="d-sub">30일 · 90일 · 180일 단계별 실행 우선순위</div>
@@ -896,14 +911,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
       </div>
 
       <!-- 컨설팅 CTA -->
-      <div class="consult-band" style="margin-top:22px">
+      <div class="consult-band" style="margin-top:22px" id="secConsult">
         <div>
           <h3>컨설팅 제안 과제</h3>
           <p>진단 유형에 따라 그로스벤처스가 우선 지원할 수 있는 과제를 추천합니다.</p>
           <div class="consult-tasklist" id="consultTasks"></div>
         </div>
         <div style="text-align:right">
-          <button class="btn btn-gold btn-lg" onclick="alert('전문가 상담 문의\n\n그로스벤처스㈜ · Beconic\nTEL 070-4103-4177\nstart@gven.kr\nwww.beconic.kr')">전문가 상담 신청 →</button>
+          <button class="btn btn-gold btn-lg" onclick="openConsult()">전문가 상담 신청 →</button>
         </div>
       </div>
 
@@ -913,6 +928,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
         <button class="btn btn-ghost" onclick="restartDiagnosis()">다시 진단하기</button>
       </div>
     </div>
+  </div>
+  <div class="m-bottom no-print">
+    <button class="btn btn-ghost" onclick="openConsult()">상담 신청</button>
+    <button class="btn btn-primary" onclick="openReportMetaModal()">보고서 PDF 받기</button>
   </div>
 </div>
 
@@ -1045,11 +1064,7 @@ table.rp-table tr:nth-child(even) td{background:#F8FAFC;}
   @page{
     size:A4 portrait;
     margin:14mm 14mm 16mm;
-    /* 페이지 하단 우측에 페이지 번호(브라우저 카운터) */
-    @bottom-right{ content:"Page " counter(page); font-size:8pt; color:#6B7280; }
-    @bottom-left{ content:"그로스벤처스㈜ · Beconic"; font-size:8pt; color:#9CA3AF; }
-    @top-left{ content:"고객문제·솔루션 적합성 진단보고서"; font-size:8pt; color:#9CA3AF; }
-    @top-right{ content:"중소기업상담회사 제2025-684호"; font-size:8pt; color:#9CA3AF; }
+    /* 머리글·바닥글 문구는 COMPANY 상수로 스크립트가 주입(mountPageRunStyle) */
   }
   @page cover{ margin:0; @bottom-right{content:""} @bottom-left{content:""} @top-left{content:""} @top-right{content:""} }
   html,body{width:auto;background:#fff;color:#111827;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:10pt;}
@@ -1070,7 +1085,10 @@ table.rp-table tr:nth-child(even) td{background:#F8FAFC;}
   .rp-section{padding:0 0 8mm;border-bottom:none;break-inside:avoid;page-break-inside:avoid;}
   .rp-section.pb{break-before:page;page-break-before:always;} /* 큰 섹션은 페이지 시작 */
   .exhibit-box,table,figure,svg,.rp-callout,.rp-note,tr{page-break-inside:avoid;break-inside:avoid;}
-  h1,h2,h3,.rp-h2,.rp-title{page-break-after:avoid;break-after:avoid;}
+  table.rp-table-split{page-break-inside:auto;break-inside:auto;}   /* 긴 표는 행 단위로 다음 쪽에 이어짐(빈 쪽 방지) */
+  .rp-section.rp-flow{break-inside:auto;page-break-inside:auto;}
+  h1,h2,h3,.rp-h2,.rp-title,.rp-eyebrow{page-break-after:avoid;break-after:avoid;}
+  thead{display:table-header-group;}   /* 표가 다음 쪽으로 넘어가면 머리행 반복 */
   table.rp-table{font-size:8.4pt;}
   .rp-p,.rp-note{orphans:2;widows:2;}
   /* 구형 단일페이지 방식도 폴백 유지 */
@@ -1111,6 +1129,15 @@ table.rp-table tr:nth-child(even) td{background:#F8FAFC;}
     <div class="modal-head"><div class="eyebrow">Quality Assurance</div><h3>보고서 검수 결과</h3><p>PDF 생성 전 자동 QA를 실행했습니다.</p></div>
     <div class="modal-body" id="qaModalBody"></div>
     <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('qaModal')">닫기</button><button class="btn btn-primary" onclick="proceedAfterQA()">보고서 보기 →</button></div>
+  </div>
+</div>
+
+<!-- 범용 안내 모달(체크리스트·상담) — QA 모달을 덮어쓰지 않도록 분리 -->
+<div class="modal-overlay" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+  <div class="modal">
+    <div class="modal-head"><div class="eyebrow" id="infoEyebrow"></div><h3 id="infoTitle"></h3><p id="infoDesc"></p></div>
+    <div class="modal-body" id="infoBody"></div>
+    <div class="modal-foot" id="infoFoot"></div>
   </div>
 </div>
 
@@ -1175,10 +1202,198 @@ table.rp-table tr:nth-child(even) td{background:#F8FAFC;}
 </div>
 
 
+
+<style id="toss-theme">
+/* =====================================================================
+   토스 스타일 테마 (웹·앱 화면 전용, v2.2)
+   - 흰 바탕 + 회색 면(#F2F4F6) 구분, 블루 포인트(#3182F6), 큰 굵은 제목, 둥근 카드(20px), 그림자 최소
+   - 폰트: Pretendard(전 영역). 보고서(#screen-report)·PDF는 컨설팅 톤(네이비·골드) 유지
+   - 화면 컴포넌트가 쓰는 디자인 토큰을 화면 영역에서만 재정의 → 보고서에는 영향 없음
+   ===================================================================== */
+:root{--t-blue:#3182F6;--t-blue-d:#1B64DA;--t-blue-50:#E8F3FF;--t-g900:#191F28;--t-g800:#333D4B;--t-g700:#4E5968;--t-g600:#6B7684;--t-g500:#8B95A1;--t-g400:#B0B8C1;--t-g200:#E5E8EB;--t-g100:#F2F4F6;--t-g50:#F9FAFB;
+  --font:"Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;}
+html,body{font-family:var(--font);}
+body{background:#fff;color:var(--t-g900);-webkit-font-smoothing:antialiased;word-break:keep-all;}
+svg text{font-family:var(--font);}
+.topbar,#screen-landing,#screen-form,#screen-dashboard,#screen-admin,#metaModal,#qaModal,#infoModal,#printModal,.footer{
+  --navy-900:#191F28;--navy-800:#333D4B;--navy-700:#4E5968;--navy-600:#3182F6;--navy-100:#E5E8EB;--navy-050:#F2F4F6;
+  --gold-600:#1B64DA;--gold-500:#3182F6;--gold-100:#E8F3FF;
+  --ink-900:#191F28;--ink-700:#333D4B;--ink-500:#6B7684;--ink-400:#8B95A1;--line:#E5E8EB;--line-soft:#F2F4F6;--bg:#F9FAFB;
+  --ok:#03B26C;--ok-bg:#E3F7EE;--warn:#F08C00;--warn-bg:#FFF4E2;--bad:#F04452;--bad-bg:#FFEEF0;--info:#3182F6;
+  --radius:20px;--radius-sm:12px;--shadow-sm:none;--shadow-md:0 8px 24px rgba(0,27,55,.08);--shadow-lg:0 12px 32px rgba(0,27,55,.10);
+}
+#screen-landing h1,#screen-landing h2,#screen-landing h3,#screen-form h2,#screen-dashboard h2,#screen-dashboard h3{letter-spacing:-.025em;}
+
+/* 상단바 */
+.topbar{background:rgba(255,255,255,.96);border-bottom:1px solid var(--t-g100);}
+.topbar-in{height:58px;}
+.brand-name{font-size:17px;color:var(--t-g900);}
+.topnav button{border-radius:10px;font-size:14px;font-weight:600;color:var(--t-g700);white-space:nowrap;}
+.topnav button:hover{background:var(--t-g100);color:var(--t-g900);}
+.topnav .tn-primary{background:var(--t-blue);color:#fff;}
+.topnav .tn-primary:hover{background:var(--t-blue-d);color:#fff;}
+
+/* 버튼: 토스 블루 단색, 둥근 14px, 큰 터치 영역 */
+.btn{border-radius:14px;font-weight:700;letter-spacing:-.01em;min-height:48px;}
+.btn-lg{min-height:56px;border-radius:16px;font-size:17px;}
+.btn-sm{min-height:36px;border-radius:10px;}
+.btn-primary,.btn-gold{background:var(--t-blue);color:#fff;box-shadow:none;}
+.btn-primary:hover,.btn-gold:hover{background:var(--t-blue-d);filter:none;box-shadow:none;}
+.btn-ghost{background:var(--t-g100);color:var(--t-g700);border:0;}
+.btn-ghost:hover{background:var(--t-g200);color:var(--t-g900);border:0;}
+.btn:active{transform:scale(.98);}
+
+/* 랜딩 히어로: 흰 바탕 · 큰 제목 · 블루 강조 */
+.hero{background:#fff;color:var(--t-g900);padding:72px 0 64px;}
+.hero::after{display:none;}
+.hero h1{color:var(--t-g900);font-size:44px;line-height:1.25;}
+.hero h1 .hl{color:var(--t-blue);}
+.hero .eyebrow{color:var(--t-blue);letter-spacing:.06em;}
+.hero p.lead{color:var(--t-g600);font-size:18px;}
+.hero-meta{color:var(--t-g600);}
+.hero-meta b{color:var(--t-g900);}
+.hero-meta > div{background:var(--t-g100);border-radius:12px;padding:8px 14px;}
+.beacon svg{filter:none;}
+.beacon .ring{stroke:var(--t-g100);stroke-width:10;}
+.beacon .arc{stroke:var(--t-blue);stroke-width:10;}
+.beacon-core .lab{color:var(--t-blue);letter-spacing:.08em;}
+.beacon-core .num{color:var(--t-g900);}
+.beacon-core .cap{color:var(--t-g600);}
+.section{padding:64px 0;}
+.section-head h2{font-size:30px;}
+.value-card{background:var(--t-g50);border:0;border-radius:24px;padding:28px 24px;}
+.value-card::before{display:none;}
+.value-card:hover{transform:none;box-shadow:none;background:var(--t-g100);}
+.value-card .vc-ico{background:var(--t-blue-50);border-radius:14px;}
+.value-card .vc-ico svg{stroke:var(--t-blue);}
+.pipe-step{background:var(--t-g50);border:0;border-radius:16px;}
+.pipe-step .ps-n{color:var(--t-blue);}
+.pipe-arrow svg{stroke:var(--t-g400);}
+.method-strip{background:#fff;border:0;}
+.method-chip{background:var(--t-g100);border:0;color:var(--t-g700);}
+.method-chip span{color:var(--t-blue);}
+.disclaimer-band{background:var(--t-g50);color:var(--t-g600);}
+.disclaimer-band .dz{background:var(--t-g100);color:var(--t-g600);}
+.footer{background:var(--t-g50);color:var(--t-g600);border-top:1px solid var(--t-g100);}
+.footer .f-brand .fb-name{color:var(--t-g900);}
+.footer .f-brand .fb-sub{color:var(--t-g500);}
+.footer b{color:var(--t-g800);}
+.footer a{color:var(--t-g700);text-decoration:underline;text-underline-offset:2px;}
+.footer a:hover{color:var(--t-blue);}
+.footer .f-brand .f-logo-badge{box-shadow:none;border:1px solid var(--t-g200);}
+.footer .f-cert{background:#fff;border:1px solid var(--t-g200);color:var(--t-g700);}
+.footer .f-bottom{border-top:1px solid var(--t-g200);color:var(--t-g500);}
+.footer .f-ver b{color:var(--t-g700);}
+
+/* 입력 폼: 한 화면 한 단계, 회색 입력창, 블루 진행바 */
+#screen-form{background:#fff;}
+.form-shell{max-width:680px;}
+.form-help-bar{background:var(--t-blue-50);border:0;border-radius:16px;color:var(--t-g800);}
+.progress{height:6px;background:var(--t-g100);}
+.progress-bar{background:var(--t-blue);}
+.step-dot{border:0;background:var(--t-g100);color:var(--t-g500);border-radius:10px;cursor:default;}
+.step-dot.done{background:var(--t-blue-50);color:var(--t-blue);cursor:pointer;}
+.step-dot.cur{background:var(--t-g900);color:#fff;}
+.form-card{border:0;box-shadow:none;padding:8px 0 0;}
+.step-eyebrow{color:var(--t-blue);letter-spacing:.06em;}
+.step-h{font-size:28px;}
+label.flab{font-size:15px;color:var(--t-g900);}
+input[type=text],input[type=number],input[type=password],select,textarea{background:var(--t-g100);border:2px solid transparent;border-radius:14px;padding:14px 16px;font-size:16px;color:var(--t-g900);}
+input:focus,select:focus,textarea:focus{background:#fff;border-color:var(--t-blue);box-shadow:none;}
+.invalid input,.invalid select,.invalid textarea{border-color:var(--bad);background:#fff;}
+.chip-opt{border:0;background:var(--t-g100);color:var(--t-g700);border-radius:12px;padding:10px 16px;}
+.chip-opt.on{background:var(--t-blue);color:#fff;}
+.f-guide{background:var(--t-g50);border-left:0;border-radius:14px;}
+.fg-how .fg-tag{background:var(--t-g900);}
+.fm-chip{border:0;background:var(--t-g100);}
+.fm-chip.hit{background:var(--ok-bg);}
+
+/* 결과: 흰 카드 · 블루 게이지 */
+.dash{background:var(--t-g50);}
+.dash-hero{background:#fff;color:var(--t-g900);box-shadow:none;border-radius:24px;}
+.dash-hero::after{display:none;}
+.gauge .g-bg{stroke:var(--t-g100);}
+.gauge .g-fg{stroke:var(--t-blue);}
+.gauge-core .gv{color:var(--t-g900);}
+.gauge-core .gt{color:var(--t-g500);}
+.dash-verdict .grade-badge{display:inline-block;background:var(--t-blue-50);color:var(--t-blue);line-height:1.5;border-radius:12px;}
+.cap-note{font-size:12.5px;color:var(--t-g500);margin-top:6px;}
+.cap-note:empty{display:none;}
+.fg-tag{justify-self:start;}
+.dash-verdict h2{color:var(--t-g900);font-size:26px;}
+.dash-verdict p{color:var(--t-g700);}
+.dash-primary-type{background:var(--t-g100);color:var(--t-g800);}
+.dash-actions .btn-ghost{background:var(--t-g100) !important;color:var(--t-g700) !important;border:0 !important;}
+.d-card,.snapshot{background:#fff;border:0 !important;box-shadow:none;border-radius:24px;}
+.snapshot{border-left:0 !important;}
+.exhibit-tag{color:var(--t-blue);}
+.consult-band{background:var(--t-blue-50);color:var(--t-g900);}
+.consult-band h3{color:var(--t-g900);}
+.consult-band p{color:var(--t-g700);}
+.consult-tasklist span{background:#fff;color:var(--t-g800);}
+.consult-opts{display:grid;gap:10px;}
+.consult-opt{display:flex;gap:14px;align-items:center;padding:16px;border-radius:16px;background:var(--t-g50);color:var(--t-g900);text-decoration:none;}
+.consult-opt:hover{background:var(--t-g100);}
+.consult-opt .co-ic{font-size:22px;}
+.consult-opt small{color:var(--t-g600);}
+.admin-table{border-radius:20px;box-shadow:none;border:1px solid var(--t-g100);}
+.modal{border-radius:24px;}
+
+/* 결과 화면 바로가기(섹션 칩) */
+.dash-jump{position:sticky;top:58px;z-index:40;background:rgba(249,250,251,.96);backdrop-filter:blur(8px);padding:10px 0;margin:0 -2px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;}
+.dash-jump::-webkit-scrollbar{display:none;}
+.dash-jump a{flex-shrink:0;padding:8px 14px;border-radius:999px;background:#fff;color:var(--t-g700);font-size:13.5px;font-weight:700;text-decoration:none;}
+.dash-jump a:hover{background:var(--t-g200);}
+#screen-dashboard [id]{scroll-margin-top:120px;}
+
+/* 이어하기 배너 · 소요 시간 */
+.resume-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--t-blue-50);border-radius:16px;padding:14px 18px;margin-top:24px;color:var(--t-g800);font-size:14.5px;}
+.resume-bar b{color:var(--t-blue);}
+.save-note{font-size:12.5px;color:var(--t-g500);margin-top:8px;text-align:right;}
+
+/* 모바일 앱: 하단 고정 버튼(손가락 닿는 곳), 안전영역 */
+.m-bottom{display:none;}
+@media (max-width:720px){
+  .brand-sub,.topnav .tn-hide-m{display:none;}
+  .brand img{width:28px;}
+  .topnav button{padding:8px 10px;font-size:13.5px;}
+  .hero{padding:40px 0 36px;}
+  .hero h1{font-size:30px;}
+  .hero p.lead{font-size:16px;}
+  .hero-cta .btn{flex:1 1 100%;}
+  .beacon{max-width:200px;}
+  .section{padding:44px 0;}
+  .section-head h2{font-size:24px;}
+  .step-h{font-size:24px;}
+  .step-dots{display:none;}
+  .form-help-bar{flex-direction:column;align-items:stretch;gap:10px;}
+  .form-shell{padding-bottom:120px;}
+  .form-nav{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(rgba(255,255,255,0),#fff 28%);}
+  .form-nav .left .btn:not(#btnPrev){display:none;}
+  .form-nav #btnNext{flex:1;}
+  .dash-hero{padding:24px 18px;}
+  .dash-verdict h2{font-size:22px;}
+  .dash-actions{display:none;}
+  .dash{padding-bottom:110px;}
+  .m-bottom{display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:60;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(rgba(249,250,251,0),var(--t-g50) 28%);}
+  #screen-dashboard:not(.active) .m-bottom{display:none;}
+  .m-bottom .btn{flex:1;}
+  .dash-jump{top:58px;}
+}
+@media print{ .m-bottom,.dash-jump,.resume-bar{display:none !important;} }
+</style>
 <script>
 /* ==================================================================
    BECONIC 진단 엔진 — Vanilla JS / Rule-based
    ================================================================== */
+
+/* ---------- 회사 정보 (단일 출처: 화면·보고서·PDF 머리글·상담 링크가 모두 여기서 읽음) ---------- */
+const COMPANY={name:"그로스벤처스 주식회사",short:"그로스벤처스㈜",en:"growthventures Co., Ltd.",brand:"Beconic",
+  certNo:"제2025-684호",certLabel:"중소벤처기업부 공식 인증 중소기업상담회사",
+  tel:"02-6124-5960",mail:"start@gven.kr",web:"www.beconic.kr",addr:"서울시 구로구 디지털로27길 24, 209호",
+  since:2023,serviceUrl:"https://beconic-diagnosis-psf.netlify.app/"};
+const telHref=()=>"tel:"+COMPANY.tel.replace(/[^0-9+]/g,"");
+const copyYears=()=>{ const y=new Date().getFullYear(); return y>COMPANY.since?`${COMPANY.since}~${y}`:String(COMPANY.since); };
 
 /* 브랜드 로고 (base64 인라인) */
 const LOGO_DATA = "data:image/jpeg;base64,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";
@@ -1215,6 +1430,7 @@ function goScreen(name){
   if(el) el.classList.add('active');
   window.scrollTo({top:0,behavior:'instant'});
   if(name==='admin') renderAdmin();
+  if(name==='landing') renderResumeBar();
 }
 function resetForm(){
   document.querySelectorAll('#screen-form [data-k]').forEach(el=>{ el.value=''; });
@@ -1222,7 +1438,14 @@ function resetForm(){
   document.querySelectorAll('#screen-form .field.invalid').forEach(f=>f.classList.remove('invalid'));
   if(typeof renderAllMeters==='function') renderAllMeters();
 }
-function startDiagnosis(){ resetForm(); currentStep=1; renderStep(); goScreen('form'); }
+function startDiagnosis(opts){
+  // 작성 중인 임시저장이 있으면 덮어쓰기 전에 묻는다(새 진단의 첫 자동저장이 이전 내용을 지우지 않도록)
+  if(!(opts&&opts.fresh) && typeof readDraft==='function' && readDraft()){
+    if(confirm('작성 중인 진단이 있어요. 이어서 작성할까요?\n(취소를 누르면 지우고 새로 시작합니다)')) return resumeDraft();
+    clearDraft();
+  }
+  resetForm(); currentStep=1; renderStep(); goScreen('form');
+}
 function restartDiagnosis(){ if(confirm('새로운 진단을 시작할까요? 현재 결과는 이력에 저장되어 있습니다.')){ startDiagnosis(); } }
 
 /* ---------- 스텝 렌더 ---------- */
@@ -1235,7 +1458,7 @@ function renderStep(){
   // dots
   const dots = STEP_LABELS.map((lb,i)=>{
     const n=i+1; let cls='step-dot'; if(n<currentStep)cls+=' done'; if(n===currentStep)cls+=' cur';
-    return `<div class="${cls}">${n}. ${lb}</div>`;
+    return n<currentStep?`<button type="button" class="${cls}" onclick="goToStep(${n})" aria-label="${n}단계 ${lb}로 이동">${n}. ${lb}</button>`:`<div class="${cls}"${n===currentStep?' aria-current="step"':''}>${n}. ${lb}</div>`;
   }).join('');
   document.getElementById('stepDots').innerHTML = dots;
   document.getElementById('btnPrev').style.display = currentStep===1?'none':'inline-flex';
@@ -1263,9 +1486,44 @@ function nextStep(){
     return; 
   }
   if(currentStep===TOTAL_STEPS){ completeDiagnosis(); return; }
-  currentStep++; renderStep();
+  currentStep++; renderStep(); saveDraft();
 }
-function prevStep(){ if(currentStep>1){ currentStep--; renderStep(); } }
+function prevStep(){ if(currentStep>1){ currentStep--; renderStep(); saveDraft(); } }
+function goToStep(n){ if(n>=1&&n<currentStep){ currentStep=n; renderStep(); saveDraft(); } }
+
+/* ---------- 임시저장·이어하기 (이 기기 브라우저에만, 진단 완료 시 삭제) ---------- */
+const DRAFT_KEY='beconic_psf_draft_v1';
+let _draftTimer=null;
+function readDraft(){ try{ const d=JSON.parse(localStorage.getItem(DRAFT_KEY)); return d&&d.values?d:null; }catch(e){ return null; } }
+function clearDraft(){ try{ localStorage.removeItem(DRAFT_KEY); }catch(e){} }
+function saveDraft(){
+  const values={}; let filled=0;
+  document.querySelectorAll('#screen-form [data-k]').forEach(el=>{ values[el.dataset.k]=el.value; if(String(el.value).trim()) filled++; });
+  const chips=[...document.querySelectorAll('[data-chips="problemCost"] .chip-opt.on')].map(c=>c.textContent);
+  if(!filled&&!chips.length) return;
+  try{ localStorage.setItem(DRAFT_KEY,JSON.stringify({v:1,at:new Date().toISOString(),step:currentStep,values,chips,filled})); }catch(e){}
+  const n=document.getElementById('saveNote'); if(n) n.textContent='이 기기에 자동 저장됨 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+}
+function queueSaveDraft(){ clearTimeout(_draftTimer); _draftTimer=setTimeout(saveDraft,600); }
+function resumeDraft(){
+  const d=readDraft(); if(!d) return startDiagnosis({fresh:true});
+  resetForm();
+  Object.entries(d.values).forEach(([k,v])=>{ const el=document.querySelector(`#screen-form [data-k="${k}"]`); if(el) el.value=v; });
+  document.querySelectorAll('[data-chips="problemCost"] .chip-opt').forEach(c=>{ c.classList.toggle('on',(d.chips||[]).includes(c.textContent)); syncChip(c); });
+  if(typeof renderAllMeters==='function') renderAllMeters();
+  currentStep=Math.min(Math.max(1,d.step|0),TOTAL_STEPS); renderStep(); goScreen('form');
+}
+function discardDraft(){ clearDraft(); renderResumeBar(); }
+function renderResumeBar(){
+  const el=document.getElementById('resumeBar'); if(!el) return;
+  const d=readDraft(); if(!d){ el.classList.add('hidden'); el.innerHTML=''; return; }
+  const when=new Date(d.at).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  el.classList.remove('hidden');
+  el.innerHTML=`<span>작성 중인 진단이 있어요 · <b>${d.step}/${TOTAL_STEPS}단계</b> · ${when} 저장</span><span style="display:flex;gap:8px"><button class="btn btn-sm btn-ghost" onclick="discardDraft()">지우기</button><button class="btn btn-sm btn-primary" onclick="resumeDraft()">이어서 작성</button></span>`;
+}
+document.addEventListener('input',e=>{ if(e.target.closest&&e.target.closest('#screen-form')) queueSaveDraft(); });
+document.addEventListener('change',e=>{ if(e.target.closest&&e.target.closest('#screen-form')) queueSaveDraft(); });
+document.addEventListener('click',e=>{ if(e.target.classList&&e.target.classList.contains('chip-opt')) queueSaveDraft(); });
 
 /* ---------- 입력 수집 ---------- */
 /* XSS 방어: 사용자 입력을 수집 시점에 HTML 이스케이프.
@@ -1343,7 +1601,7 @@ function fillSample(){
   document.querySelectorAll('.field').forEach(f=>f.classList.remove('invalid'));
   if(typeof renderAllMeters==='function') renderAllMeters();
 }
-function loadSampleAndStart(){ startDiagnosis(); setTimeout(()=>{ fillSample(); },80); }
+function loadSampleAndStart(){ startDiagnosis({fresh:true}); setTimeout(()=>{ fillSample(); },80); }
 
 
 /* ---------- 문항 작성 가이드 주입 (GUIDE 단일 출처 → 폼 안내·실시간 체크·채점 공통) ---------- */
@@ -1381,6 +1639,7 @@ document.addEventListener('DOMContentLoaded',mountGuides);   // GUIDE는 다음 
 function completeDiagnosis(){
   diagnosisInput = collectInput();
   diagnosisResult = runDiagnosis(diagnosisInput);
+  clearDraft();
   saveDiagnosis(diagnosisInput, diagnosisResult, null);
   goScreen('dashboard');
   renderDashboard(diagnosisInput, diagnosisResult);
@@ -1915,103 +2174,111 @@ const TYPE_CATALOG={
 };
 const TYPE_ORDER=["문제불명확형","고객불명확형","솔루션과잉형","정합성부족형","검증부족형","차별성부족형","실행전략부족형","균형발전형","PMF준비형","고객솔루션적합형"];
 
+/* 증거 사다리 다음 단계 계획 — 권고·로드맵·KPI·12개월 계획이 같은 정의를 쓴다(현재 등급 L → 다음 L+1 확보) */
+const EVIDENCE_NEXT=[
+  {title:"고객 문제 인터뷰 5명",desc:"타깃 고객 5명 이상과 20분 이상 문제 인터뷰를 하고, 반복되는 Pain을 기록하세요.",output:"인터뷰 노트 5건+",kpi:"인터뷰 수·문제 공감률",theme:"문제 인터뷰로 문제 실재성 확인",qkpi:"인터뷰 10명·문제 공감률"},
+  {title:"인터뷰 15명·피드백 기록",desc:"인터뷰를 15명까지 늘리거나 설문 30명을 더해, 긍정·부정 피드백을 패턴으로 정리하세요.",output:"피드백 패턴 정리표",kpi:"인터뷰 수·반복 Pain 비율",theme:"고객 세그먼트·Pain 패턴 확정",qkpi:"인터뷰 15명+·피드백 기록"},
+  {title:"시제품·파일럿 1건",desc:"Early Adopter 1~2곳에서 기간·지표를 정한 파일럿(PoC)을 실행하세요.",output:"파일럿 결과 보고서",kpi:"파일럿 핵심 지표",theme:"시제품·파일럿 실사용 검증",qkpi:"파일럿 1건·핵심 지표 측정"},
+  {title:"구매의향서(LOI) 확보",desc:"파일럿 고객에게 가격·수량 조건이 적힌 구매의향서나 협약서를 받으세요.",output:"서명된 LOI",kpi:"LOI 건수",theme:"구매의향·가격 수용성 확인",qkpi:"LOI 1~3건"},
+  {title:"유료 전환 1건",desc:"구매의향 고객 중 1곳 이상을 계약·세금계산서가 발행되는 유료 고객으로 전환하세요.",output:"계약서·세금계산서",kpi:"유료 고객 수·전환율",theme:"유료 전환·첫 매출",qkpi:"유료 고객 1~3사·매출 발생"},
+  {title:"재구매·반복 사용 확인",desc:"유료 고객의 재구매·갱신·반복 사용을 코호트로 추적하세요.",output:"코호트 리포트",kpi:"재구매율·3개월 유지율",theme:"반복 구매·리텐션 검증",qkpi:"재구매율·3개월 유지율"},
+  {title:"단위경제성 점검",desc:"LTV/CAC·회수기간을 계산해 채널 확장 여부를 판단하세요.",output:"단위경제성 시트",kpi:"LTV/CAC·회수기간",theme:"채널 확장·단위경제성",qkpi:"LTV/CAC·CAC 회수기간"}
+];
+const nextEvidence=lv=>EVIDENCE_NEXT[Math.max(0,Math.min(6,lv|0))];
+const evLevelOf=E=>(E&&E.evidence?E.evidence.level:0);
+
 /* SWOT */
 /* 강점: 실제 입력을 분석해 '무엇이 왜 강점인지' 근거와 함께 도출 */
-function generateStrengths(input,sc){
+function generateStrengths(input,sc,E){
   const out=[];
-  const P=input.problem,C=input.customer,S=input.solution,V=input.validation;
-  // 1) 문제-솔루션 정합성 (교차분석)
-  const fit=conceptOverlap(P.problemStatement,S.solutionDescription);
-  if(fit>=0.15 && RT(sc,'problemClarity')>=0.67 && RT(sc,'solutionFit')>=0.67)
-    out.push(`문제와 솔루션의 개념 정합성이 확인됩니다 — 문제('${_short(P.problemStatement,22)}')와 솔루션 서술이 같은 문제축을 다룹니다.`);
+  const C=input.customer,S=input.solution,V=input.validation;
+  const lv=evLevelOf(E);
+  // 1) 문제-솔루션 정합성: 엔진의 5개 연결 점검 결과 사용
+  const links=(E&&E.links)||[], ok=links.filter(l=>l.status==="연결됨");
+  if(RT(sc,'coherence')>=0.75) out.push(`문제에서 결과까지 논리가 이어집니다 — 연결 점검 ${links.length}개 중 ${ok.length}개 연결(정합성 ${sc.coherence}/${MAXOF.coherence}점).`);
   // 2) 정량적 차별점
-  const uvA=analyzeText(S.uniqueValue);
-  if(uvA.hasQuant) out.push(`차별점이 정량 근거를 포함합니다 — "${_short(S.uniqueValue,30)}" (수치화된 우위는 세일즈·투자 설득력이 높습니다).`);
-  // 3) 검증 실체
-  if(V.customerInterviewCount>=10) out.push(`고객 인터뷰 ${V.customerInterviewCount}명으로 정성 근거가 축적되어 주장이 가설을 넘어섭니다.`);
-  if(V.paidCustomer==="있음"||(HAS(V.letterOfIntent)&&V.letterOfIntent!=="없음")) out.push(`지불의사 증거(${V.paidCustomer==="있음"?"유료고객":"구매의향서"} 확보)가 있어 수요의 진정성이 뒷받침됩니다.`);
-  // 4) 고객 구조 명확성
-  if(HAS(C.userPersona)&&HAS(C.decisionMaker)&&C.userPersona!==C.decisionMaker)
-    out.push(`사용자(${_short(C.userPersona,12)})와 구매결정자(${_short(C.decisionMaker,12)})가 분리되어 영업 타깃이 명확합니다.`);
-  // 5) VPC 구조
-  if(analyzeText(S.painRelievers).quality>=0.4 && analyzeText(S.gainCreators).quality>=0.4)
-    out.push("Pain Reliever·Gain Creator가 구체적으로 정의되어 가치제안 구조가 견고합니다.");
-  // 점수 기반 보조(구체 강점이 부족할 때만)
-  if(out.length<2) DOMAIN_META.filter(d=>sc[d.key]/d.max>=0.85).forEach(d=>{ if(out.length<3) out.push(`${d.name}이(가) 만점권(${sc[d.key]}/${d.max})으로 진단의 신뢰 기반이 됩니다.`); });
+  if(analyzeText(S.uniqueValue).hasQuant) out.push(`차별점에 정량 근거가 있습니다 — "${_short(S.uniqueValue,34)}"`);
+  // 3) 검증 실체: 증거 등급
+  if(lv>=3) out.push(`실사용 이상의 증거가 있습니다 — 증거 등급 L${lv}(${EVIDENCE_LEVELS[lv].name}): ${EVIDENCE_LEVELS[lv].desc}.`);
+  else if(V.customerInterviewCount>=10) out.push(`고객 인터뷰 ${V.customerInterviewCount}명으로 정성 근거가 쌓였습니다.`);
+  // 4) 고객 구조
+  if(HAS(C.userPersona)&&HAS(C.decisionMaker)&&_unesc(C.userPersona)!==_unesc(C.decisionMaker))
+    out.push(`사용자(${_short(C.userPersona,14)})와 구매결정자(${_short(C.decisionMaker,14)})가 분리되어 영업 타깃이 명확합니다.`);
+  if(out.length<2) DOMAIN_META.filter(d=>sc[d.key]/d.max>=0.85).forEach(d=>{ if(out.length<3) out.push(`${d.name}이(가) 만점권(${sc[d.key]}/${d.max})입니다.`); });
   if(out.length===0) out.push("현재 입력에서 두드러지는 강점은 확인되지 않았습니다. 가장 점수가 높은 영역부터 근거를 심화해 강점화하세요.");
   return out.slice(0,4);
 }
 /* 약점: 실제 입력의 빈 곳·얕은 곳을 짚고 '무엇을 어떻게' 보완할지 대안 제시 */
-function generateWeaknesses(input,sc){
+function generateWeaknesses(input,sc,E){
   const out=[];
-  const P=input.problem,C=input.customer,S=input.solution,V=input.validation,E=input.execution;
-  // 1) 문제-솔루션 불일치 (교차분석)
-  const fit=conceptOverlap(P.problemStatement,S.solutionDescription);
-  if(HAS(P.problemStatement)&&HAS(S.solutionDescription)&&fit<0.08)
-    out.push(`문제와 솔루션의 연결이 약합니다 — 문제 서술과 솔루션 서술이 공유하는 개념이 적어, 솔루션이 정의한 문제를 직접 겨냥하는지 불명확합니다. → 각 기능을 문제의 어느 부분을 해결하는지 1:1로 매핑하세요.`);
-  // 2) 공허한 주관식 답변 감지
-  const thinFields=[];
-  const checkThin=(label,txt)=>{ const a=analyzeText(txt); if(HAS(txt)&&a.isThin) thinFields.push(label); };
-  checkThin("차별점",S.uniqueValue); checkThin("고객 Job",C.customerJob); checkThin("문제 진술",P.problemStatement); checkThin("솔루션 설명",S.solutionDescription);
-  if(thinFields.length) out.push(`${thinFields.join('·')} 답변이 형식적입니다 — 내용이 짧거나 추상적이어서 제3자가 타당성을 판단하기 어렵습니다. → 수치·고유명사·구체 사례를 넣어 재작성하세요.`);
-  // 3) 차별점 비정량
-  const uvA=analyzeText(S.uniqueValue);
-  if(HAS(S.uniqueValue)&&!uvA.hasQuant) out.push(`차별점이 정성적입니다 — "${_short(S.uniqueValue,26)}"에 정량 우위(비용·시간·성능 수치)가 없어 "왜 굳이 바꿔야 하는가"에 답하기 약합니다. → 기존 대안 대비 정량 비교치를 제시하세요.`);
-  // 4) 검증 부족 (실제 수치 인용)
-  if(V.customerInterviewCount<5) out.push(`정성 검증 부족 — 고객 인터뷰 ${V.customerInterviewCount}명으로는 문제 공감·지불의사를 확신하기 어렵습니다. → 타깃 고객 ${Math.max(10-V.customerInterviewCount,10)}명 추가 인터뷰가 필요합니다.`);
-  // 5) 실행 공백
-  const exGap=[]; if(!HAS(E.goToMarket))exGap.push("GTM 채널"); if(!HAS(E.pricingStrategy))exGap.push("가격정책"); if(!HAS(E.keyMetrics))exGap.push("핵심지표");
-  if(exGap.length>=2) out.push(`실행 설계 공백 — ${exGap.join('·')}이(가) 비어 있어 다음 90일 액션이 구체화되지 않습니다. → 채널 1~2개부터 문서화하세요.`);
-  // 점수 기반 보조
-  if(out.length===0){ const weak=DOMAIN_META.filter(d=>sc[d.key]/d.max<0.6).sort((a,b)=>sc[a.key]/a.max-sc[b.key]/b.max)[0];
-    if(weak) out.push(`${weak.name}(${sc[weak.key]}/${weak.max})이 상대적으로 낮습니다 — 치명적이진 않으나 근거를 심화하면 완성도가 높아집니다.`);
-    else out.push("뚜렷한 약점은 없으나 검증 데이터의 양적 확대로 확신 수준을 높일 수 있습니다."); }
+  const P=input.problem,C=input.customer,S=input.solution,V=input.validation,X=input.execution;
+  const lv=evLevelOf(E);
+  // 1) 연결 단절: 엔진의 연결 점검(구 단어 일치 방식은 조사 차이로 오판해 폐기)
+  const weak=((E&&E.links)||[]).filter(l=>l.status==="약함"||l.status==="단절");
+  if(weak.length) out.push(`연결이 약한 구간이 있습니다 — ${weak.map(l=>`${l.label}(${l.status})`).join(', ')}. → 앞 칸의 핵심어를 뒤 칸에 그대로 이어 쓰세요.`);
+  // 2) 다음 증거 공백
+  if(lv<5) out.push(`지불 증거가 아직 없습니다 — 현재 증거 L${lv}(${EVIDENCE_LEVELS[lv].name}). 다음 단계: ${nextEvidence(lv).title}.`);
+  // 3) 형식적 답변
+  const thin=[]; [["차별점",S.uniqueValue],["고객 Job",C.customerJob],["문제 진술",P.problemStatement],["솔루션 설명",S.solutionDescription]].forEach(([l,t])=>{ if(HAS(t)&&analyzeText(t).isThin) thin.push(l); });
+  if(thin.length) out.push(`${thin.join('·')} 답변이 형식적입니다 — 수치·대상·사례를 넣어 다시 쓰세요.`);
+  if(HAS(S.uniqueValue)&&!analyzeText(S.uniqueValue).hasQuant) out.push(`차별점이 정성적입니다 — 기존 대안 대비 비용·시간·성능 수치를 제시하세요.`);
+  if(V.customerInterviewCount<5) out.push(`정성 검증이 부족합니다 — 고객 인터뷰 ${V.customerInterviewCount}명.`);
+  const gap=[]; if(!HAS(X.goToMarket))gap.push("GTM 채널"); if(!HAS(X.pricingStrategy))gap.push("가격정책"); if(!HAS(X.keyMetrics))gap.push("핵심지표");
+  if(gap.length>=2) out.push(`실행 설계 공백 — ${gap.join('·')} 미기재.`);
+  if(out.length===0){ const w=[...DOMAIN_META].sort((a,b)=>sc[a.key]/a.max-sc[b.key]/b.max)[0]; out.push(`가장 낮은 영역은 ${w.name}(${sc[w.key]}/${w.max})입니다 — 치명적이진 않으나 다음 개선 지렛대입니다.`); }
   return out.slice(0,4);
 }
 /* 리스크: 입력 근거에서 파생된 실제 위험 + 대표 인지 리스크 결합 */
-function generateRisks(input,sc){
+function generateRisks(input,sc,E){
   const out=[];
-  const V=input.validation,S=input.solution,P=input.problem,E=input.execution;
-  if(RT(sc,'validationEvidence')<0.5) out.push(`수요 미검증 리스크 — 인터뷰 ${V.customerInterviewCount}명·유료전환 ${V.paidCustomer==="있음"?"있음":"없음"} 수준으로, 제품을 만들어도 팔리지 않을 위험. 개발·투자 전 실증이 선행돼야 합니다.`);
-  if(RT(sc,'valueProposition')<0.5){ const uvA=analyzeText(S.uniqueValue); out.push(`차별성 소실 리스크 — ${uvA.isThin?"차별점이 추상적이라":"정량 우위가 없어"} 경쟁 진입 시 가격 경쟁에 휘말릴 수 있습니다.`); }
-  if(RT(sc,'problemSeverity')<0.53) out.push(`문제 강도 리스크 — 빈도 '${P.problemFrequency||"미상"}'·심각도 '${P.problemSeverity||"미상"}'로는 고객이 '있으면 좋은(vitamin)' 수준으로 인식해 구매 우선순위에서 밀릴 수 있습니다.`);
-  if(RT(sc,'executionReadiness')<0.5) out.push("실행 지연 리스크 — GTM·가격·지표 설계 부족으로 초기 진입이 늦어지고 자원이 분산될 수 있습니다.");
-  if(HAS(E.mainRisk)) out.push(`대표 인지 리스크 — "${_short(E.mainRisk,40)}" (자가 식별 항목, 대응계획 수립 필요).`);
-  if(out.length===0) out.push("현 단계에서 관리 가능한 수준이나, 검증 결과에 따라 문제·솔루션 가설의 재평가가 필요합니다.");
+  const V=input.validation,S=input.solution,P=input.problem,X=input.execution, lv=evLevelOf(E);
+  if(lv<5) out.push(`지불의사 미검증 — 증거 L${lv}로 유료 전환이 확인되지 않아, 제품을 만들어도 팔리지 않을 위험이 남아 있습니다.`);
+  if(RT(sc,'valueProposition')<0.5) out.push(`차별성 소실 — 경쟁 진입 시 가격 경쟁에 휘말릴 수 있습니다.`);
+  if(RT(sc,'problemSeverity')<0.53) out.push(`문제 강도 — 빈도 '${P.problemFrequency||"미상"}'·심각도 '${P.problemSeverity||"미상"}'로는 구매 우선순위에서 밀릴 수 있습니다.`);
+  if(RT(sc,'executionReadiness')<0.5) out.push("실행 지연 — GTM·가격·지표 설계 부족으로 초기 진입이 늦어질 수 있습니다.");
+  const mr=splitRisk(X.mainRisk); if(mr) out.push(`대표 인지 리스크 — ${mr.risk}${mr.resp?` (대응: ${mr.resp})`:''}`);
+  if(out.length===0) out.push("현 단계에서 관리 가능한 수준입니다. 검증 결과에 따라 가설을 분기마다 재평가하세요.");
   return out.slice(0,4);
+}
+/* 대표가 쓴 리스크 '리스크 → 대응'을 나눈다(대응·지표 칸을 대표의 문장으로 채움) */
+function splitRisk(t){
+  const s=_unesc(t||"").trim(); if(!s||inspectText(s).state!=="text") return null;
+  const parts=s.split(/\s*(?:→|->|=>)\s*/);
+  const risk=parts[0], resp=parts.slice(1).join(' → ');
+  const mon=(resp.match(/[가-힣A-Za-z]+[률율][^,·]*/)||[])[0]||'';
+  return {risk:esc(risk),resp:esc(resp),monitor:esc(mon)};
 }
 
 /* 개선 제안 */
-function generateRecommendations(input,sc){
-  const recs=[];
-  const push=(t,d)=>recs.push({title:t,desc:d});
-  if(RT(sc,'problemClarity')<0.67) push("문제 정의 재정리","고객·상황·손실·시급성이 한 문장에 드러나도록 문제 진술을 구체화하세요.");
-  if(RT(sc,'customerSpecificity')<0.67) push("고객 세분화","사용자·구매자·결정자를 분리하고 Early Adopter 1개 세그먼트로 좁히세요.");
-  if(RT(sc,'validationEvidence')<0.6) push("고객 검증 강화","향후 30일 내 타깃 고객 인터뷰 10명 이상을 진행해 문제·의지·지불의사를 확인하세요.");
-  if(RT(sc,'coherence')<0.6) push("문제-솔루션 연결 재설계","고객 Pain·Job의 핵심어를 Pain Reliever·Outcome에 그대로 이어 쓰고, 연결 안 되는 기능은 후순위로 미루세요.");
-  if(RT(sc,'valueProposition')<0.6) push("차별성 명료화","기존 대안 대비 정량적 우위(비용·시간·리스크 절감)를 수치로 제시하세요.");
-  if(RT(sc,'executionReadiness')<0.6) push("GTM 실행설계","초기 채널 1~2개에 집중하고 가격·핵심지표·다음 실험을 문서화하세요.");
-  if(recs.length<3) push("검증 지표 정의","3개월 내 확인할 핵심 지표(전환율·재사용률 등)의 기준값과 목표값을 설정하세요.");
+function generateRecommendations(input,sc,E){
+  const recs=[], lv=evLevelOf(E), nx=nextEvidence(lv);
+  const push=(t,d,o,k)=>recs.push({title:t,desc:d,output:o,kpi:k});
+  // 1순위: 증거 사다리의 다음 단계(점수가 높아도 항상 다음 관문이 있음)
+  push(`다음 증거: ${nx.title}`,`현재 증거 L${lv}(${EVIDENCE_LEVELS[lv].name}) → ${lv<6?`L${lv+1}(${EVIDENCE_LEVELS[lv+1].name})`:'확장 준비'}. ${nx.desc}`,nx.output,nx.kpi);
+  if(HAS(input.execution.nextExperiment)) push("계획한 실험 실행",`대표가 정한 다음 실험: ${_short(input.execution.nextExperiment,80)}`,"실험 결과 요약",HAS(input.execution.keyMetrics)?_short(input.execution.keyMetrics,40):"실험 성공 기준");
+  if(RT(sc,'problemClarity')<0.67) push("문제 정의 재정리","고객·상황·손실·시급성이 한 문장에 드러나도록 문제 진술을 구체화하세요.","문제 진술서 1p","문제 공감률");
+  if(RT(sc,'customerSpecificity')<0.67) push("고객 세분화","사용자·구매자·결정자를 분리하고 Early Adopter 1개 세그먼트로 좁히세요.","페르소나·세그먼트 정의서","세그먼트별 반응률");
+  if(RT(sc,'coherence')<0.6) push("문제-솔루션 연결 재설계","고객 Pain·Job의 핵심어를 Pain Reliever·Outcome에 그대로 이어 쓰고, 연결 안 되는 기능은 후순위로 미루세요.","Pain↔기능 매핑표","Pain별 대응 기능 수");
+  if(RT(sc,'valueProposition')<0.6) push("차별성 명료화","기존 대안 대비 정량적 우위(비용·시간·리스크 절감)를 수치로 제시하세요.","포지셔닝 맵","전환율");
+  if(RT(sc,'executionReadiness')<0.6) push("GTM 실행설계","초기 채널 1~2개에 집중하고 가격·핵심지표·다음 실험을 문서화하세요.","GTM 1p 계획","파이프라인 수");
+  if(!HAS(input.execution.keyMetrics)) push("검증 지표 정의","3개월 내 확인할 핵심 지표의 현재값과 목표값을 정하세요.","KPI 정의서","지표 정의 완료");
   return recs.slice(0,5);
 }
 
 /* 로드맵 30/90/180 */
-function generateRoadmap(input,sc,primaryType){
+function generateRoadmap(input,sc,primaryType,E){
   const r={thirtyDays:[],ninetyDays:[],oneEightyDays:[]};
-  const pc=primaryType?TYPE_CATALOG[primaryType]:null;
+  const pc=primaryType?TYPE_CATALOG[primaryType]:null, lv=evLevelOf(E), nx=nextEvidence(lv), nx2=nextEvidence(lv+1);
   const weakest=[...DOMAIN_META].sort((a,b)=>(sc[a.key]/a.max)-(sc[b.key]/b.max))[0];
-  // 30일: 진단유형별 처방 + 약축 보완
-  if(pc) r.thirtyDays.push(`[${primaryType}] ${pc.plan30}`);
-  r.thirtyDays.push(`최약점 '${weakest.name}(${sc[weakest.key]}/${weakest.max})' 보완: 관련 근거를 실데이터로 대체`);
+  if(pc) r.thirtyDays.push(`${pc.plan30} (${primaryType} 처방)`);
+  r.thirtyDays.push(`가장 낮은 '${weakest.name}(${sc[weakest.key]}/${weakest.max})' 근거를 실데이터로 보강`);
   r.thirtyDays.push("문제·고객·솔루션 1페이지 요약(가설 캔버스) 정리");
-  // 90일: 유형별 60~90일 계획 + 검증
-  if(pc) r.ninetyDays.push(`[${primaryType}] ${pc.plan60}`);
-  r.ninetyDays.push(input.execution.nextExperiment ? `핵심 실험 실행: ${input.execution.nextExperiment}` : "MVP 파일럿 실행 및 핵심지표 측정");
-  r.ninetyDays.push("Early Adopter 대상 유료 전환 1건 이상 시도");
-  // 180일: 유형별 90일+ 계획 + 확장
-  if(pc) r.oneEightyDays.push(`[${primaryType}] ${pc.plan90}`);
-  r.oneEightyDays.push("검증 데이터 기반 GTM 채널 확대 및 KPI·단위경제성 점검");
-  r.oneEightyDays.push(input.execution.consultingNeeds ? `보완 영역 전문 컨설팅: ${input.execution.consultingNeeds}` : `권장 컨설팅: ${(pc&&pc.consult||["정책자금·실증사업 연계"]).slice(0,2).join('·')}`);
+  if(pc) r.ninetyDays.push(`${pc.plan60} (${primaryType} 처방)`);
+  r.ninetyDays.push(HAS(input.execution.nextExperiment)?`핵심 실험 실행: ${_short(input.execution.nextExperiment,70)}`:"MVP 파일럿 실행 및 핵심지표 측정");
+  r.ninetyDays.push(`다음 증거 확보: ${nx.title}`);
+  if(pc) r.oneEightyDays.push(`${pc.plan90} (${primaryType} 처방)`);
+  r.oneEightyDays.push(`그다음 증거: ${nx2.title}`);
+  r.oneEightyDays.push(HAS(input.execution.consultingNeeds)?`보완 영역 전문 컨설팅: ${_short(input.execution.consultingNeeds,60)}`:`권장 컨설팅: ${(pc&&pc.consult||["정책자금·실증사업 연계"]).slice(0,2).join('·')}`);
   return r;
 }
 
@@ -2036,27 +2303,40 @@ function generateConsultingTasks(types){
 }
 
 /* 리스크 테이블 (매트릭스+보고서 공용) */
-function generateRiskTable(input,sc){
-  const rows=[];
-  if(RT(sc,'validationEvidence')<0.6) rows.push({risk:"시장 수요 미검증",prob:RT(sc,'validationEvidence')<0.4?"높음":"보통",impact:"높음",resp:"30일 내 고객 인터뷰 10명+파일럿으로 수요 실증",monitor:"인터뷰 수, 문제 공감률"});
-  if(RT(sc,'coherence')<0.5) rows.push({risk:"문제-솔루션 불일치(엉뚱한 제품)",prob:"보통",impact:"높음",resp:"VPC 매핑표로 Pain↔기능 1:1 정렬 후 고객 5명 이해도 테스트",monitor:"Pain별 대응 기능 수, 데모 후 '내 문제 맞다' 응답률"});
+function generateRiskTable(input,sc,E){
+  const rows=[], lv=evLevelOf(E);
+  if(lv<5) rows.push({risk:"지불의사(유료 전환) 미검증",prob:lv<=2?"높음":"보통",impact:"높음",resp:nextEvidence(Math.max(lv,3)).desc,monitor:"LOI·유료 전환 건수"});
+  if(RT(sc,'validationEvidence')<0.4) rows.push({risk:"시장 수요 미검증",prob:"높음",impact:"높음",resp:"30일 내 고객 인터뷰 10명+파일럿으로 수요 실증",monitor:"인터뷰 수, 문제 공감률"});
+  if(RT(sc,'coherence')<0.5) rows.push({risk:"문제-솔루션 불일치",prob:"보통",impact:"높음",resp:"Pain↔기능 매핑표로 1:1 정렬 후 고객 5명 이해도 테스트",monitor:"데모 후 '내 문제 맞다' 응답률"});
   if(RT(sc,'valueProposition')<0.6) rows.push({risk:"차별성 부족·전환 실패",prob:"보통",impact:"높음",resp:"정량적 우위 지표화 및 레퍼런스 확보",monitor:"전환율, 경쟁 대비 승률"});
   if(RT(sc,'executionReadiness')<0.6) rows.push({risk:"GTM 실행 지연",prob:"보통",impact:"보통",resp:"채널 1~2개 집중 및 실험 캘린더 운영",monitor:"파이프라인, 실험 실행률"});
-  if(RT(sc,'problemClarity')<0.53) rows.push({risk:"문제정의 오류",prob:"높음",impact:"높음",resp:"문제 재정의 워크숍 및 근본원인 분석",monitor:"문제 공감률, 재정의 횟수"});
-  if(HAS(input.execution.mainRisk)) rows.push({risk:input.execution.mainRisk,prob:"보통",impact:"보통",resp:"대표 인지 리스크에 대한 대응계획 수립",monitor:"리스크별 지표 모니터링"});
+  if(RT(sc,'problemClarity')<0.53) rows.push({risk:"문제정의 오류",prob:"높음",impact:"높음",resp:"문제 재정의 워크숍 및 근본원인 분석",monitor:"문제 공감률"});
+  const mr=splitRisk(input.execution.mainRisk);
+  if(mr) rows.push({risk:mr.risk,prob:"보통",impact:"보통",resp:mr.resp||"대응 계획 수립 필요(대표 확인)",monitor:mr.monitor||"리스크 발생 빈도"});
   if(rows.length===0) rows.push({risk:"검증 결과에 따른 방향 재조정",prob:"낮음",impact:"보통",resp:"분기별 가설 리뷰",monitor:"핵심 KPI 추이"});
   return rows.slice(0,5);
 }
 
 /* KPI 테이블 */
-function generateKpiTable(input,sc){
-  return [
-    {kpi:"고객 문제 공감률",base:"미측정",target:"70% 이상",method:"인터뷰 스크립트 응답 집계",cycle:"월",owner:"대표/PO"},
-    {kpi:"파일럿 전환율",base:input.validation.pilotTest?"진행중":"0%",target:"30% 이상",method:"파일럿→유료 전환 추적",cycle:"분기",owner:"영업"},
-    {kpi:"유료 고객 수",base:input.validation.paidCustomer==="있음"?"확보":"0",target:"3개사",method:"계약 기준 집계",cycle:"분기",owner:"대표/영업"},
-    {kpi:"핵심 기능 사용률",base:"미측정",target:"주 1회 이상",method:"사용 로그/설문",cycle:"월",owner:"제품"},
-    {kpi:"재사용·재구매율",base:input.validation.repeatUsage?"관찰중":"미측정",target:"60% 이상",method:"코호트 분석",cycle:"분기",owner:"제품/CS"}
-  ];
+function parseUserKpis(t){
+  const s=_unesc(t||"").trim(); if(!s||inspectText(s).state!=="text") return [];
+  return s.split(/\s*[,，\n/]\s*/).filter(x=>x.length>=2).slice(0,5).map(item=>{
+    const m=item.match(/^(.+?)\s*([\d.,]+\s*%?|[가-힣]+)\s*(?:→|->)\s*([\d.,]+\s*%?[^\s]*)\s*$/);
+    if(m) return {kpi:esc(m[1].trim()),base:esc(m[2].trim()),target:esc(m[3].trim())};
+    const t2=item.match(/^(.+?)\s+([\d.,]+\s*%?\s*(?:이상|이하)?)$/);
+    if(t2) return {kpi:esc(t2[1].trim()),base:"미측정",target:esc(t2[2].trim())};
+    return {kpi:esc(item),base:"미측정",target:"목표 설정 필요"};
+  });
+}
+function generateKpiTable(input,sc,E){
+  const lv=evLevelOf(E), nx=nextEvidence(lv), V=input.validation;
+  const rows=parseUserKpis(input.execution.keyMetrics).map(k=>({...k,method:"대표 지정 지표 · 측정 방법 확정 필요",cycle:"월",owner:"대표/PO"}));
+  // 증거 사다리 다음 단계 지표(항상 포함)
+  const evRow={4:{kpi:"유료 고객 수",base:"0",target:"1~3개사"},3:{kpi:"구매의향서(LOI)",base:"0",target:"1~3건"},2:{kpi:"파일럿",base:"0",target:"1건"},5:{kpi:"재구매·3개월 유지율",base:"관찰 전",target:"설정 필요"},6:{kpi:"LTV/CAC",base:"미산출",target:"3 이상"}}[lv]
+    ||{kpi:"고객 인터뷰",base:String(V.customerInterviewCount||0)+"명",target:lv<1?"5명":"15명"};
+  if(!rows.some(r=>_unesc(r.kpi).includes(evRow.kpi.slice(0,4)))) rows.unshift({...evRow,method:`${nx.output} 기준 집계`,cycle:"월",owner:"대표"});
+  if(rows.length<3) rows.push({kpi:"고객 문제 공감률",base:"미측정",target:"70% 이상",method:"인터뷰 스크립트 응답 집계",cycle:"월",owner:"대표/PO"});
+  return rows.slice(0,6);
 }
 
 /* 종합 실행 — 엔진 v2(runEngine) 결과에 해석·로드맵을 덧붙인다 */
@@ -2072,12 +2352,12 @@ function runDiagnosis(input){
     confidence:E.confidence, evidence:E.evidence, issues:E.issues, stageFit:E.stageFit, links:E.links,
     fieldQuality:E.fieldQuality, gateNote:E.gateNote, engineVersion:E.engineVersion,
     diagnosisTypes:types, primaryType:types[0], psf,
-    strengths:generateStrengths(input,scores), weaknesses:generateWeaknesses(input,scores), risks:generateRisks(input,scores),
-    recommendations:generateRecommendations(input,scores),
-    roadmap:generateRoadmap(input,scores,types[0].type),
+    strengths:generateStrengths(input,scores,E), weaknesses:generateWeaknesses(input,scores,E), risks:generateRisks(input,scores,E),
+    recommendations:generateRecommendations(input,scores,E),
+    roadmap:generateRoadmap(input,scores,types[0].type,E),
     consultingTasks:generateConsultingTasks(types),
-    riskTable:generateRiskTable(input,scores),
-    kpiTable:generateKpiTable(input,scores),
+    riskTable:generateRiskTable(input,scores,E),
+    kpiTable:generateKpiTable(input,scores,E),
     diagnosisDate:new Date().toISOString()
   };
 }
@@ -2099,7 +2379,9 @@ function renderDashboard(input,res){
   const gv=document.getElementById('gaugeVal'); gv.textContent='0';
 
   const cf=res.confidence||{score:'-',label:'-'};
-  document.getElementById('gradeBadge').innerHTML=`<b style="font-size:16px">${res.grade}등급</b> · ${res.totalScore}점 · 신뢰도 ${cf.score}(${cf.label})${res.rawTotal&&res.rawTotal!==res.totalScore?` · 상한 적용(원점수 ${res.rawTotal})`:''}`;
+  document.getElementById('gradeBadge').innerHTML=`<b style="font-size:16px">${res.grade}등급</b> · ${res.totalScore}점 · 신뢰도 ${cf.score}(${cf.label})`;
+  const capEl=document.getElementById('capNote');
+  if(capEl) capEl.textContent=res.rawTotal&&res.rawTotal!==res.totalScore?`원점수 ${res.rawTotal}점 → 등급 관문 상한 적용 ${res.totalScore}점`:'';
   document.getElementById('verdictHeadline').textContent=res.gradeLabel;
   document.getElementById('verdictSummary').textContent=unesc(buildVerdictSummary(input,res));
   document.getElementById('primaryType').innerHTML=`⚑ 주요 진단: ${res.primaryType.type}`;
@@ -2366,15 +2648,13 @@ const STAGE_DEFS=[
   {key:"scale",name:"스케일",need:"채널확장·수익화"}
 ];
 function judgeStage(res){
-  const p=res.psf, v=RT(res.scores,'validationEvidence'), t=res.totalScore;
-  let idx;
-  if(p.problem<55) idx=0;
-  else if(p.customer<55) idx=1;
-  else if(p.solution<55) idx=2;
-  else if(v<0.6) idx=3;
-  else if(t<85) idx=4;
-  else idx=5;
-  return idx;
+  const p=res.psf, t=res.totalScore, lv=res.evidence?res.evidence.level:(RT(res.scores,'validationEvidence')>=0.6?5:2);
+  if(p.problem<55) return 0;
+  if(p.customer<55) return 1;
+  if(p.solution<55||RT(res.scores,'coherence')<0.5) return 2;
+  if(lv<5) return 3;                 // 유료 고객·매출 전: 시장검증 단계(점수가 높아도 스케일 아님)
+  if(lv<6||t<85) return 4;
+  return 5;
 }
 function nextMilestone(res){
   const stageIdx=judgeStage(res);
@@ -2401,6 +2681,7 @@ function renderSnapshot(input,res){
 
 function buildVerdictSummary(input,res){
   const p=res.psf, low=Object.entries({문제:p.problem,고객:p.customer,솔루션:p.solution}).sort((a,b)=>a[1]-b[1])[0];
+  if(low[1]>=75&&res.evidence) return `${input.company.companyName}의 문제·고객·솔루션 적합도는 100점 만점 ${res.totalScore}점으로 논리 구조는 갖췄습니다. 현재 증거는 L${res.evidence.level}(${res.evidence.name})이며, 다음 관문은 '${nextEvidence(res.evidence.level).title}'입니다.`;
   return `${input.company.companyName}의 문제·고객·솔루션 적합도는 100점 만점 ${res.totalScore}점입니다. 세 축 중 '${low[0]}(${low[1]}점)' 영역의 보강이 가장 시급하며, ${res.primaryType.desc}`;
 }
 function psfNoteText(p){
@@ -2521,8 +2802,8 @@ function svgMatrix(riskTable){
 /* ==================================================================
    보고서 생성 · QA · PDF · 관리자 · 저장
    ================================================================== */
-const ISSUER="그로스벤처스㈜ · Beconic";
-const CERT="중소벤처기업부 인증 중소기업상담회사 제2025-684호";
+const ISSUER=`${COMPANY.short} · ${COMPANY.brand}`;
+const CERT=`중소벤처기업부 인증 중소기업상담회사 ${COMPANY.certNo}`;
 /* ---- 버전 이력 ----
    V1.0 (2026-08-06) 최초 릴리스: 6단계 진단·8영역 스코어·17섹션 보고서·PDF
    V1.1 (2026-08-07) 푸터 회사정보·로고 배지, 문항별 작성예시(38개), 처음으로 좌측정렬
@@ -2540,10 +2821,13 @@ const CERT="중소벤처기업부 인증 중소기업상담회사 제2025-684호
                      정합성부족형 추가(10개 유형), 보고서 '진단 신뢰도·증거 등급' 섹션·공개 산식, 표기 정비(규칙 기반)
    V2.1 (2026-11-19) Phase 2 AI 하이브리드(선택) — /api/psf-insights(Claude): 영역당 ±2 의미 보정(입력 인용 필수)·
                      연결 의미 판정·후속 질문·고쳐 쓰기. 정식 점수는 규칙, AI는 참고점수. 동의·이용 코드·한도·키 비노출
+   V2.2 (2026-11-19) PDF 점검 개선(증거 등급 반영 단계·전략 판정, SWOT 오판 수정, KPI·12개월 입력 기반, 빈 쪽 해소),
+                     토스 스타일 화면·Pretendard·PWA, 임시저장·이어하기·바로가기·상담 모달, COMPANY 단일 상수, 레드팀 회귀
 */
-const APP_VERSION="V2.1";
+const APP_VERSION="V2.2";
+const REPORT_TITLE="고객문제·솔루션 적합성 진단보고서";
 const APP_UPDATED="2026-11-19";               // 최종 업데이트 일자
-const COPYRIGHT="© 2023~2026 growthventures Co., Ltd. All rights reserved.";
+const COPYRIGHT=`© ${copyYears()} ${COMPANY.en} All rights reserved.`;
 const DISCLAIMER="본 진단 결과는 사용자가 입력한 정보와 제공된 자료를 기반으로 한 규칙 기반 사전진단 결과입니다. 본 결과는 기업의 문제설정, 고객정의, 솔루션 적합성, 검증 수준을 점검하기 위한 참고자료이며, 투자, 정책자금, 인증, 세무, 법률, 보증, 대출 등의 최종 판단이나 승인 가능성을 보장하지 않습니다. 실제 사업화, 투자유치, 정책자금 신청, 법률·세무 의사결정 전에는 반드시 관계기관 및 분야별 전문가의 추가 검토가 필요합니다.";
 
 let PAGE_NO = 0;
@@ -2587,16 +2871,16 @@ function proceedAfterQA(){ closeModal('qaModal'); renderReportPreview(consulting
 function generateConsultingReport(input,res,meta){
   const recipientCompany=meta.recipientCompany||input.company.companyName||"확인 필요";
   return {
-    cover:{reportTitle:"고객문제·솔루션 적합성 진단보고서",companyName:input.company.companyName,
+    cover:{reportTitle:REPORT_TITLE,companyName:input.company.companyName,
       recipientCompany,recipientPerson:meta.recipientPerson,recipientDepartment:meta.recipientDepartment,
       diagnosisDate:fmtDate(res.diagnosisDate),version:APP_VERSION,confidentiality:meta.confidentialityLevel,
       reportPurpose:meta.reportPurpose,standard:"사용자 입력 기반 규칙 엔진 사전진단 ("+ENGINE_VERSION+")"+(res.ai&&res.ai.result?" + AI 해석 초안(검토 필요)":"")},
     documentInfo:{purpose:`${input.company.companyName}의 문제설정·고객정의·솔루션 적합성·검증 수준 점검 (${meta.reportPurpose})`,
-      scope:"입력된 6개 영역(기업/문제/고객/솔루션/검증/사업화) 기반 사전진단",
+      scope:`입력된 ${TOTAL_STEPS}개 단계(${STEP_LABELS.join('/')}) 응답 기반 사전진단`,
       dataUsed:["사용자 입력 진단 응답","입력 기반 파생 지표"],
       methodology:["Double Diamond","Jobs-to-be-Done","Value Proposition Canvas","Lean Startup","Kano Model","국내 창업지원 평가구조"],
       limitations:["외부 시장·재무 데이터 미반영","자가입력 정보에 근거하므로 실측 검증 필요","점수는 절대평가가 아닌 자가진단 참고점수"],
-      recipient:recipientCompany,confidentiality:meta.confidentialityLevel,issuer:"그로스벤처스 주식회사 (Beconic) · 서울시 구로구 디지털로27길 24, 209호 · TEL 070-4103-4177 · www.beconic.kr",certification:CERT,disclaimer:DISCLAIMER},
+      recipient:recipientCompany,confidentiality:meta.confidentialityLevel,issuer:`${COMPANY.name} (${COMPANY.brand}) · ${COMPANY.addr} · TEL ${COMPANY.tel} · ${COMPANY.web}`,certification:CERT,disclaimer:DISCLAIMER},
     executiveSummary:buildExecSummary(input,res),
     scorecard:DOMAIN_META.map(d=>{
       const v=res.scores[d.key], a=analyzeDomain(d.key,input,v,d.max);
@@ -2783,7 +3067,13 @@ const DOMAIN_ANALYZER={
     return {evidence,why:why_txt,fix};
   }
 };
-function _short(s,n){ s=(s||"").trim(); return s.length>n?s.slice(0,n)+"…":s; }
+function _short(s,n){
+  s=_unesc(s||"").trim(); if(s.length<=n) return esc(s);
+  let c=s.slice(0,n); const sp=Math.max(c.lastIndexOf(' '),c.lastIndexOf(','),c.lastIndexOf('·'));
+  if(sp>=n*0.6) c=c.slice(0,sp);
+  const open=c.lastIndexOf('('); if(open>c.lastIndexOf(')')) c=c.slice(0,open);   // 열린 괄호에서 자르지 않음
+  return esc(c.replace(/[\s,·(]+$/,''))+"…";
+}
 
 /* 영역 분석 결과 캐시 생성 */
 function analyzeDomain(k,input,v,max){
@@ -2801,7 +3091,9 @@ function buildExecSummary(input,res){
   const stageIdx=judgeStage(res);
   const balance=Math.max(p.problem,p.customer,p.solution)-Math.min(p.problem,p.customer,p.solution);
   return {
-    headline:`${input.company.companyName}는 문제·고객·솔루션 적합도 ${res.totalScore}점(${res.grade}등급)으로, '${weak[0]}' 축 보강이 최우선 과제입니다`,
+    headline:(weak[1]>=75&&res.evidence)
+      ?`${input.company.companyName}는 적합도 ${res.totalScore}점(${res.grade}등급)으로 논리 구조는 갖췄으며, 다음 관문은 '${nextEvidence(res.evidence.level).title}'입니다`
+      :`${input.company.companyName}는 문제·고객·솔루션 적합도 ${res.totalScore}점(${res.grade}등급)으로, '${weak[0]}' 축 보강이 최우선 과제입니다`,
     overallJudgement:res.gradeLabel,
     stage:STAGE_DEFS[stageIdx].name,
     stageNeed:STAGE_DEFS[stageIdx].need,
@@ -2809,7 +3101,7 @@ function buildExecSummary(input,res){
     balance,
     balanceLabel:(balance<=15?"균형":balance<=30?"다소 불균형":"불균형 심함"),
     keyEvidence:[
-      `종합 ${res.totalScore}/100점, ${DOMAIN_META.length}개 영역 중 ${DOMAIN_META.filter(d=>res.scores[d.key]/d.max<0.5).length}개 영역이 미흡(50% 미만) 수준`,
+      (()=>{ const n=DOMAIN_META.filter(d=>res.scores[d.key]/d.max<0.5).length; return n?`종합 ${res.totalScore}/100점, ${DOMAIN_META.length}개 영역 중 ${n}개 영역이 미흡(50% 미만)`:`종합 ${res.totalScore}/100점, ${DOMAIN_META.length}개 영역 모두 50% 이상(미흡 영역 없음)`; })(),
       ...(res.confidence?[`진단 신뢰도 ${res.confidence.score}(${res.confidence.label}) · 증거 등급 L${res.evidence.level} ${res.evidence.name} · 점검 사항 ${res.issues.length}건${res.rawTotal!==res.totalScore?` · 상한 적용(원점수 ${res.rawTotal})`:''}`]:[]),
       ...(res.stageFit?[`${res.stageFit.stage} 단계 기대수준 ${res.stageFit.expected}점 대비 ${res.stageFit.diff>=0?'+':''}${res.stageFit.diff}점 — ${res.stageFit.verdict}`]:[]),
       `PSF 3축: 문제 ${p.problem} · 고객 ${p.customer} · 솔루션 ${p.solution}(100점 환산), 밸런스 편차 ${balance}`,
@@ -2826,9 +3118,10 @@ function buildKeyFindings(input,res){
   const f=[];
   const weakDomains=DOMAIN_META.filter(d=>res.scores[d.key]/d.max<0.5);
   const strongDomains=DOMAIN_META.filter(d=>res.scores[d.key]/d.max>=0.75);
-  if(strongDomains.length) f.push({type:"강점",title:`${strongDomains.map(d=>d.name).join('·')} 영역이 견고합니다`,body:"입력 근거가 충실해 사업화 논리의 기반이 됩니다. 이 강점을 세일즈·투자 스토리의 축으로 활용하세요."});
+  if(strongDomains.length) f.push({type:"강점",title:strongDomains.length>=4?`${DOMAIN_META.length}개 영역 중 ${strongDomains.length}개 영역이 양호(75%↑)합니다`:`${strongDomains.map(d=>d.name).join('·')} 영역이 견고합니다`,body:"입력 근거가 충실해 사업화 논리의 기반이 됩니다. 이 강점을 세일즈·투자 스토리의 축으로 활용하세요."});
   if(weakDomains.length) f.push({type:"약점",title:`${weakDomains.map(d=>d.name).join('·')} 보강이 시급합니다`,body:"해당 영역의 근거가 부족해 전체 적합도를 끌어내립니다. 실데이터로 대체하는 것이 최우선입니다."});
-  f.push({type:"검증",title:RT(res.scores,'validationEvidence')>=0.6?"검증 근거가 축적되고 있습니다":"검증이 가설 수준에 머물러 있습니다",body:`고객 인터뷰 ${input.validation.customerInterviewCount}명, 설문 ${input.validation.surveyCount}명. 유료전환·재구매로 확신 수준을 높이세요.`});
+  const lvF=res.evidence?res.evidence.level:0;
+  f.push({type:"검증",title:`증거 등급 L${lvF}(${EVIDENCE_LEVELS[lvF].name}) — 다음 관문은 '${nextEvidence(lvF).title}'입니다`,body:`고객 인터뷰 ${input.validation.customerInterviewCount}명, 설문 ${input.validation.surveyCount}명. ${nextEvidence(lvF).desc}`});
   f.push({type:"유형",title:`주요 진단유형은 '${res.primaryType.type}'입니다`,body:res.primaryType.desc});
   return f.slice(0,5);
 }
@@ -2866,8 +3159,15 @@ function buildRootCauses(input,res){
     root:"검증 이전에 실행을 구체화할 근거가 부족 — 순서 역전",
     impact:"좋은 아이디어가 시장 진입으로 연결되지 못함",
     fix:"채널 1~2개 집중 + 90일 실험 캘린더 수립"});
+  const lvC=res.evidence?res.evidence.level:0;
+  if(lvC<5&&causes.length<3) causes.push({
+    symptom:`수요의 진성 미확인 (증거 L${lvC} ${EVIDENCE_LEVELS[lvC].name}, 유료 고객 없음)`,
+    direct:"계약·매출 같은 지불 증거가 아직 없음",
+    root:"말·사용 단계의 증거로 '살 것'이라고 추정 — 지불 실험이 아직 설계되지 않음",
+    impact:"개발·인력 투자 규모를 정할 근거가 부족",
+    fix:nextEvidence(Math.max(lvC,3)).desc});
   if(causes.length===0) causes.push({
-    symptom:"뚜렷한 결함 없음(전 영역 50%+ )",
+    symptom:"뚜렷한 결함 없음(전 영역 50% 이상)",
     direct:"일부 영역의 검증 데이터가 양적으로 얇음",
     root:"핵심 가설의 반복 검증 횟수 부족",
     impact:"확신 수준(신뢰구간)이 제한적",
@@ -2876,21 +3176,23 @@ function buildRootCauses(input,res){
 }
 
 function buildStrategicOptions(input,res){
+  const lv=res.evidence?res.evidence.level:0, p=res.psf;
   return [
-    {name:"A. 문제·고객 재검증 우선",focus:"Discover/Define 재정비",pros:"근거 견고화, 이후 리스크 감소",cons:"제품화 지연",fit:res.psf.problem<60||res.psf.customer<60?"높음":"보통",when:"문제·고객 축이 약할 때"},
-    {name:"B. 솔루션 검증(파일럿) 집중",focus:"MVP 파일럿·유료전환",pros:"실증 데이터 확보, 투자 논리 강화",cons:"타깃 오류 시 재작업",fit:res.psf.solution<60&&res.psf.problem>=60?"높음":"보통",when:"문제는 명확하나 검증이 부족할 때"},
-    {name:"C. GTM 확장·세일즈 가속",focus:"채널 확대·반복 세일즈",pros:"매출 조기 창출",cons:"검증 부족 시 이탈·CS 부담",fit:res.totalScore>=80?"높음":"낮음",when:"PSF가 견고하고 반복 판매가 가능할 때"}
+    {name:"A. 문제·고객 재검증 우선",focus:"Discover/Define 재정비",pros:"근거 견고화, 이후 리스크 감소",cons:"제품화 지연",fit:p.problem<60||p.customer<60?"높음":"낮음",when:"문제·고객 축이 약할 때"},
+    {name:"B. 솔루션 검증(파일럿·유료전환) 집중",focus:"MVP 파일럿·유료전환",pros:"지불 증거 확보, 투자 논리 강화",cons:"타깃 오류 시 재작업",fit:lv<5&&p.problem>=60&&p.customer>=60?"높음":"보통",when:"문제·고객은 명확하나 지불 증거(L5)가 없을 때"},
+    {name:"C. GTM 확장·세일즈 가속",focus:"채널 확대·반복 세일즈",pros:"매출 조기 창출",cons:"검증 부족 시 이탈·CS 부담",fit:lv>=5&&res.totalScore>=80?"높음":"낮음",when:"유료 고객(L5↑)이 있고 반복 판매가 가능할 때"}
   ];
 }
 
 function buildFinalRec(input,res){
   let strategy,reasons,approach; const p=res.psf, iv=input.validation.customerInterviewCount||0;
-  if(res.totalScore>=80){ strategy="전략 C 기반 — 검증된 강점을 세일즈로 가속하되 단위경제성 점검 병행";
+  const lvR=res.evidence?res.evidence.level:0;
+  if(res.totalScore>=80&&lvR>=5){ strategy="전략 C 기반 — 검증된 강점을 세일즈로 가속하되 단위경제성 점검 병행";
     reasons=[`PSF 3축(문제${p.problem}·고객${p.customer}·솔루션${p.solution})이 고르게 높아 반복 판매 여건이 성숙`,`검증 근거(인터뷰 ${iv}명 등)가 뒷받침되어 확장 리스크가 관리 가능`];
     approach=["초기 채널 1~2개 집중","레퍼런스 기반 세일즈 자료화","단위경제성(LTV/CAC)·리텐션 모니터링"]; }
-  else if(res.psf.solution<60 && res.psf.problem>=55){ strategy="전략 B 기반 — MVP 파일럿으로 솔루션·검증 축을 집중 보강";
-    reasons=[`문제 축(${p.problem})은 성립했으나 솔루션 축(${p.solution})·검증(${res.scores.validationEvidence}/${MAXOF.validationEvidence})이 병목`,`실증 데이터가 다음 투자·개발 의사결정의 관문`];
-    approach=["Early Adopter 대상 파일럿 설계","핵심지표 측정 체계 구축",`유료전환 1건 이상 시도(현재 인터뷰 ${iv}명)`]; }
+  else if(res.psf.problem>=55 && res.psf.customer>=55){ strategy="전략 B 기반 — 파일럿·유료 전환으로 지불 증거를 먼저 확보";
+    reasons=[`문제(${p.problem})·고객(${p.customer}) 축은 성립했으나 증거 등급 L${lvR}(${EVIDENCE_LEVELS[lvR].name})로 지불 증거가 없음`,`검증근거 ${res.scores.validationEvidence}/${MAXOF.validationEvidence} — 유료 전환이 다음 투자·개발 의사결정의 관문`];
+    approach=[nextEvidence(lvR).title,"핵심지표 측정 체계 구축",HAS(input.execution.nextExperiment)?`계획한 실험 실행: ${_short(input.execution.nextExperiment,40)}`:"Early Adopter 대상 유료 파일럿 설계"]; }
   else{ strategy="전략 A 기반 — 문제·고객 재검증으로 근거를 재정비한 뒤 솔루션 심화";
     reasons=[`문제(${p.problem})·고객(${p.customer}) 축의 근거가 약해 이후 단계 신뢰도가 저하`,"이 상태에서의 조기 확장은 매몰비용 리스크가 큼"];
     approach=["문제 재정의 워크숍(JTBD)",`고객 인터뷰 ${Math.max(10-iv,10)}명 추가`,"타깃 세그먼트 1개로 축소"]; }
@@ -2903,8 +3205,8 @@ function buildPriorityActions(input,res){
   const acts=[];
   res.recommendations.slice(0,4).forEach((r,i)=>{
     acts.push({task:r.title,detail:r.desc,owner:i===0?"대표/PO":"실무 담당",
-      timeline:i<2?"0~30일":"31~90일",output:actionOutput(r.title),
-      kpi:actionKpi(r.title),risk:"근거 부족 시 재작업",pre:"핵심 가설 정의"});
+      timeline:i<2?"0~30일":"31~90일",output:r.output||actionOutput(r.title),
+      kpi:r.kpi||actionKpi(r.title),risk:"근거 부족 시 재작업",pre:"핵심 가설 정의"});
   });
   return acts;
 }
@@ -2919,12 +3221,12 @@ function buildNinetyDay(input,res){
   ];
 }
 function buildTwelveMonth(input,res){
-  return [
-    {q:"Q1",theme:"문제·고객·솔루션 근거 재정비 및 파일럿",kpi:"인터뷰 10명+, 파일럿 1건"},
-    {q:"Q2",theme:"MVP 검증·유료전환 확보",kpi:"유료 고객 1~3사, 전환율 측정"},
-    {q:"Q3",theme:"GTM 채널 확대·반복 세일즈",kpi:"파이프라인 구축, 재구매율"},
-    {q:"Q4",theme:"단위경제성 점검·확장/투자 준비",kpi:"LTV/CAC, 성장률"}
-  ];
+  const lv=res.evidence?res.evidence.level:0;
+  const userKpi=parseUserKpis(input.execution.keyMetrics).map(k=>_unesc(k.kpi)).slice(0,2).join(', ');
+  return [0,1,2,3].map(i=>{
+    const L=lv+i, n=nextEvidence(L);
+    return {q:`Q${i+1}`,theme:L>6?"확장·투자 준비(성장 데이터 패키징)":n.theme,kpi:(i===0&&userKpi)?`${n.qkpi} · ${esc(userKpi)}`:(L>6?"성장률·LTV/CAC":n.qkpi)};
+  });
 }
 
 /* ==================== QA ==================== */
@@ -2952,7 +3254,7 @@ const tagRec='<span class="rp-tag tag-rec">권고</span>';
 
 function pageWrap(rep,bodyHtml,opts){
   PAGE_NO++;
-  const pb = opts&&opts.newPage ? ' pb' : '';
+  const pb = (opts&&opts.newPage ? ' pb' : '')+(opts&&opts.flow ? ' rp-flow' : '');   // flow: 긴 섹션은 쪽 중간에서 이어짐
   return `<div class="rp-section${pb}">${bodyHtml}</div>`;
 }
 function exhibit(num,title,inner,meta){
@@ -3062,7 +3364,8 @@ function generateScorecardPage(input,result,rep){
   const R=result, p=R.psf;
   return pageWrap(rep,`
     <div class="rp-eyebrow">Scorecard</div>
-    <div class="rp-title">${DOMAIN_META.length}개 영역 중 미흡 영역의 근거 보강이 종합점수 개선의 핵심입니다</div>
+    <div class="rp-title">${(()=>{ const weakN=DOMAIN_META.filter(d=>R.scores[d.key]/d.max<0.5).length; const w=[...DOMAIN_META].sort((a,b)=>R.scores[a.key]/a.max-R.scores[b.key]/b.max)[0];
+      return weakN?`${DOMAIN_META.length}개 영역 중 ${weakN}개 미흡 영역의 근거 보강이 종합점수 개선의 핵심입니다`:`미흡 영역은 없으며, 가장 낮은 '${w.name}(${R.scores[w.key]}/${w.max})'이 다음 개선 지렛대입니다`; })()}</div>
     <div style="display:flex;gap:18px;align-items:center;margin:6px 0 12px;padding:12px;border:1px solid #E5E7EB;border-radius:9px;background:#FCFCFD">
       <div style="text-align:center;flex-shrink:0">${svgGauge(R.totalScore)}<div style="font-size:8pt;font-weight:800;color:${R.gradeTone==='ok'?'#1F8A5B':R.gradeTone==='warn'?'#C9871B':'#C0392B'}">${R.grade}등급</div></div>
       <div style="flex-shrink:0">${svgPSF(p)}</div>
@@ -3073,13 +3376,14 @@ function generateScorecardPage(input,result,rep){
         <span style="color:#B9862E;font-weight:700">가장 약한 축부터 보강 시 종합점수 상승 효과가 가장 큽니다.</span>
       </div>
     </div>
-    ${exhibit(1,"영역별 진단 점수 (목표 기준선 70%)",
-      svgBars(R.scores)+
-      `<table class="rp-table" style="margin-top:8px"><tr><th>영역</th><th style="width:11%">점수</th><th style="width:9%">단계 기대</th><th style="width:9%">수준</th><th>진단(원인)</th><th>개선방향</th></tr>
+    ${exhibit(1,"영역별 진단 점수 (목표 기준선 70%)",svgBars(R.scores),
+      `단위: 점(영역 만점 대비) · 출처: 사용자 입력 기반 ${ENGINE_VERSION} · 주석: 점선은 목표 기준선(70%)`)}
+    <div class="rp-h2">영역별 판정 · 단계 기대 · 개선방향</div>
+    ${`<table class="rp-table rp-table-split" style="margin-top:4px"><thead><tr><th>영역</th><th style="width:11%">점수</th><th style="width:9%">단계 기대</th><th style="width:9%">수준</th><th>진단(원인)</th><th>개선방향</th></tr></thead><tbody>
       ${rep.scorecard.map(s=>`<tr><td><b>${s.name}</b></td><td>${s.score}/${s.max}</td><td>${R.stageFit?(Math.round(s.max*R.stageFit.expRatio[s.key]*10)/10):'—'}</td><td>${s.grade}</td><td style="font-size:8pt">${s.meaning}</td><td style="font-size:8pt">${s.improve}</td></tr>`).join('')}
-      <tr style="background:#132D52"><td style="color:#fff"><b>종합</b></td><td style="color:#fff"><b>${R.totalScore}/100</b></td><td style="color:#fff">${R.stageFit?R.stageFit.expected:'—'}</td><td style="color:#fff">${R.grade}등급</td><td colspan="2" style="color:#fff">${R.gradeLabel}</td></tr></table>`,
-      `단위: 점(영역 만점 대비) · 기간: 진단 입력 시점 · 출처: 사용자 입력 기반 ${ENGINE_VERSION} · 주석: 점선은 목표 기준선(70%), 단계 기대는 입력한 사업단계 기준, 미흡(50% 미만)은 우선 보강 · 필요 행동: 미흡 영역의 근거를 실데이터로 대체`)}
-  `);
+      <tr style="background:#132D52"><td style="color:#fff"><b>종합</b></td><td style="color:#fff"><b>${R.totalScore}/100</b></td><td style="color:#fff">${R.stageFit?R.stageFit.expected:'—'}</td><td style="color:#fff">${R.grade}등급</td><td colspan="2" style="color:#fff">${R.gradeLabel}</td></tr></tbody></table>`}
+    <div class="rp-note">단계 기대는 입력한 사업단계 기준값입니다. 미흡(50% 미만) 영역은 우선 보강하고, 판정 근거는 '영역별 진단' 섹션에 있습니다.</div>
+  `,{flow:true});
 }
 
 /* 5b. 진단 신뢰도 · 증거 등급 · 점검 사항 (v2) */
@@ -3344,7 +3648,7 @@ function generateReferencePage(input,result,rep){
     <div class="rp-eyebrow">References</div>
     <div class="rp-title">참고자료 및 출처</div>
     <table class="rp-table"><tr><th style="width:30%">구분</th><th>내용</th></tr>
-    <tr><td>사용자 입력 데이터</td><td>진단 6단계 응답(기업·문제·고객·솔루션·검증·사업화)</td></tr>
+    <tr><td>사용자 입력 데이터</td><td>진단 ${TOTAL_STEPS}단계 응답(${STEP_LABELS.join('·')})</td></tr>
     <tr><td>진단 로직</td><td>${ENGINE_VERSION} — 품질가중 규칙 엔진 (${DOMAIN_META.length}개 영역 100점 · 증거 등급 · 모순 탐지 · 신뢰도)</td></tr>
     <tr><td>적용 방법론</td><td>Double Diamond, JTBD, VPC, Lean Startup, Kano, 창업지원 평가구조</td></tr>
     <tr><td>추가 확인 필요</td><td>시장규모·경쟁·재무 실측, 고객 인터뷰 원자료, 파일럿 정량 결과</td></tr></table>
@@ -3381,7 +3685,7 @@ function renderReportPreview(rep){
     generateAIPage(I,R,rep),
     generateReferencePage(I,R,rep)
   ].join('');
-  const runhead=`<div class="doc-runhead no-print"><span>고객문제·솔루션 적합성 진단보고서</span><span>${ISSUER} · ${CERT}</span></div>`;
+  const runhead=`<div class="doc-runhead no-print"><span>${REPORT_TITLE}</span><span>${ISSUER} · ${CERT}</span></div>`;
   const runfoot=`<div class="doc-runfoot no-print"><span>${co.companyName} · ${co.confidentiality} · ${APP_VERSION}</span><span>${CERT}</span></div>`;
   document.getElementById('reportContainer').innerHTML=
     cover + `<div class="report-doc">${runhead}<div class="doc-body">${sections}</div>${runfoot}</div>`;
@@ -3393,14 +3697,33 @@ function doPrint(){ closeModal('printModal'); window.print(); }
 function downloadReportAsPDF(){ showPrintGuideModal(); }
 
 /* 발행 전 체크리스트 */
+function openInfo(eyebrow,title,desc,body,foot){
+  document.getElementById('infoEyebrow').textContent=eyebrow;
+  document.getElementById('infoTitle').textContent=title;
+  document.getElementById('infoDesc').textContent=desc;
+  document.getElementById('infoBody').innerHTML=body;
+  document.getElementById('infoFoot').innerHTML=foot||`<button class="btn btn-primary" onclick="closeModal('infoModal')">확인</button>`;
+  openModal('infoModal');
+}
 function showChecklist(){
-  const items=["수신 기업/기관명이 정확한가","담당자·부서가 맞는가","기밀등급이 용도에 맞는가","작성 목적이 실제 용도와 일치하는가","표지 색상·테두리가 정상 출력되는가","종합점수·진단 결과가 맞는가","차트의 Exhibit 번호·단위·출처·주석이 포함됐는가","면책조항이 포함됐는가","인증번호 제2025-684호가 표시됐는가","개인정보 또는 민감정보가 과도하게 노출되지 않는가"];
-  const body=document.getElementById('qaModalBody');
-  body.innerHTML=`<div class="check-list">${items.map(i=>`<label class="check-item"><input type="checkbox"><div><div class="ci-t" style="font-size:13px">${i}</div></div></label>`).join('')}</div>`;
-  document.querySelector('#qaModal .modal-head h3').textContent="발행 전 체크리스트";
-  document.querySelector('#qaModal .modal-head p').textContent="PDF 저장 전 아래 항목을 확인하세요.";
-  document.querySelector('#qaModal .modal-foot').innerHTML=`<button class="btn btn-ghost" onclick="closeModal('qaModal')">닫기</button><button class="btn btn-gold" onclick="closeModal('qaModal');showPrintGuideModal()">PDF 저장으로 →</button>`;
-  openModal('qaModal');
+  const items=["수신 기업/기관명이 정확한가","담당자·부서가 맞는가","기밀등급이 용도에 맞는가","작성 목적이 실제 용도와 일치하는가","표지 색상·테두리가 정상 출력되는가","종합점수·진단 결과가 맞는가","차트의 Exhibit 번호·단위·출처·주석이 포함됐는가","면책조항이 포함됐는가",`인증번호 ${COMPANY.certNo}가 표시됐는가`,"개인정보 또는 민감정보가 과도하게 노출되지 않는가"];
+  openInfo("Checklist","발행 전 체크리스트","PDF 저장 전 아래 항목을 확인하세요.",
+    `<div class="check-list">${items.map(i=>`<label class="check-item"><input type="checkbox"><div><div class="ci-t" style="font-size:13px">${i}</div></div></label>`).join('')}</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal('infoModal')">닫기</button><button class="btn btn-primary" onclick="closeModal('infoModal');showPrintGuideModal()">PDF 저장으로 →</button>`);
+}
+/* 전문가 상담: 전화·메일(진단 요약을 메일 본문에 미리 채움). 서버로 보내는 정보 없음 */
+function openConsult(){
+  const R=diagnosisResult, I=diagnosisInput;
+  const sum=R?`[진단 요약] ${R.totalScore}점 ${R.grade}등급 · 신뢰도 ${R.confidence?R.confidence.score:'-'} · 증거 L${R.evidence?R.evidence.level:'-'} · 주요 유형 ${R.primaryType.type}`:'';
+  const subj=encodeURIComponent(`[적합성 진단 상담] ${I?_unesc(I.company.companyName):''}`.trim());
+  const body=encodeURIComponent(`${sum}\n\n상담 희망 내용:\n${I?_unesc(I.execution.consultingNeeds||''):''}\n\n연락처:`);
+  openInfo("Consulting","전문가 상담 신청",`${COMPANY.short} · ${COMPANY.certLabel} ${COMPANY.certNo}`,
+    `<div class="consult-opts">
+      <a class="consult-opt" href="${telHref()}"><span class="co-ic">📞</span><span><b>전화 상담</b><br/><small>${COMPANY.tel}</small></span></a>
+      <a class="consult-opt" href="mailto:${COMPANY.mail}?subject=${subj}&body=${body}"><span class="co-ic">✉️</span><span><b>메일로 진단 결과 보내기</b><br/><small>${COMPANY.mail} · 진단 요약이 본문에 미리 채워집니다</small></span></a>
+      <a class="consult-opt" href="https://${COMPANY.web}" target="_blank" rel="noopener"><span class="co-ic">🌐</span><span><b>홈페이지</b><br/><small>${COMPANY.web}</small></span></a>
+    </div>
+    <p style="font-size:12px;color:var(--ink-400);margin-top:10px">메일은 이용자의 메일 앱으로 작성되며, 이 화면은 어떤 정보도 서버로 보내지 않습니다.</p>`);
 }
 
 /* ---------- 저장 / 관리자 ---------- */
@@ -3452,15 +3775,15 @@ function footerHTML(){
     <div class="f-col">
       <div class="f-brand">
         <div class="f-logo-badge"><img src="${LOGO_DATA}" alt="그로스벤처스"/></div>
-        <div><div class="fb-name">그로스벤처스 주식회사</div><div class="fb-sub">Growthventures Co., Ltd. · Beconic</div></div>
+        <div><div class="fb-name">${COMPANY.name}</div><div class="fb-sub">${COMPANY.en} · ${COMPANY.brand}</div></div>
       </div>
-      <div class="f-cert">🏛️ 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호</div>
+      <div class="f-cert">🏛️ ${COMPANY.certLabel} ${COMPANY.certNo}</div>
     </div>
     <div class="f-col">
       <b>오시는 길 · 연락처</b><br/>
-      서울시 구로구 디지털로27길 24, 209호<br/>
-      전화 <a href="tel:070-4103-4177">070-4103-4177</a><br/>
-      <a href="mailto:start@gven.kr">start@gven.kr</a> · <a href="https://www.beconic.kr" target="_blank" rel="noopener">www.beconic.kr</a>
+      ${COMPANY.addr}<br/>
+      전화 <a href="${telHref()}">${COMPANY.tel}</a><br/>
+      <a href="mailto:${COMPANY.mail}">${COMPANY.mail}</a> · <a href="https://${COMPANY.web}" target="_blank" rel="noopener">${COMPANY.web}</a>
     </div>
     <div class="f-bottom" style="width:100%">
       <div>${COPYRIGHT}</div>
@@ -3472,9 +3795,36 @@ function footerHTML(){
   </div>`;
 }
 function mountFooters(){ document.querySelectorAll('[data-footer]').forEach(el=>el.innerHTML=footerHTML()); }
+/* 화면의 개수 표기(영역·섹션·단계·유형)를 실제 정의에서 계산 — 문항·영역을 바꾸면 자동 반영 */
+const REPORT_SECTION_COUNT=18;
+const EST_MINUTES="15~20";       // 화면 안내용 예상 소요 시간(서술 30문항 기준)   // generateTableOfContents 의 기본 목차 수(AI 초안 제외) — QA가 실제 목차 수와 대조
+function mountCounts(){
+  const map={minutes:`약 ${EST_MINUTES}분`,domains:`${DOMAIN_META.length}개 영역`,sections:`${REPORT_SECTION_COUNT}개 섹션`,steps:`${TOTAL_STEPS}단계`,types:`${TYPE_ORDER.length}대`,questions:`${document.querySelectorAll('#screen-form [data-k]').length+1}개 문항`};
+  document.querySelectorAll('[data-count]').forEach(el=>{ if(map[el.dataset.count]) el.textContent=map[el.dataset.count]; });
+}
+/* PDF 머리글·바닥글(@page 여백 상자) — 회사 상수에서 생성, 폰트는 Pretendard로 고정 */
+function mountPageRunStyle(){
+  const q=t=>JSON.stringify(String(t));
+  const F='font-family:"Pretendard Variable","Pretendard",-apple-system,sans-serif;font-size:8pt;';
+  const css=`@media print{@page{
+    @bottom-right{content:"Page " counter(page);${F}color:#6B7280;}
+    @bottom-left{content:${q(ISSUER)};${F}color:#9CA3AF;}
+    @top-left{content:${q(REPORT_TITLE)};${F}color:#9CA3AF;}
+    @top-right{content:${q('중소기업상담회사 '+COMPANY.certNo)};${F}color:#9CA3AF;}}
+    @page cover{@bottom-right{content:""}@bottom-left{content:""}@top-left{content:""}@top-right{content:""}}}`;
+  let el=document.getElementById('pageRunStyle'); if(!el){ el=document.createElement('style'); el.id='pageRunStyle'; document.head.appendChild(el); }
+  el.textContent=css;
+}
 
+/* 앱 설치(PWA): https 또는 localhost에서만 서비스 워커 등록 */
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js?v='+encodeURIComponent(APP_VERSION)).catch(()=>{}); });
+}
 /* 초기 진입 */
+renderResumeBar();
 mountFooters();
+mountPageRunStyle();
+mountCounts();
 renderStep();
 </script>
 
