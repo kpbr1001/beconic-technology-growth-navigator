@@ -1,0 +1,31 @@
+// PSF 진단 AI 백그라운드 처리 (파일명 -background → Netlify 백그라운드 함수, 최대 15분)
+// /api/psf-insights 가 접수한 작업 id만 받는다. 대기(queued) 중인 작업이 아니면 아무것도 하지 않는다.
+// 처리 후 입력(진단 요약·서술 답변)은 지우고 결과만 남긴다.
+import { getStore } from '@netlify/blobs';
+import { runInsights, defaultClient } from '../../lib/ai-core.mjs';
+
+const JOB_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+export function createBackground({ jobs: jobsFactory = () => getStore('psf-ai-jobs'), client = defaultClient } = {}) {
+  return async (req) => {
+    const body = await req.json().catch(() => ({}));
+    const id = typeof body.job === 'string' ? body.job : '';
+    if (!JOB_ID.test(id) || process.env.BECONIC_AI_ENABLED !== 'true' || !process.env.ANTHROPIC_API_KEY) return new Response(null, { status: 202 });
+    const jobs = jobsFactory();
+    const job = await jobs.get(id, { type: 'json' }).catch(() => null);
+    if (!job || job.status !== 'queued' || !job.request) return new Response(null, { status: 202 });
+    await jobs.setJSON(id, { ...job, status: 'running' });
+    let result;
+    try {
+      result = await runInsights(job.request, client());
+    } catch {
+      result = { status: 'error', http: 502, error: 'AI 처리 중 오류가 발생했습니다.' };
+    }
+    if (result.status === 'ok') console.log('psf-insights ok', JSON.stringify({ model: result.model, removed: result.removed || 0, unquoted: result.unquoted || 0, masked: result.masked || 0 }));
+    else console.error('psf-insights 실패', result.http, result.error); // 오류 문구는 우리가 만든 고정 문장(키·원문 미포함)
+    await jobs.setJSON(id, { status: 'done', createdAt: job.createdAt, result });
+    return new Response(null, { status: 202 });
+  };
+}
+
+export default createBackground();

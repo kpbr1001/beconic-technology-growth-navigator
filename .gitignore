@@ -29,3 +29,4 @@ prestartup/dist/
 prestartup/tests/out/
 psf/tests/out/
 psf/dist/
+psf/node_modules/

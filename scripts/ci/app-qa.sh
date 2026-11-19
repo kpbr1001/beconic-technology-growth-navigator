@@ -41,6 +41,7 @@ case "$app" in
     node finance/tests/qa.mjs http://127.0.0.1:8790/ ;;
   psf)
     (cd psf && npm run build); serve psf/dist 8796
-    node psf/tests/qa.mjs http://127.0.0.1:8796/ ;;
+    node psf/tests/qa.mjs http://127.0.0.1:8796/
+    node psf/tests/ai-contract.mjs ;;
   *) echo "알 수 없는 앱: $app" >&2; exit 2 ;;
 esac
