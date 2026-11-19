@@ -296,6 +296,52 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
   .next{flex-wrap:wrap;gap:6px 10px}.next .nl{flex:0 0 100%}
 }
 
+/* 고객여정 단계 표시 */
+.jstep{background:#fff;border-radius:18px;padding:14px 16px 10px;margin:0 0 14px}
+.jstep ol{list-style:none;margin:0;padding:0;display:flex;align-items:flex-start}
+.jstep li{flex:1;position:relative;text-align:center;min-width:0}
+.jstep li:not(:last-child)::after{content:"";position:absolute;top:15px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:var(--line)}
+.jstep li.done:not(:last-child)::after{background:var(--primary-vivid)}
+.jstep a,.jstep .js-i{display:flex;flex-direction:column;align-items:center;gap:5px;text-decoration:none;color:var(--muted);font-size:12.5px;font-weight:700;padding:0 2px;min-height:44px;border-radius:10px}
+.jstep a:hover b{background:var(--line)}
+.jstep b{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--fill);color:var(--sub);font-size:14px;position:relative;z-index:1;transition:.15s}
+.jstep li.done b{background:var(--primary-soft);color:var(--primary-strong)}
+.jstep li.on b{background:var(--primary);color:#fff;box-shadow:0 0 0 4px var(--primary-soft)}
+.jstep .js-l{font-style:normal}
+.jstep li.on .js-l{color:var(--ink);font-weight:800}
+.jstep li.done .js-l{color:var(--sub)}
+.jstep .js-cur strong{color:var(--ink)}
+.jstep .js-cur{display:none;margin:8px 0 0;text-align:center;font-size:13px;color:var(--muted)}
+@media(max-width:560px){.jstep .js-l{display:none}.jstep .js-cur{display:block}.jstep a,.jstep .js-i{min-height:36px}.jstep{padding:12px 10px 10px}}
+.step-h{margin:18px 4px 12px}
+.step-h span{font-size:12.5px;font-weight:800;color:var(--primary-strong);letter-spacing:.04em}
+.step-h h2{font-size:24px;font-weight:800;margin:2px 0 2px}
+.step-h p{font-size:14.5px;color:var(--sub)}
+.stepnav{display:flex;gap:8px;margin:16px 0 4px}
+.stepnav .btn:last-child{flex:1}
+@media(max-width:767px){
+  body.wizard .tabbar{display:none}
+  body.wizard{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+  body.wizard .stepnav{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);border-top:1px solid var(--line)}
+  body.wizard .stepnav .btn{min-height:52px}
+  body.wizard .me-actions{bottom:0;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  body.wizard .toast{bottom:calc(96px + env(safe-area-inset-bottom))}
+}
+@media screen{.stepoff{display:none!important}}
+.lnav .ln-step{font-weight:800;color:var(--ink)}
+.lnav .ln-step i{width:22px;height:22px;border-radius:50%;background:var(--fill);color:var(--sub);font-style:normal;font-size:12px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.lnav .ln-step.cur{background:var(--primary-soft);color:var(--primary-strong)}
+.lnav .ln-step.cur i{background:var(--primary);color:#fff}
+.lnav .ln-sub{padding-left:40px;font-size:13.5px;min-height:34px}
+.psum-screen .ps-top{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;padding-bottom:14px;border-bottom:1px solid var(--line-2)}
+.psum-screen .ps-top>div{font-size:14.5px}
+.psum-screen .ps-l{display:block;font-size:12px;color:var(--muted);font-weight:700}
+.psum-screen .ps-left{padding-top:12px;font-size:14.5px}
+.psum-screen .ps-left ol{margin:6px 0 0;padding-left:20px}
+.psum-screen .ps-left span{font-size:13px;color:var(--muted)}
+@media(max-width:560px){.psum-screen .ps-top{grid-template-columns:1fr}}
+.link-btn{border:0;background:none;color:var(--primary-strong);font-weight:700;text-decoration:underline;padding:4px 2px;font-size:inherit;min-height:40px}
+
 /* 이용 순서 */
 .journey{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .journey li{display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:16px;padding:14px}
@@ -315,7 +361,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
 .fcard span{font-size:13px;color:var(--muted)}
 @media(max-width:767px){.fin{grid-template-columns:1fr}}
 .me-actions{display:flex;gap:8px;margin-top:12px}
-.me-actions .btn:last-child{flex:1}
+.me-actions>:last-child{flex:1}
 .me-actions .btn-gray{background:#fff;box-shadow:0 1px 3px rgba(0,27,55,.1)}
 @media(max-width:767px){.me-actions{position:sticky;bottom:calc(var(--tab) + env(safe-area-inset-bottom));z-index:40;background:linear-gradient(rgba(242,244,246,0),var(--bg) 25%);padding:14px 0 10px;margin:0}}
 

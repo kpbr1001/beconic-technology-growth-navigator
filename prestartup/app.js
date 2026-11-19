@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -31,7 +31,7 @@ function taxExpired(now){ const [y,m]=D.meta.taxNextCheck.split('-').map(Number)
 
 /* ---------- 저장(이 기기에만) ---------- */
 const STORE = 'beconic_prestartup_v1';
-const blank = () => ({me:{}, prog:{}, memo:{}, recent:[]});
+const blank = () => ({me:{}, prog:{}, memo:{}, recent:[], meSkip:false, seen:{}});
 let S = blank();
 function load(){
   try{
@@ -42,6 +42,9 @@ function load(){
       for(const id of Object.keys(p.prog||{})) if(BY_ID[id]) S.prog[id] = {d:objBool(p.prog[id].d), s:objBool(p.prog[id].s)};
       for(const id of Object.keys(p.memo||{})) if(BY_ID[id] && typeof p.memo[id]==='string') S.memo[id]=p.memo[id].slice(0,2000);
       S.recent = Array.isArray(p.recent) ? p.recent.filter(id=>BY_ID[id]).slice(0,8) : [];
+      S.meSkip = p.meSkip===true;
+      S.seen = {};
+      for(const id of Object.keys(p.seen||{})) if(BY_ID[id] && p.seen[id] && typeof p.seen[id]==='object') S.seen[id]={benefit:p.seen[id].benefit===true, finish:p.seen[id].finish===true};
     }
   }catch{ /* 저장 사용 불가(사생활 보호 모드 등) — 화면은 그대로 동작 */ }
 }
@@ -185,11 +188,12 @@ function parse(){
 }
 function render(){
   if(scrollSpy){ scrollSpy.disconnect(); scrollSpy=null; }
-  document.body.classList.remove('has-cta');
+  document.body.classList.remove('has-cta','wizard');
   const {parts, q}=parse();
   const [a,b]=parts;
   if(a==='g' && GROUPS.includes(b)) return renderGroup(b);
-  if(a==='guide' && BY_ID[b]) return renderGuide(b);
+  if(a==='start' && BY_ID[b]){ location.replace('#'+((hasMe()||S.meSkip)?`/guide/${b}/prepare`:`/me?next=${b}`)); return; }
+  if(a==='guide' && BY_ID[b]) return renderGuide(b, GSTEPS.some(x=>x.k===parts[2])?parts[2]:'prepare');
   if(a==='search') return renderSearch(q.get('q')||'', q.get('g')||'');
   if(a==='my') return renderMy();
   if(a==='me') return renderMe(BY_ID[q.get('next')] ? q.get('next') : '');
@@ -218,6 +222,7 @@ function meChips(){
 function renderHome(){
   const recent=S.recent.filter(id=>BY_ID[id]);
   mount(`
+  ${stepper('pick')}
   <section class="hero">
     <div class="eyebrow">예비창업자용 · 회원가입 없음 · 무료</div>
     <h1 class="h-xl">업종만 고르면<br>창업 준비물을 정리해 드려요</h1>
@@ -231,12 +236,7 @@ function renderHome(){
     <div class="quick" aria-label="자주 찾는 업종">${['카페','온라인 쇼핑몰','소프트웨어','미용실','음식점','유튜브'].map(w=>`<button type="button" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div>
     <div id="homeResults"></div>
   </section>
-  <ol class="journey" aria-label="이용 순서">
-    <li><b>1</b><span><strong>업종 고르기</strong>검색하거나 업태에서 선택</span></li>
-    <li><b>2</b><span><strong>내 상황 넣기</strong>선택 · 30초, 맞춤 안내</span></li>
-    <li><b>3</b><span><strong>체크하며 준비</strong>순서·서류를 하나씩</span></li>
-    <li><b>4</b><span><strong>저장·연결</strong>PDF · 지원사업 · 전문가</span></li>
-  </ol>
+
   ${recent.length?`<div class="sec-title"><h2>이어서 준비하기</h2><a class="small muted" href="#/my">내 준비함 ›</a></div>
   <div class="recent">${recent.map(id=>{ const p=progressOf(id); return `<a class="rcard" href="#/guide/${id}"><span class="small muted">${esc(BY_ID[id].group)}</span><b>${esc(BY_ID[id].name)}</b><span class="small muted">${p.done}/${p.total} 완료</span><div class="bar"><i style="width:${p.pct}%"></i></div></a>`; }).join('')}</div>`:''}
   <div class="sec-title"><h2>업태에서 고르기</h2><span class="small muted">${IND.length}개 업종 가이드</span></div>
@@ -253,7 +253,7 @@ function renderHome(){
   const inp=$('#hq'), box=$('#homeResults');
   const run=()=>{ const v=inp.value.trim(); box.innerHTML = v ? homeResults(v) : ''; };
   inp.addEventListener('input', run);
-  $('#homeSearch').addEventListener('submit', e=>{ e.preventDefault(); const r=searchGuides(inp.value); if(r.length===1) location.hash='#/guide/'+r[0].id; else run(); inp.blur(); });
+  $('#homeSearch').addEventListener('submit', e=>{ e.preventDefault(); const r=searchGuides(inp.value); if(r.length===1) location.hash='#/start/'+r[0].id; else run(); inp.blur(); });
   document.querySelectorAll('.quick [data-q]').forEach(b=>b.addEventListener('click', ()=>{ inp.value=b.dataset.q; run(); box.scrollIntoView({behavior:'smooth', block:'nearest'}); }));
 }
 function homeResults(v){
@@ -268,19 +268,19 @@ function homeResults(v){
 }
 function itemHTML(it){
   const p=S.prog[it.id]?progressOf(it.id):null;
-  return `<a class="item" href="#/guide/${it.id}"><span class="ii" aria-hidden="true">${D.groupMeta[it.group]||'📄'}</span>
+  return `<a class="item" href="#/start/${it.id}"><span class="ii" aria-hidden="true">${D.groupMeta[it.group]||'📄'}</span>
     <span class="ib"><b>${esc(it.name)}</b><span>${p&&p.done?`<span style="color:var(--primary-strong);font-weight:700">${p.pct}% 준비 · </span>`:''}${esc(it.summary)}</span></span><span class="ar" aria-hidden="true">›</span></a>`;
 }
 function codeRow(r){
   const gid=GUIDE_BY_NTS[r.c];
   return `<div class="code-row"><span class="cn mono">${esc(r.c)}</span><span class="cb"><b>${esc(r.n)}</b><span>KSIC ${esc(r.k)} · ${esc(r.g)}</span></span>
-    <span class="acts">${gid?`<a class="btn btn-soft btn-sm" href="#/guide/${gid}">가이드</a>`:''}<button class="btn btn-gray btn-sm" type="button" data-copy="${esc(r.c)}" aria-label="업종코드 ${esc(r.c)} 복사">복사</button></span></div>`;
+    <span class="acts">${gid?`<a class="btn btn-soft btn-sm" href="#/start/${gid}">가이드</a>`:''}<button class="btn btn-gray btn-sm" type="button" data-copy="${esc(r.c)}" aria-label="업종코드 ${esc(r.c)} 복사">복사</button></span></div>`;
 }
 
 /* ---------- 업태 → 업종 ---------- */
 function renderGroup(g){
   const list=inGroup(g);
-  mount(`<div class="wrap-narrow">
+  mount(`${stepper('pick', null, g)}<div class="wrap-narrow">
     <a class="btn btn-gray btn-sm no-print" href="#/">‹ 업태 다시 고르기</a>
     <div style="margin:18px 4px 16px"><div class="eyebrow">${D.groupMeta[g]} ${esc(g)}</div><h1 class="h-lg" style="margin-top:6px">어떤 사업에 가장 가까운가요?</h1>
     <p class="muted" style="margin-top:6px">${list.length}개 업종 중에서 고르면 바로 준비 가이드가 열려요.</p></div>
@@ -290,14 +290,42 @@ function renderGroup(g){
 }
 
 /* ---------- 가이드 ---------- */
+/* 고객여정 5단계: ① 업종 → ② 내 상황 → ③ 준비 체크 → ④ 혜택·지원 → ⑤ 저장·마무리 */
+const GSTEPS = [
+  {k:'prepare', n:3, l:'준비 체크', d:'순서·서류·인허가를 하나씩 체크', secs:['me','steps','docs','license','ask','pit']},
+  {k:'benefit', n:4, l:'혜택·지원', d:'업종코드·세금 혜택·지원사업 확인', secs:['code','tax','support','expand']},
+  {k:'finish',  n:5, l:'저장·마무리', d:'PDF 저장·지원사업·전문가 확인', secs:['finish','sites','memo','about']}
+];
+const JOURNEY = [['pick','업종 고르기'],['me','내 상황'],['prepare','준비 체크'],['benefit','혜택·지원'],['finish','저장·마무리']];
+function stepState(id){
+  const pr=id?progressOf(id):null, seen=(id&&S.seen[id])||{};
+  return {pick:!!id, me:hasMe()||S.meSkip, prepare:!!pr&&pr.pct===100, benefit:!!seen.benefit, finish:!!seen.finish};
+}
+function stepHref(k,id,group){
+  if(k==='pick') return group?`#/g/${encodeURIComponent(group)}`:'#/';
+  if(!id) return null;
+  if(k==='me') return `#/me?next=${id}`;
+  return `#/guide/${id}/${k}`;
+}
+function stepper(cur, id, group){
+  const st=stepState(id);
+  return `<nav class="jstep no-print" aria-label="진행 단계"><ol>${JOURNEY.map(([k,l],i)=>{
+    const href=stepHref(k,id,group), on=k===cur, done=st[k]&&!on;
+    const inner=`<b>${done?'✓':i+1}</b><em class="js-l">${l}</em>`;
+    return `<li class="${on?'on':''} ${done?'done':''}">${href&&!on?`<a href="${href}">${inner}</a>`:`<span class="js-i" ${on?'aria-current="step"':''}>${inner}</span>`}</li>`;
+  }).join('')}</ol><p class="js-cur">${JOURNEY.findIndex(x=>x[0]===cur)+1}/5 단계 · <strong>${JOURNEY.find(x=>x[0]===cur)[1]}</strong></p></nav>`;
+}
 const NAV_EXTRA = [['me','맞춤 안내']];
 const SECS = [
   ['steps','진행 순서'],['docs','준비 서류'],['license','인허가·신고'],['code','업종코드'],['tax','세금 혜택'],['support','지원사업'],
   ['ask','미리 답할 질문'],['pit','놓치기 쉬운 점'],['expand','함께 등록·확장'],['sites','신청 사이트'],['memo','내 메모'],['about','자료 기준']
 ];
-function renderGuide(id){
+function renderGuide(id, step){
   const it=BY_ID[id];
-  S.recent=[id, ...S.recent.filter(x=>x!==id)].slice(0,8); save();
+  const G=GSTEPS.find(x=>x.k===step)||GSTEPS[0];
+  S.recent=[id, ...S.recent.filter(x=>x!==id)].slice(0,8);
+  if(G.k!=='prepare'){ S.seen[id]={...(S.seen[id]||{}), [G.k]:true}; }
+  save();
   const p=S.prog[id]||{d:{},s:{}};
   const pr=progressOf(id);
   const nx=nextTodo(id);
@@ -305,25 +333,25 @@ function renderGuide(id){
   const exp=taxExpired();
   const codeOk=isCode(it.nts);
   const related=[...(it.relatedCodes||[]), ...(it.linkedOfficial||[])].filter((x,i,a)=>a.findIndex(y=>y.nts===x.nts)===i && x.nts!==it.nts);
-  const n = k => SECS.findIndex(s=>s[0]===k)+1;
+  const n = k => { const g=GSTEPS.find(x=>x.secs.includes(k)); return g ? g.secs.filter(x=>x!=='me'&&x!=='finish').indexOf(k)+1 : ''; };
   const secHead = (k, extra) => `<div class="sec-h"><span class="sn">${n(k)}</span><h2>${SECS[n(k)-1][1]}</h2>${extra||''}</div>`;
   const reviewed = it.reviewStatus==='검수완료';
 
   mount(`
-  <nav class="tnav" aria-label="가이드 목차">${[...NAV_EXTRA, ...SECS].map(([k,l])=>`<a href="#sec-${k}" data-sec="${k}">${l}</a>`).join('')}</nav>
+  ${stepper(G.k, id, it.group)}
   <div class="guide">
     <aside class="lnav" aria-label="가이드 목차">
       <div class="ln-t">${esc(it.name)}</div>
-      ${[...NAV_EXTRA, ...SECS].map(([k,l])=>{
+      ${GSTEPS.map(g=>`<a class="ln-step ${g.k===G.k?'cur':''}" href="#/guide/${id}/${g.k}"><i>${g.n}</i>${g.l}${g.k==='prepare'?`<em>${pr.pct}%</em>`:''}</a>${g.k!==G.k?'':[...NAV_EXTRA, ...SECS, ['finish','준비 마무리']].filter(([k])=>g.secs.includes(k)).map(([k,l])=>{
         const done = (k==='steps'&&pr.ns&&pr.ds===pr.ns)||(k==='docs'&&pr.nd&&pr.dd===pr.nd);
         const cnt = k==='steps'?`${pr.ds}/${pr.ns}`: k==='docs'?`${pr.dd}/${pr.nd}`: k==='license'?it.license.length: k==='me'?(hasMe()?notes.length:'선택'): '';
-        return `<a href="#sec-${k}" data-sec="${k}">${l}${done?`<i class="dn" aria-label="완료">✓</i>`:cnt!==''?`<em>${cnt}</em>`:''}</a>`;
-      }).join('')}
+        return `<a class="ln-sub" href="#sec-${k}" data-sec="${k}">${l}${done?`<i class="dn" aria-label="완료">✓</i>`:cnt!==''?`<em>${cnt}</em>`:''}</a>`;
+      }).join('')}`).join('')}
       <div class="ln-sep"></div>
       <div class="ln-act">
         <button class="btn btn-soft btn-sm btn-block" type="button" data-act="share">링크 복사</button>
         <button class="btn btn-gray btn-sm btn-block" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 저장'}</button>
-        <a class="btn btn-gray btn-sm btn-block" href="#/g/${encodeURIComponent(it.group)}">다른 업종 보기</a>
+        <a class="btn btn-gray btn-sm btn-block" href="#/g/${encodeURIComponent(it.group)}">다른 업종 고르기</a>
       </div>
     </aside>
     <div class="gbody">
@@ -342,11 +370,13 @@ function renderGuide(id){
       </section>
 
       ${printSummary(it, pr)}
-      <section class="card no-print" aria-label="준비 진행률">
+      <div class="step-h no-print"><span>STEP ${G.n}</span><h2>${G.l}</h2><p>${G.d}</p></div>
+      ${G.k==='finish'?printSummary(it, pr, true):''}
+      <section class="card no-print" data-only="prepare" aria-label="준비 진행률">
         <div class="prog"><div class="pn">${pr.pct}<small>%</small></div><div class="pt"><b>${pr.pct===100?'준비를 모두 체크했어요':'준비 진행률'}</b><span>순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd} 체크 · 이 기기에 저장돼요</span></div>
         <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pr.pct}" aria-label="준비 진행률"><i style="width:${pr.pct}%"></i></div></div>
         ${nx?`<div class="next"><span class="nl">지금 할 일</span><span class="nt">${esc(nx.text)}</span><button class="btn btn-primary btn-sm" type="button" data-next="${nx.kind}${nx.i}">완료</button></div>`
-          :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open?`사업자등록은 <b>${ymd(addDays(S.me.open,20))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#sec-finish">마무리</a></div>`}
+          :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open?`사업자등록은 <b>${ymd(addDays(S.me.open,20))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#/guide/${id}/benefit">다음 단계</a></div>`}
         <div class="acts-row">
           <button class="btn btn-gray btn-sm" type="button" data-act="share">링크 복사</button>
           <button class="btn btn-gray btn-sm" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 저장'}</button>
@@ -450,21 +480,31 @@ function renderGuide(id){
 
     </div>
   </div>
-  <div class="guide-cta no-print"><a class="btn btn-primary" href="${esc(matchUrl(it))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a><button class="btn btn-gray" type="button" data-act="share" style="flex:0 0 auto;padding:0 18px">링크 복사</button></div>
-  `, 'home', it.name);
-  document.body.classList.add('has-cta');
+  ${stepNav(G, id)}
+  `, 'home', `${G.l} · ${it.name}`);
+  document.body.classList.add('has-cta','wizard');
+  document.querySelectorAll('.gbody .sec').forEach(el=>{ if(!G.secs.includes(el.id.replace('sec-',''))) el.classList.add('stepoff'); });
+  document.querySelectorAll('.gbody [data-only]').forEach(el=>{ if(el.dataset.only!==G.k) el.classList.add('stepoff'); });
 
   const memo=$('#memo');
   memo.addEventListener('input', ()=>{ S.memo[id]=memo.value.slice(0,2000); if(!S.memo[id]) delete S.memo[id]; save(); });
   setupSpy();
 }
-function printSummary(it, pr){
+function stepNav(G, id){
+  const i=GSTEPS.indexOf(G), prev=GSTEPS[i-1], next=GSTEPS[i+1];
+  const prevHref=prev?`#/guide/${id}/${prev.k}`:`#/me?next=${id}`, prevL=prev?prev.l:'내 상황';
+  return `<nav class="stepnav no-print" aria-label="단계 이동">
+    <a class="btn btn-gray" href="${prevHref}">‹ ${prevL}</a>
+    ${next?`<a class="btn btn-primary" href="#/guide/${id}/${next.k}">다음: ${next.l} ›</a>`:`<a class="btn btn-primary" href="#/my">내 준비함으로 ›</a>`}
+  </nav>`;
+}
+function printSummary(it, pr, screen){
   const p=S.prog[it.id]||{d:{},s:{}};
   const leftSteps=(it.licenseProcess||[]).map((t,i)=>[t,i]).filter(([,i])=>!p.s[i]).map(([t])=>stripNum(t));
   const leftDocs=it.docs.map((d,i)=>[d,i]).filter(([d,i])=>!p.d[i] && docTag(d)[0]!=='opt').map(([d])=>d);
   const left=[...leftSteps.map(t=>'[순서] '+t), ...leftDocs.map(t=>'[서류] '+t)];
   const chips=meChips();
-  return `<section class="print-only psum">
+  return `<section class="${screen?'card no-print psum-screen':'print-only psum'}">${screen?'<div class="sec-h"><span class="sn">✓</span><h2>한눈에 보기</h2></div>':''}
     <div class="ps-top"><div><span class="ps-l">업종</span><b>${esc(it.name)}</b></div>
       <div><span class="ps-l">업종코드</span><b>${isCode(it.nts)?'국세청 '+esc(it.nts)+' · KSIC '+esc(it.ksic):'홈택스 조회 필요'}</b></div>
       <div><span class="ps-l">진행률</span><b>${pr.pct}% (순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd})</b></div>
@@ -559,12 +599,12 @@ function renderSearch(q, g){
 function renderMe(next){
   const m={...S.me};
   const it=next?BY_ID[next]:null;
-  const back=it?`#/guide/${next}`:'#/my';
+  const back=it?`#/guide/${next}/prepare`:'#/my';
   const preview=()=>{ if(!it) return ''; const keep=S.me; S.me=sanitizeMe(m); const n=situationNotes(it).length; S.me=keep; return n?`지금 선택으로 <b>${esc(it.name)}</b> 가이드에 맞춤 안내 <b>${n}개</b>가 붙어요.`:`항목을 고르면 <b>${esc(it.name)}</b> 가이드에 맞춤 안내가 붙어요.`; };
-  mount(`<div class="wrap-narrow">
-    <a class="btn btn-gray btn-sm no-print" href="${back}">‹ ${it?esc(it.name)+' 가이드로':'내 준비함으로'}</a>
-    <section class="card" style="padding:28px;margin-top:14px">
-    <div class="eyebrow">선택 입력 · 이 기기에만 저장</div><h1 class="h-lg" style="margin:6px 0 6px">내 상황을 알려 주세요</h1>
+  mount(`${it?stepper('me', next, it.group):''}<div class="wrap-narrow">
+    ${it?'':`<a class="btn btn-gray btn-sm no-print" href="#/my">‹ 내 준비함으로</a>`}
+    <section class="card" style="padding:28px;margin-top:${it?0:14}px">
+    <div class="eyebrow">${it?`${esc(it.name)} · `:''}선택 입력 · 이 기기에만 저장</div><h1 class="h-lg" style="margin:6px 0 6px">내 상황을 알려 주세요</h1>
     <p class="muted" style="margin-bottom:18px">고른 항목만 맞춤 안내에 쓰여요. 모르면 건너뛰어도 돼요. 모든 업종 가이드에 함께 적용돼요.</p>
     ${it?`<div class="notice blue" id="mePreview" role="status" aria-live="polite"><span class="ni" aria-hidden="true">★</span><span>${preview()}</span></div>`:''}
     ${ME_Q.map(q=>`<div class="form-q" role="group" aria-labelledby="ql-${q.k}"><div class="ql" id="ql-${q.k}">${q.l}</div><div class="qh">${q.h}</div>
@@ -572,8 +612,10 @@ function renderMe(next){
     <div class="form-q"><label class="ql" for="open">개업 예정일</label><div class="qh">사업자등록 신청 기한(사업 시작일부터 20일)을 계산해 드려요.</div>
       <input class="inp" id="open" type="date" value="${esc(m.open||'')}"></div>
     </section>
-    <div class="me-actions"><button class="btn btn-gray" type="button" id="meClear">선택 초기화</button><button class="btn btn-primary" type="button" id="meSave">${it?'저장하고 맞춤 안내 보기':'저장'}</button></div>
+    <p class="small muted" style="margin:10px 4px 0">고른 걸 모두 지우려면 <button class="link-btn" type="button" id="meClear">선택 초기화</button> (저장해야 반영돼요)</p>
+    <div class="me-actions">${it?`<a class="btn btn-gray" href="${back}" id="meSkip">건너뛰기</a>`:''}<button class="btn btn-primary" type="button" id="meSave">${it?'저장하고 다음: 준비 체크 ›':'저장'}</button></div>
   </div>`, it?'home':'my', '내 상황');
+  if(it) document.body.classList.add('wizard');
   const upd=()=>{ const pv=$('#mePreview'); if(pv) pv.lastElementChild.innerHTML=preview(); };
   document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click', ()=>{
     const k=b.dataset.k, v=b.dataset.v; m[k] = m[k]===v ? undefined : v; if(m[k]===undefined) delete m[k];
@@ -581,7 +623,8 @@ function renderMe(next){
     upd();
   }));
   $('#open').addEventListener('change', e=>{ if(e.target.value) m.open=e.target.value; else delete m.open; upd(); });
-  $('#meSave').addEventListener('click', ()=>{ S.me=sanitizeMe(m); save(); toast(hasMe()?'저장했어요. 맞춤 안내에 반영됐어요.':'내 상황을 비웠어요.'); if(it) pendingFocus='sec-me'; location.hash = back; });
+  const sk=$('#meSkip'); if(sk) sk.addEventListener('click', ()=>{ S.meSkip=true; save(); });
+  $('#meSave').addEventListener('click', ()=>{ S.me=sanitizeMe(m); S.meSkip=true; save(); toast(hasMe()?'저장했어요. 맞춤 안내에 반영됐어요.':'내 상황을 비웠어요.'); if(it && hasMe()) pendingFocus='sec-me'; location.hash = back; });
   $('#meClear').addEventListener('click', ()=>{ for(const k of Object.keys(m)) delete m[k]; document.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed','false')); $('#open').value=''; upd(); toast('선택을 비웠어요. 저장해야 반영돼요.'); });
 }
 
@@ -609,17 +652,17 @@ function renderMy(){
 document.addEventListener('click', async e=>{
   const c=e.target.closest('[data-copy]');
   if(c){ const ok=await copyText(c.dataset.copy); toast(ok?`업종코드 ${c.dataset.copy}를 복사했어요.`:'복사가 안 되는 환경이에요. 길게 눌러 복사해 주세요.'); return; }
-  const {parts}=parse(); const id=parts[0]==='guide'?parts[1]:null;
+  const {parts}=parse(); const id=parts[0]==='guide'?parts[1]:null; const stp=GSTEPS.some(x=>x.k===parts[2])?parts[2]:'prepare';
   const k=e.target.closest('[data-chk]');
   if(k && id){
     toggleCheck(id, k.dataset.chk);
-    const y=window.scrollY; renderGuide(id); window.scrollTo(0,y);
+    const y=window.scrollY; renderGuide(id, stp); window.scrollTo(0,y);
     const again=document.querySelector(`[data-chk="${k.dataset.chk}"]`); if(again) again.focus({preventScroll:true});
     if(progressOf(id).pct===100) toast('모든 준비를 체크했어요! 사업자등록 기한을 다시 한 번 확인하세요.');
     return;
   }
   const n=e.target.closest('[data-next]');
-  if(n && id){ toggleCheck(id, n.dataset.next); const y=window.scrollY; renderGuide(id); window.scrollTo(0,y); toast('완료로 체크했어요.'); return; }
+  if(n && id){ toggleCheck(id, n.dataset.next); const y=window.scrollY; renderGuide(id, stp); window.scrollTo(0,y); toast('완료로 체크했어요.'); return; }
   const a=e.target.closest('[data-act]');
   if(a && id){
     if(a.dataset.act==='share'){ const ok=await copyText(shareLink(id)); toast(ok?'가이드 링크를 복사했어요. 체크 내용은 링크에 담기지 않아요.':'복사가 안 되는 환경이에요.'); }
