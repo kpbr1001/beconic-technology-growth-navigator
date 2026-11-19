@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'reference/**', 'tests/e2e/out/**', 'src/app/legacy-ui.ts', 'finance/vendor/**', 'finance/tests/out/**', 'finance/dist/**', 'hr/dist/**', 'hr/tests/out/**', 'growth/dist/**', 'growth/tests/out/**', 'grants/dist/**', 'grants/dist-demo/**', 'grants/tests/out/**', 'ir/dist/**', 'ir/tests/out/**', 'ir/vendor/**', 'esg/dist/**', 'esg/tests/out/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'reference/**', 'tests/e2e/out/**', 'src/app/legacy-ui.ts', 'finance/vendor/**', 'finance/tests/out/**', 'finance/dist/**', 'hr/dist/**', 'hr/tests/out/**', 'growth/dist/**', 'growth/tests/out/**', 'grants/dist/**', 'grants/dist-demo/**', 'grants/tests/out/**', 'ir/dist/**', 'ir/tests/out/**', 'ir/vendor/**', 'esg/dist/**', 'esg/tests/out/**', 'prestartup/dist/**', 'prestartup/tests/out/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -17,5 +17,10 @@ export default tseslint.config(
     files: ['grants/app.js', 'grants/data.js'],
     languageOptions: { sourceType: 'script' },
     rules: { '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^App$' }] },
+  },
+  // 창업 준비 가이드: 일반 <script>(IIFE). data.js는 window.PS_DATA, sw.js는 서비스워커 전역
+  {
+    files: ['prestartup/app.js', 'prestartup/data.js', 'prestartup/sw.js'],
+    languageOptions: { sourceType: 'script', globals: { ...globals.serviceworker } },
   },
 );

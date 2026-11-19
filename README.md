@@ -4,6 +4,7 @@
 
 - 서비스: https://beconic-diagnosis-tech.netlify.app
 - IR 진단: https://beconic-diagnosis-ir.netlify.app (`ir/`, [ir/README.md](ir/README.md))
+- 창업 준비 가이드(예비창업자, 09번): https://beconic-diagnosis-pre-startup.netlify.app (`prestartup/`, [prestartup/README.md](prestartup/README.md))
 - ESG 경영준비도 진단: https://beconic-diagnosis-esg.netlify.app (예정, `esg/`, [esg/README.md](esg/README.md))
 - 회사: 서울시 구로구 디지털로27길 24, 209호 · 02-6124-5960 · start@gven.kr · www.beconic.kr
 

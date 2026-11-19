@@ -39,10 +39,11 @@ describe('연락처(전화·주소·인증번호·이메일)는 앱마다 한 �
     'finance/index.html': /^const COMPANY=/,
     'growth/index.html': /^\s+(?:tel|certNo):"/,  // const COMPANY = { … } 여러 줄
     'ir/src/contact.js': /./,
+    'prestartup/app.js': /^const CONTACT|^\s+addr:'/,  // const CONTACT = { … } 두 줄
   };
   it('원본 밖 화면·보고서 소스에 직접 쓰지 않음', () => {
     const files = ['grants/index.html', 'grants/app.js', 'grants/netlify/lib/bot/kakao.mjs', 'hr/index.html', 'finance/index.html', 'growth/index.html',
-      'ir/src/app.js', 'ir/src/report.js', 'ir/index.html'];
+      'ir/src/app.js', 'ir/src/report.js', 'ir/index.html', 'prestartup/index.html', 'prestartup/app.js'];
     const bad: string[] = [];
     for (const f of files) readFileSync(f, 'utf8').split('\n').forEach((line, i) => {
       if (lit.test(line) && !(OWNERS[f] && OWNERS[f].test(line))) bad.push(`${f}:${i + 1}: ${line.trim().slice(0, 80)}`);

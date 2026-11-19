@@ -25,3 +25,5 @@ hr/node_modules/
 hr/dist/
 growth/tests/out/
 growth/dist/
+prestartup/dist/
+prestartup/tests/out/
