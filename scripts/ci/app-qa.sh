@@ -3,7 +3,12 @@
 # 각 앱은 별도 러너에서 병렬로 돈다(포트 충돌 없음).
 set -euo pipefail
 app="$1"
-serve() { (cd "$1" && python3 -m http.server "$2" --bind 127.0.0.1 >/dev/null 2>&1 &); sleep 1; }
+# 정적 서버를 띄우고 실제로 응답할 때까지 기다린다(고정 1초 대기는 병렬 러너에서 늦게 떠 ERR_CONNECTION_REFUSED — 2026-11-19 PR #97 grants)
+serve() {
+  (cd "$1" && python3 -m http.server "$2" --bind 127.0.0.1 >/dev/null 2>&1 &)
+  for _ in $(seq 1 40); do curl -sf --noproxy "*" --max-time 2 -o /dev/null "http://127.0.0.1:$2/" && return 0; sleep 0.5; done
+  echo "서버가 20초 안에 뜨지 않음: $1 :$2" >&2; return 1
+}
 case "$app" in
   tech)
     npm run build
