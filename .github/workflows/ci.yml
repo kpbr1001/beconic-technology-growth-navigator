@@ -74,7 +74,8 @@ jobs:
 
   e2e:
     name: E2E · 사용자 플로우 · PDF QA
-    runs-on: ubuntu-latest
+    # ubuntu-latest가 26.04로 바뀐 뒤 Playwright 1.56.1이 Chromium 설치를 거부(지원 OS 아님) → 지원되는 24.04로 고정
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
