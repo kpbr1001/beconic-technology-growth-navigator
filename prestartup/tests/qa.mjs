@@ -326,6 +326,31 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   check('도우미 결과 → 2단계(내 상황)', page.url().includes('#/me?next=cafe'));
 }
 
+// 11-8. 레드팀(v1.5.0) 보완 — 인허가 없음 표기·지난 세금 기한·간이 배제·법인 예정신고·도우미 답 유지
+{
+  const r = await page.evaluate(() => {
+    const S = window.PS.S, B = window.PS.BY_ID, dl = (id) => window.PS.deadlines(B[id]);
+    const none = ['consulting', 'design', 'entertainer', 'creator', 'translation', 'performance'].map((id) => dl(id).map((x) => x.t).join('|'));
+    const cond = dl('it_service').find((x) => x.t.includes('해당되면'))?.t || '', must = dl('machine_mfg').find((x) => x.t.startsWith('인허가'));
+    S.me = { open: '2024-03-01' }; const past = dl('software').filter((x) => x.late).map((x) => x.t);
+    S.me = { open: '2027-03-02', rev: 'lt1' }; const sim = dl('cosmetic_mfg').find((x) => x.t.includes('부가가치세'));
+    S.me = {};
+    return { none, cond, must: must && must.t + ' / ' + must.note, past, simW: sim.when, simN: sim.note };
+  });
+  check('인허가: "별도 인허가 없음·불요"를 인허가로 세지 않음', r.none.every((t) => !/없음|불요/.test(t)), JSON.stringify(r.none));
+  check('인허가: (해당 시)·(공공) 항목은 "해당되면"으로 구분', r.cond.includes('(공공) SW사업자 신고') && /공장등록/.test(r.must) && /해당되면 함께: \(해당 시\)/.test(r.must), r.cond + ' || ' + r.must);
+  check('지난 개업일: 부가세·종합소득세 기한도 지남 표시', ['사업자등록 신청', '첫 부가가치세 확정신고', '첫 종합소득세 신고(개인사업자)'].every((t) => r.past.includes(t)), JSON.stringify(r.past));
+  check('간이(1억 미만): 간이 안 되는 업종이면 일반과세 기한도 함께', r.simW.includes('간이과세자 2028년 1월 25일') && r.simW.includes('일반과세자 2027년 7월 25일'), r.simW);
+  check('법인 부가세 예정신고(4/25·10/25·제48조) 안내', r.simN.includes('4월 25일·10월 25일') && r.simN.includes('부가가치세법 제48조'), r.simN);
+  await page.goto(BASE + '#/finder'); await page.waitForTimeout(100);
+  await page.click('[data-fq="what"][data-v="digital"]'); await page.fill('#fkw', '앱'); await page.waitForTimeout(80);
+  check('도우미: 답이 주소에 남음(#/finder?w=…&k=…)', page.url().includes('#/finder?w=digital&k=%EC%95%B1'), page.url());
+  await page.click('#fres a.item >> nth=0'); await page.waitForTimeout(150); await page.goBack(); await page.waitForTimeout(200);
+  check('도우미: 뒤로가기 후 답 그대로', (await page.inputValue('#fkw')) === '앱' && (await page.getAttribute('[data-fq="what"][data-v="digital"]', 'aria-pressed')) === 'true');
+  await page.goto(BASE + '#/finder?w=%3Cx%3E&p=zzz&k=%3Cimg%20src%3Dx%3E'); await page.waitForTimeout(100);
+  check('도우미: 주소의 이상한 값은 무시·이스케이프', (await page.locator('[aria-pressed="true"]').count()) === 0 && (await page.locator('#fres img, .fopts img').count()) === 0 && (await page.inputValue('#fkw')) === '<img src=x>');
+}
+
 // 12. 앱(PWA) 구성
 {
   const m = await page.evaluate(async () => (await fetch('assets/manifest.webmanifest')).json());
