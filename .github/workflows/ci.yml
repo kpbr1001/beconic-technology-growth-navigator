@@ -76,7 +76,8 @@ jobs:
     name: E2E · 사용자 플로우 · PDF QA
     # ubuntu-latest가 26.04로 바뀐 뒤 Playwright 1.56.1이 Chromium 설치를 거부(지원 OS 아님) → 지원되는 24.04로 고정
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    # 6개 앱 QA가 이 작업에 모여 있고 apt 미러가 느린 날 설치만 15분 넘게 걸려 20분 제한에 걸림(2026-11-19 PR #93 2회 취소) → 35분
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -87,7 +88,10 @@ jobs:
       - name: Chromium 설치
         run: npx playwright install --with-deps chromium
       - name: 한글 폰트 설치 (PDF 검수용)
-        run: sudo apt-get install -y fonts-noto-cjk
+        # 낡은 패키지 목록·추천 패키지까지 받느라 17분 멈춘 사례 → 목록 갱신 후 필수만, 네트워크 재시도 3회
+        run: |
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 fonts-noto-cjk
       - run: pip install pymupdf
       - run: npm run build
       - name: 스모크 E2E (6개 화면 크기·전부 모름·PDF 섹션)
