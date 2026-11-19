@@ -65,7 +65,7 @@ await page.goto(BASE);
   await page.fill('#hq', '커피');
   await page.locator('#homeResults a.item').first().click();
   await page.waitForTimeout(200);
-  check('검색 결과 → 가이드 이동', page.url().includes('#/guide/'));
+  check('검색 결과 → 처음이면 2단계(내 상황)로 이동', page.url().includes('#/me?next='), page.url());
   await page.goBack(); await page.waitForTimeout(200);
   check('뒤로가기 → 홈', (await page.locator('main').innerText()).includes('업태에서 고르기'));
   await page.click('a.gcard >> nth=0'); await page.waitForTimeout(150);
@@ -86,6 +86,7 @@ await page.goto(BASE);
   await page.reload();
   check('새로고침 후 체크 유지(이 기기 저장)', (await page.locator('[data-chk="s0"]').getAttribute('aria-checked')) === 'true' && (await page.locator('[data-chk="d0"]').getAttribute('aria-checked')) === 'true');
   check('좌측 내비 개수 표시 갱신(순서 1/4)', (await page.locator('.lnav a[data-sec="steps"] em').innerText()) === '1/4');
+  await page.goto(BASE + '#/guide/cafe/finish'); await page.waitForTimeout(100);
   await page.fill('#memo', '건축물 용도 확인');
   await page.reload();
   check('메모 저장', (await page.inputValue('#memo')) === '건축물 용도 확인');
@@ -113,7 +114,7 @@ await page.goto(BASE);
   await page.goto(BASE + '#/search?q=552303');
   const t = await page.locator('#cres').innerText();
   check('코드 숫자 검색 → 커피 전문점', t.includes('커피 전문점'));
-  check('가이드 있는 코드에 "가이드" 연결', (await page.locator('#cres a[href="#/guide/cafe"]').count()) > 0);
+  check('가이드 있는 코드에 "가이드" 연결', (await page.locator('#cres a[href="#/start/cafe"]').count()) > 0);
   await page.fill('#cq', '화장품');
   check('업종명 검색 + 가이드 업종 함께 표시', (await page.locator('#cres').innerText()).includes('준비 가이드가 있는 업종'));
   await page.click('.filters [data-g="제조업"]');
@@ -149,18 +150,18 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   check(`${w}px: 가로 넘침 없음`, over <= 0, `${over}px`);
   check(`${w}px: 버튼 높이 36px 이상`, small.length === 0, small.slice(0, 5).join('|'));
   await p.goto(BASE + '#/guide/cafe'); await p.waitForTimeout(150);
-  const vis = await p.evaluate(() => ({ tab: getComputedStyle(document.querySelector('.tabbar')).display !== 'none', lnav: getComputedStyle(document.querySelector('.lnav')).display !== 'none', tnav: getComputedStyle(document.querySelector('.tnav')).display !== 'none', cta: getComputedStyle(document.querySelector('.guide-cta')).display !== 'none' }));
-  if (w < 768) check(`${w}px: 앱 화면 = 하단 탭 + 상단 목차 칩 + 스크롤 후 하단 고정 버튼`, vis.tab && vis.tnav && vis.cta && !vis.lnav && await p.evaluate(async () => { const c = document.querySelector('.guide-cta'); const hid = !c.classList.contains('show'); scrollTo(0, 1500); await new Promise((r) => setTimeout(r, 100)); return hid && c.classList.contains('show'); }));
-  else if (w < 1024) check(`${w}px: 태블릿 = 상단 메뉴 + 목차 칩`, !vis.tab && vis.tnav && !vis.lnav);
-  else check(`${w}px: 웹 = 상단 메뉴 + 좌측 고정 목차`, !vis.tab && vis.lnav && !vis.tnav);
+  const vis = await p.evaluate(() => { const d = (q) => { const e = document.querySelector(q); return !!e && getComputedStyle(e).display !== 'none'; }; return { tab: d('.tabbar'), lnav: d('.lnav'), jstep: d('.jstep'), nav: d('.stepnav'), fixed: getComputedStyle(document.querySelector('.stepnav')).position === 'fixed' }; });
+  if (w < 768) check(`${w}px: 앱 화면 = 단계 표시 + 하단 고정 이전/다음(탭 바 숨김)`, vis.jstep && vis.nav && vis.fixed && !vis.tab && !vis.lnav, JSON.stringify(vis));
+  else if (w < 1024) check(`${w}px: 태블릿 = 상단 메뉴 + 단계 표시 + 이전/다음`, vis.jstep && vis.nav && !vis.tab && !vis.lnav, JSON.stringify(vis));
+  else check(`${w}px: 웹 = 단계 표시 + 좌측 단계별 목차 + 이전/다음`, vis.jstep && vis.lnav && vis.nav && !vis.tab, JSON.stringify(vis));
   await p.context().close();
 }
 
 // 9. 좌측 목차 스크롤 연동
 {
-  await page.goto(BASE + '#/guide/cafe'); await page.waitForTimeout(200);
+  await page.goto(BASE + '#/guide/cafe/benefit'); await page.waitForTimeout(200);
   await page.click('.lnav a[data-sec="tax"]'); await page.waitForTimeout(900);
-  check('좌측 목차 클릭 → 세금 혜택으로 이동·활성 표시', (await page.locator('.lnav a.on').innerText()).includes('세금') && page.url().endsWith('#/guide/cafe'));
+  check('좌측 목차(4단계) 클릭 → 세금 혜택으로 이동·활성 표시', (await page.locator('.lnav a.on').innerText()).includes('세금') && page.url().endsWith('#/guide/cafe/benefit'));
 }
 
 // 10. 앱 안 브라우저(카카오톡) → PDF 대신 요약 복사
@@ -195,11 +196,11 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
 // 11-2. 사용자 흐름: 홈 이용 순서 → 가이드 → 내 상황 수정 → 저장 후 맞춤 안내로 복귀
 {
   await page.goto(BASE);
-  check('홈: 이용 순서 4단계 안내', (await page.locator('.journey li').count()) === 4);
+  check('홈: 5단계 표시, 1단계(업종 고르기) 현재', (await page.locator('.jstep li').count()) === 5 && (await page.locator('.jstep li.on').innerText()).includes('업종'));
   await page.goto(BASE + '#/guide/cafe'); await page.waitForTimeout(100);
   check('가이드 목차에 "맞춤 안내" 포함', (await page.locator('.lnav a[data-sec="me"]').count()) === 1);
   await page.click('#sec-me a[href^="#/me"]'); await page.waitForTimeout(150);
-  check('내 상황 화면: 가이드로 돌아가기·미리보기', (await page.locator('a[href="#/guide/cafe"]').first().innerText()).includes('가이드로') && (await page.locator('#mePreview').innerText()).includes('카페'));
+  check('내 상황 화면 = 2단계 표시·미리보기·건너뛰기', (await page.locator('.jstep li.on').innerText()).includes('내 상황') && (await page.locator('#mePreview').innerText()).includes('카페') && (await page.locator('#meSkip').count()) === 1);
   await page.click('.opt[data-v="home"]');
   check('미리보기: 고르는 즉시 안내 개수 갱신', /맞춤 안내 \d+개/.test(await page.locator('#mePreview').innerText()));
   await page.click('#meClear');
@@ -207,11 +208,31 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await page.click('.opt[data-v="home"]');
   await page.click('#meSave'); await page.waitForTimeout(300);
   const top = await page.evaluate(() => Math.round(document.getElementById('sec-me').getBoundingClientRect().top));
-  check('저장 → 가이드의 맞춤 안내로 이동(강조)', page.url().endsWith('#/guide/cafe') && top < 400 && (await page.locator('#sec-me .chip').count()) >= 1, `top=${top}`);
+  check('저장 → 3단계(준비 체크)의 맞춤 안내로 이동(강조)', page.url().endsWith('#/guide/cafe/prepare') && top < 400 && (await page.locator('#sec-me .chip').count()) >= 1, `top=${top}`);
   check('맞춤 안내에 선택한 상황 칩 표시', (await page.locator('#sec-me .mechips').innerText()).includes('자택'));
-  check('마무리 섹션: PDF·지원사업·전문가 3가지', (await page.locator('#sec-finish .fcard').count()) === 3);
-  await page.goBack(); await page.waitForTimeout(150);
+  await page.click('.stepnav .btn-primary'); await page.waitForTimeout(150);
+  check('다음 → 4단계(혜택·지원): 업종코드·세금·지원사업만 표시', page.url().endsWith('/benefit') && await page.isVisible('#sec-tax') && !(await page.isVisible('#sec-docs')) && (await page.locator('.jstep li.on').innerText()).includes('혜택'));
+  await page.click('.stepnav .btn-primary'); await page.waitForTimeout(150);
+  check('다음 → 5단계(저장·마무리): 한눈에 보기 + PDF·지원사업·전문가 3가지', page.url().endsWith('/finish') && await page.isVisible('.psum-screen') && (await page.locator('#sec-finish .fcard').count()) === 3);
+  check('이미 거친 단계는 ✓ 표시(1·2·4단계)', (await page.locator('.jstep li.done').count()) >= 3);
+  await page.click('.stepnav .btn-gray'); await page.waitForTimeout(150);
+  check('이전 → 4단계', page.url().endsWith('/benefit'));
+  await page.goBack(); await page.goBack(); await page.goBack(); await page.goBack(); await page.waitForTimeout(150);
   check('뒤로가기 → 내 상황 화면', page.url().includes('#/me'));
+}
+
+// 11-3. 단계 진입 규칙·인쇄는 전체
+{
+  await page.goto(BASE); await page.evaluate(() => localStorage.clear()); await page.reload(); await page.goto(BASE + '#/start/cafe'); await page.waitForTimeout(150);
+  check('처음 업종 선택 → 2단계(내 상황)', page.url().includes('#/me?next=cafe'));
+  await page.click('#meSkip'); await page.waitForTimeout(150);
+  check('건너뛰기 → 3단계(준비 체크)', page.url().endsWith('#/guide/cafe/prepare'));
+  await page.goto(BASE + '#/start/ecommerce'); await page.waitForTimeout(150);
+  check('한 번 건너뛴 뒤 다른 업종 → 바로 3단계', page.url().endsWith('#/guide/ecommerce/prepare'));
+  await page.goto(BASE + '#/guide/cafe/prepare'); await page.emulateMedia({ media: 'print' });
+  const all = await page.evaluate(() => ['tax', 'code', 'support', 'sites', 'memo', 'about', 'docs', 'steps'].every((k) => getComputedStyle(document.getElementById('sec-' + k)).display !== 'none') && getComputedStyle(document.querySelector('.jstep')).display === 'none');
+  check('인쇄: 어느 단계에서 저장해도 전체 섹션 포함, 단계 표시는 숨김', all);
+  await page.emulateMedia({ media: 'screen' });
 }
 
 // 12. 앱(PWA) 구성
