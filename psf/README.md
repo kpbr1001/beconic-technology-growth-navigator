@@ -1,4 +1,4 @@
-# BECONIC 고객문제·솔루션 적합성 진단 (v2.4) — Tool 20
+# BECONIC 고객문제·솔루션 적합성 진단 (v2.5) — Tool 20
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-diagnosis-psf.netlify.app
@@ -44,7 +44,7 @@ psf/
 ├─ netlify/functions/psf-insights.mjs           # AI 접수·결과 조회(/api/psf-insights)
 ├─ netlify/functions/psf-insights-background.mjs # AI 처리(백그라운드, 최대 15분)
 ├─ netlify.toml · package.json · .env.example
-├─ tests/qa.mjs            # Chromium QA 70항목(엔진 원칙·무의미 입력·정합성·증거 관문·모순·작성 가이드 자기 일관성·클릭 플로우·모바일 375px·A4 PDF·레드팀 회귀·데스크톱 폭·문항 가이드)
+├─ tests/qa.mjs            # Chromium QA 76항목(엔진 원칙·무의미 입력·정합성·증거 관문·모순·작성 가이드 자기 일관성·클릭 플로우·모바일 375px·A4 PDF·레드팀 회귀·데스크톱 폭·문항 가이드·샘플 미리보기·내비)
 ├─ tests/ai-contract.mjs   # AI 서버 함수 계약·키 노출·화면 연동 테스트 46항목(모의 API·카나리 키)
 └─ docs/CHANGELOG.md · REDTEAM_2026-11-19.md   # 개선 내역 · 자가부검·레드팀 점검
 ```
