@@ -294,6 +294,27 @@ const allText = (v) => page.evaluate((v) => {
   await m.close();
 }
 
+// 13. v2.4 데스크톱 폭·문항 가이드 개편 회귀
+{
+  await page.goto(BASE, { waitUntil: 'load' });
+  const [cta, free] = await page.evaluate(() => [document.querySelector('.hero .btn-gold').textContent.trim(), document.body.innerHTML.includes('무료 진단')]);
+  check("첫 화면 버튼 문구 '진단 시작하기'('무료' 표기 없음)", cta.startsWith('진단 시작하기') && !free, cta);
+  const wrapW = await page.evaluate(() => document.querySelector('.topbar .wrap, .wrap').getBoundingClientRect().width);
+  await page.evaluate(() => { loadSampleAndStart(); }); await page.waitForTimeout(200);
+  await page.click('#btnNext'); await page.waitForTimeout(150);
+  const g = await page.evaluate(() => {
+    const shell = document.querySelector('.form-shell').getBoundingClientRect().width;
+    const meter = document.querySelector('#screen-form .form-step.active .f-meter');
+    const guide = meter && meter.nextElementSibling;
+    const cs = guide ? getComputedStyle(guide) : null;
+    const field = getComputedStyle(document.querySelector('#screen-form .form-step.active .field'));
+    return { shell, meterFirst: !!(guide && guide.classList.contains('f-guide')), pad: cs ? parseFloat(cs.paddingTop) : 0, gap: cs ? parseFloat(cs.rowGap) : 0, mb: parseFloat(field.marginBottom), count: /\d+\/\d+/.test(meter ? meter.textContent : '') };
+  });
+  check('데스크톱 1440: 본문 1200px 이상, 입력 화면 900px 이상', wrapW >= 1200 && g.shell >= 900, `wrap ${Math.round(wrapW)} · form ${Math.round(g.shell)}`);
+  check('문항: 작성 체크(n/m)가 입력칸 바로 아래, 그다음 가이드 카드', g.meterFirst && g.count);
+  check('문항 가이드 여백: 안쪽 14px↑ · 항목 간격 12px↑ · 문항 간격 28px↑', g.pad >= 14 && g.gap >= 12 && g.mb >= 28, JSON.stringify(g));
+}
+
 // 11. PDF 품질 회귀 (pymupdf 있을 때)
 {
   const py = spawnSync('python3', ['-c', `
