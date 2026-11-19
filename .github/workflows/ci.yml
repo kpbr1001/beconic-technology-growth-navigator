@@ -126,6 +126,12 @@ jobs:
           (cd ir/dist && python3 -m http.server 8794 --bind 127.0.0.1 >/dev/null 2>&1 &)
           sleep 1
           node ir/tests/qa.mjs http://127.0.0.1:8794/
+      - name: 창업 준비 가이드(09번) QA (데이터 정합성·기준일·체크리스트·맞춤 안내·코드 검색·보안·웹/앱 화면·A4)
+        run: |
+          (cd prestartup && npm run build)
+          (cd prestartup/dist && python3 -m http.server 8795 --bind 127.0.0.1 >/dev/null 2>&1 &)
+          sleep 1
+          node prestartup/tests/qa.mjs http://127.0.0.1:8795/
       - name: 검수 결과물 업로드
         if: always()
         uses: actions/upload-artifact@v4
