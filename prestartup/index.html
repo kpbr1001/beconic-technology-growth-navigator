@@ -180,7 +180,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
 .lnav .ln-act{display:flex;flex-direction:column;gap:6px;padding:0 4px}
 .tnav{display:none}
 @media(max-width:1023px){
-  .guide{grid-template-columns:1fr}
+  .guide{grid-template-columns:minmax(0,1fr)}
   .lnav{display:none}
   .tnav{display:flex;gap:6px;overflow-x:auto;position:sticky;top:var(--hdr);z-index:50;background:var(--bg);margin:0 -20px 12px;padding:10px 20px;scrollbar-width:none}
   .tnav::-webkit-scrollbar{display:none}
@@ -230,6 +230,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
 .steps .sn2{font-size:12px;font-weight:800;color:var(--muted);display:block}
 .dueline{margin-top:12px;padding:14px 16px;border-radius:14px;background:var(--primary-soft);color:var(--primary-strong);font-size:14px;font-weight:600}
 .dueline b{font-weight:800}
+.dueline b.late{display:block;margin-top:6px;color:var(--warn)}
 /* 정보 카드 */
 .box{background:var(--fill);border-radius:14px;padding:16px;margin-bottom:8px}
 .box:last-child{margin-bottom:0}
@@ -348,6 +349,8 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
 .rs-s{font-size:15px;color:var(--sub)}
 .rs-m{font-size:12.5px;color:var(--muted);margin-top:12px}
 .rs-m b{color:var(--ink-2)}
+.rs-g .rs-late{background:var(--warn-soft)}
+.rs-g .rs-late b{color:var(--warn)}
 .rs-gate{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;background:var(--primary-soft);border-radius:14px;padding:14px 16px;margin:4px 0 10px}
 .rs-gate span{font-size:12.5px;font-weight:800;color:var(--primary-strong)}
 .rs-gate b{font-size:17px;font-weight:800;color:#0b3f8f}
