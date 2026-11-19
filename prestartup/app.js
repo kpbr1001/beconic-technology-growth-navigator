@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.4.0';
+const VERSION = '1.4.1';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -66,7 +66,10 @@ const ME_Q = [
 function sanitizeMe(m){
   const r={};
   for(const q of ME_Q){ if(q.o.some(([v])=>v===m[q.k])) r[q.k]=m[q.k]; }
-  if(typeof m.open==='string' && /^\d{4}-\d{2}-\d{2}$/.test(m.open) && !isNaN(new Date(m.open+'T00:00:00'))) r.open=m.open;
+  if(typeof m.open==='string' && /^\d{4}-\d{2}-\d{2}$/.test(m.open)){
+    const d=new Date(m.open+'T00:00:00');   // 2026-02-30처럼 없는 날짜는 다른 날로 넘어가므로 왕복 비교로 거른다
+    if(!isNaN(d) && `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`===m.open) r.open=m.open;
+  }
   return r;
 }
 const hasMe = () => Object.keys(S.me).length>0;
@@ -110,6 +113,8 @@ function nextTodo(id){
   return null;
 }
 const bizRegDue = open => addDays(open, RULE.bizRegDays);   // 사업자등록 신청 기한(사업 시작일 + N일)
+const duePassed = open => { const t=new Date(); t.setHours(0,0,0,0); return bizRegDue(open) < t; };
+const PASSED_MSG = '이미 지난 기한이에요. 개업했다면 바로 신청하세요(늦으면 가산세가 붙을 수 있어요). 아직 개업 전이면 내 상황에서 개업 예정일을 고쳐 주세요.';
 function addDays(iso, n){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d; }
 const ymd = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 
@@ -173,7 +178,8 @@ function situationNotes(it){
   if(m.female==='y') out.push(['','👩‍💼','여성 대표는 사업 개시 후 <b>여성기업 확인</b>(여성기업종합정보포털)을 받으면 여성창업 지원사업·공공구매 우대를 받을 수 있어요.']);
   if(m.open){
     const due=bizRegDue(m.open);
-    out.push(['blue','🗓️',`개업 예정일 <b>${esc(ymd(new Date(m.open+'T00:00:00')))}</b> 기준, 사업자등록은 <b>${ymd(due)}까지</b> 신청하세요(사업 시작일부터 ${RULE.bizRegDays}일 이내 · 시작 전에도 신청 가능). 인허가가 필요한 업종은 허가·신고증을 먼저 받아야 해요.`]);
+    if(duePassed(m.open)) out.push(['warn','⏰',`<b>사업자등록 기한(${ymd(bizRegDue(m.open))})이 지났어요.</b> ${PASSED_MSG.replace('이미 지난 기한이에요. ','')}`]);
+    else out.push(['blue','🗓️',`개업 예정일 <b>${esc(ymd(new Date(m.open+'T00:00:00')))}</b> 기준, 사업자등록은 <b>${ymd(due)}까지</b> 신청하세요(사업 시작일부터 ${RULE.bizRegDays}일 이내 · 시작 전에도 신청 가능). 인허가가 필요한 업종은 허가·신고증을 먼저 받아야 해요.`]);
   }
   return out;
 }
@@ -412,7 +418,7 @@ function renderGuide(id, step){
       <section class="card sec" id="sec-steps">${secHead('steps', `<button type="button" class="tgl no-print" data-track aria-pressed="${S.track}"><i></i>체크하며 관리</button>`)}
         <p class="sec-d no-print">${S.track?'끝낸 항목을 눌러 체크하세요. 이 기기에 저장돼요.':'순서대로 읽어 보세요. 진행 상황을 기록하려면 오른쪽 위 <b>체크하며 관리</b>를 켜세요. PDF에는 항상 체크 칸이 있어요.'}</p>
         <div class="steps ${S.track?'':'read'}">${(it.licenseProcess||[]).map((s,i)=>S.track?chk('s',i,`<span class="sn2">STEP ${i+1}</span>${esc(stripNum(s))}`, p.s[i]):readRow(i+1, esc(stripNum(s)), false, p.s[i])).join('')}</div>
-        <div class="dueline">사업자등록은 <b>사업 시작일부터 ${RULE.bizRegDays}일 안에</b> 신청해야 해요(시작 전에도 가능). 인허가 업종은 허가·신고증을 먼저 받아 함께 내요.${S.me.open?` 개업 예정일 기준 <b>${ymd(bizRegDue(S.me.open))}까지</b>.`:''}</div>
+        <div class="dueline">사업자등록은 <b>사업 시작일부터 ${RULE.bizRegDays}일 안에</b> 신청해야 해요(시작 전에도 가능). 인허가 업종은 허가·신고증을 먼저 받아 함께 내요.${S.me.open?` 개업 예정일 기준 <b>${ymd(bizRegDue(S.me.open))}까지</b>.${duePassed(S.me.open)?` <b class="late">${PASSED_MSG}</b>`:''}`:''}</div>
       </section>
 
       <section class="card sec" id="sec-docs">${secHead('docs', `<span class="cnt">${S.track?`${pr.dd}/${pr.nd} 체크`:`${pr.nd}종`}</span>`)}
@@ -534,7 +540,7 @@ function resultSummary(it, notes){
     <div class="rs-g">
       <div><span>업종코드</span><b>${isCode(it.nts)?`<span class="mono">${esc(it.nts)}</span> <button type="button" class="link-btn" data-copy="${esc(it.nts)}">복사</button>`:'홈택스 조회 필요'}</b></div>
       <div><span>세금 혜택 ${tax.length}개</span><b>${tax.map(esc).join(', ')||'—'}</b></div>
-      ${S.me.open?`<div><span>사업자등록 기한</span><b>${ymd(bizRegDue(S.me.open))}까지</b></div>`:''}
+      ${S.me.open?`<div class="${duePassed(S.me.open)?'rs-late':''}"><span>사업자등록 기한</span><b>${ymd(bizRegDue(S.me.open))}까지${duePassed(S.me.open)?' · 지남':''}</b></div>`:''}
       <div><span>내 상황 · 맞춤 안내</span><b>${hasMe()?`${chips.slice(0,3).map(esc).join(' · ')}${chips.length>3?' 외':''}<br>안내 ${notes.length}개 <button type="button" class="link-btn" data-go="sec-me">보기</button> · <a class="link-btn" href="#/me?next=${it.id}">수정</a>`:`<a class="link-btn" href="#/me?next=${it.id}">내 상황 넣기</a>`}</b></div>
     </div>
     <p class="rs-m">📅 자료 기준일 <b>${BASE}</b> · 세제 ${TAX_BASE} 법령 · 업종코드 ${CODE_Y}년 귀속 연계표 · <span title="BECONIC 내부 정리 자료">${reviewed?'✓ 전문가 검수':'내부 정리·검수 전'}</span></p>

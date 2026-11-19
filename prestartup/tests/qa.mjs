@@ -287,6 +287,21 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   check('기준값이 화면에 반영(청년 나이·간이과세·사업자등록 기한)', t.includes(`만 15~${r.youthTaxAgeMax}세`) && t.includes(r.simpleVatLimit) && t.includes(`${r.bizRegDays}일`) && t.includes('2027.03.22'));
 }
 
+// 11-6. 레드팀 보완(2026-11-19 최종 점검): 없는 날짜·지난 개업일·좁은 화면 긴 업종명
+{
+  await page.goto(BASE); await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ me: { open: '2026-02-30' } }))); await page.reload();
+  check('없는 날짜(2026-02-30)는 저장값에서 버림', await page.evaluate(() => !window.PS.S.me.open));
+  check('2월 29일(윤년)은 유지', await page.evaluate(() => window.PS.sanitizeMe({ open: '2028-02-29' }).open === '2028-02-29' && !window.PS.sanitizeMe({ open: '2027-02-29' }).open));
+  await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ me: { open: '2020-01-01' } }))); await page.reload();
+  await page.goto(BASE + '#/guide/cafe/prepare'); await page.waitForTimeout(100);
+  const t = await page.locator('main').innerText();
+  check('지난 개업일: 기한 지남 경고(요약·맞춤 안내·진행 순서)', (await page.locator('.rs-late').count()) === 1 && t.includes('기한(2020.01.21)이 지났어요') && t.includes('늦으면 가산세'));
+  const p = await newPage({ viewport: { width: 360, height: 740 } });
+  await p.goto(BASE + '#/guide/entertainer/benefit'); await p.waitForTimeout(150);
+  check('360px 긴 업종(연예인·예술인) 혜택 탭 가로 넘침 없음', await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await p.context().close();
+}
+
 // 12. 앱(PWA) 구성
 {
   const m = await page.evaluate(async () => (await fetch('assets/manifest.webmanifest')).json());
