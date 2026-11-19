@@ -23,6 +23,7 @@
 | `youthTaxAgeMax` / `youthSupportAgeMax` | 34 / 39 | 나이 선택지·청년 세액감면·청년 지원사업 안내 |
 | `militaryDeductMaxYears` | 6 | 병역 기간 차감 안내 |
 | `startupTaxFrom` · `startupTaxYouthRange` · `startupTaxNonCapitalYouth` | 2026.1.1 · 50~100% · 100% | 창업중소기업 세액감면 안내 |
+| `vatGeneralH1Due` · `vatGeneralH2Due` · `vatSimpleDue` · `bizStatusReportDue` · `incomeTaxDue` · `incomeTaxFaithfulDue` · `corpTaxMonths` | 07-25 · 01-25 · 01-25 · 02-10 · 05-31 · 06-30 · 3 | 준비물 탭 **법정 기한** 카드(근거 조문은 `meta.deadlineLaws`) |
 | `meta.codeYear` | 2025 | '업종코드 ○○년 귀속 연계표' 표기(`codeBase`와 일치 검사) |
 
 버전은 `app.js` `VERSION` 한 곳(서비스워커 캐시 이름은 등록할 때 `?v=`로 받음), `package.json` 버전과 같은지 QA가 확인한다.
@@ -31,11 +32,11 @@
 
 ```text
 index.html   화면 뼈대·스타일(토스 스타일 공통 팔레트)
-app.js       해시 라우팅(#/ · #/g/업태 · #/guide/업종 · #/search · #/me · #/my), 체크리스트·맞춤 안내·검색·공유·인쇄
-data.js      업종 64종·세제 사전·국세청 업종코드(이 파일이 원본)
+app.js       해시 라우팅(#/ · #/g/업태 · #/finder · #/guide/업종 · #/search · #/me · #/my), 체크리스트·맞춤 안내·검색·공유·인쇄
+data.js      업종 64종·세제 사전·국세청 업종코드·업종 고르기 도우미 매핑(finder)(이 파일이 원본)
 sw.js        오프라인 캐시(네트워크 우선)
 assets/      로고·아이콘·매니페스트·OG 이미지(scripts/render-images.mjs로 생성)
-tests/qa.mjs Chromium QA 105항목
+tests/qa.mjs Chromium QA 117항목
 docs/        CHANGELOG · 자가부검·레드팀 보고서
 ```
 
