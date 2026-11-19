@@ -8,9 +8,10 @@
 
 /* ---------- 버전 정보 (수정 시마다 갱신) ---------- */
 const APP_VERSION = {
-  version: 'v3.28.0',
+  version: 'v3.29.0',
   updated: '2026-11-19',
   changelog: [
+    { v:'v3.29.0', d:'2026-11-19', note:'오해 방지(B안): 화면 등급 이름을 \'조건부 추천\' → \'확인 후 신청\'으로(정답셋 실측: 추천 75%·조건부 45%), 결과 목록을 \'✅ 추천\' → \'🔎 확인 후 신청\' 두 칸으로 나누고, 첫 화면 대표 숫자를 추천 건수로, 카드에 \'공고에서 확인: …\'(확인할 조건) 표시, 지원별 상위 칸 제목에서 \'추천\' 제거' },
     { v:'v3.28.0', d:'2026-11-19', note:'토스 스타일 리디자인(BECONIC 진단 공통: 회색 바탕·흰 카드·파랑 하나만 강조·56px 버튼·모바일 하단 고정 버튼, 남색 요약·상담·바닥글을 흰 면으로, 글자 대비 AA·터치 40px 이상). 시·군·구 판정 보완: \'공동구매\'의 \'동구\' 같은 오탐 차단, 공고명·기관에 같은 시·도의 다른 시·군·구가 있으면 확인 필요, 기관명 앞머리 약칭(마포·관악 등)으로 지역·내 시·군·구 판정, [광역시] + 자치구 공고는 대상 지역이 둘이어도 그 자치구로' },
     { v:'v3.27.0', d:'2026-11-01', note:'정밀도 개선(상위 10건 42.3% → 51.3%): 예비창업자에게 소상공인 사업·자금만 원하면 행사·교육·투자 연계·유공자 포상 낮춤, 공고명 (법인/개인사업자) 판정, 출산·양육 대상 확인 필요, 업력 8년 이상은 창업 사업 확인 필요, 농식품 사업은 음식점·도소매와 거리, 넷제로·혁신제품·소프트웨어 분야 한정. 결과 링크(조건을 주소에 담아 같은 매칭 다시 열기·링크 복사), 이용 측정(이벤트 이름·건수만), 카카오 챗봇 줄임말 검색(예창패·청창사·소진공 등)' },
     { v:'v3.26.1', d:'2026-11-01', note:'상담 전화번호 변경: 070-4103-4177 → 02-6124-5960(상담 안내·신청 도움받기·인쇄 머리말·푸터·카카오 챗봇 상담 카드·전화 버튼)' },
@@ -376,6 +377,13 @@ function regionHint(p){
   const out=new Set([...s.matchAll(SIDO_TOKEN)].map(m=>m[1]));
   for(const m of s.matchAll(DISTRICT_TOKEN)) out.add(UNIQUE_DISTRICT[m[1]]);
   const ad=agencyDistrict(p); if(ad) out.add(ad.sido);
+  // 개요 첫머리의 '○○도 소재 …' — 전국 공고로 올라왔지만 특정 시·도 기업만 대상인 경우(예: '경상북도 소재 퍼스널케어 기업')
+  const lead=String(p.supportDescription||'').slice(0,400);
+  for(const m of lead.matchAll(/([가-힣]{2,7})\s*(?:내\s*)?소재\s*[^.☞\n]{0,30}?(?:기업|업체|사업자|소상공인)/g)){
+    const w=m[1].replace(/(특별자치도|특별자치시|특별시|광역시|도)$/,'');
+    const hit=REGIONS.find(r=>r===w) || (SIDO_LONG.find(([re])=>re.test(m[1]))||[])[1];
+    if(hit) out.add(hit);
+  }
   for(const [re,k] of SIDO_LONG) if(re.test(s)) out.add(k);
   return out.size>3 ? [] : [...out];   // 여러 시·도를 나열한 공고는 전국으로 둔다
 }
@@ -1034,6 +1042,10 @@ const App = (function(){
   let toastTimer = null;
   let lastFocus = null;          // 모달 닫을 때 포커스 복귀
   const ST_CLS = {'추천':'ok','조건부 추천':'cond','확인 필요':'check','대상 아님':'no'};
+  /* 화면 이름: '추천'은 판정된 자격을 모두 충족한 사업에만. 내부 '조건부 추천'(정답셋 실측 맞음 45%)은 '확인 후 신청'으로 —
+     추천처럼 읽히지 않게 한다(내부 등급 값·정렬·집계는 그대로) */
+  const ST_LABEL = {'추천':'추천','조건부 추천':'확인 후 신청','확인 필요':'확인 필요','대상 아님':'대상 아님'};
+  const stLabel = (st) => ST_LABEL[st] || st;
   let ppTmp = {};
 
   const FIELD_ICON={'정책자금/금융':'💰','R&D/기술':'🔬','창업':'🌱','사업화':'🚀','판로':'🛒',
@@ -1491,7 +1503,7 @@ const App = (function(){
       .map(x=>`<span class="ppb-chip">${labels[x.n]} <b>${x.c.toLocaleString()}건</b></span>`).join('');
     el.innerHTML=`<div class="pp-banner">
       <div class="ppb-t"><b>${needed.length}가지만 더 알려주시면 사업 <em>${imp.total.toLocaleString()}건</em>의 자격을 확정할 수 있어요</b>
-        <span>지금은 이 정보가 없어 '조건부'나 '확인 필요'로 남아 있는 사업이에요. 입력 정보는 이 브라우저에만 저장됩니다.</span>
+        <span>지금은 이 정보가 없어 '확인 후 신청'이나 '확인 필요'로 남아 있는 사업이에요. 입력 정보는 이 브라우저에만 저장됩니다.</span>
         <div class="ppb-chips">${chips}</div></div>
       <button type="button" class="btn btn-primary" onclick="App.openProgressive()">추가 정보 입력하기 →</button>
     </div>`;
@@ -1534,7 +1546,7 @@ const App = (function(){
         ${c.companyType==='예비창업자' ? '' : step(2,'사업자 형태·설립연도',f.s2,`${esc(c.bizRegType||'형태 미입력')} · ${c.establishedYear?esc(c.establishedYear)+'년 설립':'설립연도 미입력'}`)}
         ${step(3,'세부 자격',f.s3, missing3?`매출·인원·연령·해당 항목 중 ${missing3}개 미입력`:'매출·인원·연령·인증 반영',
           missing3?`<button type="button" class="fn-more" onclick="App.openProgressive()">입력하면 더 정확</button>`:'')}
-        ${step(4,'필요한 지원 맞춤',f.s4,'추천·조건부 — 아래 목록')}
+        ${step(4,'필요한 지원 맞춤',f.s4,'추천·확인 후 신청 — 아래 목록')}
       </ol>
       ${f.s3>f.s4?`<button type="button" class="fn-link" onclick="App.showConditionsMet()">3단계까지 맞지만 필요한 지원과 덜 맞는 사업은 아래 '조건은 맞는 사업'에서 볼 수 있어요 →</button>`:''}
     </section>`;
@@ -1554,7 +1566,7 @@ const App = (function(){
     const steps = [
       {label: live ? '접수 중·예정 공고' : '예시 공고', n:d.active, cls:'f0'},
       {label:'자격 대상', n:d.considerable, cls:'f1', note:d.active-d.considerable>0?`−${(d.active-d.considerable).toLocaleString()} 자격 미충족·지역·업종 등 대상 아님`:''},
-      {label:'추천·조건부', n:d.primary, cls:'f2', note:d.check?`−${d.check.toLocaleString()} 정보 부족·적합도 낮음`:''},
+      {label:'추천·확인 후 신청', n:d.primary, cls:'f2', note:d.check?`−${d.check.toLocaleString()} 정보 부족·적합도 낮음`:''},
       {label:'추천', n:d.recommend, cls:'f3'},
     ];
     const top = Math.max(1, d.active);
@@ -1579,9 +1591,9 @@ const App = (function(){
     } else {
       heroBody = d.recommend
         ? `<div class="dh-amount dh-amount-sm">추천 ${d.recommend}건</div>
-           <div class="dh-sub">추천 사업의 지원금액은 공고문에서 확인이 필요합니다. 조건부 ${d.conditional}건은 공고 확인 후 합산 대상이 됩니다.</div>`
+           <div class="dh-sub">추천 사업의 지원금액은 공고문에서 확인이 필요합니다. 확인 후 신청 ${d.conditional}건은 공고 확인 후 합산 대상이 됩니다.</div>`
         : `<div class="dh-amount dh-amount-sm">추천 확정 사업 없음</div>
-           <div class="dh-sub">조건부 ${d.conditional}건·확인 필요 ${d.check}건은 공고문 확인이 필요해 지원금 합계에 넣지 않았습니다. 선택 정보(설립 월·규모·인증)를 넣으면 추천으로 확정되는 사업이 늘어납니다.</div>`;
+           <div class="dh-sub">확인 후 신청 ${d.conditional}건·확인 필요 ${d.check}건은 공고문 확인이 필요해 지원금 합계에 넣지 않았습니다. 선택 정보(설립 월·규모·인증)를 넣으면 추천으로 확정되는 사업이 늘어납니다.</div>`;
       if(d.closingSoon>0) heroBody += `<div class="dh-chips"><span class="dchip soon">⏰ 마감임박 ${d.closingSoon}건</span></div>`;
     }
     const heroLabel = d.grantMax>0 || d.loanMax>0 ? '바로 검토할 추천 사업' : '추천 사업 지원 규모';
@@ -1590,8 +1602,8 @@ const App = (function(){
     const hookBanner = `
       <button type="button" class="hook-banner" onclick="App.scrollToResults()">
         ${srcLabel} <span class="hook-num">${d.active.toLocaleString()}</span>개 중,
-        검토할 만한 사업 <span class="hook-match">${d.primary}개</span>
-        <span class="hook-split">(추천 ${d.recommend} · 조건부 ${d.conditional})${d.check?` · 정보가 더 필요한 사업 ${d.check}개`:''}</span>
+        <b>추천 <span class="hook-match">${d.recommend}개</span></b>
+        <span class="hook-split">· 확인 후 신청 ${d.conditional}개${d.check?` · 정보가 더 필요한 사업 ${d.check}개`:''}</span>
         <span class="hook-cta">아래에서 확인 ↓</span>
       </button>`;
 
@@ -1602,9 +1614,9 @@ const App = (function(){
           ${heroBody}
         </div>
         <div class="dash-card">
-          <div class="dc-title">분야별 구성 <small>추천·조건부 · 대표 분야 기준</small></div>
+          <div class="dc-title">분야별 구성 <small>추천·확인 후 신청 · 대표 분야 기준</small></div>
           <div class="donut-wrap">${donutSVG(segs)}
-            <div class="donut-center"><b>${d.primary}</b><span>추천·조건부</span></div>
+            <div class="donut-center"><b>${d.primary}</b><span>추천·확인 후 신청</span></div>
           </div>
         </div>
         <div class="dash-card">
@@ -1614,7 +1626,7 @@ const App = (function(){
       </div>
       <div class="status-legend" aria-label="판정 범례">
         <span class="lg-item"><i class="lg-dot ok"></i><b>추천</b> 판정된 자격 모두 충족·적합도 높음</span>
-        <span class="lg-item"><i class="lg-dot cond"></i><b>조건부</b> 미충족 없음 · 일부 조건 공고 확인 또는 적합도 보통</span>
+        <span class="lg-item"><i class="lg-dot cond"></i><b>확인 후 신청</b> 걸리는 조건은 없지만 공고에서 확인할 조건이 남음</span>
         <span class="lg-item"><i class="lg-dot check"></i><b>확인 필요</b> 고른 지원과 덜 맞거나 정보 부족(목록 아래 '더 보기')</span>
       </div>`;
   }
@@ -1709,7 +1721,18 @@ const App = (function(){
       // 위 '지원별 추천'에 나온 사업은 전체 목록에서 다시 보여주지 않는다
       const picks=needPicks(), picked=new Set(picks.flatMap(x=>x.items));
       const rest=prim.filter(m=>!picked.has(m));
-      cards.innerHTML = needPicksHTML(picks) + closingStrip() + `<div class="list-head">전체 목록 <small>분야별${picked.size?` · 위 추천 ${picked.size}건 제외`:''}</small></div>` + renderGroupedByField(rest) + (showCheck ? checkSection(list.filter(m=>m.state==='확인 필요')) : '') + checkRow();
+      const recRest=rest.filter(m=>m.state==='추천'), condRest=rest.filter(m=>m.state!=='추천');
+      const tier=(cls,title,sub,arr)=>arr.length ? `<div class="tier-head ${cls}"><b>${title}</b> <span class="tier-n">${arr.length}건</span><small>${sub}</small></div>` + renderGroupedByField(arr) : '';
+      // 확정 추천이 하나도 없으면: 빈 느낌 대신 다음 행동(추가 정보로 확정 · 전문가 확인)
+      const firstCond = prim.find(m=>m.state!=='추천');
+      const noRec = !prim.some(m=>m.state==='추천') && firstCond ? `<div class="no-rec"><b>자격을 모두 확인한 '추천' 사업은 아직 없어요</b>
+        <p>아래는 걸리는 조건은 없지만 공고에서 확인할 조건이 남은 사업이에요. 정보를 더 넣으면 일부가 추천으로 확정되고, 전문가가 신청 가능 여부를 대신 확인해 드릴 수도 있어요.</p>
+        <div class="no-rec-btns">${collectNeeded().length?`<button type="button" class="btn btn-primary btn-sm" onclick="App.openProgressive()">추가 정보 넣고 확정하기</button>`:''}
+        <button type="button" class="btn btn-ghost btn-sm" onclick="App.openHelp('${esc(firstCond.program.sourceProgramId)}')">전문가 확인 요청</button></div></div>` : '';
+      cards.innerHTML = noRec + needPicksHTML(picks) + closingStrip() + `<div class="list-head">전체 목록 <small>분야별${picked.size?` · 위에 나온 ${picked.size}건 제외`:''}</small></div>`
+        + tier('ok','✅ 추천','판정된 자격을 모두 충족하고 고르신 지원과 잘 맞아요',recRest)
+        + tier('cond','🔎 확인 후 신청','자격에 걸리는 조건은 없지만 공고에서 확인할 조건이 남았어요 — 신청 전 공고를 확인하세요',condRest)
+        + (showCheck ? checkSection(list.filter(m=>m.state==='확인 필요')) : '') + checkRow();
       return;
     }
     const shown = list.slice(0, listLimit);
@@ -1754,8 +1777,8 @@ const App = (function(){
   }
   function needPicksHTML(picks=needPicks()){
     if(!picks.length) return '';
-    return watchHitsHTML() + `<section class="need-picks" aria-label="선택하신 지원별 추천">
-      <div class="np-head">📌 선택하신 지원별 추천 <small>조건에 맞는 사업 중 지원별 상위 3건</small></div>
+    return watchHitsHTML() + `<section class="need-picks" aria-label="고르신 지원별 먼저 볼 사업">
+      <div class="np-head">📌 고르신 지원별 먼저 볼 사업 <small>지원별 상위 3건 · 카드마다 '추천'(자격 모두 충족)과 '확인 후 신청'(공고 확인 필요)을 구분해 표시</small></div>
       ${picks.map(({n,items})=>`<div class="np-group">
         <h3 class="np-title">${esc(NEEDS[n].label)} <small>${esc(NEEDS[n].sub)}</small></h3>
         ${items.length ? `<div class="need-group-cards">${items.map(cardHTML).join('')}</div>`
@@ -1791,12 +1814,12 @@ const App = (function(){
     if(!soon.length) return '';
     const rows = soon.slice(0,5).map(m=>{ const dl=dlBadge(m.dl); return `
       <button type="button" class="cs-row" data-id="${esc(m.program.sourceProgramId)}" onclick="App.openDetail(this.dataset.id)">
-        <span class="rc-state ${ST_CLS[m.state]}">${esc(m.state)}</span>
+        <span class="rc-state ${ST_CLS[m.state]}">${esc(stLabel(m.state))}</span>
         <span class="cs-name">${esc(m.program.programName)}</span>
         <span class="rc-dl ${dl.cls}">${dl.icon} ${esc(dl.txt)}</span>
       </button>`; }).join('');
     return `<section class="closing-strip" aria-label="이번 주 마감">
-      <div class="cs-head">⏰ 이번 주 마감 <small>추천·조건부 ${soon.length}건${soon.length>5?' 중 마감 빠른 5건':''}</small></div>${rows}</section>`;
+      <div class="cs-head">⏰ 이번 주 마감 <small>추천·확인 후 신청 ${soon.length}건${soon.length>5?' 중 마감 빠른 5건':''}</small></div>${rows}</section>`;
   }
   // ② 조건은 맞는 사업: 지역·기업형태·업종에 걸리지 않지만 고른 지원과 덜 맞거나 확인할 정보가 남은 사업 — 내 지역 사업 먼저
   function checkSection(items){
@@ -1824,7 +1847,7 @@ const App = (function(){
     if(n){ const local=hiddenCheckLocal();
       return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">조건은 맞는 사업 ${n}건 더 보기${local?` · 내 지역 ${local}건`:''}</button>
       <p>지역·기업형태·업종은 맞지만 고른 지원과 덜 맞거나 확인할 정보가 남은 사업이에요. 선택 정보(해당되는 항목·매출 규모 등)를 넣으면 일부가 추천으로 바뀔 수 있어요.</p></div>`; }
-    if(showCheck && primaryOf(listed()).length) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">추천·조건부만 보기</button></div>`;
+    if(showCheck && primaryOf(listed()).length) return `<div class="check-row"><button type="button" class="more-btn" onclick="App.toggleCheck()">추천·확인 후 신청만 보기</button></div>`;
     return '';
   }
   function renderResultCount(n){
@@ -1906,11 +1929,12 @@ const App = (function(){
     const eligLine = m.state==='대상 아님'
       ? `<span class="chk">대상 아님 · ${esc(m.dl.state==='CLOSED' ? '접수 마감' : fail ? fail.label+(fail.evidence?` — ${fail.evidence}`:'') : '자격 미충족')}</span>`
       : checkItems.length
-      ? `자격 ${passCount}개 충족 · <span class="chk">${esc(checkItems.slice(0,2).join('·'))}${checkItems.length>2?` 외 ${checkItems.length-2}`:''} 확인 필요</span>`
-      : `판정된 자격 ${passCount}개 모두 충족`;
+      ? `자격 ${passCount}개 충족 · <span class="chk">공고에서 확인: ${esc(checkItems.slice(0,2).join('·'))}${checkItems.length>2?` 외 ${checkItems.length-2}`:''}</span>`
+      : m.state==='추천' ? `판정된 자격 ${passCount}개 모두 충족`
+      : `판정된 자격 ${passCount}개 충족 · <span class="chk">고르신 지원과 관련도 보통</span>`;
     return `<article class="rcard ${ST_CLS[m.state]}" data-id="${esc(p.sourceProgramId)}">
       <div class="rc-line1">
-        <span class="rc-state ${ST_CLS[m.state]}">${esc(m.state)}</span>
+        <span class="rc-state ${ST_CLS[m.state]}">${esc(stLabel(m.state))}</span>
         <span class="rc-dl ${dl.cls}">${dl.icon} ${esc(dl.txt)}</span>
       </div>
       <h3>${esc(p.programName)}</h3>
@@ -2058,7 +2082,7 @@ const App = (function(){
     const depth = p._aiEnriched ? 'AI 본문 분석(근거 문구 대조)' : p.eligibilityDepth==='doc' ? '공고문(PDF) 신청자격 분석' : p.eligibilityDepth==='rule' ? '공고 본문 정형 문구 분석' : p.eligibilityDepth==='listing' ? '공고 목록 정보(본문 미분석)' : ProgramProvider.lastMode==='live' ? '공고 정보' : 'DEMO 예시 데이터';
     const period = (p.applicationStart||p.applicationEnd) ? `${p.applicationStart||'—'} ~ ${p.applicationEnd||'—'}` : periodText(p, m.dl);
     document.getElementById('modalBody').innerHTML=`
-      <span class="rc-state ${ST_CLS[m.state]}" style="align-self:flex-start">${esc(m.state)}</span>
+      <span class="rc-state ${ST_CLS[m.state]}" style="align-self:flex-start">${esc(stLabel(m.state))}</span>
       <h2 id="modalTitle" style="margin:8px 0 4px">${esc(p.programName)}</h2>
       <div class="m-info">
         <div><span>소관기관</span><b>${esc(p.agency||'—')}</b></div>
@@ -2288,8 +2312,8 @@ const App = (function(){
     const dl=m=>m.dl.dday==null ? '상시·예산 소진 시' : m.dl.state==='UPCOMING' ? `접수 예정 D-${m.dl.dday}` : m.dl.dday===0 ? '오늘 마감' : `마감 D-${m.dl.dday}`;
     return [`[BECONIC 지원사업 매칭 결과] ${fmtStamp(new Date())}`,
       [company.region, company.district, company.companyType, company.industry].filter(Boolean).join(' · '),
-      `추천 ${dash.recommend}건 · 조건부 ${dash.conditional}건`, '',
-      ...top.map((m,i)=>`${i+1}. [${m.state==='추천'?'추천':'조건부'}] ${m.program.programName} (${dl(m)})${safeUrl(m.program.originalUrl)?`\n   ${safeUrl(m.program.originalUrl)}`:''}`),
+      `추천 ${dash.recommend}건 · 확인 후 신청 ${dash.conditional}건`, '',
+      ...top.map((m,i)=>`${i+1}. [${m.state==='추천'?'추천':'확인 후 신청'}] ${m.program.programName} (${dl(m)})${safeUrl(m.program.originalUrl)?`\n   ${safeUrl(m.program.originalUrl)}`:''}`),
       '', `같은 조건으로 다시 보기: ${shareUrl()}`].join('\n');
   }
   async function printReport(){

@@ -812,6 +812,19 @@ footer .cert{color:var(--ink-2);background:var(--fill);border-color:transparent}
 footer .f-cta a{color:var(--ink-2);background:var(--fill);border-color:transparent}
 footer .f-cta a:hover{background:var(--primary);border-color:var(--primary);color:#fff}
 footer .foot-bottom{border-top-color:var(--line)}
+/* B안: 목록을 '추천' → '확인 후 신청' 두 칸으로 */
+.tier-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:28px 0 4px;padding:16px 18px;border-radius:16px;background:#fff}
+.tier-head b{font-size:18px;letter-spacing:-.02em}
+.tier-head .tier-n{font-size:15px;font-weight:700;color:var(--primary-strong)}
+.tier-head small{flex-basis:100%;font-size:13px;color:var(--sub);line-height:1.5}
+.tier-head.ok{box-shadow:inset 4px 0 0 var(--ok)}
+.tier-head.cond{box-shadow:inset 4px 0 0 var(--cond)}
+.tier-head.cond .tier-n{color:var(--cond)}
+.hook-banner b .hook-match{color:var(--primary)}
+.no-rec{background:#fff;border-radius:16px;padding:18px 20px;margin:0 0 16px;box-shadow:inset 4px 0 0 var(--cond)}
+.no-rec b{display:block;font-size:16px;margin-bottom:6px}
+.no-rec p{margin:0 0 12px;font-size:13.5px;color:var(--sub);line-height:1.6}
+.no-rec-btns{display:flex;gap:8px;flex-wrap:wrap}
 /* 점검 반영: 작은 글자 파랑은 진한 파랑, 터치 영역 40px 이상 */
 .kicker,.panel-head .kicker,.cta-kicker{color:var(--primary-strong)}
 .ai-badge{color:var(--primary-strong);background:var(--primary-soft)}
@@ -954,7 +967,7 @@ footer .foot-bottom{border-top-color:var(--line)}
       <div class="panel-head">
         <span class="kicker">매칭 결과</span>
         <h2 style="font-size:22px">검토할 만한 지원사업</h2>
-        <p>자격 판정에서 제외되지 않은 사업을 지원분야별로 묶었습니다. 추천·조건부 사업을 먼저 보여주고, 기본 정렬은 추천순입니다.</p>
+        <p>자격을 모두 충족한 '추천' 사업을 먼저, 공고에서 확인할 조건이 남은 '확인 후 신청' 사업을 그다음에 보여 드려요.</p>
       </div>
       <div class="res-actions" id="resActions">
         <button type="button" class="btn btn-back btn-sm" onclick="App.editInputs()">← 조건 수정</button>
