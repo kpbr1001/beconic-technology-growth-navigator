@@ -262,7 +262,7 @@ button:focus-visible,.chip-opt:focus-visible,.check-item:focus-visible{outline:3
         <h1 style="margin-top:14px">우리 기업의 <span class="hl">고객문제와 솔루션</span>이<br/>정말 연결되어 있는지 진단하세요</h1>
         <p class="lead">문제정의, 고객검증, 가치제안, 솔루션 적합성, 실행 로드맵까지 한 번에 확인하는 근거 기반 비즈니스 진단 웹앱입니다.</p>
         <div class="hero-cta">
-          <button class="btn btn-gold btn-lg" onclick="startDiagnosis()">무료 진단 시작하기 →</button>
+          <button class="btn btn-gold btn-lg" onclick="startDiagnosis()">진단 시작하기 →</button>
           <button class="btn btn-ghost btn-lg" onclick="loadSampleAndStart()">샘플로 미리보기</button>
         </div>
         <div class="resume-bar hidden" id="resumeBar"></div>
@@ -438,7 +438,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-600
 <div id="screen-form" class="screen">
   <div class="form-shell">
     <div class="form-help-bar">
-      <span>💡 각 문항의 <b>작성법</b>대로 쓰면 아래 <b>작성 체크</b>가 채워지고, 그 체크가 곧 채점 기준입니다. 모르는 항목은 <b>“잘 모름”</b>으로 두어도 됩니다.</span>
+      <span>💡 각 문항의 <b>✍️ 이렇게 쓰세요</b>대로 쓰면 입력칸 아래 <b>작성 체크</b>가 하나씩 채워져요. 이 체크가 곧 채점 기준입니다. 모르는 항목은 <b>“잘 모름”</b>으로 두어도 됩니다.</span>
       <button class="btn btn-sm btn-ghost" onclick="fillSample()">샘플 데이터 채우기</button>
     </div>
 
@@ -1434,6 +1434,80 @@ input:focus,select:focus,textarea:focus{background:#fff;border-color:var(--t-blu
 /* 보고서 미리보기: 휴대폰에서는 A4를 화면 폭에 맞춰 축소(인쇄는 원래 크기) */
 @media print{ .report-doc{zoom:1 !important;} }
 textarea.autogrow{overflow:hidden;resize:none;}
+/* ===== v2.4 데스크톱 폭 확대 · 문항 가이드 개편 ===== */
+.wrap{max-width:1280px;padding:0 32px;}
+.form-shell{max-width:960px;padding:48px 32px 96px;}
+.form-help-bar{padding:16px 20px;font-size:14.5px;line-height:1.6;}
+.step-dots{gap:8px;margin-bottom:36px;}
+.step-dot{font-size:13px;padding:10px 6px;}
+.step-desc{font-size:15px;margin-bottom:32px;}
+.field{margin-bottom:36px;}
+.field.row2{gap:24px;}
+label.flab{font-size:16px;margin-bottom:10px;line-height:1.45;}
+.fhint{font-size:13.5px;}
+/* 실시간 작성 체크: 입력칸 바로 아래 한 줄 */
+.f-meter{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;font-size:13px;}
+.f-meter .fm-l{font-weight:700;color:var(--t-g600);margin:0;}
+.f-meter .fm-l em{font-style:normal;color:var(--t-blue);margin-left:2px;}
+.f-meter .fm-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.fm-chip{border:0;background:var(--t-g100);color:var(--t-g500);padding:4px 10px;font-size:12.5px;font-weight:600;}
+.fm-chip.hit{background:var(--ok-bg);color:var(--ok);}
+.fm-state{margin-left:auto;font-size:12.5px;padding:4px 10px;border-radius:8px;}
+.fm-state.s-empty{background:var(--t-g100);color:var(--t-g500);}
+/* 작성 가이드 카드 */
+.f-guide{margin-top:12px;background:var(--t-g50);border:1px solid var(--t-g100);border-left:1px solid var(--t-g100);border-radius:16px;padding:18px 20px;display:grid;gap:14px;font-size:14px;line-height:1.65;}
+.fg-row{display:grid;grid-template-columns:132px 1fr;gap:14px;align-items:start;}
+.fg-tag{background:none !important;padding:0;font-size:13px;font-weight:700;letter-spacing:0;white-space:nowrap;line-height:1.65;border-radius:0;}
+.fg-how .fg-tag{color:var(--t-g900);}
+.fg-how .fg-txt{color:var(--t-g900);font-weight:600;}
+.fg-good .fg-tag{color:var(--ok);}
+.fg-good .fg-txt{color:var(--t-g700);background:#fff;border-radius:12px;padding:10px 14px;border:1px solid var(--t-g100);}
+.fg-bad{border-top:1px dashed var(--t-g200);padding-top:12px;color:var(--t-g700);}
+.fg-bad summary{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--t-g600);padding:4px 0;}
+.fg-bad summary:hover{color:var(--bad);}
+.fg-bad summary::before{content:"＋";font-weight:700;}
+.fg-bad[open] summary::before{content:"－";}
+.fg-bad[open] summary{color:var(--bad);}
+.fg-bad .fg-badtxt{margin-top:10px;display:grid;gap:8px;}
+.fg-badex{background:var(--bad-bg);color:var(--t-g800);border-radius:12px;padding:10px 14px;display:flex;gap:8px;}
+.fg-badex .fg-x{color:var(--bad);font-weight:800;flex-shrink:0;}
+.fg-why{font-size:13.5px;color:var(--t-g700);padding:0 4px;}
+.fg-why b{color:var(--t-g900);margin-right:4px;}
+/* 가이드가 없는 선택형 문항의 예시 */
+.f-ex{margin-top:10px;background:var(--t-g50);border:1px solid var(--t-g100);border-left:1px solid var(--t-g100);border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.6;color:var(--t-g700);}
+.f-ex b{color:var(--t-g900);font-weight:700;}
+@media (min-width:721px){ .form-nav{margin-top:44px;} }
+.save-note{font-size:13px;}
+/* 2열 칸 안(좁은 폭)에서는 가이드를 세로로 */
+.field.row2 .fg-row{grid-template-columns:1fr;gap:6px;}
+/* 랜딩 · 결과 화면 데스크톱 스케일 */
+@media (min-width:1100px){
+  .hero-meta{display:grid;grid-template-columns:repeat(2,max-content);gap:10px;}
+  .hero{padding:96px 0 88px;}
+  .hero h1{font-size:52px;}
+  .hero p.lead{font-size:19px;max-width:620px;}
+  .beacon{max-width:360px;}
+  .section{padding:88px 0;}
+  .section-head{max-width:760px;margin-bottom:52px;}
+  .section-head h2{font-size:34px;}
+  .dash{padding-top:44px;}
+  .dash-grid{gap:24px;}
+  .dash-verdict p{max-width:720px;font-size:15.5px;}
+  .d-card{padding:30px 32px;}
+  .step-h{font-size:32px;}
+}
+@media (max-width:720px){
+  .wrap{padding:0 20px;}
+  .form-shell{padding:28px 20px 120px;}
+  .field{margin-bottom:28px;}
+  .field.row2{gap:28px;}
+  label.flab{font-size:15.5px;}
+  .f-guide{padding:14px 16px;gap:12px;font-size:13.5px;}
+  .fg-row{grid-template-columns:1fr;gap:6px;}
+  /* 모바일: 1줄 = '작성 체크 n/m · 상태', 2줄 = 체크 칩 */
+  .f-meter .fm-l{order:0;} .fm-state{order:1;margin-left:0;} .f-meter .fm-chips{order:2;flex-basis:100%;}
+}
+@media (max-width:360px){ .wrap{padding:0 16px;} .form-shell{padding-left:16px;padding-right:16px;} }
 </style>
 <script>
 /* ==================================================================
@@ -1686,11 +1760,12 @@ function loadSampleAndStart(){ startDiagnosis({fresh:true}); setTimeout(()=>{ fi
 /* ---------- 문항 작성 가이드 주입 (GUIDE 단일 출처 → 폼 안내·실시간 체크·채점 공통) ---------- */
 function guideHTML(k){
   const g=GUIDE[k]; if(!g) return "";
-  return `<div class="f-guide" data-guide="${k}">
-    <div class="fg-row fg-how"><span class="fg-tag">작성법</span><span>${g.how}</span></div>
-    <div class="fg-row fg-good"><span class="fg-tag">좋은 예</span><span>${g.good}</span></div>
-    ${g.bad?`<details class="fg-bad"><summary>피할 예 보기</summary><div class="fg-badtxt"><s>${g.bad}</s> → ${g.badWhy||''}</div></details>`:''}
-  </div>${g.checks?`<div class="f-meter" data-meter="${k}" aria-live="polite"></div>`:''}`;
+  /* 순서: ① 입력 바로 아래 실시간 작성 체크 ② 작성 가이드 카드(작성법 → 좋은 예 → 피할 예 접기) */
+  return `${g.checks?`<div class="f-meter" data-meter="${k}" aria-live="polite"></div>`:''}<div class="f-guide" data-guide="${k}">
+    <div class="fg-row fg-how"><span class="fg-tag">✍️ 이렇게 쓰세요</span><span class="fg-txt">${g.how}</span></div>
+    <div class="fg-row fg-good"><span class="fg-tag">👍 좋은 예</span><span class="fg-txt">${g.good}</span></div>
+    ${g.bad?`<details class="fg-bad"><summary>피해야 할 예 보기</summary><div class="fg-badtxt"><div class="fg-badex"><span class="fg-x">✕</span>${g.bad}</div><div class="fg-why"><b>왜 안 되나요?</b> ${g.badWhy||''}</div></div></details>`:''}
+  </div>`;
 }
 const METER_STATE={empty:"미입력",thin:"보강 필요",ok:"양호",rich:"우수",junk:"의미 없는 입력",placeholder:"자리채움 값",dup:"다른 문항과 중복"};
 function renderMeter(k){
@@ -1698,7 +1773,8 @@ function renderMeter(k){
   if(!box||!el) return;
   const q=fieldQuality(k,el.value,null);
   const chips=(GUIDE[k].checks||[]).map(c=>`<span class="fm-chip ${q.hits.includes(c)?'hit':''}">${q.hits.includes(c)?'✓':'○'} ${SIG[c].label}</span>`).join('');
-  box.innerHTML=`<span class="fm-l">작성 체크</span>${chips}<span class="fm-state s-${q.state}">${METER_STATE[q.state]||''}</span>`;
+  const hit=(GUIDE[k].checks||[]).filter(c=>q.hits.includes(c)).length, tot=(GUIDE[k].checks||[]).length;
+  box.innerHTML=`<span class="fm-l">작성 체크 <em>${hit}/${tot}</em></span><span class="fm-chips">${chips}</span><span class="fm-state s-${q.state}">${METER_STATE[q.state]||''}</span>`;
 }
 function renderAllMeters(){ TEXT_KEYS.forEach(renderMeter); }
 function mountGuides(){
@@ -2911,8 +2987,10 @@ const CERT=`중소벤처기업부 인증 중소기업상담회사 ${COMPANY.cert
    V2.3 (2026-11-19) 모바일 전수 점검(320~414px 넘침 0, 하단 시트 모달, 이력 카드, 보고서 미리보기 화면 맞춤),
                      휴대폰 뒤로 버튼 연동, 키보드 열림 시 하단 버튼 숨김, 서술 칸 자동 높이, 음수 인원 방어,
                      아이디어 단계 문장·조사 보정, PWA 제거(옛 서비스 워커 자가 해제), OG 이미지 배포 포함
+   V2.4 (2026-11-19) 데스크톱 폭 확대(본문 1280·입력 960px, 글자·여백 재조정), 문항 가이드 개편(작성 체크 n/m을 입력칸 바로 아래로,
+        가이드 카드 여백·라벨 정리, 피할 예는 접어서 이유와 함께), 첫 화면 버튼 '진단 시작하기'.
 */
-const APP_VERSION="V2.3";
+const APP_VERSION="V2.4";
 const REPORT_TITLE="고객문제·솔루션 적합성 진단보고서";
 const APP_UPDATED="2026-11-19";               // 최종 업데이트 일자
 const COPYRIGHT=`© ${copyYears()} ${COMPANY.en} All rights reserved.`;
