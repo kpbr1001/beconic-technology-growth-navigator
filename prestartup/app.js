@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.4.1';
+const VERSION = '1.5.0';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -114,6 +114,24 @@ function nextTodo(id){
 }
 const bizRegDue = open => addDays(open, RULE.bizRegDays);   // 사업자등록 신청 기한(사업 시작일 + N일)
 const duePassed = open => { const t=new Date(); t.setHours(0,0,0,0); return bizRegDue(open) < t; };
+const LAW = D.meta.deadlineLaws;
+const md = mmdd => { const [m,d]=mmdd.split('-').map(Number); return `${m}월 ${d}일`; };
+const hasIn = (it,re) => re.test(JSON.stringify([it.license,it.docs,it.licenseProcess]));
+/* 법정 기한 — 법령에 정해진 순서·마감만(처리에 며칠 걸리는지 같은 추정 기간은 넣지 않는다) */
+function deadlines(it){
+  const out=[], open=S.me.open, od=open?new Date(open+'T00:00:00'):null, y=od?od.getFullYear():null;
+  const lic=it.license.filter(l=>!/통신판매|위생교육/.test(l.name));   // 통신판매·위생교육은 아래 별도 항목
+  if(hasIn(it,/위생교육/)) out.push({t:'위생교육 이수', when:'영업신고 전에 미리', law:/미용|숙박|피부|세탁/.test(it.name)?LAW.publicEdu:LAW.foodEdu});
+  if(lic.length) out.push({t:`인허가 받기 · ${lic[0].name}${lic.length>1?` 외 ${lic.length-1}건`:''}`, when:'사업자등록 신청 전(신청 때 허가·신고·등록증 사본 제출)', law:LAW.licenseFirst});
+  if(hasIn(it,/통신판매/)) out.push({t:'통신판매업 신고', when:'온라인 판매를 시작하기 전(온라인으로 팔 때)', law:LAW.ecommerce});
+  out.push({t:'사업자등록 신청', when: od?`${ymd(bizRegDue(open))}까지`:`사업 시작일부터 ${RULE.bizRegDays}일 안에(시작 전에도 가능)`, law:LAW.bizReg, late: od&&duePassed(open)});
+  const simple=S.me.rev==='lt1';
+  const vatGen = od ? (od.getMonth()<6 ? `${y}년 ${md(RULE.vatGeneralH1Due)}(1~6월분)` : `${y+1}년 ${md(RULE.vatGeneralH2Due)}(7~12월분)`) : `반기마다 ${md(RULE.vatGeneralH1Due)}·${md(RULE.vatGeneralH2Due)}`;
+  const vatSim = od ? `${y+1}년 ${md(RULE.vatSimpleDue)}(1년분)` : `다음 해 ${md(RULE.vatSimpleDue)}(1년에 한 번)`;
+  out.push({t:'첫 부가가치세 확정신고', when: simple?`간이과세자 ${vatSim}`:`일반과세자 ${vatGen} · 간이과세자 ${vatSim}`, law:`${LAW.vatGeneral}·${LAW.vatSimple}`, note:`면세 사업자는 부가세 대신 다음 해 ${md(RULE.bizStatusReportDue)}까지 사업장현황신고(${LAW.bizStatus})`});
+  out.push({t:'첫 종합소득세 신고(개인사업자)', when: od?`${y+1}년 ${md(RULE.incomeTaxDue)}까지`:`개업 다음 해 ${md(RULE.incomeTaxDue)}까지`, law:LAW.incomeTax, note:`성실신고확인 대상은 ${md(RULE.incomeTaxFaithfulDue)}까지 · 법인은 사업연도가 끝나고 ${RULE.corpTaxMonths}개월 안에 법인세(${LAW.corpTax}). 창업 세액감면은 이 신고 때 신청해요`});
+  return out;
+}
 const PASSED_MSG = '이미 지난 기한이에요. 개업했다면 바로 신청하세요(늦으면 가산세가 붙을 수 있어요). 아직 개업 전이면 내 상황에서 개업 예정일을 고쳐 주세요.';
 function addDays(iso, n){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d; }
 const ymd = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
@@ -211,6 +229,7 @@ function render(){
   if(a==='start' && BY_ID[b]){ location.replace(`#/me?next=${b}`); return; }   // 업종을 고르면 항상 ② 내 상황(지난 입력은 미리 채워 확인·수정)
   if(a==='guide' && BY_ID[b]) return renderGuide(b, GSTEPS.some(x=>x.k===parts[2])?parts[2]:'prepare');
   if(a==='search') return renderSearch(q.get('q')||'', q.get('g')||'');
+  if(a==='finder') return renderFinder();
   if(a==='my') return renderMy();
   if(a==='me') return renderMe(BY_ID[q.get('next')] ? q.get('next') : '');
   return renderHome();
@@ -250,6 +269,7 @@ function renderHome(){
       <input id="hq" type="search" enterkeyhint="search" autocomplete="off" placeholder="업종 검색 (예: 카페, 쇼핑몰, 앱)">
     </form>
     <div class="quick" aria-label="자주 찾는 업종">${['카페','온라인 쇼핑몰','소프트웨어','미용실','음식점','유튜브'].map(w=>`<button type="button" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div>
+    <a class="finder-cta" href="#/finder"><span><b>업종 이름을 모르겠다면</b>질문 3개로 맞는 업종을 찾아 드려요</span><span aria-hidden="true">›</span></a>
     <div id="homeResults"></div>
   </section>
 
@@ -312,14 +332,14 @@ function renderGroup(g){
     <p class="muted" style="margin-top:6px">${list.length}개 업종 중에서 고르면 바로 준비 가이드가 열려요.</p></div>
     <div class="list">${list.map(itemHTML).join('')}</div>
     <div class="card" style="margin-top:12px"><b>찾는 업종이 없나요?</b><p class="small muted" style="margin:4px 0 12px">국세청 업종코드 ${NTS_UNIQUE.toLocaleString()}개에서 직접 찾아보세요. 가이드가 있는 업종은 바로 연결돼요.</p>
-    <a class="btn btn-soft btn-sm" href="#/search">업종코드 찾기</a></div></div>`, 'home', g);
+    <div class="row"><a class="btn btn-soft btn-sm" href="#/finder">질문으로 찾기</a><a class="btn btn-gray btn-sm" href="#/search">업종코드 찾기</a></div></div></div>`, 'home', g);
 }
 
 /* ---------- 가이드 ---------- */
 
 /* 입력은 단계(① 업종 → ② 내 상황 → ③ 결과), 결과는 탭(준비물 · 혜택·지원 · 저장·상담) */
 const GSTEPS = [
-  {k:'prepare', n:1, l:'준비물', d:'진행 순서 · 준비 서류 · 인허가', secs:['me','steps','docs','license','ask','pit']},
+  {k:'prepare', n:1, l:'준비물', d:'진행 순서 · 준비 서류 · 인허가', secs:['me','deadline','steps','docs','license','ask','pit']},
   {k:'benefit', n:2, l:'혜택·지원', d:'업종코드 · 세금 혜택 · 지원사업', secs:['code','tax','support','expand']},
   {k:'finish',  n:3, l:'저장·상담', d:'PDF · 전문가 확인 · 신청 사이트', secs:['finish','sites','memo','about']}
 ];
@@ -343,7 +363,7 @@ function stepper(cur, id, group){
 }
 const NAV_EXTRA = [['me','맞춤 안내']];
 const SECS = [
-  ['steps','진행 순서'],['docs','준비 서류'],['license','인허가·신고'],['code','업종코드'],['tax','세금 혜택'],['support','지원사업'],
+  ['deadline','법정 기한'],['steps','진행 순서'],['docs','준비 서류'],['license','인허가·신고'],['code','업종코드'],['tax','세금 혜택'],['support','지원사업'],
   ['ask','미리 답할 질문'],['pit','놓치기 쉬운 점'],['expand','함께 등록·확장'],['sites','신청 사이트'],['memo','내 메모'],['about','자료 기준']
 ];
 function renderGuide(id, step){
@@ -414,6 +434,11 @@ function renderGuide(id, step){
         <p class="note">입력하신 내용으로 확인할 점을 골라 보여 드리는 안내예요. 적용 여부는 관할 기관·전문가 확인이 필요해요.</p></section>`
       :`<section class="card sec no-print" id="sec-me"><div class="expert"><div class="et"><b style="font-size:16px">내 상황을 넣으면 맞춤 안내가 붙어요</b><p class="small muted" style="margin-top:4px">나이·지역·사업장·예상 매출 — 30초, 전부 선택이에요. 세액감면 청년 기준, 자택 등록 가능 여부, 사업자등록 기한을 알려 드려요.</p></div>
         <a class="btn btn-soft" href="#/me?next=${it.id}">30초 입력</a></div></section>`}
+
+      <section class="card sec" id="sec-deadline" aria-label="법정 기한">${secHead('deadline', S.me.open?`<span class="cnt">개업 ${ymd(new Date(S.me.open+'T00:00:00'))} 기준</span>`:`<a class="link-btn no-print" href="#/me?next=${id}">개업 예정일 넣기</a>`)}
+        <p class="sec-d">법령에 정해진 순서와 마감만 담았어요. 처리에 며칠 걸리는지는 기관마다 달라 넣지 않았어요.${S.me.open?'':' 개업 예정일을 넣으면 날짜로 바꿔 드려요.'}</p>
+        <ol class="dl">${deadlines(it).map(x=>`<li class="${x.late?'late':''}"><div class="dl-w">${esc(x.when)}${x.late?' · 지남':''}</div><div class="dl-t">${esc(x.t)}</div>${x.note?`<div class="dl-n">${esc(x.note)}</div>`:''}<div class="dl-l">${esc(x.law)}</div></li>`).join('')}</ol>
+      </section>
 
       <section class="card sec" id="sec-steps">${secHead('steps', `<button type="button" class="tgl no-print" data-track aria-pressed="${S.track}"><i></i>체크하며 관리</button>`)}
         <p class="sec-d no-print">${S.track?'끝낸 항목을 눌러 체크하세요. 이 기기에 저장돼요.':'순서대로 읽어 보세요. 진행 상황을 기록하려면 오른쪽 위 <b>체크하며 관리</b>를 켜세요. PDF에는 항상 체크 칸이 있어요.'}</p>
@@ -619,6 +644,54 @@ function summary(id){
     '', `가이드 다시 보기: ${shareLink(id)}`].join('\n');
 }
 
+/* ---------- 업종 고르기 도우미: 무엇을 → 어디서 → 한 단어 ---------- */
+const FINDER = D.finder;
+function finderRank(f){
+  const what=FINDER.what.find(o=>o.k===f.what), where=FINDER.where.find(o=>o.k===f.where);
+  const kw=(f.kw||'').trim(), hits=kw?searchGuides(kw).map(i=>i.id):[];
+  let ids = what ? what.ids.slice() : (hits.length ? hits.slice() : []);
+  if(what && hits.length){ const inter=ids.filter(i=>hits.includes(i)); if(inter.length) ids=inter.concat(ids.filter(i=>!inter.includes(i))); }
+  return ids.map(id=>{
+    let sc=0; const why=[];
+    if(what && what.ids.includes(id)){ sc+=10; why.push(what.l); }
+    if(where && where.ids.includes(id)){ sc+=5; why.push(where.l); }
+    const hi=hits.indexOf(id); if(hi>=0){ sc+=8-Math.min(hi,6); why.push(`'${kw}'`); }
+    return {it:BY_ID[id], sc, why};
+  }).filter(r=>r.it).sort((a,b)=>b.sc-a.sc);
+}
+function renderFinder(){
+  const f={what:'',where:'',kw:''};
+  mount(`${stepper('pick')}<div class="wrap-narrow">
+    <a class="btn btn-gray btn-sm no-print" href="#/">‹ 업종 검색으로</a>
+    <section class="card" style="padding:28px;margin-top:14px">
+      <div class="eyebrow">업종 고르기 도우미</div><h1 class="h-lg" style="margin:6px 0 6px">업종 이름을 몰라도 괜찮아요</h1>
+      <p class="muted" style="margin-bottom:20px">질문에 답하면 맞는 업종을 바로 추천해요. 첫 질문만 답해도 돼요.</p>
+      <div class="form-q" role="group" aria-labelledby="fq1"><div class="ql" id="fq1">1. 무엇을 파나요?</div>
+        <div class="fopts">${FINDER.what.map(o=>`<button type="button" class="fopt" data-fq="what" data-v="${o.k}" aria-pressed="false"><b>${esc(o.l)}</b><span>${esc(o.h)}</span></button>`).join('')}</div></div>
+      <div class="form-q" role="group" aria-labelledby="fq2"><div class="ql" id="fq2">2. 주로 어디서 파나요? <span class="opt-l">선택</span></div>
+        <div class="opts">${FINDER.where.map(o=>`<button type="button" class="opt" data-fq="where" data-v="${o.k}" aria-pressed="false">${esc(o.l)}</button>`).join('')}</div></div>
+      <div class="form-q"><label class="ql" for="fkw">3. 한 단어로 말하면? <span class="opt-l">선택</span></label><div class="qh">예: 커피, 화장품, 네일, 앱, 인테리어</div>
+        <input class="inp" id="fkw" type="search" autocomplete="off" placeholder="한 단어로 입력" style="width:100%"></div>
+    </section>
+    <section class="card" id="fres" aria-live="polite"></section>
+  </div>`, 'home', '업종 고르기 도우미');
+  const draw=()=>{
+    const r=finderRank(f).slice(0,5);
+    $('#fres').innerHTML = !f.what && !f.kw.trim() ? `<p class="muted">1번 질문에 답하면 추천 업종이 여기에 나와요.</p>`
+      : r.length ? `<div class="sec-h"><h2>추천 업종</h2><span class="cnt">맞는 순서</span></div>
+        <div class="list" style="padding:0;margin:0 -10px">${r.map((x,i)=>`<a class="item fr" href="#/start/${x.it.id}"><span class="ii" aria-hidden="true">${i===0?'⭐':D.groupMeta[x.it.group]}</span><span class="ib"><b>${esc(x.it.name)}</b><span>${esc(x.it.summary)}</span><span class="fwhy">${x.why.map(w=>`<em>${esc(w)}</em>`).join('')}</span></span><span class="ar" aria-hidden="true">›</span></a>`).join('')}</div>
+        <p class="note">딱 맞는 업종이 없으면 <a href="#/search${f.kw.trim()?`?q=${encodeURIComponent(f.kw.trim())}`:''}" class="link-btn">업종코드 ${NTS_UNIQUE.toLocaleString()}개에서 찾기</a></p>`
+      : `<p class="muted">맞는 업종을 못 찾았어요. 다른 단어로 바꾸거나 <a class="link-btn" href="#/search?q=${encodeURIComponent(f.kw.trim())}">업종코드에서 찾기</a></p>`;
+  };
+  document.querySelectorAll('[data-fq]').forEach(b=>b.addEventListener('click', ()=>{
+    const k=b.dataset.fq; f[k] = f[k]===b.dataset.v ? '' : b.dataset.v;
+    document.querySelectorAll(`[data-fq="${k}"]`).forEach(x=>x.setAttribute('aria-pressed', f[k]===x.dataset.v?'true':'false'));
+    draw();
+  }));
+  $('#fkw').addEventListener('input', e=>{ f.kw=e.target.value; draw(); });
+  draw();
+}
+
 /* ---------- 업종코드 찾기 ---------- */
 let codeLimit=40;
 function renderSearch(q, g){
@@ -766,5 +839,5 @@ window.addEventListener('hashchange', ()=>{ render(); afterNav(); });
 render();
 
 /* QA용 읽기 전용 노출 */
-window.PS = {VERSION, RULE, CODE_Y, BY_ID, searchGuides, searchCodes, progressOf, situationNotes, matchUrl, docTag, taxExpired, sanitizeMe, summary, NTS_UNIQUE, get S(){ return S; }};
+window.PS = {finderRank, deadlines, VERSION, RULE, CODE_Y, BY_ID, searchGuides, searchCodes, progressOf, situationNotes, matchUrl, docTag, taxExpired, sanitizeMe, summary, NTS_UNIQUE, get S(){ return S; }};
 })();

@@ -302,6 +302,30 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await p.context().close();
 }
 
+// 11-7. 법정 기한 카드 · 업종 고르기 도우미
+{
+  await page.goto(BASE); await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ me: { rev: 'lt1', open: '2027-03-02' } }))); await page.reload();
+  await page.goto(BASE + '#/guide/cafe/prepare'); await page.waitForTimeout(100);
+  const dl = await page.locator('#sec-deadline').innerText();
+  check('법정 기한: 준비물 탭에 표시(위생교육·인허가·사업자등록·부가세·종합소득세 + 법령 근거)', dl.includes('위생교육') && dl.includes('식품위생법 제41조') && dl.includes('2027.03.22까지') && dl.includes('2028년 1월 25일') && dl.includes('2028년 5월 31일') && dl.includes('부가가치세법 제8조'));
+  check('법정 기한: 위생교육을 인허가 개수에 중복으로 세지 않음', !/휴게음식점 영업신고 외/.test(dl), dl.match(/인허가 받기[^\n]*/)?.[0]);
+  check('법정 기한: 추정 소요 기간(D-·며칠 소요) 없음', !/D-\d|일 소요|주 소요/.test(dl));
+  const gen = await page.evaluate(() => { const S = window.PS.S; S.me = { open: '2027-03-02' }; const a = window.PS.deadlines(window.PS.BY_ID.software).find((x) => x.t.includes('부가가치세')).when; S.me = { open: '2027-08-10' }; const b = window.PS.deadlines(window.PS.BY_ID.software).find((x) => x.t.includes('부가가치세')).when; S.me = {}; const c = window.PS.deadlines(window.PS.BY_ID.software); return { a, b, c: c.map((x) => x.t).join('|'), cw: c.find((x) => x.t.includes('사업자등록')).when }; });
+  check('부가세: 상반기 개업 → 그해 7월 25일, 하반기 → 다음 해 1월 25일(일반과세)', gen.a.includes('2027년 7월 25일(1~6월분)') && gen.b.includes('2028년 1월 25일(7~12월분)'), JSON.stringify(gen));
+  check('업종별 항목: 소프트웨어는 위생교육 없음·통신판매 있음, 개업일 없으면 규칙으로', !gen.c.includes('위생교육') && gen.c.includes('통신판매업 신고') && gen.cw.includes('20일 안에'));
+  check('미용은 공중위생관리법 위생교육', await page.evaluate(() => window.PS.deadlines(window.PS.BY_ID.beauty)[0].law.includes('공중위생관리법')));
+  await page.goto(BASE);
+  check('홈: 업종 고르기 도우미 진입', (await page.locator('a.finder-cta[href="#/finder"]').count()) === 1);
+  await page.goto(BASE + '#/finder'); await page.waitForTimeout(100);
+  check('도우미: 질문 전 안내 · 1단계 표시', (await page.locator('#fres').innerText()).includes('1번 질문') && (await page.locator('.jstep li.on').innerText()).includes('업종'));
+  await page.click('[data-fq="what"][data-v="food"]'); await page.click('[data-fq="where"][data-v="store"]'); await page.fill('#fkw', '커피'); await page.waitForTimeout(80);
+  check('도우미: 음식·매장·"커피" → 1순위 카페', (await page.locator('#fres a.item').first().getAttribute('href')) === '#/start/cafe');
+  check('도우미: 한 단어만("네일") → 미용 계열', await page.evaluate(() => ['beauty', 'skincare'].includes(window.PS.finderRank({ kw: '네일' })[0].it.id)));
+  check('도우미: 64개 업종 모두 1번 질문으로 도달 가능', await page.evaluate(() => { const all = new Set(window.PS_DATA.finder.what.flatMap((o) => o.ids)); return Object.keys(window.PS.BY_ID).every((id) => all.has(id)); }));
+  await page.click('#fres a.item >> nth=0'); await page.waitForTimeout(150);
+  check('도우미 결과 → 2단계(내 상황)', page.url().includes('#/me?next=cafe'));
+}
+
 // 12. 앱(PWA) 구성
 {
   const m = await page.evaluate(async () => (await fetch('assets/manifest.webmanifest')).json());
