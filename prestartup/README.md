@@ -14,6 +14,19 @@
 
 내용을 고치면 `guideBaseDate`를 바꾸고, 세제를 다시 점검하면 `taxBaseDate`·`taxNextCheck`를 함께 바꾼다.
 
+**제도 기준값은 `data.js` `meta.rules` 한 곳**에서만 관리한다(화면 문구·계산이 모두 여기서 가져옴 — QA가 `app.js`의 직접 표기를 막음).
+
+| 키 | 값 | 쓰이는 곳 |
+|---|---|---|
+| `bizRegDays` | 20 | 사업자등록 기한 계산(개업일 + N일)·안내 문구 |
+| `simpleVatLimit` | 1억400만원 | 간이과세 안내·내 상황 질문 |
+| `youthTaxAgeMax` / `youthSupportAgeMax` | 34 / 39 | 나이 선택지·청년 세액감면·청년 지원사업 안내 |
+| `militaryDeductMaxYears` | 6 | 병역 기간 차감 안내 |
+| `startupTaxFrom` · `startupTaxYouthRange` · `startupTaxNonCapitalYouth` | 2026.1.1 · 50~100% · 100% | 창업중소기업 세액감면 안내 |
+| `meta.codeYear` | 2025 | '업종코드 ○○년 귀속 연계표' 표기(`codeBase`와 일치 검사) |
+
+버전은 `app.js` `VERSION` 한 곳(서비스워커 캐시 이름은 등록할 때 `?v=`로 받음), `package.json` 버전과 같은지 QA가 확인한다.
+
 ## 구조
 
 ```text
@@ -22,7 +35,7 @@ app.js       해시 라우팅(#/ · #/g/업태 · #/guide/업종 · #/search · 
 data.js      업종 64종·세제 사전·국세청 업종코드(이 파일이 원본)
 sw.js        오프라인 캐시(네트워크 우선)
 assets/      로고·아이콘·매니페스트·OG 이미지(scripts/render-images.mjs로 생성)
-tests/qa.mjs Chromium QA 90항목
+tests/qa.mjs Chromium QA 101항목
 docs/        CHANGELOG · 자가부검·레드팀 보고서
 ```
 

@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -27,6 +27,8 @@ const fmtDate = s => s.replace(/^(\d{4})-(\d{2})(?:-(\d{2}))?$/, (m,y,mo,d)=> d 
 const BASE = fmtDate(D.meta.guideBaseDate);
 const TAX_BASE = fmtDate(D.meta.taxBaseDate);
 const TAX_NEXT = fmtDate(D.meta.taxNextCheck);
+const CODE_Y = D.meta.codeYear;          // 업종코드 연계표 귀속연도
+const RULE = D.meta.rules;               // 제도 기준값(사업자등록 기한·간이과세·청년 나이 등) — data.js 한 곳에서만
 function taxExpired(now){ const [y,m]=D.meta.taxNextCheck.split('-').map(Number); const n=now||new Date(); return n.getFullYear()>y || (n.getFullYear()===y && n.getMonth()+1>=m); }
 
 /* ---------- 저장(이 기기에만) ---------- */
@@ -54,10 +56,10 @@ function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch{ /*
 
 /* ---------- 내 상황(선택 입력) ---------- */
 const ME_Q = [
-  {k:'age', l:'대표자 나이(창업일 기준)', h:'세액감면 청년 기준(만 34세)과 청년 지원사업 기준(대개 만 39세)이 달라요.', o:[['u34','만 34세 이하'],['u39','만 35~39세'],['o40','만 40세 이상']]},
+  {k:'age', l:'대표자 나이(창업일 기준)', h:`세액감면 청년 기준(만 ${RULE.youthTaxAgeMax}세)과 청년 지원사업 기준(대개 만 ${RULE.youthSupportAgeMax}세)이 달라요.`, o:[['u34',`만 ${RULE.youthTaxAgeMax}세 이하`],['u39',`만 ${RULE.youthTaxAgeMax+1}~${RULE.youthSupportAgeMax}세`],['o40',`만 ${RULE.youthSupportAgeMax+1}세 이상`]]},
   {k:'region', l:'사업장 시·도', h:'수도권은 창업 지역에 따라 세액감면율이 크게 달라요.', o:REGIONS.map(r=>[r,r])},
   {k:'space', l:'사업장 형태', h:'업종에 따라 자택·공유오피스로 등록이 안 될 수 있어요.', o:[['home','자택'],['rent','임차(사무실·점포·공장)'],['shared','공유오피스·비상주'],['own','자가(소유)']]},
-  {k:'rev', l:'첫해 예상 매출', h:'간이과세(연 1억400만원 미만) 가능성을 안내해요.', o:[['lt1','1억원 미만'],['gt1','1억원 이상'],['na','아직 모름']]},
+  {k:'rev', l:'첫해 예상 매출', h:`간이과세(연 ${RULE.simpleVatLimit} 미만) 가능성을 안내해요.`, o:[['lt1','1억원 미만'],['gt1','1억원 이상'],['na','아직 모름']]},
   {k:'prior', l:'같은 업종으로 사업한 적', h:'같은 업종을 다시 시작하면 \'창업\'으로 보지 않을 수 있어요.', o:[['no','없어요'],['yes','있어요']]},
   {k:'female', l:'여성 대표인가요?', h:'여성기업 확인·여성창업 지원 우대 안내용이에요(선택).', o:[['y','네'],['n','아니요']]}
 ];
@@ -80,9 +82,15 @@ async function copyText(s){
   catch{ try{ const ta=document.createElement('textarea'); ta.value=s; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); const ok=document.execCommand('copy'); ta.remove(); return ok; }catch{ return false; } }
 }
 const stripNum = s => String(s).replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/, '');
+/* 서류 분류(2026-11-19 보완: 64개 업종 중 35개가 '필수 1개 이하'였음 — 영업등록 신청서·위생교육·보건증·신분증·임대차계약서가 '권장'으로 표시)
+   해당 시 = 조건부(괄호로 시작·'○○ 시') / 권장 = 계획·실적·도면 등 보완 자료 / 필수 = 등록·신고·자격·사업장 증빙 */
+const DOC_OPT = /^\(|\(해당|\(선택\)|해당 시|\(.{1,12} 시\)/;
+const DOC_REC = /전문성|포트폴리오|실적|사업계획|평면도|배치도|설비 내역|약관|정책|거래 관련|기술·도면|채용|정산|관련 체계|관련 서류|관련 계약서|전속계약서/;
+const DOC_MUST = /사업자등록|영업신고|영업등록|신청서|신고서|신고증|신고확인증|개설|등록증|허가|면허|자격증|자격 증빙|자격·등록|수료증|보건증|건강진단|신분증|임대차|등기부|공제증서|건축물대장|완비증명|구매안전|에스크로|등록기준|등록요건|기술인력|결제대행|품질관리 기준|GMP|품목제조|등급분류|차고지/;
 function docTag(doc){
-  if(/\(해당|\(선택\)|해당 시|\(품목별\)|\(온라인 시\)|\(직접 제조 시\)|\(.{1,12} 시\)/.test(doc)) return ['opt','해당 시'];
-  if(/사업자등록|영업신고|개설|등록증|허가|면허|등록신청|신고서/.test(doc)) return ['must','필수'];
+  if(DOC_OPT.test(doc)) return ['opt','해당 시'];
+  if(DOC_REC.test(doc)) return ['rec','권장'];
+  if(DOC_MUST.test(doc)) return ['must','필수'];
   return ['rec','권장'];
 }
 function progressOf(id){
@@ -101,6 +109,7 @@ function nextTodo(id){
   if(dj>=0) return {kind:'d', i:dj, text:it.docs[dj]};
   return null;
 }
+const bizRegDue = open => addDays(open, RULE.bizRegDays);   // 사업자등록 신청 기한(사업 시작일 + N일)
 function addDays(iso, n){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d; }
 const ymd = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 
@@ -149,22 +158,22 @@ function matchUrl(it){
 const FACILITY_GROUPS = ['음식점업','제조업','숙박업','교육서비스업','보건업'];
 function situationNotes(it){
   const m=S.me, out=[];
-  if(m.age==='u34') out.push(['blue','🎯','<b>세액감면 \'청년\' 기준(창업일 기준 만 15~34세)</b>에 해당할 수 있어요. 2026년 이후 창업분은 창업 지역에 따라 감면율이 50~100%로 달라져요. 만 39세 이하 대상 청년 창업지원사업도 함께 살펴보세요.']);
-  if(m.age==='u39') out.push(['','🎯','세액감면의 청년 기준(만 34세)은 넘지만 <b>병역을 이행했다면 최대 6년을 빼고</b> 나이를 계산해요. 만 39세 이하 대상 청년 창업지원사업(예: 청년창업사관학교)은 해당될 수 있어요.']);
+  if(m.age==='u34') out.push(['blue','🎯',`<b>세액감면 '청년' 기준(창업일 기준 만 15~${RULE.youthTaxAgeMax}세)</b>에 해당할 수 있어요. ${RULE.startupTaxFrom} 이후 창업분은 창업 지역에 따라 감면율이 ${RULE.startupTaxYouthRange}로 달라져요. 만 ${RULE.youthSupportAgeMax}세 이하 대상 청년 창업지원사업도 함께 살펴보세요.`]);
+  if(m.age==='u39') out.push(['','🎯',`세액감면의 청년 기준(만 ${RULE.youthTaxAgeMax}세)은 넘지만 <b>병역을 이행했다면 최대 ${RULE.militaryDeductMaxYears}년을 빼고</b> 나이를 계산해요. 만 ${RULE.youthSupportAgeMax}세 이하 대상 청년 창업지원사업(예: 청년창업사관학교)은 해당될 수 있어요.`]);
   if(m.region && CAPITAL.includes(m.region)) out.push(['warn','📍',`<b>${esc(m.region)}(수도권)</b>은 같은 시·도 안에서도 과밀억제권역인지, 인구감소지역인지에 따라 창업중소기업 세액감면율이 달라요. 사업장 주소를 정하기 전에 세무서·세무사에게 확인하세요.`]);
-  else if(m.region) out.push(['','📍',`<b>${esc(m.region)}(비수도권)</b>은 2026년 이후 창업분 기준 청년 창업 세액감면율이 가장 높은 구간(100%)이에요. 청년 외에는 율이 낮아요.`]);
+  else if(m.region) out.push(['','📍',`<b>${esc(m.region)}(비수도권)</b>은 ${RULE.startupTaxFrom} 이후 창업분 기준 청년 창업 세액감면율이 가장 높은 구간(${RULE.startupTaxNonCapitalYouth})이에요. 청년 외에는 율이 낮아요.`]);
   if(m.space==='home' && FACILITY_GROUPS.includes(it.group)) out.push(['warn','🏠',`<b>${esc(it.group)}</b>은 시설 기준이 있어 <b>자택으로는 영업신고·등록이 어려운 경우가 많아요.</b> 사업장 후보부터 정해 주세요.`]);
   else if(m.space==='home') out.push(['','🏠','자택을 사업장으로 등록할 수 있는 업종이에요. 다만 임대주택·오피스텔은 계약상 사업자등록이 제한될 수 있어 집주인 동의를 확인하세요.']);
   if(m.space==='rent') out.push(['warn','📑','<b>임대차 계약 전에 건축물대장 용도</b>(세움터)를 확인하세요. 용도가 업종과 맞지 않으면 영업신고·등록이 반려돼요. 계약서에 \'인허가 불가 시 계약 해제\' 특약을 넣는 것도 방법이에요.']);
   if(m.space==='shared') out.push(['warn','🏢','공유오피스·비상주 사무실은 업종에 따라 사업자등록이 안 되거나 세무서가 실제 사업장 확인을 요구할 수 있어요. 지원사업도 \'사업장 소재지\' 요건을 따로 봐요.']);
   if(m.space==='own') out.push(['','🏠','자가 사업장은 취득세·재산세와 감가상각·이자 비용 처리를 함께 검토하세요. 주거와 함께 쓰면 비용을 나눠 처리해야 해요.']);
-  if(m.rev==='lt1') out.push(['','💵','첫해 매출이 연 1억400만원 미만이면 <b>간이과세</b>로 시작할 수 있어요. 다만 일부 업종(전문직 서비스·일정 제조업 등)과 지역은 안 되고, 세금계산서를 받는 거래처가 많다면 일반과세가 나을 수 있어요.']);
+  if(m.rev==='lt1') out.push(['','💵',`첫해 매출이 연 ${RULE.simpleVatLimit} 미만이면 <b>간이과세</b>로 시작할 수 있어요. 다만 일부 업종(전문직 서비스·일정 제조업 등)과 지역은 안 되고, 세금계산서를 받는 거래처가 많다면 일반과세가 나을 수 있어요.`]);
   if(m.rev==='gt1') out.push(['','💵','연 매출 1억원 이상이면 <b>일반과세자</b>로 시작하는 게 보통이에요. 매입 세금계산서를 꼼꼼히 받아 두면 부가세를 줄일 수 있어요.']);
   if(m.prior==='yes') out.push(['warn','⚠️','같은 업종 사업 이력이 있으면 <b>창업중소기업 세액감면의 \'창업\'으로 인정되지 않을 수 있어요</b>(사업 승계·이전·같은 업종 재개 등). 등록 전에 세무사에게 확인하세요.']);
   if(m.female==='y') out.push(['','👩‍💼','여성 대표는 사업 개시 후 <b>여성기업 확인</b>(여성기업종합정보포털)을 받으면 여성창업 지원사업·공공구매 우대를 받을 수 있어요.']);
   if(m.open){
-    const due=addDays(m.open, 20);
-    out.push(['blue','🗓️',`개업 예정일 <b>${esc(ymd(new Date(m.open+'T00:00:00')))}</b> 기준, 사업자등록은 <b>${ymd(due)}까지</b> 신청하세요(사업 시작일부터 20일 이내 · 시작 전에도 신청 가능). 인허가가 필요한 업종은 허가·신고증을 먼저 받아야 해요.`]);
+    const due=bizRegDue(m.open);
+    out.push(['blue','🗓️',`개업 예정일 <b>${esc(ymd(new Date(m.open+'T00:00:00')))}</b> 기준, 사업자등록은 <b>${ymd(due)}까지</b> 신청하세요(사업 시작일부터 ${RULE.bizRegDays}일 이내 · 시작 전에도 신청 가능). 인허가가 필요한 업종은 허가·신고증을 먼저 받아야 해요.`]);
   }
   return out;
 }
@@ -176,7 +185,7 @@ function setTab(tab){
 function footer(){
   $('#foot').innerHTML = `<b>${CONTACT.company}</b> · 중소벤처기업부 공식 인증 중소기업상담회사(${CONTACT.cert})<br>
     ${CONTACT.addr} · <a href="tel:${CONTACT.tel.replace(/-/g,'')}">${CONTACT.tel}</a> · <a href="mailto:${CONTACT.email}">${CONTACT.email}</a> · <a href="${CONTACT.web}" target="_blank" rel="noopener">www.beconic.kr</a><br>
-    창업 준비 가이드 v${VERSION} · 자료 기준일 ${BASE} · 세제 ${TAX_BASE} 법령 기준 · 업종코드 2025년 귀속 연계표 · 입력·체크 내용은 이 기기에만 저장돼요.`;
+    창업 준비 가이드 v${VERSION} · 자료 기준일 ${BASE} · 세제 ${TAX_BASE} 법령 기준 · 업종코드 ${CODE_Y}년 귀속 연계표 · 입력·체크 내용은 이 기기에만 저장돼요.`;
 }
 
 /* ---------- 라우터 (해시: 뒤로가기·링크 공유 지원) ---------- */
@@ -193,7 +202,7 @@ function render(){
   const {parts, q}=parse();
   const [a,b]=parts;
   if(a==='g' && GROUPS.includes(b)) return renderGroup(b);
-  if(a==='start' && BY_ID[b]){ location.replace('#'+((hasMe()||S.meSkip)?`/guide/${b}/prepare`:`/me?next=${b}`)); return; }
+  if(a==='start' && BY_ID[b]){ location.replace(`#/me?next=${b}`); return; }   // 업종을 고르면 항상 ② 내 상황(지난 입력은 미리 채워 확인·수정)
   if(a==='guide' && BY_ID[b]) return renderGuide(b, GSTEPS.some(x=>x.k===parts[2])?parts[2]:'prepare');
   if(a==='search') return renderSearch(q.get('q')||'', q.get('g')||'');
   if(a==='my') return renderMy();
@@ -228,7 +237,7 @@ function renderHome(){
     <div class="eyebrow">예비창업자용 · 회원가입 없음 · 무료</div>
     <h1 class="h-xl">업종만 고르면<br>창업 준비물을 정리해 드려요</h1>
     <p class="lead">준비 서류, 인허가·신고 순서, 업종코드, 세금 혜택까지 한 화면에. 체크하면서 하나씩 끝내 보세요.</p>
-    <div class="basebar" title="세제 정보 ${TAX_BASE} 법령 기준 · 업종코드 2025년 귀속 연계표"><i></i>자료 기준일 ${BASE}</div>
+    <div class="basebar" title="세제 정보 ${TAX_BASE} 법령 기준 · 업종코드 ${CODE_Y}년 귀속 연계표"><i></i>자료 기준일 ${BASE}</div>
     <form class="search" role="search" id="homeSearch">
       <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <label class="sr" for="hq">업종 검색</label>
@@ -245,7 +254,7 @@ function renderHome(){
   <div class="sec-title"><h2>이 가이드는 이렇게 달라요</h2></div>
   <div class="values">
     <div class="value"><div class="vn">순서대로</div><b>무엇부터 할지 알려 드려요</b><p>위생교육 → 영업신고 → 사업자등록처럼 업종별 진행 순서와 '지금 할 일'을 보여 줘요.</p></div>
-    <div class="value"><div class="vn">기준일 표기</div><b>언제 기준 정보인지 밝혀요</b><p>세제는 ${TAX_BASE} 법령, 업종코드는 2025년 귀속 연계표 기준. 점검 주기가 지나면 화면에서 알려 드려요.</p></div>
+    <div class="value"><div class="vn">기준일 표기</div><b>언제 기준 정보인지 밝혀요</b><p>세제는 ${TAX_BASE} 법령, 업종코드는 ${CODE_Y}년 귀속 연계표 기준. 점검 주기가 지나면 화면에서 알려 드려요.</p></div>
     <div class="value"><div class="vn">이어서 준비</div><b>체크하면 이 기기에 남아요</b><p>가입 없이 진행률이 저장되고, 링크·PDF로 공유할 수 있어요. 입력값은 서버로 보내지 않아요.</p></div>
   </div>
   <div class="card" style="margin-top:12px"><div class="expert">
@@ -301,12 +310,12 @@ function renderGroup(g){
 }
 
 /* ---------- 가이드 ---------- */
-/* 고객여정 5단계: ① 업종 → ② 내 상황 → ③ 준비 체크 → ④ 혜택·지원 → ⑤ 저장·마무리 */
+
 /* 입력은 단계(① 업종 → ② 내 상황 → ③ 결과), 결과는 탭(준비물 · 혜택·지원 · 저장·상담) */
 const GSTEPS = [
   {k:'prepare', n:1, l:'준비물', d:'진행 순서 · 준비 서류 · 인허가', secs:['me','steps','docs','license','ask','pit']},
   {k:'benefit', n:2, l:'혜택·지원', d:'업종코드 · 세금 혜택 · 지원사업', secs:['code','tax','support','expand']},
-  {k:'finish',  n:3, l:'저장·상담', d:'PDF · 공유 · 전문가 확인 · 신청 사이트', secs:['finish','sites','memo','about']}
+  {k:'finish',  n:3, l:'저장·상담', d:'PDF · 전문가 확인 · 신청 사이트', secs:['finish','sites','memo','about']}
 ];
 const JOURNEY = [['pick','업종 고르기'],['me','내 상황'],['result','결과 보기']];
 function stepState(id){
@@ -360,13 +369,12 @@ function renderGuide(id, step){
       }).join('')}`).join('')}
       <div class="ln-sep"></div>
       <div class="ln-act">
-        <button class="btn btn-soft btn-sm btn-block" type="button" data-act="share">링크 복사</button>
         <button class="btn btn-gray btn-sm btn-block" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 저장'}</button>
         <a class="btn btn-gray btn-sm btn-block" href="#/g/${encodeURIComponent(it.group)}">다른 업종 고르기</a>
       </div>
     </aside>
     <div class="gbody">
-      <div class="print-only phead"><b>BECONIC 창업 준비 체크리스트</b><span>출력 ${ymd(new Date())} · 자료 기준일 ${BASE} · 세제 ${TAX_BASE} 법령 기준 · 업종코드 2025년 귀속 연계표</span></div>
+      <div class="print-only phead"><b>BECONIC 창업 준비 체크리스트</b><span>출력 ${ymd(new Date())} · 자료 기준일 ${BASE} · 세제 ${TAX_BASE} 법령 기준 · 업종코드 ${CODE_Y}년 귀속 연계표</span></div>
       <section class="card ghero print-only">
         <div class="eyebrow">${D.groupMeta[it.group]||''} ${esc(it.group)} · 창업 준비 가이드</div>
         <h1 class="h-lg">${esc(it.name)}</h1>
@@ -377,7 +385,7 @@ function renderGuide(id, step){
           <span class="chip">업태 · ${esc(it.bizType)}</span>
           <span class="chip ${reviewed?'ok':''}" title="${reviewed?'전문가 검수 완료':'BECONIC 내부 정리 자료 — 업종별 전문가 검수 전'}">${reviewed?'✓ 전문가 검수':'내부 정리 · 검수 전'}</span>
         </div>
-        <div class="meta"><span>📅 자료 기준일 <b>${BASE}</b></span><span>세제 <b>${TAX_BASE}</b> 법령 기준</span><span>업종코드 <b>2025년 귀속</b> 연계표</span></div>
+        <div class="meta"><span>📅 자료 기준일 <b>${BASE}</b></span><span>세제 <b>${TAX_BASE}</b> 법령 기준</span><span>업종코드 <b>${CODE_Y}년 귀속</b> 연계표</span></div>
       </section>
 
       ${printSummary(it, pr)}
@@ -388,9 +396,8 @@ function renderGuide(id, step){
         <div class="prog"><div class="pn">${pr.pct}<small>%</small></div><div class="pt"><b>${pr.pct===100?'준비를 모두 체크했어요':'준비 진행률'}</b><span>순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd} 체크 · 이 기기에 저장돼요</span></div>
         <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pr.pct}" aria-label="준비 진행률"><i style="width:${pr.pct}%"></i></div></div>
         ${nx?`<div class="next"><span class="nl">지금 할 일</span><span class="nt">${esc(nx.text)}</span><button class="btn btn-primary btn-sm" type="button" data-next="${nx.kind}${nx.i}">완료</button></div>`
-          :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open?`사업자등록은 <b>${ymd(addDays(S.me.open,20))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#/guide/${id}/benefit">혜택·지원 보기</a></div>`}
+          :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open?`사업자등록은 <b>${ymd(bizRegDue(S.me.open))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#/guide/${id}/benefit">혜택·지원 보기</a></div>`}
         <div class="acts-row">
-          <button class="btn btn-gray btn-sm" type="button" data-act="share">링크 복사</button>
           <button class="btn btn-gray btn-sm" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 저장'}</button>
         </div>
       </section>${S.track?'':'-->'}
@@ -405,7 +412,7 @@ function renderGuide(id, step){
       <section class="card sec" id="sec-steps">${secHead('steps', `<button type="button" class="tgl no-print" data-track aria-pressed="${S.track}"><i></i>체크하며 관리</button>`)}
         <p class="sec-d no-print">${S.track?'끝낸 항목을 눌러 체크하세요. 이 기기에 저장돼요.':'순서대로 읽어 보세요. 진행 상황을 기록하려면 오른쪽 위 <b>체크하며 관리</b>를 켜세요. PDF에는 항상 체크 칸이 있어요.'}</p>
         <div class="steps ${S.track?'':'read'}">${(it.licenseProcess||[]).map((s,i)=>S.track?chk('s',i,`<span class="sn2">STEP ${i+1}</span>${esc(stripNum(s))}`, p.s[i]):readRow(i+1, esc(stripNum(s)), false, p.s[i])).join('')}</div>
-        <div class="dueline">사업자등록은 <b>사업 시작일부터 20일 안에</b> 신청해야 해요(시작 전에도 가능). 인허가 업종은 허가·신고증을 먼저 받아 함께 내요.${S.me.open?` 개업 예정일 기준 <b>${ymd(addDays(S.me.open,20))}까지</b>.`:''}</div>
+        <div class="dueline">사업자등록은 <b>사업 시작일부터 ${RULE.bizRegDays}일 안에</b> 신청해야 해요(시작 전에도 가능). 인허가 업종은 허가·신고증을 먼저 받아 함께 내요.${S.me.open?` 개업 예정일 기준 <b>${ymd(bizRegDue(S.me.open))}까지</b>.`:''}</div>
       </section>
 
       <section class="card sec" id="sec-docs">${secHead('docs', `<span class="cnt">${S.track?`${pr.dd}/${pr.nd} 체크`:`${pr.nd}종`}</span>`)}
@@ -436,7 +443,7 @@ function renderGuide(id, step){
           <p><span class="lbl">적용 조건</span>${esc(t.cond)}</p><p><span class="lbl w">유의</span>${esc(t.note)}${sch&&!similar(t.note,sch.caution)?' '+esc(sch.caution):''}</p></div>`; }).join('')}
         ${it.taxPoints&&it.taxPoints.length?`<div class="sub-h">함께 확인할 세금 포인트</div><ul class="ul">${it.taxPoints.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
         ${D.taxStrategy[it.group]?`<div class="sub-h">${esc(it.group)} 세무 관리 팁</div><ul class="ul">${D.taxStrategy[it.group].map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
-        <p class="note">감면율·기준금액은 법령상 일반 기준이에요. 대표자 나이·사업장 지역·창업 시점·업종에 따라 실제 적용이 달라지고 수시로 개정돼요(예: 창업중소기업 세액감면은 2026.1.1 이후 창업분부터 지역별로 달라짐). 국세법령정보시스템에서 원문을 확인하고 세무사와 검토하세요.</p>
+        <p class="note">감면율·기준금액은 법령상 일반 기준이에요. 대표자 나이·사업장 지역·창업 시점·업종에 따라 실제 적용이 달라지고 수시로 개정돼요(예: 창업중소기업 세액감면은 ${RULE.startupTaxFrom} 이후 창업분부터 지역별로 달라짐). 국세법령정보시스템에서 원문을 확인하고 세무사와 검토하세요.</p>
       </section>
 
       <section class="card sec" id="sec-support">${secHead('support')}
@@ -509,20 +516,29 @@ function readRow(num, html, bullet, done){
 }
 function resultSummary(it, notes){
   const reviewed=it.reviewStatus==='검수완료';
+  const p=S.prog[it.id]||{d:{},s:{}};
   const tc=it.docs.reduce((a,d)=>{ a[docTag(d)[0]]++; return a; }, {must:0,rec:0,opt:0});
+  const must=it.docs.map((d,i)=>[d,i]).filter(([d])=>docTag(d)[0]==='must');
   const tax=(it.taxDetail||[]).map(t=>t.name);
+  const gate=it.license[0];
+  const steps=(it.licenseProcess||[]).map(stripNum);
+  const chips=meChips();
   return `<section class="card rsum no-print" aria-label="결과 요약">
     <div class="rs-h"><div><span class="rs-e">${D.groupMeta[it.group]||''} ${esc(it.group)} · 결과 요약</span><h1 class="h-lg">${esc(it.name)}</h1><p class="rs-s">${esc(it.summary)}</p></div></div>
+    ${gate?`<div class="rs-gate"><span>핵심 관문</span><b>${esc(gate.name)}</b>${gate.org&&gate.org!=='-'?`<em>${esc(gate.org)}</em>`:''}${it.license.length>1?`<small>외 인허가·신고 ${it.license.length-1}건</small>`:''}</div>`:''}
+    <div class="rs-two">
+      <div class="rs-box"><h3>먼저 할 일</h3><ol>${steps.slice(0,3).map((t,i)=>`<li class="${p.s[i]?'done':''}">${esc(t)}</li>`).join('')}</ol>${steps.length>3?`<p class="rs-more">외 ${steps.length-3}단계 · 사업자등록은 사업 시작일부터 ${RULE.bizRegDays}일 안에</p>`:`<p class="rs-more">사업자등록은 사업 시작일부터 ${RULE.bizRegDays}일 안에</p>`}</div>
+      <div class="rs-box"><h3>꼭 챙길 서류 <span>필수 ${tc.must}종</span></h3><ul>${must.slice(0,5).map(([d,i])=>`<li class="${p.d[i]?'done':''}">${esc(d)}</li>`).join('')}</ul>${must.length>5||tc.rec+tc.opt?`<p class="rs-more">${[must.length>5?`외 필수 ${must.length-5}종`:'', tc.rec?`권장 ${tc.rec}종`:'', tc.opt?`해당 시 ${tc.opt}종`:''].filter(Boolean).join(' · ')}</p>`:''}</div>
+    </div>
+    ${it.pitfalls&&it.pitfalls[0]?`<div class="rs-warn"><span aria-hidden="true">⚠️</span><span><b>많이 놓치는 점</b> ${esc(it.pitfalls[0])}</span></div>`:''}
     <div class="rs-g">
       <div><span>업종코드</span><b>${isCode(it.nts)?`<span class="mono">${esc(it.nts)}</span> <button type="button" class="link-btn" data-copy="${esc(it.nts)}">복사</button>`:'홈택스 조회 필요'}</b></div>
-      <div><span>인허가·신고 ${it.license.length}건</span><b>${it.license.map(l=>esc(l.name)).join(', ')}</b></div>
-      <div><span>준비 서류 ${it.docs.length}종</span><b>필수 ${tc.must} · 권장 ${tc.rec} · 해당 시 ${tc.opt}</b></div>
       <div><span>세금 혜택 ${tax.length}개</span><b>${tax.map(esc).join(', ')||'—'}</b></div>
-      ${S.me.open?`<div><span>사업자등록 기한</span><b>${ymd(addDays(S.me.open,20))}까지</b></div>`:''}
-      <div><span>맞춤 안내</span><b>${hasMe()?`${notes.length}개 <button type="button" class="link-btn" data-go="sec-me">보기</button>`:`<a class="link-btn" href="#/me?next=${it.id}">내 상황 넣기</a>`}</b></div>
+      ${S.me.open?`<div><span>사업자등록 기한</span><b>${ymd(bizRegDue(S.me.open))}까지</b></div>`:''}
+      <div><span>내 상황 · 맞춤 안내</span><b>${hasMe()?`${chips.slice(0,3).map(esc).join(' · ')}${chips.length>3?' 외':''}<br>안내 ${notes.length}개 <button type="button" class="link-btn" data-go="sec-me">보기</button> · <a class="link-btn" href="#/me?next=${it.id}">수정</a>`:`<a class="link-btn" href="#/me?next=${it.id}">내 상황 넣기</a>`}</b></div>
     </div>
-    <p class="rs-m">📅 자료 기준일 <b>${BASE}</b> · 세제 ${TAX_BASE} 법령 · 업종코드 2025년 귀속 연계표 · <span title="BECONIC 내부 정리 자료">${reviewed?'✓ 전문가 검수':'내부 정리·검수 전'}</span></p>
-    <div class="rs-a"><button class="btn btn-primary" type="button" data-act="print">${IN_APP?'체크리스트 복사':'PDF 받기'}</button><button class="btn btn-soft" type="button" data-act="share">링크 복사</button><a class="btn btn-gray" href="${esc(matchUrl(it))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a></div>
+    <p class="rs-m">📅 자료 기준일 <b>${BASE}</b> · 세제 ${TAX_BASE} 법령 · 업종코드 ${CODE_Y}년 귀속 연계표 · <span title="BECONIC 내부 정리 자료">${reviewed?'✓ 전문가 검수':'내부 정리·검수 전'}</span></p>
+    <div class="rs-a"><button class="btn btn-primary" type="button" data-act="print">${IN_APP?'체크리스트 복사':'PDF 받기'}</button><a class="btn btn-gray" href="${esc(matchUrl(it))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a></div>
   </section>`;
 }
 function stepNav(G, id){
@@ -542,8 +558,8 @@ function printSummary(it, pr, screen){
     <div class="ps-top"><div><span class="ps-l">업종</span><b>${esc(it.name)}</b></div>
       <div><span class="ps-l">업종코드</span><b>${isCode(it.nts)?'국세청 '+esc(it.nts)+' · KSIC '+esc(it.ksic):'홈택스 조회 필요'}</b></div>
       <div><span class="ps-l">진행률</span><b>${pr.pct}% (순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd})</b></div>
-      <div><span class="ps-l">인허가·신고</span><b>${it.license.map(l=>esc(l.name)).join(', ')}</b></div>
-      ${S.me.open?`<div><span class="ps-l">사업자등록 기한</span><b>${ymd(addDays(S.me.open,20))}까지 (개업 예정 ${ymd(new Date(S.me.open+'T00:00:00'))} + 20일)</b></div>`:''}
+      <div><span class="ps-l">핵심 관문 · 인허가·신고</span><b>${it.license.map(l=>esc(l.name)+(l.org&&l.org!=='-'?`(${esc(l.org)})`:'')).join(', ')}</b></div>
+      ${S.me.open?`<div><span class="ps-l">사업자등록 기한</span><b>${ymd(bizRegDue(S.me.open))}까지 (개업 예정 ${ymd(new Date(S.me.open+'T00:00:00'))} + ${RULE.bizRegDays}일)</b></div>`:''}
       ${chips.length?`<div><span class="ps-l">내 상황</span><b>${chips.map(esc).join(' · ')}</b></div>`:''}
     </div>
     <div class="ps-left"><b>${left.length?`${(pr.ds+pr.dd)?'남은 할 일':'준비할 것(필수·권장)'} ${left.length}개`:'남은 필수·권장 할 일이 없어요'}</b>${left.length?`<ol>${left.slice(0,12).map(t=>`<li>${esc(t)}</li>`).join('')}</ol>${left.length>12?`<span>외 ${left.length-12}개는 아래 체크리스트 참고</span>`:''}`:''}</div>
@@ -639,15 +655,16 @@ function renderMe(next){
     ${it?'':`<a class="btn btn-gray btn-sm no-print" href="#/my">‹ 내 준비함으로</a>`}
     <section class="card" style="padding:28px;margin-top:${it?0:14}px">
     <div class="eyebrow">${it?`${esc(it.name)} · `:''}선택 입력 · 이 기기에만 저장</div><h1 class="h-lg" style="margin:6px 0 6px">내 상황을 알려 주세요</h1>
+    ${it&&hasMe()?`<div class="notice"><span class="ni" aria-hidden="true">✎</span><span><b>지난번 입력한 내용이에요.</b> 맞는지 확인하고 바뀐 것만 고친 뒤 결과를 보세요.</span></div>`:''}
     <p class="muted" style="margin-bottom:18px">고른 항목만 맞춤 안내에 쓰여요. 모르면 건너뛰어도 돼요. 모든 업종 가이드에 함께 적용돼요.</p>
     ${it?`<div class="notice blue" id="mePreview" role="status" aria-live="polite"><span class="ni" aria-hidden="true">★</span><span>${preview()}</span></div>`:''}
     ${ME_Q.map(q=>`<div class="form-q" role="group" aria-labelledby="ql-${q.k}"><div class="ql" id="ql-${q.k}">${q.l}</div><div class="qh">${q.h}</div>
       <div class="opts">${q.o.map(([v,l])=>`<button type="button" class="opt" data-k="${q.k}" data-v="${esc(v)}" aria-pressed="${m[q.k]===v?'true':'false'}">${esc(l)}</button>`).join('')}</div></div>`).join('')}
-    <div class="form-q"><label class="ql" for="open">개업 예정일</label><div class="qh">사업자등록 신청 기한(사업 시작일부터 20일)을 계산해 드려요.</div>
+    <div class="form-q"><label class="ql" for="open">개업 예정일</label><div class="qh">사업자등록 신청 기한(사업 시작일부터 ${RULE.bizRegDays}일)을 계산해 드려요.</div>
       <input class="inp" id="open" type="date" value="${esc(m.open||'')}"></div>
     </section>
     <p class="small muted" style="margin:10px 4px 0">고른 걸 모두 지우려면 <button class="link-btn" type="button" id="meClear">선택 초기화</button> (저장해야 반영돼요)</p>
-    <div class="me-actions">${it?`<a class="btn btn-gray" href="${back}" id="meSkip">건너뛰기</a>`:''}<button class="btn btn-primary" type="button" id="meSave">${it?'저장하고 결과 보기 ›':'저장'}</button></div>
+    <div class="me-actions">${it?`<a class="btn btn-gray" href="${back}" id="meSkip">${hasMe()?'그대로 결과 보기':'건너뛰기'}</a>`:''}<button class="btn btn-primary" type="button" id="meSave">${it?'저장하고 결과 보기 ›':'저장'}</button></div>
   </div>`, it?'home':'my', '내 상황');
   if(it) document.body.classList.add('wizard');
   const upd=()=>{ const pv=$('#mePreview'); if(pv) pv.lastElementChild.innerHTML=preview(); };
@@ -731,17 +748,17 @@ function printGuide(id){
 let deferredInstall=null;
 window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferredInstall=e; });
 if('serviceWorker' in navigator && location.protocol==='https:'){
-  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{ /* 오프라인 캐시 생략 */ }); });
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js?v='+encodeURIComponent(VERSION)).catch(()=>{ /* 오프라인 캐시 생략 */ }); });
 }
 
 /* ---------- 시작 ---------- */
 load();
 footer();
 $('#baseChip').textContent = `${BASE} 기준`;
-$('#baseChip').title = `자료 기준일 ${BASE} · 세제 ${TAX_BASE} 법령 · 업종코드 2025년 귀속 연계표`;
+$('#baseChip').title = `자료 기준일 ${BASE} · 세제 ${TAX_BASE} 법령 · 업종코드 ${CODE_Y}년 귀속 연계표`;
 window.addEventListener('hashchange', ()=>{ render(); afterNav(); });
 render();
 
 /* QA용 읽기 전용 노출 */
-window.PS = {VERSION, BY_ID, searchGuides, searchCodes, progressOf, situationNotes, matchUrl, docTag, taxExpired, sanitizeMe, summary, NTS_UNIQUE, get S(){ return S; }};
+window.PS = {VERSION, RULE, CODE_Y, BY_ID, searchGuides, searchCodes, progressOf, situationNotes, matchUrl, docTag, taxExpired, sanitizeMe, summary, NTS_UNIQUE, get S(){ return S; }};
 })();

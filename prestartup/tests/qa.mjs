@@ -245,11 +245,46 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await page.click('#meSkip'); await page.waitForTimeout(150);
   check('건너뛰기 → 3단계(준비 체크)', page.url().endsWith('#/guide/cafe/prepare'));
   await page.goto(BASE + '#/start/ecommerce'); await page.waitForTimeout(150);
-  check('한 번 건너뛴 뒤 다른 업종 → 바로 3단계', page.url().endsWith('#/guide/ecommerce/prepare'));
+  check('건너뛴 뒤에도 업종을 고르면 항상 2단계(내 상황)', page.url().includes('#/me?next=ecommerce'));
+  await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ me: { age: 'u34', region: '서울' } }))); await page.reload();
+  await page.goto(BASE + '#/start/cafe'); await page.waitForTimeout(150);
+  check('2단계: 지난 입력 미리 채움·확인 안내·"그대로 결과 보기"', (await page.locator('.opt[data-v="u34"]').getAttribute('aria-pressed')) === 'true' && (await page.locator('main').innerText()).includes('지난번 입력한 내용') && (await page.locator('#meSkip').innerText()).includes('그대로 결과 보기'));
+  await page.goto(BASE + '#/guide/cafe/prepare'); await page.waitForTimeout(100);
+  check('결과 화면에 링크 복사 버튼 없음', (await page.locator('[data-act="share"]').count()) === 0);
+  const rs = await page.locator('.rsum').innerText();
+  check('결과 요약: 핵심 관문·먼저 할 일·꼭 챙길 서류·많이 놓치는 점', rs.includes('핵심 관문') && rs.includes('휴게음식점 영업신고') && rs.includes('먼저 할 일') && rs.includes('꼭 챙길 서류') && rs.includes('많이 놓치는 점'));
+  check('서류 분류: 위생교육 수료증·보건증·영업신고증은 필수', await page.evaluate(() => ['위생교육 수료증', '건강진단결과서(보건증)', '휴게음식점 영업신고증'].every((d) => window.PS.docTag(d)[0] === 'must') && window.PS.docTag('사업계획서')[0] === 'rec' && window.PS.docTag('(해당 시) 소방')[0] === 'opt'));
+  check('모든 업종 필수 서류 2종 이상(인적용역 제외)', await page.evaluate(() => Object.values(window.PS.BY_ID).filter((i) => i.id !== 'entertainer').every((i) => i.docs.filter((d) => window.PS.docTag(d)[0] === 'must').length >= 2)));
   await page.goto(BASE + '#/guide/cafe/prepare'); await page.emulateMedia({ media: 'print' });
   const all = await page.evaluate(() => ['tax', 'code', 'support', 'sites', 'memo', 'about', 'docs', 'steps'].every((k) => getComputedStyle(document.getElementById('sec-' + k)).display !== 'none') && getComputedStyle(document.querySelector('.jstep')).display === 'none');
   check('인쇄: 어느 단계에서 저장해도 전체 섹션 포함, 단계 표시는 숨김', all);
   await page.emulateMedia({ media: 'screen' });
+}
+
+// 11-5. 하드코딩 재발 방지 — 기준값은 data.js meta(codeYear·rules) 한 곳, 버전은 app.js 한 곳
+{
+  const { readFileSync } = await import('node:fs');
+  const src = readFileSync(new URL('../app.js', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const lits = ['2025년 귀속', '1억400만', '20일', '만 34세', '만 39세', '2026년 이후', '2026.1.1', "addDays(S.me.open,20)", 'ps-guide-1.'];
+  const found = lits.filter((l) => src.includes(l));
+  check('app.js에 제도 기준값·연계표 연도 직접 표기 없음(data.js meta.rules·codeYear에서)', found.length === 0, found.join(', '));
+  const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  check('버전은 한 곳: package.json = app VERSION, sw 캐시는 등록 시 ?v=', pkg.version === await page.evaluate(() => window.PS.VERSION) && !/ps-guide-\d/.test(sw) && sw.includes("searchParams.get('v')"));
+  check('연계표 연도 일치(meta.codeYear ⊂ codeBase)', await page.evaluate(() => window.PS_DATA.meta.codeBase.includes(window.PS_DATA.meta.codeYear + '년')));
+  const og = await page.evaluate(() => document.querySelector('meta[property="og:description"]').content);
+  check('OG 설명의 업종 수 = 실제 업종 수', og.includes(`${await page.evaluate(() => window.PS_DATA.industries.length)}개 업종`));
+  const leak = [];
+  for (const u of ['', '#/me?next=cafe', '#/guide/cafe/prepare', '#/guide/cafe/benefit', '#/guide/cafe/finish', '#/my', '#/search?q=카페']) {
+    await page.goto(BASE + u); await page.waitForTimeout(80);
+    if ((await page.locator('body').innerText()).includes('${')) leak.push(u || 'home');
+  }
+  check('화면에 템플릿 문법(${…})이 그대로 노출되지 않음', leak.length === 0, leak.join(','));
+  await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ me: { age: 'u34', rev: 'lt1', open: '2027-03-02' } }))); await page.reload();
+  await page.goto(BASE + '#/guide/cafe/prepare'); await page.waitForTimeout(100);
+  const t = await page.locator('main').innerText();
+  const r = await page.evaluate(() => window.PS.RULE);
+  check('기준값이 화면에 반영(청년 나이·간이과세·사업자등록 기한)', t.includes(`만 15~${r.youthTaxAgeMax}세`) && t.includes(r.simpleVatLimit) && t.includes(`${r.bizRegDays}일`) && t.includes('2027.03.22'));
 }
 
 // 12. 앱(PWA) 구성
