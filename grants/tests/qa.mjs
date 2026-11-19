@@ -152,7 +152,8 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
         const b2 = tier({ programName: '[부산] 해운대구 2027년 직불제 신청안내', targetRegions: ['부산'] }, bz('해운대구'));
         const c = tier({ programName: '[창업] 내 매장 자리 찾기', agency: '마포청년창업취업지원센터 나루', targetRegions: ['전국'], targetRegionsInferred: true }, seoul);
         const c2 = tier({ programName: '[창업] 내 매장 자리 찾기', agency: '마포청년창업취업지원센터 나루', targetRegions: ['전국'], targetRegionsInferred: true }, bz('동구'));
-        return { gongdong: [a.regionTier, reg(a).result], other: [b.regionTier, reg(b).result, !!reg(b).restricted], same: b2.regionTier, agency: c.regionTier, agencyOther: reg(c2).result }; })(),
+        const so = tier({ programName: '2026년 퍼스널케어 융합 얼라이언스 육성사업', supportDescription: '공고합니다. ☞ 경상북도 소재 퍼스널케어(헬스, 뷰티케어)분야 제조기업', targetRegions: ['전국'] }, C({ ...sme, region: '대전', district: '유성구' }));
+        return { soje: [reg(so).result, !!reg(so).restricted], gongdong: [a.regionTier, reg(a).result], other: [b.regionTier, reg(b).result, !!reg(b).restricted], same: b2.regionTier, agency: c.regionTier, agencyOther: reg(c2).result }; })(),
       specialSan: sanitizeCompany({ specialStatus: ['disabled', 'x', 'disabled'] }).specialStatus,
       // 업종 추론(공고명): 도입·활용 사업은 업종 제한 아님, 업종 그룹 일치/불일치
       sector: [cond({ programName: '2026 AI 바우처 지원사업' }, { ...sme, industry: '음식점업(F&B)' }, '업종 조건').result,
@@ -211,6 +212,7 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('정밀도 규칙: 유공자 포상은 지원사업 아님, 농식품 사업은 음식점과 거리 있음', r.prec.award && r.prec.agriFood);
   check('시·군·구: "공동구매"의 "동구"는 부산 동구 아님(광역시 단위 1)', r.dist.gongdong[0] === 1 && r.dist.gongdong[1] === 'pass', JSON.stringify(r.dist.gongdong));
   check('시·군·구: 공고명에 같은 시·도의 다른 구(해운대구)면 동구 기업은 확인 필요, 해운대구 기업은 내 시군구(2)', r.dist.other[0] === 1 && r.dist.other[1] === 'unknown' && r.dist.other[2] && r.dist.same === 2, JSON.stringify(r.dist));
+  check('지역: 전국 공고라도 개요 첫머리에 "경상북도 소재 … 기업"이면 대전 기업은 확인 필요', r.dist.soje[0] === 'unknown' && r.dist.soje[1], JSON.stringify(r.dist.soje));
   check('시·군·구: 기관명 앞머리 약칭(마포청년창업센터) → 마포구 기업 내 시군구(2), 다른 시·도 기업 확인 필요', r.dist.agency === 2 && r.dist.agencyOther === 'unknown', `${r.dist.agency}/${r.dist.agencyOther}`);
   check('해당되는 항목 저장값 정제(허용 키·중복 제거)', JSON.stringify(r.specialSan) === '["disabled"]', JSON.stringify(r.specialSan));
   check('저장값 정제: 허용 밖 값 제거', r.sanitize.region === null && r.sanitize.establishedYear === null && r.sanitize.exportHistory === null && r.sanitize.industry === '제조업');
@@ -296,7 +298,15 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('상세의 도움받기 → 상세 닫고 도움받기 창', await page.locator('#detailModal.hidden').count() === 1 && await page.locator('#helpModal:not(.hidden)').count() === 1);
   await page.keyboard.press('Escape');
   const hook = await page.locator('.hook-banner').innerText();
-  check('후킹 문구: DEMO 표기·검토할 만한(신청 가능 단정 아님)', /DEMO 예시 공고/.test(hook) && /검토할 만한/.test(hook) && !/신청할 수 있는/.test(hook), hook.replace(/\s+/g, ' '));
+  check('후킹 문구: DEMO 표기·대표 숫자는 추천 건수, 나머지는 확인 후 신청(신청 가능 단정 아님)', /DEMO 예시 공고/.test(hook) && /추천 \d+개/.test(hook) && /확인 후 신청 \d+개/.test(hook) && !/신청할 수 있는/.test(hook), hook.replace(/\s+/g, ' '));
+  // B안: 화면 등급 이름 — '추천'은 자격 모두 충족만, 내부 '조건부 추천'은 '확인 후 신청'으로 · 목록은 추천 → 확인 후 신청 두 칸
+  const tierB = await page.evaluate(() => {
+    const labels = [...document.querySelectorAll('#cards .rc-state')].map((e) => e.textContent.trim());
+    const states = App.matched.filter((m) => m.state === '조건부 추천').length;
+    const heads = [...document.querySelectorAll('#cards .tier-head')].map((e) => e.querySelector('b').textContent.trim());
+    return { cond: labels.includes('확인 후 신청'), old: /조건부/.test(document.getElementById('view-results').innerText), heads, states };
+  });
+  check('B안: 카드·문구에 "조건부" 없음, 확인 후 신청 표기·목록 두 칸(추천 → 확인 후 신청 순)', !tierB.old && (tierB.states === 0 || tierB.cond) && tierB.heads.length >= 1 && (tierB.heads.length < 2 || (/추천/.test(tierB.heads[0]) && /확인 후 신청/.test(tierB.heads[1]))), JSON.stringify(tierB));
   const notice = await page.locator('.data-notice').innerText();
   check('데이터 안내: DEMO·예시 명시', /DEMO/.test(notice) && /예시/.test(notice));
   const resFoot = await page.locator('#resFoot').innerText();
@@ -451,9 +461,10 @@ async function newPage(viewport = { width: 1440, height: 900 }) {
   check('실시간: 안내에 본문 자격요건 미분석 명시', /세부 자격요건/.test(await page.locator('.data-notice').innerText()));
   const st = await page.locator('#cards .rc-state').allInnerTexts();
   check('실시간 목록 공고는 "추천" 확정 없음(조건부 이하)', st.length > 0 && !st.includes('추천'), [...new Set(st)].join(','));
+  check('B안: 확정 추천이 없으면 맨 위에 안내 + 추가 정보·전문가 확인 버튼', await page.locator('#cards .no-rec').count() === 1 && await page.locator('#cards .no-rec button', { hasText: '전문가 확인 요청' }).count() === 1);
   check('그룹당 카드 제한 + 더 보기(지원별 추천 3건은 별도)', await page.locator('#cards .need-group .rcard').count() === 6 && await page.locator('.need-group .more-btn').count() === 1 && await page.locator('.need-picks .rcard').count() === 3);
   await page.locator('.need-group .more-btn').click();
-  check('더 보기 → 전체 표시(위 추천 3건 제외)', await page.locator('#cards .need-group .rcard').count() === 117 && /위 추천 3건 제외/.test(await page.locator('.list-head').innerText()));
+  check('더 보기 → 전체 표시(위에 나온 3건 제외)', await page.locator('#cards .need-group .rcard').count() === 117 && /위에 나온 3건 제외/.test(await page.locator('.list-head').innerText()));
   await page.emulateMedia({ media: 'print' });
   await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
   const printed = await page.locator('#cards .rcard').count();
