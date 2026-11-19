@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -200,10 +200,18 @@ function mount(html, tab, title){
   $('#view').innerHTML=html;
   document.title = title ? `${title} · BECONIC 창업 준비 가이드` : 'BECONIC 창업 준비 가이드 · 업종별 서류·인허가·세금 혜택 정리';
 }
+let pendingFocus=null;
 function afterNav(){
-  const {parts}=parse();
-  if(parts[0]==='guide' && location.hash.includes('#sec-')) return;
+  if(pendingFocus){
+    const t=document.getElementById(pendingFocus); pendingFocus=null;
+    if(t){ t.scrollIntoView({block:'start'}); t.classList.add('flash'); setTimeout(()=>t.classList.remove('flash'), 1600); t.setAttribute('tabindex','-1'); t.focus({preventScroll:true}); return; }
+  }
   window.scrollTo(0,0);
+}
+function meChips(){
+  const t=ME_Q.filter(q=>S.me[q.k]).map(q=>q.o.find(o=>o[0]===S.me[q.k])[1]);
+  if(S.me.open) t.push('개업 예정 '+ymd(new Date(S.me.open+'T00:00:00')));
+  return t;
 }
 
 /* ---------- 홈 ---------- */
@@ -223,6 +231,12 @@ function renderHome(){
     <div class="quick" aria-label="자주 찾는 업종">${['카페','온라인 쇼핑몰','소프트웨어','미용실','음식점','유튜브'].map(w=>`<button type="button" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div>
     <div id="homeResults"></div>
   </section>
+  <ol class="journey" aria-label="이용 순서">
+    <li><b>1</b><span><strong>업종 고르기</strong>검색하거나 업태에서 선택</span></li>
+    <li><b>2</b><span><strong>내 상황 넣기</strong>선택 · 30초, 맞춤 안내</span></li>
+    <li><b>3</b><span><strong>체크하며 준비</strong>순서·서류를 하나씩</span></li>
+    <li><b>4</b><span><strong>저장·연결</strong>PDF · 지원사업 · 전문가</span></li>
+  </ol>
   ${recent.length?`<div class="sec-title"><h2>이어서 준비하기</h2><a class="small muted" href="#/my">내 준비함 ›</a></div>
   <div class="recent">${recent.map(id=>{ const p=progressOf(id); return `<a class="rcard" href="#/guide/${id}"><span class="small muted">${esc(BY_ID[id].group)}</span><b>${esc(BY_ID[id].name)}</b><span class="small muted">${p.done}/${p.total} 완료</span><div class="bar"><i style="width:${p.pct}%"></i></div></a>`; }).join('')}</div>`:''}
   <div class="sec-title"><h2>업태에서 고르기</h2><span class="small muted">${IND.length}개 업종 가이드</span></div>
@@ -276,6 +290,7 @@ function renderGroup(g){
 }
 
 /* ---------- 가이드 ---------- */
+const NAV_EXTRA = [['me','맞춤 안내']];
 const SECS = [
   ['steps','진행 순서'],['docs','준비 서류'],['license','인허가·신고'],['code','업종코드'],['tax','세금 혜택'],['support','지원사업'],
   ['ask','미리 답할 질문'],['pit','놓치기 쉬운 점'],['expand','함께 등록·확장'],['sites','신청 사이트'],['memo','내 메모'],['about','자료 기준']
@@ -295,13 +310,13 @@ function renderGuide(id){
   const reviewed = it.reviewStatus==='검수완료';
 
   mount(`
-  <nav class="tnav" aria-label="가이드 목차">${SECS.map(([k,l])=>`<a href="#sec-${k}" data-sec="${k}">${l}</a>`).join('')}</nav>
+  <nav class="tnav" aria-label="가이드 목차">${[...NAV_EXTRA, ...SECS].map(([k,l])=>`<a href="#sec-${k}" data-sec="${k}">${l}</a>`).join('')}</nav>
   <div class="guide">
     <aside class="lnav" aria-label="가이드 목차">
       <div class="ln-t">${esc(it.name)}</div>
-      ${SECS.map(([k,l])=>{
+      ${[...NAV_EXTRA, ...SECS].map(([k,l])=>{
         const done = (k==='steps'&&pr.ns&&pr.ds===pr.ns)||(k==='docs'&&pr.nd&&pr.dd===pr.nd);
-        const cnt = k==='steps'?`${pr.ds}/${pr.ns}`: k==='docs'?`${pr.dd}/${pr.nd}`: k==='license'?it.license.length: '';
+        const cnt = k==='steps'?`${pr.ds}/${pr.ns}`: k==='docs'?`${pr.dd}/${pr.nd}`: k==='license'?it.license.length: k==='me'?(hasMe()?notes.length:'선택'): '';
         return `<a href="#sec-${k}" data-sec="${k}">${l}${done?`<i class="dn" aria-label="완료">✓</i>`:cnt!==''?`<em>${cnt}</em>`:''}</a>`;
       }).join('')}
       <div class="ln-sep"></div>
@@ -312,7 +327,7 @@ function renderGuide(id){
       </div>
     </aside>
     <div class="gbody">
-      <div class="print-only" style="margin-bottom:10pt"><b style="font-size:15pt">BECONIC 창업 준비 체크리스트 · ${esc(it.name)}</b><br><span class="small">출력 ${ymd(new Date())} · 자료 기준일 ${BASE} · 세제 ${TAX_BASE} 법령 기준 · 업종코드 2025년 귀속 연계표</span></div>
+      <div class="print-only phead"><b>BECONIC 창업 준비 체크리스트</b><span>출력 ${ymd(new Date())} · 자료 기준일 ${BASE} · 세제 ${TAX_BASE} 법령 기준 · 업종코드 2025년 귀속 연계표</span></div>
       <section class="card ghero">
         <div class="eyebrow">${D.groupMeta[it.group]||''} ${esc(it.group)} · 창업 준비 가이드</div>
         <h1 class="h-lg">${esc(it.name)}</h1>
@@ -326,21 +341,23 @@ function renderGuide(id){
         <div class="meta"><span>📅 자료 기준일 <b>${BASE}</b></span><span>세제 <b>${TAX_BASE}</b> 법령 기준</span><span>업종코드 <b>2025년 귀속</b> 연계표</span></div>
       </section>
 
+      ${printSummary(it, pr)}
       <section class="card no-print" aria-label="준비 진행률">
         <div class="prog"><div class="pn">${pr.pct}<small>%</small></div><div class="pt"><b>${pr.pct===100?'준비를 모두 체크했어요':'준비 진행률'}</b><span>순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd} 체크 · 이 기기에 저장돼요</span></div>
         <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pr.pct}" aria-label="준비 진행률"><i style="width:${pr.pct}%"></i></div></div>
-        ${nx?`<div class="next"><span class="nl">지금 할 일</span><span class="nt">${esc(nx.text)}</span><button class="btn btn-primary btn-sm" type="button" data-next="${nx.kind}${nx.i}">완료</button></div>`:''}
+        ${nx?`<div class="next"><span class="nl">지금 할 일</span><span class="nt">${esc(nx.text)}</span><button class="btn btn-primary btn-sm" type="button" data-next="${nx.kind}${nx.i}">완료</button></div>`
+          :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open?`사업자등록은 <b>${ymd(addDays(S.me.open,20))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#sec-finish">마무리</a></div>`}
         <div class="acts-row">
-          <a class="btn btn-gray btn-sm" href="#/me?next=${it.id}">${hasMe()?'내 상황 수정':'내 상황 넣기'}</a>
           <button class="btn btn-gray btn-sm" type="button" data-act="share">링크 복사</button>
           <button class="btn btn-gray btn-sm" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 저장'}</button>
         </div>
       </section>
 
-      ${notes.length?`<section class="card" aria-label="내 상황 맞춤 안내"><div class="sec-h"><span class="sn">★</span><h2>내 상황 맞춤 안내</h2><a class="small muted no-print" href="#/me?next=${it.id}">수정</a></div>
+      ${notes.length?`<section class="card sec" id="sec-me" aria-label="내 상황 맞춤 안내"><div class="sec-h"><span class="sn">★</span><h2>내 상황 맞춤 안내</h2><a class="btn btn-soft btn-sm no-print" href="#/me?next=${it.id}">내 상황 수정</a></div>
+        <div class="row mechips">${meChips().map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>
         ${notes.map(([c,i,t])=>`<div class="notice ${c}"><span class="ni" aria-hidden="true">${i}</span><span>${t}</span></div>`).join('')}
         <p class="note">입력하신 내용으로 확인할 점을 골라 보여 드리는 안내예요. 적용 여부는 관할 기관·전문가 확인이 필요해요.</p></section>`
-      :`<section class="card no-print"><div class="expert"><div class="et"><b style="font-size:16px">내 상황을 넣으면 맞춤 안내가 붙어요</b><p class="small muted" style="margin-top:4px">나이·지역·사업장·예상 매출 — 30초, 전부 선택이에요. 세액감면 청년 기준, 자택 등록 가능 여부, 사업자등록 기한을 알려 드려요.</p></div>
+      :`<section class="card sec no-print" id="sec-me"><div class="expert"><div class="et"><b style="font-size:16px">내 상황을 넣으면 맞춤 안내가 붙어요</b><p class="small muted" style="margin-top:4px">나이·지역·사업장·예상 매출 — 30초, 전부 선택이에요. 세액감면 청년 기준, 자택 등록 가능 여부, 사업자등록 기한을 알려 드려요.</p></div>
         <a class="btn btn-soft" href="#/me?next=${it.id}">30초 입력</a></div></section>`}
 
       <section class="card sec" id="sec-steps">${secHead('steps', `<span class="cnt">${pr.ds}/${pr.ns}</span>`)}
@@ -409,7 +426,19 @@ function renderGuide(id){
       <section class="card sec" id="sec-memo">${secHead('memo')}
         <p class="sec-d no-print">이 기기에만 저장되고 PDF에 함께 나와요.</p>
         <label class="sr" for="memo">내 메모</label>
-        <textarea class="ta" id="memo" maxlength="2000" placeholder="예: 상가 계약 전 건축물 용도 확인 / 위생교육 온라인 신청 완료 / 세무사 상담 예약">${esc(S.memo[id]||'')}</textarea>
+        <div class="print-only pmemo">${S.memo[id]?esc(S.memo[id]):'<i></i><i></i><i></i><i></i>'}</div>
+        <textarea class="ta no-print" id="memo" maxlength="2000" placeholder="예: 상가 계약 전 건축물 용도 확인 / 위생교육 온라인 신청 완료 / 세무사 상담 예약">${esc(S.memo[id]||'')}</textarea>
+      </section>
+
+      <section class="card sec finish" id="sec-finish" aria-label="준비 마무리">
+        <div class="sec-h"><span class="sn">✓</span><h2>준비 마무리</h2><span class="cnt no-print">${pr.pct}% 체크</span></div>
+        <p class="sec-d no-print">체크를 마쳤다면 아래 세 가지로 마무리하세요.</p>
+        <div class="fin no-print">
+          <button class="fcard" type="button" data-act="print"><b>① ${IN_APP?'체크리스트 복사':'PDF로 저장'}</b><span>${IN_APP?'나와의 채팅에 붙여 넣어 보관':'한눈에 보기 + 남은 할 일 + 전체 체크리스트'}</span></button>
+          <a class="fcard" href="${esc(matchUrl(it))}" target="_blank" rel="noopener"><b>② 지원사업 찾기 ↗</b><span>예비창업자·이 업종${S.me.region?'·'+esc(S.me.region):''} 조건으로 접수 중 공고 확인</span></a>
+          <a class="fcard" href="${CONTACT.kakao}" target="_blank" rel="noopener"><b>③ 전문가에게 확인</b><span>서류·세금 요건을 카카오톡으로 물어보기 · ${CONTACT.tel}</span></a>
+        </div>
+        <div class="print-only pcontact"><b>전문가 확인이 필요하면</b> ${CONTACT.company}(중소벤처기업부 인증 중소기업상담회사 ${CONTACT.cert}) · ${CONTACT.tel} · ${CONTACT.email} · 카카오톡 채널 'BECONIC' · www.beconic.kr<br>지원사업 찾기: beconic-grant-matching.netlify.app · 이 가이드 다시 보기: ${esc(shareLink(id).replace(/^https?:\/\//,''))}</div>
       </section>
 
       <section class="card sec disc" id="sec-about">${secHead('about')}
@@ -419,10 +448,6 @@ function renderGuide(id){
         <p><b>개인정보</b> 입력한 상황·체크·메모는 이 기기 브라우저에만 저장되고 서버로 보내지 않아요. '내 준비함'에서 언제든 지울 수 있어요.</p>
       </section>
 
-      <section class="card no-print"><div class="expert">
-        <div class="et"><b style="font-size:16px">서류·세금, 전문가와 한 번 더 확인하고 싶다면</b><p class="small muted" style="margin-top:4px">${CONTACT.company} · 중기부 인증 중소기업상담회사(${CONTACT.cert}) · 평일 09~18시</p></div>
-        <div class="row"><a class="btn btn-primary btn-sm" href="${CONTACT.kakao}" target="_blank" rel="noopener">카카오톡 상담</a><a class="btn btn-gray btn-sm" href="tel:${CONTACT.tel.replace(/-/g,'')}">${CONTACT.tel}</a></div>
-      </div></section>
     </div>
   </div>
   <div class="guide-cta no-print"><a class="btn btn-primary" href="${esc(matchUrl(it))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a><button class="btn btn-gray" type="button" data-act="share" style="flex:0 0 auto;padding:0 18px">링크 복사</button></div>
@@ -432,6 +457,23 @@ function renderGuide(id){
   const memo=$('#memo');
   memo.addEventListener('input', ()=>{ S.memo[id]=memo.value.slice(0,2000); if(!S.memo[id]) delete S.memo[id]; save(); });
   setupSpy();
+}
+function printSummary(it, pr){
+  const p=S.prog[it.id]||{d:{},s:{}};
+  const leftSteps=(it.licenseProcess||[]).map((t,i)=>[t,i]).filter(([,i])=>!p.s[i]).map(([t])=>stripNum(t));
+  const leftDocs=it.docs.map((d,i)=>[d,i]).filter(([d,i])=>!p.d[i] && docTag(d)[0]!=='opt').map(([d])=>d);
+  const left=[...leftSteps.map(t=>'[순서] '+t), ...leftDocs.map(t=>'[서류] '+t)];
+  const chips=meChips();
+  return `<section class="print-only psum">
+    <div class="ps-top"><div><span class="ps-l">업종</span><b>${esc(it.name)}</b></div>
+      <div><span class="ps-l">업종코드</span><b>${isCode(it.nts)?'국세청 '+esc(it.nts)+' · KSIC '+esc(it.ksic):'홈택스 조회 필요'}</b></div>
+      <div><span class="ps-l">진행률</span><b>${pr.pct}% (순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd})</b></div>
+      <div><span class="ps-l">인허가·신고</span><b>${it.license.map(l=>esc(l.name)).join(', ')}</b></div>
+      ${S.me.open?`<div><span class="ps-l">사업자등록 기한</span><b>${ymd(addDays(S.me.open,20))}까지 (개업 예정 ${ymd(new Date(S.me.open+'T00:00:00'))} + 20일)</b></div>`:''}
+      ${chips.length?`<div><span class="ps-l">내 상황</span><b>${chips.map(esc).join(' · ')}</b></div>`:''}
+    </div>
+    <div class="ps-left"><b>${left.length?`남은 할 일 ${left.length}개`:'남은 필수·권장 할 일이 없어요'}</b>${left.length?`<ol>${left.slice(0,12).map(t=>`<li>${esc(t)}</li>`).join('')}</ol>${left.length>12?`<span>외 ${left.length-12}개는 아래 체크리스트 참고</span>`:''}`:''}</div>
+  </section>`;
 }
 function chk(kind,i,html,on,tail){
   return `<button type="button" class="chk" role="checkbox" aria-checked="${on?'true':'false'}" data-chk="${kind}${i}"><span class="bx">${CHECK_SVG}</span><span class="ct">${html}</span>${tail||''}</button>`;
@@ -454,7 +496,7 @@ function regSites(it){
 function siteHTML(s){
   const href=/^https?:\/\//.test(s.url)?s.url:'https://'+s.url;
   const shown=s.url.replace(/^https?:\/\//,'').replace(/\/$/,'');
-  return `<a class="site ${s.brand?'brand':''}" href="${esc(href)}" target="_blank" rel="noopener"><b>${esc(s.name)}</b><span>${esc(s.desc||shown)}</span></a>`;
+  return `<a class="site ${s.brand?'brand':''}" href="${esc(href)}" target="_blank" rel="noopener"><b>${esc(s.name)}</b><span class="${s.desc?'':'print-hide'}">${esc(s.desc||shown)}</span><span class="print-only purl">${esc(shown)}</span></a>`;
 }
 function setupSpy(){
   const links=[...document.querySelectorAll('.lnav a[data-sec], .tnav a[data-sec]')];
@@ -516,22 +558,31 @@ function renderSearch(q, g){
 /* ---------- 내 상황 ---------- */
 function renderMe(next){
   const m={...S.me};
-  mount(`<div class="wrap-narrow"><section class="card" style="padding:28px">
+  const it=next?BY_ID[next]:null;
+  const back=it?`#/guide/${next}`:'#/my';
+  const preview=()=>{ if(!it) return ''; const keep=S.me; S.me=sanitizeMe(m); const n=situationNotes(it).length; S.me=keep; return n?`지금 선택으로 <b>${esc(it.name)}</b> 가이드에 맞춤 안내 <b>${n}개</b>가 붙어요.`:`항목을 고르면 <b>${esc(it.name)}</b> 가이드에 맞춤 안내가 붙어요.`; };
+  mount(`<div class="wrap-narrow">
+    <a class="btn btn-gray btn-sm no-print" href="${back}">‹ ${it?esc(it.name)+' 가이드로':'내 준비함으로'}</a>
+    <section class="card" style="padding:28px;margin-top:14px">
     <div class="eyebrow">선택 입력 · 이 기기에만 저장</div><h1 class="h-lg" style="margin:6px 0 6px">내 상황을 알려 주세요</h1>
-    <p class="muted" style="margin-bottom:24px">고른 항목만 맞춤 안내에 쓰여요. 모르면 건너뛰어도 돼요.</p>
+    <p class="muted" style="margin-bottom:18px">고른 항목만 맞춤 안내에 쓰여요. 모르면 건너뛰어도 돼요. 모든 업종 가이드에 함께 적용돼요.</p>
+    ${it?`<div class="notice blue" id="mePreview" role="status" aria-live="polite"><span class="ni" aria-hidden="true">★</span><span>${preview()}</span></div>`:''}
     ${ME_Q.map(q=>`<div class="form-q" role="group" aria-labelledby="ql-${q.k}"><div class="ql" id="ql-${q.k}">${q.l}</div><div class="qh">${q.h}</div>
       <div class="opts">${q.o.map(([v,l])=>`<button type="button" class="opt" data-k="${q.k}" data-v="${esc(v)}" aria-pressed="${m[q.k]===v?'true':'false'}">${esc(l)}</button>`).join('')}</div></div>`).join('')}
     <div class="form-q"><label class="ql" for="open">개업 예정일</label><div class="qh">사업자등록 신청 기한(사업 시작일부터 20일)을 계산해 드려요.</div>
       <input class="inp" id="open" type="date" value="${esc(m.open||'')}"></div>
-    <div class="row"><button class="btn btn-primary" type="button" id="meSave" style="flex:1">${next?'저장하고 가이드 보기':'저장'}</button><button class="btn btn-gray" type="button" id="meClear">모두 지우기</button></div>
-  </section></div>`, 'my', '내 상황');
+    </section>
+    <div class="me-actions"><button class="btn btn-gray" type="button" id="meClear">선택 초기화</button><button class="btn btn-primary" type="button" id="meSave">${it?'저장하고 맞춤 안내 보기':'저장'}</button></div>
+  </div>`, it?'home':'my', '내 상황');
+  const upd=()=>{ const pv=$('#mePreview'); if(pv) pv.lastElementChild.innerHTML=preview(); };
   document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click', ()=>{
     const k=b.dataset.k, v=b.dataset.v; m[k] = m[k]===v ? undefined : v; if(m[k]===undefined) delete m[k];
     document.querySelectorAll(`.opt[data-k="${k}"]`).forEach(x=>x.setAttribute('aria-pressed', m[k]===x.dataset.v?'true':'false'));
+    upd();
   }));
-  $('#open').addEventListener('change', e=>{ if(e.target.value) m.open=e.target.value; else delete m.open; });
-  $('#meSave').addEventListener('click', ()=>{ S.me=sanitizeMe(m); save(); toast('저장했어요. 맞춤 안내에 반영돼요.'); location.hash = next ? '#/guide/'+next : '#/my'; });
-  $('#meClear').addEventListener('click', ()=>{ S.me={}; save(); toast('내 상황을 지웠어요.'); render(); });
+  $('#open').addEventListener('change', e=>{ if(e.target.value) m.open=e.target.value; else delete m.open; upd(); });
+  $('#meSave').addEventListener('click', ()=>{ S.me=sanitizeMe(m); save(); toast(hasMe()?'저장했어요. 맞춤 안내에 반영됐어요.':'내 상황을 비웠어요.'); if(it) pendingFocus='sec-me'; location.hash = back; });
+  $('#meClear').addEventListener('click', ()=>{ for(const k of Object.keys(m)) delete m[k]; document.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed','false')); $('#open').value=''; upd(); toast('선택을 비웠어요. 저장해야 반영돼요.'); });
 }
 
 /* ---------- 내 준비함 ---------- */
@@ -574,7 +625,7 @@ document.addEventListener('click', async e=>{
     if(a.dataset.act==='share'){ const ok=await copyText(shareLink(id)); toast(ok?'가이드 링크를 복사했어요. 체크 내용은 링크에 담기지 않아요.':'복사가 안 되는 환경이에요.'); }
     if(a.dataset.act==='print'){
       if(IN_APP){ const ok=await copyText(summary(id)); toast(ok?'앱 안 브라우저는 PDF 저장이 안 돼요. 체크리스트를 복사했으니 나와의 채팅에 붙여 넣어 보관하세요.':'다른 브라우저로 열어 PDF로 저장해 주세요.'); }
-      else window.print();
+      else printGuide(id);
     }
     return;
   }
@@ -584,6 +635,14 @@ document.addEventListener('click', async e=>{
 
 /* 모바일 하단 고정 버튼: 첫 화면(진행률 카드)을 지난 뒤에만 보여 줘 '지금 할 일'을 가리지 않는다 */
 window.addEventListener('scroll', ()=>{ const c=document.querySelector('.guide-cta'); if(c) c.classList.toggle('show', window.scrollY>560); }, {passive:true});
+
+function printGuide(id){
+  const it=BY_ID[id], prev=document.title, d=new Date();
+  document.title=`창업준비체크리스트_${it.name.replace(/[\\/:*?"<>|·\s]+/g,'')}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const restore=()=>{ document.title=prev; window.removeEventListener('afterprint', restore); };
+  window.addEventListener('afterprint', restore);
+  window.print();
+}
 
 /* ---------- 앱(PWA) ---------- */
 let deferredInstall=null;

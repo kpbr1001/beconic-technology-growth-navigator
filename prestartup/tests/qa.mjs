@@ -11,7 +11,7 @@ const newPage = async (opt = {}) => {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, ...opt });
   const p = await ctx.newPage();
   p.on('pageerror', (e) => errors.push(String(e)));
-  p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|net::ERR/.test(m.text())) errors.push(m.text()); });
+  p.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|net::ERR|Framing 'https:\/\/app\.netlify\.com\//.test(m.text())) errors.push(m.text()); });
   return p;
 };
 const page = await newPage();
@@ -173,14 +173,45 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await p.context().close();
 }
 
-// 11. 인쇄(A4) — 내비·하단 탭 숨김, 기준일 머리말
+// 11. 인쇄(A4) — 한눈에 보기 요약·남은 할 일·쪽 번호·사이트 주소·빈 메모 줄·연락처
 {
-  await page.goto(BASE + '#/guide/cafe'); await page.emulateMedia({ media: 'print' });
-  const pr = await page.evaluate(() => ({ head: getComputedStyle(document.querySelector('.print-only')).display, top: getComputedStyle(document.querySelector('.top')).display, lnav: getComputedStyle(document.querySelector('.lnav')).display }));
-  check('인쇄: 머리말(기준일) 표시, 상단·좌측 내비 숨김', pr.head === 'block' && pr.top === 'none' && pr.lnav === 'none');
+  await page.goto(BASE + '#/guide/cafe');
+  await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ me: { age: 'u34', open: '2027-03-02' }, prog: { cafe: { s: { 0: true }, d: { 0: true } } }, recent: ['cafe'] })));
+  await page.reload(); await page.emulateMedia({ media: 'print' });
+  const pr = await page.evaluate(() => ({ head: getComputedStyle(document.querySelector('.phead')).display, sum: getComputedStyle(document.querySelector('.psum')).display, top: getComputedStyle(document.querySelector('.top')).display, lnav: getComputedStyle(document.querySelector('.lnav')).display, memoTa: getComputedStyle(document.querySelector('#memo')).display, sumText: document.querySelector('.psum').innerText, url: getComputedStyle(document.querySelector('.purl')).display, contact: document.querySelector('.pcontact').innerText }));
+  check('인쇄: 머리말(기준일) 표시, 상단·좌측 내비 숨김', pr.head !== 'none' && pr.top === 'none' && pr.lnav === 'none');
+  check('인쇄: 한눈에 보기(업종코드·진행률·인허가·사업자등록 기한·남은 할 일)', pr.sum === 'block' && /552303/.test(pr.sumText) && /진행률/.test(pr.sumText) && /2027\.03\.22까지/.test(pr.sumText) && /남은 할 일 \d+개/.test(pr.sumText) && !/\[순서\] 위생교육/.test(pr.sumText));
+  check('인쇄: 빈 메모는 예시 문구 대신 쓰기 줄', pr.memoTa === 'none' && (await page.locator('.pmemo i').count()) === 4);
+  check('인쇄: 신청 사이트 주소 표시·전문가 연락처', pr.url === 'block' && pr.contact.includes('02-6124-5960'));
   const pdf = await page.pdf({ format: 'A4' });
   check('인쇄: A4 PDF 생성', pdf.length > 20000, `${Math.round(pdf.length / 1024)}KB`);
+  const css = await page.evaluate(() => [...document.styleSheets].flatMap((ss) => { try { return [...ss.cssRules].map((r) => r.cssText); } catch { return []; } }).join(' '));
+  check('인쇄: 쪽 번호·바닥글(@page 여백 상자)', /counter\(pages\)/.test(css));
   await page.emulateMedia({ media: 'screen' });
+  const title = await page.evaluate(() => { let t = ''; const o = window.print; window.print = () => { t = document.title; }; document.querySelector('[data-act="print"]').click(); window.print = o; return t; });
+  check('PDF 파일 이름 = 창업준비체크리스트_업종_날짜', /^창업준비체크리스트_카페커피전문점_\d{8}$/.test(title), title);
+}
+
+// 11-2. 사용자 흐름: 홈 이용 순서 → 가이드 → 내 상황 수정 → 저장 후 맞춤 안내로 복귀
+{
+  await page.goto(BASE);
+  check('홈: 이용 순서 4단계 안내', (await page.locator('.journey li').count()) === 4);
+  await page.goto(BASE + '#/guide/cafe'); await page.waitForTimeout(100);
+  check('가이드 목차에 "맞춤 안내" 포함', (await page.locator('.lnav a[data-sec="me"]').count()) === 1);
+  await page.click('#sec-me a[href^="#/me"]'); await page.waitForTimeout(150);
+  check('내 상황 화면: 가이드로 돌아가기·미리보기', (await page.locator('a[href="#/guide/cafe"]').first().innerText()).includes('가이드로') && (await page.locator('#mePreview').innerText()).includes('카페'));
+  await page.click('.opt[data-v="home"]');
+  check('미리보기: 고르는 즉시 안내 개수 갱신', /맞춤 안내 \d+개/.test(await page.locator('#mePreview').innerText()));
+  await page.click('#meClear');
+  check('선택 초기화는 저장 전까지 반영 안 함', await page.evaluate(() => window.PS.S.me.age === 'u34'));
+  await page.click('.opt[data-v="home"]');
+  await page.click('#meSave'); await page.waitForTimeout(300);
+  const top = await page.evaluate(() => Math.round(document.getElementById('sec-me').getBoundingClientRect().top));
+  check('저장 → 가이드의 맞춤 안내로 이동(강조)', page.url().endsWith('#/guide/cafe') && top < 400 && (await page.locator('#sec-me .chip').count()) >= 1, `top=${top}`);
+  check('맞춤 안내에 선택한 상황 칩 표시', (await page.locator('#sec-me .mechips').innerText()).includes('자택'));
+  check('마무리 섹션: PDF·지원사업·전문가 3가지', (await page.locator('#sec-finish .fcard').count()) === 3);
+  await page.goBack(); await page.waitForTimeout(150);
+  check('뒤로가기 → 내 상황 화면', page.url().includes('#/me'));
 }
 
 // 12. 앱(PWA) 구성
