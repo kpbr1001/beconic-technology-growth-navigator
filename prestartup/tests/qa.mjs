@@ -245,7 +245,16 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await page.click('#meSkip'); await page.waitForTimeout(150);
   check('건너뛰기 → 3단계(준비 체크)', page.url().endsWith('#/guide/cafe/prepare'));
   await page.goto(BASE + '#/start/ecommerce'); await page.waitForTimeout(150);
-  check('한 번 건너뛴 뒤 다른 업종 → 바로 3단계', page.url().endsWith('#/guide/ecommerce/prepare'));
+  check('건너뛴 뒤에도 업종을 고르면 항상 2단계(내 상황)', page.url().includes('#/me?next=ecommerce'));
+  await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ me: { age: 'u34', region: '서울' } }))); await page.reload();
+  await page.goto(BASE + '#/start/cafe'); await page.waitForTimeout(150);
+  check('2단계: 지난 입력 미리 채움·확인 안내·"그대로 결과 보기"', (await page.locator('.opt[data-v="u34"]').getAttribute('aria-pressed')) === 'true' && (await page.locator('main').innerText()).includes('지난번 입력한 내용') && (await page.locator('#meSkip').innerText()).includes('그대로 결과 보기'));
+  await page.goto(BASE + '#/guide/cafe/prepare'); await page.waitForTimeout(100);
+  check('결과 화면에 링크 복사 버튼 없음', (await page.locator('[data-act="share"]').count()) === 0);
+  const rs = await page.locator('.rsum').innerText();
+  check('결과 요약: 핵심 관문·먼저 할 일·꼭 챙길 서류·많이 놓치는 점', rs.includes('핵심 관문') && rs.includes('휴게음식점 영업신고') && rs.includes('먼저 할 일') && rs.includes('꼭 챙길 서류') && rs.includes('많이 놓치는 점'));
+  check('서류 분류: 위생교육 수료증·보건증·영업신고증은 필수', await page.evaluate(() => ['위생교육 수료증', '건강진단결과서(보건증)', '휴게음식점 영업신고증'].every((d) => window.PS.docTag(d)[0] === 'must') && window.PS.docTag('사업계획서')[0] === 'rec' && window.PS.docTag('(해당 시) 소방')[0] === 'opt'));
+  check('모든 업종 필수 서류 2종 이상(인적용역 제외)', await page.evaluate(() => Object.values(window.PS.BY_ID).filter((i) => i.id !== 'entertainer').every((i) => i.docs.filter((d) => window.PS.docTag(d)[0] === 'must').length >= 2)));
   await page.goto(BASE + '#/guide/cafe/prepare'); await page.emulateMedia({ media: 'print' });
   const all = await page.evaluate(() => ['tax', 'code', 'support', 'sites', 'memo', 'about', 'docs', 'steps'].every((k) => getComputedStyle(document.getElementById('sec-' + k)).display !== 'none') && getComputedStyle(document.querySelector('.jstep')).display === 'none');
   check('인쇄: 어느 단계에서 저장해도 전체 섹션 포함, 단계 표시는 숨김', all);

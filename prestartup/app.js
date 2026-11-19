@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -80,9 +80,15 @@ async function copyText(s){
   catch{ try{ const ta=document.createElement('textarea'); ta.value=s; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); const ok=document.execCommand('copy'); ta.remove(); return ok; }catch{ return false; } }
 }
 const stripNum = s => String(s).replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/, '');
+/* 서류 분류(2026-11-19 보완: 64개 업종 중 35개가 '필수 1개 이하'였음 — 영업등록 신청서·위생교육·보건증·신분증·임대차계약서가 '권장'으로 표시)
+   해당 시 = 조건부(괄호로 시작·'○○ 시') / 권장 = 계획·실적·도면 등 보완 자료 / 필수 = 등록·신고·자격·사업장 증빙 */
+const DOC_OPT = /^\(|\(해당|\(선택\)|해당 시|\(.{1,12} 시\)/;
+const DOC_REC = /전문성|포트폴리오|실적|사업계획|평면도|배치도|설비 내역|약관|정책|거래 관련|기술·도면|채용|정산|관련 체계|관련 서류|관련 계약서|전속계약서/;
+const DOC_MUST = /사업자등록|영업신고|영업등록|신청서|신고서|신고증|신고확인증|개설|등록증|허가|면허|자격증|자격 증빙|자격·등록|수료증|보건증|건강진단|신분증|임대차|등기부|공제증서|건축물대장|완비증명|구매안전|에스크로|등록기준|등록요건|기술인력|결제대행|품질관리 기준|GMP|품목제조|등급분류|차고지/;
 function docTag(doc){
-  if(/\(해당|\(선택\)|해당 시|\(품목별\)|\(온라인 시\)|\(직접 제조 시\)|\(.{1,12} 시\)/.test(doc)) return ['opt','해당 시'];
-  if(/사업자등록|영업신고|개설|등록증|허가|면허|등록신청|신고서/.test(doc)) return ['must','필수'];
+  if(DOC_OPT.test(doc)) return ['opt','해당 시'];
+  if(DOC_REC.test(doc)) return ['rec','권장'];
+  if(DOC_MUST.test(doc)) return ['must','필수'];
   return ['rec','권장'];
 }
 function progressOf(id){
@@ -193,7 +199,7 @@ function render(){
   const {parts, q}=parse();
   const [a,b]=parts;
   if(a==='g' && GROUPS.includes(b)) return renderGroup(b);
-  if(a==='start' && BY_ID[b]){ location.replace('#'+((hasMe()||S.meSkip)?`/guide/${b}/prepare`:`/me?next=${b}`)); return; }
+  if(a==='start' && BY_ID[b]){ location.replace(`#/me?next=${b}`); return; }   // 업종을 고르면 항상 ② 내 상황(지난 입력은 미리 채워 확인·수정)
   if(a==='guide' && BY_ID[b]) return renderGuide(b, GSTEPS.some(x=>x.k===parts[2])?parts[2]:'prepare');
   if(a==='search') return renderSearch(q.get('q')||'', q.get('g')||'');
   if(a==='my') return renderMy();
@@ -306,7 +312,7 @@ function renderGroup(g){
 const GSTEPS = [
   {k:'prepare', n:1, l:'준비물', d:'진행 순서 · 준비 서류 · 인허가', secs:['me','steps','docs','license','ask','pit']},
   {k:'benefit', n:2, l:'혜택·지원', d:'업종코드 · 세금 혜택 · 지원사업', secs:['code','tax','support','expand']},
-  {k:'finish',  n:3, l:'저장·상담', d:'PDF · 공유 · 전문가 확인 · 신청 사이트', secs:['finish','sites','memo','about']}
+  {k:'finish',  n:3, l:'저장·상담', d:'PDF · 전문가 확인 · 신청 사이트', secs:['finish','sites','memo','about']}
 ];
 const JOURNEY = [['pick','업종 고르기'],['me','내 상황'],['result','결과 보기']];
 function stepState(id){
@@ -360,7 +366,6 @@ function renderGuide(id, step){
       }).join('')}`).join('')}
       <div class="ln-sep"></div>
       <div class="ln-act">
-        <button class="btn btn-soft btn-sm btn-block" type="button" data-act="share">링크 복사</button>
         <button class="btn btn-gray btn-sm btn-block" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 저장'}</button>
         <a class="btn btn-gray btn-sm btn-block" href="#/g/${encodeURIComponent(it.group)}">다른 업종 고르기</a>
       </div>
@@ -390,7 +395,6 @@ function renderGuide(id, step){
         ${nx?`<div class="next"><span class="nl">지금 할 일</span><span class="nt">${esc(nx.text)}</span><button class="btn btn-primary btn-sm" type="button" data-next="${nx.kind}${nx.i}">완료</button></div>`
           :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open?`사업자등록은 <b>${ymd(addDays(S.me.open,20))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#/guide/${id}/benefit">혜택·지원 보기</a></div>`}
         <div class="acts-row">
-          <button class="btn btn-gray btn-sm" type="button" data-act="share">링크 복사</button>
           <button class="btn btn-gray btn-sm" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 저장'}</button>
         </div>
       </section>${S.track?'':'-->'}
@@ -509,20 +513,29 @@ function readRow(num, html, bullet, done){
 }
 function resultSummary(it, notes){
   const reviewed=it.reviewStatus==='검수완료';
+  const p=S.prog[it.id]||{d:{},s:{}};
   const tc=it.docs.reduce((a,d)=>{ a[docTag(d)[0]]++; return a; }, {must:0,rec:0,opt:0});
+  const must=it.docs.map((d,i)=>[d,i]).filter(([d])=>docTag(d)[0]==='must');
   const tax=(it.taxDetail||[]).map(t=>t.name);
+  const gate=it.license[0];
+  const steps=(it.licenseProcess||[]).map(stripNum);
+  const chips=meChips();
   return `<section class="card rsum no-print" aria-label="결과 요약">
     <div class="rs-h"><div><span class="rs-e">${D.groupMeta[it.group]||''} ${esc(it.group)} · 결과 요약</span><h1 class="h-lg">${esc(it.name)}</h1><p class="rs-s">${esc(it.summary)}</p></div></div>
+    ${gate?`<div class="rs-gate"><span>핵심 관문</span><b>${esc(gate.name)}</b>${gate.org&&gate.org!=='-'?`<em>${esc(gate.org)}</em>`:''}${it.license.length>1?`<small>외 인허가·신고 ${it.license.length-1}건</small>`:''}</div>`:''}
+    <div class="rs-two">
+      <div class="rs-box"><h3>먼저 할 일</h3><ol>${steps.slice(0,3).map((t,i)=>`<li class="${p.s[i]?'done':''}">${esc(t)}</li>`).join('')}</ol>${steps.length>3?`<p class="rs-more">외 ${steps.length-3}단계 · 사업자등록은 사업 시작일부터 20일 안에</p>`:'<p class="rs-more">사업자등록은 사업 시작일부터 20일 안에</p>'}</div>
+      <div class="rs-box"><h3>꼭 챙길 서류 <span>필수 ${tc.must}종</span></h3><ul>${must.slice(0,5).map(([d,i])=>`<li class="${p.d[i]?'done':''}">${esc(d)}</li>`).join('')}</ul>${must.length>5||tc.rec+tc.opt?`<p class="rs-more">${[must.length>5?`외 필수 ${must.length-5}종`:'', tc.rec?`권장 ${tc.rec}종`:'', tc.opt?`해당 시 ${tc.opt}종`:''].filter(Boolean).join(' · ')}</p>`:''}</div>
+    </div>
+    ${it.pitfalls&&it.pitfalls[0]?`<div class="rs-warn"><span aria-hidden="true">⚠️</span><span><b>많이 놓치는 점</b> ${esc(it.pitfalls[0])}</span></div>`:''}
     <div class="rs-g">
       <div><span>업종코드</span><b>${isCode(it.nts)?`<span class="mono">${esc(it.nts)}</span> <button type="button" class="link-btn" data-copy="${esc(it.nts)}">복사</button>`:'홈택스 조회 필요'}</b></div>
-      <div><span>인허가·신고 ${it.license.length}건</span><b>${it.license.map(l=>esc(l.name)).join(', ')}</b></div>
-      <div><span>준비 서류 ${it.docs.length}종</span><b>필수 ${tc.must} · 권장 ${tc.rec} · 해당 시 ${tc.opt}</b></div>
       <div><span>세금 혜택 ${tax.length}개</span><b>${tax.map(esc).join(', ')||'—'}</b></div>
       ${S.me.open?`<div><span>사업자등록 기한</span><b>${ymd(addDays(S.me.open,20))}까지</b></div>`:''}
-      <div><span>맞춤 안내</span><b>${hasMe()?`${notes.length}개 <button type="button" class="link-btn" data-go="sec-me">보기</button>`:`<a class="link-btn" href="#/me?next=${it.id}">내 상황 넣기</a>`}</b></div>
+      <div><span>내 상황 · 맞춤 안내</span><b>${hasMe()?`${chips.slice(0,3).map(esc).join(' · ')}${chips.length>3?' 외':''}<br>안내 ${notes.length}개 <button type="button" class="link-btn" data-go="sec-me">보기</button> · <a class="link-btn" href="#/me?next=${it.id}">수정</a>`:`<a class="link-btn" href="#/me?next=${it.id}">내 상황 넣기</a>`}</b></div>
     </div>
     <p class="rs-m">📅 자료 기준일 <b>${BASE}</b> · 세제 ${TAX_BASE} 법령 · 업종코드 2025년 귀속 연계표 · <span title="BECONIC 내부 정리 자료">${reviewed?'✓ 전문가 검수':'내부 정리·검수 전'}</span></p>
-    <div class="rs-a"><button class="btn btn-primary" type="button" data-act="print">${IN_APP?'체크리스트 복사':'PDF 받기'}</button><button class="btn btn-soft" type="button" data-act="share">링크 복사</button><a class="btn btn-gray" href="${esc(matchUrl(it))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a></div>
+    <div class="rs-a"><button class="btn btn-primary" type="button" data-act="print">${IN_APP?'체크리스트 복사':'PDF 받기'}</button><a class="btn btn-gray" href="${esc(matchUrl(it))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a></div>
   </section>`;
 }
 function stepNav(G, id){
@@ -542,7 +555,7 @@ function printSummary(it, pr, screen){
     <div class="ps-top"><div><span class="ps-l">업종</span><b>${esc(it.name)}</b></div>
       <div><span class="ps-l">업종코드</span><b>${isCode(it.nts)?'국세청 '+esc(it.nts)+' · KSIC '+esc(it.ksic):'홈택스 조회 필요'}</b></div>
       <div><span class="ps-l">진행률</span><b>${pr.pct}% (순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd})</b></div>
-      <div><span class="ps-l">인허가·신고</span><b>${it.license.map(l=>esc(l.name)).join(', ')}</b></div>
+      <div><span class="ps-l">핵심 관문 · 인허가·신고</span><b>${it.license.map(l=>esc(l.name)+(l.org&&l.org!=='-'?`(${esc(l.org)})`:'')).join(', ')}</b></div>
       ${S.me.open?`<div><span class="ps-l">사업자등록 기한</span><b>${ymd(addDays(S.me.open,20))}까지 (개업 예정 ${ymd(new Date(S.me.open+'T00:00:00'))} + 20일)</b></div>`:''}
       ${chips.length?`<div><span class="ps-l">내 상황</span><b>${chips.map(esc).join(' · ')}</b></div>`:''}
     </div>
@@ -639,6 +652,7 @@ function renderMe(next){
     ${it?'':`<a class="btn btn-gray btn-sm no-print" href="#/my">‹ 내 준비함으로</a>`}
     <section class="card" style="padding:28px;margin-top:${it?0:14}px">
     <div class="eyebrow">${it?`${esc(it.name)} · `:''}선택 입력 · 이 기기에만 저장</div><h1 class="h-lg" style="margin:6px 0 6px">내 상황을 알려 주세요</h1>
+    ${it&&hasMe()?`<div class="notice"><span class="ni" aria-hidden="true">✎</span><span><b>지난번 입력한 내용이에요.</b> 맞는지 확인하고 바뀐 것만 고친 뒤 결과를 보세요.</span></div>`:''}
     <p class="muted" style="margin-bottom:18px">고른 항목만 맞춤 안내에 쓰여요. 모르면 건너뛰어도 돼요. 모든 업종 가이드에 함께 적용돼요.</p>
     ${it?`<div class="notice blue" id="mePreview" role="status" aria-live="polite"><span class="ni" aria-hidden="true">★</span><span>${preview()}</span></div>`:''}
     ${ME_Q.map(q=>`<div class="form-q" role="group" aria-labelledby="ql-${q.k}"><div class="ql" id="ql-${q.k}">${q.l}</div><div class="qh">${q.h}</div>
@@ -647,7 +661,7 @@ function renderMe(next){
       <input class="inp" id="open" type="date" value="${esc(m.open||'')}"></div>
     </section>
     <p class="small muted" style="margin:10px 4px 0">고른 걸 모두 지우려면 <button class="link-btn" type="button" id="meClear">선택 초기화</button> (저장해야 반영돼요)</p>
-    <div class="me-actions">${it?`<a class="btn btn-gray" href="${back}" id="meSkip">건너뛰기</a>`:''}<button class="btn btn-primary" type="button" id="meSave">${it?'저장하고 결과 보기 ›':'저장'}</button></div>
+    <div class="me-actions">${it?`<a class="btn btn-gray" href="${back}" id="meSkip">${hasMe()?'그대로 결과 보기':'건너뛰기'}</a>`:''}<button class="btn btn-primary" type="button" id="meSave">${it?'저장하고 결과 보기 ›':'저장'}</button></div>
   </div>`, it?'home':'my', '내 상황');
   if(it) document.body.classList.add('wizard');
   const upd=()=>{ const pv=$('#mePreview'); if(pv) pv.lastElementChild.innerHTML=preview(); };
