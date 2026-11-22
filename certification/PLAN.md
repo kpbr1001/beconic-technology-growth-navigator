@@ -1,7 +1,7 @@
 # BECONIC | 기업인증 준비도 진단 — 개발계획 (STEP 1 착수분석)
 
 - 작성일: 2026-11-22 · 기준 요구사항: `BECONIC_기업인증_ClaudeCode_마스터프롬프트_v2.0.md` (v1.1과 충돌 시 v2.0 우선)
-- 상태: **구현·검증 완료(로컬)** — 운영 배포(main 병합)는 승인 대기. 결과: `QA_REPORT.md`, `QA_PDF_REPORT.md`
+- 상태: **운영 배포 완료(2026-11-22, PR #112)** — https://beconic-diagnosis-certification.netlify.app · 결과: `QA_REPORT.md`, `QA_PDF_REPORT.md`
 - 승인 반영(2026-11-22): Base directory=`certification` · 전화 02-6124-5960 · 확인 안 된 법령·제도는 '확인 필요'로 명시 · OG는 첨부본에서 '78%' 부분만 교체 · 전문가 검토 대신 대표 검토
 
 ---
