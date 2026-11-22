@@ -136,3 +136,10 @@ h1{font-size:40px;letter-spacing:-.03em;margin:0 0 8px;line-height:1.25}
  .tray .btn.w{display:none}
  .search{display:block}
 }
+.dt{width:100%;border-collapse:collapse;font-size:15px}
+.dt th{text-align:left;font-size:13px;color:var(--m);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--b)}
+.dt td{padding:12px 10px;border-bottom:1px solid var(--b);vertical-align:top}
+.dt td small{display:block;color:var(--m);font-size:13px;margin-top:2px}
+.dt a{color:var(--pd);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.tile small{font-weight:500;font-size:12px}
+@media (max-width:700px){.dt thead{display:none}.dt tr{display:block;border:1px solid var(--b);border-radius:12px;padding:8px 10px;margin-bottom:8px}.dt td{display:block;border:0;padding:3px 0}}
