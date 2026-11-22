@@ -53,9 +53,9 @@ await page.goto(BASE);
   const g = await page.locator('main').innerText();
   check('가이드: 기준일·세제 기준·업종코드 귀속연도 표기', g.includes('2026.11.19') && g.includes('2026.01') && g.includes('2025년 귀속'));
   check('가이드: 검수 상태 정직 표기(검수 전)', g.includes('검수 전'));
-  // 가이드 자체는 진단하지 않음 — 다른 BECONIC 진단으로 이어 주는 '다음 진단' 섹션(이름·라벨)만 예외
+  // 가이드 자체는 진단하지 않음 — 다른 BECONIC 진단으로 이어 주는 '추천 연계 진단' 섹션(이름·라벨)만 예외
   const gOwn = await page.evaluate(() => { const m = document.querySelector('main').cloneNode(true); m.querySelector('#sec-next')?.remove(); return m.innerText; });
-  check('가이드: 진단 표현 없음(다음 진단 연결 섹션 제외)', !/진단|점수|등급/.test(gOwn.replace(/진단·평가를 하지 않아요/, '').replace(/건강진단/g, '').replace(/다음 진단/g, '')), (gOwn.match(/.{0,20}(진단|점수|등급).{0,20}/) || [])[0]);
+  check('가이드: 진단 표현 없음(추천 연계 진단 섹션 제외)', !/진단|점수|등급/.test(gOwn.replace(/진단·평가를 하지 않아요/, '').replace(/건강진단/g, '').replace(/추천 연계 진단/g, '')), (gOwn.match(/.{0,20}(진단|점수|등급).{0,20}/) || [])[0]);
   check('세제 점검 시점 경과 판정: 2026-12 정상, 2027-01부터 경고', await page.evaluate(() => !window.PS.taxExpired(new Date(2026, 11, 31)) && window.PS.taxExpired(new Date(2027, 0, 1))));
 }
 
@@ -353,7 +353,7 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   check('도우미: 주소의 이상한 값은 무시·이스케이프', (await page.locator('[aria-pressed="true"]').count()) === 0 && (await page.locator('#fres img, .fopts img').count()) === 0 && (await page.inputValue('#fkw')) === '<img src=x>');
 }
 
-// 11-9. 다음 진단(BECONIC 31 연결) — 예비창업자 / 기창업자 구분
+// 11-9. 추천 연계 진단(BECONIC 31 연결) — 예비창업자 / 기창업자 구분
 {
   const r = await page.evaluate(() => {
     const P = window.PS, B = P.BY_ID, b31 = window.PS_DATA.beconic31, S = P.S, ids = (id, k) => P.nextSteps(B[id], k).map((x) => x.id);
@@ -376,18 +376,23 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await page.goto(BASE + '#/guide/cafe/finish'); await page.waitForTimeout(150);
   const t0 = await page.locator('#sec-next').innerText();
   const l0 = await page.locator('#nxl .nx').innerText();
-  check('저장·상담 탭: 다음 진단 — 기본은 예비창업자', t0.startsWith('1') && /다음 진단/.test(t0.split('\n').slice(0, 3).join(' ')) && (await page.locator('#sec-next').isVisible()) && l0.includes('아이템 발굴') && !l0.includes('기업성장 종합진단') && (await page.getAttribute('[data-biz="pre"]', 'aria-pressed')) === 'true');
+  check('저장·상담 탭: 추천 연계 진단 — 기본은 예비창업자', t0.startsWith('1') && /추천 연계 진단/.test(t0.split('\n').slice(0, 3).join(' ')) && (await page.locator('#sec-next').isVisible()) && l0.includes('아이템 발굴') && !l0.includes('기업성장 종합진단') && (await page.getAttribute('[data-biz="pre"]', 'aria-pressed')) === 'true');
   await page.click('[data-biz="own"]'); await page.waitForTimeout(80);
   const l1 = await page.locator('#nxl .nx').innerText(), st = await page.evaluate(() => JSON.parse(localStorage.getItem('beconic_prestartup_v1')).me);
   check('기창업자로 바꾸면 목록·지원사업 유형이 바뀌고 내 상황에 저장', l1.startsWith('1\n기업성장 종합진단') && !l1.includes('아이템 발굴') && st.biz === 'own' && (await page.locator('#sec-finish a.fcard[href*="grant-matching"]').innerText()).includes('소상인') && (await page.getAttribute('#sec-finish a.fcard[href*="grant-matching"]', 'href')).includes('t=retail'));
-  check('다음 진단: 연결 버튼과 링크만(설명·소요시간 없음) · 새 창·noopener', await page.evaluate(() => { const a = [...document.querySelectorAll('#sec-next .nx a')]; return a.length >= 4 && a.every((x) => x.target === '_blank' && x.rel.includes('noopener') && /^https:/.test(x.href) && x.innerText.replace(/\s+/g, ' ').trim().split(' ').length <= 6) && !/분|해요/.test(document.querySelector('#sec-next .nx').innerText); }));
+  check('추천 연계 진단: 버튼마다 추천 이유 · 주소 표기 없음 · 새 창·noopener', await page.evaluate(() => { const a = [...document.querySelectorAll('#sec-next .nx a')], sec = document.querySelector('#sec-next'); return a.length >= 4 && a.every((x) => x.target === '_blank' && x.rel.includes('noopener') && /^https:/.test(x.href) && (x.querySelector('.nx-w')?.textContent.length || 0) > 15) && !/netlify\.app|https?:|\{|\}/.test(sec.textContent); }));
+  const why = await page.evaluate(() => { const P = window.PS, B = P.BY_ID, w = (id, k, t) => P.nextSteps(B[id], k).find((x) => x.id === t)?.why || '';
+    const all = []; for (const id of Object.keys(B)) for (const k of ['pre', 'own']) for (const x of P.nextSteps(B[id], k)) all.push(x.why);
+    return { cafeS3: w('cafe', 'pre', 'S3'), mfgS3: w('cosmetic_mfg', 'pre', 'S3'), swS2: w('software', 'pre', 'S2'), cafeM5: w('cafe', 'pre', 'M5'), ownG: w('cafe', 'own', 'G'), ownGsw: w('restaurant', 'own', 'G'), empty: all.filter((t) => !t || /[{}]/.test(t)).length }; });
+  check('추천 이유가 업종·업태에 따라 다름(음식점·제조·IT·매장) · 64업종×2 모두 이유 있음', why.cafeS3.includes('음식점') && why.mfgS3.includes('제조업') && why.swS2.includes('정보통신업은') && why.cafeM5.includes('상권') && why.empty === 0, JSON.stringify(why));
+  check('추천 이유 조사(을/를) 받침에 맞춤', why.ownG.includes('카페·커피전문점을 더하기') && why.ownGsw.includes('음식점·카페를 더하기'), why.ownG + ' | ' + why.ownGsw);
   // 탭마다 섹션 제목 = 그 섹션 이름(번호는 탭 안 순서) — v1.6.0 이전: 2·3번째 탭 제목이 앞 탭 이름으로 밀려 나옴
   const heads = [];
   for (const st of ['prepare', 'benefit', 'finish']) {
     await page.goto(BASE + '#/guide/cafe/' + st); await page.waitForTimeout(80);
     heads.push(...(await page.evaluate(() => [...document.querySelectorAll('.gbody .sec:not(.stepoff)')].filter((s) => s.querySelector('.sec-h .sn') && /^\d+$/.test(s.querySelector('.sec-h .sn').textContent)).map((s) => [s.id, s.querySelector('.sec-h h2').textContent]))));
   }
-  const want = { 'sec-deadline': '법정 기한', 'sec-steps': '진행 순서', 'sec-docs': '준비 서류', 'sec-license': '인허가·신고', 'sec-ask': '미리 답할 질문', 'sec-pit': '놓치기 쉬운 점', 'sec-code': '업종코드', 'sec-tax': '세금 혜택', 'sec-support': '지원사업', 'sec-expand': '함께 등록·확장', 'sec-next': '다음 진단', 'sec-sites': '신청 사이트', 'sec-memo': '내 메모', 'sec-about': '자료 기준' };
+  const want = { 'sec-deadline': '법정 기한', 'sec-steps': '진행 순서', 'sec-docs': '준비 서류', 'sec-license': '인허가·신고', 'sec-ask': '미리 답할 질문', 'sec-pit': '놓치기 쉬운 점', 'sec-code': '업종코드', 'sec-tax': '세금 혜택', 'sec-support': '지원사업', 'sec-expand': '함께 등록·확장', 'sec-next': '추천 연계 진단', 'sec-sites': '신청 사이트', 'sec-memo': '내 메모', 'sec-about': '자료 기준' };
   check('세 탭 모두 섹션 제목이 내용과 일치', heads.length >= 13 && heads.every(([id, h]) => want[id] === h), JSON.stringify(heads.filter(([id, h]) => want[id] !== h)));
   await page.evaluate(() => localStorage.removeItem('beconic_prestartup_v1'));
 }

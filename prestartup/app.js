@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.6.1';
+const VERSION = '1.6.2';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -180,13 +180,21 @@ function searchCodes(q, group){
   return out;
 }
 
-/* ---------- 예비창업자 / 기창업자 구분 — 지원사업 유형과 다음 진단이 달라진다 ---------- */
+/* ---------- 예비창업자 / 기창업자 구분 — 지원사업 유형과 추천 연계 진단이 달라진다 ---------- */
 const B31 = D.beconic31;
 const STORE_IDS = new Set((D.finder.where.find(o=>o.k==='store')||{ids:[]}).ids);   // 매장형 업종(도우미 '매장' 답과 같은 목록)
 const bizOf = () => S.me.biz==='own' ? 'own' : 'pre';                               // 모르면 예비창업자(이 가이드의 기본 대상)
+const WHY_IF = {mfg:it=>it.group==='제조업', fnb:it=>it.group==='음식점업', store:it=>STORE_IDS.has(it.id), knowledge:it=>['정보통신업','전문서비스업','사업서비스업'].includes(it.group)};
+const JOSA = {'은':['은','는'],'는':['은','는'],'이':['이','가'],'가':['이','가'],'을':['을','를'],'를':['을','를'],'과':['과','와'],'와':['과','와']};
+function josa(w, p){ const base=w.replace(/\s*\([^)]*\)$/,''), c=base.charCodeAt(base.length-1), has=c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28>0; return w+(JOSA[p]?JOSA[p][has?0:1]:p); }
+// 추천 이유: 업종·업태 조건 중 처음 맞는 문장({name}·{group} 채움, ':을' 등은 받침에 맞춰 조사)
+function whyOf(id, it, biz){
+  const hit=((B31.why[biz]||{})[id]||[]).find(([c])=>!c||WHY_IF[c](it));
+  return hit ? hit[1].replace(/\{(name|group)(?::([^}]+))?\}/g, (_,k,p)=>{ const w=k==='name'?it.name:it.group; return p?josa(w,p):w; }) : '';
+}
 function nextSteps(it, biz){
   const P=B31.paths[biz], ok={store:STORE_IDS.has(it.id), fnb:it.group==='음식점업'};
-  return P.steps.filter(x=>!x.if||ok[x.if]).map(x=>Object.assign({}, x, B31.tools[x.id]));
+  return P.steps.filter(x=>!x.if||ok[x.if]).map(x=>Object.assign({}, x, B31.tools[x.id], {why:whyOf(x.id, it, biz)}));
 }
 // MATCH 유형: 예비창업자 → founder, 기창업자 → 제조 소공인(maker)·매장 소상인(retail)·그 밖의 중소기업(sme)
 function matchPersona(it){
@@ -374,7 +382,7 @@ function renderGroup(g){
 const GSTEPS = [
   {k:'prepare', n:1, l:'준비물', d:'진행 순서 · 준비 서류 · 인허가', secs:['me','deadline','steps','docs','license','ask','pit']},
   {k:'benefit', n:2, l:'혜택·지원', d:'업종코드 · 세금 혜택 · 지원사업', secs:['code','tax','support','expand']},
-  {k:'finish',  n:3, l:'저장·상담', d:'PDF · 다음 진단 · 신청 사이트', secs:['finish','next','sites','memo','about']}
+  {k:'finish',  n:3, l:'저장·상담', d:'PDF · 추천 연계 진단 · 신청 사이트', secs:['finish','next','sites','memo','about']}
 ];
 const JOURNEY = [['pick','업종 고르기'],['me','내 상황'],['result','결과 보기']];
 function stepState(id){
@@ -397,7 +405,7 @@ function stepper(cur, id, group){
 const NAV_EXTRA = [['me','맞춤 안내']];
 const SECS = [
   ['deadline','법정 기한'],['steps','진행 순서'],['docs','준비 서류'],['license','인허가·신고'],['code','업종코드'],['tax','세금 혜택'],['support','지원사업'],
-  ['ask','미리 답할 질문'],['pit','놓치기 쉬운 점'],['expand','함께 등록·확장'],['next','다음 진단'],['sites','신청 사이트'],['memo','내 메모'],['about','자료 기준']
+  ['ask','미리 답할 질문'],['pit','놓치기 쉬운 점'],['expand','함께 등록·확장'],['next','추천 연계 진단'],['sites','신청 사이트'],['memo','내 메모'],['about','자료 기준']
 ];
 function renderGuide(id, step){
   const it=BY_ID[id];
@@ -532,7 +540,7 @@ function renderGuide(id, step){
         ${!(it.linkedOfficial||[]).length && !(it.linkedDirection||[]).length?'<p class="muted">이 업종은 아직 정리된 확장 정보가 없어요.</p>':''}
       </section>
 
-      <section class="card sec" id="sec-next" aria-label="다음 진단">${secHead('next', `<span class="cnt">BECONIC 진단 연결</span>`)}
+      <section class="card sec" id="sec-next" aria-label="추천 연계 진단">${secHead('next', `<span class="cnt">BECONIC 진단 연결</span>`)}
         <div class="bizsel no-print" role="group" aria-label="내 단계">${['pre','own'].map(k=>`<button type="button" class="opt" data-biz="${k}" aria-pressed="${bizOf()===k}"><b>${B31.paths[k].l}</b> <span>${B31.paths[k].s}</span></button>`).join('')}</div>
         <div class="print-only nx-who">${B31.paths[bizOf()].l} · ${B31.paths[bizOf()].s}</div>
         <div id="nxl">${nextHTML(it, bizOf())}</div>
@@ -587,8 +595,8 @@ function renderGuide(id, step){
   memo.addEventListener('input', ()=>{ S.memo[id]=memo.value.slice(0,2000); if(!S.memo[id]) delete S.memo[id]; save(); });
   setupSpy();
 }
-function nextHTML(it, biz){   // 연결 버튼과 링크만(설명·소요시간 없음)
-  return `<div class="nx">${nextSteps(it, biz).map((x,i)=>`<a class="nxb" href="${esc(x.url)}" target="_blank" rel="noopener"><span class="nx-n">${i+1}</span><b>${esc(x.n)}</b><i aria-hidden="true">↗</i><span class="print-only nx-u">${esc(x.url.replace(/^https?:\/\//,''))}</span></a>`).join('')}</div>`;
+function nextHTML(it, biz){   // 추천 연계 진단: 연결 버튼 + 업종·업태별 추천 이유(주소는 표기하지 않음)
+  return `<div class="nx">${nextSteps(it, biz).map((x,i)=>`<a class="nxb" href="${esc(x.url)}" target="_blank" rel="noopener"><span class="nx-n">${i+1}</span><b>${esc(x.n)}</b><i aria-hidden="true">↗</i>${x.why?`<span class="nx-w">${esc(x.why)}</span>`:''}</a>`).join('')}</div>`;
 }
 function readRow(num, html, bullet, done){
   return `<div class="rrow">${bullet?'<span class="rb" aria-hidden="true"></span>':`<span class="rn">${num}</span>`}<span class="pbox print-only ${done?'on':''}" aria-hidden="true">${done?'✓':''}</span><span class="rt">${num?`<span class="sn2">STEP ${num}</span>`:''}${html}</span></div>`;
