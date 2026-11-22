@@ -3,14 +3,15 @@ export const DATA_FILES = {
   catalog: 'data/catalog.json',
   sources: 'data/sources.json',
   questions: 'data/questions.json',
+  links: 'data/links.json',
   packs: ['data/rule_packs/venture.json', 'data/rule_packs/innobiz.json', 'data/rule_packs/mainbiz.json', 'data/rule_packs/rnd.json'],
 };
 
-export function prepare({ catalog, sources, questions, packFiles }) {
+export function prepare({ catalog, sources, questions, packFiles, links = null }) {
   const packs = {};
   packFiles.forEach((f) => (f.packs ? f.packs : [f]).forEach((p) => { packs[p.scheme_id] = p; }));
   return {
-    catalog, sources, questions, packs,
+    catalog, sources, questions, packs, links,
     schemeMap: Object.fromEntries(catalog.schemes.map((s) => [s.scheme_id, s])),
     sourceMap: Object.fromEntries(sources.sources.map((s) => [s.source_id, s])),
     questionMap: Object.fromEntries(questions.questions.map((q) => [q.question_id, q])),
@@ -23,8 +24,8 @@ export async function loadData(base = '') {
     if (!r.ok) throw new Error(`데이터를 불러오지 못했어요 (${p})`);
     return r.json();
   };
-  const [catalog, sources, questions, ...packFiles] = await Promise.all([
-    get(DATA_FILES.catalog), get(DATA_FILES.sources), get(DATA_FILES.questions), ...DATA_FILES.packs.map(get),
+  const [catalog, sources, questions, links, ...packFiles] = await Promise.all([
+    get(DATA_FILES.catalog), get(DATA_FILES.sources), get(DATA_FILES.questions), get(DATA_FILES.links), ...DATA_FILES.packs.map(get),
   ]);
-  return prepare({ catalog, sources, questions, packFiles });
+  return prepare({ catalog, sources, questions, packFiles, links });
 }

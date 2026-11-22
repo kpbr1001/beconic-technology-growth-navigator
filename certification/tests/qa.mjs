@@ -310,6 +310,25 @@ const badgeOf = (page, id) => page.$eval(`#res-${id} .card-head > .badge`, (e) =
   check('E15b 연구소 소기업 3명·독립공간 → 기본요건 확인', ids[0].includes('기본요건 확인'));
 }
 
+// ── E16 BECONIC 31 연결·상담 연계 ──
+{
+  const p = await newPage({ hash: '#/scheme/VEN', clock: '2026-11-22T03:00:00Z' });
+  await p.click('[data-act="diagnose"]'); await p.waitForTimeout(80);
+  await p.goto(p.url().replace(/#.*$/, '#/scheme/INNO')); await p.click('[data-act="diagnose"]');
+  await p.waitForSelector('form[data-step="profile"]');
+  await profileCorp(p);
+  for (let i = 0; i < 8; i++) { await p.waitForSelector('form[data-form="step"], #result-title'); if (await p.$('#result-title')) break; await submit(p); }
+  const links = await p.$$eval('.next-card a', (as) => as.map((a) => ({ href: a.href, rel: a.rel, target: a.target })));
+  check('E16 결과 화면에 다음 진단 추천(BECONIC 31) 1~3개, 모두 BECONIC 서비스·새 창 noopener',
+    links.length >= 1 && links.length <= 3 && links.every((l) => /^https:\/\/beconic-[a-z0-9-]+\.netlify\.app\//.test(l.href) && l.target === '_blank' && l.rel.includes('noopener')), links.map((l) => l.href).join(' '));
+  const common = await p.$$eval('.common-docs li', (li) => li.length);
+  check('E16b 벤처+이노비즈 선택 시 공통 서류 묶음 표시', common >= 2, `${common}종`);
+  const mail = await p.getAttribute('.consult a[href^="mailto:"]', 'href');
+  const body = decodeURIComponent((mail || '').split('&body=')[1] || '');
+  check('E16c 상담 메일 초안에 문서번호·진단 결과 포함, 회사명 미포함', /BC-\d{8}-[0-9A-Z]{6}/.test(body) && body.includes('벤처기업확인') && !body.includes('비코닉'), body.split('\n')[1]);
+  await p.context().close();
+}
+
 await browser.close();
 console.log(`\n${results.length - failed}/${results.length} 통과`);
 if (process.env.QA_JSON) (await import('node:fs')).writeFileSync(process.env.QA_JSON, JSON.stringify(results, null, 2));
