@@ -26,14 +26,11 @@ export function questionLabel(data, q) {
   return it ? it.label_plain_ko : q;
 }
 
-function ongoingFor(id) {
-  switch (id) {
-    case 'INNO': return '확인서 유효기간 3년 — 만료 90일 전부터 연장 신청(운영규정 제15조).';
-    case 'MAIN': return '확인서 유효기간 3년 — 연장 기간에 재신청·평가.';
-    case 'RNDI': case 'RNDD': return '매년 4월 30일까지 연구개발 실적 제출, 인력·공간 변경 시 변경신고(시행규칙 제5조·제8조).';
-    case 'VEN': return '확인 유효기간과 사후관리 기준을 벤처확인시스템에서 확인하세요(이 앱에는 미반영).';
-    default: return null;
-  }
+// 사후관리 안내는 catalog.ongoing(출처 연결 또는 '근거 원문 미확보' 표시)에서만 읽는다
+function ongoingFor(scheme) {
+  const o = scheme && scheme.ongoing;
+  if (!o || !o.text) return null;
+  return o.unverified ? `${o.text} (근거 원문 미확보)` : o.text;
 }
 
 export function buildReport(data, state) {
@@ -56,7 +53,7 @@ export function buildReport(data, state) {
     const selfcheck = selfItems ? computeReadiness(selfItems.map((i) => ({ ...i, item_id: `${id}:${i.item_id}`, applies_when: 'always' })), answers, state.docStatus || {}, ctx) : null;
     const tri = scheme.triage ? triage(scheme, answers) : null;
     const miss = result && result.gate.active ? missingInputs(result).map((q) => ({ q, label: questionLabel(data, q) })) : [];
-    return { scheme, rec: recMap[id], result, label, readiness, selfcheck, selfcheckMeta: scheme.self_check ? data.catalog.self_checks[scheme.self_check] : null, triage: tri, missing: miss, ongoing: ongoingFor(id) };
+    return { scheme, rec: recMap[id], result, label, readiness, selfcheck, selfcheckMeta: scheme.self_check ? data.catalog.self_checks[scheme.self_check] : null, triage: tri, missing: miss, ongoing: ongoingFor(scheme) };
   }).filter(Boolean);
 
   // ── 요건 집계(중복 원자요건 1회) ──

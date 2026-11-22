@@ -30,6 +30,7 @@
         { "item_id": "VEN-D-CEO", "label": "대표자 관련 증빙서류", "why": "혁신성장·예비벤처 유형 평가 자료예요.", "where": "회사 보관", "required": false, "applies_when": "always", "source_refs": ["S-VEN-DOCS"] }
       ],
       "help_text": "벤처확인 수수료, 처리기간 등은 벤처확인시스템 공식 안내를 확인하세요.",
+      "ongoing": {"text": "확인 유효기간과 사후관리 기준은 이 앱에 반영하지 않았어요. 벤처확인시스템에서 확인하세요.", "unverified": true},
       "disclaimer": "이 진단은 신청 기본요건 사전 점검이에요. 실제 확인 여부는 전문평가기관 평가와 벤처기업확인위원회가 결정해요."
     },
     {
@@ -59,7 +60,8 @@
         { "item_id": "INNO-D-IP", "label": "지식재산권 등록원부", "why": "기술 성과 확인", "where": "특허로", "required": false, "applies_when": "always", "source_refs": ["S-INNO-PROC"] },
         { "item_id": "INNO-D-PLAN", "label": "기술사업계획서", "why": "개별기술수준 평가 자료", "where": "이노비즈넷(평가기관 요청 시 제출)", "required": true, "applies_when": "always", "source_refs": ["S-INNO-RULE"] }
       ],
-      "help_text": "현장평가 수수료(신규 70만원, 부가세 별도)는 운영규정 제18조 기준이에요.",
+      "help_text": "현장평가 수수료 등 비용은 이노비즈넷 공식 안내에서 확인하세요(이 앱은 근거 원문 미확보).",
+      "ongoing": {"text": "확인서 유효기간 3년(운영규정 제12조④). 연장 절차와 시기는 이노비즈넷에서 확인하세요.", "source_refs": ["S-INNO-RULE"], "quote": "제12조④ 유효기간 3년"},
       "disclaimer": "이 진단은 신청대상 요건 사전 점검이에요. 실제 선정은 자가진단·현장평가 결과에 따라 중소벤처기업부가 결정해요."
     },
     {
@@ -88,7 +90,8 @@
         { "item_id": "MAIN-D-STD", "label": "사내기술·생산 표준화 자료(QC 보고서·지침서·작업표준서 등)", "why": "운영관리 평가", "where": "회사 작성", "required": false, "applies_when": "always", "source_refs": ["S-MAIN-DOCS"] },
         { "item_id": "MAIN-D-CUSTOMER", "label": "고객관리 매뉴얼·경영방침·사내규정", "why": "조직관리 평가", "where": "회사 작성", "required": false, "applies_when": "always", "source_refs": ["S-MAIN-DOCS"] }
       ],
-      "help_text": "평가지표(경영혁신 인프라 350점·활동 400점·성과 250점)는 업종별로 달라요.",
+      "help_text": "평가지표와 배점은 업종별로 달라요. 메인비즈 공식 안내에서 확인하세요(이 앱은 근거 원문 미확보).",
+      "ongoing": {"text": "확인서 유효기간 3년. 연장 절차와 시기는 메인비즈 공식 안내에서 확인하세요.", "source_refs": ["S-MAIN-GUIDE"], "quote": "유효기간 3년"},
       "disclaimer": "이 진단은 선정기준·신청 제외 요건 사전 점검이에요. 실제 선정은 자가진단·현장평가 결과로 결정돼요."
     },
     {
@@ -118,7 +121,8 @@
         { "item_id": "RNDI-D-FOUNDER", "label": "연구원·교원 창업 증명 서류", "why": "연구원·교원 창업 기업만 해당", "where": "소속 기관", "required": true, "applies_when": "rnd_founder_researcher == yes", "source_refs": ["S-RND-RULE"] },
         { "item_id": "RNDI-D-MID", "label": "중견기업 증명 서류", "why": "중견기업만 해당", "where": "중견기업 확인", "required": true, "applies_when": "company_size == midsize", "source_refs": ["S-RND-RULE"] }
       ],
-      "help_text": "인정 후 매년 4월 30일까지 연구개발 실적을 제출해야 해요(시행규칙 제8조).",
+      "help_text": "인정 후에도 연구개발 실적 제출·변경신고 등 사후관리가 필요해요. 기한과 근거 조항은 한국산업기술진흥협회에서 확인하세요(이 앱은 근거 원문 미확보).",
+      "ongoing": {"text": "인정 후 연구개발 실적 제출, 인력·공간 변경 시 변경신고 등 사후관리 의무가 있어요. 기한과 근거 조항은 한국산업기술진흥협회에서 확인하세요.", "unverified": true},
       "disclaimer": "이 진단은 인정기준 사전 점검이에요. 실제 인정은 한국산업기술진흥협회 검토로 결정되며, 2026 업무편람의 세부 운영기준은 반영하지 못했어요."
     },
     {
@@ -144,6 +148,7 @@
         { "item_id": "RNDD-D-PLAN", "label": "부서가 있는 층 전체 도면·내부 도면(전용 출입구 현판·내부 사진 포함)", "why": "연구공간 확인", "where": "회사 작성", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] }
       ],
       "help_text": "",
+      "ongoing": {"text": "인정 후 연구개발 실적 제출, 인력·공간 변경 시 변경신고 등 사후관리 의무가 있어요. 기한과 근거 조항은 한국산업기술진흥협회에서 확인하세요.", "unverified": true},
       "disclaimer": "이 진단은 인정기준 사전 점검이에요. 실제 인정은 한국산업기술진흥협회 검토로 결정돼요."
     },
 
