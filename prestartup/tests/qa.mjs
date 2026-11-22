@@ -378,9 +378,9 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   const l0 = await page.locator('#nxl .nx').innerText();
   check('저장·상담 탭: 다음 진단 — 기본은 예비창업자', t0.startsWith('1') && /다음 진단/.test(t0.split('\n').slice(0, 3).join(' ')) && (await page.locator('#sec-next').isVisible()) && l0.includes('아이템 발굴') && !l0.includes('기업성장 종합진단') && (await page.getAttribute('[data-biz="pre"]', 'aria-pressed')) === 'true');
   await page.click('[data-biz="own"]'); await page.waitForTimeout(80);
-  const t1 = await page.locator('#nxl').innerText(), l1 = await page.locator('#nxl .nx').innerText(), st = await page.evaluate(() => JSON.parse(localStorage.getItem('beconic_prestartup_v1')).me);
-  check('기창업자로 바꾸면 목록·지원사업 유형이 바뀌고 내 상황에 저장', t1.startsWith('기창업자') && l1.startsWith('1\n기업성장 종합진단') && !l1.includes('아이템 발굴') && st.biz === 'own' && (await page.locator('#sec-finish a.fcard[href*="grant-matching"]').innerText()).includes('소상인') && (await page.getAttribute('#sec-finish a.fcard[href*="grant-matching"]', 'href')).includes('t=retail'));
-  check('다음 진단 링크: 새 창·noopener', await page.evaluate(() => [...document.querySelectorAll('#sec-next .nx a')].every((a) => a.target === '_blank' && a.rel.includes('noopener'))));
+  const l1 = await page.locator('#nxl .nx').innerText(), st = await page.evaluate(() => JSON.parse(localStorage.getItem('beconic_prestartup_v1')).me);
+  check('기창업자로 바꾸면 목록·지원사업 유형이 바뀌고 내 상황에 저장', l1.startsWith('1\n기업성장 종합진단') && !l1.includes('아이템 발굴') && st.biz === 'own' && (await page.locator('#sec-finish a.fcard[href*="grant-matching"]').innerText()).includes('소상인') && (await page.getAttribute('#sec-finish a.fcard[href*="grant-matching"]', 'href')).includes('t=retail'));
+  check('다음 진단: 연결 버튼과 링크만(설명·소요시간 없음) · 새 창·noopener', await page.evaluate(() => { const a = [...document.querySelectorAll('#sec-next .nx a')]; return a.length >= 4 && a.every((x) => x.target === '_blank' && x.rel.includes('noopener') && /^https:/.test(x.href) && x.innerText.replace(/\s+/g, ' ').trim().split(' ').length <= 6) && !/분|해요/.test(document.querySelector('#sec-next .nx').innerText); }));
   // 탭마다 섹션 제목 = 그 섹션 이름(번호는 탭 안 순서) — v1.6.0 이전: 2·3번째 탭 제목이 앞 탭 이름으로 밀려 나옴
   const heads = [];
   for (const st of ['prepare', 'benefit', 'finish']) {

@@ -527,10 +527,9 @@ function renderGuide(id, step){
       </section>
 
       <section class="card sec" id="sec-next" aria-label="다음 진단">${secHead('next', `<span class="cnt">BECONIC 진단 연결</span>`)}
-        <p class="sec-d">이 가이드 다음에 이어서 받을 BECONIC 진단이에요. <b>예비창업자와 이미 사업 중인 분은 순서가 달라요.</b></p>
         <div class="bizsel no-print" role="group" aria-label="내 단계">${['pre','own'].map(k=>`<button type="button" class="opt" data-biz="${k}" aria-pressed="${bizOf()===k}"><b>${B31.paths[k].l}</b> <span>${B31.paths[k].s}</span></button>`).join('')}</div>
+        <div class="print-only nx-who">${B31.paths[bizOf()].l} · ${B31.paths[bizOf()].s}</div>
         <div id="nxl">${nextHTML(it, bizOf())}</div>
-        <p class="note">출시된 진단만 연결해요(${esc(B31.checked)} 확인). 각 진단은 새 창에서 열리고 결과도 그 진단에 따로 저장돼요.</p>
       </section>
 
       <section class="card sec" id="sec-sites">${secHead('sites')}
@@ -575,16 +574,15 @@ function renderGuide(id, step){
   document.querySelectorAll('[data-biz]').forEach(b=>b.addEventListener('click', ()=>{
     S.me.biz=b.dataset.biz; save();   // 내 상황에도 저장 — 지원사업 유형·맞춤 안내가 함께 바뀜
     document.querySelectorAll('[data-biz]').forEach(x=>x.setAttribute('aria-pressed', x===b?'true':'false'));
-    $('#nxl').innerHTML=nextHTML(it, bizOf());
+    $('#nxl').innerHTML=nextHTML(it, bizOf()); const w=document.querySelector('.nx-who'); if(w) w.textContent=`${B31.paths[bizOf()].l} · ${B31.paths[bizOf()].s}`;
     const mc=document.querySelector('#sec-finish a.fcard[href^="'+MATCH_URL+'"]'); if(mc){ mc.href=matchUrl(it); mc.querySelector('span').textContent=`${PERSONA_L[matchPersona(it)]}·이 업종${S.me.region?'·'+S.me.region:''} 조건으로 접수 중 공고 확인`; }
   }));
   const memo=$('#memo');
   memo.addEventListener('input', ()=>{ S.memo[id]=memo.value.slice(0,2000); if(!S.memo[id]) delete S.memo[id]; save(); });
   setupSpy();
 }
-function nextHTML(it, biz){
-  const P=B31.paths[biz];
-  return `<p class="nx-lead"><b>${esc(P.l)}</b>${P.s?` · ${esc(P.s)}`:''} — ${esc(P.lead)}</p><ol class="nx">${nextSteps(it, biz).map((x,i)=>`<li><a href="${esc(x.url)}" target="_blank" rel="noopener"><span class="nx-n">${i+1}</span><span class="nx-b"><b>${esc(x.n)} <i aria-hidden="true">↗</i></b>${x.when?`<em>${esc(x.when)}</em>`:''}<span>${esc(x.why)}</span><small>${esc(x.time)}<span class="print-only"> · ${esc(x.url.replace(/^https?:\/\//,''))}</span></small></span></a></li>`).join('')}</ol>`;
+function nextHTML(it, biz){   // 연결 버튼과 링크만(설명·소요시간 없음)
+  return `<div class="nx">${nextSteps(it, biz).map((x,i)=>`<a class="nxb" href="${esc(x.url)}" target="_blank" rel="noopener"><span class="nx-n">${i+1}</span><b>${esc(x.n)}</b><i aria-hidden="true">↗</i><span class="print-only nx-u">${esc(x.url.replace(/^https?:\/\//,''))}</span></a>`).join('')}</div>`;
 }
 function readRow(num, html, bullet, done){
   return `<div class="rrow">${bullet?'<span class="rb" aria-hidden="true"></span>':`<span class="rn">${num}</span>`}<span class="pbox print-only ${done?'on':''}" aria-hidden="true">${done?'✓':''}</span><span class="rt">${num?`<span class="sn2">STEP ${num}</span>`:''}${html}</span></div>`;
