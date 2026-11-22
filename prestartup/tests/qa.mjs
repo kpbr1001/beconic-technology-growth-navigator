@@ -53,7 +53,9 @@ await page.goto(BASE);
   const g = await page.locator('main').innerText();
   check('가이드: 기준일·세제 기준·업종코드 귀속연도 표기', g.includes('2026.11.19') && g.includes('2026.01') && g.includes('2025년 귀속'));
   check('가이드: 검수 상태 정직 표기(검수 전)', g.includes('검수 전'));
-  check('가이드: 진단 표현 없음', !/진단|점수|등급/.test(g.replace(/진단·평가를 하지 않아요/, '').replace(/건강진단/g, '')));
+  // 가이드 자체는 진단하지 않음 — 다른 BECONIC 진단으로 이어 주는 '다음 진단' 섹션(이름·라벨)만 예외
+  const gOwn = await page.evaluate(() => { const m = document.querySelector('main').cloneNode(true); m.querySelector('#sec-next')?.remove(); return m.innerText; });
+  check('가이드: 진단 표현 없음(다음 진단 연결 섹션 제외)', !/진단|점수|등급/.test(gOwn.replace(/진단·평가를 하지 않아요/, '').replace(/건강진단/g, '').replace(/다음 진단/g, '')), (gOwn.match(/.{0,20}(진단|점수|등급).{0,20}/) || [])[0]);
   check('세제 점검 시점 경과 판정: 2026-12 정상, 2027-01부터 경고', await page.evaluate(() => !window.PS.taxExpired(new Date(2026, 11, 31)) && window.PS.taxExpired(new Date(2027, 0, 1))));
 }
 
@@ -349,6 +351,45 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   check('도우미: 뒤로가기 후 답 그대로', (await page.inputValue('#fkw')) === '앱' && (await page.getAttribute('[data-fq="what"][data-v="digital"]', 'aria-pressed')) === 'true');
   await page.goto(BASE + '#/finder?w=%3Cx%3E&p=zzz&k=%3Cimg%20src%3Dx%3E'); await page.waitForTimeout(100);
   check('도우미: 주소의 이상한 값은 무시·이스케이프', (await page.locator('[aria-pressed="true"]').count()) === 0 && (await page.locator('#fres img, .fopts img').count()) === 0 && (await page.inputValue('#fkw')) === '<img src=x>');
+}
+
+// 11-9. 다음 진단(BECONIC 31 연결) — 예비창업자 / 기창업자 구분
+{
+  const r = await page.evaluate(() => {
+    const P = window.PS, B = P.BY_ID, b31 = window.PS_DATA.beconic31, S = P.S, ids = (id, k) => P.nextSteps(B[id], k).map((x) => x.id);
+    const used = new Set(Object.values(b31.paths).flatMap((p) => p.steps.map((x) => x.id)));
+    const o = { pre: ids('cafe', 'pre'), own: ids('cafe', 'own'), ownSw: ids('software', 'own'), preMfg: ids('cosmetic_mfg', 'pre'),
+      toolsOk: [...used].every((id) => b31.tools[id] && /^https:\/\/[a-z0-9.-]+\.netlify\.app$/.test(b31.tools[id].url)) && Object.keys(b31.tools).every((id) => used.has(id)) };
+    S.me = {}; o.p0 = P.matchPersona(B.cafe);
+    S.me = { biz: 'own' }; o.p1 = [P.matchPersona(B.cafe), P.matchPersona(B.cosmetic_mfg), P.matchPersona(B.software)]; o.url = P.matchUrl(B.cafe);
+    o.note = P.situationNotes(B.cafe).some((n) => n[2].includes('사업자등록 정정'));
+    S.me = {}; o.keep = P.sanitizeMe({ biz: 'own', x: 1 });
+    return o;
+  });
+  check('31 연결: 경로의 진단은 모두 주소가 있고(출시분), 안 쓰는 진단 없음', r.toolsOk);
+  check('예비창업자: 기업성장 종합진단(G) 없이 아이템→검증→숫자→계획서→자금', !r.pre.includes('G') && r.pre.join() === 'S1,S2,M5,S3,S4,F2', r.pre.join());
+  check('기창업자: 기업성장 종합진단(G)부터, 외식 매장이면 외식업·상권 진단', r.own[0] === 'G' && r.own.includes('M6') && r.own.includes('M5') && !r.own.includes('S1') && !r.own.includes('S2'), r.own.join());
+  check('업종 조건: 소프트웨어 기창업자는 외식·상권 제외 / 제조 예비창업자는 상권 제외', !r.ownSw.includes('M6') && !r.ownSw.includes('M5') && !r.preMfg.includes('M5'), r.ownSw.join() + ' | ' + r.preMfg.join());
+  check('지원사업 MATCH 유형: 예비 → founder, 기창업 → 소상인·소공인·중소기업', r.p0 === 'founder' && r.p1.join() === 'retail,maker,sme' && r.url.includes('t=retail'), JSON.stringify(r));
+  check('기창업자 맞춤 안내(업종 추가 = 사업자등록 정정) · 저장값 정리', r.note && JSON.stringify(r.keep) === '{"biz":"own"}');
+  await page.goto(BASE); await page.evaluate(() => localStorage.removeItem('beconic_prestartup_v1')); await page.reload();
+  await page.goto(BASE + '#/guide/cafe/finish'); await page.waitForTimeout(150);
+  const t0 = await page.locator('#sec-next').innerText();
+  const l0 = await page.locator('#nxl .nx').innerText();
+  check('저장·상담 탭: 다음 진단 — 기본은 예비창업자', t0.startsWith('1') && /다음 진단/.test(t0.split('\n').slice(0, 3).join(' ')) && (await page.locator('#sec-next').isVisible()) && l0.includes('아이템 발굴') && !l0.includes('기업성장 종합진단') && (await page.getAttribute('[data-biz="pre"]', 'aria-pressed')) === 'true');
+  await page.click('[data-biz="own"]'); await page.waitForTimeout(80);
+  const l1 = await page.locator('#nxl .nx').innerText(), st = await page.evaluate(() => JSON.parse(localStorage.getItem('beconic_prestartup_v1')).me);
+  check('기창업자로 바꾸면 목록·지원사업 유형이 바뀌고 내 상황에 저장', l1.startsWith('1\n기업성장 종합진단') && !l1.includes('아이템 발굴') && st.biz === 'own' && (await page.locator('#sec-finish a.fcard[href*="grant-matching"]').innerText()).includes('소상인') && (await page.getAttribute('#sec-finish a.fcard[href*="grant-matching"]', 'href')).includes('t=retail'));
+  check('다음 진단: 연결 버튼과 링크만(설명·소요시간 없음) · 새 창·noopener', await page.evaluate(() => { const a = [...document.querySelectorAll('#sec-next .nx a')]; return a.length >= 4 && a.every((x) => x.target === '_blank' && x.rel.includes('noopener') && /^https:/.test(x.href) && x.innerText.replace(/\s+/g, ' ').trim().split(' ').length <= 6) && !/분|해요/.test(document.querySelector('#sec-next .nx').innerText); }));
+  // 탭마다 섹션 제목 = 그 섹션 이름(번호는 탭 안 순서) — v1.6.0 이전: 2·3번째 탭 제목이 앞 탭 이름으로 밀려 나옴
+  const heads = [];
+  for (const st of ['prepare', 'benefit', 'finish']) {
+    await page.goto(BASE + '#/guide/cafe/' + st); await page.waitForTimeout(80);
+    heads.push(...(await page.evaluate(() => [...document.querySelectorAll('.gbody .sec:not(.stepoff)')].filter((s) => s.querySelector('.sec-h .sn') && /^\d+$/.test(s.querySelector('.sec-h .sn').textContent)).map((s) => [s.id, s.querySelector('.sec-h h2').textContent]))));
+  }
+  const want = { 'sec-deadline': '법정 기한', 'sec-steps': '진행 순서', 'sec-docs': '준비 서류', 'sec-license': '인허가·신고', 'sec-ask': '미리 답할 질문', 'sec-pit': '놓치기 쉬운 점', 'sec-code': '업종코드', 'sec-tax': '세금 혜택', 'sec-support': '지원사업', 'sec-expand': '함께 등록·확장', 'sec-next': '다음 진단', 'sec-sites': '신청 사이트', 'sec-memo': '내 메모', 'sec-about': '자료 기준' };
+  check('세 탭 모두 섹션 제목이 내용과 일치', heads.length >= 13 && heads.every(([id, h]) => want[id] === h), JSON.stringify(heads.filter(([id, h]) => want[id] !== h)));
+  await page.evaluate(() => localStorage.removeItem('beconic_prestartup_v1'));
 }
 
 // 12. 앱(PWA) 구성

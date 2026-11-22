@@ -433,6 +433,18 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
 .fwhy{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .fwhy em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--primary-strong);background:var(--primary-soft);border-radius:6px;padding:1px 6px}
 .item.fr .ib>span:not(.fwhy){-webkit-line-clamp:1}
+/* 다음 진단(BECONIC 31 연결) */
+.bizsel{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 14px}
+.bizsel .opt{min-height:56px;padding:8px 12px;text-align:left;line-height:1.35}
+.bizsel .opt span{display:block;font-size:12.5px;font-weight:600;color:var(--muted)}
+.nx{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.nxb{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-height:52px;text-decoration:none;color:var(--ink);flex-wrap:wrap}
+.nxb:hover{border-color:var(--primary-vivid);background:var(--primary-soft)}
+.nxb b{font-size:15px;flex:1;min-width:0}
+.nxb i{font-style:normal;color:var(--primary-strong);font-weight:800}
+.nx-n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--primary-soft);color:var(--primary-strong);font-weight:800;font-size:12.5px;display:flex;align-items:center;justify-content:center}
+.nx-u{flex-basis:100%;font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.nx-who{font-size:12px;font-weight:700;margin-bottom:4pt}
 
 /* 이용 순서 */
 .journey{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
@@ -514,6 +526,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
   .rrow{padding:4pt 0;break-inside:avoid}
   .rsum,.rtabs{display:none!important}
   .dl li{break-inside:avoid;padding:4pt 0 6pt 14pt}
+  .nx{display:block}.nxb{border:0;padding:2pt 0;min-height:0;break-inside:avoid}
   .purl{display:block!important;font-size:8pt;color:#333d4b}
   .pcontact{font-size:9.5pt;line-height:1.6;border-top:1px solid #d1d6db;padding-top:6pt}
   .mechips .chip{border:1px solid #d1d6db}

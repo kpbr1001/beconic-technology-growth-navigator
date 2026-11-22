@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.5.1';
+const VERSION = '1.6.0';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -56,6 +56,7 @@ function save(){ try{ localStorage.setItem(STORE, JSON.stringify(S)); }catch{ /*
 
 /* ---------- 내 상황(선택 입력) ---------- */
 const ME_Q = [
+  {k:'biz', l:'지금 사업자등록이 있나요?', h:'예비창업자와 이미 사업 중인 분은 지원사업 유형과 이어서 받을 BECONIC 진단이 달라요.', o:[['pre','아직 없어요(예비창업자)'],['own','있어요(이미 사업 중·업종 추가)']]},
   {k:'age', l:'대표자 나이(창업일 기준)', h:`세액감면 청년 기준(만 ${RULE.youthTaxAgeMax}세)과 청년 지원사업 기준(대개 만 ${RULE.youthSupportAgeMax}세)이 달라요.`, o:[['u34',`만 ${RULE.youthTaxAgeMax}세 이하`],['u39',`만 ${RULE.youthTaxAgeMax+1}~${RULE.youthSupportAgeMax}세`],['o40',`만 ${RULE.youthSupportAgeMax+1}세 이상`]]},
   {k:'region', l:'사업장 시·도', h:'수도권은 창업 지역에 따라 세액감면율이 크게 달라요.', o:REGIONS.map(r=>[r,r])},
   {k:'space', l:'사업장 형태', h:'업종에 따라 자택·공유오피스로 등록이 안 될 수 있어요.', o:[['home','자택'],['rent','임차(사무실·점포·공장)'],['shared','공유오피스·비상주'],['own','자가(소유)']]},
@@ -174,14 +175,29 @@ function searchCodes(q, group){
   return out;
 }
 
-/* ---------- 지원사업 MATCH 연결(예비창업자 유형) ---------- */
+/* ---------- 예비창업자 / 기창업자 구분 — 지원사업 유형과 다음 진단이 달라진다 ---------- */
+const B31 = D.beconic31;
+const STORE_IDS = new Set((D.finder.where.find(o=>o.k==='store')||{ids:[]}).ids);   // 매장형 업종(도우미 '매장' 답과 같은 목록)
+const bizOf = () => S.me.biz==='own' ? 'own' : 'pre';                               // 모르면 예비창업자(이 가이드의 기본 대상)
+function nextSteps(it, biz){
+  const P=B31.paths[biz], ok={store:STORE_IDS.has(it.id), fnb:it.group==='음식점업'};
+  return P.steps.filter(x=>!x.if||ok[x.if]).map(x=>Object.assign({}, x, B31.tools[x.id]));
+}
+// MATCH 유형: 예비창업자 → founder, 기창업자 → 제조 소공인(maker)·매장 소상인(retail)·그 밖의 중소기업(sme)
+function matchPersona(it){
+  if(bizOf()==='pre') return 'founder';
+  if(it.group==='제조업') return 'maker';
+  return STORE_IDS.has(it.id)||['음식점업','도소매업','개인서비스업','숙박업'].includes(it.group) ? 'retail' : 'sme';
+}
+const PERSONA_L = {founder:'예비창업자', retail:'소상인', maker:'소공인', sme:'중소기업'};
+/* ---------- 지원사업 MATCH 연결 ---------- */
 const MATCH_IND_GROUP = {'제조업':'제조업','도소매업':'도소매업','정보통신업':'정보통신(ICT)','음식점업':'음식점업(F&B)','숙박업':'관광·MICE·숙박','전문서비스업':'지식서비스(컨설팅·HR)',
   '사업서비스업':'서비스업(기타)','교육서비스업':'교육(에듀테크)','건설업':'건설·건축','운수업':'물류·유통','부동산업':'부동산(프롭테크)','개인서비스업':'서비스업(기타)','보건업':'의료기기·헬스케어','대중문화산업':'문화·예술·미디어'};
 const MATCH_IND_ID = {cosmetic_mfg:'뷰티·화장품',cosmetic_retail:'뷰티·화장품',skincare:'뷰티·화장품',health_food_mfg:'기능성식품',health_food_retail:'기능성식품',game_dev:'게임·콘텐츠',
   content:'게임·콘텐츠',creator:'게임·콘텐츠',design:'디자인',data_service:'AI·빅데이터',it_service:'SW·시스템통합',software:'SW·시스템통합',machine_mfg:'기계·장비',metal_fab:'금속·소재 성형가공',
   plastic_mfg:'화학·섬유',medical_device:'의료기기·헬스케어',agri_wholesale:'농림수산업',logistics:'물류·유통',delivery:'물류·유통',clinic:'서비스업(기타)',vet:'서비스업(기타)'};
 function matchUrl(it){
-  const q=new URLSearchParams({t:'founder'});
+  const q=new URLSearchParams({t:matchPersona(it)});
   const ind=MATCH_IND_ID[it.id]||MATCH_IND_GROUP[it.group]; if(ind) q.set('i', ind);
   if(S.me.region) q.set('r', S.me.region);
   return MATCH_URL+'?'+q.toString();
@@ -191,6 +207,7 @@ function matchUrl(it){
 const FACILITY_GROUPS = ['음식점업','제조업','숙박업','교육서비스업','보건업'];
 function situationNotes(it){
   const m=S.me, out=[];
+  if(m.biz==='own') out.push(['blue','🧾','<b>이미 사업자등록이 있다면</b> 새로 등록하지 않고 기존 사업자에 업종을 추가(사업자등록 정정신고)할 수 있어요. 다만 같은 사업을 이어 가거나 업종만 늘리는 경우는 창업 세액감면의 \'창업\'으로 보지 않을 수 있어요.']);
   if(m.age==='u34') out.push(['blue','🎯',`<b>세액감면 '청년' 기준(창업일 기준 만 15~${RULE.youthTaxAgeMax}세)</b>에 해당할 수 있어요. ${RULE.startupTaxFrom} 이후 창업분은 창업 지역에 따라 감면율이 ${RULE.startupTaxYouthRange}로 달라져요. 만 ${RULE.youthSupportAgeMax}세 이하 대상 청년 창업지원사업도 함께 살펴보세요.`]);
   if(m.age==='u39') out.push(['','🎯',`세액감면의 청년 기준(만 ${RULE.youthTaxAgeMax}세)은 넘지만 <b>병역을 이행했다면 최대 ${RULE.militaryDeductMaxYears}년을 빼고</b> 나이를 계산해요. 만 ${RULE.youthSupportAgeMax}세 이하 대상 청년 창업지원사업(예: 청년창업사관학교)은 해당될 수 있어요.`]);
   if(m.region && CAPITAL.includes(m.region)) out.push(['warn','📍',`<b>${esc(m.region)}(수도권)</b>은 같은 시·도 안에서도 과밀억제권역인지, 인구감소지역인지에 따라 창업중소기업 세액감면율이 달라요. 사업장 주소를 정하기 전에 세무서·세무사에게 확인하세요.`]);
@@ -351,7 +368,7 @@ function renderGroup(g){
 const GSTEPS = [
   {k:'prepare', n:1, l:'준비물', d:'진행 순서 · 준비 서류 · 인허가', secs:['me','deadline','steps','docs','license','ask','pit']},
   {k:'benefit', n:2, l:'혜택·지원', d:'업종코드 · 세금 혜택 · 지원사업', secs:['code','tax','support','expand']},
-  {k:'finish',  n:3, l:'저장·상담', d:'PDF · 전문가 확인 · 신청 사이트', secs:['finish','sites','memo','about']}
+  {k:'finish',  n:3, l:'저장·상담', d:'PDF · 다음 진단 · 신청 사이트', secs:['finish','next','sites','memo','about']}
 ];
 const JOURNEY = [['pick','업종 고르기'],['me','내 상황'],['result','결과 보기']];
 function stepState(id){
@@ -374,7 +391,7 @@ function stepper(cur, id, group){
 const NAV_EXTRA = [['me','맞춤 안내']];
 const SECS = [
   ['deadline','법정 기한'],['steps','진행 순서'],['docs','준비 서류'],['license','인허가·신고'],['code','업종코드'],['tax','세금 혜택'],['support','지원사업'],
-  ['ask','미리 답할 질문'],['pit','놓치기 쉬운 점'],['expand','함께 등록·확장'],['sites','신청 사이트'],['memo','내 메모'],['about','자료 기준']
+  ['ask','미리 답할 질문'],['pit','놓치기 쉬운 점'],['expand','함께 등록·확장'],['next','다음 진단'],['sites','신청 사이트'],['memo','내 메모'],['about','자료 기준']
 ];
 function renderGuide(id, step){
   const it=BY_ID[id];
@@ -390,7 +407,7 @@ function renderGuide(id, step){
   const codeOk=isCode(it.nts);
   const related=[...(it.relatedCodes||[]), ...(it.linkedOfficial||[])].filter((x,i,a)=>a.findIndex(y=>y.nts===x.nts)===i && x.nts!==it.nts);
   const n = k => { const g=GSTEPS.find(x=>x.secs.includes(k)); return g ? g.secs.filter(x=>x!=='me'&&x!=='finish').indexOf(k)+1 : ''; };
-  const secHead = (k, extra) => `<div class="sec-h"><span class="sn">${n(k)}</span><h2>${SECS[n(k)-1][1]}</h2>${extra||''}</div>`;
+  const secHead = (k, extra) => `<div class="sec-h"><span class="sn">${n(k)}</span><h2>${SECS.find(x=>x[0]===k)[1]}</h2>${extra||''}</div>`;   // 제목은 키로(번호는 탭 안 순서)
   const reviewed = it.reviewStatus==='검수완료';
 
   mount(`
@@ -489,7 +506,7 @@ function renderGuide(id, step){
 
       <section class="card sec" id="sec-support">${secHead('support')}
         <ul class="ul">${(it.supportPoints||[]).map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
-        <div class="match no-print"><div class="mt"><b>지금 접수 중인 예비창업자 지원사업 찾기</b><span>BECONIC 지원사업 MATCH에서 ${S.me.region?esc(S.me.region)+' · ':''}이 업종 조건으로 기업마당·K-Startup 공고를 바로 맞춰 봐요.</span></div>
+        <div class="match no-print"><div class="mt"><b>지금 접수 중인 ${PERSONA_L[matchPersona(it)]} 지원사업 찾기</b><span>BECONIC 지원사업 MATCH에서 ${S.me.region?esc(S.me.region)+' · ':''}이 업종 조건으로 기업마당·K-Startup 공고를 바로 맞춰 봐요.</span></div>
           <a class="btn btn-primary" href="${esc(matchUrl(it))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a></div>
         <p class="note">지원사업은 공고마다 자격(업력·지역·제외 업종)이 달라요. 이 안내는 미리 살펴볼 점이며 선정을 보장하지 않아요.</p>
       </section>
@@ -507,6 +524,12 @@ function renderGuide(id, step){
         ${(it.linkedOfficial||[]).length?`<div class="sub-h">함께 등록하면 좋은 업종(공식 코드)</div>${it.linkedOfficial.map(l=>`<div class="box"><div class="bt"><b>${esc(l.name)}</b><span class="bo mono">${esc(l.nts)}</span></div><p>${esc(l.why)}</p></div>`).join('')}`:''}
         ${(it.linkedDirection||[]).length?`<div class="sub-h">사업 확장 아이디어 <span style="font-weight:600">(업종코드는 따로 확인)</span></div>${it.linkedDirection.map(l=>`<div class="idea"><b>${esc(l.label)}</b><p>${esc(l.why)}</p>${l.how?`<p><span class="lbl" style="font-size:12px;font-weight:800;color:var(--primary-strong)">실행</span> ${esc(l.how)}</p>`:''}${l.point?`<p><span class="lbl" style="font-size:12px;font-weight:800;color:var(--warn)">핵심</span> ${esc(l.point)}</p>`:''}</div>`).join('')}`:''}
         ${!(it.linkedOfficial||[]).length && !(it.linkedDirection||[]).length?'<p class="muted">이 업종은 아직 정리된 확장 정보가 없어요.</p>':''}
+      </section>
+
+      <section class="card sec" id="sec-next" aria-label="다음 진단">${secHead('next', `<span class="cnt">BECONIC 진단 연결</span>`)}
+        <div class="bizsel no-print" role="group" aria-label="내 단계">${['pre','own'].map(k=>`<button type="button" class="opt" data-biz="${k}" aria-pressed="${bizOf()===k}"><b>${B31.paths[k].l}</b> <span>${B31.paths[k].s}</span></button>`).join('')}</div>
+        <div class="print-only nx-who">${B31.paths[bizOf()].l} · ${B31.paths[bizOf()].s}</div>
+        <div id="nxl">${nextHTML(it, bizOf())}</div>
       </section>
 
       <section class="card sec" id="sec-sites">${secHead('sites')}
@@ -527,7 +550,7 @@ function renderGuide(id, step){
         <p class="sec-d no-print">체크를 마쳤다면 아래 세 가지로 마무리하세요.</p>
         <div class="fin no-print">
           <button class="fcard" type="button" data-act="print"><b>① ${IN_APP?'체크리스트 복사':'PDF로 저장'}</b><span>${IN_APP?'나와의 채팅에 붙여 넣어 보관':'한눈에 보기 + 남은 할 일 + 전체 체크리스트'}</span></button>
-          <a class="fcard" href="${esc(matchUrl(it))}" target="_blank" rel="noopener"><b>② 지원사업 찾기 ↗</b><span>예비창업자·이 업종${S.me.region?'·'+esc(S.me.region):''} 조건으로 접수 중 공고 확인</span></a>
+          <a class="fcard" href="${esc(matchUrl(it))}" target="_blank" rel="noopener"><b>② 지원사업 찾기 ↗</b><span>${PERSONA_L[matchPersona(it)]}·이 업종${S.me.region?'·'+esc(S.me.region):''} 조건으로 접수 중 공고 확인</span></a>
           <a class="fcard" href="${CONTACT.kakao}" target="_blank" rel="noopener"><b>③ 전문가에게 확인</b><span>서류·세금 요건을 카카오톡으로 물어보기 · ${CONTACT.tel}</span></a>
         </div>
         <div class="print-only pcontact"><b>전문가 확인이 필요하면</b> ${CONTACT.company}(중소벤처기업부 인증 중소기업상담회사 ${CONTACT.cert}) · ${CONTACT.tel} · ${CONTACT.email} · 카카오톡 채널 'BECONIC' · www.beconic.kr<br>지원사업 찾기: beconic-grant-matching.netlify.app · 이 가이드 다시 보기: ${esc(shareLink(id).replace(/^https?:\/\//,''))}</div>
@@ -548,9 +571,18 @@ function renderGuide(id, step){
   document.querySelectorAll('.gbody .sec').forEach(el=>{ if(!G.secs.includes(el.id.replace('sec-',''))) el.classList.add('stepoff'); });
   document.querySelectorAll('.gbody [data-only]').forEach(el=>{ if(el.dataset.only!==G.k) el.classList.add('stepoff'); });
 
+  document.querySelectorAll('[data-biz]').forEach(b=>b.addEventListener('click', ()=>{
+    S.me.biz=b.dataset.biz; save();   // 내 상황에도 저장 — 지원사업 유형·맞춤 안내가 함께 바뀜
+    document.querySelectorAll('[data-biz]').forEach(x=>x.setAttribute('aria-pressed', x===b?'true':'false'));
+    $('#nxl').innerHTML=nextHTML(it, bizOf()); const w=document.querySelector('.nx-who'); if(w) w.textContent=`${B31.paths[bizOf()].l} · ${B31.paths[bizOf()].s}`;
+    const mc=document.querySelector('#sec-finish a.fcard[href^="'+MATCH_URL+'"]'); if(mc){ mc.href=matchUrl(it); mc.querySelector('span').textContent=`${PERSONA_L[matchPersona(it)]}·이 업종${S.me.region?'·'+S.me.region:''} 조건으로 접수 중 공고 확인`; }
+  }));
   const memo=$('#memo');
   memo.addEventListener('input', ()=>{ S.memo[id]=memo.value.slice(0,2000); if(!S.memo[id]) delete S.memo[id]; save(); });
   setupSpy();
+}
+function nextHTML(it, biz){   // 연결 버튼과 링크만(설명·소요시간 없음)
+  return `<div class="nx">${nextSteps(it, biz).map((x,i)=>`<a class="nxb" href="${esc(x.url)}" target="_blank" rel="noopener"><span class="nx-n">${i+1}</span><b>${esc(x.n)}</b><i aria-hidden="true">↗</i><span class="print-only nx-u">${esc(x.url.replace(/^https?:\/\//,''))}</span></a>`).join('')}</div>`;
 }
 function readRow(num, html, bullet, done){
   return `<div class="rrow">${bullet?'<span class="rb" aria-hidden="true"></span>':`<span class="rn">${num}</span>`}<span class="pbox print-only ${done?'on':''}" aria-hidden="true">${done?'✓':''}</span><span class="rt">${num?`<span class="sn2">STEP ${num}</span>`:''}${html}</span></div>`;
@@ -853,5 +885,5 @@ window.addEventListener('hashchange', ()=>{ render(); afterNav(); });
 render();
 
 /* QA용 읽기 전용 노출 */
-window.PS = {finderRank, deadlines, VERSION, RULE, CODE_Y, BY_ID, searchGuides, searchCodes, progressOf, situationNotes, matchUrl, docTag, taxExpired, sanitizeMe, summary, NTS_UNIQUE, get S(){ return S; }};
+window.PS = {finderRank, deadlines, nextSteps, matchPersona, VERSION, RULE, CODE_Y, BY_ID, searchGuides, searchCodes, progressOf, situationNotes, matchUrl, docTag, taxExpired, sanitizeMe, summary, NTS_UNIQUE, get S(){ return S; }};
 })();
