@@ -290,16 +290,21 @@ function leafRow(l, data) {
   else next = '-';
   return `<tr class="${l.inactive ? 'inactive' : ''}">
     <td data-th="요건">${esc(l.label)}${l.is_condition ? ' <span class="muted">(선행조건)</span>' : ''}</td>
-    <td data-th="판단 근거" class="basis">${esc(l.kind === 'assessment' ? '평가·심사 단계' : (l.detail && !l.unverified ? l.detail : (l.status === S.PASS || l.status === S.FAIL ? '입력값 기준' : '-')))}</td>
+    ${(() => { const t = l.kind === 'assessment' ? '평가·심사 단계' : (l.detail && !l.unverified ? l.detail : (l.status === S.PASS || l.status === S.FAIL ? '입력값 기준' : '')); return `<td data-th="판단 근거" class="basis${t ? '' : ' empty'}">${esc(t || '-')}</td>`; })()}
     <td data-th="판정" class="st">${badge(stKey, stText, true)}</td>
     <td data-th="공식 근거" class="src">${src.map((x) => extLink(x.official_url, x.title.length > 24 ? `${x.title.slice(0, 24)}…` : x.title)).join('<br>')}</td>
-    <td data-th="다음 확인">${esc(next)}</td></tr>`;
+    <td data-th="다음 확인" class="${next === '-' || !next ? 'empty' : ''}">${esc(next || '-')}</td></tr>`;
 }
 function pathwayBlock(p, data) {
-  const lb = p.basic === 'OUT_OF_SCOPE' ? leafLabel(S.NA) : { pass: { key: 'pass', text: '기본요건 확인' }, fail: { key: 'fail', text: '기본요건 미충족' }, unknown: { key: 'unknown', text: '추가 확인 필요' }, na: { key: 'na', text: '해당 없음' } }[leafLabel(p.basic).key];
-  const rows = p.leaves.filter((l) => !(l.inactive && p.basic === S.NA));
-  return `<div class="pathway"><div class="pathway-head"><span class="pathway-name">${esc(p.name)}</span>${badge(lb.key, lb.text, true)}<span class="muted small">평가: ${esc(p.evaluator)}</span></div>
-  ${p.basic === S.NA ? '<p class="muted small m0">공식 기준상 이 신청 유형의 대상이 아니에요.</p>' : `<table class="req-table"><thead><tr><th scope="col">요건</th><th scope="col">판단 근거</th><th scope="col">판정</th><th scope="col">공식 근거</th><th scope="col">다음 확인</th></tr></thead><tbody>${rows.map((l) => leafRow(l, data)).join('')}</tbody></table>`}</div>`;
+  const lb = { pass: { key: 'pass', text: '기본요건 확인' }, fail: { key: 'fail', text: '기본요건 미충족' }, unknown: { key: 'unknown', text: '추가 확인 필요' }, na: { key: 'na', text: '해당 없음' } }[leafLabel(p.basic).key];
+  if (p.basic === S.NA) return `<div class="pathway pathway-na"><span class="pathway-name">${esc(p.name)}</span> ${badge(lb.key, lb.text, true)} <span class="muted small">공식 기준상 이 신청 유형의 대상이 아니에요.</span></div>`;
+  const rows = p.leaves;
+  const req = rows.filter((l) => l.kind !== 'assessment' && !l.inactive && !l.is_condition && l.status !== S.NA);
+  const n = (st) => req.filter((l) => l.status === st).length;
+  const counts = `충족 ${n(S.PASS)} · 확인 필요 ${n(S.UNKNOWN)} · 미충족 ${n(S.FAIL)}`;
+  return `<details class="pathway"${p.basic === S.FAIL || p.basic === S.PASS ? ' open' : ''}><summary class="pathway-head"><span class="pathway-name">${esc(p.name)}</span>${badge(lb.key, lb.text, true)}<span class="muted small">${counts} · 요건별 판정 보기</span></summary>
+  <p class="muted small m0">평가: ${esc(p.evaluator)}</p>
+  <table class="req-table"><thead><tr><th scope="col">요건</th><th scope="col">판단 근거</th><th scope="col">판정</th><th scope="col">공식 근거</th><th scope="col">다음 확인</th></tr></thead><tbody>${rows.map((l) => leafRow(l, data)).join('')}</tbody></table></details>`;
 }
 function schemeResultCard(x, data, st) {
   const s = x.scheme;

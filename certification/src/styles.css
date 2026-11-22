@@ -272,3 +272,12 @@ details.expert summary { cursor: pointer; min-height: 40px; display: inline-flex
 .fs18 { font-size: 18px; } .tc { text-align: center; } .jc-center { justify-content: center; } .jc-between { justify-content: space-between; }
 .br-m { display: none; }
 @media (max-width: 560px) { .br-m { display: inline; } }
+details.pathway { border: 1px solid var(--border); border-radius: 14px; padding: 10px 14px; margin-top: 10px; }
+details.pathway > summary { cursor: pointer; list-style: none; min-height: 44px; margin: 0; }
+details.pathway > summary::-webkit-details-marker { display: none; }
+details.pathway > summary::after { content: '펼치기 ▾'; margin-left: auto; font-size: 13px; color: var(--primary-d); font-weight: 600; }
+details.pathway[open] > summary::after { content: '접기 ▴'; }
+details.pathway[open] > summary { margin-bottom: 6px; }
+.pathway-na { margin-top: 10px; padding: 8px 2px; font-size: 15px; }
+h1[tabindex="-1"]:focus { outline: none; }
+@media (max-width: 680px) { .req-table td.empty { display: none; } details.pathway { padding: 8px 10px; } }

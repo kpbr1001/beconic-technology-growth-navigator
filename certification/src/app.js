@@ -66,7 +66,13 @@ function render() {
       if (!st.started) html = V.noStateView();
       else {
         const recs = recommend(D.catalog.schemes, { ...st.answers, desired_schemes: st.selected });
-        if (!st._preselected) { st._preselected = true; if (!st.selected.length) st.selected = recs.filter((r) => r.tier === 'high' && (r.scheme.diagnosable || r.scheme.triage || r.scheme.self_check)).slice(0, V.MAX_SELECT).map((r) => r.scheme.scheme_id); }
+        if (!st._preselected) { st._preselected = true; if (!st.selected.length) {
+          const ok = (r) => r.scheme.diagnosable || r.scheme.triage || r.scheme.self_check;
+          const high = recs.filter((r) => r.tier === 'high' && ok(r));
+          // 관련성 높음이 없으면 '검토해 볼 만함' 중 자동 진단 가능한 상위 2개만 미리 골라 둔다(사용자가 바꿀 수 있음)
+          const pick = high.length ? high.slice(0, V.MAX_SELECT) : recs.filter((r) => r.tier === 'consider' && r.scheme.diagnosable).slice(0, 2);
+          st.selected = pick.map((r) => r.scheme.scheme_id);
+        } }
         html = V.recommendView(st, D, recs);
       }
       title = '후보 추천 | BECONIC';
