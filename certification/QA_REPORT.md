@@ -44,7 +44,7 @@
 | E09 | 320·360·390·430·768·1024·1440px 가로 넘침 0, 작은 터치영역 0 | TESTED ✅ |
 | E10 | 키보드 진행, 레이블·legend, 제목 포커스, aria-live | TESTED ✅ (자동 점검 수준) |
 | E11 | PDF 8종 | TESTED ✅ → QA_PDF_REPORT.md |
-| E12 | 정적 OG·canonical, OG 이미지, 전화·메일 링크, 공유는 랜딩 URL만 | TESTED ✅ (로컬). 운영 URL·카카오 실측은 NOT_VERIFIED |
+| E12 | 정적 OG·canonical, OG 이미지, 전화·메일 링크, 공유는 랜딩 URL만 | TESTED ✅ (로컬·운영). 카카오톡 공유 미리보기는 운영사 대표가 실측 확인(2026-11-22) |
 | E13 | 근거 재확인 기한(2027-05-22) 지난 기준일 → 자동 판정 중지 | TESTED ✅ (시계 고정) |
 | E14 | 미래 날짜·문자 숫자 오류 안내, 쉼표 숫자 허용, 회사명 HTML 주입 무력화 | TESTED ✅ |
 | E15 | 같은 입력 → 같은 결과·문서 ID | TESTED ✅ |
@@ -70,7 +70,15 @@
 - **숫자 위변조**: 규칙의 숫자 기준을 바꾸면 근거 문구와 출처 발췌 대조에서 실패해요(DATA-05·05b).
 - **XSS**: 모든 동적 텍스트를 이스케이프하고, 외부 링크는 https만 허용해요. 인라인 스크립트·스타일을 금지하는 CSP를 적용했어요(E14c·SEC-01).
 
-## 5. 상태별 완료 보고
+## 5. 운영 배포 검증 (2026-11-22)
+
+- PR [#112](https://github.com/kpbr1001/beconic-technology-growth-navigator/pull/112) 머지 → Netlify 자동 배포 → https://beconic-diagnosis-certification.netlify.app (HTTPS 200)
+- 운영 응답 헤더: CSP(`'self'` 전용)·X-Frame-Options DENY·Referrer-Policy·Permissions-Policy 적용 확인. OG 태그·OG 이미지(1200×630) 200
+- 공개 범위: `dist/`만 배포 — `tests/`·문서(`QA_REPORT.md` 등)는 404
+- 운영 URL E2E: `node tests/qa.mjs https://beconic-diagnosis-certification.netlify.app/` → **38/38 통과**
+- 카카오톡 공유 미리보기: 운영사 대표가 직접 확인(정상)
+
+## 6. 상태별 완료 보고
 
 ### IMPLEMENTED + TESTED
 - 국내 5개 제도 기본요건 자동 판정(벤처 4유형 OR, 이노비즈, 메인비즈, 기업부설연구소, 연구개발전담부서). 모든 숫자 기준은 공식 원문 문구와 자동 대조해요.
@@ -83,7 +91,6 @@
 - Netlify 설정(`certification/netlify.toml`, Base directory=`certification`), CI 등록(`scripts/ci`), 루트 ESLint 대상 포함.
 
 ### NOT_VERIFIED (이 환경에서 확인 못 함)
-- **운영 배포·도메인·SSL·카카오 공유 미리보기 실측**: main 병합과 Netlify 배포는 승인 전이라 하지 않았어요. OG URL은 `beconic-diagnosis-certification.netlify.app`로 넣어 두었어요.
 - **실사용자 관찰 테스트(대표·실무자 5명 내외)**: 미실시
 - **실제 스크린리더(VoiceOver·NVDA) 청취 테스트**: 미실시. 자동 점검(레이블·legend·aria-live·포커스)만 했어요.
 - **iOS Safari·Android Chrome 실기기·사파리 인쇄**: 미실시. Chromium만 확인했어요.
