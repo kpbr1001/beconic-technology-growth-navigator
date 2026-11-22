@@ -12,6 +12,7 @@ export function loadDataSync() {
     sources: readJson(DATA_FILES.sources),
     questions: readJson(DATA_FILES.questions),
     packFiles: DATA_FILES.packs.map(readJson),
+    links: readJson(DATA_FILES.links),
   });
 }
 

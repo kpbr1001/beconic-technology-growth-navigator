@@ -1,5 +1,6 @@
 // 보고서 뷰모델 — 화면(결과·서류·로드맵)과 인쇄용 PDF가 이 객체 하나만 쓴다(결과 불일치 방지).
 import { S, ENGINE_VERSION, evaluateScheme, missingInputs, schemeLabel } from './engine.js';
+import { nextSteps, strategyNotes, commonDocs } from './next.js';
 import { computeReadiness, readinessSentence, EVIDENCE } from './readiness.js';
 import { recommend, TIER_LABEL } from './recommend.js';
 import { triage } from './triage.js';
@@ -109,6 +110,9 @@ export function buildReport(data, state) {
     else findings.push({ key: 'out', text: `${s.scheme.name_ko}: 정보 안내 제도예요(자동 판정 없음).` });
   });
 
+  const linkR = { schemes };
+  const connect = { next: nextSteps(data.links, linkR, answers), strategy: strategyNotes(data.links, linkR, answers), commonDocs: commonDocs(data.links, linkR) };
+
   const docId = `BC-${asOf.replace(/-/g, '')}-${hash(JSON.stringify({ a: answers, s: selected, d: state.docStatus || {} }))}`;
   return {
     meta: {
@@ -121,6 +125,7 @@ export function buildReport(data, state) {
     schemes, recs, actions, roadmap: groupRoadmap(actions),
     summary: { headline, pass, fail, unknown, unverified, byKey, diagnosed, docCounts, findings: findings.slice(0, 3), allFindings: findings, firstAction: actions[0] || null },
     unknownInputs,
+    connect,
     tierLabel: TIER_LABEL,
     _answers: answers, // 인쇄 보고서의 '응답' 열 표시용(브라우저 메모리 안에서만 사용)
   };

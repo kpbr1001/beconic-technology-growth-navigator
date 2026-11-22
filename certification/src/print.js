@@ -163,6 +163,18 @@ function plan(data, R) {
   <thead><tr><th scope="col">시점</th><th scope="col">순위·구분</th><th scope="col">할 일</th><th scope="col">담당(예시)</th><th scope="col">산출물</th><th scope="col">완료 판단</th></tr></thead><tbody>${rows}</tbody></table>` : '<p class="p-p">지금 할 일이 없습니다.</p>'}</section>`;
 }
 
+function connectPrint(R) {
+  const c = R.connect || { next: [], strategy: [], commonDocs: [] };
+  if (!c.next.length && !c.strategy.length && !c.commonDocs.length) return '';
+  return `<section class="p-sec"><h3 class="p-h3">여러 인증 함께 준비 · 다음 진단</h3>
+  ${c.strategy.map((x) => `<p class="p-p">${esc(x.text)}</p>`).join('')}
+  ${c.commonDocs.length ? `<p class="p-p"><b>공통 서류 ${c.commonDocs.length}종</b>: ${c.commonDocs.map((d) => `${esc(d.name)}(${esc(d.schemes.join('·'))})`).join(', ')} — 한 번 발급해 함께 사용(발급일 제한 서류는 신청 직전 발급).</p>` : ''}
+  ${c.next.length ? `<table class="p-table"><colgroup><col class="c-22"><col class="c-46"><col class="c-32"></colgroup>
+  <thead><tr><th scope="col">다음 진단(BECONIC 31)</th><th scope="col">추천 이유</th><th scope="col">주소</th></tr></thead><tbody>
+  ${c.next.map((x) => `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.why)}</td><td class="p-url">${esc(x.url)}</td></tr>`).join('')}</tbody></table>` : ''}
+  <p class="p-note">상담: 02-6124-5960 · start@gven.kr (문서번호 ${esc(R.meta.doc_id)}를 알려 주시면 이 결과로 바로 상담해요)</p></section>`;
+}
+
 function appendix(data, R) {
   const SI = sourceIndex(R);
   const srcRows = Object.keys(SI).map((r) => data.sourceMap[r]).filter(Boolean).map((s) => `<tr><td><span class="p-sid">[${SI[s.source_id]}]</span> ${esc(s.title)}</td><td>${esc(s.regulator)}</td><td>${esc(s.document_identifier || '-')}</td><td class="nw">${esc(s.checked_at)}</td><td>${esc(ACCESS_LABEL[s.access_status])}</td><td class="p-url">${esc(readableUrl(s.official_url))}</td></tr>`).join('');
@@ -191,6 +203,6 @@ function appendix(data, R) {
 
 export function renderPrint(data, R) {
   return `<div class="p-doc">
-  ${cover(data, R)}${execSummary(data, R)}${comparison(data, R)}${ruleTables(data, R)}${evidence(data, R)}${plan(data, R)}${appendix(data, R)}
+  ${cover(data, R)}${execSummary(data, R)}${comparison(data, R)}${ruleTables(data, R)}${evidence(data, R)}${plan(data, R)}${connectPrint(R)}${appendix(data, R)}
   </div>`;
 }

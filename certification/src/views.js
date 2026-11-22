@@ -358,6 +358,7 @@ export function resultView(st, data, R) {
   ${R.unknownInputs.length ? `<div class="notice warn"><b>확인하면 정확해지는 정보 ${R.unknownInputs.length}가지</b><ul class="missing-list">${R.unknownInputs.slice(0, 6).map((m) => `<li>${esc(m.label)}</li>`).join('')}</ul><p class="m0 mt8"><button class="btn sm sec" type="button" data-act="edit">입력 수정하기</button></p></div>` : ''}
   <h2 class="h2">검토한 인증·제도</h2>
   ${R.schemes.map((x) => schemeResultCard(x, data, st)).join('')}
+  ${connectView(R)}
   <div class="result-actions">
     <button class="btn" type="button" data-act="print">${ICON.print} PDF 저장</button>
     <a class="btn sec" href="#/docs">서류 체크</a>
@@ -370,6 +371,41 @@ export function resultView(st, data, R) {
   </div>
   <p class="muted small">결과 범위: 선택한 ${R.schemes.length}개 제도 · 앱 v${esc(R.meta.app_version)} · 데이터 ${esc(R.meta.data_versions.catalog)} · 문서 ${esc(R.meta.doc_id)}. 미검증 데이터와 근거는 <a href="#/about-data">근거·데이터 기준</a>에서 볼 수 있어요.</p>
 </section>`;
+}
+
+// ── 연결: 함께 준비하기 · 다음 진단(BECONIC 31) · 상담 ─────────────
+export function consultMailto(R) {
+  const lines = [
+    '[기업인증 진단 결과로 상담 요청]',
+    `문서번호: ${R.meta.doc_id} (진단 기준일 ${R.meta.as_of})`,
+    '',
+    '■ 진단 결과',
+    ...R.schemes.map((x) => `- ${x.scheme.name_ko}: ${x.label.text}`),
+    '',
+    '■ 먼저 할 일',
+    ...R.actions.slice(0, 3).map((a, i) => `${i + 1}. ${a.title}`),
+    '',
+    '■ 상담받고 싶은 내용:',
+    '■ 회사명·연락처:',
+  ];
+  const subject = `[기업인증 진단] 상담 요청 ${R.meta.doc_id}`;
+  return `mailto:${CONTACT.mail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+}
+function connectView(R) {
+  const c = R.connect || { next: [], strategy: [], commonDocs: [] };
+  const prep = c.strategy.length || c.commonDocs.length ? `<section class="card my14" aria-labelledby="prep-h"><h2 class="card-title" id="prep-h">${ICON.route} 여러 인증을 함께 준비할 때</h2>
+    ${c.strategy.map((x) => `<p class="m0 mt8">${esc(x.text)}</p>`).join('')}
+    ${c.commonDocs.length ? `<p class="m0 mt8"><b>공통 서류 ${c.commonDocs.length}종</b> — 한 번 발급해 같이 쓰면 돼요. 발급일 제한(예: 1개월 이내)이 있는 서류는 신청 직전에 발급하세요.</p>
+      <ul class="common-docs">${c.commonDocs.map((d) => `<li><b>${esc(d.name)}</b> <span class="muted small">${esc(d.schemes.join(' · '))}</span></li>`).join('')}</ul>` : ''}
+  </section>` : '';
+  const next = c.next.length ? `<section class="my14" aria-labelledby="next-h"><h2 class="h2" id="next-h">다음 진단 추천 <span class="muted small">BECONIC 31</span></h2>
+    <p class="muted small m0">이번 결과와 답한 내용을 보고 이어서 하면 좋은 진단을 골랐어요. 새 창으로 열리고, 입력한 정보는 넘어가지 않아요.</p>
+    <div class="next-grid">${c.next.map((n, i) => `<div class="next-card"><span class="next-no">${i + 1}</span><div><p class="next-name">${esc(n.name)}</p><p class="small m0">${esc(n.why)}</p>
+      <p class="m0 mt8">${extLink(n.url, '진단 시작하기', 'btn sm sec')}</p></div></div>`).join('')}</div></section>` : '';
+  const consult = `<section class="consult" aria-labelledby="consult-h"><div><h2 class="consult-h" id="consult-h">이 결과로 전문가 상담 받기</h2>
+    <p class="small m0">진단 결과와 먼저 할 일을 정리한 메일 초안을 열어 드려요. 회사명·연락처는 직접 적어 보내 주세요. 그로스벤처스는 중소벤처기업부 공식 인증 중소기업상담회사(제2025-684호)예요.</p></div>
+    <div class="row"><a class="btn" href="${esc(consultMailto(R))}">${ICON.doc} 결과 담아 메일 상담</a><a class="btn sec" href="${CONTACT.telHref}">${ICON.phone} ${CONTACT.tel}</a></div></section>`;
+  return prep + next + consult;
 }
 
 // ── 서류 체크 ──────────────────────────────────────────────
@@ -461,7 +497,9 @@ export function privacyView() {
   <ul><li>입력 내용을 서버로 보내거나, 브라우저 저장소(localStorage 등)에 저장하지 않아요. 새로고침하면 사라져요.</li>
   <li>외부 분석 도구(애널리틱스)·광고 추적·외부 글꼴 서버를 쓰지 않아요. 글꼴(Pretendard)은 이 사이트에서 직접 제공해요.</li>
   <li>PDF는 브라우저 인쇄 기능으로 내 기기에 저장돼요. 저장 여부를 이 서비스가 알 수 없어요.</li>
-  <li>상담은 전화·메일로만 받아요. 이 화면에서 연락처를 수집하지 않아요.</li></ul>
+  <li>상담은 전화·메일로만 받아요. 이 화면에서 연락처를 수집하지 않아요.</li>
+  <li>‘결과 담아 메일 상담’은 내 메일 앱에 초안(문서번호·결과 요약)을 열기만 해요. 회사명 등 입력값은 넣지 않고, 보낼지는 직접 정해요.</li>
+  <li>‘다음 진단 추천’ 링크로 다른 BECONIC 진단으로 이동해도 입력한 정보는 넘어가지 않아요.</li></ul>
   <p class="muted">운영사의 정식 개인정보 처리방침이 마련되면 이 페이지에서 연결해요. 문의: start@gven.kr</p></section>`;
 }
 export function aboutDataView(data) {

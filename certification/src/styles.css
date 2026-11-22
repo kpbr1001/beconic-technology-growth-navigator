@@ -281,3 +281,15 @@ details.pathway[open] > summary { margin-bottom: 6px; }
 .pathway-na { margin-top: 10px; padding: 8px 2px; font-size: 15px; }
 h1[tabindex="-1"]:focus { outline: none; }
 @media (max-width: 680px) { .req-table td.empty { display: none; } details.pathway { padding: 8px 10px; } }
+
+/* 연결: 함께 준비하기 · 다음 진단 · 상담 */
+.common-docs { margin: 8px 0 0; padding-left: 18px; }
+.common-docs li { margin: 4px 0; }
+.next-grid { display: grid; gap: 12px; grid-template-columns: 1fr; margin-top: 12px; }
+@media (min-width: 760px) { .next-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.next-card { display: flex; gap: 12px; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; background: #fff; min-width: 0; }
+.next-no { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--panel); display: grid; place-items: center; font-weight: 800; }
+.next-name { font-weight: 800; margin: 2px 0 4px; }
+.consult { display: grid; gap: 12px; align-items: center; border-radius: var(--radius); padding: 18px; background: var(--panel); margin: 18px 0; }
+@media (min-width: 760px) { .consult { grid-template-columns: minmax(0, 1fr) auto; } }
+.consult-h { font-size: 18px; margin: 0 0 6px; }
