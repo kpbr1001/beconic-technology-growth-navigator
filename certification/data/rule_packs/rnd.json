@@ -54,7 +54,11 @@
                   "id": "RNDI-STAFF",
                   "label": "연구전담요원 상시 확보(기업 규모별 2~10명)",
                   "check": "rnd_institute_staff",
-                  "args": {},
+                  "args": {
+                    "q": "rnd_researchers",
+                    "unit": "명",
+                    "staff": { "small": 3, "startup_years": 3, "small_startup": 2, "medium": 5, "transition_years": 1, "medium_transition": 3, "venture_or_founder": 2, "midsize": 7, "large": 10 }
+                  },
                   "source_refs": [
                     "S-RND-DEC",
                     "S-RND-RULE"
@@ -209,7 +213,8 @@
                   "label": "연구공간 기준(독립 공간 또는 인정되는 예외)",
                   "check": "rnd_space",
                   "args": {
-                    "unit": "dept"
+                    "unit": "dept",
+                    "partition_industries": ["software_582", "info_63"]
                   },
                   "source_refs": [
                     "S-RND-RULE"

@@ -142,23 +142,26 @@ export const CHECKS = {
     return { status: S.UNKNOWN, missing: [industry], inputs: [spend, revenue, industry], detail: `${shown} — 업종에 따라 ${lo}~${hi}% 기준이 달라요. 업종을 선택해 주세요.` };
   },
   // 시행령 제6조①1호: 규모·벤처·연구원창업·창업3년·중기업 전환 1년에 따른 연구전담요원 기준 인원
-  rnd_institute_staff(_args, ctx) {
+  // 기준 인원은 규칙팩 args.staff(근거 문구와 DATA-05로 대조)에서만 읽는다
+  rnd_institute_staff(args, ctx) {
     const a = ctx.answers;
-    const count = num(a.rnd_researchers);
+    const K = args && args.staff;
+    if (!K) return { status: S.UNKNOWN, inputs: [], detail: '규칙 데이터에 기준 인원표가 없어 판정하지 않아요.' };
+    const count = num(a[args.q || 'rnd_researchers']);
     const sizes = ['small', 'medium', 'midsize', 'large'].includes(a.company_size) ? [a.company_size] : ['small', 'medium', 'midsize', 'large'];
     const opts = (v) => (v === true ? [true] : v === false ? [false] : [true, false]);
     const V = opts(tri(a.rnd_is_venture));
     const F = opts(tri(a.rnd_founder_researcher));
     const yrs = isMissing(a.founded_on) ? null : fullYearsBetween(a.founded_on, ctx.asOf);
-    const Y = opts(yrs === null || yrs < 0 ? null : yrs < 3);
+    const Y = opts(yrs === null || yrs < 0 ? null : yrs < K.startup_years);
     const B = opts(tri(a.rnd_became_medium_1y));
     const T = new Set();
     for (const size of sizes) for (const v of V) for (const f of F) for (const y of Y) for (const b of B) {
-      if ((size === 'small' || size === 'medium') && (v || f)) T.add(2);
-      else if (size === 'small') T.add(y ? 2 : 3);
-      else if (size === 'medium') T.add(b ? 3 : 5);
-      else if (size === 'midsize') T.add(7);
-      else T.add(10);
+      if ((size === 'small' || size === 'medium') && (v || f)) T.add(K.venture_or_founder);
+      else if (size === 'small') T.add(y ? K.small_startup : K.small);
+      else if (size === 'medium') T.add(b ? K.medium_transition : K.medium);
+      else if (size === 'midsize') T.add(K.midsize);
+      else T.add(K.large);
     }
     const lo = Math.min(...T); const hi = Math.max(...T);
     const need = lo === hi ? `기준 ${lo}명 이상` : `기준 ${lo}~${hi}명(규모·벤처 여부 등에 따라 결정)`;
@@ -176,7 +179,7 @@ export const CHECKS = {
     return { status: S.UNKNOWN, missing: miss, inputs, detail: `${shown} — 기준 인원을 정하려면 추가 정보가 필요해요.` };
   },
   // 시행규칙 제2조②1호: 독립 연구공간 원칙 + 칸막이·2m 벽체 예외
-  rnd_space({ unit }, ctx) {
+  rnd_space({ unit, partition_industries: inds }, ctx) {
     const a = ctx.answers; const sp = a.rnd_space;
     const inputs = ['rnd_space'];
     if (sp === 'independent') return { status: S.PASS, inputs, detail: '고정 벽체·별도 출입문 독립 공간' };
@@ -185,7 +188,7 @@ export const CHECKS = {
     if (sp !== 'partition') return { status: S.UNKNOWN, missing: ['rnd_space'], inputs };
     // 칸막이: (중소기업 | 연구개발형 중소기업·벤처 | 전담부서이면서 정보서비스·SW개발공급업) AND 50㎡ 초과 확보 불가
     const elig = [tri(a.is_sme), tri(a.rnd_is_venture), tri(a.rnd_founder_researcher)];
-    if (unit === 'dept') elig.push(isMissing(a.industry) ? null : ['software_582', 'info_63'].includes(a.industry));
+    if (unit === 'dept') elig.push(isMissing(a.industry) || !Array.isArray(inds) ? null : inds.includes(a.industry));
     const e = elig.includes(true) ? true : elig.every((x) => x === false) ? false : null;
     const o = tri(a.rnd_space_over50_impossible);
     const allInputs = ['rnd_space', 'is_sme', 'rnd_is_venture', 'rnd_space_over50_impossible'];

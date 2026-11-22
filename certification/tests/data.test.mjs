@@ -92,6 +92,11 @@ function quoteErrors(leaf) {
   if (a.years !== undefined) forms.push(`${a.years}년`);
   if (a.pct !== undefined) forms.push(`${a.pct}%`);
   if (a.pct_culture !== undefined) forms.push(`${a.pct_culture}%`);
+  if (a.staff) {
+    const k = a.staff;
+    forms.push(`소기업 ${k.small}명`, `${k.startup_years}년까지 ${k.small_startup}명`, `중기업 ${k.medium}명`,
+      `${k.transition_years}년까지 ${k.medium_transition}명`, `벤처기업 ${k.venture_or_founder}명`, `중견기업 ${k.midsize}명`, `그 밖 ${k.large}명`);
+  }
   forms.forEach((f) => { if (!leaf.quote.includes(f)) errs.push(`${leaf.id}: 규칙 숫자 '${f}'가 근거 문구에 없음`); });
   return errs;
 }
@@ -102,11 +107,28 @@ test('DATA-05 가짜 기준 0건: 숫자 기준 요건은 근거 문구가 출�
   assert.deepEqual(leaves.flatMap(quoteErrors), []);
 });
 
+test('DATA-05c 숫자 판정 함수는 기준값을 규칙 데이터(args)로 받는다 — 코드 속 기준값 금지', () => {
+  allLeaves().map((x) => x.n).filter((l) => NUMERIC.includes(l.check)).forEach((l) => {
+    assert.ok(l.args && Object.keys(l.args).length > 0, `${l.id}: args가 비어 있음(기준값이 코드에 숨어 있을 수 있음)`);
+  });
+  const staff = allLeaves().map((x) => x.n).find((l) => l.id === 'RNDI-STAFF');
+  ['small', 'startup_years', 'small_startup', 'medium', 'transition_years', 'medium_transition', 'venture_or_founder', 'midsize', 'large']
+    .forEach((k) => assert.ok(Number.isInteger(staff.args.staff[k]), `RNDI-STAFF staff.${k} 없음`));
+  const dept = allLeaves().map((x) => x.n).find((l) => l.id === 'RNDD-SPACE');
+  assert.ok(dept.args.partition_industries.length > 0);
+  dept.args.partition_industries.forEach((c) => assert.ok(D.questionMap.industry.response_options.some((o) => o.value === c), `업종 코드 ${c} 없음`));
+  assert.ok(D.sourceMap['S-RND-RULE'].excerpt_or_section_ref.includes('정보서비스·SW개발공급업 연구개발부서 포함'));
+});
+
 test('DATA-05b 검사기 자체 검증: 기준 숫자·문구를 바꾼 변조 규칙을 잡아냄', () => {
   const orig = allLeaves().map((x) => x.n).find((l) => l.id === 'VEN-INV-AMT');
   assert.ok(quoteErrors({ ...orig, args: { ...orig.args, min: 4000 } }).length > 0, '숫자 변조');
   assert.ok(quoteErrors({ ...orig, quote: '투자금액 합계 4천만원 이상', args: { ...orig.args, min: 4000 } }).length > 0, '문구·숫자 동시 변조');
   assert.ok(quoteErrors({ ...orig, quote: undefined }).length > 0, '문구 삭제');
+  const staff = allLeaves().map((x) => x.n).find((l) => l.id === 'RNDI-STAFF');
+  assert.deepEqual(quoteErrors(staff), [], '연구소 기준표 원본은 통과');
+  assert.ok(quoteErrors({ ...staff, args: { ...staff.args, staff: { ...staff.args.staff, small: 2 } } }).length > 0, '연구소 인원 변조');
+  assert.ok(quoteErrors({ ...staff, args: { ...staff.args, staff: { ...staff.args.staff, large: 8 } } }).length > 0, '연구소 인원 변조(그 밖)');
   const debt = allLeaves().map((x) => x.n).find((l) => l.id === 'MAIN-X-DEBT');
   assert.ok(quoteErrors({ ...debt, args: { ...debt.args, max: 2000 } }).length > 0);
 });
@@ -179,4 +201,27 @@ test('DATA-12 레드팀: 한국 회사의 ISO 인증이 국내/해외 필터에�
   const r1 = searchSchemes(D.catalog.schemes, 'ISO 9001', { group: 'all' }).map((r) => r.scheme.scheme_id);
   const r2 = searchSchemes(D.catalog.schemes, 'ISO 9001', { group: 'international' }).map((r) => r.scheme.scheme_id);
   assert.ok(r1.includes('ISO9001') && r2.includes('ISO9001'));
+});
+
+test('DATA-09 사후관리·도움말의 법령 조항·숫자는 출처가 있거나 미확보로 표시', () => {
+  const ARTICLE = /제\d+조|\d+월 \d+일|\d+만원|\d+점/;
+  D.catalog.schemes.filter((s) => s.diagnosable).forEach((s) => {
+    const o = s.ongoing;
+    assert.ok(o && o.text, `${s.scheme_id} 사후관리 안내 없음`);
+    if (o.unverified) assert.ok(!ARTICLE.test(o.text), `${s.scheme_id}: 미확보 안내에 조항·숫자를 단정하면 안 됨`);
+    else {
+      assert.ok(o.quote && o.source_refs.some((r) => D.sourceMap[r] && D.sourceMap[r].excerpt_or_section_ref.includes(o.quote)), `${s.scheme_id}: 사후관리 근거 문구가 출처에 없음`);
+      (o.text.match(/제\d+조[①-⑩]?/g) || []).forEach((art) => assert.ok(o.quote.includes(art), `${s.scheme_id}: 조항 ${art}가 근거 문구에 없음`));
+    }
+    if (s.help_text && ARTICLE.test(s.help_text)) assert.fail(`${s.scheme_id} 도움말에 출처 없는 조항·숫자: ${s.help_text}`);
+  });
+});
+
+test('HC-01 판정 엔진·모델에 법정 기준값·업종 코드·제도별 법령 문구 하드코딩 금지', async () => {
+  const { readFileSync } = await import('node:fs');
+  const engine = readFileSync(new URL('../src/engine.js', import.meta.url), 'utf8');
+  const model = readFileSync(new URL('../src/model.js', import.meta.url), 'utf8');
+  assert.ok(!/T\.add\(\d/.test(engine), '엔진에 연구전담요원 기준 숫자');
+  assert.ok(!/'(software_582|info_63|programming_62)'/.test(engine), '엔진에 업종 코드');
+  assert.ok(!/case '(INNO|MAIN|RNDI|RNDD|VEN)'/.test(model), '모델에 제도별 문구 분기');
 });

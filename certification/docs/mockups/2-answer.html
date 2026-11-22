@@ -6,9 +6,9 @@
   <p class="lead">모두 버튼으로 답해요. 모르면 <b>모름</b>을 눌러도 결과에서 무엇을 확인하면 되는지 알려 드려요.</p>
   <div class="grid g-two">
     <section>
-      <div class="sec-t">공통 질문 <span>6개 중 4개 답함</span></div>
+      <div class="sec-t">공통 질문 <span>6개 중 6개 답함</span></div>
       <div class="q done"><p class="ql">사업자 형태</p><em>법인사업자 ✎</em></div>
-      <div class="q done"><p class="ql">업력(사업 시작 후)</p><em>3년 이상 ✎</em></div>
+      <div class="q done"><p class="ql">업력(사업 시작 후)</p><em>3년 이상 ✎</em><p class="qh">업력 3년 전후 6개월이면 정확한 판정을 위해 설립일을 따로 물어봐요.</p></div>
       <div class="q done"><p class="ql">회사 규모 <span class="note">(중소기업확인서의 구분)</span></p><em>소기업 ✎</em></div>
       <div class="q done"><p class="ql">주 업종</p><em>소프트웨어 개발·공급업 ✎</em></div>
       <div class="q"><p class="ql">직전 4개 분기 매출</p><p class="qh">공식 연구개발비 비율표의 매출 구간(50억·100억)과 같게 나눴어요.</p>
@@ -18,21 +18,34 @@
 
       <div class="sec-t">벤처기업확인 <span>3개</span></div>
       <div class="q"><p class="ql">적격투자기관에서 받은 투자금</p><p class="qh">벤처투자유형 기준은 5천만원 이상이에요.</p>
-        <div class="chips"><span class="chip">받은 적 없음</span><span class="chip on">5천만원 미만</span><span class="chip">5천만원 이상</span><span class="chip u">모름</span></div></div>
+        <div class="chips"><span class="chip on">받은 적 없음</span><span class="chip">5천만원 미만</span><span class="chip">5천만원 이상</span><span class="chip u">모름</span></div></div>
       <div class="q"><p class="ql">직전 4개 분기 연구개발비</p><p class="qh">연구개발유형 기준은 5천만원 이상이에요.</p>
         <div class="chips"><span class="chip">5천만원 미만</span><span class="chip on">5천만원 이상</span><span class="chip u">모름</span></div></div>
-      <div class="q"><p class="ql">매출 대비 연구개발비가 <b style="color:var(--pd)">10% 이상</b>인가요?</p><p class="qh">우리 회사 기준: 소프트웨어 개발·공급업 · 매출 50억 미만 → 공식 기준 10% (업종·매출을 바꾸면 기준도 자동으로 바뀌어요)</p>
+      <div class="q"><p class="ql">매출 대비 연구개발비가 <b style="color:var(--pd)">10% 이상</b>인가요?</p><p class="qh">우리 회사 기준: 소프트웨어 개발·공급업 · 매출 50억 미만 → 공식 기준 10% (업종·매출을 바꾸면 기준도 자동으로 바뀌어요. 창업 3년 미만이면 이 질문은 나오지 않아요)</p>
         <div class="chips"><span class="chip on">네, 10% 이상</span><span class="chip">아니요, 10% 미만</span><span class="chip u">모름</span></div></div>
 
-      <div class="sec-t">기업부설연구소 <span>2개</span></div>
+      <div class="sec-t">이노비즈 <span>2개</span></div>
+      <div class="q"><p class="ql">국세·지방세 체납정보 등록 여부</p><p class="qh">신청 제외 사유예요. 납세증명서로 확인할 수 있어요.</p>
+        <div class="chips"><span class="chip">등록 없음</span><span class="chip">등록 있음</span><span class="chip u on">모름</span></div></div>
+      <div class="q"><p class="ql">거래정지·파산·회생 절차·최근 3년 법령위반 처분 중 해당하는 것</p><p class="qh">하나라도 있으면 신청이 제한돼요(회생인가 후 정상이행은 예외).</p>
+        <div class="chips"><span class="chip on">해당 없음</span><span class="chip">해당 있음</span><span class="chip u">모름</span></div></div>
+      <p class="note">신청 불가 업종(운영규정 별표 2)은 공식 원문을 확보하지 못해 질문하지 않고 결과에서 확인 방법을 안내해요.</p>
+
+      <div class="sec-t">기업부설연구소 <span>4개</span></div>
       <div class="q"><p class="ql">연구만 전담하는 자격 있는 인력</p><p class="qh">소기업은 3명(창업 3년 이내 2명)이 기준이에요.</p>
-        <div class="chips"><span class="chip">0명</span><span class="chip">1명</span><span class="chip on">2명</span><span class="chip">3~4명</span><span class="chip">5명 이상</span><span class="chip u">모름</span></div></div>
+        <div class="chips"><span class="chip">0명</span><span class="chip">1명</span><span class="chip on">2명</span><span class="chip">3~4명</span><span class="chip">5~6명</span><span class="chip">7~9명</span><span class="chip">10명 이상</span><span class="chip u">모름</span></div></div>
+      <div class="q"><p class="ql">연구공간</p><p class="qh">원칙은 고정 벽체·별도 출입문이 있는 독립 공간이에요.</p>
+        <div class="chips"><span class="chip on">독립 공간</span><span class="chip">칸막이로 구분</span><span class="chip">아직 없음</span><span class="chip u">모름</span></div></div>
+      <div class="q"><p class="ql">연구 기자재가 연구공간 안에 있나요?</p>
+        <div class="chips"><span class="chip on">네</span><span class="chip">아니요</span><span class="chip u">모름</span></div></div>
+      <div class="q"><p class="ql">연구 분야가 유흥 등 인정 제외 분야(시행령 별표 1)인가요?</p>
+        <div class="chips"><span class="chip on">아니요</span><span class="chip">네</span><span class="chip u">모름</span></div></div>
     </section>
     <aside class="side-prev">
       <div class="panel prev" style="position:sticky;top:24px">
         <h3>답할수록 결과가 바뀌어요</h3>
-        <div class="bar"><i style="width:72%"></i></div><p class="note" style="margin:0 0 6px">14개 중 10개 답함</p>
-        <div class="row">벤처기업확인<span class="badge ok">✓ 가능 유형 있음</span></div>
+        <div class="bar"><i style="width:100%"></i></div><p class="note" style="margin:0 0 6px">15개 중 15개 답함 (모름 1개)</p>
+        <div class="row">벤처기업확인<span class="badge ok">✓ 기본요건 충족</span></div>
         <div class="row">이노비즈<span class="badge wq">? 확인 2개</span></div>
         <div class="row">기업부설연구소<span class="badge no">✕ 1명 부족</span></div>
         <p class="note">미리보기예요. 최종 결과는 다음 단계에서 근거와 함께 보여 드려요.</p>
@@ -42,7 +55,7 @@
     </aside>
   </div>
 </main>
-<div class="tray panel mbar" style="position:fixed;left:0;right:0;bottom:0;border-radius:20px 20px 0 0;padding:14px 16px;box-shadow:0 -6px 24px #0001"><div class="mb"><span class="c">10/14 답함 · 벤처 ✓ · 이노비즈 ? · 연구소 ✕</span><button class="btn">결과 →</button></div></div>
+<div class="tray panel mbar" style="position:fixed;left:0;right:0;bottom:0;border-radius:20px 20px 0 0;padding:14px 16px;box-shadow:0 -6px 24px #0001"><div class="mb"><span class="c">15/15 답함 · 벤처 ✓ · 이노비즈 ? · 연구소 ✕</span><button class="btn">결과 →</button></div></div>
 <footer class="foot"><div class="in"><div><img src="../../assets/growth-shield-symbol-navy.png" alt=""><b style="color:var(--navy)">BECONIC</b></div><span>그로스벤처스 주식회사 · 02-6124-5960 · start@gven.kr · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호</span></div></footer>
 <style>@media(min-width:701px){.mbar{display:none}}</style>
 </body></html>
