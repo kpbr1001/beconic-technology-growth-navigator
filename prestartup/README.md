@@ -36,7 +36,7 @@ app.js       해시 라우팅(#/ · #/g/업태 · #/finder · #/guide/업종 · 
 data.js      업종 64종·세제 사전·국세청 업종코드·업종 고르기 도우미 매핑(finder)·다음 진단 연결(beconic31)(이 파일이 원본)
 sw.js        오프라인 캐시(네트워크 우선)
 assets/      로고·아이콘·매니페스트·OG 이미지(scripts/render-images.mjs로 생성)
-tests/qa.mjs Chromium QA 135항목
+tests/qa.mjs Chromium QA 140항목
 docs/        CHANGELOG · 자가부검·레드팀 보고서
 ```
 

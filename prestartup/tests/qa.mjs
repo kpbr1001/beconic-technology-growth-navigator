@@ -392,6 +392,26 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await page.evaluate(() => localStorage.removeItem('beconic_prestartup_v1'));
 }
 
+// 11-10. 레드팀(v1.6.0) — 기창업자를 고르면 신규 등록 문구 대신 정정신고(업종 추가)
+{
+  const r = await page.evaluate(() => {
+    const P = window.PS, B = P.BY_ID, S = P.S;
+    S.me = { biz: 'own', open: '2024-03-01' }; const own = P.deadlines(B.cafe), on = P.situationNotes(B.cafe).map((n) => n[2]).join(' ');
+    S.me = { open: '2024-03-01' }; const pre = P.deadlines(B.cafe);
+    S.me = {}; return { own: own.map((x) => x.t + '|' + x.when + '|' + (x.note || '') + '|' + x.law + '|' + !!x.late), on, pre: pre.map((x) => x.t + '|' + !!x.late) };
+  });
+  const o = r.own.join('\n');
+  check('기창업: 기한 카드 = 사업자등록 정정(업종 추가)·시행령 제14조, 20일·지남 없음', o.includes('사업자등록 정정 · 업종 추가') && o.includes('부가가치세법 시행령 제14조') && !o.includes('사업자등록 신청|') && !/정정[^\n]*\|true/.test(o), o);
+  check('기창업: 세금 신고는 "새 업종 포함 첫 신고", 창업 감면 문구 없음', !/^첫 /m.test(o) && o.includes('새 업종 포함 첫 신고') && !o.includes('창업 세액감면은 이 신고 때'));
+  check('기창업: 지난 날짜여도 "사업자등록 기한 지남·가산세" 경고 없음', !r.on.includes('기한(') && !r.on.includes('가산세') && r.on.includes('정정신고'), r.on);
+  check('예비창업은 그대로(사업자등록 신청·지남)', r.pre.some((x) => x === '사업자등록 신청|true'));
+  await page.goto(BASE); await page.evaluate(() => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ me: { biz: 'own', open: '2024-03-01' } }))); await page.goto('about:blank');
+  await page.goto(BASE + '#/guide/cafe/prepare'); await page.waitForTimeout(150);
+  const main = await page.locator('main').innerText();
+  check('기창업 화면: 요약·진행 순서·서류에 신규 등록 기한·지남 없음, 서류명 정정신고서', !main.includes('사업자등록 기한') && !main.includes('사업 시작일부터 20일') && !main.includes('늦으면 가산세') && main.includes('사업자등록 정정신고서(업종 추가)') && main.includes('업종 추가 2024.03.01'), (main.match(/.{0,30}(사업자등록 기한|20일|가산세).{0,30}/) || [])[0]);
+  await page.evaluate(() => localStorage.removeItem('beconic_prestartup_v1'));
+}
+
 // 12. 앱(PWA) 구성
 {
   const m = await page.evaluate(async () => (await fetch('assets/manifest.webmanifest')).json());

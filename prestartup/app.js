@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.6.0';
+const VERSION = '1.6.1';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -130,19 +130,24 @@ function deadlines(it){
   if(must.length) out.push({t:`인허가 받기 · ${must[0].name}${must.length>1?` 외 ${must.length-1}건`:''}`, when:'사업자등록 신청 전(신청 때 허가·신고·등록증 사본 제출)', law:LAW.licenseFirst, note: cond.length?`해당되면 함께: ${cond.map(l=>l.name).join(', ')}`:''});
   else if(cond.length) out.push({t:`해당되면 신고·등록 · ${cond.map(l=>l.name).join(', ')}`, when:'해당될 때만 · 사업자등록 신청 전', law:LAW.licenseFirst});
   if(hasIn(it,/통신판매/)) out.push({t:'통신판매업 신고', when:'온라인 판매를 시작하기 전(온라인으로 팔 때)', law:LAW.ecommerce});
-  out.push({t:'사업자등록 신청', when: od?`${ymd(bizRegDue(open))}까지`:`사업 시작일부터 ${RULE.bizRegDays}일 안에(시작 전에도 가능)`, law:LAW.bizReg, late: od&&duePassed(open)});
+  if(OWN()) out.push({t:'사업자등록 정정 · 업종 추가', when: od?`${ymd(od)} 새 업종 시작 후 지체 없이(홈택스 정정신고)`:'새 업종을 시작하면 지체 없이(홈택스 정정신고)', law:LAW.bizFix});
+  else out.push({t:'사업자등록 신청', when: od?`${ymd(bizRegDue(open))}까지`:`사업 시작일부터 ${RULE.bizRegDays}일 안에(시작 전에도 가능)`, law:LAW.bizReg, late: od&&duePassed(open)});
   const simple=S.me.rev==='lt1';
   const genD = od ? (od.getMonth()<6 ? atMD(y, RULE.vatGeneralH1Due) : atMD(y+1, RULE.vatGeneralH2Due)) : null, simD = od ? atMD(y+1, RULE.vatSimpleDue) : null;
   const vatGen = od ? `${genD.getFullYear()}년 ${md(od.getMonth()<6?RULE.vatGeneralH1Due:RULE.vatGeneralH2Due)}(${od.getMonth()<6?'1~6월분':'7~12월분'})` : `반기마다 ${md(RULE.vatGeneralH1Due)}·${md(RULE.vatGeneralH2Due)}`;
   const vatSim = od ? `${y+1}년 ${md(RULE.vatSimpleDue)}(1년분)` : `다음 해 ${md(RULE.vatSimpleDue)}(1년에 한 번)`;
-  out.push({t:'첫 부가가치세 확정신고',
+  out.push({t:OWN()?'부가가치세 확정신고 · 새 업종 포함 첫 신고':'첫 부가가치세 확정신고',
     when: simple?`간이과세자 ${vatSim} · 간이과세가 안 되는 업종·지역이면 일반과세자 ${vatGen}`:`일반과세자 ${vatGen} · 간이과세자 ${vatSim}`,
     law:`${LAW.vatGeneral}·${LAW.vatSimple}`, late: od && isPast(simple?simD:genD),
     note:`법인은 확정신고 전 ${RULE.vatCorpPrelimDue.map(md).join('·')} 예정신고도 해요(${LAW.vatPrelim}). 면세 사업자는 부가세 대신 다음 해 ${md(RULE.bizStatusReportDue)}까지 사업장현황신고(${LAW.bizStatus})`});
-  out.push({t:'첫 종합소득세 신고(개인사업자)', when: od?`${y+1}년 ${md(RULE.incomeTaxDue)}까지`:`개업 다음 해 ${md(RULE.incomeTaxDue)}까지`, law:LAW.incomeTax, late: od && isPast(atMD(y+1, RULE.incomeTaxDue)),
-    note:`성실신고확인 대상은 ${md(RULE.incomeTaxFaithfulDue)}까지 · 법인은 사업연도가 끝나고 ${RULE.corpTaxMonths}개월 안에 법인세(${LAW.corpTax}). 창업 세액감면은 이 신고 때 신청해요`});
+  out.push({t:OWN()?'종합소득세 신고 · 새 업종 포함 첫 신고(개인사업자)':'첫 종합소득세 신고(개인사업자)', when: od?`${y+1}년 ${md(RULE.incomeTaxDue)}까지`:`개업 다음 해 ${md(RULE.incomeTaxDue)}까지`, law:LAW.incomeTax, late: od && isPast(atMD(y+1, RULE.incomeTaxDue)),
+    note:`성실신고확인 대상은 ${md(RULE.incomeTaxFaithfulDue)}까지 · 법인은 사업연도가 끝나고 ${RULE.corpTaxMonths}개월 안에 법인세(${LAW.corpTax})${OWN()?'':'. 창업 세액감면은 이 신고 때 신청해요'}`});
   return out;
 }
+// 기창업자(이미 사업자등록 있음): 새로 등록하지 않고 '정정신고(업종 추가)' — 신규 등록 20일 기한·지남 경고·'첫' 신고 문구를 쓰지 않는다
+const OWN = () => S.me.biz==='own';
+const REG_RULE = () => OWN() ? '이미 사업자가 있으면 새 업종을 시작할 때 지체 없이 사업자등록 정정(업종 추가)' : `사업자등록은 사업 시작일부터 ${RULE.bizRegDays}일 안에`;
+const docLabel = d => OWN() ? d.replace(/^사업자등록 신청서/, '사업자등록 정정신고서(업종 추가)') : d;
 const PASSED_MSG = '이미 지난 기한이에요. 개업했다면 바로 신청하세요(늦으면 가산세가 붙을 수 있어요). 아직 개업 전이면 내 상황에서 개업 예정일을 고쳐 주세요.';
 function addDays(iso, n){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d; }
 const ymd = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
@@ -223,7 +228,8 @@ function situationNotes(it){
   if(m.female==='y') out.push(['','👩‍💼','여성 대표는 사업 개시 후 <b>여성기업 확인</b>(여성기업종합정보포털)을 받으면 여성창업 지원사업·공공구매 우대를 받을 수 있어요.']);
   if(m.open){
     const due=bizRegDue(m.open);
-    if(duePassed(m.open)) out.push(['warn','⏰',`<b>사업자등록 기한(${ymd(bizRegDue(m.open))})이 지났어요.</b> ${PASSED_MSG.replace('이미 지난 기한이에요. ','')}`]);
+    if(OWN()) out.push(['blue','🗓️',`새 업종 시작 예정일 <b>${esc(ymd(new Date(m.open+'T00:00:00')))}</b> — 시작하면 지체 없이 홈택스에서 <b>사업자등록 정정신고(업종 추가)</b>를 하세요. 인허가가 필요한 업종은 허가·신고증을 먼저 받아야 해요.`]);
+    else if(duePassed(m.open)) out.push(['warn','⏰',`<b>사업자등록 기한(${ymd(bizRegDue(m.open))})이 지났어요.</b> ${PASSED_MSG.replace('이미 지난 기한이에요. ','')}`]);
     else out.push(['blue','🗓️',`개업 예정일 <b>${esc(ymd(new Date(m.open+'T00:00:00')))}</b> 기준, 사업자등록은 <b>${ymd(due)}까지</b> 신청하세요(사업 시작일부터 ${RULE.bizRegDays}일 이내 · 시작 전에도 신청 가능). 인허가가 필요한 업종은 허가·신고증을 먼저 받아야 해요.`]);
   }
   return out;
@@ -276,7 +282,7 @@ function afterNav(){
 }
 function meChips(){
   const t=ME_Q.filter(q=>S.me[q.k]).map(q=>q.o.find(o=>o[0]===S.me[q.k])[1]);
-  if(S.me.open) t.push('개업 예정 '+ymd(new Date(S.me.open+'T00:00:00')));
+  if(S.me.open) t.push((OWN()?'업종 추가 예정 ':'개업 예정 ')+ymd(new Date(S.me.open+'T00:00:00')));
   return t;
 }
 
@@ -449,7 +455,7 @@ function renderGuide(id, step){
         <div class="prog"><div class="pn">${pr.pct}<small>%</small></div><div class="pt"><b>${pr.pct===100?'준비를 모두 체크했어요':'준비 진행률'}</b><span>순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd} 체크 · 이 기기에 저장돼요</span></div>
         <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pr.pct}" aria-label="준비 진행률"><i style="width:${pr.pct}%"></i></div></div>
         ${nx?`<div class="next"><span class="nl">지금 할 일</span><span class="nt">${esc(nx.text)}</span><button class="btn btn-primary btn-sm" type="button" data-next="${nx.kind}${nx.i}">완료</button></div>`
-          :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open?`사업자등록은 <b>${ymd(bizRegDue(S.me.open))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#/guide/${id}/benefit">혜택·지원 보기</a></div>`}
+          :`<div class="next done"><span class="nl">다음 단계</span><span class="nt">${S.me.open&&!OWN()?`사업자등록은 <b>${ymd(bizRegDue(S.me.open))}까지</b> · `:''}지원사업과 전문가 확인으로 마무리하세요</span><a class="btn btn-primary btn-sm" href="#/guide/${id}/benefit">혜택·지원 보기</a></div>`}
         <div class="acts-row">
           <button class="btn btn-gray btn-sm" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 저장'}</button>
         </div>
@@ -462,7 +468,7 @@ function renderGuide(id, step){
       :`<section class="card sec no-print" id="sec-me"><div class="expert"><div class="et"><b style="font-size:16px">내 상황을 넣으면 맞춤 안내가 붙어요</b><p class="small muted" style="margin-top:4px">나이·지역·사업장·예상 매출 — 30초, 전부 선택이에요. 세액감면 청년 기준, 자택 등록 가능 여부, 사업자등록 기한을 알려 드려요.</p></div>
         <a class="btn btn-soft" href="#/me?next=${it.id}">30초 입력</a></div></section>`}
 
-      <section class="card sec" id="sec-deadline" aria-label="법정 기한">${secHead('deadline', S.me.open?`<span class="cnt">개업 ${ymd(new Date(S.me.open+'T00:00:00'))} 기준</span>`:`<a class="link-btn no-print" href="#/me?next=${id}">개업 예정일 넣기</a>`)}
+      <section class="card sec" id="sec-deadline" aria-label="법정 기한">${secHead('deadline', S.me.open?`<span class="cnt">${OWN()?'업종 추가':'개업'} ${ymd(new Date(S.me.open+'T00:00:00'))} 기준</span>`:`<a class="link-btn no-print" href="#/me?next=${id}">개업 예정일 넣기</a>`)}
         <p class="sec-d">법령에 정해진 순서와 마감만 담았어요. 처리에 며칠 걸리는지는 기관마다 달라 넣지 않았어요.${S.me.open?'':' 개업 예정일을 넣으면 날짜로 바꿔 드려요.'}</p>
         <ol class="dl">${deadlines(it).map(x=>`<li class="${x.late?'late':''}"><div class="dl-w">${esc(x.when)}${x.late?' · 지남':''}</div><div class="dl-t">${esc(x.t)}</div>${x.note?`<div class="dl-n">${esc(x.note)}</div>`:''}<div class="dl-l">${esc(x.law)}</div></li>`).join('')}</ol>
       </section>
@@ -470,13 +476,13 @@ function renderGuide(id, step){
       <section class="card sec" id="sec-steps">${secHead('steps', `<button type="button" class="tgl no-print" data-track aria-pressed="${S.track}"><i></i>체크하며 관리</button>`)}
         <p class="sec-d no-print">${S.track?'끝낸 항목을 눌러 체크하세요. 이 기기에 저장돼요.':'순서대로 읽어 보세요. 진행 상황을 기록하려면 오른쪽 위 <b>체크하며 관리</b>를 켜세요. PDF에는 항상 체크 칸이 있어요.'}</p>
         <div class="steps ${S.track?'':'read'}">${(it.licenseProcess||[]).map((s,i)=>S.track?chk('s',i,`<span class="sn2">STEP ${i+1}</span>${esc(stripNum(s))}`, p.s[i]):readRow(i+1, esc(stripNum(s)), false, p.s[i])).join('')}</div>
-        <div class="dueline">사업자등록은 <b>사업 시작일부터 ${RULE.bizRegDays}일 안에</b> 신청해야 해요(시작 전에도 가능). 인허가 업종은 허가·신고증을 먼저 받아 함께 내요.${S.me.open?` 개업 예정일 기준 <b>${ymd(bizRegDue(S.me.open))}까지</b>.${duePassed(S.me.open)?` <b class="late">${PASSED_MSG}</b>`:''}`:''}</div>
+        <div class="dueline">${OWN()?'이미 사업자가 있으면 새로 등록하지 않고 새 업종을 시작할 때 <b>지체 없이 사업자등록 정정신고(업종 추가)</b>를 해요(홈택스). 인허가 업종은 허가·신고증을 먼저 받아요.':`사업자등록은 <b>사업 시작일부터 ${RULE.bizRegDays}일 안에</b> 신청해야 해요(시작 전에도 가능). 인허가 업종은 허가·신고증을 먼저 받아 함께 내요.`}${S.me.open&&!OWN()?` 개업 예정일 기준 <b>${ymd(bizRegDue(S.me.open))}까지</b>.${duePassed(S.me.open)?` <b class="late">${PASSED_MSG}</b>`:''}`:''}</div>
       </section>
 
       <section class="card sec" id="sec-docs">${secHead('docs', `<span class="cnt">${S.track?`${pr.dd}/${pr.nd} 체크`:`${pr.nd}종`}</span>`)}
         <p class="sec-d"><span class="tag must" style="padding:2px 6px;border-radius:6px;font-size:11.5px;font-weight:800">필수</span> 등록·신고에 꼭 필요 · <span class="tag rec" style="padding:2px 6px;border-radius:6px;font-size:11.5px;font-weight:800">권장</span> 상황에 따라 필요 · <span class="tag opt" style="padding:2px 6px;border-radius:6px;font-size:11.5px;font-weight:800">해당 시</span> 해당할 때만</p>
-        ${S.track ? it.docs.map((d,i)=>{ const [c,l]=docTag(d); return chk('d',i,esc(c==='opt'?d.replace(/^\(해당 시\)\s*/,''):d),p.d[i],`<span class="tag ${c}">${l}</span>`); }).join('')
-          : [['must','필수'],['rec','권장'],['opt','해당 시']].map(([c,l])=>{ const ds=it.docs.map((d,i)=>[d,i]).filter(([d])=>docTag(d)[0]===c); return ds.length?`<div class="dgrp"><div class="dgh"><span class="tag ${c}">${l}</span> ${ds.length}종</div>${ds.map(([d,i])=>readRow('', esc(c==='opt'?d.replace(/^\(해당 시\)\s*/,''):d), true, p.d[i])).join('')}</div>`:''; }).join('')}
+        ${S.track ? it.docs.map((d,i)=>{ const [c,l]=docTag(d); return chk('d',i,esc(c==='opt'?docLabel(d).replace(/^\(해당 시\)\s*/,''):docLabel(d)),p.d[i],`<span class="tag ${c}">${l}</span>`); }).join('')
+          : [['must','필수'],['rec','권장'],['opt','해당 시']].map(([c,l])=>{ const ds=it.docs.map((d,i)=>[d,i]).filter(([d])=>docTag(d)[0]===c); return ds.length?`<div class="dgrp"><div class="dgh"><span class="tag ${c}">${l}</span> ${ds.length}종</div>${ds.map(([d,i])=>readRow('', esc(c==='opt'?docLabel(d).replace(/^\(해당 시\)\s*/,''):docLabel(d)), true, p.d[i])).join('')}</div>`:''; }).join('')}
       </section>
 
       <section class="card sec" id="sec-license">${secHead('license', `<span class="cnt">${it.license.length}건</span>`)}
@@ -600,14 +606,14 @@ function resultSummary(it, notes){
     <div class="rs-h"><div><span class="rs-e">${D.groupMeta[it.group]||''} ${esc(it.group)} · 결과 요약</span><h1 class="h-lg">${esc(it.name)}</h1><p class="rs-s">${esc(it.summary)}</p></div></div>
     ${gate?`<div class="rs-gate"><span>핵심 관문</span><b>${esc(gate.name)}</b>${gate.org&&gate.org!=='-'?`<em>${esc(gate.org)}</em>`:''}${it.license.length>1?`<small>외 인허가·신고 ${it.license.length-1}건</small>`:''}</div>`:''}
     <div class="rs-two">
-      <div class="rs-box"><h3>먼저 할 일</h3><ol>${steps.slice(0,3).map((t,i)=>`<li class="${p.s[i]?'done':''}">${esc(t)}</li>`).join('')}</ol>${steps.length>3?`<p class="rs-more">외 ${steps.length-3}단계 · 사업자등록은 사업 시작일부터 ${RULE.bizRegDays}일 안에</p>`:`<p class="rs-more">사업자등록은 사업 시작일부터 ${RULE.bizRegDays}일 안에</p>`}</div>
-      <div class="rs-box"><h3>꼭 챙길 서류 <span>필수 ${tc.must}종</span></h3><ul>${must.slice(0,5).map(([d,i])=>`<li class="${p.d[i]?'done':''}">${esc(d)}</li>`).join('')}</ul>${must.length>5||tc.rec+tc.opt?`<p class="rs-more">${[must.length>5?`외 필수 ${must.length-5}종`:'', tc.rec?`권장 ${tc.rec}종`:'', tc.opt?`해당 시 ${tc.opt}종`:''].filter(Boolean).join(' · ')}</p>`:''}</div>
+      <div class="rs-box"><h3>먼저 할 일</h3><ol>${steps.slice(0,3).map((t,i)=>`<li class="${p.s[i]?'done':''}">${esc(t)}</li>`).join('')}</ol>${steps.length>3?`<p class="rs-more">외 ${steps.length-3}단계 · ${REG_RULE()}</p>`:`<p class="rs-more">${REG_RULE()}</p>`}</div>
+      <div class="rs-box"><h3>꼭 챙길 서류 <span>필수 ${tc.must}종</span></h3><ul>${must.slice(0,5).map(([d,i])=>`<li class="${p.d[i]?'done':''}">${esc(docLabel(d))}</li>`).join('')}</ul>${must.length>5||tc.rec+tc.opt?`<p class="rs-more">${[must.length>5?`외 필수 ${must.length-5}종`:'', tc.rec?`권장 ${tc.rec}종`:'', tc.opt?`해당 시 ${tc.opt}종`:''].filter(Boolean).join(' · ')}</p>`:''}</div>
     </div>
     ${it.pitfalls&&it.pitfalls[0]?`<div class="rs-warn"><span aria-hidden="true">⚠️</span><span><b>많이 놓치는 점</b> ${esc(it.pitfalls[0])}</span></div>`:''}
     <div class="rs-g">
       <div><span>업종코드</span><b>${isCode(it.nts)?`<span class="mono">${esc(it.nts)}</span> <button type="button" class="link-btn" data-copy="${esc(it.nts)}">복사</button>`:'홈택스 조회 필요'}</b></div>
       <div><span>세금 혜택 ${tax.length}개</span><b>${tax.map(esc).join(', ')||'—'}</b></div>
-      ${S.me.open?`<div class="${duePassed(S.me.open)?'rs-late':''}"><span>사업자등록 기한</span><b>${ymd(bizRegDue(S.me.open))}까지${duePassed(S.me.open)?' · 지남':''}</b></div>`:''}
+      ${S.me.open&&!OWN()?`<div class="${duePassed(S.me.open)?'rs-late':''}"><span>사업자등록 기한</span><b>${ymd(bizRegDue(S.me.open))}까지${duePassed(S.me.open)?' · 지남':''}</b></div>`:''}
       <div><span>내 상황 · 맞춤 안내</span><b>${hasMe()?`${chips.slice(0,3).map(esc).join(' · ')}${chips.length>3?' 외':''}<br>안내 ${notes.length}개 <button type="button" class="link-btn" data-go="sec-me">보기</button> · <a class="link-btn" href="#/me?next=${it.id}">수정</a>`:`<a class="link-btn" href="#/me?next=${it.id}">내 상황 넣기</a>`}</b></div>
     </div>
     <p class="rs-m">📅 자료 기준일 <b>${BASE}</b> · 세제 ${TAX_BASE} 법령 · 업종코드 ${CODE_Y}년 귀속 연계표 · <span title="BECONIC 내부 정리 자료">${reviewed?'✓ 전문가 검수':'내부 정리·검수 전'}</span></p>
@@ -624,7 +630,7 @@ function stepNav(G, id){
 function printSummary(it, pr, screen){
   const p=S.prog[it.id]||{d:{},s:{}};
   const leftSteps=(it.licenseProcess||[]).map((t,i)=>[t,i]).filter(([,i])=>!p.s[i]).map(([t])=>stripNum(t));
-  const leftDocs=it.docs.map((d,i)=>[d,i]).filter(([d,i])=>!p.d[i] && docTag(d)[0]!=='opt').map(([d])=>d);
+  const leftDocs=it.docs.map((d,i)=>[d,i]).filter(([d,i])=>!p.d[i] && docTag(d)[0]!=='opt').map(([d])=>docLabel(d));
   const left=[...leftSteps.map(t=>'[순서] '+t), ...leftDocs.map(t=>'[서류] '+t)];
   const chips=meChips();
   return `<section class="${screen?'card no-print psum-screen':'print-only psum'}">${screen?'<div class="sec-h"><span class="sn">✓</span><h2>한눈에 보기</h2></div>':''}
@@ -632,7 +638,7 @@ function printSummary(it, pr, screen){
       <div><span class="ps-l">업종코드</span><b>${isCode(it.nts)?'국세청 '+esc(it.nts)+' · KSIC '+esc(it.ksic):'홈택스 조회 필요'}</b></div>
       <div><span class="ps-l">진행률</span><b>${pr.pct}% (순서 ${pr.ds}/${pr.ns} · 서류 ${pr.dd}/${pr.nd})</b></div>
       <div><span class="ps-l">핵심 관문 · 인허가·신고</span><b>${it.license.map(l=>esc(l.name)+(l.org&&l.org!=='-'?`(${esc(l.org)})`:'')).join(', ')}</b></div>
-      ${S.me.open?`<div><span class="ps-l">사업자등록 기한</span><b>${ymd(bizRegDue(S.me.open))}까지 (개업 예정 ${ymd(new Date(S.me.open+'T00:00:00'))} + ${RULE.bizRegDays}일)</b></div>`:''}
+      ${S.me.open&&!OWN()?`<div><span class="ps-l">사업자등록 기한</span><b>${ymd(bizRegDue(S.me.open))}까지 (개업 예정 ${ymd(new Date(S.me.open+'T00:00:00'))} + ${RULE.bizRegDays}일)</b></div>`:''}
       ${chips.length?`<div><span class="ps-l">내 상황</span><b>${chips.map(esc).join(' · ')}</b></div>`:''}
     </div>
     <div class="ps-left"><b>${left.length?`${(pr.ds+pr.dd)?'남은 할 일':'준비할 것(필수·권장)'} ${left.length}개`:'남은 필수·권장 할 일이 없어요'}</b>${left.length?`<ol>${left.slice(0,12).map(t=>`<li>${esc(t)}</li>`).join('')}</ol>${left.length>12?`<span>외 ${left.length-12}개는 아래 체크리스트 참고</span>`:''}`:''}</div>
@@ -681,7 +687,7 @@ function summary(id){
   return [`[BECONIC 창업 준비 가이드] ${it.name} (자료 기준일 ${BASE})`,
     isCode(it.nts)?`업종코드: 국세청 ${it.nts} · KSIC ${it.ksic} ${it.ksicName}`:`업종코드: 홈택스 조회 필요`,
     `진행률 ${pr.pct}%`, '', '■ 진행 순서', ...(it.licenseProcess||[]).map((s,i)=>`${p.s[i]?'✅':'⬜'} ${stripNum(s)}`),
-    '', '■ 준비 서류', ...it.docs.map((d,i)=>`${p.d[i]?'✅':'⬜'} ${d}`),
+    '', '■ 준비 서류', ...it.docs.map((d,i)=>`${p.d[i]?'✅':'⬜'} ${docLabel(d)}`),
     ...(S.memo[id]?['', '■ 메모', S.memo[id]]:[]),
     '', `가이드 다시 보기: ${shareLink(id)}`].join('\n');
 }
@@ -785,7 +791,7 @@ function renderMe(next){
     ${it?`<div class="notice blue" id="mePreview" role="status" aria-live="polite"><span class="ni" aria-hidden="true">★</span><span>${preview()}</span></div>`:''}
     ${ME_Q.map(q=>`<div class="form-q" role="group" aria-labelledby="ql-${q.k}"><div class="ql" id="ql-${q.k}">${q.l}</div><div class="qh">${q.h}</div>
       <div class="opts">${q.o.map(([v,l])=>`<button type="button" class="opt" data-k="${q.k}" data-v="${esc(v)}" aria-pressed="${m[q.k]===v?'true':'false'}">${esc(l)}</button>`).join('')}</div></div>`).join('')}
-    <div class="form-q"><label class="ql" for="open">개업 예정일</label><div class="qh">사업자등록 신청 기한(사업 시작일부터 ${RULE.bizRegDays}일)을 계산해 드려요.</div>
+    <div class="form-q"><label class="ql" for="open">개업 예정일</label><div class="qh">사업자등록 신청 기한(사업 시작일부터 ${RULE.bizRegDays}일)을 계산해 드려요. 이미 사업 중이면 새 업종 시작일을 넣으세요.</div>
       <input class="inp" id="open" type="date" value="${esc(m.open||'')}"></div>
     </section>
     <p class="small muted" style="margin:10px 4px 0">고른 걸 모두 지우려면 <button class="link-btn" type="button" id="meClear">선택 초기화</button> (저장해야 반영돼요)</p>
@@ -808,7 +814,7 @@ function renderMe(next){
 function renderMy(){
   const ids=[...new Set([...S.recent, ...Object.keys(S.prog)])].filter(id=>BY_ID[id]);
   const meTxt=ME_Q.filter(q=>S.me[q.k]).map(q=>q.o.find(o=>o[0]===S.me[q.k])[1]);
-  if(S.me.open) meTxt.push('개업 예정 '+ymd(new Date(S.me.open+'T00:00:00')));
+  if(S.me.open) meTxt.push((OWN()?'업종 추가 예정 ':'개업 예정 ')+ymd(new Date(S.me.open+'T00:00:00')));
   mount(`<div class="wrap-narrow">
     <div style="margin:6px 4px 14px"><h1 class="h-lg">내 준비함</h1><p class="muted" style="margin-top:6px">가입 없이 이 기기에 저장돼요. 다른 기기에서는 '링크 복사'로 이어 보세요(체크 내용은 기기마다 따로예요).</p></div>
     <section class="card"><div class="sec-h"><h2>내 상황</h2><a class="btn btn-gray btn-sm" href="#/me">${hasMe()?'수정':'입력'}</a></div>
