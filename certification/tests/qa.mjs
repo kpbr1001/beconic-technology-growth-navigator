@@ -22,12 +22,14 @@ async function newPage(opts = {}) {
   page.on('console', (m) => { if (m.type() === 'error') page._errs.push(m.text()); });
   page.on('pageerror', (e) => page._errs.push(`PAGEERR ${e.message}`));
   page.on('dialog', (d) => { page._dialog = d.message(); d.accept(); });
-  page.on('request', (r) => { const u = new URL(r.url()); if (!['127.0.0.1', 'localhost'].includes(u.hostname) && !u.protocol.startsWith('data')) page._ext.push(r.url()); });
+  page.on('request', (r) => { const u = new URL(r.url()); if (![new URL(BASE).hostname, '127.0.0.1', 'localhost'].includes(u.hostname) && !u.protocol.startsWith('data')) page._ext.push(r.url()); });
   await page.route('**/*', async (route) => {
-    const resp = await route.fetch();
-    const headers = { ...resp.headers() };
-    if ((headers['content-type'] || '').includes('text/html')) headers['content-security-policy'] = CSP;
-    await route.fulfill({ response: resp, headers });
+    try {
+      const resp = await route.fetch();
+      const headers = { ...resp.headers() };
+      if ((headers['content-type'] || '').includes('text/html')) headers['content-security-policy'] = CSP;
+      await route.fulfill({ response: resp, headers });
+    } catch { /* 창을 닫는 중 끝나지 않은 요청(원격 서버 테스트 시) — 무시 */ }
   });
   await page.addInitScript(() => { window.__csp = []; document.addEventListener('securitypolicyviolation', (e) => window.__csp.push(`${e.violatedDirective} ${e.blockedURI}`)); });
   if (opts.clock) await page.clock.setFixedTime(new Date(opts.clock));
