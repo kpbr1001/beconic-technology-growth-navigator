@@ -1,0 +1,536 @@
+{
+  "rule_pack_id": "RP-VEN",
+  "scheme_id": "VEN",
+  "rule_version": "2026.11.22-1",
+  "review_status": "VERIFIED",
+  "verification_basis": "공식 원문 대조 완료(벤처확인시스템 유형별 안내·별표). 전문가 검토 절차 제외 — 운영사 대표 검토 대상",
+  "reviewer": null,
+  "valid_from": "2026-11-22",
+  "valid_to": null,
+  "review_due_at": "2027-05-22",
+  "last_verified_at": "2026-11-22",
+  "tables": {
+    "rd_ratio": {
+      "source_ref": "S-VEN-B-RATIO",
+      "revenue_buckets_manwon": [
+        500000,
+        1000000
+      ],
+      "bucket_labels": [
+        "매출 50억원 미만",
+        "매출 50억원 이상 100억원 미만",
+        "매출 100억원 이상"
+      ],
+      "rows": {
+        "pharma_21": [
+          6,
+          6,
+          6
+        ],
+        "machinery_29": [
+          7,
+          5,
+          5
+        ],
+        "computer_263": [
+          6,
+          6,
+          5
+        ],
+        "office_2918": [
+          6,
+          6,
+          5
+        ],
+        "electric_28": [
+          6,
+          5,
+          5
+        ],
+        "semi_261_262": [
+          6,
+          5,
+          5
+        ],
+        "medical_27": [
+          8,
+          7,
+          6
+        ],
+        "other_mfg": [
+          5,
+          5,
+          5
+        ],
+        "retail_45_47": [
+          5,
+          5,
+          5
+        ],
+        "telecom_61": [
+          7,
+          5,
+          5
+        ],
+        "software_582": [
+          10,
+          8,
+          8
+        ],
+        "programming_62": [
+          10,
+          8,
+          8
+        ],
+        "info_63": [
+          10,
+          8,
+          8
+        ],
+        "internet": [
+          5,
+          5,
+          5
+        ],
+        "other": [
+          5,
+          5,
+          5
+        ]
+      }
+    }
+  },
+  "combine": "OR",
+  "combine_note": "신청 유형(벤처투자·연구개발·혁신성장·예비벤처) 중 하나만 갖추면 신청 가능 — 한 유형의 미충족이 전체 미충족이 아님",
+  "pathways": [
+    {
+      "pathway_id": "VEN-INV",
+      "name": "벤처투자유형",
+      "evaluator": "한국벤처캐피탈협회 (요건검증)",
+      "source_refs": [
+        "S-VEN-A"
+      ],
+      "root": {
+        "type": "WHEN",
+        "id": "VEN-INV-WHEN",
+        "label": "사업자(개인·법인) 대상 유형",
+        "cond": {
+          "type": "LEAF",
+          "id": "VEN-INV-OPERATING",
+          "check": "enum",
+          "args": {
+            "q": "biz_status",
+            "pass": [
+              "individual",
+              "corporation"
+            ],
+            "fail": [
+              "pre"
+            ]
+          },
+          "label": "사업자등록 완료",
+          "source_refs": [
+            "S-VEN-A",
+            "S-VEN-D"
+          ]
+        },
+        "then": {
+          "type": "AND",
+          "id": "VEN-INV-AND",
+          "label": "벤처투자유형 기준요건(모두 충족)",
+          "children": [
+            {
+              "type": "LEAF",
+              "id": "VEN-SME",
+              "label": "「중소기업기본법」 제2조 중소기업",
+              "check": "yes",
+              "args": {
+                "q": "is_sme"
+              },
+              "source_refs": [
+                "S-VEN-A"
+              ],
+              "action_fail": "중소기업 해당 여부(중소기업확인서)를 확인하세요. 중소기업이 아니면 벤처확인 대상이 아니에요."
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-EXCL",
+              "label": "벤처 제외 업종(시행령 별표 1)이 아님",
+              "check": "no",
+              "args": {
+                "q": "ven_excluded_industry"
+              },
+              "source_refs": [
+                "S-VEN-EXCL"
+              ],
+              "action_fail": "주 업종이 제외 업종이면 벤처확인을 받을 수 없어요. 업종코드를 확인하세요.",
+              "quote": "카지노 운영업(91242)"
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-INV-AMT",
+              "label": "적격투자기관 투자금 합계 5천만원 이상",
+              "check": "gte",
+              "args": {
+                "q": "ven_invest_total",
+                "min": 5000,
+                "unit": "만원"
+              },
+              "source_refs": [
+                "S-VEN-A"
+              ],
+              "action_fail": "적격투자기관 투자 유치 계획을 세우거나, 다른 신청 유형(연구개발·혁신성장)을 검토하세요.",
+              "quote": "투자금액 합계 5천만원 이상"
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-INV-RATIO",
+              "label": "자본금 중 투자금 비율 10% 이상(문화산업 제작자 법인 7%)",
+              "check": "venture_invest_ratio",
+              "args": {
+                "invest": "ven_invest_total",
+                "capital": "ven_capital",
+                "culture": "ven_culture_producer",
+                "pct": 10,
+                "pct_culture": 7
+              },
+              "source_refs": [
+                "S-VEN-A"
+              ],
+              "action_fail": "자본금 대비 투자금 비율을 다시 계산하세요. 증자 구조에 따라 비율이 달라져요.",
+              "quote": "투자금액 합계 비율 10% 이상(문화산업진흥 기본법 제2조제12호 제작자 중 법인은 7% 이상)"
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-INV-QUAL",
+              "label": "투자자가 적격투자기관",
+              "check": "yes",
+              "args": {
+                "q": "ven_qualified_investor"
+              },
+              "source_refs": [
+                "S-VEN-A"
+              ],
+              "action_fail": "벤처확인시스템 '적격투자기관 상세조회'에서 투자자를 확인하세요."
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-INV-REVIEW",
+              "label": "전문평가기관 요건검증(한국벤처캐피탈협회)",
+              "check": "assessment",
+              "kind": "assessment",
+              "args": {},
+              "source_refs": [
+                "S-VEN-A"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pathway_id": "VEN-RD",
+      "name": "연구개발유형",
+      "evaluator": "신용보증기금, 중소벤처기업진흥공단 (요건검증, 사업의 성장성)",
+      "source_refs": [
+        "S-VEN-B",
+        "S-VEN-B-RATIO"
+      ],
+      "root": {
+        "type": "WHEN",
+        "id": "VEN-RD-WHEN",
+        "label": "사업자(개인·법인) 대상 유형",
+        "cond": {
+          "type": "LEAF",
+          "id": "VEN-RD-OPERATING",
+          "check": "enum",
+          "args": {
+            "q": "biz_status",
+            "pass": [
+              "individual",
+              "corporation"
+            ],
+            "fail": [
+              "pre"
+            ]
+          },
+          "label": "사업자등록 완료",
+          "source_refs": [
+            "S-VEN-B",
+            "S-VEN-D"
+          ]
+        },
+        "then": {
+          "type": "AND",
+          "id": "VEN-RD-AND",
+          "label": "연구개발유형 기준요건(모두 충족)",
+          "children": [
+            {
+              "type": "LEAF",
+              "id": "VEN-SME",
+              "label": "「중소기업기본법」 제2조 중소기업",
+              "check": "yes",
+              "args": {
+                "q": "is_sme"
+              },
+              "source_refs": [
+                "S-VEN-B"
+              ],
+              "action_fail": "중소기업 해당 여부(중소기업확인서)를 확인하세요."
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-EXCL",
+              "label": "벤처 제외 업종(시행령 별표 1)이 아님",
+              "check": "no",
+              "args": {
+                "q": "ven_excluded_industry"
+              },
+              "source_refs": [
+                "S-VEN-EXCL"
+              ],
+              "action_fail": "주 업종이 제외 업종이면 벤처확인을 받을 수 없어요.",
+              "quote": "카지노 운영업(91242)"
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-RD-UNIT",
+              "label": "기업부설연구소·연구개발전담부서 등 연구조직 1개 이상 보유",
+              "check": "enum",
+              "args": {
+                "q": "rnd_unit",
+                "pass": [
+                  "institute",
+                  "dept",
+                  "creative"
+                ],
+                "fail": [
+                  "none"
+                ]
+              },
+              "source_refs": [
+                "S-VEN-B"
+              ],
+              "action_fail": "기업부설연구소 또는 연구개발전담부서 인정을 먼저 받으세요(이 앱의 연구소·전담부서 진단 참고)."
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-RD-AMT",
+              "label": "직전 4개 분기 연구개발비 5천만원 이상",
+              "check": "gte",
+              "args": {
+                "q": "ven_rd_spend",
+                "min": 5000,
+                "unit": "만원"
+              },
+              "source_refs": [
+                "S-VEN-B"
+              ],
+              "action_fail": "공식 '연구개발비 산정기준'에 맞춰 직전 4개 분기 연구개발비를 다시 집계하세요.",
+              "quote": "직전 4개 분기 연구개발비 5천만원 이상"
+            },
+            {
+              "type": "WHEN",
+              "id": "VEN-RD-RATIO-WHEN",
+              "label": "창업 3년 이상 기업에만 비율 기준 적용",
+              "cond": {
+                "type": "LEAF",
+                "id": "VEN-RD-AGE3",
+                "check": "years_since_gte",
+                "args": {
+                  "q": "founded_on",
+                  "years": 3
+                },
+                "label": "창업 후 3년 경과",
+                "source_refs": [
+                  "S-VEN-B"
+                ],
+                "quote": "창업 3년 미만은 비율 미적용"
+              },
+              "na_note": "창업 3년 미만은 매출액 대비 연구개발비 비율을 적용하지 않아요(공식 안내).",
+              "then": {
+                "type": "LEAF",
+                "id": "VEN-RD-RATIO",
+                "label": "같은 기간 매출액 대비 연구개발비 비율(업종·매출 규모별 5~10%) 이상",
+                "check": "venture_rd_ratio",
+                "args": {
+                  "spend": "ven_rd_spend",
+                  "revenue": "ven_revenue",
+                  "industry": "industry"
+                },
+                "source_refs": [
+                  "S-VEN-B",
+                  "S-VEN-B-RATIO"
+                ],
+                "action_fail": "업종별 기준 비율을 확인하고, 연구개발비 확대 또는 다른 신청 유형을 검토하세요.",
+                "quote": "5% 이상(업종별 기준)"
+              }
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-RD-REVIEW",
+              "label": "벤처기업확인기관의 '사업의 성장성' 평가",
+              "check": "assessment",
+              "kind": "assessment",
+              "args": {},
+              "source_refs": [
+                "S-VEN-B"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pathway_id": "VEN-GROWTH",
+      "name": "혁신성장유형",
+      "evaluator": "기술보증기금 등 9개 전문평가기관 (기술의 혁신성, 사업의 성장성)",
+      "source_refs": [
+        "S-VEN-C"
+      ],
+      "root": {
+        "type": "WHEN",
+        "id": "VEN-GROWTH-WHEN",
+        "label": "사업자(개인·법인) 대상 유형",
+        "cond": {
+          "type": "LEAF",
+          "id": "VEN-GROWTH-OPERATING",
+          "check": "enum",
+          "args": {
+            "q": "biz_status",
+            "pass": [
+              "individual",
+              "corporation"
+            ],
+            "fail": [
+              "pre"
+            ]
+          },
+          "label": "사업자등록 완료",
+          "source_refs": [
+            "S-VEN-C",
+            "S-VEN-D"
+          ]
+        },
+        "then": {
+          "type": "AND",
+          "id": "VEN-GROWTH-AND",
+          "label": "혁신성장유형 기준요건(모두 충족)",
+          "children": [
+            {
+              "type": "LEAF",
+              "id": "VEN-SME",
+              "label": "「중소기업기본법」 제2조 중소기업",
+              "check": "yes",
+              "args": {
+                "q": "is_sme"
+              },
+              "source_refs": [
+                "S-VEN-C"
+              ],
+              "action_fail": "중소기업 해당 여부(중소기업확인서)를 확인하세요."
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-EXCL",
+              "label": "벤처 제외 업종(시행령 별표 1)이 아님",
+              "check": "no",
+              "args": {
+                "q": "ven_excluded_industry"
+              },
+              "source_refs": [
+                "S-VEN-EXCL"
+              ],
+              "action_fail": "주 업종이 제외 업종이면 벤처확인을 받을 수 없어요.",
+              "quote": "카지노 운영업(91242)"
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-GROWTH-REVIEW",
+              "label": "벤처기업확인기관의 '기술의 혁신성·사업의 성장성' 평가",
+              "check": "assessment",
+              "kind": "assessment",
+              "args": {},
+              "source_refs": [
+                "S-VEN-C"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "pathway_id": "VEN-PRE",
+      "name": "예비벤처유형",
+      "evaluator": "기술보증기금 (기술의 혁신성, 사업의 성장성)",
+      "source_refs": [
+        "S-VEN-D"
+      ],
+      "root": {
+        "type": "WHEN",
+        "id": "VEN-PRE-WHEN",
+        "label": "사업자등록 준비 중인 예비창업자 대상 유형",
+        "cond": {
+          "type": "LEAF",
+          "id": "VEN-PRE-STATUS",
+          "check": "enum",
+          "args": {
+            "q": "biz_status",
+            "pass": [
+              "pre"
+            ],
+            "fail": [
+              "individual",
+              "corporation"
+            ]
+          },
+          "label": "법인 또는 개인사업자 등록을 준비 중",
+          "source_refs": [
+            "S-VEN-D"
+          ]
+        },
+        "then": {
+          "type": "AND",
+          "id": "VEN-PRE-AND",
+          "label": "예비벤처유형 기준요건(모두 충족)",
+          "children": [
+            {
+              "type": "LEAF",
+              "id": "VEN-EXCL",
+              "label": "벤처 제외 업종(시행령 별표 1)이 아님",
+              "check": "no",
+              "args": {
+                "q": "ven_excluded_industry"
+              },
+              "source_refs": [
+                "S-VEN-EXCL",
+                "S-VEN-D"
+              ],
+              "action_fail": "준비 중인 업종이 제외 업종이면 벤처확인을 받을 수 없어요.",
+              "quote": "카지노 운영업(91242)"
+            },
+            {
+              "type": "LEAF",
+              "id": "VEN-PRE-REVIEW",
+              "label": "벤처기업확인기관의 '기술의 혁신성·사업의 성장성' 평가",
+              "check": "assessment",
+              "kind": "assessment",
+              "args": {},
+              "source_refs": [
+                "S-VEN-D"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "test_case_ids": [
+    "T-VEN-01",
+    "T-VEN-02",
+    "T-VEN-03",
+    "T-VEN-04",
+    "T-VEN-05",
+    "T-VEN-06"
+  ]
+}

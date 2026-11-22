@@ -1,0 +1,211 @@
+{
+  "rule_pack_id": "RP-MAIN",
+  "scheme_id": "MAIN",
+  "rule_version": "2026.11.22-1",
+  "review_status": "VERIFIED",
+  "verification_basis": "공식 안내 화면 원문 대조 완료(메인비즈 인증시스템 제도 안내 — 운영규정 인용). 전문가 검토 절차 제외 — 운영사 대표 검토 대상",
+  "reviewer": null,
+  "valid_from": "2026-11-22",
+  "valid_to": null,
+  "review_due_at": "2027-05-22",
+  "last_verified_at": "2026-11-22",
+  "combine": "OR",
+  "pathways": [
+    {
+      "pathway_id": "MAIN-NEW",
+      "name": "신규 신청",
+      "evaluator": "신용보증기금·기술보증기금·한국생산성본부 (현장평가 700점 이상)",
+      "source_refs": [
+        "S-MAIN-GUIDE"
+      ],
+      "root": {
+        "type": "WHEN",
+        "id": "MAIN-WHEN",
+        "label": "사업자(개인·법인) 대상 제도",
+        "cond": {
+          "type": "LEAF",
+          "id": "MAIN-OPERATING",
+          "check": "enum",
+          "args": {
+            "q": "biz_status",
+            "pass": [
+              "individual",
+              "corporation"
+            ],
+            "fail": [
+              "pre"
+            ]
+          },
+          "label": "사업자등록 완료",
+          "source_refs": [
+            "S-MAIN-GUIDE"
+          ]
+        },
+        "then": {
+          "type": "AND",
+          "id": "MAIN-AND",
+          "label": "메인비즈 선정기준·신청 제외 요건(모두 충족)",
+          "children": [
+            {
+              "type": "LEAF",
+              "id": "MAIN-SME",
+              "label": "「중소기업기본법」 제2조제1항 중소기업",
+              "check": "yes",
+              "args": {
+                "q": "is_sme"
+              },
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ],
+              "action_fail": "중소기업 해당 여부(중소기업확인서)를 확인하세요."
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-AGE",
+              "label": "업력 3년 이상",
+              "check": "biz_age_gte",
+              "args": {
+                "years": 3,
+                "conversion": true,
+                "suspension": false
+              },
+              "note": "메인비즈 업력 기산일 정의 조항은 원문 미확보 — 공식 안내 화면의 '업력 3년 이상' 기준으로 판정",
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ],
+              "action_fail": "업력 3년이 되는 날 이후에 신청할 수 있어요.",
+              "quote": "업력 3년 이상"
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-EXCL",
+              "label": "평가 제외 업종이 아님",
+              "check": "no",
+              "args": {
+                "q": "main_excluded_industry"
+              },
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ],
+              "action_fail": "주 업종이 평가 제외 업종이면 신청할 수 없어요."
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-X-CREDIT",
+              "label": "체납정보 등 신용정보 등록 기업이 아님",
+              "check": "no",
+              "args": {
+                "q": "x_credit"
+              },
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ],
+              "action_fail": "체납·연체를 먼저 해소하세요."
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-X-DISHONOR",
+              "label": "어음교환소 거래정지처분 기업이 아님",
+              "check": "no",
+              "args": {
+                "q": "x_dishonor"
+              },
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ],
+              "action_fail": "거래정지처분 해소 전에는 신청할 수 없어요."
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-X-INSOLV",
+              "label": "파산·회생·청산 절차 중이 아님(회생인가 후 정상이행 예외)",
+              "check": "enum",
+              "args": {
+                "q": "x_insolvency",
+                "pass": [
+                  "none",
+                  "rehab_ok"
+                ],
+                "fail": [
+                  "yes"
+                ]
+              },
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ],
+              "action_fail": "도산 절차 진행 중에는 신청할 수 없어요."
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-X-DEBT",
+              "label": "직전 사업연도 말 부채비율 1,000% 미만",
+              "check": "lt",
+              "args": {
+                "q": "main_debt_ratio",
+                "max": 1000,
+                "unit": "%"
+              },
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ],
+              "action_fail": "부채비율을 1,000% 미만으로 낮춘 결산 이후에 신청할 수 있어요.",
+              "quote": "부채비율 1,000% 이상"
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-X-IMPAIRED",
+              "label": "직전 사업연도 말 완전자본잠식이 아님",
+              "check": "no",
+              "args": {
+                "q": "main_capital_impaired"
+              },
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ],
+              "action_fail": "자본잠식 해소(증자 등) 이후 결산 기준으로 신청할 수 있어요."
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-X-VIOL",
+              "label": "최근 3년 법령위반 공표·처분(4종) 해당 없음",
+              "check": "no",
+              "args": {
+                "q": "x_violation"
+              },
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ],
+              "action_fail": "해당 처분일로부터 3년이 지난 뒤 신청할 수 있어요."
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-SELF",
+              "label": "1차 온라인 자가진단 600점 이상",
+              "check": "assessment",
+              "kind": "assessment",
+              "args": {},
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ]
+            },
+            {
+              "type": "LEAF",
+              "id": "MAIN-FIELD",
+              "label": "2차 현장평가 700점 이상",
+              "check": "assessment",
+              "kind": "assessment",
+              "args": {},
+              "source_refs": [
+                "S-MAIN-GUIDE"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "test_case_ids": [
+    "T-MAIN-01",
+    "T-MAIN-02"
+  ]
+}

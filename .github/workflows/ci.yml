@@ -143,7 +143,7 @@ jobs:
         run: |
           case "${{ matrix.app }}" in
             tech|growth|psf) pip install pymupdf ;;
-            ir|finance) sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 poppler-utils ;;
+            ir|finance|certification) sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 poppler-utils ;;
           esac
       - name: QA
         run: bash scripts/ci/app-qa.sh ${{ matrix.app }}
@@ -155,6 +155,7 @@ jobs:
           path: |
             tests/e2e/out/
             ${{ matrix.app }}/tests/out/
+            ${{ matrix.app }}/qa-out/
           if-no-files-found: ignore
           retention-days: 14
 

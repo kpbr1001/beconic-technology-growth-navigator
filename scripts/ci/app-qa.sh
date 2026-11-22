@@ -43,5 +43,9 @@ case "$app" in
     (cd psf && npm run build); serve psf/dist 8796
     node psf/tests/qa.mjs http://127.0.0.1:8796/
     node psf/tests/ai-contract.mjs ;;
+  certification)
+    (cd certification && npm test && npm run build); serve certification/dist 8797
+    node certification/tests/qa.mjs http://127.0.0.1:8797/
+    node certification/tests/pdf.mjs http://127.0.0.1:8797/ ;;
   *) echo "알 수 없는 앱: $app" >&2; exit 2 ;;
 esac

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "beconic/question.schema.json",
+  "title": "질문 객체",
+  "type": "object",
+  "required": ["question_id", "version", "scheme_id", "label_plain_ko", "why_this_matters", "data_type", "response_options", "unknown_allowed", "required_when", "show_when", "evidence_examples", "rule_refs", "source_refs", "privacy_level", "help_text", "validation"],
+  "properties": {
+    "data_type": { "enum": ["single", "multi", "number", "date", "text"] },
+    "privacy_level": { "enum": ["low", "medium", "high"] },
+    "unknown_allowed": { "type": "boolean" }
+  }
+}

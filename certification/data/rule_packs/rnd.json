@@ -1,0 +1,255 @@
+{
+  "packs": [
+    {
+      "rule_pack_id": "RP-RNDI",
+      "scheme_id": "RNDI",
+      "rule_version": "2026.11.22-1",
+      "review_status": "VERIFIED",
+      "verification_basis": "공식 원문 대조 완료(「기업부설연구소등의 연구개발 지원에 관한 법률」 시행령 제2조·제6조, 시행규칙 제2조, 2026.2.1. 시행). 한국산업기술진흥협회 2026 업무편람은 접속 불가로 미반영. 전문가 검토 절차 제외 — 운영사 대표 검토 대상",
+      "reviewer": null,
+      "valid_from": "2026-02-01",
+      "valid_to": null,
+      "review_due_at": "2027-05-22",
+      "last_verified_at": "2026-11-22",
+      "combine": "OR",
+      "pathways": [
+        {
+          "pathway_id": "RNDI-DOMESTIC",
+          "name": "국내 기업부설연구소 인정",
+          "evaluator": "한국산업기술진흥협회 (인정 신청서 검토)",
+          "source_refs": [
+            "S-RND-DEC",
+            "S-RND-RULE"
+          ],
+          "root": {
+            "type": "WHEN",
+            "id": "RNDI-WHEN",
+            "label": "사업자(개인·법인) 대상",
+            "cond": {
+              "type": "LEAF",
+              "id": "RNDI-OPERATING",
+              "check": "enum",
+              "args": {
+                "q": "biz_status",
+                "pass": [
+                  "individual",
+                  "corporation"
+                ],
+                "fail": [
+                  "pre"
+                ]
+              },
+              "label": "사업자등록 완료",
+              "source_refs": [
+                "S-RND-DEC"
+              ]
+            },
+            "then": {
+              "type": "AND",
+              "id": "RNDI-AND",
+              "label": "기업부설연구소 인정기준(시행령 제6조, 모두 충족)",
+              "children": [
+                {
+                  "type": "LEAF",
+                  "id": "RNDI-STAFF",
+                  "label": "연구전담요원 상시 확보(기업 규모별 2~10명)",
+                  "check": "rnd_institute_staff",
+                  "args": {},
+                  "source_refs": [
+                    "S-RND-DEC",
+                    "S-RND-RULE"
+                  ],
+                  "action_fail": "자격을 갖춘 연구전담요원을 기준 인원 이상 확보하세요(채용 또는 기존 인력 전담 배치).",
+                  "quote": "소기업 3명(창업일부터 3년까지 2명), 중기업 5명(소기업→중기업 1년까지 3명), 연구원·교원 창업 연구개발형 중소기업 또는 벤처기업 2명, 중견기업 7명, 그 밖 10명"
+                },
+                {
+                  "type": "LEAF",
+                  "id": "RNDI-FIELD",
+                  "label": "유흥 등 관련 분야(시행령 별표 1)가 아닌 연구개발활동",
+                  "check": "no",
+                  "args": {
+                    "q": "rnd_excluded_field"
+                  },
+                  "source_refs": [
+                    "S-RND-DEC"
+                  ],
+                  "action_fail": "유흥 등 관련 분야의 연구는 인정 대상이 아니에요."
+                },
+                {
+                  "type": "LEAF",
+                  "id": "RNDI-SPACE",
+                  "label": "연구공간 기준(독립 공간 또는 인정되는 예외)",
+                  "check": "rnd_space",
+                  "args": {
+                    "unit": "institute"
+                  },
+                  "source_refs": [
+                    "S-RND-RULE"
+                  ],
+                  "action_fail": "고정 벽체와 별도 출입문으로 구분된 연구공간을 마련하세요.",
+                  "quote": "50㎡ 초과 면적을 확보할 수 없는 경우 칸막이 구분 인정"
+                },
+                {
+                  "type": "LEAF",
+                  "id": "RNDI-EQUIP",
+                  "label": "연구 기자재가 연구공간 안에 있음",
+                  "check": "yes",
+                  "args": {
+                    "q": "rnd_equipment"
+                  },
+                  "source_refs": [
+                    "S-RND-RULE"
+                  ],
+                  "action_fail": "연구에 직접 쓰는 기자재를 연구공간 안에 배치하고 현황을 정리하세요."
+                },
+                {
+                  "type": "LEAF",
+                  "id": "RNDI-FILE",
+                  "label": "한국산업기술진흥협회 인정 신청·검토",
+                  "check": "assessment",
+                  "kind": "assessment",
+                  "args": {},
+                  "source_refs": [
+                    "S-RND-RULE"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "test_case_ids": [
+        "T-RNDI-01",
+        "T-RNDI-02",
+        "T-RNDI-03",
+        "T-RNDI-04"
+      ]
+    },
+    {
+      "rule_pack_id": "RP-RNDD",
+      "scheme_id": "RNDD",
+      "rule_version": "2026.11.22-1",
+      "review_status": "VERIFIED",
+      "verification_basis": "공식 원문 대조 완료(시행령 제6조제1항제1호사목, 시행규칙 제2조). 전문가 검토 절차 제외 — 운영사 대표 검토 대상",
+      "reviewer": null,
+      "valid_from": "2026-02-01",
+      "valid_to": null,
+      "review_due_at": "2027-05-22",
+      "last_verified_at": "2026-11-22",
+      "combine": "OR",
+      "pathways": [
+        {
+          "pathway_id": "RNDD-DOMESTIC",
+          "name": "연구개발전담부서 인정",
+          "evaluator": "한국산업기술진흥협회 (인정 신청서 검토)",
+          "source_refs": [
+            "S-RND-DEC",
+            "S-RND-RULE"
+          ],
+          "root": {
+            "type": "WHEN",
+            "id": "RNDD-WHEN",
+            "label": "사업자(개인·법인) 대상",
+            "cond": {
+              "type": "LEAF",
+              "id": "RNDD-OPERATING",
+              "check": "enum",
+              "args": {
+                "q": "biz_status",
+                "pass": [
+                  "individual",
+                  "corporation"
+                ],
+                "fail": [
+                  "pre"
+                ]
+              },
+              "label": "사업자등록 완료",
+              "source_refs": [
+                "S-RND-DEC"
+              ]
+            },
+            "then": {
+              "type": "AND",
+              "id": "RNDD-AND",
+              "label": "연구개발전담부서 인정기준(모두 충족)",
+              "children": [
+                {
+                  "type": "LEAF",
+                  "id": "RNDD-STAFF",
+                  "label": "연구전담요원 1명 이상",
+                  "check": "gte",
+                  "args": {
+                    "q": "rnd_researchers",
+                    "min": 1,
+                    "unit": "명"
+                  },
+                  "source_refs": [
+                    "S-RND-DEC"
+                  ],
+                  "action_fail": "자격을 갖춘 연구전담요원 1명 이상을 연구개발 업무에 전담 배치하세요.",
+                  "quote": "연구개발전담부서 1명"
+                },
+                {
+                  "type": "LEAF",
+                  "id": "RNDD-FIELD",
+                  "label": "유흥 등 관련 분야(시행령 별표 1)가 아닌 연구개발활동",
+                  "check": "no",
+                  "args": {
+                    "q": "rnd_excluded_field"
+                  },
+                  "source_refs": [
+                    "S-RND-DEC"
+                  ],
+                  "action_fail": "유흥 등 관련 분야의 연구는 인정 대상이 아니에요."
+                },
+                {
+                  "type": "LEAF",
+                  "id": "RNDD-SPACE",
+                  "label": "연구공간 기준(독립 공간 또는 인정되는 예외)",
+                  "check": "rnd_space",
+                  "args": {
+                    "unit": "dept"
+                  },
+                  "source_refs": [
+                    "S-RND-RULE"
+                  ],
+                  "action_fail": "고정 벽체와 별도 출입문으로 구분된 연구공간을 마련하세요.",
+                  "quote": "50㎡ 초과 면적을 확보할 수 없는 경우 칸막이 구분 인정"
+                },
+                {
+                  "type": "LEAF",
+                  "id": "RNDD-EQUIP",
+                  "label": "연구 기자재가 연구공간 안에 있음",
+                  "check": "yes",
+                  "args": {
+                    "q": "rnd_equipment"
+                  },
+                  "source_refs": [
+                    "S-RND-RULE"
+                  ],
+                  "action_fail": "연구에 직접 쓰는 기자재를 연구공간 안에 배치하세요."
+                },
+                {
+                  "type": "LEAF",
+                  "id": "RNDD-FILE",
+                  "label": "한국산업기술진흥협회 인정 신청·검토",
+                  "check": "assessment",
+                  "kind": "assessment",
+                  "args": {},
+                  "source_refs": [
+                    "S-RND-RULE"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "test_case_ids": [
+        "T-RNDD-01",
+        "T-RNDD-02"
+      ]
+    }
+  ]
+}
