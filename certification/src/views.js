@@ -1,10 +1,9 @@
 // 화면 렌더링 — 문자열 템플릿. 사용자 입력·데이터는 모두 esc()/extLink()를 거친다.
 import { esc, extLink, badge, ICON, fmtDate, GROUP_LABEL, TYPE_LABEL, MANDATORY_LABEL, TARGET_LABEL, ACCESS_LABEL } from './ui.js';
 import { S, leafLabel } from './engine.js';
-import { evalExpr } from './conditions.js';
 import { searchSchemes, suggest } from './search.js';
 import { TIER_LABEL } from './recommend.js';
-import { EVIDENCE, EVIDENCE_LABEL, readinessSentence } from './readiness.js';
+import { EVIDENCE, readinessSentence } from './readiness.js';
 import { CATEGORY, TIMEFRAME } from './model.js';
 
 export const MAX_SELECT = 3;
@@ -205,6 +204,8 @@ export function questionStep(st, data, key) {
   };
   const [h, sub] = titles[key];
   const qs = questionsFor(data, key);
+  // B경로(인증 먼저)는 목적 단계를 건너뛰므로, 제품·시장 단계에서 판매 시장을 함께 묻는다
+  if (key === 'export' && (st.flow === 'B' || !(st.answers.markets || []).length)) qs.unshift(data.questionMap.markets);
   return `<section class="view wrap narrow">
   ${progress(st, data, key)}
   <h1 class="h1">${esc(h)}</h1><p class="lead">${esc(sub)}</p>

@@ -1,6 +1,10 @@
 /* A4 인쇄 전용 — 화면 요소는 숨기고 #print-root 보고서만 출력.
    표 semantics 유지(display 변경 금지), thead 반복, 고정 열폭, 국문 줄바꿈(keep-all) */
-@page { size: A4 portrait; margin: 15mm 14mm 16mm 14mm; }
+@page {
+  size: A4 portrait; margin: 15mm 14mm 16mm 14mm;
+  @bottom-left { content: "BECONIC 기업인증 준비도 진단 · 그로스벤처스(주) · 사전 검토 자료(공식 판정 아님)"; font-family: 'Pretendard Variable', Pretendard, sans-serif; font-size: 7.5pt; color: #6B7280; }
+  @bottom-right { content: counter(page) " / " counter(pages); font-family: 'Pretendard Variable', Pretendard, sans-serif; font-size: 7.5pt; color: #6B7280; }
+}
 @page :first { margin: 0; }
 
 html, body { background: #fff !important; }
@@ -11,7 +15,6 @@ body[data-print="screen"] .print-root { display: none !important; }
 .print-root { display: block !important; }
 
 .p-doc { font-family: var(--font); word-break: keep-all; overflow-wrap: break-word; }
-.p-runfoot { position: fixed; bottom: -10mm; left: 0; right: 0; font-size: 7.5pt; color: #6B7280; text-align: center; }
 
 /* 표지(여백 0 페이지) */
 .p-cover { height: 297mm; padding: 26mm 22mm 20mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; background: #fff; position: relative; }
@@ -55,7 +58,8 @@ body[data-print="screen"] .print-root { display: none !important; }
 .p-table thead th { background: #EEF2F8; color: #1B2C55; font-weight: 700; }
 .p-table tr { break-inside: avoid; }
 .p-table td.nw, .p-table th.nw { white-space: nowrap; }
-.p-src { font-size: 8.5pt; }
+.p-src { font-size: 8.5pt; white-space: nowrap; }
+.p-sid { font-weight: 700; color: #1B2C55; white-space: nowrap; }
 .p-url { overflow-wrap: anywhere; word-break: break-all; font-size: 8pt; }
 .t-src td { font-size: 8.5pt; }
 .c-8 { width: 8%; } .c-9 { width: 9%; } .c-10 { width: 10%; } .c-12 { width: 12%; } .c-14 { width: 14%; } .c-16 { width: 16%; } .c-17 { width: 17%; } .c-18 { width: 18%; }

@@ -21,10 +21,19 @@ function fmtAnswer(data, q, v) {
 
 function leafInputs(data, R, l) {
   const ans = R._answers || {};
-  const qs = (l.inputs || []).filter((q, i, a) => a.indexOf(q) === i && data.questionMap[q]);
-  if (!qs.length) return l.kind === 'assessment' ? '평가·심사 단계' : '-';
-  return qs.map((q) => `${data.questionMap[q].label_plain_ko.replace(/\s*\(.*?\)\s*$/, '').slice(0, 26)}: ${fmtAnswer(data, q, ans[q])}`).join(' / ');
+  const qs = (l.inputs || []).filter((q, i, a) => a.indexOf(q) === i && data.questionMap[q] && ans[q] !== undefined);
+  if (l.kind === 'assessment') return '평가·심사 단계';
+  if (!qs.length) return '미입력';
+  return qs.slice(0, 3).map((q) => fmtAnswer(data, q, ans[q])).join(' / ');
 }
+
+// 부록 출처 번호 — 판정표에서는 [번호]로만 참조해 표를 짧게 유지
+function sourceIndex(R) {
+  const ids = [];
+  R.schemes.forEach((x) => x.scheme.sources.forEach((r) => { if (!ids.includes(r)) ids.push(r); }));
+  return Object.fromEntries(ids.map((r, i) => [r, i + 1]));
+}
+function readableUrl(u) { try { return decodeURI(u); } catch { return u; } }
 
 function cover(data, R) {
   const m = R.meta;
@@ -76,7 +85,7 @@ function execSummary(data, R) {
     <div class="p-box"><h3 class="p-h3">우선 행동</h3><ol class="p-ol">${top.map((a) => `<li><b>[${esc(TIMEFRAME[a.timeframe])}]</b> ${esc(a.title)}</li>`).join('') || '<li>즉시 할 일 없음</li>'}</ol></div>
   </div>
   <div class="p-box p-risk"><h3 class="p-h3">미확인 위험</h3>
-    <p>확인되지 않은 요건 ${s.unknown}개(이 중 공식 원문 미검증 ${s.unverified}개), 입력이 필요한 정보 ${R.unknownInputs.length}개, 보유 여부를 모르는 서류 ${s.docCounts.unknown}개가 있어요. 이 항목이 확인되기 전에는 결과가 달라질 수 있어요.</p>
+    <p>${s.unknown + R.unknownInputs.length + s.docCounts.unknown === 0 ? '입력한 정보 기준으로 확인되지 않은 요건·정보·서류는 없어요. 다만 입력값 자체가 사실과 다르면 결과가 달라져요.' : `확인되지 않은 요건 ${s.unknown}개(이 중 공식 원문 미검증 ${s.unverified}개), 입력이 필요한 정보 ${R.unknownInputs.length}개, 보유 여부를 모르는 서류 ${s.docCounts.unknown}개가 있어요. 이 항목이 확인되기 전에는 결과가 달라질 수 있어요.`}</p>
     <p class="p-note">‘기본요건 확인’은 입력 정보 기준 사전 판단이며, 최종 확인·선정·인정은 관할기관과 평가기관의 심사로 결정됩니다. 준비항목 수치는 사내 진단 편의용이며 공식 심사 점수가 아닙니다.</p></div>
 </section>`;
 }
@@ -95,6 +104,7 @@ function comparison(data, R) {
 }
 
 function ruleTables(data, R) {
+  const SI = sourceIndex(R);
   const blocks = R.schemes.map((x) => {
     const s = x.scheme;
     let inner = '';
@@ -105,7 +115,7 @@ function ruleTables(data, R) {
         const rows = p.leaves.map((l) => {
           const k = l.kind === 'assessment' ? null : leafLabel(l.status).key;
           const stx = l.kind === 'assessment' ? 'ⓘ 기관 평가' : l.unverified ? '? 확인 필요(미검증)' : LEAF_TXT[k];
-          const src = (l.source_refs || []).map((r) => data.sourceMap[r]).filter(Boolean).map((z) => `${esc(z.title)}${z.document_identifier ? ` (${esc(z.document_identifier)})` : ''}`).join('; ');
+          const src = (l.source_refs || []).filter((r) => SI[r]).map((r) => `[${SI[r]}]`).join(' ');
           let next = '-';
           if (l.inactive) next = '해당 유형 아님';
           else if (l.kind === 'assessment') next = '평가기관 판단';
@@ -114,8 +124,8 @@ function ruleTables(data, R) {
           return `<tr><td>${esc(l.label)}${l.is_condition ? ' (선행조건)' : ''}</td><td>${esc(leafInputs(data, R, l))}${l.detail && !l.unverified && l.kind !== 'assessment' ? `<br><span class="p-muted">${esc(l.detail)}</span>` : ''}</td><td class="nw">${esc(stx)}</td><td class="p-src">${src}</td><td>${esc(next)}</td></tr>`;
         }).join('');
         return `<h4 class="p-h4">${esc(p.name)} — ${esc(LEAF_TXT[lb] || '')} <span class="p-muted">(평가: ${esc(p.evaluator)})</span></h4>
-        <table class="p-table t-rule"><colgroup><col class="c-22"><col class="c-26"><col class="c-12"><col class="c-20"><col class="c-20"></colgroup>
-        <thead><tr><th scope="col">요건</th><th scope="col">응답·판단 근거</th><th scope="col">판정</th><th scope="col">공식 근거</th><th scope="col">다음 확인</th></tr></thead><tbody>${rows}</tbody></table>`;
+        <table class="p-table t-rule"><colgroup><col class="c-28"><col class="c-24"><col class="c-14"><col class="c-8"><col class="c-26"></colgroup>
+        <thead><tr><th scope="col">요건</th><th scope="col">응답·판단 근거</th><th scope="col">판정</th><th scope="col">근거</th><th scope="col">다음 확인</th></tr></thead><tbody>${rows}</tbody></table>`;
       }).join('');
       if (s.scheme_id === 'VEN') inner = `<p class="p-p">벤처기업확인은 4개 신청 유형 중 하나만 갖추면 됩니다(대체 경로 OR). 한 유형의 미충족이 전체 미충족을 뜻하지 않습니다.</p>${inner}`;
     } else if (x.result) {
@@ -127,8 +137,8 @@ function ruleTables(data, R) {
     }
     return `<div class="p-scheme"><h3 class="p-h3">${esc(s.name_ko)} — ${esc(STATUS_TXT[x.label.key])}</h3>${inner}</div>`;
   }).join('');
-  return `<section class="p-sec p-break"><h2 class="p-h2"><span class="p-num">03</span> 개별 인증별 규칙 판정표</h2>
-  <p class="p-p">요건 → 응답 → 판정 → 공식 근거 → 다음 확인 순서입니다. ‘확인 필요’는 정보 부족 또는 공식 원문 미검증 상태이며, 불합격(미충족)으로 처리하지 않았습니다.</p>${blocks}</section>`;
+  return `<section class="p-sec"><h2 class="p-h2"><span class="p-num">03</span> 개별 인증별 규칙 판정표</h2>
+  <p class="p-p">요건 → 응답 → 판정 → 근거 → 다음 확인 순서입니다. 근거 [번호]는 부록(06) ‘참조 규정·공식 근거’의 번호입니다. ‘확인 필요’는 정보 부족 또는 공식 원문 미검증 상태이며, 불합격(미충족)으로 처리하지 않았습니다.</p>${blocks}</section>`;
 }
 
 function evidence(data, R) {
@@ -141,28 +151,27 @@ function evidence(data, R) {
     <table class="p-table"><colgroup><col class="c-26"><col class="c-8"><col class="c-24"><col class="c-18"><col class="c-12"><col class="c-12"></colgroup>
     <thead><tr><th scope="col">증빙·준비항목</th><th scope="col">구분</th><th scope="col">왜 필요한가</th><th scope="col">발급·확인처</th><th scope="col">상태</th><th scope="col">검증</th></tr></thead><tbody>${rows}</tbody></table>`;
   }).join('');
-  return `<section class="p-sec p-break"><h2 class="p-h2"><span class="p-num">04</span> 증빙 체크리스트 및 발급·확인 경로</h2>
+  return `<section class="p-sec"><h2 class="p-h2"><span class="p-num">04</span> 증빙 체크리스트 및 발급·확인 경로</h2>
   <p class="p-p">상태는 사용자의 자가응답이며, 서류 원본이나 진위를 확인한 결과가 아닙니다. 공식 제출서류 목록은 각 기관 화면 기준이며 기관 요청에 따라 추가될 수 있습니다.</p>${tables}</section>`;
 }
 
 function plan(data, R) {
   const rows = R.actions.map((a) => `<tr><td class="nw">${esc(TIMEFRAME[a.timeframe])}</td><td>${esc(a.order)}. ${esc(CATEGORY[a.category])}<br><span class="p-muted">${esc(a.scheme_name)}</span></td><td><b>${esc(a.title)}</b>${a.detail ? `<br><span class="p-muted">${esc(a.detail)}</span>` : ''}</td><td>${esc(a.owner)}</td><td>${esc(a.deliverable)}</td><td>${esc(a.done_when)}</td></tr>`).join('');
-  return `<section class="p-sec p-break"><h2 class="p-h2"><span class="p-num">05</span> 실행계획 (즉시 · 30 · 60 · 90일 · 지속관리)</h2>
+  return `<section class="p-sec"><h2 class="p-h2"><span class="p-num">05</span> 실행계획 (즉시 · 30 · 60 · 90일 · 지속관리)</h2>
   <p class="p-p">우선순위 기준: 신청상 장애 요인 제거 → 필수 증빙 → 평가·신청 준비 → 선택적 강화 → 지속관리. 일정은 준비 순서의 예시이며 기관 처리기간·취득 시점을 보장하지 않습니다. 담당은 예시입니다.</p>
   ${R.actions.length ? `<table class="p-table t-plan"><colgroup><col class="c-9"><col class="c-17"><col class="c-34"><col class="c-12"><col class="c-12"><col class="c-16"></colgroup>
   <thead><tr><th scope="col">시점</th><th scope="col">순위·구분</th><th scope="col">할 일</th><th scope="col">담당(예시)</th><th scope="col">산출물</th><th scope="col">완료 판단</th></tr></thead><tbody>${rows}</tbody></table>` : '<p class="p-p">지금 할 일이 없습니다.</p>'}</section>`;
 }
 
 function appendix(data, R) {
-  const used = new Set();
-  R.schemes.forEach((x) => x.scheme.sources.forEach((r) => used.add(r)));
-  const srcRows = [...used].map((r) => data.sourceMap[r]).filter(Boolean).map((s) => `<tr><td>${esc(s.title)}</td><td>${esc(s.regulator)}</td><td>${esc(s.document_identifier || '-')}</td><td class="nw">${esc(s.checked_at)}</td><td>${esc(ACCESS_LABEL[s.access_status])}</td><td class="p-url">${esc(s.official_url)}</td></tr>`).join('');
+  const SI = sourceIndex(R);
+  const srcRows = Object.keys(SI).map((r) => data.sourceMap[r]).filter(Boolean).map((s) => `<tr><td><span class="p-sid">[${SI[s.source_id]}]</span> ${esc(s.title)}</td><td>${esc(s.regulator)}</td><td>${esc(s.document_identifier || '-')}</td><td class="nw">${esc(s.checked_at)}</td><td>${esc(ACCESS_LABEL[s.access_status])}</td><td class="p-url">${esc(readableUrl(s.official_url))}</td></tr>`).join('');
   const packs = R.schemes.filter((x) => x.result).map((x) => `${esc(x.scheme.name_ko)}: ${esc(x.result.meta.rule_pack_id)} v${esc(x.result.meta.rule_version)} (근거 확인 ${esc(x.result.meta.last_verified_at)})`).join(' · ');
   const ans = R._answers || {};
   const asked = new Set();
   R.schemes.forEach((x) => { if (x.result) x.result.pathways.forEach((p) => p.leaves.forEach((l) => (l.inputs || []).forEach((q) => asked.add(q)))); });
   const notEntered = [...asked].filter((q) => data.questionMap[q] && (ans[q] === undefined || ans[q] === '' || ans[q] === 'unknown')).map((q) => data.questionMap[q].label_plain_ko);
-  return `<section class="p-sec p-break"><h2 class="p-h2"><span class="p-num">06</span> 한계·법적 고지 및 부록</h2>
+  return `<section class="p-sec"><h2 class="p-h2"><span class="p-num">06</span> 한계·법적 고지 및 부록</h2>
   <h3 class="p-h3">결과 활용의 한계</h3>
   <ul class="p-ul">
     <li>본 결과는 사용자가 입력한 정보에 기초한 사전 검토입니다. 인증·허가·신고 결과는 관계 법령과 관할기관의 심사에 따릅니다.</li>
@@ -182,7 +191,6 @@ function appendix(data, R) {
 
 export function renderPrint(data, R) {
   return `<div class="p-doc">
-  <div class="p-runfoot" aria-hidden="true">BECONIC 기업인증 준비도 진단 · ${esc(R.meta.doc_id)} · 그로스벤처스(주) · 사전 검토 자료(공식 판정 아님)</div>
   ${cover(data, R)}${execSummary(data, R)}${comparison(data, R)}${ruleTables(data, R)}${evidence(data, R)}${plan(data, R)}${appendix(data, R)}
   </div>`;
 }

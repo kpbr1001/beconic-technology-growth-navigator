@@ -139,6 +139,7 @@ export function buildActions(data, schemes) {
     const r = s.result;
     if (r && r.gate.active) {
       const schemePass = r.basic === S.PASS;
+      const askQ = [];
       r.pathways.forEach((p) => {
         if (p.basic === S.NA) return;
         p.leaves.forEach((l) => {
@@ -150,26 +151,28 @@ export function buildActions(data, schemes) {
             push({ category: 1, timeframe: 'now', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `공식 원문 확인: ${l.label}`, detail: l.detail, basis: '', owner: '대표·경영지원', deliverable: '공식 확인 결과', done_when: '운영기관 답변 또는 원문 확보' });
           }
           if (l.status === S.UNKNOWN && l.missing && l.missing.length && !(schemePass && p.basic !== S.PASS)) {
-            l.missing.forEach((q) => {
-              if (seenQ.has(q)) return; seenQ.add(q);
-              const qd = data.questionMap[q];
-              push({ category: 1, timeframe: 'now', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `확인: ${qd ? qd.label_plain_ko : q}`, detail: qd ? qd.why_this_matters : '', basis: qd && qd.evidence_examples && qd.evidence_examples.length ? `확인 자료: ${qd.evidence_examples.join(', ')}` : '', owner: '경영지원', deliverable: '확인된 값', done_when: '진단에 값 입력 후 재계산', q });
-            });
+            l.missing.forEach((q) => { if (!seenQ.has(q)) { seenQ.add(q); askQ.push(q); } });
           }
         });
       });
+      if (askQ.length) {
+        const labels = askQ.map((q) => (data.questionMap[q] ? data.questionMap[q].label_plain_ko.replace(/\s*\(.*?\)\s*$/, '') : q));
+        const ev = [...new Set(askQ.flatMap((q) => (data.questionMap[q] && data.questionMap[q].evidence_examples) || []))].slice(0, 4);
+        push({ category: 1, timeframe: 'now', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `확인할 정보 ${askQ.length}개 정리`, detail: labels.join(' · '), basis: ev.length ? `확인 자료: ${ev.join(', ')}` : '', owner: '경영지원', deliverable: '확인된 값', done_when: '진단에 값 입력 후 재계산', qs: askQ });
+      }
       if (r.basic === S.PASS || r.basic === S.UNKNOWN) {
         const assess = [];
         r.pathways.forEach((p) => { if (p.basic === S.PASS || p.basic === S.UNKNOWN) p.leaves.forEach((l) => { if (l.kind === 'assessment' && !l.inactive && !assess.includes(l.label)) assess.push(l.label); }); });
-        assess.forEach((lb) => push({ category: 3, timeframe: 'd60', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `평가 준비: ${lb}`, detail: '공식 평가지표·제출서류를 내려받아 근거 자료를 맞춰 두세요. 이 앱은 평가 점수를 예측하지 않아요.', basis: '', owner: '대표·연구책임자', deliverable: '평가 대응 자료', done_when: '평가지표별 근거 자료 정리' }));
+        if (assess.length) push({ category: 3, timeframe: 'd60', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname} 평가 준비`, detail: `${assess.join(' · ')} — 공식 평가지표·제출서류로 근거 자료를 맞춰 두세요. 이 앱은 평가 점수를 예측하지 않아요.`, basis: '', owner: '대표·연구책임자', deliverable: '평가 대응 자료', done_when: '평가지표별 근거 자료 정리' });
         push({ category: 3, timeframe: 'd90', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname} 신청·평가 일정 확정`, detail: '공식 시스템에서 신청서를 작성하고 평가 일정을 잡아요.', basis: s.scheme.official_link, owner: '대표', deliverable: '신청 접수', done_when: '접수 완료 확인' });
       }
     }
     if (s.readiness) {
       s.readiness.rows.filter((x) => x.applicable).forEach((d) => {
         if (d.status === EVIDENCE.NOT_AVAILABLE) push({ category: d.required ? 2 : 4, timeframe: d.required ? 'd30' : 'd90', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `서류 준비: ${d.label}`, detail: d.why, basis: d.where ? `발급·확인처: ${d.where}` : '', owner: '경영지원', deliverable: d.label, done_when: '서류 확보' });
-        else if (d.status === EVIDENCE.UNKNOWN && d.required) push({ category: 2, timeframe: 'now', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `보유 확인: ${d.label}`, detail: d.why, basis: d.where ? `발급·확인처: ${d.where}` : '', owner: '경영지원', deliverable: '보유 여부', done_when: '서류 체크 화면에서 상태 표시' });
       });
+      const unk = s.readiness.rows.filter((x) => x.applicable && x.required && x.status === EVIDENCE.UNKNOWN);
+      if (unk.length) push({ category: 2, timeframe: 'now', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `필수 서류 ${unk.length}건 보유 여부 확인`, detail: unk.map((x) => x.label).join(' · '), basis: '', owner: '경영지원', deliverable: '보유 여부', done_when: '서류 체크 화면에서 상태 표시' });
     }
     if (s.selfcheck) {
       s.selfcheck.rows.forEach((d) => {

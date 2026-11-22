@@ -289,7 +289,7 @@ async function printReport() {
     const imgs = [...root.querySelectorAll('img')];
     await Promise.all(imgs.map((i) => (i.complete ? null : new Promise((r) => { i.onload = r; i.onerror = r; }))));
     window.print();
-  } catch (e) {
+  } catch {
     toast('인쇄 화면을 준비하지 못했어요. 다시 시도해 주세요.');
   }
 }
