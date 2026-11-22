@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.6.2';
+const VERSION = '1.6.3';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';

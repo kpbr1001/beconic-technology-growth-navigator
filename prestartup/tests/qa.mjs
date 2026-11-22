@@ -417,6 +417,18 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await page.evaluate(() => localStorage.removeItem('beconic_prestartup_v1'));
 }
 
+// 11-11. 레드팀(v1.6.2) — 추천 이유 사실성: 기술창업 지원사업(예비창업패키지)을 매장형·일반 업종에 권하지 않음, 단정 표현 없음
+{
+  const r = await page.evaluate(() => { const P = window.PS, B = P.BY_ID, all = [];
+    for (const id of Object.keys(B)) for (const k of ['pre', 'own']) for (const x of P.nextSteps(B[id], k)) all.push([id, B[id].group, k, x.id, x.why]);
+    const s4 = (id) => all.find((a) => a[0] === id && a[2] === 'pre' && a[3] === 'S4')[4];
+    return { cafe: s4('cafe'), ecom: s4('ecommerce'), sw: s4('software'), mfg: s4('cosmetic_mfg'), sw1: all.find((a) => a[0] === 'software' && a[2] === 'pre' && a[3] === 'S1')[4],
+      pkgWrong: all.filter((a) => a[4].includes('예비창업패키지') && !['정보통신업', '전문서비스업', '사업서비스업', '제조업'].includes(a[1])).map((a) => a[0] + ':' + a[3]),
+      assert: all.filter((a) => /비중이 커서 사업계획서|경우가 많아요/.test(a[4])).length }; });
+  check('추천 이유: 예비창업패키지(기술창업)는 IT·지식서비스·제조에만 · 매장형은 소상공인 창업 지원사업', r.pkgWrong.length === 0 && r.cafe.includes('소상공인') && !r.ecom.includes('예비창업패키지') && r.ecom.includes('제외 업종') && r.sw.includes('대상이 될 수 있어') && r.mfg.includes('대상이 될 수 있어'), JSON.stringify(r));
+  check('추천 이유: 근거 없는 단정 없음 · 아이템 발굴은 "아직 구체적이지 않다면" 조건', r.assert === 0 && r.sw1.includes('아직 구체적이지 않다면'));
+}
+
 // 12. 앱(PWA) 구성
 {
   const m = await page.evaluate(async () => (await fetch('assets/manifest.webmanifest')).json());
