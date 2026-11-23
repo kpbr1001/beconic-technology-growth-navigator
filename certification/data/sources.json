@@ -21,9 +21,10 @@
       "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK",
-      "excerpt_or_section_ref": "중소기업(중소기업기본법 제2조) · 적격투자기관으로부터 유치한 투자금액 합계 5천만원 이상 · 자본금 중 투자금액 합계 비율 10% 이상(문화산업진흥 기본법 제2조제12호 제작자 중 법인은 7% 이상) · 전문평가기관 한국벤처캐피탈협회, 평가사항: 요건검증 · '각 항목의 요건을 모두 충족하여야 신청 가능'",
+      "excerpt_or_section_ref": "중소기업(중소기업기본법 제2조) · 적격투자기관으로부터 유치한 투자금액 합계 5천만원 이상 · 자본금 중 투자금액 합계 비율 10% 이상(문화산업진흥 기본법 제2조제12호 제작자 중 법인은 7% 이상) · 전문평가기관 한국벤처캐피탈협회, 평가사항: 요건검증 · '각 항목의 요건을 모두 충족하여야 신청 가능' · [수수료·처리기간, 2026-11-23 확인] 확인결과 안내기간 : 접수완료(벤처확인 수수료 납부)일로부터 30일 이내 소요 · 신규 275,000원 100,000원 175,000원 재확인 275,000원 50,000원 225,000원",
       "reviewer": null,
-      "review_status": "SOURCE_CHECKED"
+      "review_status": "SOURCE_CHECKED",
+      "fee_checked_at": "2026-11-23"
     },
     {
       "source_id": "S-VEN-B",
@@ -32,11 +33,15 @@
       "official_url": "https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=B",
       "source_kind": "official_guide",
       "document_identifier": "법적 근거: 벤처기업법 제2조의2 제1항 제2호 나목",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK",
-      "excerpt_or_section_ref": "중소기업 · 기업부설연구소/연구개발전담부서/기업부설창작연구소/기업창작전담부서 중 1개 이상 보유 · 확인 요청일이 속하는 분기의 직전 4개 분기 연구개발비 5천만원 이상 · 같은 기간 총매출액 중 연구개발비 비율 5% 이상(업종별 기준) — 창업 3년 미만은 비율 미적용 · 벤처기업확인기관으로부터 사업의 성장성 우수 평가 (전문평가기관: 신용보증기금, 중소벤처기업진흥공단)",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "excerpt_or_section_ref": "중소기업 · 기업부설연구소/연구개발전담부서/기업부설창작연구소/기업창작전담부서 중 1개 이상 보유 · 확인 요청일이 속하는 분기의 직전 4개 분기 연구개발비 5천만원 이상 · 같은 기간 총매출액 중 연구개발비 비율 5% 이상(업종별 기준) — 창업 3년 미만은 비율 미적용 · 벤처기업확인기관으로부터 사업의 성장성 우수 평가 (전문평가기관: 신용보증기금, 중소벤처기업진흥공단) · [수수료·처리기간, 2026-11-23 확인] 확인결과 안내기간 : 접수완료(벤처확인 수수료 납부)일로부터 45일 이내 소요 · 신규 495,000원 150,000원 345,000원 재확인 495,000원 50,000원 445,000원",
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED",
+      "fee_checked_at": "2026-11-23"
     },
     {
       "source_id": "S-VEN-B-RATIO",
@@ -45,11 +50,14 @@
       "official_url": "https://www.smes.go.kr/venturein/resources/images/sub/09rd_type.png",
       "source_kind": "official_guide_image",
       "document_identifier": "매출액 규모별(50억원 미만 / 50억~100억원 미만 / 100억원 이상) 업종별 비율표",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK_IMAGE",
       "excerpt_or_section_ref": "의약품(21) 6/6/6 · 기계 및 장비제조(29, 2918 제외) 7/5/5 · 컴퓨터 및 주변장치(263) 6/6/5 · 사무용기계 및 장비(2918) 6/6/5 · 전기장비(28) 6/5/5 · 반도체 및 전자부품(261,262) 6/5/5 · 의료·정밀·광학기기 및 시계(27) 8/7/6 · 기타제조업 5/5/5 · 도매 및 소매업(45~47) 5/5/5 · 통신업(61) 7/5/5 · 소프트웨어개발 공급업(582) 10/8/8 · 컴퓨터프로그래밍, 시스템통합관리업(62) 10/8/8 · 정보서비스업(63) 10/8/8 · 인터넷산업 5/5/5 · 기타산업 5/5/5",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED"
     },
     {
       "source_id": "S-VEN-C",
@@ -58,11 +66,15 @@
       "official_url": "https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=C",
       "source_kind": "official_guide",
       "document_identifier": "법적 근거: 벤처기업법 제2조의2 제1항 제2호 다목",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK",
-      "excerpt_or_section_ref": "중소기업 · 벤처기업확인기관으로부터 기술의 혁신성과 사업의 성장성이 우수한 것으로 평가받은 기업 (전문평가기관: 기술보증기금 등 9개 기관)",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "excerpt_or_section_ref": "중소기업 · 벤처기업확인기관으로부터 기술의 혁신성과 사업의 성장성이 우수한 것으로 평가받은 기업 (전문평가기관: 기술보증기금 등 9개 기관) · [수수료·처리기간, 2026-11-23 확인] 확인결과 안내기간 : 접수완료(벤처확인 수수료 납부)일로부터 45일 이내 소요 · 신규 605,000원 150,000원 455,000원 재확인 50,000원 555,000원 · 혁신성장유형 벤처확인 수수료(이노비즈연계) 신규 440,000원 150,000원 290,000원 재확인 50,000원 390,000원",
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED",
+      "fee_checked_at": "2026-11-23"
     },
     {
       "source_id": "S-VEN-D",
@@ -71,11 +83,15 @@
       "official_url": "https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=D",
       "source_kind": "official_guide",
       "document_identifier": "법적 근거 표기: 벤처기업법 제2조의2 제1항 제2호 다목(공식 화면 표기 그대로)",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK",
-      "excerpt_or_section_ref": "법인 또는 개인사업자 등록을 준비 중인 자 · 벤처기업확인기관으로부터 기술의 혁신성과 사업의 성장성이 우수한 것으로 평가받은 자 (전문평가기관: 기술보증기금)",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "excerpt_or_section_ref": "법인 또는 개인사업자 등록을 준비 중인 자 · 벤처기업확인기관으로부터 기술의 혁신성과 사업의 성장성이 우수한 것으로 평가받은 자 (전문평가기관: 기술보증기금) · [수수료·처리기간, 2026-11-23 확인] 확인결과 안내기간 : 접수완료(벤처확인 수수료 납부)일로부터 45일 이내 소요 · 신규 495,000원 150,000원 345,000원 재확인 50,000원 445,000원",
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED",
+      "fee_checked_at": "2026-11-23"
     },
     {
       "source_id": "S-VEN-EXCL",
@@ -84,11 +100,14 @@
       "official_url": "https://www.smes.go.kr/venturein/resources/images/sub/ventureRestricted11thIndustry.jpg",
       "source_kind": "statute_annex_image",
       "document_identifier": "시행령 별표 1 (제2조의4 관련)",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK_IMAGE",
       "excerpt_or_section_ref": "일반 유흥 주점업(56211) · 무도 유흥 주점업(56212) · 기타 주점업(56219) · 카지노 운영업(91242) · 기타 사행시설 관리 및 운영업(91249) · 무도장 운영업(91291)",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED"
     },
     {
       "source_id": "S-VEN-DOCS",
@@ -97,11 +116,14 @@
       "official_url": "https://www.smes.go.kr/venturein/institution/requireGuide",
       "source_kind": "official_guide",
       "document_identifier": "유형별 안내 각 탭 제출서류 표",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK",
       "excerpt_or_section_ref": "벤처투자: 중소기업확인서(자동 연계)·사업자등록증·법인등기부등본(투자유치사항 등기 완료 본)·부가가치세 신고서·재무제표·투자계약서·투자금 입금내역 증빙·주주명부 / 연구개발: 사업계획서·연구개발조직 인정서 및 소속 인력현황·인건비 산정내역서·인건비 외 개발비용 산정내역서 등 / 혁신성장: 사업계획서·재무제표·4대보험 가입자 명부 등 / 예비벤처: 사업계획서·대표자 관련 증빙서류 등 ('추가 서류(일부 필수)' 구분은 화면 기준)",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED"
     },
     {
       "source_id": "S-INNO-RULE",
@@ -120,7 +142,8 @@
         "내려받은 파일 첫 줄 제목이 '일부개정(안)'으로 표기됨 — 부칙에는 고시 제2026-44호·시행일이 기재됨. 국가법령정보센터 행정규칙 원문과 대조 필요",
         "별표 2(신청 불가 업종) 표가 파일에 포함되어 있지 않음 — 원문 미확보"
       ],
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED"
     },
     {
       "source_id": "S-INNO-PROC",
@@ -129,11 +152,15 @@
       "official_url": "https://www.innobiz.net/authen/authen1.asp",
       "source_kind": "official_guide",
       "document_identifier": "제도소개/신규신청 화면",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK",
-      "excerpt_or_section_ref": "온라인 자가진단 650점 이상 · 기술보증기금 현장평가 기술혁신시스템 700점 이상 및 개별기술수준 B등급 이상 · 업체준비서류(사업자등록증, 법인등기부등본, 주주명부·조직도, 표준재무제표증명원 3개년, 부가세 과세표준증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 가입자 명부, 지식재산권 등록원부 등)",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "excerpt_or_section_ref": "온라인 자가진단 650점 이상 · 기술보증기금 현장평가 기술혁신시스템 700점 이상 및 개별기술수준 B등급 이상 · 업체준비서류(사업자등록증, 법인등기부등본, 주주명부·조직도, 표준재무제표증명원 3개년, 부가세 과세표준증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 가입자 명부, 지식재산권 등록원부 등) · [수수료·처리기간, 2026-11-23 확인] 수수료(평가비용) - 신규 신청 77만원(부가세 포함) - 유효기간 연장 신청 44만원(부가세 포함) · 감면 적용 수수료 - 신규 신청 수수료 55만원(부가세 포함) - 22만원 감면 - 유효기간 연장 신청 수수료 33만원(부가세 포함) - 11만원 감면 · 벤처 유효기간 시작일이 이노비즈 신청일 기준 6개월 이내",
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED",
+      "fee_checked_at": "2026-11-23"
     },
     {
       "source_id": "S-MAIN-GUIDE",
@@ -142,14 +169,17 @@
       "official_url": "https://www.smes.go.kr/mainbiz/usr/mainbizInfo/descriptMainbiz.do",
       "source_kind": "official_guide",
       "document_identifier": "경영혁신형 중소기업(Main-Biz) 제도 운영규정 인용 화면, 중소기업 기술혁신 촉진법 제2조 제4의2호",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK",
       "excerpt_or_section_ref": "중소기업기본법 제2조제1항 중소기업 중 업력 3년 이상 · 1차 온라인 자가진단 600점 이상 · 2차 현장평가 700점 이상 · 유효기간 3년 · 제외 업종(불건전 영상게임기 C33402 중, 도박게임장비 등 C33409 중, 담배중개업 G46102 중, 주류·담배도매업 G46331·G46333, 숙박업 및 주점업 I55~56(관광숙박업 예외), 불건전 게임소프트웨어 J5821 중) · 제외 기업(체납정보 등록, 거래정지, 파산·회생 등, 부채비율 1,000% 이상, 완전자본잠식, 최근 3년 법령위반 공표·처분 4종)",
       "known_issues": [
         "업력 기산일 정의 조항(운영규정 원문) 미확보 — 공식 안내 화면 문구 기준으로만 판정"
       ],
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED"
     },
     {
       "source_id": "S-MAIN-DOCS",
@@ -158,11 +188,15 @@
       "official_url": "https://www.smes.go.kr/mainbiz/usr/mainbizInfo/mainbizGuide.do",
       "source_kind": "official_guide",
       "document_identifier": "신청 안내 화면 '현장평가 준비 자료 목록'",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "OK",
-      "excerpt_or_section_ref": "기본서류: 법인등기부등본(말소사항 포함, 개인기업 제외)·신용정보조회서·표준재무제표증명원(최근 3년)·사업장 산업재해율 조회 결과(제조·건설업) / 경영관련: 기업소개자료·경영계획서·사내기술 및 생산 표준화·제조 공정 관련 서류·대외 협력 관련 자료 / 조직관리: 고객관리 매뉴얼·경영방침·사내규정",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "excerpt_or_section_ref": "기본서류: 법인등기부등본(말소사항 포함, 개인기업 제외)·신용정보조회서·표준재무제표증명원(최근 3년)·사업장 산업재해율 조회 결과(제조·건설업) / 경영관련: 기업소개자료·경영계획서·사내기술 및 생산 표준화·제조 공정 관련 서류·대외 협력 관련 자료 / 조직관리: 고객관리 매뉴얼·경영방침·사내규정 · [수수료·처리기간, 2026-11-23 확인] 현장평가 신청 신규 55만 원 연장 44만 원 (VAT포함) 현장평가 실시 현장평가 700점 이상 기간 3주 이내",
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED",
+      "fee_checked_at": "2026-11-23"
     },
     {
       "source_id": "S-RND-DEC",
@@ -177,7 +211,8 @@
       "checked_at": "2026-11-22",
       "access_status": "OK",
       "excerpt_or_section_ref": "제2조 정의(연구전담요원: 연구개발 외 업무 겸직 금지, 창업 3년 미경과 소기업 대표자 예외 / 연구시설: 배타적 독립 연구공간) · 제6조① 인정기준 — 연구전담요원 상시 확보: 소기업 3명(창업일부터 3년까지 2명), 중기업 5명(소기업→중기업 1년까지 3명), 연구원·교원 창업 연구개발형 중소기업 또는 벤처기업 2명, 중견기업 7명, 그 밖 10명, 국외 5명, 연구개발전담부서 1명 · 연구시설 기준 적합",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED"
     },
     {
       "source_id": "S-RND-RULE",
@@ -192,7 +227,8 @@
       "checked_at": "2026-11-22",
       "access_status": "OK",
       "excerpt_or_section_ref": "제2조② 연구공간: 고정 벽체와 별도 출입문으로 구분된 독립 공간(중소기업·벤처 등이 50㎡ 초과 면적을 확보할 수 없는 경우 칸막이 구분 인정, 정보서비스·SW개발공급업 연구개발부서 포함) · 연구 기자재는 연구공간 내 위치 · 제2조④ 연구전담요원 자격(자연계 학사 이상, 기사 이상, 중소기업은 전문학사+경력 등) · 제2조⑧ 제외(직원 증명 불가, 대표자·감사 등 — 창업 3년 미경과 소기업 대표자 예외) · 제3조·제4조 신청 첨부서류",
-      "reviewer": null, "review_status": "SOURCE_CHECKED"
+      "reviewer": null,
+      "review_status": "SOURCE_CHECKED"
     },
     {
       "source_id": "S-RND-PORTAL",
@@ -201,100 +237,238 @@
       "official_url": "https://www.rnd.or.kr/user/info/outline.do",
       "source_kind": "official_guide",
       "document_identifier": "2026 기업부설연구소/연구개발전담부서 업무편람",
-      "published_at": null, "effective_from": null, "effective_until": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
       "checked_at": "2026-11-22",
       "access_status": "UNREACHABLE",
       "excerpt_or_section_ref": "개발 환경에서 접속 불가 — 편람 세부 운영기준(면적 산정, 인력 증빙 실무 등)은 미반영",
-      "reviewer": null, "review_status": "UNVERIFIED"
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-KC-SAFETY", "regulator": "국가기술표준원", "title": "제품안전정보센터(KC 안전인증 등)",
-      "official_url": "https://www.safetykorea.kr", "source_kind": "official_portal", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "OK", "excerpt_or_section_ref": "포털 접속 확인. 제품별 인증 대상 판단 기준은 미반영", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_id": "S-KC-SAFETY",
+      "regulator": "국가기술표준원",
+      "title": "제품안전정보센터(KC 안전인증 등)",
+      "official_url": "https://www.safetykorea.kr",
+      "source_kind": "official_portal",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "OK",
+      "excerpt_or_section_ref": "포털 접속 확인. 제품별 인증 대상 판단 기준은 미반영",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-KC-RADIO", "regulator": "국립전파연구원", "title": "방송통신기자재 적합성평가",
-      "official_url": "https://www.rra.go.kr", "source_kind": "official_portal", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "OK", "excerpt_or_section_ref": "포털 접속 확인. 기자재별 대상 판단 기준은 미반영", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_id": "S-KC-RADIO",
+      "regulator": "국립전파연구원",
+      "title": "방송통신기자재 적합성평가",
+      "official_url": "https://www.rra.go.kr",
+      "source_kind": "official_portal",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "OK",
+      "excerpt_or_section_ref": "포털 접속 확인. 기자재별 대상 판단 기준은 미반영",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-HACCP", "regulator": "식품의약품안전처 · 한국식품안전관리인증원", "title": "HACCP(식품안전관리인증기준)",
-      "official_url": "https://www.haccp.or.kr", "source_kind": "official_portal", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "OK", "excerpt_or_section_ref": "포털 접속 확인. 의무적용 품목 기준은 미반영", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_id": "S-HACCP",
+      "regulator": "식품의약품안전처 · 한국식품안전관리인증원",
+      "title": "HACCP(식품안전관리인증기준)",
+      "official_url": "https://www.haccp.or.kr",
+      "source_kind": "official_portal",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "OK",
+      "excerpt_or_section_ref": "포털 접속 확인. 의무적용 품목 기준은 미반영",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-WOMEN", "regulator": "중소벤처기업부 · 한국여성경제인협회", "title": "여성기업 확인",
-      "official_url": "https://www.wbiz.or.kr", "source_kind": "official_portal", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "UNREACHABLE", "excerpt_or_section_ref": "개발 환경에서 접속 불가 — 링크 유효성 미검증", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_id": "S-WOMEN",
+      "regulator": "중소벤처기업부 · 한국여성경제인협회",
+      "title": "여성기업 확인",
+      "official_url": "https://www.wbiz.or.kr",
+      "source_kind": "official_portal",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "UNREACHABLE",
+      "excerpt_or_section_ref": "개발 환경에서 접속 불가 — 링크 유효성 미검증",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-DISABLED", "regulator": "중소벤처기업부 · 장애인기업종합지원센터", "title": "장애인기업 확인",
-      "official_url": "https://www.debc.or.kr", "source_kind": "official_portal", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "UNREACHABLE", "excerpt_or_section_ref": "개발 환경에서 접속 불가 — 링크 유효성 미검증", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_id": "S-DISABLED",
+      "regulator": "중소벤처기업부 · 장애인기업종합지원센터",
+      "title": "장애인기업 확인",
+      "official_url": "https://www.debc.or.kr",
+      "source_kind": "official_portal",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "UNREACHABLE",
+      "excerpt_or_section_ref": "개발 환경에서 접속 불가 — 링크 유효성 미검증",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-FAMILY", "regulator": "가족친화인증 운영기관(정부)", "title": "가족친화인증",
-      "official_url": "https://www.ffm.go.kr", "source_kind": "official_portal", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "UNREACHABLE", "excerpt_or_section_ref": "개발 환경에서 접속 불가 — 주관부처·링크 유효성 미검증", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_id": "S-FAMILY",
+      "regulator": "가족친화인증 운영기관(정부)",
+      "title": "가족친화인증",
+      "official_url": "https://www.ffm.go.kr",
+      "source_kind": "official_portal",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "UNREACHABLE",
+      "excerpt_or_section_ref": "개발 환경에서 접속 불가 — 주관부처·링크 유효성 미검증",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-SOCIALV", "regulator": "중소벤처기업부 · 기술보증기금(판별 운영)", "title": "소셜벤처 판별",
-      "official_url": "https://www.kibo.or.kr", "source_kind": "official_portal", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "UNREACHABLE", "excerpt_or_section_ref": "개발 환경에서 접속 불가 — 판별 기관·링크 유효성 미검증", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_id": "S-SOCIALV",
+      "regulator": "중소벤처기업부 · 기술보증기금(판별 운영)",
+      "title": "소셜벤처 판별",
+      "official_url": "https://www.kibo.or.kr",
+      "source_kind": "official_portal",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "UNREACHABLE",
+      "excerpt_or_section_ref": "개발 환경에서 접속 불가 — 판별 기관·링크 유효성 미검증",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-ISO", "regulator": "ISO (International Organization for Standardization)", "title": "ISO — Certification",
-      "official_url": "https://www.iso.org/certification.html", "source_kind": "standards_body", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "BLOCKED", "excerpt_or_section_ref": "봇 차단(403). 'ISO는 인증서를 직접 발행하지 않고 외부 인증기관이 인증' — v2.0 요구사항 문서 기재 내용, 이번 개발 중 원문 재확인 못 함", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_id": "S-ISO",
+      "regulator": "ISO (International Organization for Standardization)",
+      "title": "ISO — Certification",
+      "official_url": "https://www.iso.org/certification.html",
+      "source_kind": "standards_body",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "BLOCKED",
+      "excerpt_or_section_ref": "봇 차단(403). 'ISO는 인증서를 직접 발행하지 않고 외부 인증기관이 인증' — v2.0 요구사항 문서 기재 내용, 이번 개발 중 원문 재확인 못 함",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-EU-CE", "regulator": "European Union", "title": "Your Europe — CE marking",
+      "source_id": "S-EU-CE",
+      "regulator": "European Union",
+      "title": "Your Europe — CE marking",
       "official_url": "https://europa.eu/youreurope/business/product-rules-compliance/general-product-compliance/ce-marking/index_en.htm",
-      "source_kind": "regulator_guide", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "OK", "excerpt_or_section_ref": "CE 표시는 해당 EU 제품 법규가 요구하는 제품에만 적용 — 제품군별 법규·적합성평가 경로 확인 필요", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_kind": "regulator_guide",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "OK",
+      "excerpt_or_section_ref": "CE 표시는 해당 EU 제품 법규가 요구하는 제품에만 적용 — 제품군별 법규·적합성평가 경로 확인 필요",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-EU-CA", "regulator": "European Commission", "title": "Conformity assessment",
+      "source_id": "S-EU-CA",
+      "regulator": "European Commission",
+      "title": "Conformity assessment",
       "official_url": "https://single-market-economy.ec.europa.eu/single-market/goods/building-blocks/conformity-assessment_en",
-      "source_kind": "regulator_guide", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "OK", "excerpt_or_section_ref": "적합성평가(자체 평가 또는 Notified Body 관여)는 해당 법규에 따라 결정", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_kind": "regulator_guide",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "OK",
+      "excerpt_or_section_ref": "적합성평가(자체 평가 또는 Notified Body 관여)는 해당 법규에 따라 결정",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-FDA-RL", "regulator": "U.S. FDA", "title": "Important Reminders about Registration and Listing (Medical Devices)",
+      "source_id": "S-FDA-RL",
+      "regulator": "U.S. FDA",
+      "title": "Important Reminders about Registration and Listing (Medical Devices)",
       "official_url": "https://www.fda.gov/medical-devices/device-registration-and-listing/important-reminders-about-registration-and-listing",
-      "source_kind": "regulator_guide", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "OK", "excerpt_or_section_ref": "시설 등록·제품 목록 등재는 FDA의 승인·허가(clearance/approval)를 의미하지 않음", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_kind": "regulator_guide",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "OK",
+      "excerpt_or_section_ref": "시설 등록·제품 목록 등재는 FDA의 승인·허가(clearance/approval)를 의미하지 않음",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-FDA-DEV", "regulator": "U.S. FDA", "title": "Overview of Device Regulation",
+      "source_id": "S-FDA-DEV",
+      "regulator": "U.S. FDA",
+      "title": "Overview of Device Regulation",
       "official_url": "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/overview-device-regulation",
-      "source_kind": "regulator_guide", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "OK", "excerpt_or_section_ref": "의료기기 규제 개요(등급 분류·시판 전 경로). v2.0 문서의 'device-approvals-and-clearances' 주소는 404로 대체", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_kind": "regulator_guide",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "OK",
+      "excerpt_or_section_ref": "의료기기 규제 개요(등급 분류·시판 전 경로). v2.0 문서의 'device-approvals-and-clearances' 주소는 404로 대체",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-FDA-FOOD", "regulator": "U.S. FDA", "title": "Registration of Food Facilities and Other Submissions",
+      "source_id": "S-FDA-FOOD",
+      "regulator": "U.S. FDA",
+      "title": "Registration of Food Facilities and Other Submissions",
       "official_url": "https://www.fda.gov/food/guidance-regulation-food-and-dietary-supplements/registration-food-facilities-and-other-submissions",
-      "source_kind": "regulator_guide", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "OK", "excerpt_or_section_ref": "식품 시설 등록 안내", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_kind": "regulator_guide",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "OK",
+      "excerpt_or_section_ref": "식품 시설 등록 안내",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     },
     {
-      "source_id": "S-FCC", "regulator": "U.S. FCC", "title": "Equipment Authorization",
-      "official_url": "https://www.fcc.gov/oet/ea", "source_kind": "regulator_guide", "document_identifier": null,
-      "published_at": null, "effective_from": null, "effective_until": null, "checked_at": "2026-11-22",
-      "access_status": "BLOCKED", "excerpt_or_section_ref": "봇 차단(403) — Certification / Supplier's Declaration of Conformity 등 경로 구분은 원문 재확인 필요", "reviewer": null, "review_status": "UNVERIFIED"
+      "source_id": "S-FCC",
+      "regulator": "U.S. FCC",
+      "title": "Equipment Authorization",
+      "official_url": "https://www.fcc.gov/oet/ea",
+      "source_kind": "regulator_guide",
+      "document_identifier": null,
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-22",
+      "access_status": "BLOCKED",
+      "excerpt_or_section_ref": "봇 차단(403) — Certification / Supplier's Declaration of Conformity 등 경로 구분은 원문 재확인 필요",
+      "reviewer": null,
+      "review_status": "UNVERIFIED"
     }
   ]
 }
