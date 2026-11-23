@@ -169,7 +169,7 @@ export const CHECKS = {
     if (r < Math.min(pct, pct_culture)) return { status: S.FAIL, inputs: [invest, capital], detail: `${shown} / 기준 ${th}% 이상` };
     if (cul === 'yes') return { status: S.PASS, inputs: [invest, capital, culture], detail: `${shown} / 문화산업 제작자 법인 기준 ${pct_culture}% 이상` };
     if (cul === 'no') return { status: S.FAIL, inputs: [invest, capital, culture], detail: `${shown} / 기준 ${pct}% 이상` };
-    return { status: S.UNKNOWN, missing: [culture], inputs: [invest, capital, culture], detail: `${shown} — 문화산업 제작자 법인이면 7%, 아니면 10% 기준이에요.` };
+    return { status: S.UNKNOWN, missing: [culture], inputs: [invest, capital, culture], detail: `${shown} — 문화산업 제작자 법인이면 ${pct_culture}%, 아니면 ${pct}% 기준이에요.` };
   },
   venture_rd_ratio({ spend, revenue, industry, ratio_q }, ctx) {
     const a = ctx.answers; const sp = num(a[spend]); const rv = num(a[revenue]);
@@ -261,12 +261,13 @@ export const CHECKS = {
     return { status: S.UNKNOWN, missing: miss, inputs, detail: `${shown} — 기준 인원을 정하려면 추가 정보가 필요해요.` };
   },
   // 시행규칙 제2조②1호: 독립 연구공간 원칙 + 칸막이·2m 벽체 예외
-  rnd_space({ unit, partition_industries: inds }, ctx) {
+  // 면적·벽체 높이 기준은 규칙팩 args(area_m2·wall_m)에서만 읽는다
+  rnd_space({ unit, partition_industries: inds, area_m2: area, wall_m: wall }, ctx) {
     const a = ctx.answers; const sp = a.rnd_space;
     const inputs = ['rnd_space'];
     if (sp === 'independent') return { status: S.PASS, inputs, detail: '고정 벽체·별도 출입문 독립 공간' };
     if (sp === 'none') return { status: S.FAIL, inputs, detail: '연구공간 없음' };
-    if (sp === 'partial_wall') return { status: S.UNKNOWN, inputs, detail: '2m 이상 벽체 예외는 ① 2m 이상 고정 벽체·별도 출입문 ② 전용 공간으로 명확히 식별 ③ 건축 관계 법령 적합을 모두 갖춰야 하고, 벽체로 천장까지 구분할 수 없는 사유(환기·소방 등)가 있어야 해요. 현장 확인이 필요해요.' };
+    if (sp === 'partial_wall') return { status: S.UNKNOWN, inputs, detail: `${wall}m 이상 벽체 예외는 ① ${wall}m 이상 고정 벽체·별도 출입문 ② 전용 공간으로 명확히 식별 ③ 건축 관계 법령 적합을 모두 갖춰야 하고, 벽체로 천장까지 구분할 수 없는 사유(환기·소방 등)가 있어야 해요. 현장 확인이 필요해요.` };
     if (sp !== 'partition') return { status: S.UNKNOWN, missing: ['rnd_space'], inputs };
     // 칸막이: (중소기업 | 연구개발형 중소기업·벤처 | 전담부서이면서 정보서비스·SW개발공급업) AND 50㎡ 초과 확보 불가
     const elig = [tri(a.is_sme), tri(a.rnd_is_venture), tri(a.rnd_founder_researcher)];
@@ -275,8 +276,8 @@ export const CHECKS = {
     const o = tri(a.rnd_space_over50_impossible);
     const allInputs = ['rnd_space', 'is_sme', 'rnd_is_venture', 'rnd_space_over50_impossible'];
     if (e === false) return { status: S.FAIL, inputs: allInputs, detail: '칸막이 예외는 중소기업·벤처기업 등에만 인정돼요.' };
-    if (o === false) return { status: S.FAIL, inputs: allInputs, detail: '50㎡ 초과 면적을 확보할 수 있으면 칸막이 예외가 인정되지 않아요.' };
-    if (e === true && o === true) return { status: S.PASS, inputs: allInputs, detail: '칸막이 구분 예외(50㎡ 초과 확보 불가) 해당' };
+    if (o === false) return { status: S.FAIL, inputs: allInputs, detail: `${area}㎡ 초과 면적을 확보할 수 있으면 칸막이 예외가 인정되지 않아요.` };
+    if (e === true && o === true) return { status: S.PASS, inputs: allInputs, detail: `칸막이 구분 예외(${area}㎡ 초과 확보 불가) 해당` };
     const miss = [];
     if (e === null) miss.push('is_sme');
     if (o === null) miss.push('rnd_space_over50_impossible');

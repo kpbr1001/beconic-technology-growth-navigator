@@ -57,7 +57,17 @@
                   "args": {
                     "q": "rnd_researchers",
                     "unit": "명",
-                    "staff": { "small": 3, "startup_years": 3, "small_startup": 2, "medium": 5, "transition_years": 1, "medium_transition": 3, "venture_or_founder": 2, "midsize": 7, "large": 10 }
+                    "staff": {
+                      "small": 3,
+                      "startup_years": 3,
+                      "small_startup": 2,
+                      "medium": 5,
+                      "transition_years": 1,
+                      "medium_transition": 3,
+                      "venture_or_founder": 2,
+                      "midsize": 7,
+                      "large": 10
+                    }
                   },
                   "source_refs": [
                     "S-RND-DEC",
@@ -85,7 +95,9 @@
                   "label": "연구공간 기준(독립 공간 또는 인정되는 예외)",
                   "check": "rnd_space",
                   "args": {
-                    "unit": "institute"
+                    "unit": "institute",
+                    "area_m2": 50,
+                    "wall_m": 2
                   },
                   "source_refs": [
                     "S-RND-RULE"
@@ -214,7 +226,12 @@
                   "check": "rnd_space",
                   "args": {
                     "unit": "dept",
-                    "partition_industries": ["software_582", "info_63"]
+                    "partition_industries": [
+                      "software_582",
+                      "info_63"
+                    ],
+                    "area_m2": 50,
+                    "wall_m": 2
                   },
                   "source_refs": [
                     "S-RND-RULE"

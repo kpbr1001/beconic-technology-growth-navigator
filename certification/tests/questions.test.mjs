@@ -116,3 +116,36 @@ test('QS-07 조건식 or: and가 먼저 묶이고, 전담부서는 칸막이를 
   assert.equal(evalExpr('a == 1 or b == 2 and c == 3', { a: 0, b: 2, c: 4 }), false);
   assert.equal(evalExpr('a == 1 or b == 2 and c == 3', { a: 1 }), true);
 });
+
+test('QS-08 인증별 질문: 그 인증만 고르면 화면의 인증별 질문은 모두 그 인증 규칙이 쓰는 것(군더더기 0)', () => {
+  for (const id of SCHEMES) {
+    const used = questionsUsedBy(D.packs[id], D.questionMap);
+    const { per } = answerQuestions({ selected: [id], answers: {}, f: {} }, D);
+    const idle = per.flatMap((p) => p.list).map((q) => q.question_id).filter((q) => !used.has(q));
+    assert.deepEqual(idle, [], `${id}: 규칙이 쓰지 않는 인증별 질문`);
+  }
+});
+
+test('QS-09 모든 인증(86개): 결과에 할 일 2개 이상, 판정 없는 인증은 준비 점검·신청 단계 포함, 문항은 판정·체크·트리아지·준비점검 중 하나', async () => {
+  const { buildReport } = await import('../src/model.js');
+  for (const s of D.catalog.schemes) {
+    const R = buildReport(D, { answers: {}, selected: [s.scheme_id], docStatus: {}, asOf: AS_OF });
+    const acts = R.actions.filter((a) => a.scheme_id === s.scheme_id);
+    assert.ok(acts.length >= 2, `${s.scheme_id}: 할 일 ${acts.length}개`);
+    const kinds = [!!D.packs[s.scheme_id], !!s.self_check, !!s.triage, !!s.prep_check].filter(Boolean).length;
+    assert.equal(kinds, 1, `${s.scheme_id}: 문항 유형 ${kinds}개`);
+    if (!D.packs[s.scheme_id]) assert.ok(acts.some((a) => a.timeframe === 'd90'), `${s.scheme_id}: 신청 단계 없음`);
+    if (s.prep_check) {
+      const { per } = answerQuestions({ selected: [s.scheme_id], answers: {}, f: {} }, D);
+      assert.equal(per[0].checks.length, 3, `${s.scheme_id}: 준비 점검 3문항`);
+      assert.ok(per[0].checks[0].why && per[0].checks[0].why === s.first_check, `${s.scheme_id}: 첫 문항 이유 = 먼저 확인할 것`);
+    }
+  }
+});
+
+test('QS-10 제품·판매 시장 질문은 그 답을 쓰는 해외 규정 트리아지 인증을 고를 때만', () => {
+  for (const s of D.catalog.schemes) {
+    const { exp } = answerQuestions({ selected: [s.scheme_id], answers: {}, f: {} }, D);
+    assert.equal(exp.length > 0, !!s.triage, `${s.scheme_id}: 제품·시장 질문 ${exp.length}개`);
+  }
+});
