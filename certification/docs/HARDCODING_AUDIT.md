@@ -65,3 +65,18 @@
 ## v1에 남아 있는 것(v2에서 처리)
 - 실행계획의 '30·60·90일' 기간 구분은 근거 없는 일정처럼 읽힐 수 있음 → v2는 '먼저·다음·그다음'으로 순서만 표시
 - P1 #4~#7, P2 전부
+
+## v2.1.1 재점검 (2026-11-23)
+
+| # | 위치 | 하드코딩 | 조치 |
+|---|---|---|---|
+| H1 | engine.js 투자금 비율 안내 | "문화산업 제작자 법인이면 7%, 아니면 10%" | 규칙팩 args(pct·pct_culture)로 표시 |
+| H2 | engine.js 연구공간 | 50㎡·2m 문구 | 규칙팩 args(area_m2·wall_m) |
+| H3 | views.js 연구개발비 비율 | "5·6·7·8·10%" | 벤처 판정표에서 계산 |
+| H4 | views.js / recommend.js | 목적 목록·라벨 3곳 중복 | questions.json purposes(short 라벨)에서 |
+| H5 | recommend.js | 예비창업 제외 인증 ID 목록 | catalog `needs_business_registration`(규칙팩과 일치 검사 HC-03) |
+| H6 | triage.js | CE·FDA·FCC 규정 검토 문구 | catalog `triage_specs` |
+| 유지 | search.js 목적 검색어, ui.js 라벨·분야, HTTP 허용 호스트 | 화면 어휘·보안 허용 목록 | 코드에 두되, 검색어 키 = 목적 선택지 검사(HC-03) |
+
+재발 방지: HC-02(코드 문자열 안 기준 숫자·인증 ID 목록·규정 문구 금지), HC-03(데이터 일관성).
+

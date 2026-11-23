@@ -5,7 +5,7 @@ import { computeReadiness, readinessSentence, EVIDENCE } from './readiness.js';
 import { recommend, TIER_LABEL } from './recommend.js';
 import { triage } from './triage.js';
 
-export const APP_VERSION = '2.1.0';
+export const APP_VERSION = '2.1.1';
 
 export const CATEGORY = {
   1: '신청 장애 요인 제거·확인',
@@ -40,7 +40,7 @@ export function buildReport(data, state) {
   const asOf = state.asOf;
   const selected = state.selected || [];
   const ctx = { schemes: selected };
-  const recs = recommend(data.catalog.schemes, answers);
+  const recs = recommend(data.catalog.schemes, answers, data.questionMap);
   const recMap = Object.fromEntries(recs.map((r) => [r.scheme.scheme_id, r]));
 
   const schemes = selected.map((id) => {
@@ -53,9 +53,11 @@ export function buildReport(data, state) {
       ? computeReadiness(scheme.readiness_items, answers, state.docStatus || {}, ctx) : null;
     const selfItems = scheme.self_check ? data.catalog.self_checks[scheme.self_check].items : null;
     const selfcheck = selfItems ? computeReadiness(selfItems.map((i) => ({ ...i, item_id: `${id}:${i.item_id}`, applies_when: 'always' })), answers, state.docStatus || {}, ctx) : null;
-    const tri = scheme.triage ? triage(scheme, answers) : null;
+    const tri = scheme.triage ? triage(scheme, answers, data.catalog.triage_specs) : null;
+    const prepMeta = scheme.prep_check ? (data.catalog.prep_checks || {})[scheme.prep_check] : null;
+    const prep = prepMeta ? computeReadiness(prepItems(scheme, prepMeta).map((i) => ({ ...i, item_id: `${id}:${i.item_id}`, applies_when: 'always' })), answers, state.docStatus || {}, ctx) : null;
     const miss = result && result.gate.active ? missingInputs(result).map((q) => ({ q, label: questionLabel(data, q) })) : [];
-    return { scheme, rec: recMap[id], result, label, readiness, selfcheck, selfcheckMeta: scheme.self_check ? data.catalog.self_checks[scheme.self_check] : null, triage: tri, missing: miss, ongoing: ongoingFor(scheme) };
+    return { scheme, rec: recMap[id], result, label, readiness, selfcheck, selfcheckMeta: scheme.self_check ? data.catalog.self_checks[scheme.self_check] : null, prep, prepMeta, triage: tri, missing: miss, ongoing: ongoingFor(scheme) };
   }).filter(Boolean);
 
   // ── 요건 집계(중복 원자요건 1회) ──
@@ -183,16 +185,32 @@ export function buildActions(data, schemes) {
         if (d.status === EVIDENCE.NOT_AVAILABLE) push({ category: d.required ? 3 : 4, timeframe: d.required ? 'd60' : 'd90', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `운영 준비: ${d.label}`, detail: d.why, basis: '', owner: '품질·운영 책임자', deliverable: d.label, done_when: '운영 기록 확보' });
       });
     }
+    if (s.selfcheck) {
+      const open = s.selfcheck.rows.filter((d) => d.status !== EVIDENCE.NOT_AVAILABLE && d.status !== EVIDENCE.SELF_DECLARED_AVAILABLE);
+      if (open.length) push({ category: 1, timeframe: 'now', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `준비상태 ${open.length}개 확인`, detail: open.map((d) => d.label).join(' · '), basis: '', owner: '품질·운영 책임자', deliverable: '자가점검 결과', done_when: '진단에 네·아니요로 입력' });
+    }
+    if (s.prep) {
+      s.prep.rows.filter((d) => d.status !== EVIDENCE.SELF_DECLARED_AVAILABLE).forEach((d) => {
+        const t = d.todo || {};
+        push({ category: t.timeframe === 'now' ? 1 : 2, timeframe: t.timeframe || 'd30', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: t.title || d.label, detail: d.why, basis: s.scheme.official_link, owner: '경영지원', deliverable: d.label, done_when: '공식 기관 안내 확인' });
+      });
+    }
+    if (!s.result) {
+      push({ category: 3, timeframe: 'd90', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: s.triage ? '공식 절차 진행' : '신청·접수', detail: s.triage ? '판매국 규정에 맞는 시험·등록·신청 절차를 진행해요.' : '공식 신청처에서 신청서를 작성하고 접수해요.', basis: (s.scheme.apply_site && s.scheme.apply_site.url) || s.scheme.official_link, owner: '대표', deliverable: '신청 접수', done_when: '접수 완료 확인' });
+    }
     if (s.triage) {
       push({ category: 1, timeframe: 'now', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname}: 적용 규정 확인`, detail: s.triage.missing.length ? `먼저 정리할 정보: ${s.triage.missing.map((m) => m.text).join(', ')}` : '판매국 규제기관 원문 또는 전문가로 적용 법규·절차를 확인하세요.', basis: s.scheme.official_link, owner: '대표·해외영업', deliverable: '적용 규정 목록', done_when: '적용 법규·절차 확정' });
-    } else if (!s.result && !s.selfcheck) {
-      push({ category: 4, timeframe: 'd30', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname}: 공식 요건 확인`, detail: s.scheme.first_check, basis: s.scheme.official_link, owner: '경영지원', deliverable: '요건 확인 메모', done_when: '공식 기관 안내 확인' });
     }
-    if (s.ongoing && s.result && s.result.gate.active && s.result.basic !== S.NA && s.result.basic !== S.FAIL) {
+    if (s.ongoing && (!s.result || (s.result.gate.active && s.result.basic !== S.NA && s.result.basic !== S.FAIL))) {
       push({ category: 5, timeframe: 'ongoing', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: '유효기간·사후관리', detail: s.ongoing, basis: '', owner: '경영지원', deliverable: '관리 일정', done_when: '캘린더 등록' });
     }
   });
   return out.sort((a, b) => a.category - b.category || a.rank - b.rank).map((a, i) => ({ ...a, order: i + 1, category_label: CATEGORY[a.category], timeframe_label: TIMEFRAME[a.timeframe] }));
+}
+
+// 준비 점검 문항 — why_from이 있으면 인증 데이터의 해당 문구(예: first_check)를 이유로 쓴다
+export function prepItems(scheme, meta) {
+  return ((meta && meta.items) || []).map((i) => ({ ...i, why: i.why_from ? scheme[i.why_from] || '' : i.why }));
 }
 
 export function groupRoadmap(actions) {

@@ -298,6 +298,27 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   await p.context().close();
 }
 
+// ── E29 정보 안내 인증(HACCP): 준비 점검 3문항 → 결과 탭 5개(스크롤바 없음)·할 일 기본 세트 ──
+{
+  const p = await newPage({ w: 1280, h: 900 });
+  await pick(p, ['HACCP']);
+  const checks = await p.$$eval('#sec-HACCP ~ fieldset.q, fieldset.q', (e) => e.filter((x) => x.querySelector('[data-sc^="HACCP:"]')).length);
+  await p.click('label.chip:has(> input[data-sc="HACCP:P1"][value="have"])');
+  await toResult(p);
+  const tabs = await p.$$eval('#res-HACCP .rtabs [role="tab"]', (e) => e.map((x) => x.textContent.trim()));
+  const bar = await p.$eval('#res-HACCP .rtabs', (e) => ({ sh: e.scrollHeight, ch: e.clientHeight, ov: getComputedStyle(e).overflowY }));
+  await p.click('#tb-HACCP-todo');
+  const todo = await p.$$eval('#tp-HACCP-todo .ph', (e) => e.map((x) => x.textContent.replace(/\s+/g, ' ').trim()));
+  const todoTxt = todo.join(' | ');
+  await p.click('#tb-HACCP-req');
+  const prep = await p.$eval('#tp-HACCP-req', (e) => e.textContent);
+  check('E29 정보 안내 인증(HACCP): 준비 점검 3문항, 결과 탭 5개 항상 표시(서류 0 대신 서류, 스크롤바 없음), 할 일 = 서류·비용 확인 + 신청, 확인한 항목은 할 일에서 빠짐',
+    checks === 3 && tabs.join(',') === '요건,서류,비용·기간,할 일,근거' && bar.sh <= bar.ch + 1 && bar.ov === 'visible'
+    && /신청서류 목록 확인/.test(todoTxt) && /신청·접수/.test(todoTxt) && !/신청 대상·요건 확인/.test(todoTxt) && /신청 준비 점검/.test(prep),
+    `${checks} · ${tabs.join(',')} · ${JSON.stringify(bar)} · ${todoTxt.slice(0, 160)}`);
+  await p.context().close();
+}
+
 // ── E07 해외 제품 규제: 의무·승인 확정 표현 없음 ──
 {
   const p = await newPage({ w: 1280 });

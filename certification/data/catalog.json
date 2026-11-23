@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.23-3",
+  "version": "2026.11.23-4",
   "schemes": [
     {
       "scheme_id": "VEN",
@@ -505,7 +505,8 @@
       ],
       "industry_major": [
         "all"
-      ]
+      ],
+      "needs_business_registration": true
     },
     {
       "scheme_id": "MAIN",
@@ -699,7 +700,8 @@
       ],
       "industry_major": [
         "all"
-      ]
+      ],
+      "needs_business_registration": true
     },
     {
       "scheme_id": "RNDI",
@@ -883,7 +885,8 @@
       ],
       "industry_major": [
         "all"
-      ]
+      ],
+      "needs_business_registration": true
     },
     {
       "scheme_id": "RNDD",
@@ -1005,7 +1008,8 @@
       ],
       "industry_major": [
         "all"
-      ]
+      ],
+      "needs_business_registration": true
     },
     {
       "scheme_id": "KC-SAFETY",
@@ -1063,7 +1067,8 @@
         "mach",
         "chem",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "KC-RADIO",
@@ -1118,7 +1123,8 @@
         "elec",
         "ict",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "HACCP",
@@ -1170,7 +1176,8 @@
       "industry_major": [
         "food",
         "agri"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "WOMEN",
@@ -1217,7 +1224,8 @@
       "disclaimer": "정보 안내만 제공해요. 링크 접속은 개발 환경에서 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "DISABLED",
@@ -1263,7 +1271,8 @@
       "disclaimer": "정보 안내만 제공해요. 링크 접속은 개발 환경에서 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "FAMILY",
@@ -1310,7 +1319,8 @@
       "disclaimer": "정보 안내만 제공해요. 주관기관 명칭은 미검증이고, 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "SOCIALV",
@@ -1358,7 +1368,8 @@
       "disclaimer": "정보 안내만 제공해요. 운영기관·링크는 미검증이에요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ISO9001",
@@ -1937,7 +1948,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "SOCIAL-ENT",
@@ -1985,7 +1997,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "PRE-SOCIAL",
@@ -2031,7 +2044,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ROOT-IND",
@@ -2079,7 +2093,8 @@
         "mach",
         "elec",
         "chem"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "DIRECT-PROD",
@@ -2126,7 +2141,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "PERF-CERT",
@@ -2172,7 +2188,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "SHARE-PERF",
@@ -2219,7 +2236,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "GLOBAL-1000",
@@ -2268,7 +2286,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "SW-BIZ",
@@ -2315,7 +2334,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "ict"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "RND-SERVICE",
@@ -2361,7 +2381,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "pro"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "CREATIVE-LAB",
@@ -2410,7 +2431,8 @@
         "culture",
         "pro",
         "ict"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "GS-CERT",
@@ -2458,7 +2480,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "ict"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "NEP",
@@ -2505,7 +2528,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "NET",
@@ -2552,7 +2576,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "GREEN-CERT",
@@ -2600,7 +2625,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "PPS-EXCELLENT",
@@ -2647,7 +2673,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "INNOV-PROD",
@@ -2693,7 +2720,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "KS",
@@ -2746,7 +2774,8 @@
         "food",
         "chem",
         "constr"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "HIGH-EFF",
@@ -2795,7 +2824,8 @@
         "elec",
         "mach",
         "constr"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ENERGY-LABEL",
@@ -2843,7 +2873,8 @@
         "elec",
         "mach",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ECO-LABEL",
@@ -2890,7 +2921,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "GR-MARK",
@@ -2939,7 +2971,8 @@
         "chem",
         "mach",
         "constr"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "GOOD-DESIGN",
@@ -2985,7 +3018,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "KR-MEDICAL",
@@ -3034,7 +3068,8 @@
       "industry_major": [
         "bio",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ISMS-P",
@@ -3082,7 +3117,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "CC-CERT",
@@ -3131,7 +3167,8 @@
       "industry_major": [
         "ict",
         "elec"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "KOSHA-MS",
@@ -3178,7 +3215,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "DISABLED-WS",
@@ -3224,7 +3262,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ECO-AGRI",
@@ -3273,7 +3312,8 @@
       "industry_major": [
         "agri",
         "food"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "KCS-SAFETY",
@@ -3321,7 +3361,8 @@
       "industry_major": [
         "mach",
         "elec"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "CARBON-LABEL",
@@ -3369,7 +3410,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ISO50001",
@@ -3416,7 +3458,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ISO37001",
@@ -3463,7 +3506,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ISO37301",
@@ -3510,7 +3554,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ISO27701",
@@ -3557,7 +3602,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ISO22301",
@@ -3604,7 +3650,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "ISO20000",
@@ -3653,7 +3700,8 @@
         "ict",
         "pro",
         "svc"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "IATF16949",
@@ -3703,7 +3751,8 @@
         "mach",
         "elec",
         "chem"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "AS9100",
@@ -3752,7 +3801,8 @@
         "mach",
         "elec",
         "chem"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "FSSC22000",
@@ -3801,7 +3851,8 @@
       "industry_major": [
         "food",
         "agri"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "SOC2",
@@ -3851,7 +3902,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "PCI-DSS",
@@ -3898,7 +3950,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "CMMI",
@@ -3945,7 +3998,8 @@
       "industry_major": [
         "ict",
         "pro"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "BCORP",
@@ -3993,7 +4047,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "all"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "FSC",
@@ -4044,7 +4099,8 @@
         "agri",
         "trade",
         "culture"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "CB-SCHEME",
@@ -4094,7 +4150,8 @@
         "elec",
         "mach",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "IECEX",
@@ -4144,7 +4201,8 @@
         "mach",
         "chem",
         "constr"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "EU-ROHS",
@@ -4192,7 +4250,8 @@
         "elec",
         "mach",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "EU-REACH",
@@ -4243,7 +4302,8 @@
         "food",
         "chem",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "EU-MDR",
@@ -4290,7 +4350,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "bio"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "UKCA",
@@ -4341,7 +4402,8 @@
         "food",
         "chem",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "US-FDA-COS",
@@ -4390,7 +4452,8 @@
         "food",
         "chem",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "US-NRTL",
@@ -4441,7 +4504,8 @@
         "elec",
         "mach",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "US-ENERGY-STAR",
@@ -4490,7 +4554,8 @@
         "elec",
         "mach",
         "constr"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "JP-PSE",
@@ -4537,7 +4602,8 @@
       "industry_major": [
         "elec",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "CN-CCC",
@@ -4589,7 +4655,8 @@
         "food",
         "chem",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "IN-BIS",
@@ -4640,7 +4707,8 @@
         "food",
         "chem",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "SA-SASO",
@@ -4692,7 +4760,8 @@
         "food",
         "chem",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "EAEU-EAC",
@@ -4744,7 +4813,8 @@
         "food",
         "chem",
         "trade"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "CN-NMPA",
@@ -4790,7 +4860,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "bio"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "JP-PMDA",
@@ -4836,7 +4907,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
       "industry_major": [
         "bio"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "AU-TGA",
@@ -4883,7 +4955,8 @@
       "industry_major": [
         "bio",
         "food"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "CA-HC-MD",
@@ -4930,7 +5003,8 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
       "industry_major": [
         "bio"
-      ]
+      ],
+      "prep_check": "info_basic"
     },
     {
       "scheme_id": "HALAL-MY",
@@ -4980,7 +5054,8 @@
         "agri",
         "bio",
         "chem"
-      ]
+      ],
+      "prep_check": "info_basic"
     }
   ],
   "self_checks": {
@@ -5043,6 +5118,96 @@
           "why": "기관마다 요구가 다를 수 있어요.",
           "where": "인증기관 문의",
           "required": false
+        }
+      ]
+    }
+  },
+  "triage_specs": {
+    "eu_ce": {
+      "market": "EU",
+      "market_label": "EU",
+      "notes": {
+        "electrical": "전기·전자제품은 전기안전·전자파 관련 EU 제품 법규의 적용 대상인지 검토 후보예요.",
+        "radio": "무선 기능이 있으면 무선기기 관련 EU 제품 법규 검토 후보예요.",
+        "medical": "의료 목적이면 EU 의료기기 법규 검토 후보예요(제품 등급에 따라 Notified Body 관여).",
+        "machinery": "기계류는 기계 관련 EU 제품 법규 검토 후보예요.",
+        "toy_child": "어린이용 완구는 완구 안전 관련 EU 제품 법규 검토 후보예요.",
+        "chemical": "화학제품은 CE 표시 대상이 아닌 별도 화학물질 규제가 적용될 수 있어요.",
+        "software": "실물 제품이 없는 소프트웨어·서비스는 CE 표시 대상이 아닐 수 있어요. 별도 확인이 필요해요.",
+        "food": "식품은 CE 표시 대상이 아니에요. EU 식품 법규를 따로 확인하세요.",
+        "cosmetics": "화장품은 CE 표시 대상이 아니에요. EU 화장품 법규를 따로 확인하세요."
+      }
+    },
+    "us_fda_device": {
+      "market": "US",
+      "market_label": "미국",
+      "needs": [
+        "medical"
+      ],
+      "notes": {
+        "medical": "사용 목적(intended use)과 기기 분류에 따라 시판 전 절차가 달라요. 시설 등록·목록 등재는 FDA 승인이 아니에요."
+      }
+    },
+    "us_fda_food": {
+      "market": "US",
+      "market_label": "미국",
+      "needs": [
+        "food"
+      ],
+      "notes": {
+        "food": "식품 시설 등록은 승인·인증이 아니에요. 제품 유형별 추가 규정을 확인하세요."
+      }
+    },
+    "us_fcc": {
+      "market": "US",
+      "market_label": "미국",
+      "needs": [
+        "radio",
+        "electrical"
+      ],
+      "notes": {
+        "radio": "무선 송신 기기는 Certification 등 경로 검토 후보예요.",
+        "electrical": "전자파를 내는 전자기기는 공급자 적합성 선언(SDoC) 등 경로 검토 후보예요."
+      }
+    }
+  },
+  "prep_checks": {
+    "info_basic": {
+      "title": "신청 준비 점검",
+      "note": "정보 안내 인증은 자격을 판정하지 않아요. 신청 전에 확인할 3가지를 점검하고, 확인하지 못한 것은 할 일로 정리해 드려요.",
+      "items": [
+        {
+          "item_id": "P1",
+          "label": "신청 대상·요건을 공식 기관 안내에서 확인했다",
+          "why_from": "first_check",
+          "where": "공식 기관 안내",
+          "required": true,
+          "todo": {
+            "timeframe": "now",
+            "title": "신청 대상·요건 확인"
+          }
+        },
+        {
+          "item_id": "P2",
+          "label": "신청서류 목록을 공식 안내에서 확인했다",
+          "why": "기관마다 서식·첨부 서류가 달라요. 공식 안내의 최신 목록으로 준비하세요.",
+          "where": "공식 기관 안내",
+          "required": true,
+          "todo": {
+            "timeframe": "d30",
+            "title": "신청서류 목록 확인·준비"
+          }
+        },
+        {
+          "item_id": "P3",
+          "label": "신청처·수수료·처리기간을 확인했다",
+          "why": "이 앱은 공식 원문과 대조한 금액·기간만 보여 줘요. 이 인증은 기관 안내로 확인이 필요해요.",
+          "where": "공식 기관 안내",
+          "required": true,
+          "todo": {
+            "timeframe": "now",
+            "title": "신청처·수수료·처리기간 확인"
+          }
         }
       ]
     }

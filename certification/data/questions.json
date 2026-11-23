@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.23-3",
+  "version": "2026.11.23-4",
   "groups": [
     {
       "group_id": "purpose",
@@ -33,36 +33,44 @@
       "data_type": "multi",
       "response_options": [
         {
-          "value": "rnd",
-          "label": "R&D·세액공제·연구인력"
+          "value": "finance",
+          "label": "정책자금·보증·투자",
+          "short": "정책자금·투자"
         },
         {
-          "value": "finance",
-          "label": "정책자금·보증·투자"
+          "value": "rnd",
+          "label": "R&D·세액공제·연구인력",
+          "short": "R&D·세액공제"
         },
         {
           "value": "procurement",
-          "label": "공공조달·입찰 가점"
+          "label": "공공조달·입찰 가점",
+          "short": "공공조달 가점"
         },
         {
           "value": "export",
-          "label": "해외 수출·판매"
+          "label": "해외 수출·판매",
+          "short": "해외 수출"
         },
         {
           "value": "quality",
-          "label": "품질·안전 관리"
+          "label": "품질·안전 관리",
+          "short": "품질·안전"
         },
         {
           "value": "security",
-          "label": "정보보호"
+          "label": "정보보호",
+          "short": "정보보호"
         },
         {
           "value": "customer",
-          "label": "고객사·거래처 요구"
+          "label": "고객사·거래처 요구",
+          "short": "거래처 요구"
         },
         {
           "value": "brand",
-          "label": "대외 신뢰·홍보"
+          "label": "대외 신뢰·홍보",
+          "short": "대외 신뢰"
         },
         {
           "value": "other",
@@ -1077,7 +1085,7 @@
       ],
       "unknown_allowed": true,
       "required_when": "scheme in [VEN]",
-      "show_when": "scheme in [VEN, RNDI, RNDD] and biz_status != pre",
+      "show_when": "scheme in [VEN] and biz_status != pre",
       "evidence_examples": [
         "연구개발조직 인정서"
       ],
@@ -1600,7 +1608,7 @@
       ],
       "unknown_allowed": true,
       "required_when": "scheme in [RNDI]",
-      "show_when": "scheme in [RNDI, RNDD]",
+      "show_when": "scheme in [RNDI] or scheme in [RNDD] and rnd_space == partition",
       "evidence_examples": [
         "벤처기업확인서"
       ],

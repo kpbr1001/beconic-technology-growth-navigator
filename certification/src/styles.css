@@ -425,3 +425,6 @@ fieldset.q { margin: 0 0 14px; }
 .flist.chipset { flex-direction: row; flex-wrap: wrap; gap: 6px; }
 .flist.chipset button { display: inline-flex; padding: 7px 11px; border-radius: 999px; border: 1px solid var(--b); background: #fff; font-size: 13.5px; }
 .flist.chipset button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+/* 결과 탭: 5개 항상 한 줄에 다 보이게(스크롤바 없음) — 좁으면 줄바꿈 */
+.rtabs { overflow: visible; flex-wrap: wrap; row-gap: 0; }

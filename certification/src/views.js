@@ -2,11 +2,12 @@
 import { esc, extLink, badge, ICON, fmtDate, TYPE_LABEL, MANDATORY_LABEL, TARGET_LABEL, ACCESS_LABEL, LEVEL_LABEL, levelOf, FIELDS, fieldOf, FIELD_TONE, won } from './ui.js';
 import { S, leafLabel, rdRatioThresholds, questionsUsedBy } from './engine.js';
 import { searchSchemes } from './search.js';
-import { TIMEFRAME } from './model.js';
+import { TIMEFRAME, prepItems } from './model.js';
 import { SITE } from './site.js';
 
 export const MAX_SELECT = 3;
-const PURPOSES = [['finance', '정책자금·투자'], ['rnd', 'R&D·세액공제'], ['procurement', '공공조달 가점'], ['export', '해외 수출'], ['quality', '품질·안전'], ['security', '정보보호'], ['customer', '거래처 요구'], ['brand', '대외 신뢰']];
+// 목적 필터 목록은 데이터(questions.json purposes의 short 라벨)에서 만든다
+const purposeOpts = (data) => ((data.questionMap.purposes && data.questionMap.purposes.response_options) || []).filter((o) => o.short).map((o) => [o.value, o.short]);
 
 // ── 공통 ──────────────────────────────────────────────────
 const STEPS = [['select', '인증 고르기', '#/select'], ['answer', '우리 회사 답하기', '#/answer'], ['result', '결과·할 일', '#/result']];
@@ -127,7 +128,7 @@ function mselectsHTML(st, data) {
   const opt = (v, l, cur) => `<option value="${esc(v)}"${cur === v ? ' selected' : ''}>${esc(l)}</option>`;
   return `<div class="mselects">
     <label><span>업종</span><select data-input="industry">${opt('', '전체 업종', st.f.industry || '')}${industryOpts(data).map((o) => opt(o.value, o.label, st.f.industry)).join('')}</select></label>
-    <label><span>목적</span><select data-input="purpose">${opt('', '전체 목적', st.f.purpose || '')}${PURPOSES.map(([v, l]) => opt(v, l, st.f.purpose)).join('')}</select></label>
+    <label><span>목적</span><select data-input="purpose">${opt('', '전체 목적', st.f.purpose || '')}${purposeOpts(data).map(([v, l]) => opt(v, l, st.f.purpose)).join('')}</select></label>
   </div>`;
 }
 export function selectView(st, data) {
@@ -145,7 +146,7 @@ export function selectView(st, data) {
       <p class="side-n">고르면 다른 업종 전용 인증을 빼고 보여 줘요. 한 번 더 누르면 해제돼요.</p>
       <div class="flist chipset" id="ilist">${industryListHTML(st, data)}</div>
       <h2 class="side-h">목적으로 찾기</h2>
-      <div class="flist">${PURPOSES.map(([v, l]) => `<button type="button" data-act="purpose" data-v="${v}" aria-pressed="${f.purpose === v}">${esc(l)}</button>`).join('')}</div>
+      <div class="flist">${purposeOpts(data).map(([v, l]) => `<button type="button" data-act="purpose" data-v="${v}" aria-pressed="${f.purpose === v}">${esc(l)}</button>`).join('')}</div>
     </aside>
     <section aria-label="인증 목록">
       <div class="searchbox" role="search">${ICON.search}<label class="sr-only" for="q-search">인증 이름·목적으로 검색</label><input id="q-search" type="search" value="${esc(f.q)}" placeholder="인증 이름·목적으로 검색 (예: 벤처, 연구소, ISO, 유럽 수출)" autocomplete="off" enterkeyhint="search" data-input="q"></div>
@@ -162,7 +163,8 @@ export function selectView(st, data) {
 
 // ── 2 우리 회사 답하기 ─────────────────────────────────────
 export function needsExport(st, data) {
-  return st.selected.some((id) => data.schemeMap[id] && (data.schemeMap[id].triage || data.schemeMap[id].target === 'product'));
+  // 제품·판매 시장 질문은 해외 규정 트리아지(CE·FDA·FCC 등)만 쓴다 — 국내 제품 인증엔 묻지 않는다
+  return st.selected.some((id) => data.schemeMap[id] && data.schemeMap[id].triage);
 }
 const relevantTo = (q, id) => [...q.show_when.matchAll(/scheme in \[([^\]]*)\]/g)].some((m) => m[1].split(',').map((x) => x.trim()).includes(id));
 // 고른 인증의 판정 규칙이 실제로 읽는 질문
@@ -181,7 +183,8 @@ export function answerQuestions(st, data) {
     const s = data.schemeMap[id];
     const list = Q.filter((q) => q.group === 'scheme' && relevantTo(q, id) && !seen.has(q.question_id));
     list.forEach((q) => seen.add(q.question_id));
-    const checks = s.self_check ? data.catalog.self_checks[s.self_check].items.map((it) => ({ id: `${id}:${it.item_id}`, label: it.label, why: it.why })) : [];
+    const items = s.self_check ? data.catalog.self_checks[s.self_check].items : s.prep_check ? prepItems(s, (data.catalog.prep_checks || {})[s.prep_check]) : [];
+    const checks = items.map((it) => ({ id: `${id}:${it.item_id}`, label: it.label, why: it.why }));
     return { s, list, checks };
   });
   return { common, exp, per };
@@ -205,7 +208,9 @@ export function dynRatioHTML(q, st, data) {
     const rev = data.questionMap.ven_revenue.response_options.find((o) => o.value === a.ven_revenue);
     return `<p class="dyn-note">우리 회사 기준: ${esc(ind ? ind.label : '')} · 매출 ${esc(rev ? rev.label : '')} → 공식 기준 ${x}%</p>${chipList(dq, a[q.question_id])}`;
   }
-  return `<p class="dyn-note">업종과 매출 구간을 고르면 우리 회사 기준 비율 하나로 물어봐요. 지금은 기준 경계(5·6·7·8·10%)로 나눈 구간에서 골라 주세요.</p>${chipList(q, a[q.question_id])}`;
+  const table = data.packs.VEN && data.packs.VEN.tables && data.packs.VEN.tables.rd_ratio;
+  const bounds = table ? [...new Set(Object.values(table.rows).flat())].sort((x, y) => x - y).join('·') : '';
+  return `<p class="dyn-note">업종과 매출 구간을 고르면 우리 회사 기준 비율 하나로 물어봐요. 지금은 기준 경계(${esc(bounds)}%)로 나눈 구간에서 골라 주세요.</p>${chipList(q, a[q.question_id])}`;
 }
 export function renderQ(q, st, data) {
   const v = st.answers[q.question_id];
@@ -259,6 +264,7 @@ export function answerView(st, data, R, prog) {
         : s.triage ? '<p class="note">판매 시장·제품 정보(위 질문)로 확인할 규정을 정리해요.</p>'
           : '<p class="note">정보 안내 인증이라 질문이 없어요. 결과에서 무엇·어디서·공식 링크를 정리해 드려요.</p>';
     }
+    if (s.prep_check && data.catalog.prep_checks && data.catalog.prep_checks[s.prep_check]) inner = `<p class="note">${esc(data.catalog.prep_checks[s.prep_check].note)}</p>${inner}`;
     if (s.self_check) inner = `<p class="note">${esc(data.catalog.self_checks[s.self_check].note)}</p>${inner}`;
     return sec(shortName(s), `${LEVEL_LABEL[levelOf(s)]} · ${list.length + checks.length}개`, inner, `sec-${s.scheme_id}`);
   }).join('');
@@ -315,7 +321,10 @@ function reqPanel(x, data) {
     const k = { SELF_DECLARED_AVAILABLE: 'pass', NOT_AVAILABLE: 'fail' };
     return `<p class="note m0">${esc(x.selfcheckMeta.note)}</p><ul class="cl mt12">${x.selfcheck.rows.map((d) => { const key = k[d.status] || 'unknown'; return `<li><span class="c-${key}">${STATUS_ICON[key]}</span><div>${esc(d.label)}<small>${key === 'pass' ? '네(자가 응답)' : key === 'fail' ? `아니요 — ${esc(d.why)}` : '모름·미응답'}</small></div></li>`; }).join('')}</ul>`;
   }
-  return `<dl class="kv"><dt>무엇인가요?</dt><dd>${esc(s.what)}</dd><dt>언제 필요한가요?</dt><dd>${esc(s.when)}</dd><dt>누가 판단하나요?</dt><dd>${esc(s.who_decides)}</dd><dt>먼저 확인할 것</dt><dd>${esc(s.first_check)}</dd></dl>`;
+  const kv = `<dl class="kv"><dt>무엇인가요?</dt><dd>${esc(s.what)}</dd><dt>언제 필요한가요?</dt><dd>${esc(s.when)}</dd><dt>누가 판단하나요?</dt><dd>${esc(s.who_decides)}</dd><dt>먼저 확인할 것</dt><dd>${esc(s.first_check)}</dd></dl>`;
+  if (!x.prep) return kv;
+  const k = { SELF_DECLARED_AVAILABLE: 'pass', NOT_AVAILABLE: 'fail' };
+  return `${kv}<h3 class="sub-h">${esc(x.prepMeta.title)} <span class="muted small">판정 아님 · 자가 응답</span></h3><ul class="cl">${x.prep.rows.map((d) => { const key = k[d.status] || 'unknown'; return `<li><span class="c-${key}">${STATUS_ICON[key]}</span><div>${esc(d.label)}<small>${key === 'pass' ? '네(확인함)' : key === 'fail' ? '아니요 — 할 일에 넣었어요' : '모름·미응답 — 할 일에 넣었어요'}</small></div></li>`; }).join('')}</ul>`;
 }
 export function docRows(x) { return x.readiness ? x.readiness.rows.filter((r) => r.applicable) : []; }
 // 공식 파일(PDF·HWP) 내려받기는 바로 받지 않고 안내 창(형식·출처·확인일)을 먼저 띄운다
@@ -400,6 +409,8 @@ export function tilesFor(x) {
   } else if (x.selfcheck) {
     const rows = x.selfcheck.rows;
     req = { label: '자가 확인', b: `${rows.filter((d) => d.status === 'SELF_DECLARED_AVAILABLE').length} / ${rows.length}`, small: '자가 응답 기준' };
+  } else if (x.prep) {
+    req = { label: '판정 방식', b: LEVEL_LABEL[levelOf(s)], small: `준비 점검 ${x.prep.rows.filter((d) => d.status === 'SELF_DECLARED_AVAILABLE').length}/${x.prep.rows.length}` };
   }
   const docs = docRows(x).length;
   const docsReq = docRows(x).filter((d) => d.required).length;
@@ -411,7 +422,8 @@ export function tilesFor(x) {
 function resultCard(x, data, R) {
   const s = x.scheme; const id = s.scheme_id;
   const t = tilesFor(x);
-  const tabs = [['req', '요건'], ['docs', `서류 ${t.docs}`], ['fee', '비용·기간'], ['todo', '할 일'], ['src', '근거']];
+  // 어떤 인증이든 5개 탭을 항상 같은 순서로 보여 준다(서류 수가 없으면 숫자 없이)
+  const tabs = [['req', '요건'], ['docs', t.docs ? `서류 ${t.docs}` : '서류'], ['fee', '비용·기간'], ['todo', '할 일'], ['src', '근거']];
   // 모바일 펼침 제목줄: 열지 않아도 핵심 숫자를 보여 준다
   const nTodo = R.actions.filter((a) => a.scheme_id === id).length;
   const nSrc = s.sources.filter((r) => data.sourceMap[r]).length;

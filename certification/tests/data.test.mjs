@@ -268,3 +268,30 @@ test('DATA-11 인증 목록: 120개 이하, 모든 공식 링크 https, 출처 �
     (s.guides || []).forEach((g) => assert.match(g.url, /^https:\/\//));
   });
 });
+
+test('HC-02 화면·모델 코드에 법정 기준 숫자·인증 ID 목록·규제 설명 문구 하드코딩 금지(데이터에서만 읽기)', async () => {
+  const { readFileSync, readdirSync } = await import('node:fs');
+  const dir = new URL('../src/', import.meta.url);
+  for (const f of readdirSync(dir).filter((x) => x.endsWith('.js'))) {
+    const code = readFileSync(new URL(f, dir), 'utf8').split('\n').filter((l) => !/^\s*\/\//.test(l)).map((l) => l.replace(/\/\/.*$/, '')).join('\n');
+    assert.ok(!/['"`][^'"`\n]*\d+\s*(%|㎡|m 이상|만원|억원)[^'"`\n]*['"`]/.test(code), `${f}: 문자열 안에 기준 숫자`);
+    assert.ok(!/\[\s*'(VEN|INNO|MAIN|RNDI|RNDD|HACCP|EU-CE)'\s*,/.test(code), `${f}: 인증 ID 목록`);
+  }
+  const tri = readFileSync(new URL('triage.js', dir), 'utf8');
+  assert.ok(!/법규|Notified|SDoC/.test(tri), 'triage.js에 규제 설명 문구(데이터로 옮길 것)');
+  assert.ok(!/const PURPOSES\s*=/.test(readFileSync(new URL('views.js', dir), 'utf8')), 'views.js 목적 목록 하드코딩');
+});
+
+test('HC-03 데이터로 옮긴 값의 일관성: 목적 검색어 키 = 목적 선택지, 사업자등록 필요 인증 = 규칙상 예비창업 불가', async () => {
+  const { readFileSync } = await import('node:fs');
+  const purposeVals = D.questionMap.purposes.response_options.map((o) => o.value);
+  const keys = [...readFileSync(new URL('../src/search.js', import.meta.url), 'utf8').matchAll(/^\s{2}([a-z]+): \[/gm)].map((m) => m[1]);
+  keys.forEach((k) => assert.ok(purposeVals.includes(k), `검색 목적어 ${k}가 목적 선택지에 없음`));
+  const failsPre = (pack) => pack.pathways.every((pw) => JSON.stringify(pw.root).includes('"q":"biz_status"') && /"fail":\[[^\]]*"pre"/.test(JSON.stringify(pw.root)));
+  D.catalog.schemes.forEach((s) => {
+    const p = D.packs[s.scheme_id];
+    if (s.needs_business_registration) assert.ok(p && failsPre(p), `${s.scheme_id}: 사업자등록 필요 표시인데 규칙에 근거 없음`);
+    else if (p) assert.ok(!failsPre(p), `${s.scheme_id}: 규칙상 예비창업 불가인데 표시 누락`);
+  });
+  Object.values(D.catalog.schemes).filter((s) => s.triage).forEach((s) => assert.ok(D.catalog.triage_specs[s.triage], `${s.scheme_id} 트리아지 문구 데이터 없음`));
+});
