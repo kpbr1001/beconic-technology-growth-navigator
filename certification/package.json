@@ -1,6 +1,6 @@
 {
   "name": "beconic-certification-diagnosis",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "private": true,
   "type": "module",
   "description": "BECONIC 기업인증 준비도 진단 — 정적 웹앱(브라우저 내 계산, 서버 전송 없음)",

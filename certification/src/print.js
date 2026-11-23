@@ -150,7 +150,7 @@ function evidence(data, R) {
       <thead><tr><th scope="col">No.</th><th scope="col">서류</th><th scope="col">왜 필요한가</th><th scope="col">발급·내려받기 (공식 주소)</th></tr></thead><tbody>
       ${rows.map((d, i) => `<tr><td class="nw">${i + 1}</td><td>${esc(d.label)}${d.required ? '' : '<br><span class="p-muted">해당할 때만</span>'}</td><td>${esc(d.why)}</td><td>${esc(d.where || '-')}${d.link ? `<br><span class="p-url">${esc(readableUrl(d.link))}${d.link_unverified ? ' ※접속 미검증' : ''}</span>` : ''}</td></tr>`).join('')}</tbody></table>` : `<p class="p-p">공식 서류 목록을 정리하지 못했습니다. 신청처 안내를 확인하세요.</p>`;
     return `<div class="p-scheme"><div class="p-certbar"><b>${esc(s.name_ko)}${rows.length ? ` · 신청서류 ${rows.length}개` : ''}</b><span>신청: ${esc(tl.apply.name)} <span class="p-url">${esc(readableUrl(tl.apply.url || ''))}</span></span></div>
-      ${guides}${table}<p class="p-p"><b>공식 수수료(VAT 포함)</b>: ${fees}<br><b>처리기간</b>: ${proc}${x.ongoing ? `<br><b>유효기간·사후관리</b>: ${esc(x.ongoing)}` : ''}</p></div>`;
+      ${s.procedure ? `<p class="p-p"><b>${esc(s.procedure.title)}</b>: ${s.procedure.steps.map((x, i) => `${i + 1}. ${esc(x.label)}${x.sub ? `(${esc(x.sub)})` : ''}${x.unverified ? '※원문 미확보' : ''}`).join(' → ')}</p>` : ''}${guides}${table}<p class="p-p"><b>공식 수수료(VAT 포함)</b>: ${fees}<br><b>처리기간</b>: ${proc}${x.ongoing ? `<br><b>유효기간·사후관리</b>: ${esc(x.ongoing)}` : ''}</p></div>`;
   }).join('');
   return `<section class="p-sec"><h2 class="p-h2"><span class="p-num">04</span> 신청서류와 공식 링크 · 수수료 · 처리기간</h2>
   <p class="p-p">인증별로 제출할 서류와 발급처, 공식 서식 내려받기 주소를 정리했습니다. 서식은 바뀔 수 있으니 반드시 공식 주소에서 최신본을 받으세요. 서식 파일은 저작권·최신성 때문에 보고서에 넣지 않습니다.</p>${blocks}</section>`;

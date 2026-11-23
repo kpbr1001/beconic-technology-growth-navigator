@@ -313,9 +313,26 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   await p.click('#tb-HACCP-req');
   const prep = await p.$eval('#tp-HACCP-req', (e) => e.textContent);
   check('E29 정보 안내 인증(HACCP): 준비 점검 3문항, 결과 탭 5개 항상 표시(서류 0 대신 서류, 스크롤바 없음), 할 일 = 서류·비용 확인 + 신청, 확인한 항목은 할 일에서 빠짐',
-    checks === 3 && tabs.join(',') === '요건,서류,비용·기간,할 일,근거' && bar.sh <= bar.ch + 1 && bar.ov === 'visible'
-    && /신청서류 목록 확인/.test(todoTxt) && /신청·접수/.test(todoTxt) && !/신청 대상·요건 확인/.test(todoTxt) && /신청 준비 점검/.test(prep),
+    checks === 3 && /^요건,서류( \d+)?,비용·기간,할 일,근거$/.test(tabs.join(',')) && bar.sh <= bar.ch + 1 && bar.ov === 'visible'
+    && /신청서류 \d+개 준비|신청서류 목록 확인/.test(todoTxt) && /신청·접수/.test(todoTxt) && !/신청 대상·요건 확인/.test(todoTxt) && /신청 준비 점검/.test(prep),
     `${checks} · ${tabs.join(',')} · ${JSON.stringify(bar)} · ${todoTxt.slice(0, 160)}`);
+  await p.context().close();
+}
+
+// ── E30 메인(리포트형) 비교표·보고서 예시는 데이터에서, 결과(대시보드형) 등록 절차 취합 ──
+{
+  const p = await newPage({ w: 1440, h: 900 });
+  await p.goto(BASE); await p.waitForSelector('.home-hero');
+  const cmp = await p.$$eval('.cmp tbody tr', (e) => e.map((x) => x.textContent.replace(/\s+/g, ' ')));
+  const nums = await p.$$eval('.nums b', (e) => e.map((x) => x.textContent));
+  const sheet = await p.$eval('.sheet', (e) => e.textContent);
+  await pick(p, ['VEN', 'RNDI', 'HACCP']); await corp(p); await toResult(p);
+  const rows = await p.$$eval('#proc-h ~ .proc-all .proc-row', (e) => e.map((x) => ({ n: x.querySelector('.proc-nm b').textContent, steps: x.querySelectorAll('.ps').length })));
+  const bars = await p.$$eval('.rc .rbar', (e) => e.length);
+  check('E30 메인: 자동 판정 인증 비교표(신규 수수료)·숫자 띠·보고서 예시 / 결과: 등록 절차 취합(인증별 단계 수)·기본요건 진행 막대',
+    cmp.length === 5 && /벤처/.test(cmp[0]) && /원/.test(cmp[0]) && nums.length === 4 && /원/.test(sheet)
+    && rows.length === 3 && rows.find((r) => /HACCP/.test(r.n)).steps === 7 && rows.find((r) => /벤처/.test(r.n)).steps >= 3 && bars >= 2,
+    `${cmp.length}행 · ${JSON.stringify(rows)} · 막대 ${bars}`);
   await p.context().close();
 }
 
