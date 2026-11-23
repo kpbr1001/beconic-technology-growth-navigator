@@ -101,7 +101,8 @@ export const CHECKS = {
     }
     const v = b ? b.lo : null; // 숫자 답 또는 정확한 값 구간(예: '받은 적 없음' = r:0:0)
     if (v === null) return { status: S.UNKNOWN, missing: [q], inputs: [q], detail: `기준 ${fmt(min)}${unit} 이상` };
-    return { status: v >= min ? S.PASS : S.FAIL, inputs: [q], detail: `입력 ${fmt(v)}${unit} / 기준 ${fmt(min)}${unit} 이상` };
+    const how = typeof ctx.answers[q] === 'string' ? '선택' : '입력';
+    return { status: v >= min ? S.PASS : S.FAIL, inputs: [q], detail: `${how} ${fmt(v)}${unit} / 기준 ${fmt(min)}${unit} 이상` };
   },
   lt({ q, max, unit = '' }, ctx) {
     const b = band(ctx.answers[q]);
@@ -111,7 +112,7 @@ export const CHECKS = {
     }
     const v = b ? b.lo : null;
     if (v === null) return { status: S.UNKNOWN, missing: [q], inputs: [q], detail: `기준 ${fmt(max)}${unit} 미만` };
-    return { status: v < max ? S.PASS : S.FAIL, inputs: [q], detail: `입력 ${fmt(v)}${unit} / 기준 ${fmt(max)}${unit} 미만` };
+    return { status: v < max ? S.PASS : S.FAIL, inputs: [q], detail: `${typeof ctx.answers[q] === 'string' ? '선택' : '입력'} ${fmt(v)}${unit} / 기준 ${fmt(max)}${unit} 미만` };
   },
   years_since_gte({ q, years }, ctx) {
     const raw = ctx.answers[q];

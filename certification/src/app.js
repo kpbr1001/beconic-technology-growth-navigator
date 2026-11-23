@@ -199,6 +199,9 @@ function onClick(e) {
       break;
     }
     case 'print': printReport(); break;
+    case 'dl': openDownload(el); break;
+    case 'jump': { const t = document.getElementById(el.dataset.to); if (t) { t.scrollIntoView({ block: 'start' }); t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); } break; }
+    case 'dl-close': document.getElementById('dl-dialog').close(); break;
     case 'rep-edit': {
       const doc = document.querySelector('#rep-stage .p-doc'); if (!doc) return;
       const on = doc.getAttribute('contenteditable') !== 'true';
@@ -238,6 +241,20 @@ function onInput(e) {
   if (t.matches('.q-text')) { const q = st.data.questionMap[t.name]; st.answers[t.name] = t.value.slice(0, (q && q.validation && q.validation.max_length) || 100); }
 }
 function onSubmit(e) { if (e.target.matches('form[data-form="answer"]')) e.preventDefault(); }
+
+// ── 공식 서식 내려받기 안내 창 ──────────────────────────────
+function openDownload(el) {
+  const dlg = document.getElementById('dl-dialog');
+  let host = '';
+  try { const u = new URL(el.dataset.url); if (u.protocol !== 'https:') return; host = u.hostname; } catch { return; }
+  document.getElementById('dl-name').textContent = el.dataset.title;
+  document.getElementById('dl-type').textContent = el.dataset.type;
+  document.getElementById('dl-host').textContent = `${host} (공식 사이트)`;
+  document.getElementById('dl-checked').textContent = el.dataset.checked || '-';
+  const go = document.getElementById('dl-go'); go.href = el.dataset.url;
+  go.onclick = () => setTimeout(() => dlg.close(), 0);
+  if (typeof dlg.showModal === 'function') dlg.showModal(); else window.open(el.dataset.url, '_blank', 'noopener');
+}
 
 // ── 보고서: PDF(인쇄)·HTML 저장 ────────────────────────────
 function markEdited(doc) {

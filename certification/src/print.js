@@ -2,7 +2,7 @@
 import { esc, fmtDate, ACCESS_LABEL, LEVEL_LABEL, levelOf, won } from './ui.js';
 import { S, leafLabel } from './engine.js';
 import { CATEGORY, TIMEFRAME } from './model.js';
-import { tilesFor, docRows } from './views.js';
+import { tilesFor, docRows, headline } from './views.js';
 import { SITE } from './site.js';
 
 const STATUS_TXT = { pass: '✓ 기본요건 확인', fail: '✕ 기본요건 미충족', unknown: '? 추가 확인 필요', na: '— 해당 없음', out: 'ⓘ 판정 범위 밖' };
@@ -76,12 +76,12 @@ function execSummary(data, R) {
   const top = R.actions.slice(0, 3);
   return `<section class="p-page p-exec">
   <h2 class="p-h2"><span class="p-num">01</span> Executive Summary</h2>
-  <p class="p-headline">${esc(s.headline)}</p>
+  <p class="p-headline">${esc(headline(R).h)}</p><p class="p-p">${esc(headline(R).p)}</p>
   <table class="p-table t-exec"><colgroup><col class="c-22"><col class="c-18"><col class="c-32"><col class="c-28"></colgroup>
     <thead><tr><th scope="col">제도</th><th scope="col">기본요건 상태</th><th scope="col">핵심 사유</th><th scope="col">다음 행동</th></tr></thead><tbody>${rows}</tbody></table>
   <div class="p-grid2">
     <div class="p-box"><h3 class="p-h3">주요 발견</h3><ol class="p-ol">${s.findings.map((f) => `<li>${esc(f.text)}</li>`).join('')}</ol></div>
-    <div class="p-box"><h3 class="p-h3">우선 행동</h3><ol class="p-ol">${top.map((a) => `<li><b>[${esc(TIMEFRAME[a.timeframe])}]</b> ${esc(a.title)}</li>`).join('') || '<li>즉시 할 일 없음</li>'}</ol></div>
+    <div class="p-box"><h3 class="p-h3">우선 행동</h3><ol class="p-ol">${top.map((a) => `<li><b>[${esc(TIMEFRAME[a.timeframe])}]</b> ${esc(a.scheme_name)} — ${esc(a.title)}</li>`).join('') || '<li>즉시 할 일 없음</li>'}</ol></div>
   </div>
   <div class="p-box p-risk"><h3 class="p-h3">미확인 위험</h3>
     <p>${s.unknown + R.unknownInputs.length === 0 ? '입력한 정보 기준으로 확인되지 않은 요건·정보는 없어요. 다만 입력값 자체가 사실과 다르면 결과가 달라져요.' : `확인되지 않은 요건 ${s.unknown}개(이 중 공식 원문 미검증 ${s.unverified}개), 입력이 필요한 정보 ${R.unknownInputs.length}개가 있어요. 이 항목이 확인되기 전에는 결과가 달라질 수 있어요.`}</p>
@@ -143,12 +143,12 @@ function ruleTables(data, R) {
 function evidence(data, R) {
   const blocks = R.schemes.map((x) => {
     const s = x.scheme; const rows = docRows(x); const tl = tilesFor(x);
-    const guides = (s.guides || []).map((g) => `<p class="p-p">공식 안내: ${esc(g.title)} <span class="p-url">${esc(readableUrl(g.url))}</span></p>`).join('');
+    const guides = (s.guides || []).length ? `<p class="p-p"><b>공식 서식·안내</b></p><ol class="p-ol p-guides">${s.guides.map((g) => `<li>${esc(g.title)}<br><span class="p-url">${esc(readableUrl(g.url))}</span></li>`).join('')}</ol>` : '';
     const fees = s.fees && !s.fees.unverified ? s.fees.items.map((i) => `${esc(i.label)} ${won(i.company !== undefined ? i.company : i.total)}${i.company !== undefined ? `(합계 ${won(i.total)} 중 기업 부담)` : ''}`).join(' · ') : '기관 확인(공식 원문 미확보)';
     const proc = s.processing && !s.processing.unverified ? s.processing.items.map((i) => `${esc(i.label)} ${i.days ? `${i.days}일 이내` : `${i.weeks}주 이내`}`).join(' · ') : '기관 확인(공식 원문 미확보)';
-    const table = rows.length ? `<table class="p-table"><colgroup><col class="c-30"><col class="c-26"><col class="c-44"></colgroup>
-      <thead><tr><th scope="col">서류</th><th scope="col">왜 필요한가</th><th scope="col">발급·내려받기 (공식 주소)</th></tr></thead><tbody>
-      ${rows.map((d) => `<tr><td>${esc(d.label)}${d.required ? '' : '<br><span class="p-muted">해당할 때만</span>'}</td><td>${esc(d.why)}</td><td>${esc(d.where || '-')}${d.link ? `<br><span class="p-url">${esc(readableUrl(d.link))}${d.link_unverified ? ' ※접속 미검증' : ''}</span>` : ''}</td></tr>`).join('')}</tbody></table>` : `<p class="p-p">공식 서류 목록을 정리하지 못했습니다. 신청처 안내를 확인하세요.</p>`;
+    const table = rows.length ? `<table class="p-table"><colgroup><col class="c-6"><col class="c-28"><col class="c-24"><col class="c-42"></colgroup>
+      <thead><tr><th scope="col">No.</th><th scope="col">서류</th><th scope="col">왜 필요한가</th><th scope="col">발급·내려받기 (공식 주소)</th></tr></thead><tbody>
+      ${rows.map((d, i) => `<tr><td class="nw">${i + 1}</td><td>${esc(d.label)}${d.required ? '' : '<br><span class="p-muted">해당할 때만</span>'}</td><td>${esc(d.why)}</td><td>${esc(d.where || '-')}${d.link ? `<br><span class="p-url">${esc(readableUrl(d.link))}${d.link_unverified ? ' ※접속 미검증' : ''}</span>` : ''}</td></tr>`).join('')}</tbody></table>` : `<p class="p-p">공식 서류 목록을 정리하지 못했습니다. 신청처 안내를 확인하세요.</p>`;
     return `<div class="p-scheme"><div class="p-certbar"><b>${esc(s.name_ko)}${rows.length ? ` · 신청서류 ${rows.length}개` : ''}</b><span>신청: ${esc(tl.apply.name)} <span class="p-url">${esc(readableUrl(tl.apply.url || ''))}</span></span></div>
       ${guides}${table}<p class="p-p"><b>공식 수수료(VAT 포함)</b>: ${fees}<br><b>처리기간</b>: ${proc}${x.ongoing ? `<br><b>유효기간·사후관리</b>: ${esc(x.ongoing)}` : ''}</p></div>`;
   }).join('');

@@ -34,7 +34,7 @@ export function home(data) {
     <div><p class="eyebrow">BECONIC 기업인증 진단</p>
       <h1>우리 회사, 어떤 인증부터<br>준비해야 할까요?</h1>
       <p>인증을 고르고 버튼으로 답하면, 신청 기본요건 충족 여부와 신청서류·공식 수수료·처리기간을 바로 정리해 드려요.</p>
-      <a class="btn" href="#/select">무료 진단 시작 ${ICON.arrow}</a></div>
+      <a class="btn" href="#/select">기업인증 진단 시작 ${ICON.arrow}</a></div>
     <ol class="home-steps">
       <li><i>1</i><div><b>인증 고르기</b><span>국내 ${dom}개 · 해외 ${intl}개 중 최대 ${MAX_SELECT}개</span></div></li>
       <li><i>2</i><div><b>우리 회사 답하기</b><span>숫자 입력 없이 버튼으로. 모르면 ‘모름’</span></div></li>
@@ -201,7 +201,7 @@ export function previewHTML(st, data, R, prog) {
   return `<h2>답할수록 결과가 바뀌어요</h2>
     <div class="bar" aria-hidden="true"><i class="w${pct}"></i></div><p class="note m0">${prog.total}개 중 ${prog.done}개 답함${prog.unknown ? ` (모름 ${prog.unknown}개)` : ''}</p>
     ${rows}
-    <p class="note">미리보기예요. 최종 결과는 다음 단계에서 근거와 함께 보여 드려요.</p>
+
     <a class="btn w" href="#/result" data-act="to-result">결과 보기 ${ICON.arrow}</a>
     <a class="btn gh w mt8" href="#/select">${ICON.back} 인증 다시 고르기</a>`;
 }
@@ -211,7 +211,10 @@ export function mbarAnswerHTML(R, prog) {
 }
 export function answerView(st, data, R, prog) {
   const { common, exp, per } = answerQuestions(st, data);
-  const sec = (title, tag, inner) => `<h2 class="sec-t">${esc(title)}${tag ? ` <span>${esc(tag)}</span>` : ''}</h2>${inner}`;
+  const sec = (title, tag, inner, id = '') => `<h2 class="sec-t"${id ? ` id="${esc(id)}"` : ''}>${esc(title)}${tag ? ` <span>${esc(tag)}</span>` : ''}</h2>${inner}`;
+  const qCount = (p) => p.list.length + p.checks.length;
+  const jb = (id, label) => `<button type="button" data-act="jump" data-to="${esc(id)}">${esc(label)}</button>`;
+  const jump = `<nav class="q-nav" aria-label="질문 구역 바로가기">${jb('sec-common', `공통 ${common.length}`)}${exp.length ? jb('sec-export', `제품·시장 ${exp.length}`) : ''}${per.map((p) => jb(`sec-${p.s.scheme_id}`, `${shortName(p.s)} ${qCount(p)}`)).join('')}</nav>`;
   const blocks = per.map(({ s, list, checks }) => {
     let inner = list.map((q) => renderQ(q, st, data)).join('') + checks.map((c) => checkQ(c, st)).join('');
     if (!inner) {
@@ -220,16 +223,17 @@ export function answerView(st, data, R, prog) {
           : '<p class="note">정보 안내 인증이라 질문이 없어요. 결과에서 무엇·어디서·공식 링크를 정리해 드려요.</p>';
     }
     if (s.self_check) inner = `<p class="note">${esc(data.catalog.self_checks[s.self_check].note)}</p>${inner}`;
-    return sec(shortName(s), LEVEL_LABEL[levelOf(s)], inner);
+    return sec(shortName(s), `${LEVEL_LABEL[levelOf(s)]} · ${list.length + checks.length}개`, inner, `sec-${s.scheme_id}`);
   }).join('');
   return `<section class="wrap">
   ${stepper('answer', st)}
   <h1 class="h1">우리 회사에 대해 알려 주세요</h1>
-  <p class="lead">모두 버튼으로 답해요. 모르면 <b>모름</b>을 눌러도 결과에서 무엇을 확인하면 되는지 알려 드려요.</p>
+  <p class="lead">모두 버튼으로 답해요. 모르면 <b>모름</b>을 누르세요. 공통 질문은 한 번만, 인증별로는 판정에 필요한 핵심 요건만 물어요(여러 인증이 같이 쓰는 정보는 한 번만).</p>
+  ${jump}
   <div class="grid g-two">
     <form data-form="answer" novalidate aria-label="진단 질문">
-      ${sec('공통 질문', '', common.map((q) => renderQ(q, st, data)).join(''))}
-      ${exp.length ? sec('제품·판매 시장', '', exp.map((q) => renderQ(q, st, data)).join('')) : ''}
+      ${sec('공통 질문', `모든 인증 · ${common.length}개`, common.map((q) => renderQ(q, st, data)).join(''), 'sec-common')}
+      ${exp.length ? sec('제품·판매 시장', `${exp.length}개`, exp.map((q) => renderQ(q, st, data)).join(''), 'sec-export') : ''}
       ${blocks}
       ${sec('보고서 표지', '선택', renderQ(data.questionMap.company_name, st, data))}
     </form>
@@ -277,15 +281,22 @@ function reqPanel(x, data) {
   return `<dl class="kv"><dt>무엇인가요?</dt><dd>${esc(s.what)}</dd><dt>언제 필요한가요?</dt><dd>${esc(s.when)}</dd><dt>누가 판단하나요?</dt><dd>${esc(s.who_decides)}</dd><dt>먼저 확인할 것</dt><dd>${esc(s.first_check)}</dd></dl>`;
 }
 export function docRows(x) { return x.readiness ? x.readiness.rows.filter((r) => r.applicable) : []; }
+// 공식 파일(PDF·HWP) 내려받기는 바로 받지 않고 안내 창(형식·출처·확인일)을 먼저 띄운다
+export const isFile = (u) => /\.(pdf|hwp|hwpx|docx?|xlsx?|zip)(\?|$)/i.test(decodeURI(u || '')) || /\/file\/download/.test(u || '');
+const fileType = (u, t) => ((decodeURI(u || '').match(/\.(pdf|hwpx?|docx?|xlsx?|zip)(\?|$)/i) || [])[1] || ((t || '').match(/\((PDF|HWP)\)/) || [])[1] || '파일').toUpperCase();
+function dlBtn(url, title, checked, label) {
+  return `<button type="button" class="dl" data-act="dl" data-url="${esc(url)}" data-title="${esc(title)}" data-type="${esc(fileType(url, title))}" data-checked="${esc(checked || '')}">${ICON.doc} ${esc(label || title)}</button>`;
+}
 function docsPanel(x) {
   const rows = docRows(x);
-  const guides = (x.scheme.guides || []).map((g) => `<li>${extLink(g.url, g.title)} <span class="muted small">· 확인 ${esc(g.checked_at || '')}</span></li>`).join('');
+  const guides = x.scheme.guides || [];
   if (!rows.length) return `<p class="note">이 인증은 공식 서류 목록을 아직 정리하지 못했어요. ${extLink(x.scheme.official_link, '공식 기관 안내')}에서 확인하세요.</p>`;
-  return `${guides ? `<p class="m0"><b>공식 안내</b></p><ul class="m0">${guides}</ul>` : ''}
-    <table class="dt mt12"><thead><tr><th scope="col">서류</th><th scope="col">왜 필요한가</th><th scope="col">발급·내려받기</th></tr></thead><tbody>
-    ${rows.map((d) => `<tr><td><b>${esc(d.label)}</b>${d.required ? '' : '<small>해당할 때만</small>'}</td><td>${esc(d.why)}</td><td>${d.link ? extLink(d.link, d.where || '바로가기') : esc(d.where || '-')}${d.link_unverified ? ' <span class="unv">접속 미검증</span>' : ''}</td></tr>`).join('')}
-    </tbody></table>
-    <p class="note">서식은 공식 사이트 최신본을 받도록 링크만 드려요(파일 재배포 없음).</p>`;
+  const req = rows.filter((d) => d.required).length;
+  return `${guides.length ? `<h3 class="sub-h">공식 서식·안내 ${guides.length}개</h3><ol class="guide-list">${guides.map((g) => `<li>${isFile(g.url) ? dlBtn(g.url, g.title, g.checked_at) : extLink(g.url, g.title)}</li>`).join('')}</ol>` : ''}
+    <h3 class="sub-h">신청서류 ${rows.length}개 <span class="muted small">필수 ${req}${rows.length > req ? ` · 해당 시 ${rows.length - req}` : ''}</span></h3>
+    <table class="dt"><thead><tr><th scope="col" class="no">No.</th><th scope="col">서류</th><th scope="col">왜 필요한가</th><th scope="col">발급·내려받기</th></tr></thead><tbody>
+    ${rows.map((d, i) => `<tr><td class="no">${i + 1}</td><td><b>${esc(d.label)}</b>${d.required ? '' : '<small>해당할 때만</small>'}</td><td>${esc(d.why)}</td><td>${d.link ? (isFile(d.link) ? dlBtn(d.link, `${d.label} 양식`, '', d.where || '양식 내려받기') : extLink(d.link, d.where || '바로가기')) : esc(d.where || '-')}${d.link_unverified ? ' <span class="unv">접속 미검증</span>' : ''}</td></tr>`).join('')}
+    </tbody></table>`;
 }
 // 수수료·처리기간 — 공식 원문에서 확인한 값만 숫자로, 나머지는 '기관 확인'
 export function feeSummary(s, pathwayName) {
@@ -354,10 +365,11 @@ export function tilesFor(x) {
     req = { label: '자가 확인', b: `${rows.filter((d) => d.status === 'SELF_DECLARED_AVAILABLE').length} / ${rows.length}`, small: '자가 응답 기준' };
   }
   const docs = docRows(x).length;
+  const docsReq = docRows(x).filter((d) => d.required).length;
   const fee = feeSummary(s, pw && pw.name);
   const proc = procSummary(s, pw && pw.name);
   const apply = s.apply_site || { name: shortName(s) === s.issuing_authority ? '공식 기관' : s.issuing_authority, url: s.official_link };
-  return { req, docs, fee, proc, apply, pw };
+  return { req, docs, docsReq, fee, proc, apply, pw };
 }
 function resultCard(x, data, R) {
   const s = x.scheme; const id = s.scheme_id;
@@ -365,12 +377,12 @@ function resultCard(x, data, R) {
   const tabs = [['req', '요건'], ['docs', `서류 ${t.docs}`], ['fee', '비용·기간'], ['todo', '할 일'], ['src', '근거']];
   const panels = { req: () => reqPanel(x, data), docs: () => docsPanel(x), fee: () => feePanel(x, data), todo: () => todoPanel(x, R), src: () => srcPanel(x, data) };
   let sub = x.label.sub || '';
-  if (x.result && x.result.gate.active && x.result.basic === S.PASS) sub = `${t.pw.name} 기본요건 충족 · 다음 단계: ${t.pw.evaluator || '기관 평가'}(심사 결과는 기관이 결정)`;
+  if (x.result && x.result.gate.active && x.result.basic === S.PASS) sub = `${t.pw.name} 기본요건 충족 · 남은 단계는 기관 평가(결과는 기관이 결정)`;
   return `<article class="rc" id="res-${esc(id)}">
     <div class="rc-h"><div>${badge(x.label.key, x.label.text)}<h2 class="tt">${esc(s.name_ko)}</h2><p class="sub">${esc(sub)}</p></div>${levelTag(s)}</div>
     <div class="tiles">
       <div class="tile"><span>${t.req.label}</span><b>${esc(t.req.b)}</b>${t.req.small ? `<small>${esc(t.req.small)}</small>` : ''}</div>
-      <div class="tile"><span>신청서류</span><b>${t.docs ? `${t.docs}개` : '기관 안내'}</b></div>
+      <div class="tile"><span>신청서류</span><b>${t.docs ? `${t.docs}개` : '기관 안내'}</b>${t.docs && t.docsReq !== t.docs ? `<small>필수 ${t.docsReq} · 해당 시 ${t.docs - t.docsReq}</small>` : ''}</div>
       <div class="tile"><span>신청처</span><b>${extLink(t.apply.url, t.apply.name)}</b></div>
       <div class="tile"><span>공식 수수료</span><b>${esc(t.fee.b)}</b><small>${esc(t.fee.small)}</small></div>
       <div class="tile"><span>처리기간</span><b>${esc(t.proc.b)}</b><small>${esc(t.proc.small)}</small></div>
@@ -394,7 +406,8 @@ export function resultView(st, data, R) {
   const k = R.summary.byKey; const hl = headline(R);
   const kv = [['pass', '기본요건 충족'], ['unknown', '확인 필요'], ['fail', '보완 필요']];
   const order = ['now', 'd30', 'd60', 'd90', 'ongoing'];
-  const steps = order.map((tf) => R.roadmap[tf].slice(0, 1).map((a) => `<div class="ph"><span class="no2">${esc(TIMEFRAME[tf])}</span><div><b>${esc(shortName(data.schemeMap[a.scheme_id]))}: ${esc(a.title)}</b>${a.detail ? `<p>${esc(a.detail.length > 90 ? `${a.detail.slice(0, 90)}…` : a.detail)}</p>` : ''}</div></div>`).join('')).join('');
+  const many = R.schemes.length > 1;
+  const steps = order.map((tf) => R.roadmap[tf].slice(0, 1).map((a) => `<div class="ph"><span class="no2">${esc(TIMEFRAME[tf])}</span><div>${many ? `<span class="who">${esc(shortName(data.schemeMap[a.scheme_id]))}</span>` : ''}<b>${esc(a.title)}</b>${a.detail ? `<p>${esc(a.detail.length > 70 ? `${a.detail.slice(0, 70)}…` : a.detail)}</p>` : ''}</div></div>`).join('')).join('');
   const applyLinks = R.schemes.map((x) => tilesFor(x).apply).map((a, i) => `<li>${extLink(a.url, `${shortName(R.schemes[i].scheme)} — ${a.name}`)}</li>`).join('');
   return `<section class="wrap">
   ${stepper('result', st)}
@@ -404,45 +417,46 @@ export function resultView(st, data, R) {
   </div>
   <p class="disc">입력한 정보 기준 사전 진단이에요. 최종 확인·선정·인정은 공식 기관의 평가와 심사로 결정돼요. 확률·점수는 표시하지 않아요.</p>
   <div class="grid g-two">
-    <section aria-label="인증별 결과">
-      ${R.schemes.map((x) => resultCard(x, data, R)).join('')}
+    <div>
+      <section class="zone" aria-labelledby="z1"><h2 class="zone-h" id="z1"><span>1</span>인증별 진단 결과 <em>${R.schemes.length}개</em></h2>
+        ${R.schemes.map((x) => resultCard(x, data, R)).join('')}</section>
       ${prepHTML(R)}
-      ${nextHTML(R)}
-    </section>
-    <aside class="sticky" aria-label="할 일과 저장">
-      <div class="panel rm mb18"><h2>무엇부터 할까요?</h2>${steps || '<p class="note">지금 할 일이 없어요.</p>'}<p class="note m0 mt8">전체 할 일은 각 인증의 ‘할 일’ 탭과 PDF에 있어요.</p></div>
-      <div class="panel mb18"><h2>공식 신청 바로가기</h2><ul class="links-list">${applyLinks}</ul><p class="note m0 mt8">PDF에도 같은 링크와 확인일이 들어가요.</p></div>
-      <div class="act">
-        <button class="btn" type="button" data-act="print">${ICON.print} PDF 보고서 저장</button>
-        <a class="btn sec" href="#/report">${ICON.doc} 보고서 문구 수정 · HTML 저장</a>
-        <a class="btn gh" href="#/answer">답 고치기</a>
+      ${nextHTML(R, R.connect && (R.connect.strategy.length || R.connect.commonDocs.length) ? 3 : 2)}
+    </div>
+    <aside class="side-r" aria-label="할 일·신청·저장">
+      <div class="panel rm"><h2 class="side-t">무엇부터 할까요?</h2>${steps || '<p class="note">지금 할 일이 없어요.</p>'}</div>
+      <div class="panel"><h2 class="side-t">공식 신청 바로가기</h2><ul class="links-list">${applyLinks}</ul></div>
+      <div class="panel act"><h2 class="side-t">보고서 저장</h2>
+        <button class="btn w" type="button" data-act="print">${ICON.print} PDF 보고서 저장</button>
+        <a class="btn w sec" href="#/report">${ICON.doc} 문구 수정 · HTML 저장</a>
+        <a class="btn w gh" href="#/answer">${ICON.back} 답 고치기</a>
       </div>
-      <div class="callout"><h2>인증 준비, 함께 하실까요?</h2><p>진단 결과를 바탕으로 신청 순서와 서류 준비를 도와드려요.</p>
+      <div class="callout"><h2 class="side-t">인증 준비, 함께 하실까요?</h2><p>신청 순서와 서류 준비를 도와드려요.</p>
         <a class="btn w navy" href="${SITE.telHref}">${ICON.phone} ${esc(SITE.tel)} 상담</a>
         <a class="btn w sec" href="${esc(consultMailto(R))}">${ICON.doc} 결과 담아 메일 상담</a></div>
-      <p class="note mt12">문서 ${esc(R.meta.doc_id)} · 앱 v${esc(R.meta.app_version)} · 데이터 ${esc(R.meta.data_versions.catalog)}</p>
+      <p class="note">문서 ${esc(R.meta.doc_id)} · 앱 v${esc(R.meta.app_version)} · 데이터 ${esc(R.meta.data_versions.catalog)}</p>
     </aside>
   </div>
 </section>`;
 }
 export function consultMailto(R) {
-  const lines = ['[기업인증 진단 결과로 상담 요청]', `문서번호: ${R.meta.doc_id} (진단 기준일 ${R.meta.as_of})`, '', '■ 진단 결과', ...R.schemes.map((x) => `- ${x.scheme.name_ko}: ${x.label.text}`), '', '■ 먼저 할 일', ...R.actions.slice(0, 3).map((a, i) => `${i + 1}. ${a.title}`), '', '■ 상담받고 싶은 내용:', '■ 회사명·연락처:'];
+  const lines = ['[기업인증 진단 결과로 상담 요청]', `문서번호: ${R.meta.doc_id} (진단 기준일 ${R.meta.as_of})`, '', '■ 진단 결과', ...R.schemes.map((x) => `- ${x.scheme.name_ko}: ${x.label.text}`), '', '■ 먼저 할 일', ...R.actions.slice(0, 3).map((a, i) => `${i + 1}. [${a.scheme_name}] ${a.title}`), '', '■ 상담받고 싶은 내용:', '■ 회사명·연락처:'];
   return `mailto:${SITE.mail}?subject=${encodeURIComponent(`[기업인증 진단] 상담 요청 ${R.meta.doc_id}`)}&body=${encodeURIComponent(lines.join('\n'))}`;
 }
 function prepHTML(R) {
   const c = R.connect || { strategy: [], commonDocs: [] };
   if (!c.strategy.length && !c.commonDocs.length) return '';
-  return `<section class="prep" aria-labelledby="prep-h"><h2 id="prep-h">${ICON.route} 여러 인증을 함께 준비할 때</h2>
+  return `<section class="zone" aria-labelledby="prep-h"><h2 class="zone-h" id="prep-h"><span>2</span>여러 인증 함께 준비</h2><div class="prep">
     ${c.strategy.map((x) => `<p class="m0 mt8">${esc(x.text)}</p>`).join('')}
     ${c.commonDocs.length ? `<p class="m0 mt8"><b>공통 서류 ${c.commonDocs.length}종</b> — 한 번 발급해 같이 쓰면 돼요. 발급일 제한(예: 1개월 이내)이 있는 서류는 신청 직전에 발급하세요.</p>
-    <ul class="common-docs">${c.commonDocs.map((d) => `<li><b>${esc(d.name)}</b> <span class="muted small">${esc(d.schemes.join(' · '))}</span></li>`).join('')}</ul>` : ''}</section>`;
+    <ul class="common-docs">${c.commonDocs.map((d) => `<li><b>${esc(d.name)}</b> <span class="muted small">${esc(d.schemes.join(' · '))}</span></li>`).join('')}</ul>` : ''}</div></section>`;
 }
-function nextHTML(R) {
+function nextHTML(R, no = 3) {
   const c = R.connect || { next: [] };
   if (!c.next.length) return '';
-  return `<section aria-labelledby="next-h"><h2 class="h2" id="next-h">다음 진단 추천 <span class="muted small">BECONIC 31</span></h2>
-    <p class="note m0">이번 결과와 답한 내용을 보고 이어서 하면 좋은 진단을 골랐어요. 새 창으로 열리고, 입력한 정보는 넘어가지 않아요.</p>
-    <div class="next-grid">${c.next.map((n, i) => `<div class="next-card"><span class="next-no">${i + 1}</span><div><p class="next-name">${esc(n.name)}</p><p class="small m0">${esc(n.why)}</p><p class="m0 mt8">${extLink(n.url, '진단 시작하기', 'btn sm sec')}</p></div></div>`).join('')}</div></section>`;
+  return `<section class="zone" aria-labelledby="next-h"><h2 class="zone-h" id="next-h"><span>${no}</span>다음 진단 추천 <em>BECONIC 31</em></h2>
+    <p class="note m0">결과에 맞춰 이어서 하면 좋은 진단이에요. 새 창으로 열리고 입력한 정보는 넘어가지 않아요.</p>
+    <div class="next-grid">${c.next.map((n, i) => `<div class="next-card"><div class="next-top"><span class="next-no">${i + 1}</span><p class="next-name">${esc(n.name)}</p></div><p class="next-why">${esc(n.why)}</p>${extLink(n.url, '진단 시작하기', 'btn sm sec w')}</div>`).join('')}</div></section>`;
 }
 
 // ── 보고서 화면(문구 수정·HTML 저장) ───────────────────────

@@ -74,6 +74,13 @@
     </div>
   </footer>
 
+  <dialog id="dl-dialog" class="dl-dialog" aria-labelledby="dl-title">
+    <h2 id="dl-title">공식 서식 내려받기</h2>
+    <p class="dl-name" id="dl-name"></p>
+    <dl class="dl-meta"><dt>형식</dt><dd id="dl-type"></dd><dt>출처</dt><dd id="dl-host"></dd><dt>링크 확인일</dt><dd id="dl-checked"></dd></dl>
+    <p class="note">공식 기관 사이트의 파일을 그대로 내려받아요(이 서비스가 파일을 보관·수정하지 않아요). 서식은 바뀔 수 있으니 제출 전 공식 사이트에서 최신본인지 확인하세요. HWP 파일은 한글(또는 한컴오피스 뷰어)로 열어요.</p>
+    <div class="dl-actions"><a class="btn" id="dl-go" href="#" target="_blank" rel="noopener noreferrer">내려받기<span class="sr-only"> (새 창)</span></a><button class="btn gh" type="button" data-act="dl-close">닫기</button></div>
+  </dialog>
   <div id="print-root" class="print-root" aria-hidden="true"></div>
 </body>
 </html>
