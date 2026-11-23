@@ -282,7 +282,7 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   check('E12 정적 HTML head에 OG·canonical (JS 실행 전)', missing.length === 0, missing.join(','));
   check('E12b og:image 절대 HTTPS 1200×630', /og:image" content="https:\/\/[^"]+og-certification\.png"/.test(html) && html.includes('content="1200"') && html.includes('content="630"'));
   check('E12c OG 이미지 로컬 200', (await fetch(`${BASE}assets/og-certification.png`)).status === 200);
-  check('E12f 헤더·푸터 로고는 방패만(글자 로고 없음)', !html.includes('growth-ventures-ko') && (html.match(/growth-shield-symbol-navy\.png/g) || []).length >= 2);
+  check('E12f 헤더·푸터: 방패 + BECONIC + by Growth Ventures(IR 진단과 같은 형태), 글자 로고 없음', !html.includes('growth-ventures-ko') && html.includes('assets/shield.png') && html.includes('assets/shield-white.png') && (html.match(/기업인증 진단 · by Growth Ventures/g) || []).length === 2 && html.includes('class="f-cert"'));
   const p = await newPage();
   const tel = await p.$$eval('a[href^="tel:"]', (e) => [...new Set(e.map((x) => x.getAttribute('href')))]);
   const mail = await p.$$eval('a[href^="mailto:"]', (e) => [...new Set(e.map((x) => x.getAttribute('href')))]);

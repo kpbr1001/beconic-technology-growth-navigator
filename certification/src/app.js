@@ -2,7 +2,7 @@
 import { loadData } from './data.js';
 import { buildReport, APP_VERSION } from './model.js';
 import { evalExpr } from './conditions.js';
-import { parseDate } from './engine.js';
+import { parseDate, ENGINE_VERSION } from './engine.js';
 import * as V from './views.js';
 import { renderPrint } from './print.js';
 import { SITE } from './site.js';
@@ -322,7 +322,7 @@ async function boot() {
     if (ready && !document.getElementById('print-root').innerHTML) document.getElementById('print-root').innerHTML = renderPrint(st.data, report(), { edited: st.edited });
   });
   window.addEventListener('afterprint', () => { document.getElementById('print-root').innerHTML = ''; });
-  const ver = document.getElementById('ver'); if (ver) ver.textContent = `· v${APP_VERSION}`;
+  const ver = document.getElementById('ver'); if (ver) ver.textContent = `· v${APP_VERSION} · 판정엔진 ${ENGINE_VERSION}`;
   const yr = document.getElementById('year'); if (yr) yr.textContent = st.asOf.slice(0, 4);
   try {
     st.data = await loadData('');

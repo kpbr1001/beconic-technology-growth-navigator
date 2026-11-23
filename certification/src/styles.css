@@ -363,3 +363,32 @@ fieldset.q { margin: 0 0 14px; }
   .dt td.no::before { content: 'No. '; }
 }
 .callout { padding: 24px; }
+
+/* ── 헤더·푸터: BECONIC 공통 형태(IR 진단과 동일) ── */
+.top-in { min-height: 60px; padding: 10px 40px; }
+.brand { gap: 10px; font-size: inherit; }
+.brand img { width: 34px; height: 34px; }
+.brand .txt { display: flex; flex-direction: column; line-height: 1.15; }
+.brand .txt b { font-size: 18px; font-weight: 800; letter-spacing: .02em; color: var(--navy); }
+.brand .txt small { font-size: 11.5px; color: var(--m); font-weight: 600; letter-spacing: 0; display: block; }
+.nav a.call { display: inline-flex; align-items: center; gap: 6px; background: var(--pw); color: var(--pd); }
+.nav a.call:hover { background: #dbe8ff; color: var(--pd); }
+.foot { background: #142044; color: #b8c3e0; border-top: 0; margin-top: 64px; }
+.foot-in { padding: 40px 40px calc(40px + var(--safe-b)); display: block; }
+.f-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.f-brand img { width: 40px; height: 40px; }
+.f-brand b { color: #fff; font-size: 18px; display: block; letter-spacing: .02em; }
+.f-brand small { font-size: 12px; color: #93a1cc; }
+.foot-in p { margin: 6px 0; font-size: 13px; line-height: 1.7; }
+.foot a, .foot .linkbtn { color: #dbe3f7; }
+.f-cert { color: #fff; font-weight: 600; }
+.f-legal { color: #93a1cc; }
+.f-ver { color: #7381ad; font-size: 12px; }
+@media (max-width: 760px) {
+  .top-in { padding: 8px 16px; }
+  .brand .txt small { display: block; font-size: 11px; }
+  .nav a.call { padding: 8px 12px; }
+  .foot-in { padding: 32px 16px calc(120px + var(--safe-b)); }
+}
+@media (max-width: 420px) { .nav a.call span { display: none; } }
+.foot a { text-decoration: underline; text-underline-offset: 3px; }
