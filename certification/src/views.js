@@ -27,29 +27,85 @@ const shortName = (s) => s.short_name || s.name_ko.replace(/\s*\(.*\)\s*$/, '');
 // ── 홈 ────────────────────────────────────────────────────
 export function home(data) {
   const all = data.catalog.schemes;
-  const dom = all.filter((s) => s.display_group === 'domestic').length;
-  const intl = all.length - dom;
-  const a = all.filter((s) => levelOf(s) === 'A').length;
-  return `<section class="wrap">
-  <div class="home-hero">
-    <div><p class="eyebrow">BECONIC 기업인증 진단</p>
-      <h1>우리 회사, 어떤 인증부터<br>준비해야 할까요?</h1>
-      <p>인증을 고르고 버튼으로 답하면, 신청 기본요건 충족 여부와 신청서류·공식 수수료·처리기간을 바로 정리해 드려요.</p>
-      <a class="btn" href="#/select">기업인증 진단 시작 ${ICON.arrow}</a></div>
-    <ol class="home-steps">
-      <li><i>1</i><div><b>인증 고르기</b><span>국내 ${dom}개 · 해외 ${intl}개 중 최대 ${MAX_SELECT}개</span></div></li>
-      <li><i>2</i><div><b>우리 회사 답하기</b><span>숫자 입력 없이 버튼으로. 모르면 ‘모름’</span></div></li>
-      <li><i>3</i><div><b>결과·할 일</b><span>기본요건 · 신청서류 · 신청처 · 수수료 · 기간, PDF 저장</span></div></li>
-    </ol>
-  </div>
-  <ul class="home-facts">
-    <li><b>공식 근거로만 판정</b><span>자동 판정 ${a}개는 법령·운영규정 원문과 대조한 요건만 판정해요.</span></li>
-    <li><b>확률·점수 없음</b><span>‘충족·미충족·확인 필요’만 보여 드려요. 최종 결정은 기관 심사예요.</span></li>
-    <li><b>신청서류·공식 링크</b><span>서식은 공식 사이트 최신본으로 연결해요.</span></li>
-    <li><b>입력값은 이 브라우저에만</b><span>서버로 보내거나 저장하지 않아요.</span></li>
-  </ul>
-  <p class="trust">결과는 공식 기관의 최종 판단을 대신하지 않아요. 운영: ${esc(SITE.company)} (${esc(SITE.regNo)})</p>
-</section>`;
+  const auto = all.filter((s) => levelOf(s) === 'A');
+  const nSrc = data.sources.sources.length;
+  // 보고서 예시: 데이터에서 계산(벤처 연구개발유형) — 숫자를 코드에 쓰지 않는다
+  const ven = data.schemeMap.VEN;
+  const rd = ven && ven.fees && !ven.fees.unverified ? ven.fees.items.find((x) => /연구개발/.test(x.label)) : null;
+  const rdDays = ven && ven.processing && !ven.processing.unverified ? ven.processing.items.find((x) => /연구개발/.test(x.label)) : null;
+  const vdocs = ven ? ven.readiness_items : [];
+  const sheet = ven ? `<div class="sheet" aria-label="결과 보고서 예시">
+      <span class="sheet-tag">결과 보고서 예시</span>
+      <div class="sheet-no"><span>BECONIC 기업인증 진단 보고서</span><span>예시</span></div>
+      <h3>${esc(ven.name_ko)} · 연구개발유형</h3>
+      <p class="sheet-s">입력한 정보로 신청 기본요건을 모두 갖춘 경우 이렇게 보여 드려요.</p>
+      <span class="stamp">기본요건 충족</span>
+      <div class="sheet-kv">
+        <div><span>공식 수수료(기업 부담)</span><b>${rd ? won(rd.company !== undefined ? rd.company : rd.total) : '기관 확인'}</b></div>
+        <div><span>확인결과 안내</span><b>${rdDays && rdDays.days ? `${rdDays.days}일 이내` : '기관 확인'}</b></div>
+        <div><span>신청서류</span><b>${vdocs.length}개</b> <small>필수 ${vdocs.filter((d) => d.required).length}</small></div>
+        <div><span>신청처</span><b>${esc((ven.apply_site && ven.apply_site.name) || ven.issuing_authority)}</b></div>
+      </div>
+      <p class="sheet-foot">수수료·기간은 공식 안내 원문과 대조한 값이에요. 최종 확인은 기관 심사로 결정돼요.</p>
+    </div>` : '';
+  // 비교표 수수료는 '신규' 신청 기준(연장·재확인 금액 제외)
+  const newFee = (s) => { const f = s.fees; if (!f || f.unverified) return feeSummary(s); const it = f.items.filter((x) => /신규/.test(x.label)); if (!it.length) return feeSummary(s);
+    const v = it.map((x) => (x.company !== undefined ? x.company : x.total)); const many = new Set(v).size > 1;
+    return { b: `${won(Math.min(...v))}${many ? '~' : ''}`, small: `신규 · VAT ${f.vat}${it.some((x) => x.company !== undefined) ? ' · 기업 부담' : ''}${many ? ' · 유형별' : ''}` }; };
+  const rows = auto.map((s) => { const f = newFee(s); const pr = procSummary(s);
+    return `<tr><th scope="row">${esc(shortName(s))}</th><td>${esc(LEVEL_LABEL.A)}</td><td><b>${esc(f.b)}</b><small>${esc(f.small)}</small></td><td><b>${esc(pr.b)}</b><small>${esc(pr.small)}</small></td><td>${esc((s.apply_site && s.apply_site.name) || s.issuing_authority)}</td></tr>`; }).join('');
+  return `<div class="home-a">
+  <section class="wrap home-top">
+    <div class="home-hero">
+      <div class="hh-l">
+        <p class="kicker">${auto.map((s) => esc(shortName(s))).join(' · ')}</p>
+        <h1>서류부터 준비하기 전에,<br><em>신청 요건이 되는지</em><br>먼저 확인하세요.</h1>
+        <p class="lead">법령·운영규정 원문 기준으로 기본요건을 판정하고, 신청서류·공식 수수료·처리기간·등록 절차·할 일까지 보고서 한 장으로 정리해 드려요.</p>
+        <a class="btn lg" href="#/select">기업인증 진단 시작 ${ICON.arrow}</a>
+        <p class="hh-meta"><span><b>버튼으로 답하기</b> · 모르면 ‘모름’</span><span><b>회원가입 없음</b> · 입력값 저장 안 함</span></p>
+      </div>
+      ${sheet}
+    </div>
+    <div class="nums">
+      <div><b>${all.length}</b><span>국내·해외 인증 안내</span></div>
+      <div><b>${auto.length}</b><span>법령 원문 기준 자동 판정</span></div>
+      <div><b>${nSrc}</b><span>공식 출처 · 확인일 표시</span></div>
+      <div><b>0</b><span>서버에 저장되는 입력값</span></div>
+    </div>
+  </section>
+  <section class="wrap home-sec">
+    <div class="hs"><p class="hs-n">01 · 왜 먼저 진단하나요</p><div>
+      <h2>인증 준비가 늦어지는 이유는<br>대부분 처음 단계에 있어요.</h2>
+      <div class="pains">
+        <div><b>요건을 잘못 읽고 시작</b><p>업력·연구전담요원·연구공간 기준을 다르게 이해하고 서류부터 준비하는 경우</p></div>
+        <div><b>비용·기간을 모르고 일정 수립</b><p>평가비용과 결과 안내 기간을 몰라 사업 일정과 어긋나는 경우</p></div>
+        <div><b>무엇부터 할지 모름</b><p>여러 인증 중 어떤 순서로 준비해야 서류를 한 번에 쓸 수 있는지 모르는 경우</p></div>
+      </div></div></div>
+    <div class="hs"><p class="hs-n">02 · 한눈에 비교</p><div>
+      <h2>많이 찾는 인증, 공식 기준으로 비교했어요.</h2>
+      <p class="hs-p">금액·기간은 기관 공식 안내 문구와 대조한 값만 보여 드려요. 원문을 확인하지 못한 값은 ‘기관 확인’으로 표시해요.</p>
+      <div class="tbl-wrap"><table class="cmp"><thead><tr><th scope="col">인증</th><th scope="col">판정</th><th scope="col">공식 수수료</th><th scope="col">처리기간</th><th scope="col">신청처</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="hs-src">전체 ${all.length}개 인증의 수수료·기간·등록 절차는 진단 화면에서 볼 수 있어요. <a href="#/about-data">근거·데이터 기준</a></p>
+    </div></div>
+    <div class="hs"><p class="hs-n">03 · 진행 방법</p><div>
+      <h2>세 단계, 숫자를 몰라도 답할 수 있어요.</h2>
+      <div class="steps3">
+        <div><i>1</i><b>인증 고르기</b><p>최대 ${MAX_SELECT}개. 업종·목적으로 좁혀 볼 수 있어요.</p></div>
+        <div><i>2</i><b>버튼으로 답하기</b><p>법정 기준으로 나눈 구간을 고르면 돼요. 모르면 ‘모름’.</p></div>
+        <div><i>3</i><b>보고서 받기</b><p>요건별 판정·신청서류·수수료·등록 절차·할 일. PDF로 저장해 내부 보고에 써요.</p></div>
+      </div></div></div>
+    <div class="hs"><p class="hs-n">04 · 운영사</p><div>
+      <h2>진단 다음 단계까지 함께해요.</h2>
+      <div class="trust2">
+        <div><h3>${esc(SITE.company)}</h3><ul><li>${esc(SITE.regNo)}</li><li>사업계획·기술사업화·인증 실무 컨설팅</li><li>상담 ${esc(SITE.tel)} · ${esc(SITE.mail)}</li></ul></div>
+        <div><h3>판정 원칙</h3><ul><li>공식 원문에 있는 기준만 판정해요</li><li>확률·점수로 표시하지 않아요</li><li>원문 미확보 항목은 ‘확인 필요’로 남겨요</li></ul></div>
+      </div></div></div>
+  </section>
+  <section class="home-cta"><div class="wrap">
+    <div><h2>지금 우리 회사 기준으로 확인해 보세요.</h2><p>결과를 받은 뒤 상담이 필요하면 보고서 문서번호로 바로 이어서 안내해 드려요.</p></div>
+    <div class="row"><a class="btn lg white" href="#/select">기업인증 진단 시작 ${ICON.arrow}</a><a class="btn lg line" href="${SITE.telHref}">${ICON.phone} 전화 상담</a></div>
+  </div></section>
+</div>`;
 }
 
 // ── 1 인증 고르기 ──────────────────────────────────────────
@@ -338,7 +394,8 @@ function docsPanel(x) {
   const guides = x.scheme.guides || [];
   if (!rows.length) return `<p class="note">이 인증은 공식 서류 목록을 아직 정리하지 못했어요. ${extLink(x.scheme.official_link, '공식 기관 안내')}에서 확인하세요.</p>`;
   const req = rows.filter((d) => d.required).length;
-  return `${guides.length ? `<h3 class="sub-h">공식 서식·안내 ${guides.length}개</h3><ol class="guide-list">${guides.map((g) => `<li>${isFile(g.url) ? dlBtn(g.url, g.title, g.checked_at) : extLink(g.url, g.title)}</li>`).join('')}</ol>` : ''}
+  const dnote = x.scheme.docs_note ? `<p class="note m0">${esc(x.scheme.docs_note)}</p>` : '';
+  return `${dnote}${guides.length ? `<h3 class="sub-h">공식 서식·안내 ${guides.length}개</h3><ol class="guide-list">${guides.map((g) => `<li>${isFile(g.url) ? dlBtn(g.url, g.title, g.checked_at) : extLink(g.url, g.title)}</li>`).join('')}</ol>` : ''}
     <h3 class="sub-h">신청서류 ${rows.length}개 <span class="muted small">필수 ${req}${rows.length > req ? ` · 해당 시 ${rows.length - req}` : ''}</span></h3>
     <table class="dt"><thead><tr><th scope="col" class="no">No.</th><th scope="col">서류</th><th scope="col">왜 필요한가</th><th scope="col">발급·내려받기</th></tr></thead><tbody>
     ${rows.map((d, i) => `<tr><td class="no">${i + 1}</td><td><b>${esc(d.label)}</b>${d.required ? '' : '<small>해당할 때만</small>'}</td><td>${esc(d.why)}</td><td>${d.link ? (isFile(d.link) ? dlBtn(d.link, `${d.label} 양식`, '', d.where || '양식 내려받기') : extLink(d.link, d.where || '바로가기')) : esc(d.where || '-')}${d.link_unverified ? ' <span class="unv">접속 미검증</span>' : ''}</td></tr>`).join('')}
@@ -364,8 +421,17 @@ export function procSummary(s, pathwayName) {
   if (it) return { b: fmt(it), small: it.label === '현장평가 실시' ? '현장평가까지' : '접수(수수료 납부)부터 결과 안내' };
   return { b: p.items.map(fmt).join(' / '), small: p.text };
 }
+// ── 등록 절차(인증별) — 단계는 데이터(catalog procedure)에서만. 원문에 없는 단계는 점선·'기관 확인' ──
+export function procedureHTML(s, data, { compact = false } = {}) {
+  const p = s.procedure;
+  if (!p || !p.steps || !p.steps.length) return `<p class="note m0">공식 등록 절차는 아직 정리하지 못했어요. ${extLink(s.official_link, '공식 기관 안내')}에서 확인하세요.</p>`;
+  const srcs = (p.source_refs || []).map((r) => data.sourceMap[r]).filter(Boolean);
+  return `<ol class="proc n${Math.min(p.steps.length, 8)}${compact ? ' sm' : ''}" aria-label="${esc(p.title)} ${p.steps.length}단계">${p.steps.map((x, i) => `<li class="ps${x.unverified ? ' u' : ''}"><i>${i + 1}</i><b>${esc(x.label)}</b>${x.sub || x.unverified ? `<small>${esc(x.sub || '')}${x.unverified ? ' (원문 미확보)' : ''}</small>` : ''}</li>`).join('')}</ol>
+    ${compact ? '' : `<p class="proc-src">${p.note ? `${esc(p.note)} · ` : ''}출처: ${srcs.map((so) => `${extLink(so.official_url, so.title)} <span class="muted">(${esc(ACCESS_LABEL[so.access_status])}, 확인 ${esc(so.checked_at)})</span>`).join(' · ')}</p>`}`;
+}
 function feePanel(x, data) {
   const s = x.scheme; const f = s.fees; const p = s.processing;
+  const procTop = `<h3 class="sub-h">${esc((s.procedure && s.procedure.title) || '등록 절차')}</h3>${procedureHTML(s, data)}`;
   const src = (refs) => [...new Set(refs)].map((r) => data.sourceMap[r]).filter(Boolean).map((so) => `${extLink(so.official_url, so.title)} <span class="muted small">· 확인 ${esc(so.fee_checked_at || so.checked_at)}</span>`).join('<br>');
   let fee = '';
   if (!f) fee = `<p class="note">공식 수수료를 아직 정리하지 못했어요. ${extLink(s.official_link, '공식 기관 안내')}에서 확인하세요.</p>`;
@@ -381,7 +447,7 @@ function feePanel(x, data) {
   else if (p.unverified) proc = `<p class="notice warn m0">${esc(p.text)}</p>`;
   else proc = `<ul class="m0">${p.items.map((i) => `<li><b>${esc(i.label)}</b>: ${i.days ? `${i.days}일 이내` : `${i.weeks}주 이내`}</li>`).join('')}</ul><p class="note">${esc(p.text)}</p>`;
   const refs = [...((f && f.items) || []), ...((p && p.items) || [])].map((i) => i.source_ref);
-  return `<h3 class="m0">공식 수수료</h3>${fee}
+  return `${procTop}<h3 class="m0">공식 수수료</h3>${fee}
     <h3 class="mt16">접수부터 확인서 발급까지</h3>${proc}
     ${x.ongoing ? `<h3 class="mt16">유효기간·사후관리</h3><p class="m0">${esc(x.ongoing)}</p>` : ''}
     ${refs.length ? `<p class="note mt12">근거: ${src(refs)}</p>` : ''}`;
@@ -440,6 +506,7 @@ function resultCard(x, data, R) {
   if (x.result && x.result.gate.active && x.result.basic === S.PASS) sub = `${t.pw.name} 기본요건 충족 · 남은 단계는 기관 평가(결과는 기관이 결정)`;
   return `<article class="rc" id="res-${esc(id)}">
     <div class="rc-h"><div>${badge(x.label.key, x.label.text)}<h2 class="tt">${esc(s.name_ko)}</h2><p class="sub">${esc(sub)}</p></div>${levelTag(s)}</div>
+    ${barHTML(x)}
     <div class="tiles">
       <div class="tile"><span>${t.req.label}</span><b>${esc(t.req.b)}</b>${t.req.small ? `<small>${esc(t.req.small)}</small>` : ''}</div>
       <div class="tile"><span>신청서류</span><b>${t.docs ? `${t.docs}개` : '기관 안내'}</b>${t.docs && t.docsReq !== t.docs ? `<small>필수 ${t.docsReq} · 해당 시 ${t.docs - t.docsReq}</small>` : ''}</div>
@@ -451,6 +518,17 @@ function resultCard(x, data, R) {
     <div class="acc">${tabs.map(([k], i) => `<button type="button" class="acc-h" id="ah-${esc(id)}-${k}" data-act="acc" data-card="${esc(id)}" data-k="${k}" aria-expanded="${i === 0}" aria-controls="tp-${esc(id)}-${k}"><span class="acc-l">${esc(accLabel[k])}</span><em>${esc(accSum[k])}</em><i aria-hidden="true">⌄</i></button>
     <div class="tp${i === 0 ? ' on open' : ''}" role="tabpanel" id="tp-${esc(id)}-${k}" aria-labelledby="tb-${esc(id)}-${k}">${panels[k]()}</div>`).join('')}</div>
   </article>`;
+}
+// 결과 카드 진행 막대: 가장 가까운 경로의 기본요건(기관 평가 제외)을 충족·확인 필요·미충족 칸으로
+function barHTML(x) {
+  const r = x.result;
+  if (!r || !r.gate.active || r.basic === S.NA) return '';
+  const pw = bestPathway(r); const req = reqLeaves(pw);
+  if (!req.length) return '';
+  const cls = { [S.PASS]: 'ok', [S.FAIL]: 'no', [S.UNKNOWN]: 'q' };
+  const n = (st) => req.filter((l) => l.status === st).length;
+  return `<div class="rbar" aria-hidden="true">${req.map((l) => `<i class="${cls[l.status] || 'q'}"></i>`).join('')}</div>
+    <p class="rbar-l">기본요건 ${n(S.PASS)} / ${req.length} 충족${n(S.UNKNOWN) ? ` · 확인 필요 ${n(S.UNKNOWN)}` : ''}${n(S.FAIL) ? ` · 미충족 ${n(S.FAIL)}` : ''}${r.pathways.length > 1 ? ` · ${esc(pw.name)} 기준` : ''}</p>`;
 }
 export function headline(R) {
   const n = R.schemes.length; const k = R.summary.byKey;
@@ -473,7 +551,7 @@ export function resultView(st, data, R) {
   return `<section class="wrap">
   ${stepper('result', st)}
   <div class="hero-r">
-    <div><p>진단 결과 · ${esc(fmtDate(R.meta.as_of))}</p><h1 id="result-title" tabindex="-1">${esc(hl.h)}</h1><p>${esc(hl.p)}</p></div>
+    <div><p>진단 결과 · ${esc(fmtDate(R.meta.as_of))} · ${esc(R.meta.doc_id)}</p><h1 id="result-title" tabindex="-1">${esc(hl.h)}</h1><p>${esc(hl.p)}</p></div>
     ${R.summary.diagnosed ? `<div class="k">${kv.map(([key, l]) => `<div><b>${k[key] || 0}</b><span>${l}</span></div>`).join('')}</div>` : ''}
   </div>
   <p class="disc">입력한 정보 기준 사전 진단이에요. 최종 확인·선정·인정은 공식 기관의 평가와 심사로 결정돼요. 확률·점수는 표시하지 않아요.</p>
@@ -481,11 +559,12 @@ export function resultView(st, data, R) {
     <div>
       <section class="zone" aria-labelledby="z1"><h2 class="zone-h" id="z1"><span>1</span>인증별 진단 결과 <em>${R.schemes.length}개</em></h2>
         ${R.schemes.map((x) => resultCard(x, data, R)).join('')}</section>
-      ${prepHTML(R)}
-      ${nextHTML(R, R.connect && (R.connect.strategy.length || R.connect.commonDocs.length) ? 3 : 2)}
+      ${procZoneHTML(R, data)}
+      ${prepHTML(R, 3)}
+      ${nextHTML(R, R.connect && (R.connect.strategy.length || R.connect.commonDocs.length) ? 4 : 3)}
     </div>
     <aside class="side-r" aria-label="할 일·신청·저장">
-      <div class="panel rm"><h2 class="side-t">무엇부터 할까요?</h2>${steps || '<p class="note">지금 할 일이 없어요.</p>'}</div>
+      <div class="panel rm"><h2 class="side-t">무엇부터 할까요? <em>${R.actions.length}개</em></h2>${steps || '<p class="note">지금 할 일이 없어요.</p>'}</div>
       <div class="panel"><h2 class="side-t">공식 신청 바로가기</h2><ul class="links-list">${applyLinks}</ul></div>
       <div class="panel act"><h2 class="side-t">보고서 저장</h2>
         <button class="btn w" type="button" data-act="print">${ICON.print} PDF 보고서 저장</button>
@@ -504,10 +583,17 @@ export function consultMailto(R) {
   const lines = ['[기업인증 진단 결과로 상담 요청]', `문서번호: ${R.meta.doc_id} (진단 기준일 ${R.meta.as_of})`, '', '■ 진단 결과', ...R.schemes.map((x) => `- ${x.scheme.name_ko}: ${x.label.text}`), '', '■ 먼저 할 일', ...R.actions.slice(0, 3).map((a, i) => `${i + 1}. [${a.scheme_name}] ${a.title}`), '', '■ 상담받고 싶은 내용:', '■ 회사명·연락처:'];
   return `mailto:${SITE.mail}?subject=${encodeURIComponent(`[기업인증 진단] 상담 요청 ${R.meta.doc_id}`)}&body=${encodeURIComponent(lines.join('\n'))}`;
 }
-function prepHTML(R) {
+// 고른 인증의 등록 절차를 한곳에 모아(취합) 단계 수와 함께 보여 준다
+function procZoneHTML(R, data) {
+  const rows = R.schemes.map((x) => { const s = x.scheme; const n = s.procedure ? s.procedure.steps.length : 0;
+    return `<div class="proc-row"><div class="proc-nm"><b>${esc(shortName(s))}</b><span>${n ? `${n}단계` : '기관 안내'}</span></div>${procedureHTML(s, data, { compact: true })}</div>`; }).join('');
+  return `<section class="zone" aria-labelledby="proc-h"><h2 class="zone-h" id="proc-h"><span>2</span>등록 절차 한눈에 <em>${R.schemes.length}개 인증</em></h2>
+    <div class="proc-all">${rows}</div><p class="note">단계별 출처는 인증 카드의 ‘비용·기간’ 탭에 있어요. 점선 단계는 공식 원문을 확보하지 못한 단계예요.</p></section>`;
+}
+function prepHTML(R, no = 2) {
   const c = R.connect || { strategy: [], commonDocs: [] };
   if (!c.strategy.length && !c.commonDocs.length) return '';
-  return `<section class="zone" aria-labelledby="prep-h"><h2 class="zone-h" id="prep-h"><span>2</span>여러 인증 함께 준비</h2><div class="prep">
+  return `<section class="zone" aria-labelledby="prep-h"><h2 class="zone-h" id="prep-h"><span>${no}</span>여러 인증 함께 준비</h2><div class="prep">
     ${c.strategy.map((x) => `<p class="m0 mt8">${esc(x.text)}</p>`).join('')}
     ${c.commonDocs.length ? `<p class="m0 mt8"><b>공통 서류 ${c.commonDocs.length}종</b> — 한 번 발급해 같이 쓰면 돼요. 발급일 제한(예: 1개월 이내)이 있는 서류는 신청 직전에 발급하세요.</p>
     <ul class="common-docs">${c.commonDocs.map((d) => `<li><b>${esc(d.name)}</b> <span class="muted small">${esc(d.schemes.join(' · '))}</span></li>`).join('')}</ul>` : ''}</div></section>`;
@@ -548,7 +634,7 @@ export function schemeDetail(st, data, id) {
     <dt>발급·확인</dt><dd>${esc(s.issuing_authority)}</dd>
     <dt>진단 방식</dt><dd>${{ A: '공식 원문으로 검증한 기본요건을 자동 판정', B: '핵심 요건·준비상태를 스스로 확인(판정 아님)', C: '정보 안내(자동 판정 없음)' }[levelOf(s)]}</dd>
   </dl></div>
-  ${s.fees || s.processing ? `<div class="card">${feePanel(x, data)}</div>` : ''}
+  ${s.fees || s.processing || s.procedure ? `<div class="card">${feePanel(x, data)}</div>` : ''}
   <p class="notice info">${esc(s.scope_note)}</p>
   ${s.help_text ? `<p class="muted">${esc(s.help_text)}</p>` : ''}
   <h2 class="h2">공식 근거</h2>

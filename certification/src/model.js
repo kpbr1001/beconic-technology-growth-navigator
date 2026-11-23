@@ -5,7 +5,7 @@ import { computeReadiness, readinessSentence, EVIDENCE } from './readiness.js';
 import { recommend, TIER_LABEL } from './recommend.js';
 import { triage } from './triage.js';
 
-export const APP_VERSION = '2.1.1';
+export const APP_VERSION = '2.2.0';
 
 export const CATEGORY = {
   1: '신청 장애 요인 제거·확인',
@@ -190,7 +190,7 @@ export function buildActions(data, schemes) {
       if (open.length) push({ category: 1, timeframe: 'now', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `준비상태 ${open.length}개 확인`, detail: open.map((d) => d.label).join(' · '), basis: '', owner: '품질·운영 책임자', deliverable: '자가점검 결과', done_when: '진단에 네·아니요로 입력' });
     }
     if (s.prep) {
-      s.prep.rows.filter((d) => d.status !== EVIDENCE.SELF_DECLARED_AVAILABLE).forEach((d) => {
+      s.prep.rows.filter((d) => d.status !== EVIDENCE.SELF_DECLARED_AVAILABLE && !(d.skip_if_docs && s.readiness)).forEach((d) => {
         const t = d.todo || {};
         push({ category: t.timeframe === 'now' ? 1 : 2, timeframe: t.timeframe || 'd30', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: t.title || d.label, detail: d.why, basis: s.scheme.official_link, owner: '경영지원', deliverable: d.label, done_when: '공식 기관 안내 확인' });
       });

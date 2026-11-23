@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.23-4",
+  "version": "2026.11.23-5",
   "schemes": [
     {
       "scheme_id": "VEN",
@@ -294,7 +294,31 @@
       ],
       "industry_major": [
         "all"
-      ]
+      ],
+      "procedure": {
+        "title": "벤처기업확인 절차",
+        "source_refs": [
+          "S-VEN-A",
+          "S-VEN-B"
+        ],
+        "steps": [
+          {
+            "label": "신청·수수료 납부",
+            "sub": "벤처확인시스템 · 접수완료",
+            "quote": "접수완료(벤처확인 수수료 납부)"
+          },
+          {
+            "label": "전문평가기관 평가",
+            "sub": "유형별 평가기관(요건검증·성장성 등)",
+            "quote": "전문평가기관"
+          },
+          {
+            "label": "확인결과 안내",
+            "sub": "접수완료일부터 30일(투자유형)·45일 이내",
+            "quote": "확인결과 안내기간 : 접수완료(벤처확인 수수료 납부)일로부터 45일 이내 소요"
+          }
+        ]
+      }
     },
     {
       "scheme_id": "INNO",
@@ -506,7 +530,35 @@
       "industry_major": [
         "all"
       ],
-      "needs_business_registration": true
+      "needs_business_registration": true,
+      "procedure": {
+        "title": "이노비즈 선정 절차",
+        "source_refs": [
+          "S-INNO-PROC"
+        ],
+        "steps": [
+          {
+            "label": "온라인 자가진단",
+            "sub": "650점 이상",
+            "quote": "온라인 자가진단 650점 이상"
+          },
+          {
+            "label": "신청·서류 제출",
+            "sub": "업체준비서류",
+            "quote": "업체준비서류"
+          },
+          {
+            "label": "현장평가",
+            "sub": "기술보증기금 · 700점 이상 · 기술수준 B등급 이상",
+            "quote": "기술보증기금 현장평가 기술혁신시스템 700점 이상 및 개별기술수준 B등급 이상"
+          },
+          {
+            "label": "선정 결과 안내",
+            "sub": "기관 확인",
+            "unverified": true
+          }
+        ]
+      }
     },
     {
       "scheme_id": "MAIN",
@@ -701,7 +753,30 @@
       "industry_major": [
         "all"
       ],
-      "needs_business_registration": true
+      "needs_business_registration": true,
+      "procedure": {
+        "title": "메인비즈 선정 절차",
+        "source_refs": [
+          "S-MAIN-GUIDE"
+        ],
+        "steps": [
+          {
+            "label": "1차 온라인 자가진단",
+            "sub": "600점 이상",
+            "quote": "1차 온라인 자가진단 600점 이상"
+          },
+          {
+            "label": "2차 현장평가",
+            "sub": "700점 이상",
+            "quote": "2차 현장평가 700점 이상"
+          },
+          {
+            "label": "확인서 발급",
+            "sub": "유효기간 3년",
+            "quote": "유효기간 3년"
+          }
+        ]
+      }
     },
     {
       "scheme_id": "RNDI",
@@ -1166,18 +1241,109 @@
       "diagnosable": false,
       "verified_status": "UNVERIFIED",
       "sources": [
-        "S-HACCP"
+        "S-HACCP",
+        "S-HACCP-SMART"
       ],
-      "official_link": "https://www.haccp.or.kr",
-      "last_verified_at": "2026-11-22",
+      "official_link": "https://www.haccp.or.kr/shp/shp/guest/main/mainIndex.do",
+      "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-22",
-      "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요.",
+      "readiness_items": [
+        {
+          "item_id": "HACCP-APP",
+          "label": "자동 기록관리 시스템 적용업소 등록 신청서(별지 제9호서식)",
+          "why": "스마트HACCP 적용업소 등록 신청서예요(식품 및 축산물 안전관리인증기준 별지 제9호서식).",
+          "where": "스마트HACCP 지원포털",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-HACCP-SMART"
+          ]
+        },
+        {
+          "item_id": "HACCP-BIZ",
+          "label": "영업허가증·영업신고증 또는 영업등록증 사본",
+          "why": "영업 자격을 확인해요.",
+          "where": "스마트HACCP 지원포털",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-HACCP-SMART"
+          ]
+        },
+        {
+          "item_id": "HACCP-CERT",
+          "label": "안전관리인증기준 적용업소 인증서 사본",
+          "why": "HACCP 적용업소인 경우에만 내요.",
+          "where": "스마트HACCP 지원포털",
+          "required": false,
+          "applies_when": "always",
+          "source_refs": [
+            "S-HACCP-SMART"
+          ]
+        },
+        {
+          "item_id": "HACCP-PLAN",
+          "label": "HACCP 관리계획서",
+          "why": "서류검토 단계에서 검토하는 핵심 서류예요.",
+          "where": "스마트HACCP 지원포털",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-HACCP-SMART"
+          ]
+        }
+      ],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 등록 절차·첨부서류는 스마트HACCP 지원포털 안내(운영사 확인 화면, 2026-11-23) 기준이에요. 의무 적용 품목과 수수료·기간은 인증원에서 확인하세요.",
       "industry_major": [
         "food",
         "agri"
       ],
-      "prep_check": "info_basic"
+      "prep_check": "info_basic",
+      "apply_site": {
+        "name": "스마트HACCP 지원포털",
+        "url": "https://www.haccp.or.kr/shp/shp/guest/main/mainIndex.do"
+      },
+      "docs_note": "스마트HACCP 적용업소 등록(중요관리점 모니터링 자동 기록관리 시스템) 기준 첨부서류예요. 일반 HACCP 신규 인증 서류는 인증원 안내로 확인하세요.",
+      "procedure": {
+        "title": "스마트HACCP 등록 절차",
+        "source_refs": [
+          "S-HACCP-SMART"
+        ],
+        "note": "중요관리점(CCP) 모니터링 자동 기록관리 시스템 적용업소 등록 기준이에요.",
+        "steps": [
+          {
+            "label": "신청서 작성",
+            "sub": "신청인",
+            "quote": "1 신청서 작성(신청인)"
+          },
+          {
+            "label": "접수",
+            "quote": "2 접수"
+          },
+          {
+            "label": "서류검토",
+            "sub": "HACCP 관리계획서",
+            "quote": "3 서류검토(HACCP 관리계획서)"
+          },
+          {
+            "label": "현지 확인 및 평가",
+            "quote": "4 현지 확인 및 평가"
+          },
+          {
+            "label": "판정",
+            "quote": "5 판정"
+          },
+          {
+            "label": "결재",
+            "quote": "6 결재"
+          },
+          {
+            "label": "HACCP 인증서 발급",
+            "sub": "교부 또는 재교부",
+            "quote": "7 HACCP 인증서 발급(교부 또는 재교부)"
+          }
+        ]
+      }
     },
     {
       "scheme_id": "WOMEN",
@@ -5196,7 +5362,8 @@
           "todo": {
             "timeframe": "d30",
             "title": "신청서류 목록 확인·준비"
-          }
+          },
+          "skip_if_docs": true
         },
         {
           "item_id": "P3",

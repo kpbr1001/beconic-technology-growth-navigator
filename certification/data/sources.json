@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.23-4",
+  "version": "2026.11.23-5",
   "checked_by": "개발 시점 원문 대조(자동 수집 + 개발자 확인). 전문가 검토 없음 — 운영사 대표 검토 대상",
   "access_status_legend": {
     "OK": "개발 환경에서 원문 접속·내용 확인",
@@ -282,13 +282,13 @@
       "source_id": "S-HACCP",
       "regulator": "식품의약품안전처 · 한국식품안전관리인증원",
       "title": "HACCP(식품안전관리인증기준)",
-      "official_url": "https://www.haccp.or.kr",
+      "official_url": "https://www.haccp.or.kr/shp/shp/guest/main/mainIndex.do",
       "source_kind": "official_portal",
       "document_identifier": null,
       "published_at": null,
       "effective_from": null,
       "effective_until": null,
-      "checked_at": "2026-11-22",
+      "checked_at": "2026-11-23",
       "access_status": "OK",
       "excerpt_or_section_ref": "포털 접속 확인. 의무적용 품목 기준은 미반영",
       "reviewer": null,
@@ -1492,6 +1492,22 @@
       "access_status": "OK",
       "excerpt_or_section_ref": "공식 사이트 접속 확인(2026-11-23). 요건·수수료·처리기간 원문은 대조하지 않음 — 정보 안내용",
       "reviewer": null,
+      "review_status": "UNVERIFIED"
+    },
+    {
+      "source_id": "S-HACCP-SMART",
+      "regulator": "식품의약품안전처 · 한국식품안전관리인증원",
+      "title": "스마트HACCP 지원포털 — 인증절차 안내(스마트HACCP 등록)",
+      "official_url": "https://www.haccp.or.kr/shp/shp/guest/main/mainIndex.do",
+      "source_kind": "official_portal",
+      "document_identifier": "식품 및 축산물 안전관리인증기준(식약처 고시) 제11조의2",
+      "published_at": null,
+      "effective_from": null,
+      "effective_until": null,
+      "checked_at": "2026-11-23",
+      "access_status": "USER_OK",
+      "excerpt_or_section_ref": "스마트HACCP 지원포털 「인증절차 안내」(운영사 대표 제공 화면, 2026-11-23) · 스마트HACCP 등록 절차 처리절차: 1 신청서 작성(신청인) → 2 접수 → 3 서류검토(HACCP 관리계획서) → 4 현지 확인 및 평가 → 5 판정 → 6 결재 → 7 HACCP 인증서 발급(교부 또는 재교부) · 스마트HACCP 적용업소 등록 방법: 중요관리점(CCP) 모니터링 자동 기록관리 시스템 적용 여부에 대한 등록 제도를 운영 · (관련근거) 식품 및 축산물 안전관리인증기준(식약처 고시) 제11조의2 · 첨부서류: 자동 기록관리 시스템 적용업소 등록 신청서(식품 및 축산물 안전관리인증기준 별지 제9호서식) · 영업허가증, 영업신고증 또는 영업등록증 사본 · 안전관리인증기준 적용업소 인증서 사본(HACCP 적용업소의 경우에 한함) · HACCP 관리계획서",
+      "reviewer": "운영사 대표 제공 화면",
       "review_status": "UNVERIFIED"
     }
   ]

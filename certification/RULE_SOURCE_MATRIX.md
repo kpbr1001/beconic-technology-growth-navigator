@@ -1,6 +1,6 @@
 # 규칙–공식 근거 대조표 (RULE_SOURCE_MATRIX)
 
-> 자동 생성: `node scripts/matrix.mjs` · 데이터 2026.11.23-4 · 출처 2026.11.23-4
+> 자동 생성: `node scripts/matrix.mjs` · 데이터 2026.11.23-5 · 출처 2026.11.23-5
 
 검토 방법: 각 행의 **근거 문구**가 **출처 원문**에 있는지, 판정 함수·기준이 원문과 같은지 확인합니다. 숫자 기준 문구는 `tests/data.test.mjs` DATA-05가 출처 발췌와 자동 대조합니다(숫자 변조 시 실패).
 
@@ -129,7 +129,7 @@
 | S-RND-PORTAL | [연구소/전담부서 신고관리 · 2026 업무편람](https://www.rnd.or.kr/user/info/outline.do) | 한국산업기술진흥협회 | 2026 기업부설연구소/연구개발전담부서 업무편람 | 미기재 | 2026-11-22 | UNREACHABLE | - |
 | S-KC-SAFETY | [제품안전정보센터(KC 안전인증 등)](https://www.safetykorea.kr) | 국가기술표준원 | - | 미기재 | 2026-11-22 | OK | - |
 | S-KC-RADIO | [방송통신기자재 적합성평가](https://www.rra.go.kr) | 국립전파연구원 | - | 미기재 | 2026-11-22 | OK | - |
-| S-HACCP | [HACCP(식품안전관리인증기준)](https://www.haccp.or.kr) | 식품의약품안전처 · 한국식품안전관리인증원 | - | 미기재 | 2026-11-22 | OK | - |
+| S-HACCP | [HACCP(식품안전관리인증기준)](https://www.haccp.or.kr/shp/shp/guest/main/mainIndex.do) | 식품의약품안전처 · 한국식품안전관리인증원 | - | 미기재 | 2026-11-23 | OK | - |
 | S-WOMEN | [여성기업 확인](https://www.wbiz.or.kr) | 중소벤처기업부 · 한국여성경제인협회 | - | 미기재 | 2026-11-22 | UNREACHABLE | - |
 | S-DISABLED | [장애인기업 확인](https://www.debc.or.kr) | 중소벤처기업부 · 장애인기업종합지원센터 | - | 미기재 | 2026-11-22 | UNREACHABLE | - |
 | S-FAMILY | [가족친화인증](https://www.ffsb.kr) | 가족친화인증 운영기관(정부) | - | 미기재 | 2026-11-23 | USER_OK | - |
@@ -205,3 +205,4 @@
 | S-AU-TGA | [호주 TGA 의료제품 등록](https://www.tga.gov.au) | 호주 TGA | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
 | S-CA-HC-MD | [캐나다 의료기기 허가(Health Canada)](https://www.canada.ca/en/health-canada.html) | 캐나다 보건부 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
 | S-HALAL-MY | [할랄 인증(말레이시아 JAKIM 등)](https://www.halal.gov.my) | 국가별 할랄 인증기관 | - | 미기재 | 2026-11-23 | OK | - |
+| S-HACCP-SMART | [스마트HACCP 지원포털 — 인증절차 안내(스마트HACCP 등록)](https://www.haccp.or.kr/shp/shp/guest/main/mainIndex.do) | 식품의약품안전처 · 한국식품안전관리인증원 | 식품 및 축산물 안전관리인증기준(식약처 고시) 제11조의2 | 미기재 | 2026-11-23 | USER_OK | - |

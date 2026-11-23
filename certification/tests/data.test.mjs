@@ -295,3 +295,21 @@ test('HC-03 데이터로 옮긴 값의 일관성: 목적 검색어 키 = 목적 
   });
   Object.values(D.catalog.schemes).filter((s) => s.triage).forEach((s) => assert.ok(D.catalog.triage_specs[s.triage], `${s.scheme_id} 트리아지 문구 데이터 없음`));
 });
+
+test('PROC-01 등록 절차: 단계마다 공식 원문 문구가 출처 발췌에 그대로 있고, 원문 없는 단계는 미확보 표시', () => {
+  const withProc = D.catalog.schemes.filter((s) => s.procedure);
+  assert.ok(withProc.length >= 4, `절차 데이터 ${withProc.length}개`);
+  for (const s of withProc) {
+    const p = s.procedure;
+    assert.ok(p.title && p.steps.length >= 2, `${s.scheme_id} 단계 부족`);
+    p.source_refs.forEach((r) => assert.ok(s.sources.includes(r) && D.sourceMap[r], `${s.scheme_id} 출처 ${r}`));
+    const ex = p.source_refs.map((r) => D.sourceMap[r].excerpt_or_section_ref).join(' ');
+    p.steps.forEach((st) => {
+      if (st.quote) assert.ok(ex.includes(st.quote), `${s.scheme_id} '${st.label}' 근거 문구가 출처에 없음`);
+      else assert.ok(st.unverified, `${s.scheme_id} '${st.label}' 근거 없는데 미확보 표시 없음`);
+    });
+  }
+  const h = D.schemeMap.HACCP;
+  assert.equal(h.official_link, 'https://www.haccp.or.kr/shp/shp/guest/main/mainIndex.do');
+  assert.equal(h.procedure.steps.length, 7);
+});
