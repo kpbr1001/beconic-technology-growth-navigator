@@ -1,8 +1,8 @@
 // 기본요건 판정 엔진 — 4값 논리(PASS/FAIL/UNKNOWN/NOT_APPLICABLE), AND/OR/WHEN 트리.
 // 순수 함수만 둔다(DOM·네트워크·저장소 접근 없음). 브라우저와 Node 테스트가 같은 코드를 쓴다.
-import { isMissing } from './conditions.js';
+import { isMissing, band, bandGte } from './conditions.js';
 
-export const ENGINE_VERSION = '2.0.0';
+export const ENGINE_VERSION = '2.1.0'; // 2.1: 구간 답 판정
 export const S = Object.freeze({ PASS: 'PASS', FAIL: 'FAIL', UNKNOWN: 'UNKNOWN', NA: 'NOT_APPLICABLE' });
 
 // ── 4값 결합 ───────────────────────────────────────────────
@@ -49,6 +49,30 @@ const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('ko-KR') : String(n
 const tri = (v) => (v === 'yes' ? true : v === 'no' ? false : null); // null = 모름
 
 function num(v) { return typeof v === 'number' && Number.isFinite(v) ? v : null; }
+// 구간 답 표시: 숫자 답과 구분해 '선택'으로 보여 준다
+function bandText(b, unit = '') {
+  if (b.exact) return `${fmt(b.lo)}${unit}`;
+  if (unit === '명') return b.hi === Infinity ? `${fmt(b.lo)}명 이상` : b.hi - b.lo === 1 ? `${fmt(b.lo)}명` : `${fmt(b.lo)}~${fmt(b.hi - 1)}명`;
+  if (b.hi === Infinity) return `${fmt(b.lo)}${unit} 이상`;
+  if (b.lo === 0 || (unit === '만원' && b.lo === 1)) return `${fmt(b.hi)}${unit} 미만`;
+  return `${fmt(b.lo)}${unit} 이상 ${fmt(b.hi)}${unit} 미만`;
+}
+const STRADDLE = ' — 고른 구간이 기준에 걸쳐 있어 정확한 값 확인이 필요해요';
+function bandStatus(g) { return g === null ? S.UNKNOWN : g ? S.PASS : S.FAIL; }
+// 벤처 연구개발비 비율 기준(업종×매출 구간)에서 가능한 기준값 목록 — 화면의 '우리 회사 기준' 안내에도 쓴다
+export function rdRatioThresholds(table, industry, revenueAnswer) {
+  if (!table) return [];
+  const [b1, b2] = table.revenue_buckets_manwon;
+  const buckets = [[0, b1], [b1, b2], [b2, Infinity]];
+  const rb = band(revenueAnswer);
+  const idx = buckets.map((bk, i) => i).filter((i) => {
+    if (!rb) return true;
+    const [lo, hi] = buckets[i];
+    return rb.exact ? rb.lo >= lo && rb.lo < hi : rb.lo < hi && rb.hi > lo;
+  });
+  const rows = table.rows[industry] ? [table.rows[industry]] : Object.values(table.rows);
+  return [...new Set(rows.flatMap((r) => idx.map((i) => r[i])))].sort((x, y) => x - y);
+}
 
 export const CHECKS = {
   yes({ q }, ctx) {
@@ -70,17 +94,32 @@ export const CHECKS = {
     return { status: S.UNKNOWN, missing: [q], inputs: [q] };
   },
   gte({ q, min, unit = '' }, ctx) {
-    const v = num(ctx.answers[q]);
+    const b = band(ctx.answers[q]);
+    if (b && !b.exact) {
+      const g = bandGte(b, min);
+      return { status: bandStatus(g), inputs: [q], ...(g === null ? { missing: [q] } : {}), detail: `선택 ${bandText(b, unit)} / 기준 ${fmt(min)}${unit} 이상${g === null ? STRADDLE : ''}` };
+    }
+    const v = b ? b.lo : null; // 숫자 답 또는 정확한 값 구간(예: '받은 적 없음' = r:0:0)
     if (v === null) return { status: S.UNKNOWN, missing: [q], inputs: [q], detail: `기준 ${fmt(min)}${unit} 이상` };
     return { status: v >= min ? S.PASS : S.FAIL, inputs: [q], detail: `입력 ${fmt(v)}${unit} / 기준 ${fmt(min)}${unit} 이상` };
   },
   lt({ q, max, unit = '' }, ctx) {
-    const v = num(ctx.answers[q]);
+    const b = band(ctx.answers[q]);
+    if (b && !b.exact) {
+      const g = bandGte(b, max);
+      return { status: g === null ? S.UNKNOWN : g ? S.FAIL : S.PASS, inputs: [q], ...(g === null ? { missing: [q] } : {}), detail: `선택 ${bandText(b, unit)} / 기준 ${fmt(max)}${unit} 미만${g === null ? STRADDLE : ''}` };
+    }
+    const v = b ? b.lo : null;
     if (v === null) return { status: S.UNKNOWN, missing: [q], inputs: [q], detail: `기준 ${fmt(max)}${unit} 미만` };
     return { status: v < max ? S.PASS : S.FAIL, inputs: [q], detail: `입력 ${fmt(v)}${unit} / 기준 ${fmt(max)}${unit} 미만` };
   },
   years_since_gte({ q, years }, ctx) {
     const raw = ctx.answers[q];
+    const b = band(raw);
+    if (b && typeof raw === 'string') { // 업력 구간(년)
+      const g = bandGte(b, years);
+      return { status: bandStatus(g), inputs: [q], ...(g === null ? { missing: [q] } : {}), detail: `업력 ${bandText(b, '년')}(선택) / 기준 ${years}년 이상${g === null ? STRADDLE : ''}` };
+    }
     if (isMissing(raw)) return { status: S.UNKNOWN, missing: [q], inputs: [q] };
     const y = fullYearsBetween(raw, ctx.asOf);
     if (y === null || y < 0) return { status: S.UNKNOWN, missing: [q], inputs: [q], detail: '날짜를 다시 확인해 주세요(없는 날짜이거나 기준일 이후 날짜).' };
@@ -99,8 +138,23 @@ export const CHECKS = {
     }
     return base;
   },
-  venture_invest_ratio({ invest, capital, culture, pct, pct_culture }, ctx) {
+  venture_invest_ratio({ invest, capital, culture, pct, pct_culture, ratio_q }, ctx) {
     const a = ctx.answers; const i = num(a[invest]); const c = num(a[capital]);
+    if (i === null && ratio_q) { // 구간 답: 자본금 대비 투자금 비율을 바로 고른다
+      const rb = band(a[ratio_q]);
+      if (!rb) return { status: S.UNKNOWN, missing: [ratio_q], inputs: [ratio_q], detail: `기준 ${pct}% 이상(문화산업 제작자 법인 ${pct_culture}%)` };
+      const shown = `선택 ${bandText(rb, '%')}`;
+      const hiTh = Math.max(pct, pct_culture); const loTh = Math.min(pct, pct_culture);
+      if (bandGte(rb, hiTh) === true) return { status: S.PASS, inputs: [ratio_q], detail: `${shown} / 기준 ${pct}% 이상` };
+      if (bandGte(rb, loTh) === false) return { status: S.FAIL, inputs: [ratio_q], detail: `${shown} / 기준 ${pct}% 이상` };
+      const cul = a[culture];
+      if (cul === 'yes' || cul === 'no') {
+        const th = cul === 'yes' ? pct_culture : pct;
+        const g = bandGte(rb, th);
+        return { status: bandStatus(g), inputs: [ratio_q, culture], ...(g === null ? { missing: [ratio_q] } : {}), detail: `${shown} / ${cul === 'yes' ? '문화산업 제작자 법인 ' : ''}기준 ${th}% 이상${g === null ? STRADDLE : ''}` };
+      }
+      return { status: S.UNKNOWN, missing: [culture], inputs: [ratio_q, culture], detail: `${shown} — 문화산업 제작자 법인이면 ${pct_culture}%, 아니면 ${pct}% 기준이에요.` };
+    }
     const missing = [];
     if (i === null) missing.push(invest);
     if (c === null) missing.push(capital);
@@ -116,10 +170,29 @@ export const CHECKS = {
     if (cul === 'no') return { status: S.FAIL, inputs: [invest, capital, culture], detail: `${shown} / 기준 ${pct}% 이상` };
     return { status: S.UNKNOWN, missing: [culture], inputs: [invest, capital, culture], detail: `${shown} — 문화산업 제작자 법인이면 7%, 아니면 10% 기준이에요.` };
   },
-  venture_rd_ratio({ spend, revenue, industry }, ctx) {
+  venture_rd_ratio({ spend, revenue, industry, ratio_q }, ctx) {
     const a = ctx.answers; const sp = num(a[spend]); const rv = num(a[revenue]);
     const table = ctx.tables && ctx.tables.rd_ratio;
     if (!table) return { status: S.UNKNOWN, detail: '업종별 기준표가 없어요.', unverified: true };
+    if ((sp === null || rv === null) && ratio_q) { // 구간 답: 매출 구간 + 비율 구간
+      const rb = band(a[revenue]);
+      if (!rb) return { status: S.UNKNOWN, missing: [revenue], inputs: [revenue, ratio_q, industry], detail: '매출 규모에 따라 기준 비율이 달라요.' };
+      if (rb.exact && rb.lo === 0) return { status: S.UNKNOWN, missing: [], inputs: [revenue], detail: '매출액이 0원이면 비율 산정 방식을 확인기관에 확인해야 해요.' };
+      const ths = rdRatioThresholds(table, a[industry], a[revenue]);
+      const lo = ths[0]; const hi = ths[ths.length - 1];
+      const need = lo === hi ? `기준 ${lo}% 이상` : `기준 ${lo}~${hi}%(업종·매출 규모에 따라)`;
+      const qb = band(a[ratio_q]);
+      if (!qb) return { status: S.UNKNOWN, missing: [ratio_q], inputs: [revenue, ratio_q, industry], detail: need };
+      const shown = `선택 ${bandText(qb, '%')} / ${need}`;
+      const ins = [revenue, ratio_q, industry];
+      if (bandGte(qb, hi) === true) return { status: S.PASS, inputs: ins, detail: shown };
+      if (bandGte(qb, lo) === false) return { status: S.FAIL, inputs: ins, detail: shown };
+      const miss = [];
+      if (lo !== hi && !table.rows[a[industry]]) miss.push(industry);
+      if (lo !== hi && (rb.exact ? false : rdRatioThresholds(table, a[industry], `r:${rb.lo}:${rb.lo}`).length !== ths.length)) miss.push(revenue);
+      if (!miss.length) miss.push(ratio_q);
+      return { status: S.UNKNOWN, missing: miss, inputs: ins, detail: `${shown}${STRADDLE}` };
+    }
     const missing = [];
     if (sp === null) missing.push(spend);
     if (rv === null) missing.push(revenue);
@@ -147,13 +220,17 @@ export const CHECKS = {
     const a = ctx.answers;
     const K = args && args.staff;
     if (!K) return { status: S.UNKNOWN, inputs: [], detail: '규칙 데이터에 기준 인원표가 없어 판정하지 않아요.' };
-    const count = num(a[args.q || 'rnd_researchers']);
+    const cq = args.q || 'rnd_researchers';
+    const count = num(a[cq]);
+    const cband = typeof a[cq] === 'string' ? band(a[cq]) : null;
     const sizes = ['small', 'medium', 'midsize', 'large'].includes(a.company_size) ? [a.company_size] : ['small', 'medium', 'midsize', 'large'];
     const opts = (v) => (v === true ? [true] : v === false ? [false] : [true, false]);
     const V = opts(tri(a.rnd_is_venture));
     const F = opts(tri(a.rnd_founder_researcher));
-    const yrs = isMissing(a.founded_on) ? null : fullYearsBetween(a.founded_on, ctx.asOf);
-    const Y = opts(yrs === null || yrs < 0 ? null : yrs < K.startup_years);
+    const fb = typeof a.founded_on === 'string' ? band(a.founded_on) : null;
+    const yrs = fb || isMissing(a.founded_on) ? null : fullYearsBetween(a.founded_on, ctx.asOf);
+    const underStartup = fb ? (bandGte(fb, K.startup_years) === null ? null : !bandGte(fb, K.startup_years)) : (yrs === null || yrs < 0 ? null : yrs < K.startup_years);
+    const Y = opts(underStartup);
     const B = opts(tri(a.rnd_became_medium_1y));
     const T = new Set();
     for (const size of sizes) for (const v of V) for (const f of F) for (const y of Y) for (const b of B) {
@@ -166,16 +243,20 @@ export const CHECKS = {
     const lo = Math.min(...T); const hi = Math.max(...T);
     const need = lo === hi ? `기준 ${lo}명 이상` : `기준 ${lo}~${hi}명(규모·벤처 여부 등에 따라 결정)`;
     const inputs = ['rnd_researchers', 'company_size', 'rnd_is_venture', 'rnd_founder_researcher', 'founded_on', 'rnd_became_medium_1y'];
-    if (count === null) return { status: S.UNKNOWN, missing: ['rnd_researchers'], inputs, detail: need };
-    const shown = `입력 ${count}명 / ${need}`;
-    if (count >= hi) return { status: S.PASS, inputs, detail: shown };
-    if (count < lo) return { status: S.FAIL, inputs, detail: shown };
+    if (count === null && !cband) return { status: S.UNKNOWN, missing: ['rnd_researchers'], inputs, detail: need };
+    const shown = cband ? `선택 ${bandText(cband, '명')} / ${need}` : `입력 ${count}명 / ${need}`;
+    const allHi = cband ? bandGte(cband, hi) === true : count >= hi;
+    const allLo = cband ? bandGte(cband, lo) === false : count < lo;
+    if (allHi) return { status: S.PASS, inputs, detail: shown };
+    if (allLo) return { status: S.FAIL, inputs, detail: shown };
     const miss = [];
     if (sizes.length > 1) miss.push('company_size');
     if (V.length > 1) miss.push('rnd_is_venture');
     if (F.length > 1) miss.push('rnd_founder_researcher');
     if (Y.length > 1) miss.push('founded_on');
     if (B.length > 1 && sizes.includes('medium')) miss.push('rnd_became_medium_1y');
+    if (cband && lo === hi) return { status: S.UNKNOWN, missing: [cq], inputs, detail: `${shown}${STRADDLE}` };
+    if (cband && !miss.length) miss.push(cq);
     return { status: S.UNKNOWN, missing: miss, inputs, detail: `${shown} — 기준 인원을 정하려면 추가 정보가 필요해요.` };
   },
   // 시행규칙 제2조②1호: 독립 연구공간 원칙 + 칸막이·2m 벽체 예외

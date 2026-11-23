@@ -74,7 +74,7 @@ test('DATA-04 모든 원자요건: 화이트리스트 판정 함수·존재하�
     assert.ok(CHECKS[n.check], `${pack.rule_pack_id}/${n.id} 판정 함수 ${n.check}`);
     (n.source_refs || []).forEach((r) => assert.ok(D.sourceMap[r], `${n.id} 출처 ${r} 없음`));
     const args = n.args || {};
-    ['q', 'invest', 'capital', 'culture', 'spend', 'revenue', 'industry'].forEach((k) => { if (args[k]) assert.ok(D.questionMap[args[k]], `${n.id} 질문 ${args[k]} 없음`); });
+    ['q', 'invest', 'capital', 'culture', 'spend', 'revenue', 'industry', 'ratio_q'].forEach((k) => { if (args[k]) assert.ok(D.questionMap[args[k]], `${n.id} 질문 ${args[k]} 없음`); });
   });
 });
 
@@ -224,4 +224,46 @@ test('HC-01 판정 엔진·모델에 법정 기준값·업종 코드·제도별 
   assert.ok(!/T\.add\(\d/.test(engine), '엔진에 연구전담요원 기준 숫자');
   assert.ok(!/'(software_582|info_63|programming_62)'/.test(engine), '엔진에 업종 코드');
   assert.ok(!/case '(INNO|MAIN|RNDI|RNDD|VEN)'/.test(model), '모델에 제도별 문구 분기');
+});
+
+test('DATA-10 공식 수수료·처리기간: 금액·기간은 공식 원문 문구와 한 글자도 다르지 않고, 없으면 미확보로 표시', () => {
+  const won = (n) => `${n.toLocaleString('en-US')}원`;
+  const man = (n) => [`${n / 10000}만원`, `${n / 10000}만 원`];
+  D.catalog.schemes.filter((s) => s.diagnosable).forEach((s) => {
+    ['fees', 'processing'].forEach((k) => {
+      const f = s[k];
+      assert.ok(f, `${s.scheme_id} ${k} 없음`);
+      if (f.unverified) { assert.ok(!/\d+원|\d+일 이내|\d+주/.test(f.text), `${s.scheme_id} 미확보인데 숫자 단정`); return; }
+      f.items.forEach((it) => {
+        const src = D.sourceMap[it.source_ref];
+        assert.ok(src && src.excerpt_or_section_ref.includes(it.quote), `${s.scheme_id} ${it.label}: 근거 문구가 출처에 없음`);
+        if (k === 'fees') {
+          assert.ok(it.quote.includes(won(it.total)) || man(it.total).some((m) => it.quote.includes(m)), `${s.scheme_id} ${it.label} 금액 ${it.total} 원문 불일치`);
+          if (it.gov !== undefined) {
+            assert.equal(it.gov + it.company, it.total, `${it.label} 정부지원+기업부담 ≠ 합계`);
+            assert.ok(it.quote.includes(won(it.gov)) && it.quote.includes(won(it.company)));
+          }
+        } else {
+          if (it.days) assert.ok(it.quote.includes(`${it.days}일 이내`));
+          if (it.weeks) assert.ok(it.quote.includes(`${it.weeks}주 이내`));
+        }
+      });
+    });
+  });
+  const ven = D.catalog.schemes.find((s) => s.scheme_id === 'VEN').fees.items.find((i) => i.label === '벤처투자유형 신규');
+  assert.equal(ven.company, 175000);
+});
+
+test('DATA-11 인증 목록: 120개 이하, 모든 공식 링크 https, 출처 접속 상태 기록, 분야는 정해진 목록 안', async () => {
+  const { FIELDS, fieldOf, levelOf } = await import('../src/ui.js');
+  const all = D.catalog.schemes;
+  assert.ok(all.length <= 120, `인증 ${all.length}개 — 상한 120`);
+  all.forEach((s) => {
+    assert.match(s.official_link, /^https:\/\//, s.scheme_id);
+    assert.ok(FIELDS.includes(fieldOf(s)), `${s.scheme_id} 분야 ${fieldOf(s)}`);
+    s.sources.forEach((r) => assert.ok(['OK', 'OK_IMAGE', 'BLOCKED', 'UNREACHABLE'].includes(D.sourceMap[r].access_status), `${s.scheme_id} 출처 상태`));
+    if (levelOf(s) === 'C') assert.ok(!s.fees || s.fees.unverified, `${s.scheme_id}: 정보 안내 인증에 대조 안 된 수수료 숫자 금지`);
+    (s.readiness_items || []).forEach((d) => { if (d.link) assert.match(d.link, /^https:\/\//); });
+    (s.guides || []).forEach((g) => assert.match(g.url, /^https:\/\//));
+  });
 });

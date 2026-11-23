@@ -5,7 +5,7 @@ import { computeReadiness, readinessSentence, EVIDENCE } from './readiness.js';
 import { recommend, TIER_LABEL } from './recommend.js';
 import { triage } from './triage.js';
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '2.0.0';
 
 export const CATEGORY = {
   1: '신청 장애 요인 제거·확인',
@@ -14,7 +14,8 @@ export const CATEGORY = {
   4: '선택적 경쟁력 강화',
   5: '지속관리',
 };
-export const TIMEFRAME = { now: '즉시', d30: '30일 안', d60: '60일 안', d90: '90일 안', ongoing: '지속관리' };
+// v2: 근거 없는 일정(30·60·90일) 대신 준비 순서만 표시한다
+export const TIMEFRAME = { now: '먼저', d30: '서류 준비', d60: '평가 준비', d90: '신청', ongoing: '사후관리' };
 
 function hash(str) { // FNV-1a 32bit — 문서 ID용(개인정보를 담지 않는 짧은 식별자)
   let h = 0x811c9dc5;
@@ -173,8 +174,8 @@ export function buildActions(data, schemes) {
       s.readiness.rows.filter((x) => x.applicable).forEach((d) => {
         if (d.status === EVIDENCE.NOT_AVAILABLE) push({ category: d.required ? 2 : 4, timeframe: d.required ? 'd30' : 'd90', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `서류 준비: ${d.label}`, detail: d.why, basis: d.where ? `발급·확인처: ${d.where}` : '', owner: '경영지원', deliverable: d.label, done_when: '서류 확보' });
       });
-      const unk = s.readiness.rows.filter((x) => x.applicable && x.required && x.status === EVIDENCE.UNKNOWN);
-      if (unk.length) push({ category: 2, timeframe: 'now', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `필수 서류 ${unk.length}건 보유 여부 확인`, detail: unk.map((x) => x.label).join(' · '), basis: '', owner: '경영지원', deliverable: '보유 여부', done_when: '서류 체크 화면에서 상태 표시' });
+      const req = s.readiness.rows.filter((x) => x.applicable && x.required && x.status !== EVIDENCE.NOT_AVAILABLE && x.status !== EVIDENCE.SELF_DECLARED_AVAILABLE);
+      if (req.length && !(r && r.gate.active && r.basic === S.FAIL)) push({ category: 2, timeframe: 'd30', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname} 신청서류 ${req.length}건 준비`, detail: req.slice(0, 4).map((x) => x.label).join(' · ') + (req.length > 4 ? ` 외 ${req.length - 4}건` : ''), basis: '', owner: '경영지원', deliverable: '신청서류', done_when: '발급·작성 완료' });
     }
     if (s.selfcheck) {
       s.selfcheck.rows.forEach((d) => {

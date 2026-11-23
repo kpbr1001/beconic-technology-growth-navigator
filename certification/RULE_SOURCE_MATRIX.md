@@ -1,6 +1,6 @@
 # 규칙–공식 근거 대조표 (RULE_SOURCE_MATRIX)
 
-> 자동 생성: `node scripts/matrix.mjs` · 데이터 2026.11.22-1 · 출처 2026.11.22-1
+> 자동 생성: `node scripts/matrix.mjs` · 데이터 2026.11.23-1 · 출처 2026.11.23-1
 
 검토 방법: 각 행의 **근거 문구**가 **출처 원문**에 있는지, 판정 함수·기준이 원문과 같은지 확인합니다. 숫자 기준 문구는 `tests/data.test.mjs` DATA-05가 출처 발췌와 자동 대조합니다(숫자 변조 시 실패).
 
@@ -18,7 +18,7 @@
 | 벤처투자유형 | VEN-SME | 「중소기업기본법」 제2조 중소기업 | yes {"q":"is_sme"} | - | [벤처확인 유형별 안내 — 벤처투자유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=A) | OK |
 | 벤처투자유형 | VEN-EXCL | 벤처 제외 업종(시행령 별표 1)이 아님 | no {"q":"ven_excluded_industry"} | 카지노 운영업(91242) | [벤처기업육성에 관한 특별법 시행령 [별표 1] 벤처기업에 포함되지 않는 업종 (벤처확인시스템 게시 이미지)](https://www.smes.go.kr/venturein/resources/images/sub/ventureRestricted11thIndustry.jpg) | OK_IMAGE |
 | 벤처투자유형 | VEN-INV-AMT | 적격투자기관 투자금 합계 5천만원 이상 | gte {"q":"ven_invest_total","min":5000,"unit":"만원"} | 투자금액 합계 5천만원 이상 | [벤처확인 유형별 안내 — 벤처투자유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=A) | OK |
-| 벤처투자유형 | VEN-INV-RATIO | 자본금 중 투자금 비율 10% 이상(문화산업 제작자 법인 7%) | venture_invest_ratio {"invest":"ven_invest_total","capital":"ven_capital","culture":"ven_culture_producer","pct":10,"pct_culture":7} | 투자금액 합계 비율 10% 이상(문화산업진흥 기본법 제2조제12호 제작자 중 법인은 7% 이상) | [벤처확인 유형별 안내 — 벤처투자유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=A) | OK |
+| 벤처투자유형 | VEN-INV-RATIO | 자본금 중 투자금 비율 10% 이상(문화산업 제작자 법인 7%) | venture_invest_ratio {"invest":"ven_invest_total","ratio_q":"ven_invest_ratio","capital":"ven_capital","culture":"ven_culture_producer","pct":10,"pct_culture":7} | 투자금액 합계 비율 10% 이상(문화산업진흥 기본법 제2조제12호 제작자 중 법인은 7% 이상) | [벤처확인 유형별 안내 — 벤처투자유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=A) | OK |
 | 벤처투자유형 | VEN-INV-QUAL | 투자자가 적격투자기관 | yes {"q":"ven_qualified_investor"} | - | [벤처확인 유형별 안내 — 벤처투자유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=A) | OK |
 | 벤처투자유형 | VEN-INV-REVIEW | 전문평가기관 요건검증(한국벤처캐피탈협회) | 기관 평가(판정 안 함) | - | [벤처확인 유형별 안내 — 벤처투자유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=A) | OK |
 | 연구개발유형 | VEN-RD-OPERATING | 사업자등록 완료 | enum {"q":"biz_status","pass":["individual","corporation"],"fail":["pre"]} | - | [벤처확인 유형별 안내 — 연구개발유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=B)<br>[벤처확인 유형별 안내 — 예비벤처유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=D) | OK, OK |
@@ -27,7 +27,7 @@
 | 연구개발유형 | VEN-RD-UNIT | 기업부설연구소·연구개발전담부서 등 연구조직 1개 이상 보유 | enum {"q":"rnd_unit","pass":["institute","dept","creative"],"fail":["none"]} | - | [벤처확인 유형별 안내 — 연구개발유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=B) | OK |
 | 연구개발유형 | VEN-RD-AMT | 직전 4개 분기 연구개발비 5천만원 이상 | gte {"q":"ven_rd_spend","min":5000,"unit":"만원"} | 직전 4개 분기 연구개발비 5천만원 이상 | [벤처확인 유형별 안내 — 연구개발유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=B) | OK |
 | 연구개발유형 | VEN-RD-AGE3 | 창업 후 3년 경과 | years_since_gte {"q":"founded_on","years":3} | 창업 3년 미만은 비율 미적용 | [벤처확인 유형별 안내 — 연구개발유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=B) | OK |
-| 연구개발유형 | VEN-RD-RATIO | 같은 기간 매출액 대비 연구개발비 비율(업종·매출 규모별 5~10%) 이상 | venture_rd_ratio {"spend":"ven_rd_spend","revenue":"ven_revenue","industry":"industry"} | 5% 이상(업종별 기준) | [벤처확인 유형별 안내 — 연구개발유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=B)<br>[업종별 연구개발투자비율 (연구개발유형 '업종별 기준 확인' 게시 이미지)](https://www.smes.go.kr/venturein/resources/images/sub/09rd_type.png) | OK, OK_IMAGE |
+| 연구개발유형 | VEN-RD-RATIO | 같은 기간 매출액 대비 연구개발비 비율(업종·매출 규모별 5~10%) 이상 | venture_rd_ratio {"spend":"ven_rd_spend","ratio_q":"ven_rd_ratio","revenue":"ven_revenue","industry":"industry"} | 5% 이상(업종별 기준) | [벤처확인 유형별 안내 — 연구개발유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=B)<br>[업종별 연구개발투자비율 (연구개발유형 '업종별 기준 확인' 게시 이미지)](https://www.smes.go.kr/venturein/resources/images/sub/09rd_type.png) | OK, OK_IMAGE |
 | 연구개발유형 | VEN-RD-REVIEW | 벤처기업확인기관의 '사업의 성장성' 평가 | 기관 평가(판정 안 함) | - | [벤처확인 유형별 안내 — 연구개발유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=B) | OK |
 | 혁신성장유형 | VEN-GROWTH-OPERATING | 사업자등록 완료 | enum {"q":"biz_status","pass":["individual","corporation"],"fail":["pre"]} | - | [벤처확인 유형별 안내 — 혁신성장유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=C)<br>[벤처확인 유형별 안내 — 예비벤처유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=D) | OK, OK |
 | 혁신성장유형 | VEN-SME | 「중소기업기본법」 제2조 중소기업 | yes {"q":"is_sme"} | - | [벤처확인 유형별 안내 — 혁신성장유형](https://www.smes.go.kr/venturein/institution/requireGuide?rgCd=C) | OK |
@@ -139,3 +139,67 @@
 | S-FDA-DEV | [Overview of Device Regulation](https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/overview-device-regulation) | U.S. FDA | - | 미기재 | 2026-11-22 | OK | - |
 | S-FDA-FOOD | [Registration of Food Facilities and Other Submissions](https://www.fda.gov/food/guidance-regulation-food-and-dietary-supplements/registration-food-facilities-and-other-submissions) | U.S. FDA | - | 미기재 | 2026-11-22 | OK | - |
 | S-FCC | [Equipment Authorization](https://www.fcc.gov/oet/ea) | U.S. FCC | - | 미기재 | 2026-11-22 | BLOCKED | - |
+| S-SME-CONF | [중소기업확인서](https://sminfo.mss.go.kr) | 중소벤처기업부 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-SOCIAL-ENT | [사회적기업 인증](https://www.socialenterprise.or.kr) | 고용노동부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-PRE-SOCIAL | [예비사회적기업 지정](https://www.socialenterprise.or.kr) | 고용노동부·지방자치단체 | - | 미기재 | 2026-11-23 | OK | - |
+| S-ROOT-IND | [뿌리기업 확인](https://www.kpic.re.kr) | 산업통상자원부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-DIRECT-PROD | [직접생산확인](https://www.smpp.go.kr) | 중소벤처기업부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-PERF-CERT | [성능인증](https://www.smpp.go.kr) | 중소벤처기업부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-SHARE-PERF | [성과공유기업 확인](https://www.winwinnuri.or.kr) | 중소벤처기업부 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-EXPORT-SME | [수출유망중소기업 지정](https://www.exportcenter.go.kr) | 중소벤처기업부(지방중소벤처기업청) | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-SW-BIZ | [소프트웨어사업자 신고](https://www.sw.or.kr) | 과학기술정보통신부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-RND-SERVICE | [연구개발서비스업 신고](https://www.rnd.or.kr) | 과학기술정보통신부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-CREATIVE-LAB | [기업부설창작연구소·기업창작전담부서](https://www.rnd.or.kr) | 과학기술정보통신부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-GS-CERT | [GS인증(소프트웨어 품질인증)](https://www.tta.or.kr) | 과학기술정보통신부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-NEP | [NEP 신제품 인증](https://www.newproduct.or.kr) | 산업통상자원부(국가기술표준원) | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-NET | [NET 신기술 인증](https://www.netmark.or.kr) | 산업통상자원부(국가기술표준원) | - | 미기재 | 2026-11-23 | OK | - |
+| S-GREEN-CERT | [녹색인증](https://www.greencertif.or.kr) | 관계부처 합동 | - | 미기재 | 2026-11-23 | OK | - |
+| S-PPS-EXCELLENT | [조달우수제품 지정](https://www.pps.go.kr) | 조달청 | - | 미기재 | 2026-11-23 | OK | - |
+| S-INNOV-PROD | [혁신제품 지정](https://www.pps.go.kr) | 조달청 등 관계부처 | - | 미기재 | 2026-11-23 | OK | - |
+| S-KS | [KS 인증](https://www.ksa.or.kr) | 산업통상자원부(국가기술표준원) | - | 미기재 | 2026-11-23 | OK | - |
+| S-HIGH-EFF | [고효율에너지기자재 인증](https://eep.energy.or.kr) | 산업통상자원부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-ENERGY-LABEL | [에너지소비효율등급 표시](https://eep.energy.or.kr) | 산업통상자원부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-ECO-LABEL | [환경표지 인증](https://el.keiti.re.kr) | 환경부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-GR-MARK | [우수재활용제품(GR) 인증](https://www.buygr.or.kr) | 산업통상자원부 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-GOOD-DESIGN | [우수디자인(GD) 선정](https://www.kidp.or.kr) | 산업통상자원부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-KR-MEDICAL | [의료기기 허가·인증·신고](https://www.mfds.go.kr) | 식품의약품안전처 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-ISMS-P | [ISMS-P 정보보호 관리체계 인증](https://isms.kisa.or.kr) | 과학기술정보통신부·개인정보보호위원회 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-CC-CERT | [CC인증(정보보호제품 평가·인증)](https://itscc.kr) | 과학기술정보통신부(국가정보원 협력) | - | 미기재 | 2026-11-23 | OK | - |
+| S-KOSHA-MS | [안전보건경영시스템(KOSHA-MS) 인증](https://www.kosha.or.kr) | 고용노동부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-DISABLED-WS | [장애인표준사업장 인증](https://www.kead.or.kr) | 고용노동부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-ECO-AGRI | [친환경농산물 인증](https://www.enviagro.go.kr) | 농림축산식품부(국립농산물품질관리원) | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-KCS-SAFETY | [산업안전 KCs 안전인증](https://www.kosha.or.kr) | 고용노동부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-CARBON-LABEL | [환경성적표지(탄소발자국) 인증](https://www.epd.or.kr) | 환경부 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-ISO50001 | [ISO 50001 에너지경영시스템](https://www.iso.org/iso-50001-energy-management.html) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-ISO37001 | [ISO 37001 부패방지경영시스템](https://www.iso.org/iso-37001-anti-bribery-management.html) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-ISO37301 | [ISO 37301 규범준수경영시스템](https://www.iso.org/standard/75080.html) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-ISO27701 | [ISO/IEC 27701 개인정보경영시스템](https://www.iso.org/standard/71670.html) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-ISO22301 | [ISO 22301 비즈니스연속성경영시스템](https://www.iso.org/standard/75106.html) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-ISO20000 | [ISO/IEC 20000-1 IT서비스경영시스템](https://www.iso.org/standard/70636.html) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-IATF16949 | [IATF 16949 자동차 품질경영시스템](https://www.iatfglobaloversight.org) | IATF 인정 인증기관 | - | 미기재 | 2026-11-23 | OK | - |
+| S-AS9100 | [AS9100 항공우주 품질경영시스템](https://iaqg.org) | IAQG 인정 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-FSSC22000 | [FSSC 22000 식품안전시스템](https://www.fssc.com) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | OK | - |
+| S-SOC2 | [SOC 2 보고서](https://www.aicpa-cima.com) | AICPA 기준에 따른 감사인 | - | 미기재 | 2026-11-23 | OK | - |
+| S-PCI-DSS | [PCI DSS 카드 데이터 보안 표준](https://www.pcisecuritystandards.org) | PCI SSC(평가는 QSA) | - | 미기재 | 2026-11-23 | OK | - |
+| S-CMMI | [CMMI 성숙도 평가](https://cmmiinstitute.com) | ISACA(CMMI Institute) 공인 평가자 | - | 미기재 | 2026-11-23 | OK | - |
+| S-BCORP | [B Corp 인증](https://www.bcorporation.net) | B Lab | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-FSC | [FSC 산림인증](https://fsc.org) | FSC 인정 인증기관 | - | 미기재 | 2026-11-23 | OK | - |
+| S-CB-SCHEME | [IECEE CB Scheme](https://www.iecee.org) | IECEE 회원 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-IECEX | [IECEx 방폭 인증](https://www.iecex.com) | IECEx 인증기관 | - | 미기재 | 2026-11-23 | OK | - |
+| S-EU-ROHS | [EU RoHS 유해물질 제한](https://environment.ec.europa.eu/topics/waste-and-recycling/rohs-directive_en) | 유럽연합 | - | 미기재 | 2026-11-23 | OK | - |
+| S-EU-REACH | [EU REACH 화학물질 등록](https://echa.europa.eu) | 유럽화학물질청(ECHA) | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-EU-MDR | [EU 의료기기 규정(MDR)](https://health.ec.europa.eu/medical-devices-sector_en) | 유럽연합(인증기관: Notified Body) | - | 미기재 | 2026-11-23 | OK | - |
+| S-UKCA | [UKCA 마킹(영국)](https://www.gov.uk/guidance/using-the-ukca-marking) | 영국 정부 | - | 미기재 | 2026-11-23 | OK | - |
+| S-US-FDA-COS | [미국 FDA 화장품(MoCRA) 등록](https://www.fda.gov/cosmetics) | 미국 FDA | - | 미기재 | 2026-11-23 | OK | - |
+| S-US-NRTL | [미국 NRTL 안전인증(UL 등)](https://www.osha.gov/nationally-recognized-testing-laboratory-program) | 미국 OSHA(인정) · NRTL 시험기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-US-ENERGY-STAR | [ENERGY STAR(미국)](https://www.energystar.gov) | 미국 환경보호청(EPA) | - | 미기재 | 2026-11-23 | OK | - |
+| S-JP-PSE | [일본 PSE 마크](https://www.meti.go.jp) | 일본 경제산업성(METI) | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-CN-CCC | [중국 CCC 강제인증](https://www.cnca.gov.cn) | 중국 국가인증인가감독관리위원회(CNCA) | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-IN-BIS | [인도 BIS 인증](https://www.bis.gov.in) | 인도 표준국(BIS) | - | 미기재 | 2026-11-23 | OK | - |
+| S-SA-SASO | [사우디 SASO·SABER 적합성](https://www.saso.gov.sa) | 사우디 표준청(SASO) | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-EAEU-EAC | [유라시아경제연합 EAC 인증](https://eec.eaeunion.org) | 유라시아경제위원회 | - | 미기재 | 2026-11-23 | OK | - |
+| S-CN-NMPA | [중국 NMPA 의료기기 등록](https://www.nmpa.gov.cn) | 중국 국가약품감독관리국(NMPA) | - | 미기재 | 2026-11-23 | BLOCKED | - |
+| S-JP-PMDA | [일본 의료기기 승인·인증(PMDA)](https://www.pmda.go.jp) | 일본 후생노동성·PMDA | - | 미기재 | 2026-11-23 | OK | - |
+| S-AU-TGA | [호주 TGA 의료제품 등록](https://www.tga.gov.au) | 호주 TGA | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-CA-HC-MD | [캐나다 의료기기 허가(Health Canada)](https://www.canada.ca/en/health-canada.html) | 캐나다 보건부 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-HALAL-MY | [할랄 인증(말레이시아 JAKIM 등)](https://www.halal.gov.my) | 국가별 할랄 인증기관 | - | 미기재 | 2026-11-23 | OK | - |

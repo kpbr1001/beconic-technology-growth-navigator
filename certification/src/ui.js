@@ -61,3 +61,23 @@ export const TYPE_LABEL = {
 export const MANDATORY_LABEL = { mandatory: '법정 의무', voluntary: '선택(자율 신청)', needs_review: '제품·시장에 따라 판단 필요' };
 export const TARGET_LABEL = { company: '회사', product: '제품', both: '회사·제품' };
 export const ACCESS_LABEL = { OK: '원문 확인', OK_IMAGE: '게시 이미지 확인', BLOCKED: '접속 차단(내용 미확인)', UNREACHABLE: '접속 불가(링크 미검증)', NOT_FOUND: '주소 없음' };
+
+// ── v2: 진단 수준(등급)·분야 ──
+// A 자동 판정: 공식 원문 규칙으로 기본요건 판정 / B 요건 체크: 핵심 요건 자가 확인 / C 정보 안내: 무엇·어디서 + 공식 링크
+export const LEVEL_LABEL = { A: '자동 판정', B: '요건 체크', C: '정보 안내' };
+export function levelOf(s) {
+  if (s.diagnosable) return 'A';
+  if (s.self_check || s.triage || (s.checklist && s.checklist.length)) return 'B';
+  return 'C';
+}
+export const FIELDS = ['기업 확인', 'R&D·기술', '조달·판로', '품질·안전', '정보보호', 'ESG·사회적가치', '경영시스템', '해외 시장 진입'];
+export function fieldOf(s) {
+  if (s.field) return s.field;
+  if (s.scheme_type === 'rnd_institute_recognition') return 'R&D·기술';
+  if (s.scheme_type === 'management_system_certification') return s.display_group === 'international' ? '경영시스템' : '품질·안전';
+  if (s.display_group === 'international') return '해외 시장 진입';
+  if (s.scheme_type === 'product_conformity_assessment') return '품질·안전';
+  return '기업 확인';
+}
+export const FIELD_TONE = { '기업 확인': '', 'R&D·기술': 'v', '조달·판로': 'o', '품질·안전': 'r', '정보보호': 'n', 'ESG·사회적가치': 'g', '경영시스템': 'n', '해외 시장 진입': 'o' };
+export const won = (n) => `${Number(n).toLocaleString('ko-KR')}원`;

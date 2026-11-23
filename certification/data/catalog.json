@@ -1,446 +1,4634 @@
 {
-  "version": "2026.11.22-1",
+  "version": "2026.11.23-1",
   "schemes": [
     {
-      "scheme_id": "VEN", "name_ko": "벤처기업확인", "official_name": "벤처기업 확인(「벤처기업육성에 관한 특별법」 제2조의2)",
-      "aliases": ["벤처", "벤처기업", "벤처인증", "벤처확인", "venture", "예비벤처", "벤처투자"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "company_confirmation", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["finance", "rnd", "procurement", "brand"],
-      "target": "company", "issuing_authority": "벤처기업확인위원회(벤처기업확인기관)", "assessment_body": "유형별 전문평가기관",
+      "scheme_id": "VEN",
+      "name_ko": "벤처기업확인",
+      "official_name": "벤처기업 확인(「벤처기업육성에 관한 특별법」 제2조의2)",
+      "aliases": [
+        "벤처",
+        "벤처기업",
+        "벤처인증",
+        "벤처확인",
+        "venture",
+        "예비벤처",
+        "벤처투자"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance",
+        "rnd",
+        "procurement",
+        "brand"
+      ],
+      "target": "company",
+      "issuing_authority": "벤처기업확인위원회(벤처기업확인기관)",
+      "assessment_body": "유형별 전문평가기관",
       "scope_note": "회사 단위 확인 제도. 벤처투자·연구개발·혁신성장·예비벤처 4개 유형 중 하나로 신청해요.",
       "what": "기술성·성장성이 있는 중소기업을 '벤처기업'으로 확인해 주는 제도예요.",
       "when": "정책자금·세제·투자 관련 우대를 받고 싶을 때 검토해요.",
       "who_decides": "민간 벤처기업확인기관이 유형별 전문평가기관 평가를 거쳐 확인해요.",
       "first_check": "4개 신청 유형 중 우리 회사가 갈 수 있는 유형이 있는지 먼저 확인하세요.",
-      "diagnosable": true, "rule_pack": "venture.json", "verified_status": "VERIFIED",
-      "sources": ["S-VEN-A", "S-VEN-B", "S-VEN-B-RATIO", "S-VEN-C", "S-VEN-D", "S-VEN-EXCL", "S-VEN-DOCS"],
+      "diagnosable": true,
+      "rule_pack": "venture.json",
+      "verified_status": "VERIFIED",
+      "sources": [
+        "S-VEN-A",
+        "S-VEN-B",
+        "S-VEN-B-RATIO",
+        "S-VEN-C",
+        "S-VEN-D",
+        "S-VEN-EXCL",
+        "S-VEN-DOCS"
+      ],
       "official_link": "https://www.smes.go.kr/venturein/institution/requireGuide",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
       "readiness_items": [
-        { "item_id": "VEN-D-BIZREG", "label": "사업자등록증", "why": "모든 사업자 유형 공통 제출 서류예요.", "where": "홈택스", "required": true, "applies_when": "biz_status in [individual, corporation]", "source_refs": ["S-VEN-DOCS"] },
-        { "item_id": "VEN-D-SMECERT", "label": "중소기업확인서", "why": "중소기업 요건을 확인해요(시스템 자동 연계).", "where": "중소기업현황정보시스템", "required": true, "applies_when": "biz_status in [individual, corporation]", "source_refs": ["S-VEN-DOCS"] },
-        { "item_id": "VEN-D-REG", "label": "법인등기부등본(투자 유형은 투자유치사항 등기 완료본)", "why": "자본금·투자 반영 여부를 확인해요.", "where": "대법원 인터넷등기소", "required": true, "applies_when": "biz_status == corporation", "source_refs": ["S-VEN-DOCS"] },
-        { "item_id": "VEN-D-FS", "label": "재무제표(또는 감사보고서)", "why": "재무 현황과 자본금을 확인해요.", "where": "세무대리인·홈택스", "required": true, "applies_when": "biz_status in [individual, corporation]", "source_refs": ["S-VEN-DOCS"] },
-        { "item_id": "VEN-D-VAT", "label": "부가가치세 신고서·과세표준증명원", "why": "매출을 확인해요.", "where": "홈택스", "required": true, "applies_when": "biz_status in [individual, corporation]", "source_refs": ["S-VEN-DOCS"] },
-        { "item_id": "VEN-D-INVCONTRACT", "label": "투자계약서·투자금 입금내역·주주명부", "why": "벤처투자유형의 투자금·투자자를 확인해요.", "where": "회사 보관", "required": true, "applies_when": "ven_invest_total > 0", "source_refs": ["S-VEN-DOCS"] },
-        { "item_id": "VEN-D-RDCERT", "label": "연구개발조직 인정서·소속 인력현황", "why": "연구개발유형의 연구조직 보유를 확인해요.", "where": "한국산업기술진흥협회", "required": true, "applies_when": "rnd_unit in [institute, dept, creative]", "source_refs": ["S-VEN-DOCS"] },
-        { "item_id": "VEN-D-RDCOST", "label": "연구개발비 산정내역서(인건비·인건비 외 비용)와 증빙", "why": "직전 4개 분기 연구개발비 5천만원을 입증해요.", "where": "벤처확인시스템 양식", "required": true, "applies_when": "rnd_unit in [institute, dept, creative]", "source_refs": ["S-VEN-DOCS"] },
-        { "item_id": "VEN-D-PLAN", "label": "사업계획서(온라인 작성)", "why": "연구개발·혁신성장·예비벤처 유형의 평가 자료예요.", "where": "벤처확인시스템", "required": true, "applies_when": "always", "source_refs": ["S-VEN-DOCS"] },
-        { "item_id": "VEN-D-CEO", "label": "대표자 관련 증빙서류", "why": "혁신성장·예비벤처 유형 평가 자료예요.", "where": "회사 보관", "required": false, "applies_when": "always", "source_refs": ["S-VEN-DOCS"] }
+        {
+          "item_id": "VEN-D-BIZREG",
+          "label": "사업자등록증",
+          "why": "모든 사업자 유형 공통 제출 서류예요.",
+          "where": "홈택스",
+          "required": true,
+          "applies_when": "biz_status in [individual, corporation]",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ],
+          "link": "https://www.hometax.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "VEN-D-SMECERT",
+          "label": "중소기업확인서",
+          "why": "중소기업 요건을 확인해요(시스템 자동 연계).",
+          "where": "중소기업현황정보시스템",
+          "required": true,
+          "applies_when": "biz_status in [individual, corporation]",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ],
+          "link": "https://sminfo.mss.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "VEN-D-REG",
+          "label": "법인등기부등본(투자 유형은 투자유치사항 등기 완료본)",
+          "why": "자본금·투자 반영 여부를 확인해요.",
+          "where": "대법원 인터넷등기소",
+          "required": true,
+          "applies_when": "biz_status == corporation",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ],
+          "link": "https://www.iros.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "VEN-D-FS",
+          "label": "재무제표(또는 감사보고서)",
+          "why": "재무 현황과 자본금을 확인해요.",
+          "where": "세무대리인·홈택스",
+          "required": true,
+          "applies_when": "biz_status in [individual, corporation]",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ],
+          "link": "https://www.hometax.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "VEN-D-VAT",
+          "label": "부가가치세 신고서·과세표준증명원",
+          "why": "매출을 확인해요.",
+          "where": "홈택스",
+          "required": true,
+          "applies_when": "biz_status in [individual, corporation]",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ],
+          "link": "https://www.hometax.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "VEN-D-INVCONTRACT",
+          "label": "투자계약서·투자금 입금내역·주주명부",
+          "why": "벤처투자유형의 투자금·투자자를 확인해요.",
+          "where": "회사 보관",
+          "required": true,
+          "applies_when": "ven_invest_total > 0",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ]
+        },
+        {
+          "item_id": "VEN-D-RDCERT",
+          "label": "연구개발조직 인정서·소속 인력현황",
+          "why": "연구개발유형의 연구조직 보유를 확인해요.",
+          "where": "한국산업기술진흥협회",
+          "required": true,
+          "applies_when": "rnd_unit in [institute, dept, creative]",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ],
+          "link": "https://www.rnd.or.kr"
+        },
+        {
+          "item_id": "VEN-D-RDCOST",
+          "label": "연구개발비 산정내역서(인건비·인건비 외 비용)와 증빙",
+          "why": "직전 4개 분기 연구개발비 5천만원을 입증해요.",
+          "where": "벤처확인시스템 양식",
+          "required": true,
+          "applies_when": "rnd_unit in [institute, dept, creative]",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ],
+          "link": "https://www.smes.go.kr/venturein/file/download?key=/public/requireguide/%EC%9D%B8%EA%B1%B4%EB%B9%84%20%EC%82%B0%EC%A0%95%EB%82%B4%EC%97%AD%EC%84%9C.hwp"
+        },
+        {
+          "item_id": "VEN-D-PLAN",
+          "label": "사업계획서(온라인 작성)",
+          "why": "연구개발·혁신성장·예비벤처 유형의 평가 자료예요.",
+          "where": "벤처확인시스템",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ],
+          "link": "https://www.smes.go.kr/venturein"
+        },
+        {
+          "item_id": "VEN-D-CEO",
+          "label": "대표자 관련 증빙서류",
+          "why": "혁신성장·예비벤처 유형 평가 자료예요.",
+          "where": "회사 보관",
+          "required": false,
+          "applies_when": "always",
+          "source_refs": [
+            "S-VEN-DOCS"
+          ]
+        }
       ],
       "help_text": "벤처확인 수수료, 처리기간 등은 벤처확인시스템 공식 안내를 확인하세요.",
-      "ongoing": {"text": "확인 유효기간과 사후관리 기준은 이 앱에 반영하지 않았어요. 벤처확인시스템에서 확인하세요.", "unverified": true},
-      "disclaimer": "이 진단은 신청 기본요건 사전 점검이에요. 실제 확인 여부는 전문평가기관 평가와 벤처기업확인위원회가 결정해요."
+      "ongoing": {
+        "text": "확인 유효기간과 사후관리 기준은 이 앱에 반영하지 않았어요. 벤처확인시스템에서 확인하세요.",
+        "unverified": true
+      },
+      "apply_site": {
+        "name": "벤처확인시스템",
+        "url": "https://www.smes.go.kr/venturein"
+      },
+      "pathway_note": "벤처기업확인은 4개 신청 유형 중 하나만 갖추면 돼요. 한 유형이 미충족이어도 다른 유형으로 신청할 수 있어요.",
+      "fees": {
+        "vat": "포함",
+        "note": "정부지원금을 뺀 기업 부담금을 내요. 평가가 끝나면 정부지원금분 세금계산서가 확인기관에서 따로 발행돼요.",
+        "items": [
+          {
+            "label": "벤처투자유형 신규",
+            "total": 275000,
+            "gov": 100000,
+            "company": 175000,
+            "source_ref": "S-VEN-A",
+            "quote": "신규 275,000원 100,000원 175,000원 재확인 275,000원 50,000원 225,000원"
+          },
+          {
+            "label": "연구개발유형 신규",
+            "total": 495000,
+            "gov": 150000,
+            "company": 345000,
+            "source_ref": "S-VEN-B",
+            "quote": "신규 495,000원 150,000원 345,000원 재확인 495,000원 50,000원 445,000원"
+          },
+          {
+            "label": "혁신성장유형 신규",
+            "total": 605000,
+            "gov": 150000,
+            "company": 455000,
+            "source_ref": "S-VEN-C",
+            "quote": "신규 605,000원 150,000원 455,000원 재확인 50,000원 555,000원"
+          },
+          {
+            "label": "혁신성장유형 신규(이노비즈 연계)",
+            "total": 440000,
+            "gov": 150000,
+            "company": 290000,
+            "source_ref": "S-VEN-C",
+            "quote": "신규 440,000원 150,000원 290,000원 재확인 50,000원 390,000원"
+          },
+          {
+            "label": "예비벤처유형 신규",
+            "total": 495000,
+            "gov": 150000,
+            "company": 345000,
+            "source_ref": "S-VEN-D",
+            "quote": "신규 495,000원 150,000원 345,000원 재확인 50,000원 445,000원"
+          }
+        ],
+        "renew_note": "재확인(유효기간 만료 후 다시 확인) 수수료는 유형별로 기업 부담금이 더 커요(정부지원금 50,000원)."
+      },
+      "processing": {
+        "items": [
+          {
+            "label": "벤처투자유형",
+            "days": 30,
+            "source_ref": "S-VEN-A",
+            "quote": "확인결과 안내기간 : 접수완료(벤처확인 수수료 납부)일로부터 30일 이내 소요"
+          },
+          {
+            "label": "연구개발·혁신성장·예비벤처유형",
+            "days": 45,
+            "source_ref": "S-VEN-B",
+            "quote": "확인결과 안내기간 : 접수완료(벤처확인 수수료 납부)일로부터 45일 이내 소요"
+          }
+        ],
+        "text": "접수 완료(수수료 납부)일부터 확인 결과 안내까지"
+      },
+      "disclaimer": "이 진단은 신청 기본요건 사전 점검이에요. 실제 확인 여부는 전문평가기관 평가와 벤처기업확인위원회가 결정해요.",
+      "guides": [
+        {
+          "title": "벤처투자유형 제출서류 가이드라인(PDF)",
+          "url": "https://www.smes.go.kr/venturein/file/download?key=/public/requireguide/%EC%9C%A0%ED%98%95%EB%B3%84%EC%95%88%EB%82%B4%20%EB%B2%A4%EC%B2%98%ED%88%AC%EC%9E%90%EC%9C%A0%ED%98%95%20%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8.pdf",
+          "checked_at": "2026-11-23"
+        },
+        {
+          "title": "연구개발유형 제출서류 가이드라인(PDF)",
+          "url": "https://www.smes.go.kr/venturein/file/download?key=/public/requireguide/%EC%9C%A0%ED%98%95%EB%B3%84%EC%95%88%EB%82%B4%20%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%9C%A0%ED%98%95%20%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8.pdf",
+          "checked_at": "2026-11-23"
+        },
+        {
+          "title": "혁신성장유형 제출서류 가이드라인(PDF)",
+          "url": "https://www.smes.go.kr/venturein/file/download?key=/public/requireguide/%EC%9C%A0%ED%98%95%EB%B3%84%EC%95%88%EB%82%B4%20%ED%98%81%EC%8B%A0%EC%84%B1%EC%9E%A5%EC%9C%A0%ED%98%95%20%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8.pdf",
+          "checked_at": "2026-11-23"
+        },
+        {
+          "title": "예비벤처유형 제출서류 가이드라인(PDF)",
+          "url": "https://www.smes.go.kr/venturein/file/download?key=/public/requireguide/%EC%9C%A0%ED%98%95%EB%B3%84%EC%95%88%EB%82%B4%20%EC%98%88%EB%B9%84%EB%B2%A4%EC%B2%98%EC%9C%A0%ED%98%95%20%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8.pdf",
+          "checked_at": "2026-11-23"
+        },
+        {
+          "title": "연구개발유형 연구개발비 산정기준(PDF)",
+          "url": "https://www.smes.go.kr/venturein/file/download?key=/public/requireguide/%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%9C%A0%ED%98%95%20%EC%82%B0%EC%A0%95%EA%B8%B0%EC%A4%80.pdf",
+          "checked_at": "2026-11-23"
+        },
+        {
+          "title": "인건비 산정내역서 양식(HWP)",
+          "url": "https://www.smes.go.kr/venturein/file/download?key=/public/requireguide/%EC%9D%B8%EA%B1%B4%EB%B9%84%20%EC%82%B0%EC%A0%95%EB%82%B4%EC%97%AD%EC%84%9C.hwp",
+          "checked_at": "2026-11-23"
+        },
+        {
+          "title": "인건비 외 모든 개발비용 산정내역서 양식(HWP)",
+          "url": "https://www.smes.go.kr/venturein/file/download?key=/public/requireguide/%EC%9D%B8%EA%B1%B4%EB%B9%84%20%EC%99%B8%20%EB%AA%A8%EB%93%A0%20%EA%B0%9C%EB%B0%9C%EB%B9%84%EC%9A%A9%20%EC%82%B0%EC%A0%95%EB%82%B4%EC%97%AD%EC%84%9C.hwp",
+          "checked_at": "2026-11-23"
+        }
+      ]
     },
     {
-      "scheme_id": "INNO", "name_ko": "이노비즈(기술혁신형 중소기업)", "official_name": "기술혁신형 중소기업(Inno-Biz) 선정(「중소기업 기술혁신 촉진법」 제15조)",
-      "aliases": ["이노비즈", "innobiz", "inno-biz", "기술혁신형", "기술혁신형중소기업"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "company_confirmation", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["finance", "rnd", "procurement", "brand", "export"],
-      "target": "company", "issuing_authority": "중소벤처기업부", "assessment_body": "기술보증기금(현장평가) · (사)중소기업기술혁신협회(관리기관)",
+      "scheme_id": "INNO",
+      "name_ko": "이노비즈(기술혁신형 중소기업)",
+      "official_name": "기술혁신형 중소기업(Inno-Biz) 선정(「중소기업 기술혁신 촉진법」 제15조)",
+      "aliases": [
+        "이노비즈",
+        "innobiz",
+        "inno-biz",
+        "기술혁신형",
+        "기술혁신형중소기업"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance",
+        "rnd",
+        "procurement",
+        "brand",
+        "export"
+      ],
+      "target": "company",
+      "issuing_authority": "중소벤처기업부",
+      "assessment_body": "기술보증기금(현장평가) · (사)중소기업기술혁신협회(관리기관)",
       "scope_note": "업력 3년 이상 중소기업의 기술혁신 역량을 평가해 선정해요. 확인서 유효기간 3년.",
       "what": "기술 경쟁력과 혁신 역량이 있는 중소기업을 정부가 선정하는 제도예요.",
       "when": "업력 3년이 넘고 기술 기반 성장 기업으로 인정받고 싶을 때 검토해요.",
       "who_decides": "기술보증기금 현장평가를 거쳐 중소벤처기업부가 선정해요.",
       "first_check": "업력 3년과 신청 제외 사유(체납·도산·법령위반 등)부터 확인하세요.",
-      "diagnosable": true, "rule_pack": "innobiz.json", "verified_status": "VERIFIED",
-      "sources": ["S-INNO-RULE", "S-INNO-PROC"],
+      "diagnosable": true,
+      "rule_pack": "innobiz.json",
+      "verified_status": "VERIFIED",
+      "sources": [
+        "S-INNO-RULE",
+        "S-INNO-PROC"
+      ],
       "official_link": "https://www.innobiz.net/authen/authen1.asp",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
       "readiness_items": [
-        { "item_id": "INNO-D-BIZREG", "label": "사업자등록증(또는 사업자등록증명원)", "why": "기본 신청 서류예요.", "where": "홈택스", "required": true, "applies_when": "always", "source_refs": ["S-INNO-PROC"] },
-        { "item_id": "INNO-D-REG", "label": "법인등기부등본(말소사항 포함, 1개월 이내)", "why": "업력·법인 현황 확인", "where": "대법원 인터넷등기소", "required": true, "applies_when": "biz_status == corporation", "source_refs": ["S-INNO-PROC"] },
-        { "item_id": "INNO-D-SHARE", "label": "주주명부·회사 조직도", "why": "지배구조·조직 확인", "where": "회사 보관", "required": true, "applies_when": "always", "source_refs": ["S-INNO-PROC"] },
-        { "item_id": "INNO-D-FS", "label": "표준재무제표증명원(최근 3개년)", "why": "재무 성과 평가", "where": "홈택스", "required": true, "applies_when": "always", "source_refs": ["S-INNO-PROC"] },
-        { "item_id": "INNO-D-VAT", "label": "부가가치세 과세표준증명원(최근 3개년~직전 분기)", "why": "매출 확인", "where": "홈택스", "required": true, "applies_when": "always", "source_refs": ["S-INNO-PROC"] },
-        { "item_id": "INNO-D-TAX", "label": "국세·지방세 납세증명서(1개월 이내)", "why": "체납 여부 확인", "where": "홈택스·정부24", "required": true, "applies_when": "always", "source_refs": ["S-INNO-PROC"] },
-        { "item_id": "INNO-D-INS", "label": "4대보험 완납증명서·가입자 명부(1개월 이내)", "why": "인력·체납 확인", "where": "사회보험 통합징수포털·4대사회보험 정보연계센터", "required": true, "applies_when": "always", "source_refs": ["S-INNO-PROC"] },
-        { "item_id": "INNO-D-IP", "label": "지식재산권 등록원부", "why": "기술 성과 확인", "where": "특허로", "required": false, "applies_when": "always", "source_refs": ["S-INNO-PROC"] },
-        { "item_id": "INNO-D-PLAN", "label": "기술사업계획서", "why": "개별기술수준 평가 자료", "where": "이노비즈넷(평가기관 요청 시 제출)", "required": true, "applies_when": "always", "source_refs": ["S-INNO-RULE"] }
+        {
+          "item_id": "INNO-D-BIZREG",
+          "label": "사업자등록증(또는 사업자등록증명원)",
+          "why": "기본 신청 서류예요.",
+          "where": "홈택스",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-INNO-PROC"
+          ],
+          "link": "https://www.hometax.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "INNO-D-REG",
+          "label": "법인등기부등본(말소사항 포함, 1개월 이내)",
+          "why": "업력·법인 현황 확인",
+          "where": "대법원 인터넷등기소",
+          "required": true,
+          "applies_when": "biz_status == corporation",
+          "source_refs": [
+            "S-INNO-PROC"
+          ],
+          "link": "https://www.iros.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "INNO-D-SHARE",
+          "label": "주주명부·회사 조직도",
+          "why": "지배구조·조직 확인",
+          "where": "회사 보관",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-INNO-PROC"
+          ]
+        },
+        {
+          "item_id": "INNO-D-FS",
+          "label": "표준재무제표증명원(최근 3개년)",
+          "why": "재무 성과 평가",
+          "where": "홈택스",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-INNO-PROC"
+          ],
+          "link": "https://www.hometax.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "INNO-D-VAT",
+          "label": "부가가치세 과세표준증명원(최근 3개년~직전 분기)",
+          "why": "매출 확인",
+          "where": "홈택스",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-INNO-PROC"
+          ],
+          "link": "https://www.hometax.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "INNO-D-TAX",
+          "label": "국세·지방세 납세증명서(1개월 이내)",
+          "why": "체납 여부 확인",
+          "where": "홈택스·정부24",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-INNO-PROC"
+          ],
+          "link": "https://www.gov.kr"
+        },
+        {
+          "item_id": "INNO-D-INS",
+          "label": "4대보험 완납증명서·가입자 명부(1개월 이내)",
+          "why": "인력·체납 확인",
+          "where": "사회보험 통합징수포털·4대사회보험 정보연계센터",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-INNO-PROC"
+          ],
+          "link": "https://www.4insure.or.kr"
+        },
+        {
+          "item_id": "INNO-D-IP",
+          "label": "지식재산권 등록원부",
+          "why": "기술 성과 확인",
+          "where": "특허로",
+          "required": false,
+          "applies_when": "always",
+          "source_refs": [
+            "S-INNO-PROC"
+          ]
+        },
+        {
+          "item_id": "INNO-D-PLAN",
+          "label": "기술사업계획서",
+          "why": "개별기술수준 평가 자료",
+          "where": "이노비즈넷(평가기관 요청 시 제출)",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-INNO-RULE"
+          ],
+          "link": "https://www.innobiz.net/authen/%EC%9D%B4%EB%85%B8%EB%B9%84%EC%A6%88_%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98_%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8_%EC%8B%A0%EA%B7%9C_Rev.05.pdf"
+        }
       ],
       "help_text": "현장평가 수수료 등 비용은 이노비즈넷 공식 안내에서 확인하세요(이 앱은 근거 원문 미확보).",
-      "ongoing": {"text": "확인서 유효기간 3년(운영규정 제12조④). 연장 절차와 시기는 이노비즈넷에서 확인하세요.", "source_refs": ["S-INNO-RULE"], "quote": "제12조④ 유효기간 3년"},
-      "disclaimer": "이 진단은 신청대상 요건 사전 점검이에요. 실제 선정은 자가진단·현장평가 결과에 따라 중소벤처기업부가 결정해요."
+      "ongoing": {
+        "text": "확인서 유효기간 3년(운영규정 제12조④). 연장 절차와 시기는 이노비즈넷에서 확인하세요.",
+        "source_refs": [
+          "S-INNO-RULE"
+        ],
+        "quote": "제12조④ 유효기간 3년"
+      },
+      "apply_site": {
+        "name": "이노비즈넷",
+        "url": "https://www.innobiz.net"
+      },
+      "fees": {
+        "vat": "포함",
+        "note": "신청 후 현장평가 전까지 납부하고, 신청 후 90일 안에 내지 않으면 신청이 취소돼요. 벤처·이노비즈 중복 신청 기업은 감면(신규 55만원)될 수 있어요(감면 조건은 협회 확인).",
+        "items": [
+          {
+            "label": "신규 신청(평가비용)",
+            "total": 770000,
+            "source_ref": "S-INNO-PROC",
+            "quote": "수수료(평가비용) - 신규 신청 77만원(부가세 포함) - 유효기간 연장 신청 44만원(부가세 포함)"
+          },
+          {
+            "label": "유효기간 연장 신청",
+            "total": 440000,
+            "source_ref": "S-INNO-PROC",
+            "quote": "수수료(평가비용) - 신규 신청 77만원(부가세 포함) - 유효기간 연장 신청 44만원(부가세 포함)"
+          }
+        ]
+      },
+      "processing": {
+        "unverified": true,
+        "text": "접수부터 확인서 발급까지 기간은 공식 안내에서 찾지 못했어요. 이노비즈협회(031-628-9600)에 확인하세요."
+      },
+      "disclaimer": "이 진단은 신청대상 요건 사전 점검이에요. 실제 선정은 자가진단·현장평가 결과에 따라 중소벤처기업부가 결정해요.",
+      "guides": [
+        {
+          "title": "이노비즈 제출서류 가이드라인 — 신규(PDF)",
+          "url": "https://www.innobiz.net/authen/%EC%9D%B4%EB%85%B8%EB%B9%84%EC%A6%88_%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98_%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8_%EC%8B%A0%EA%B7%9C_Rev.05.pdf",
+          "checked_at": "2026-11-23"
+        },
+        {
+          "title": "이노비즈 제출서류 가이드라인 — 연장(PDF)",
+          "url": "https://www.innobiz.net/authen/%EC%9D%B4%EB%85%B8%EB%B9%84%EC%A6%88_%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98_%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8_%EC%97%B0%EC%9E%A5_Rev.05.pdf",
+          "checked_at": "2026-11-23"
+        }
+      ]
     },
     {
-      "scheme_id": "MAIN", "name_ko": "메인비즈(경영혁신형 중소기업)", "official_name": "경영혁신형 중소기업(Main-Biz) 선정(「중소기업 기술혁신 촉진법」 제2조제4의2호)",
-      "aliases": ["메인비즈", "mainbiz", "main-biz", "경영혁신형", "경영혁신"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "company_confirmation", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["finance", "procurement", "brand", "quality"],
-      "target": "company", "issuing_authority": "중소벤처기업부(지방중소벤처기업청)", "assessment_body": "신용보증기금·기술보증기금·한국생산성본부 · (사)한국경영혁신중소기업협회(관리기관)",
+      "scheme_id": "MAIN",
+      "name_ko": "메인비즈(경영혁신형 중소기업)",
+      "official_name": "경영혁신형 중소기업(Main-Biz) 선정(「중소기업 기술혁신 촉진법」 제2조제4의2호)",
+      "aliases": [
+        "메인비즈",
+        "mainbiz",
+        "main-biz",
+        "경영혁신형",
+        "경영혁신"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance",
+        "procurement",
+        "brand",
+        "quality"
+      ],
+      "target": "company",
+      "issuing_authority": "중소벤처기업부(지방중소벤처기업청)",
+      "assessment_body": "신용보증기금·기술보증기금·한국생산성본부 · (사)한국경영혁신중소기업협회(관리기관)",
       "scope_note": "업력 3년 이상 중소기업의 경영혁신 활동과 성과를 평가해 선정해요. 유효기간 3년.",
       "what": "마케팅·조직·프로세스 등 경영혁신 역량이 있는 중소기업을 선정하는 제도예요.",
       "when": "기술보다 경영·서비스 혁신 성과를 인정받고 싶을 때 검토해요.",
       "who_decides": "평가기관 현장평가(700점 이상)를 거쳐 지방중소벤처기업청이 확인서를 발급해요.",
       "first_check": "업력 3년, 제외 업종, 부채비율 1,000%·완전자본잠식 여부부터 확인하세요.",
-      "diagnosable": true, "rule_pack": "mainbiz.json", "verified_status": "VERIFIED",
-      "sources": ["S-MAIN-GUIDE", "S-MAIN-DOCS"],
+      "diagnosable": true,
+      "rule_pack": "mainbiz.json",
+      "verified_status": "VERIFIED",
+      "sources": [
+        "S-MAIN-GUIDE",
+        "S-MAIN-DOCS"
+      ],
       "official_link": "https://www.smes.go.kr/mainbiz/usr/mainbizInfo/descriptMainbiz.do",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
       "readiness_items": [
-        { "item_id": "MAIN-D-REG", "label": "법인등기부등본(말소사항 포함)", "why": "기본 서류", "where": "대법원 인터넷등기소", "required": true, "applies_when": "biz_status == corporation", "source_refs": ["S-MAIN-DOCS"] },
-        { "item_id": "MAIN-D-CREDIT", "label": "신용정보조회서", "why": "신청 제외 사유 확인(평가기관에 따라 상이)", "where": "한국신용정보원", "required": true, "applies_when": "always", "source_refs": ["S-MAIN-DOCS"] },
-        { "item_id": "MAIN-D-FS", "label": "표준재무제표증명원(최근 3년)", "why": "재무성과·부채비율 확인", "where": "홈택스·세무대리인", "required": true, "applies_when": "always", "source_refs": ["S-MAIN-DOCS"] },
-        { "item_id": "MAIN-D-SAFETY", "label": "사업장 산업재해율 조회 결과", "why": "제조업·건설업만 해당", "where": "한국산업안전보건공단", "required": true, "applies_when": "industry in [pharma_21, machinery_29, computer_263, office_2918, electric_28, semi_261_262, medical_27, other_mfg]", "source_refs": ["S-MAIN-DOCS"] },
-        { "item_id": "MAIN-D-INTRO", "label": "기업소개자료·조직도", "why": "경영 현황 평가", "where": "자유양식", "required": false, "applies_when": "always", "source_refs": ["S-MAIN-DOCS"] },
-        { "item_id": "MAIN-D-PLAN", "label": "경영계획서(중장기·월별·분기별)", "why": "경영혁신 인프라 평가", "where": "회사 작성", "required": false, "applies_when": "always", "source_refs": ["S-MAIN-DOCS"] },
-        { "item_id": "MAIN-D-STD", "label": "사내기술·생산 표준화 자료(QC 보고서·지침서·작업표준서 등)", "why": "운영관리 평가", "where": "회사 작성", "required": false, "applies_when": "always", "source_refs": ["S-MAIN-DOCS"] },
-        { "item_id": "MAIN-D-CUSTOMER", "label": "고객관리 매뉴얼·경영방침·사내규정", "why": "조직관리 평가", "where": "회사 작성", "required": false, "applies_when": "always", "source_refs": ["S-MAIN-DOCS"] }
+        {
+          "item_id": "MAIN-D-REG",
+          "label": "법인등기부등본(말소사항 포함)",
+          "why": "기본 서류",
+          "where": "대법원 인터넷등기소",
+          "required": true,
+          "applies_when": "biz_status == corporation",
+          "source_refs": [
+            "S-MAIN-DOCS"
+          ],
+          "link": "https://www.iros.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "MAIN-D-CREDIT",
+          "label": "신용정보조회서",
+          "why": "신청 제외 사유 확인(평가기관에 따라 상이)",
+          "where": "한국신용정보원",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-MAIN-DOCS"
+          ]
+        },
+        {
+          "item_id": "MAIN-D-FS",
+          "label": "표준재무제표증명원(최근 3년)",
+          "why": "재무성과·부채비율 확인",
+          "where": "홈택스·세무대리인",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-MAIN-DOCS"
+          ],
+          "link": "https://www.hometax.go.kr",
+          "link_unverified": true
+        },
+        {
+          "item_id": "MAIN-D-SAFETY",
+          "label": "사업장 산업재해율 조회 결과",
+          "why": "제조업·건설업만 해당",
+          "where": "한국산업안전보건공단",
+          "required": true,
+          "applies_when": "industry in [pharma_21, machinery_29, computer_263, office_2918, electric_28, semi_261_262, medical_27, other_mfg]",
+          "source_refs": [
+            "S-MAIN-DOCS"
+          ]
+        },
+        {
+          "item_id": "MAIN-D-INTRO",
+          "label": "기업소개자료·조직도",
+          "why": "경영 현황 평가",
+          "where": "자유양식",
+          "required": false,
+          "applies_when": "always",
+          "source_refs": [
+            "S-MAIN-DOCS"
+          ]
+        },
+        {
+          "item_id": "MAIN-D-PLAN",
+          "label": "경영계획서(중장기·월별·분기별)",
+          "why": "경영혁신 인프라 평가",
+          "where": "회사 작성",
+          "required": false,
+          "applies_when": "always",
+          "source_refs": [
+            "S-MAIN-DOCS"
+          ]
+        },
+        {
+          "item_id": "MAIN-D-STD",
+          "label": "사내기술·생산 표준화 자료(QC 보고서·지침서·작업표준서 등)",
+          "why": "운영관리 평가",
+          "where": "회사 작성",
+          "required": false,
+          "applies_when": "always",
+          "source_refs": [
+            "S-MAIN-DOCS"
+          ]
+        },
+        {
+          "item_id": "MAIN-D-CUSTOMER",
+          "label": "고객관리 매뉴얼·경영방침·사내규정",
+          "why": "조직관리 평가",
+          "where": "회사 작성",
+          "required": false,
+          "applies_when": "always",
+          "source_refs": [
+            "S-MAIN-DOCS"
+          ]
+        }
       ],
       "help_text": "평가지표와 배점은 업종별로 달라요. 메인비즈 공식 안내에서 확인하세요(이 앱은 근거 원문 미확보).",
-      "ongoing": {"text": "확인서 유효기간 3년. 연장 절차와 시기는 메인비즈 공식 안내에서 확인하세요.", "source_refs": ["S-MAIN-GUIDE"], "quote": "유효기간 3년"},
-      "disclaimer": "이 진단은 선정기준·신청 제외 요건 사전 점검이에요. 실제 선정은 자가진단·현장평가 결과로 결정돼요."
+      "ongoing": {
+        "text": "확인서 유효기간 3년. 연장 절차와 시기는 메인비즈 공식 안내에서 확인하세요.",
+        "source_refs": [
+          "S-MAIN-GUIDE"
+        ],
+        "quote": "유효기간 3년"
+      },
+      "apply_site": {
+        "name": "메인비즈 신청 시스템",
+        "url": "https://www.smes.go.kr/mainbiz"
+      },
+      "fees": {
+        "vat": "포함",
+        "note": "현장평가를 신청할 때 내는 비용이에요.",
+        "items": [
+          {
+            "label": "신규 현장평가",
+            "total": 550000,
+            "source_ref": "S-MAIN-DOCS",
+            "quote": "현장평가 신청 신규 55만 원 연장 44만 원 (VAT포함) 현장평가 실시 현장평가 700점 이상 기간 3주 이내"
+          },
+          {
+            "label": "연장 현장평가",
+            "total": 440000,
+            "source_ref": "S-MAIN-DOCS",
+            "quote": "현장평가 신청 신규 55만 원 연장 44만 원 (VAT포함) 현장평가 실시 현장평가 700점 이상 기간 3주 이내"
+          }
+        ]
+      },
+      "processing": {
+        "items": [
+          {
+            "label": "현장평가 실시",
+            "weeks": 3,
+            "source_ref": "S-MAIN-DOCS",
+            "quote": "현장평가 신청 신규 55만 원 연장 44만 원 (VAT포함) 현장평가 실시 현장평가 700점 이상 기간 3주 이내"
+          }
+        ],
+        "text": "현장평가 신청 후 현장평가까지(공식 안내 기준). 이후 지방중소벤처기업청 발급 승인 기간은 공식 안내에 없어요."
+      },
+      "disclaimer": "이 진단은 선정기준·신청 제외 요건 사전 점검이에요. 실제 선정은 자가진단·현장평가 결과로 결정돼요.",
+      "guides": [
+        {
+          "title": "메인비즈 절차·현장평가 준비 서류 안내",
+          "url": "https://www.smes.go.kr/mainbiz/usr/mainbizInfo/mainbizGuide.do",
+          "checked_at": "2026-11-23"
+        }
+      ]
     },
     {
-      "scheme_id": "RNDI", "name_ko": "기업부설연구소", "official_name": "기업부설연구소 인정(「기업부설연구소등의 연구개발 지원에 관한 법률」 제7조)",
-      "aliases": ["연구소", "기업부설연구소", "부설연구소", "기업연구소", "r&d", "rnd", "연구개발", "연구소설립", "koita"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "rnd_institute_recognition", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["rnd", "finance"],
-      "target": "company", "issuing_authority": "과학기술정보통신부", "assessment_body": "한국산업기술진흥협회(위탁)",
+      "scheme_id": "RNDI",
+      "name_ko": "기업부설연구소",
+      "official_name": "기업부설연구소 인정(「기업부설연구소등의 연구개발 지원에 관한 법률」 제7조)",
+      "aliases": [
+        "연구소",
+        "기업부설연구소",
+        "부설연구소",
+        "기업연구소",
+        "r&d",
+        "rnd",
+        "연구개발",
+        "연구소설립",
+        "koita"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "rnd_institute_recognition",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "rnd",
+        "finance"
+      ],
+      "target": "company",
+      "issuing_authority": "과학기술정보통신부",
+      "assessment_body": "한국산업기술진흥협회(위탁)",
       "scope_note": "2026.2.1.부터 새 법률(「기업부설연구소등의 연구개발 지원에 관한 법률」)과 시행령·시행규칙이 적용돼요.",
       "what": "일정 인력·공간을 갖춘 연구조직을 '기업부설연구소'로 인정하는 제도예요.",
       "when": "연구개발 세제·인력 지원이나 벤처 연구개발유형을 준비할 때 검토해요.",
       "who_decides": "한국산업기술진흥협회가 인정 신청을 검토해 인정서를 발급해요.",
       "first_check": "기업 규모에 맞는 연구전담요원 수와 독립 연구공간을 먼저 확인하세요.",
-      "diagnosable": true, "rule_pack": "rnd.json#RNDI", "verified_status": "VERIFIED",
-      "sources": ["S-RND-DEC", "S-RND-RULE", "S-RND-PORTAL"],
+      "diagnosable": true,
+      "rule_pack": "rnd.json#RNDI",
+      "verified_status": "VERIFIED",
+      "sources": [
+        "S-RND-DEC",
+        "S-RND-RULE",
+        "S-RND-PORTAL"
+      ],
       "official_link": "https://www.koita.or.kr",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
       "readiness_items": [
-        { "item_id": "RNDI-D-APP", "label": "기업부설연구소 인정 신청서(별지 제1호서식)", "why": "인정 신청 서식", "where": "한국산업기술진흥협회", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDI-D-ACT", "label": "연구개발활동 개요서(별지 제2호서식)", "why": "연구 분야·내용 확인", "where": "회사 작성", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDI-D-EQUIP", "label": "연구 기자재 현황(별지 제3호서식)", "why": "연구시설 기준 확인", "where": "회사 작성", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDI-D-STAFF", "label": "연구개발인력 현황(별지 제4호서식)·자격 증빙", "why": "연구전담요원 인원·자격 확인", "where": "회사 작성·학위/자격증", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDI-D-ORG", "label": "기업 및 연구소 조직도", "why": "전담 조직 확인", "where": "회사 작성", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDI-D-PLAN", "label": "연구소가 있는 층 전체 도면·내부 도면(전용 출입구 현판·내부 사진 포함)", "why": "독립 연구공간 확인", "where": "회사 작성", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDI-D-SAFETY", "label": "연구실 안전 관련 예산 명세서·보험 가입증명서", "why": "연구전담요원 등 총 10명 이상 연구소만 해당", "where": "회사·보험사", "required": true, "applies_when": "rnd_researchers >= 10", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDI-D-FOUNDER", "label": "연구원·교원 창업 증명 서류", "why": "연구원·교원 창업 기업만 해당", "where": "소속 기관", "required": true, "applies_when": "rnd_founder_researcher == yes", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDI-D-MID", "label": "중견기업 증명 서류", "why": "중견기업만 해당", "where": "중견기업 확인", "required": true, "applies_when": "company_size == midsize", "source_refs": ["S-RND-RULE"] }
+        {
+          "item_id": "RNDI-D-APP",
+          "label": "기업부설연구소 인정 신청서(별지 제1호서식)",
+          "why": "인정 신청 서식",
+          "where": "한국산업기술진흥협회",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ],
+          "link": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B8%B0%EC%97%85%EB%B6%80%EC%84%A4%EC%97%B0%EA%B5%AC%EC%86%8C%EB%93%B1%EC%9D%98%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%A7%80%EC%9B%90%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99"
+        },
+        {
+          "item_id": "RNDI-D-ACT",
+          "label": "연구개발활동 개요서(별지 제2호서식)",
+          "why": "연구 분야·내용 확인",
+          "where": "회사 작성",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ],
+          "link": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B8%B0%EC%97%85%EB%B6%80%EC%84%A4%EC%97%B0%EA%B5%AC%EC%86%8C%EB%93%B1%EC%9D%98%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%A7%80%EC%9B%90%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99"
+        },
+        {
+          "item_id": "RNDI-D-EQUIP",
+          "label": "연구 기자재 현황(별지 제3호서식)",
+          "why": "연구시설 기준 확인",
+          "where": "회사 작성",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ],
+          "link": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B8%B0%EC%97%85%EB%B6%80%EC%84%A4%EC%97%B0%EA%B5%AC%EC%86%8C%EB%93%B1%EC%9D%98%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%A7%80%EC%9B%90%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99"
+        },
+        {
+          "item_id": "RNDI-D-STAFF",
+          "label": "연구개발인력 현황(별지 제4호서식)·자격 증빙",
+          "why": "연구전담요원 인원·자격 확인",
+          "where": "회사 작성·학위/자격증",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ],
+          "link": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B8%B0%EC%97%85%EB%B6%80%EC%84%A4%EC%97%B0%EA%B5%AC%EC%86%8C%EB%93%B1%EC%9D%98%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%A7%80%EC%9B%90%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99"
+        },
+        {
+          "item_id": "RNDI-D-ORG",
+          "label": "기업 및 연구소 조직도",
+          "why": "전담 조직 확인",
+          "where": "회사 작성",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ]
+        },
+        {
+          "item_id": "RNDI-D-PLAN",
+          "label": "연구소가 있는 층 전체 도면·내부 도면(전용 출입구 현판·내부 사진 포함)",
+          "why": "독립 연구공간 확인",
+          "where": "회사 작성",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ]
+        },
+        {
+          "item_id": "RNDI-D-SAFETY",
+          "label": "연구실 안전 관련 예산 명세서·보험 가입증명서",
+          "why": "연구전담요원 등 총 10명 이상 연구소만 해당",
+          "where": "회사·보험사",
+          "required": true,
+          "applies_when": "rnd_researchers >= 10",
+          "source_refs": [
+            "S-RND-RULE"
+          ]
+        },
+        {
+          "item_id": "RNDI-D-FOUNDER",
+          "label": "연구원·교원 창업 증명 서류",
+          "why": "연구원·교원 창업 기업만 해당",
+          "where": "소속 기관",
+          "required": true,
+          "applies_when": "rnd_founder_researcher == yes",
+          "source_refs": [
+            "S-RND-RULE"
+          ]
+        },
+        {
+          "item_id": "RNDI-D-MID",
+          "label": "중견기업 증명 서류",
+          "why": "중견기업만 해당",
+          "where": "중견기업 확인",
+          "required": true,
+          "applies_when": "company_size == midsize",
+          "source_refs": [
+            "S-RND-RULE"
+          ]
+        }
       ],
       "help_text": "인정 후에도 연구개발 실적 제출·변경신고 등 사후관리가 필요해요. 기한과 근거 조항은 한국산업기술진흥협회에서 확인하세요(이 앱은 근거 원문 미확보).",
-      "ongoing": {"text": "인정 후 연구개발 실적 제출, 인력·공간 변경 시 변경신고 등 사후관리 의무가 있어요. 기한과 근거 조항은 한국산업기술진흥협회에서 확인하세요.", "unverified": true},
-      "disclaimer": "이 진단은 인정기준 사전 점검이에요. 실제 인정은 한국산업기술진흥협회 검토로 결정되며, 2026 업무편람의 세부 운영기준은 반영하지 못했어요."
+      "ongoing": {
+        "text": "인정 후 연구개발 실적 제출, 인력·공간 변경 시 변경신고 등 사후관리 의무가 있어요. 기한과 근거 조항은 한국산업기술진흥협회에서 확인하세요.",
+        "unverified": true
+      },
+      "apply_site": {
+        "name": "한국산업기술진흥협회",
+        "url": "https://www.rnd.or.kr"
+      },
+      "fees": {
+        "unverified": true,
+        "text": "인정 신고 수수료는 이 앱에서 공식 원문을 확인하지 못했어요. 한국산업기술진흥협회에 확인하세요."
+      },
+      "processing": {
+        "unverified": true,
+        "text": "신고부터 인정서 발급까지 기간은 이 앱에서 공식 원문을 확인하지 못했어요. 한국산업기술진흥협회에 확인하세요."
+      },
+      "disclaimer": "이 진단은 인정기준 사전 점검이에요. 실제 인정은 한국산업기술진흥협회 검토로 결정되며, 2026 업무편람의 세부 운영기준은 반영하지 못했어요.",
+      "guides": [
+        {
+          "title": "기업부설연구소등 연구개발 지원법 시행규칙(별지 서식 포함)",
+          "url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B8%B0%EC%97%85%EB%B6%80%EC%84%A4%EC%97%B0%EA%B5%AC%EC%86%8C%EB%93%B1%EC%9D%98%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%A7%80%EC%9B%90%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99",
+          "checked_at": "2026-11-23"
+        }
+      ]
     },
     {
-      "scheme_id": "RNDD", "name_ko": "연구개발전담부서", "official_name": "연구개발전담부서 인정(「기업부설연구소등의 연구개발 지원에 관한 법률」 제7조)",
-      "aliases": ["전담부서", "연구개발전담부서", "연구전담부서", "r&d부서", "rnd부서"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "rnd_institute_recognition", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["rnd", "finance"],
-      "target": "company", "issuing_authority": "과학기술정보통신부", "assessment_body": "한국산업기술진흥협회(위탁)",
+      "scheme_id": "RNDD",
+      "name_ko": "연구개발전담부서",
+      "official_name": "연구개발전담부서 인정(「기업부설연구소등의 연구개발 지원에 관한 법률」 제7조)",
+      "aliases": [
+        "전담부서",
+        "연구개발전담부서",
+        "연구전담부서",
+        "r&d부서",
+        "rnd부서"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "rnd_institute_recognition",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "rnd",
+        "finance"
+      ],
+      "target": "company",
+      "issuing_authority": "과학기술정보통신부",
+      "assessment_body": "한국산업기술진흥협회(위탁)",
       "scope_note": "기업 규모와 관계없이 연구전담요원 1명 이상이면 신청할 수 있어요.",
       "what": "작은 규모의 연구조직을 '연구개발전담부서'로 인정하는 제도예요.",
       "when": "연구소 기준 인원이 아직 부족할 때 먼저 검토해요.",
       "who_decides": "한국산업기술진흥협회가 인정 신청을 검토해 인정서를 발급해요.",
       "first_check": "연구전담요원 1명과 구분된 연구공간이 있는지 확인하세요.",
-      "diagnosable": true, "rule_pack": "rnd.json#RNDD", "verified_status": "VERIFIED",
-      "sources": ["S-RND-DEC", "S-RND-RULE", "S-RND-PORTAL"],
+      "diagnosable": true,
+      "rule_pack": "rnd.json#RNDD",
+      "verified_status": "VERIFIED",
+      "sources": [
+        "S-RND-DEC",
+        "S-RND-RULE",
+        "S-RND-PORTAL"
+      ],
       "official_link": "https://www.koita.or.kr",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
       "readiness_items": [
-        { "item_id": "RNDD-D-APP", "label": "연구개발전담부서 인정 신청서(별지 제6호서식)", "why": "인정 신청 서식", "where": "한국산업기술진흥협회", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDD-D-ACT", "label": "연구개발활동 개요서·연구 기자재 현황·연구개발인력 현황", "why": "시행규칙 제3조제1항제1~3호 서류", "where": "회사 작성", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDD-D-ORG", "label": "기업 조직도", "why": "전담 조직 확인", "where": "회사 작성", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] },
-        { "item_id": "RNDD-D-PLAN", "label": "부서가 있는 층 전체 도면·내부 도면(전용 출입구 현판·내부 사진 포함)", "why": "연구공간 확인", "where": "회사 작성", "required": true, "applies_when": "always", "source_refs": ["S-RND-RULE"] }
+        {
+          "item_id": "RNDD-D-APP",
+          "label": "연구개발전담부서 인정 신청서(별지 제6호서식)",
+          "why": "인정 신청 서식",
+          "where": "한국산업기술진흥협회",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ],
+          "link": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B8%B0%EC%97%85%EB%B6%80%EC%84%A4%EC%97%B0%EA%B5%AC%EC%86%8C%EB%93%B1%EC%9D%98%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%A7%80%EC%9B%90%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99"
+        },
+        {
+          "item_id": "RNDD-D-ACT",
+          "label": "연구개발활동 개요서·연구 기자재 현황·연구개발인력 현황",
+          "why": "시행규칙 제3조제1항제1~3호 서류",
+          "where": "회사 작성",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ]
+        },
+        {
+          "item_id": "RNDD-D-ORG",
+          "label": "기업 조직도",
+          "why": "전담 조직 확인",
+          "where": "회사 작성",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ]
+        },
+        {
+          "item_id": "RNDD-D-PLAN",
+          "label": "부서가 있는 층 전체 도면·내부 도면(전용 출입구 현판·내부 사진 포함)",
+          "why": "연구공간 확인",
+          "where": "회사 작성",
+          "required": true,
+          "applies_when": "always",
+          "source_refs": [
+            "S-RND-RULE"
+          ]
+        }
       ],
       "help_text": "",
-      "ongoing": {"text": "인정 후 연구개발 실적 제출, 인력·공간 변경 시 변경신고 등 사후관리 의무가 있어요. 기한과 근거 조항은 한국산업기술진흥협회에서 확인하세요.", "unverified": true},
-      "disclaimer": "이 진단은 인정기준 사전 점검이에요. 실제 인정은 한국산업기술진흥협회 검토로 결정돼요."
+      "ongoing": {
+        "text": "인정 후 연구개발 실적 제출, 인력·공간 변경 시 변경신고 등 사후관리 의무가 있어요. 기한과 근거 조항은 한국산업기술진흥협회에서 확인하세요.",
+        "unverified": true
+      },
+      "apply_site": {
+        "name": "한국산업기술진흥협회",
+        "url": "https://www.rnd.or.kr"
+      },
+      "fees": {
+        "unverified": true,
+        "text": "인정 신고 수수료는 이 앱에서 공식 원문을 확인하지 못했어요. 한국산업기술진흥협회에 확인하세요."
+      },
+      "processing": {
+        "unverified": true,
+        "text": "신고부터 인정서 발급까지 기간은 이 앱에서 공식 원문을 확인하지 못했어요. 한국산업기술진흥협회에 확인하세요."
+      },
+      "disclaimer": "이 진단은 인정기준 사전 점검이에요. 실제 인정은 한국산업기술진흥협회 검토로 결정돼요.",
+      "guides": [
+        {
+          "title": "기업부설연구소등 연구개발 지원법 시행규칙(별지 서식 포함)",
+          "url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B8%B0%EC%97%85%EB%B6%80%EC%84%A4%EC%97%B0%EA%B5%AC%EC%86%8C%EB%93%B1%EC%9D%98%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%A7%80%EC%9B%90%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99",
+          "checked_at": "2026-11-23"
+        }
+      ]
     },
-
     {
-      "scheme_id": "KC-SAFETY", "name_ko": "KC 제품안전 인증(전기용품·생활용품·어린이제품)", "official_name": "제품안전기본법·전기용품 및 생활용품 안전관리법 등에 따른 안전인증·안전확인·공급자적합성확인",
-      "aliases": ["kc", "kc인증", "안전인증", "전기용품", "생활용품", "어린이제품", "kc마크"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "product_conformity_assessment", "mandatory_status": "needs_review",
-      "industries": ["manufacturing"], "product_scopes": ["electrical", "toy_child", "machinery"], "purpose_tags": ["quality", "customer"],
-      "target": "product", "issuing_authority": "산업통상 관계부처(국가기술표준원)", "assessment_body": "지정 인증기관",
+      "scheme_id": "KC-SAFETY",
+      "name_ko": "KC 제품안전 인증(전기용품·생활용품·어린이제품)",
+      "official_name": "제품안전기본법·전기용품 및 생활용품 안전관리법 등에 따른 안전인증·안전확인·공급자적합성확인",
+      "aliases": [
+        "kc",
+        "kc인증",
+        "안전인증",
+        "전기용품",
+        "생활용품",
+        "어린이제품",
+        "kc마크"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "manufacturing"
+      ],
+      "product_scopes": [
+        "electrical",
+        "toy_child",
+        "machinery"
+      ],
+      "purpose_tags": [
+        "quality",
+        "customer"
+      ],
+      "target": "product",
+      "issuing_authority": "산업통상 관계부처(국가기술표준원)",
+      "assessment_body": "지정 인증기관",
       "scope_note": "제품 품목에 따라 안전인증·안전확인·공급자적합성확인 등 절차가 달라요. 품목 확인 전에는 의무 여부를 판단하지 않아요.",
       "what": "국내에서 판매하는 특정 제품의 안전성을 확인하는 제도예요.",
       "when": "국내에 전기용품·생활용품·어린이제품을 판매하려 할 때 검토해요.",
       "who_decides": "품목별 대상 여부는 관련 법령과 지정 인증기관이 판단해요.",
       "first_check": "제품안전정보센터에서 우리 제품이 어떤 관리 대상 품목인지 먼저 확인하세요.",
-      "diagnosable": false, "verified_status": "UNVERIFIED",
-      "sources": ["S-KC-SAFETY"], "official_link": "https://www.safetykorea.kr",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-KC-SAFETY"
+      ],
+      "official_link": "https://www.safetykorea.kr",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "정보 안내만 제공해요. 품목별 대상 여부·절차는 자동 판정하지 않아요."
     },
     {
-      "scheme_id": "KC-RADIO", "name_ko": "KC 전파 적합성평가(방송통신기자재)", "official_name": "전파법에 따른 방송통신기자재 등의 적합성평가",
-      "aliases": ["전파인증", "적합성평가", "kc전파", "무선인증", "rra", "방송통신기자재"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "product_conformity_assessment", "mandatory_status": "needs_review",
-      "industries": ["manufacturing"], "product_scopes": ["radio", "electrical"], "purpose_tags": ["quality", "customer"],
-      "target": "product", "issuing_authority": "과학기술정보통신부 국립전파연구원", "assessment_body": "지정 시험기관 등",
+      "scheme_id": "KC-RADIO",
+      "name_ko": "KC 전파 적합성평가(방송통신기자재)",
+      "official_name": "전파법에 따른 방송통신기자재 등의 적합성평가",
+      "aliases": [
+        "전파인증",
+        "적합성평가",
+        "kc전파",
+        "무선인증",
+        "rra",
+        "방송통신기자재"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "manufacturing"
+      ],
+      "product_scopes": [
+        "radio",
+        "electrical"
+      ],
+      "purpose_tags": [
+        "quality",
+        "customer"
+      ],
+      "target": "product",
+      "issuing_authority": "과학기술정보통신부 국립전파연구원",
+      "assessment_body": "지정 시험기관 등",
       "scope_note": "기자재 종류에 따라 적합인증·적합등록 등 절차가 달라요.",
       "what": "전파를 쓰거나 전자파를 내는 기자재가 기술기준에 맞는지 평가하는 제도예요.",
       "when": "무선 기능이 있거나 전자파를 발생하는 기기를 국내에 판매할 때 검토해요.",
       "who_decides": "국립전파연구원과 지정 시험기관이 판단해요.",
       "first_check": "기자재 종류별 적합성평가 대상 여부를 국립전파연구원에서 확인하세요.",
-      "diagnosable": false, "verified_status": "UNVERIFIED",
-      "sources": ["S-KC-RADIO"], "official_link": "https://www.rra.go.kr",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-KC-RADIO"
+      ],
+      "official_link": "https://www.rra.go.kr",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "정보 안내만 제공해요. 기자재별 대상 여부·절차는 자동 판정하지 않아요."
     },
     {
-      "scheme_id": "HACCP", "name_ko": "HACCP(식품안전관리인증기준)", "official_name": "식품위생법 등에 따른 식품안전관리인증기준(HACCP)",
-      "aliases": ["haccp", "해썹", "식품안전", "식품인증"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "management_system_certification", "mandatory_status": "needs_review",
-      "industries": ["food"], "product_scopes": ["food"], "purpose_tags": ["quality", "customer", "procurement"],
-      "target": "both", "issuing_authority": "식품의약품안전처", "assessment_body": "한국식품안전관리인증원",
+      "scheme_id": "HACCP",
+      "name_ko": "HACCP(식품안전관리인증기준)",
+      "official_name": "식품위생법 등에 따른 식품안전관리인증기준(HACCP)",
+      "aliases": [
+        "haccp",
+        "해썹",
+        "식품안전",
+        "식품인증"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "food"
+      ],
+      "product_scopes": [
+        "food"
+      ],
+      "purpose_tags": [
+        "quality",
+        "customer",
+        "procurement"
+      ],
+      "target": "both",
+      "issuing_authority": "식품의약품안전처",
+      "assessment_body": "한국식품안전관리인증원",
       "scope_note": "식품 유형·규모에 따라 의무 적용 대상이 될 수 있어요. 품목 확인 전에는 의무 여부를 판단하지 않아요.",
       "what": "식품 제조·가공 과정의 위해요소를 관리하는 기준이에요.",
       "when": "식품을 제조·가공하거나 대형 유통사·급식에 납품할 때 검토해요.",
       "who_decides": "식품의약품안전처(인증원)가 판단해요.",
       "first_check": "우리 품목이 의무 적용 대상인지 인증원에서 확인하세요.",
-      "diagnosable": false, "verified_status": "UNVERIFIED",
-      "sources": ["S-HACCP"], "official_link": "https://www.haccp.or.kr",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-HACCP"
+      ],
+      "official_link": "https://www.haccp.or.kr",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "정보 안내만 제공해요."
     },
     {
-      "scheme_id": "WOMEN", "name_ko": "여성기업 확인", "official_name": "「여성기업지원에 관한 법률」에 따른 여성기업 확인",
-      "aliases": ["여성기업", "여성기업확인", "여성기업인증"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "company_confirmation", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["procurement", "finance"],
-      "target": "company", "issuing_authority": "중소벤처기업부", "assessment_body": "한국여성경제인협회",
+      "scheme_id": "WOMEN",
+      "name_ko": "여성기업 확인",
+      "official_name": "「여성기업지원에 관한 법률」에 따른 여성기업 확인",
+      "aliases": [
+        "여성기업",
+        "여성기업확인",
+        "여성기업인증"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement",
+        "finance"
+      ],
+      "target": "company",
+      "issuing_authority": "중소벤처기업부",
+      "assessment_body": "한국여성경제인협회",
       "scope_note": "공공구매 우대 등과 연결돼요. 요건은 공식 기관에서 확인하세요.",
       "what": "여성이 소유·경영하는 기업임을 확인하는 제도예요.",
       "when": "공공조달 우대를 검토할 때 확인해요.",
       "who_decides": "한국여성경제인협회가 확인해요.",
       "first_check": "공식 기관에서 소유·경영 요건을 확인하세요.",
-      "diagnosable": false, "verified_status": "UNVERIFIED",
-      "sources": ["S-WOMEN"], "official_link": "https://www.wbiz.or.kr",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-WOMEN"
+      ],
+      "official_link": "https://www.wbiz.or.kr",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "정보 안내만 제공해요. 링크 접속은 개발 환경에서 확인하지 못했어요."
     },
     {
-      "scheme_id": "DISABLED", "name_ko": "장애인기업 확인", "official_name": "「장애인기업활동 촉진법」에 따른 장애인기업 확인",
-      "aliases": ["장애인기업", "장애인기업확인"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "company_confirmation", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["procurement", "finance"],
-      "target": "company", "issuing_authority": "중소벤처기업부", "assessment_body": "장애인기업종합지원센터",
+      "scheme_id": "DISABLED",
+      "name_ko": "장애인기업 확인",
+      "official_name": "「장애인기업활동 촉진법」에 따른 장애인기업 확인",
+      "aliases": [
+        "장애인기업",
+        "장애인기업확인"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement",
+        "finance"
+      ],
+      "target": "company",
+      "issuing_authority": "중소벤처기업부",
+      "assessment_body": "장애인기업종합지원센터",
       "scope_note": "공공구매 우대 등과 연결돼요. 요건은 공식 기관에서 확인하세요.",
       "what": "장애인이 소유·경영하는 기업임을 확인하는 제도예요.",
       "when": "공공조달 우대를 검토할 때 확인해요.",
       "who_decides": "장애인기업종합지원센터가 확인해요.",
       "first_check": "공식 기관에서 요건을 확인하세요.",
-      "diagnosable": false, "verified_status": "UNVERIFIED",
-      "sources": ["S-DISABLED"], "official_link": "https://www.debc.or.kr",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-DISABLED"
+      ],
+      "official_link": "https://www.debc.or.kr",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "정보 안내만 제공해요. 링크 접속은 개발 환경에서 확인하지 못했어요."
     },
     {
-      "scheme_id": "FAMILY", "name_ko": "가족친화인증", "official_name": "「가족친화 사회환경의 조성 촉진에 관한 법률」에 따른 가족친화인증",
-      "aliases": ["가족친화", "가족친화인증", "일가정양립"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_LAW",
-      "scheme_type": "company_confirmation", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["brand", "procurement"],
-      "target": "company", "issuing_authority": "정부 주관부처(원문 미확인)", "assessment_body": "운영기관(원문 미확인)",
+      "scheme_id": "FAMILY",
+      "name_ko": "가족친화인증",
+      "official_name": "「가족친화 사회환경의 조성 촉진에 관한 법률」에 따른 가족친화인증",
+      "aliases": [
+        "가족친화",
+        "가족친화인증",
+        "일가정양립"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "brand",
+        "procurement"
+      ],
+      "target": "company",
+      "issuing_authority": "정부 주관부처(원문 미확인)",
+      "assessment_body": "운영기관(원문 미확인)",
       "scope_note": "주관부처·운영기관 명칭은 개발 환경에서 확인하지 못했어요.",
       "what": "가족친화 제도를 모범적으로 운영하는 기업을 인증하는 제도예요.",
       "when": "인재 채용·기업 이미지·일부 가점을 검토할 때 확인해요.",
       "who_decides": "정부 주관 운영기관이 심사해요.",
       "first_check": "공식 기관에서 신청 대상과 심사기준을 확인하세요.",
-      "diagnosable": false, "verified_status": "UNVERIFIED",
-      "sources": ["S-FAMILY"], "official_link": "https://www.ffm.go.kr",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-FAMILY"
+      ],
+      "official_link": "https://www.ffm.go.kr",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "정보 안내만 제공해요. 주관기관·링크는 미검증이에요."
     },
     {
-      "scheme_id": "SOCIALV", "name_ko": "소셜벤처 판별", "official_name": "소셜벤처 판별(중소벤처기업부)",
-      "aliases": ["소셜벤처", "소셜벤처판별", "사회적가치", "social venture"],
-      "display_group": "domestic", "jurisdiction_country": "KR", "applicable_markets": ["KR"], "standard_origin": "KR_POLICY",
-      "scheme_type": "company_confirmation", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["finance", "brand"],
-      "target": "company", "issuing_authority": "중소벤처기업부", "assessment_body": "판별 운영기관(원문 미확인)",
+      "scheme_id": "SOCIALV",
+      "name_ko": "소셜벤처 판별",
+      "official_name": "소셜벤처 판별(중소벤처기업부)",
+      "aliases": [
+        "소셜벤처",
+        "소셜벤처판별",
+        "사회적가치",
+        "social venture"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_POLICY",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance",
+        "brand"
+      ],
+      "target": "company",
+      "issuing_authority": "중소벤처기업부",
+      "assessment_body": "판별 운영기관(원문 미확인)",
       "scope_note": "판별 기준·운영기관은 개발 환경에서 확인하지 못했어요.",
       "what": "사회적 가치와 혁신성장을 함께 추구하는 기업을 판별하는 제도예요.",
       "when": "임팩트 투자·관련 지원사업을 검토할 때 확인해요.",
       "who_decides": "판별 운영기관이 평가해요.",
       "first_check": "공식 판별 기준을 확인하세요.",
-      "diagnosable": false, "verified_status": "UNVERIFIED",
-      "sources": ["S-SOCIALV"], "official_link": "https://www.kibo.or.kr",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-SOCIALV"
+      ],
+      "official_link": "https://www.kibo.or.kr",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "정보 안내만 제공해요. 운영기관·링크는 미검증이에요."
     },
-
     {
-      "scheme_id": "ISO9001", "name_ko": "ISO 9001 품질경영시스템", "official_name": "ISO 9001 Quality management systems",
-      "aliases": ["iso9001", "iso 9001", "품질경영", "품질인증", "iso", "qms"],
-      "display_group": "international", "jurisdiction_country": null, "applicable_markets": ["GLOBAL"], "standard_origin": "ISO",
-      "scheme_type": "management_system_certification", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["quality", "customer", "export", "procurement"],
-      "target": "company", "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)", "assessment_body": "인정기구로부터 인정받은 인증기관",
+      "scheme_id": "ISO9001",
+      "name_ko": "ISO 9001 품질경영시스템",
+      "official_name": "ISO 9001 Quality management systems",
+      "aliases": [
+        "iso9001",
+        "iso 9001",
+        "품질경영",
+        "품질인증",
+        "iso",
+        "qms"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "quality",
+        "customer",
+        "export",
+        "procurement"
+      ],
+      "target": "company",
+      "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)",
+      "assessment_body": "인정기구로부터 인정받은 인증기관",
       "scope_note": "국제표준이지만 한국에 있는 인증기관도 인증할 수 있어요. 인증기관의 인정 범위를 꼭 확인하세요.",
       "what": "품질경영 체계가 국제표준에 맞게 운영되는지 인증기관이 심사하는 제도예요.",
       "when": "거래처가 요구하거나 품질 관리 체계를 갖추려 할 때 검토해요.",
       "who_decides": "인정받은 인증기관이 심사해요.",
       "first_check": "인증 범위(사업장·제품·서비스)를 정하고, 인증기관의 인정 여부를 확인하세요.",
-      "diagnosable": false, "self_check": "iso_ms", "verified_status": "UNVERIFIED",
-      "sources": ["S-ISO"], "official_link": "https://www.iso.org/certification.html",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "self_check": "iso_ms",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO"
+      ],
+      "official_link": "https://www.iso.org/certification.html",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "신청 적격성 판정이 아닌 준비상태 자가점검만 제공해요. 표준 원문은 싣지 않았어요."
     },
     {
-      "scheme_id": "ISO14001", "name_ko": "ISO 14001 환경경영시스템", "official_name": "ISO 14001 Environmental management systems",
-      "aliases": ["iso14001", "iso 14001", "환경경영", "환경인증", "ems"],
-      "display_group": "international", "jurisdiction_country": null, "applicable_markets": ["GLOBAL"], "standard_origin": "ISO",
-      "scheme_type": "management_system_certification", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["quality", "customer", "export", "brand"],
-      "target": "company", "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)", "assessment_body": "인정받은 인증기관",
+      "scheme_id": "ISO14001",
+      "name_ko": "ISO 14001 환경경영시스템",
+      "official_name": "ISO 14001 Environmental management systems",
+      "aliases": [
+        "iso14001",
+        "iso 14001",
+        "환경경영",
+        "환경인증",
+        "ems"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "quality",
+        "customer",
+        "export",
+        "brand"
+      ],
+      "target": "company",
+      "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)",
+      "assessment_body": "인정받은 인증기관",
       "scope_note": "환경 측면 관리 체계 인증. 공급망 ESG 요구와 연결되는 경우가 있어요.",
       "what": "환경경영 체계가 국제표준에 맞게 운영되는지 심사하는 제도예요.",
       "when": "거래처의 환경·ESG 요구에 대응할 때 검토해요.",
       "who_decides": "인정받은 인증기관이 심사해요.",
       "first_check": "인증 범위와 인증기관 인정 여부를 확인하세요.",
-      "diagnosable": false, "self_check": "iso_ms", "verified_status": "UNVERIFIED",
-      "sources": ["S-ISO"], "official_link": "https://www.iso.org/certification.html",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "self_check": "iso_ms",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO"
+      ],
+      "official_link": "https://www.iso.org/certification.html",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "준비상태 자가점검만 제공해요."
     },
     {
-      "scheme_id": "ISO45001", "name_ko": "ISO 45001 안전보건경영시스템", "official_name": "ISO 45001 Occupational health and safety management systems",
-      "aliases": ["iso45001", "iso 45001", "안전보건", "안전보건경영"],
-      "display_group": "international", "jurisdiction_country": null, "applicable_markets": ["GLOBAL"], "standard_origin": "ISO",
-      "scheme_type": "management_system_certification", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["quality", "customer", "procurement"],
-      "target": "company", "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)", "assessment_body": "인정받은 인증기관",
+      "scheme_id": "ISO45001",
+      "name_ko": "ISO 45001 안전보건경영시스템",
+      "official_name": "ISO 45001 Occupational health and safety management systems",
+      "aliases": [
+        "iso45001",
+        "iso 45001",
+        "안전보건",
+        "안전보건경영"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "quality",
+        "customer",
+        "procurement"
+      ],
+      "target": "company",
+      "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)",
+      "assessment_body": "인정받은 인증기관",
       "scope_note": "인증 취득이 국내 산업안전 법령상 의무 이행을 대신하지는 않아요.",
       "what": "안전보건경영 체계가 국제표준에 맞게 운영되는지 심사하는 제도예요.",
       "when": "거래처 요구나 안전관리 체계 정비 시 검토해요.",
       "who_decides": "인정받은 인증기관이 심사해요.",
       "first_check": "인증 범위와 인증기관 인정 여부를 확인하세요.",
-      "diagnosable": false, "self_check": "iso_ms", "verified_status": "UNVERIFIED",
-      "sources": ["S-ISO"], "official_link": "https://www.iso.org/certification.html",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "self_check": "iso_ms",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO"
+      ],
+      "official_link": "https://www.iso.org/certification.html",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "준비상태 자가점검만 제공해요."
     },
     {
-      "scheme_id": "ISO27001", "name_ko": "ISO/IEC 27001 정보보호경영시스템", "official_name": "ISO/IEC 27001 Information security management systems",
-      "aliases": ["iso27001", "iso 27001", "정보보호", "정보보안", "isms", "보안인증"],
-      "display_group": "international", "jurisdiction_country": null, "applicable_markets": ["GLOBAL"], "standard_origin": "ISO_IEC",
-      "scheme_type": "management_system_certification", "mandatory_status": "voluntary",
-      "industries": ["all"], "product_scopes": [], "purpose_tags": ["security", "customer", "export"],
-      "target": "company", "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)", "assessment_body": "인정받은 인증기관",
+      "scheme_id": "ISO27001",
+      "name_ko": "ISO/IEC 27001 정보보호경영시스템",
+      "official_name": "ISO/IEC 27001 Information security management systems",
+      "aliases": [
+        "iso27001",
+        "iso 27001",
+        "정보보호",
+        "정보보안",
+        "isms",
+        "보안인증"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO_IEC",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "security",
+        "customer",
+        "export"
+      ],
+      "target": "company",
+      "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)",
+      "assessment_body": "인정받은 인증기관",
       "scope_note": "국내 ISMS-P 등 법정 인증과는 다른 제도예요.",
       "what": "정보보호 관리체계가 국제표준에 맞게 운영되는지 심사하는 제도예요.",
       "when": "B2B·해외 고객이 보안 체계를 요구할 때 검토해요.",
       "who_decides": "인정받은 인증기관이 심사해요.",
       "first_check": "인증 범위(서비스·시스템)와 인증기관 인정 여부를 확인하세요.",
-      "diagnosable": false, "self_check": "iso_ms", "verified_status": "UNVERIFIED",
-      "sources": ["S-ISO"], "official_link": "https://www.iso.org/certification.html",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "self_check": "iso_ms",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO"
+      ],
+      "official_link": "https://www.iso.org/certification.html",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "준비상태 자가점검만 제공해요."
     },
     {
-      "scheme_id": "ISO22000", "name_ko": "ISO 22000 식품안전경영시스템", "official_name": "ISO 22000 Food safety management systems",
-      "aliases": ["iso22000", "iso 22000", "식품안전경영"],
-      "display_group": "international", "jurisdiction_country": null, "applicable_markets": ["GLOBAL"], "standard_origin": "ISO",
-      "scheme_type": "management_system_certification", "mandatory_status": "voluntary",
-      "industries": ["food"], "product_scopes": ["food"], "purpose_tags": ["quality", "customer", "export"],
-      "target": "company", "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)", "assessment_body": "인정받은 인증기관",
+      "scheme_id": "ISO22000",
+      "name_ko": "ISO 22000 식품안전경영시스템",
+      "official_name": "ISO 22000 Food safety management systems",
+      "aliases": [
+        "iso22000",
+        "iso 22000",
+        "식품안전경영"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "food"
+      ],
+      "product_scopes": [
+        "food"
+      ],
+      "purpose_tags": [
+        "quality",
+        "customer",
+        "export"
+      ],
+      "target": "company",
+      "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)",
+      "assessment_body": "인정받은 인증기관",
       "scope_note": "국내 HACCP와는 별개의 제도예요.",
       "what": "식품안전 관리체계가 국제표준에 맞게 운영되는지 심사하는 제도예요.",
       "when": "해외 식품 바이어가 요구할 때 검토해요.",
       "who_decides": "인정받은 인증기관이 심사해요.",
       "first_check": "인증 범위와 인증기관 인정 여부를 확인하세요.",
-      "diagnosable": false, "self_check": "iso_ms", "verified_status": "UNVERIFIED",
-      "sources": ["S-ISO"], "official_link": "https://www.iso.org/certification.html",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "self_check": "iso_ms",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO"
+      ],
+      "official_link": "https://www.iso.org/certification.html",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "준비상태 자가점검만 제공해요."
     },
     {
-      "scheme_id": "ISO13485", "name_ko": "ISO 13485 의료기기 품질경영시스템", "official_name": "ISO 13485 Medical devices — Quality management systems",
-      "aliases": ["iso13485", "iso 13485", "의료기기품질"],
-      "display_group": "international", "jurisdiction_country": null, "applicable_markets": ["GLOBAL"], "standard_origin": "ISO",
-      "scheme_type": "management_system_certification", "mandatory_status": "voluntary",
-      "industries": ["medical"], "product_scopes": ["medical"], "purpose_tags": ["quality", "export", "customer"],
-      "target": "company", "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)", "assessment_body": "인정받은 인증기관",
+      "scheme_id": "ISO13485",
+      "name_ko": "ISO 13485 의료기기 품질경영시스템",
+      "official_name": "ISO 13485 Medical devices — Quality management systems",
+      "aliases": [
+        "iso13485",
+        "iso 13485",
+        "의료기기품질"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "medical"
+      ],
+      "product_scopes": [
+        "medical"
+      ],
+      "purpose_tags": [
+        "quality",
+        "export",
+        "customer"
+      ],
+      "target": "company",
+      "issuing_authority": "인증기관(ISO가 직접 발급하지 않음)",
+      "assessment_body": "인정받은 인증기관",
       "scope_note": "이 인증만으로 각국 의료기기 시판 허가가 되지는 않아요.",
       "what": "의료기기 품질경영 체계를 심사하는 국제표준 인증이에요.",
       "when": "의료기기를 수출하거나 해외 규제 대응을 준비할 때 검토해요.",
       "who_decides": "인정받은 인증기관이 심사해요.",
       "first_check": "판매국 의료기기 규제와 함께 인증 범위를 확인하세요.",
-      "diagnosable": false, "self_check": "iso_ms", "verified_status": "UNVERIFIED",
-      "sources": ["S-ISO"], "official_link": "https://www.iso.org/certification.html",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "self_check": "iso_ms",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO"
+      ],
+      "official_link": "https://www.iso.org/certification.html",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "준비상태 자가점검만 제공해요."
     },
     {
-      "scheme_id": "EU-CE", "name_ko": "EU CE 표시(적합성평가)", "official_name": "CE marking under applicable EU product legislation",
-      "aliases": ["ce", "ce마크", "ce인증", "유럽", "유럽수출", "eu", "유럽 수출"],
-      "display_group": "international", "jurisdiction_country": "EU", "applicable_markets": ["EU"], "standard_origin": "EU_LAW",
-      "scheme_type": "product_conformity_assessment", "mandatory_status": "needs_review",
-      "industries": ["manufacturing"], "product_scopes": ["electrical", "radio", "medical", "machinery", "toy_child", "chemical"], "purpose_tags": ["export"],
-      "target": "product", "issuing_authority": "EU 제품 법규(제조자 자기적합선언 또는 Notified Body 관여)", "assessment_body": "법규·제품에 따라 다름",
+      "scheme_id": "EU-CE",
+      "name_ko": "EU CE 표시(적합성평가)",
+      "official_name": "CE marking under applicable EU product legislation",
+      "aliases": [
+        "ce",
+        "ce마크",
+        "ce인증",
+        "유럽",
+        "유럽수출",
+        "eu",
+        "유럽 수출"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "EU",
+      "applicable_markets": [
+        "EU"
+      ],
+      "standard_origin": "EU_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "manufacturing"
+      ],
+      "product_scopes": [
+        "electrical",
+        "radio",
+        "medical",
+        "machinery",
+        "toy_child",
+        "chemical"
+      ],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "issuing_authority": "EU 제품 법규(제조자 자기적합선언 또는 Notified Body 관여)",
+      "assessment_body": "법규·제품에 따라 다름",
       "scope_note": "모든 EU 수출 제품에 CE가 필요한 것은 아니에요. 해당 EU 제품 법규가 적용되는 제품에만 필요해요. 'CE 인증서'를 EU가 발급하는 것도 아니에요.",
       "what": "EU 제품 법규가 요구하는 안전·성능 요건을 충족했음을 제조자가 표시하는 것이에요.",
       "when": "EU 시장에 해당 법규 적용 제품을 판매할 때 검토해요.",
       "who_decides": "제품에 적용되는 EU 법규가 정해요. 제품에 따라 제조자 스스로 평가하거나 Notified Body가 관여해요.",
       "first_check": "제품 종류·사용 목적으로 어떤 EU 법규가 적용되는지부터 확인하세요.",
-      "diagnosable": false, "triage": "eu_ce", "verified_status": "UNVERIFIED",
-      "sources": ["S-EU-CE", "S-EU-CA"], "official_link": "https://europa.eu/youreurope/business/product-rules-compliance/general-product-compliance/ce-marking/index_en.htm",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "triage": "eu_ce",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-EU-CE",
+        "S-EU-CA"
+      ],
+      "official_link": "https://europa.eu/youreurope/business/product-rules-compliance/general-product-compliance/ce-marking/index_en.htm",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "의무 여부·절차를 자동 판정하지 않아요. '적용 규정 확인 필요'로만 안내해요."
     },
     {
-      "scheme_id": "US-FDA-DEV", "name_ko": "미국 FDA 의료기기 규제 경로", "official_name": "U.S. FDA medical device regulation (registration & listing, premarket pathways)",
-      "aliases": ["fda", "fda인증", "미국 의료기기", "미국의료기기", "510k", "510(k)", "미국 수출"],
-      "display_group": "international", "jurisdiction_country": "US", "applicable_markets": ["US"], "standard_origin": "US_LAW",
-      "scheme_type": "authorization_clearance_approval", "mandatory_status": "needs_review",
-      "industries": ["medical"], "product_scopes": ["medical"], "purpose_tags": ["export"],
-      "target": "product", "issuing_authority": "U.S. FDA", "assessment_body": "U.S. FDA",
+      "scheme_id": "US-FDA-DEV",
+      "name_ko": "미국 FDA 의료기기 규제 경로",
+      "official_name": "U.S. FDA medical device regulation (registration & listing, premarket pathways)",
+      "aliases": [
+        "fda",
+        "fda인증",
+        "미국 의료기기",
+        "미국의료기기",
+        "510k",
+        "510(k)",
+        "미국 수출"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "US",
+      "applicable_markets": [
+        "US"
+      ],
+      "standard_origin": "US_LAW",
+      "scheme_type": "authorization_clearance_approval",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "medical"
+      ],
+      "product_scopes": [
+        "medical"
+      ],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "issuing_authority": "U.S. FDA",
+      "assessment_body": "U.S. FDA",
       "scope_note": "시설 등록·제품 목록 등재는 FDA 승인이 아니에요. 시판 전 절차(510(k) 등)는 기기 분류에 따라 달라요. 'FDA 인증서'라는 일반 제도는 없어요.",
       "what": "미국에서 의료기기를 판매하려면 기기 분류에 맞는 FDA 절차를 거쳐야 해요.",
       "when": "미국에 의료 목적 제품을 판매할 때 검토해요.",
       "who_decides": "U.S. FDA가 판단해요.",
       "first_check": "사용 목적(intended use)과 기기 분류를 먼저 확인하세요.",
-      "diagnosable": false, "triage": "us_fda_device", "verified_status": "UNVERIFIED",
-      "sources": ["S-FDA-RL", "S-FDA-DEV"], "official_link": "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/overview-device-regulation",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "triage": "us_fda_device",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-FDA-RL",
+        "S-FDA-DEV"
+      ],
+      "official_link": "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/overview-device-regulation",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "의무 여부·절차를 자동 판정하지 않아요."
     },
     {
-      "scheme_id": "US-FDA-FOOD", "name_ko": "미국 FDA 식품시설 등록", "official_name": "U.S. FDA Food Facility Registration",
-      "aliases": ["fda식품", "미국 식품", "식품수출", "food facility"],
-      "display_group": "international", "jurisdiction_country": "US", "applicable_markets": ["US"], "standard_origin": "US_LAW",
-      "scheme_type": "registration", "mandatory_status": "needs_review",
-      "industries": ["food"], "product_scopes": ["food"], "purpose_tags": ["export"],
-      "target": "product", "issuing_authority": "U.S. FDA", "assessment_body": "U.S. FDA",
+      "scheme_id": "US-FDA-FOOD",
+      "name_ko": "미국 FDA 식품시설 등록",
+      "official_name": "U.S. FDA Food Facility Registration",
+      "aliases": [
+        "fda식품",
+        "미국 식품",
+        "식품수출",
+        "food facility"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "US",
+      "applicable_markets": [
+        "US"
+      ],
+      "standard_origin": "US_LAW",
+      "scheme_type": "registration",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "food"
+      ],
+      "product_scopes": [
+        "food"
+      ],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "issuing_authority": "U.S. FDA",
+      "assessment_body": "U.S. FDA",
       "scope_note": "등록은 '승인'이나 '인증'이 아니에요. 제품 유형에 따라 추가 규정이 있을 수 있어요.",
       "what": "미국에서 소비되는 식품을 제조·가공·포장·보관하는 시설의 등록 제도예요.",
       "when": "미국으로 식품을 수출할 때 검토해요.",
       "who_decides": "U.S. FDA 규정에 따라요.",
       "first_check": "우리 시설·제품이 등록 대상인지 FDA 안내를 확인하세요.",
-      "diagnosable": false, "triage": "us_fda_food", "verified_status": "UNVERIFIED",
-      "sources": ["S-FDA-FOOD"], "official_link": "https://www.fda.gov/food/guidance-regulation-food-and-dietary-supplements/registration-food-facilities-and-other-submissions",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "triage": "us_fda_food",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-FDA-FOOD"
+      ],
+      "official_link": "https://www.fda.gov/food/guidance-regulation-food-and-dietary-supplements/registration-food-facilities-and-other-submissions",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "의무 여부·절차를 자동 판정하지 않아요."
     },
     {
-      "scheme_id": "US-FCC", "name_ko": "미국 FCC 기기 승인(Equipment Authorization)", "official_name": "U.S. FCC Equipment Authorization",
-      "aliases": ["fcc", "fcc인증", "미국 전파", "미국 무선"],
-      "display_group": "international", "jurisdiction_country": "US", "applicable_markets": ["US"], "standard_origin": "US_LAW",
-      "scheme_type": "product_conformity_assessment", "mandatory_status": "needs_review",
-      "industries": ["manufacturing"], "product_scopes": ["radio", "electrical"], "purpose_tags": ["export"],
-      "target": "product", "issuing_authority": "U.S. FCC", "assessment_body": "기기에 따라 다름",
+      "scheme_id": "US-FCC",
+      "name_ko": "미국 FCC 기기 승인(Equipment Authorization)",
+      "official_name": "U.S. FCC Equipment Authorization",
+      "aliases": [
+        "fcc",
+        "fcc인증",
+        "미국 전파",
+        "미국 무선"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "US",
+      "applicable_markets": [
+        "US"
+      ],
+      "standard_origin": "US_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "manufacturing"
+      ],
+      "product_scopes": [
+        "radio",
+        "electrical"
+      ],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "issuing_authority": "U.S. FCC",
+      "assessment_body": "기기에 따라 다름",
       "scope_note": "기기 종류에 따라 Certification 또는 공급자 적합성 선언(SDoC) 등 경로가 달라요.",
       "what": "미국에서 무선·전자 기기가 전파 규정을 지키는지 확인하는 절차예요.",
       "when": "무선 기능이 있거나 전자파를 내는 기기를 미국에 판매할 때 검토해요.",
       "who_decides": "U.S. FCC 규정에 따라요.",
       "first_check": "기기 기능(무선 여부 등)과 해당 규정 경로를 확인하세요.",
-      "diagnosable": false, "triage": "us_fcc", "verified_status": "UNVERIFIED",
-      "sources": ["S-FCC"], "official_link": "https://www.fcc.gov/oet/ea",
-      "last_verified_at": "2026-11-22", "review_due_at": "2027-05-22", "readiness_items": [],
+      "diagnosable": false,
+      "triage": "us_fcc",
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-FCC"
+      ],
+      "official_link": "https://www.fcc.gov/oet/ea",
+      "last_verified_at": "2026-11-22",
+      "review_due_at": "2027-05-22",
+      "readiness_items": [],
       "disclaimer": "의무 여부·절차를 자동 판정하지 않아요. 공식 페이지는 개발 환경에서 차단(403)돼 원문 재확인을 못 했어요."
+    },
+    {
+      "scheme_id": "SME-CONF",
+      "name_ko": "중소기업확인서",
+      "official_name": "「중소기업기본법」에 따른 중소기업 확인",
+      "aliases": [
+        "중소기업확인",
+        "중기업확인서",
+        "소기업확인서"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance",
+        "procurement"
+      ],
+      "target": "company",
+      "field": "기업 확인",
+      "issuing_authority": "중소벤처기업부",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "중소기업기본법상 중소기업(소기업·중기업)에 해당함을 확인해 주는 서류예요.",
+      "when": "정책자금·공공조달·각종 인증 신청에서 중소기업임을 증명할 때 필요해요.",
+      "who_decides": "중소벤처기업부이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "매출액·자산·독립성(관계기업) 기준을 공식 시스템에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-SME-CONF"
+      ],
+      "official_link": "https://sminfo.mss.go.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "SOCIAL-ENT",
+      "name_ko": "사회적기업 인증",
+      "official_name": "「사회적기업 육성법」에 따른 사회적기업 인증",
+      "aliases": [
+        "사회적기업",
+        "사회적기업인증"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance",
+        "brand",
+        "procurement"
+      ],
+      "target": "company",
+      "field": "ESG·사회적가치",
+      "issuing_authority": "고용노동부",
+      "assessment_body": "한국사회적기업진흥원",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "사회적 목적을 추구하면서 영업활동을 하는 기업을 인증하는 제도예요.",
+      "when": "사회적 가치 실현을 사업 목표로 두고 공공구매 우선구매·지원사업을 검토할 때 확인해요.",
+      "who_decides": "한국사회적기업진흥원이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "조직형태·사회적 목적·의사결정 구조·이윤 재투자 요건을 공식 안내에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-SOCIAL-ENT"
+      ],
+      "official_link": "https://www.socialenterprise.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "PRE-SOCIAL",
+      "name_ko": "예비사회적기업 지정",
+      "official_name": "예비사회적기업 지정",
+      "aliases": [
+        "예비사회적기업"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance",
+        "brand"
+      ],
+      "target": "company",
+      "field": "ESG·사회적가치",
+      "issuing_authority": "고용노동부·지방자치단체",
+      "assessment_body": "한국사회적기업진흥원",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "사회적기업 인증 전 단계로, 일부 요건을 갖춘 기업을 지정하는 제도예요.",
+      "when": "사회적기업 인증을 준비하면서 지원사업을 먼저 활용하려 할 때 확인해요.",
+      "who_decides": "한국사회적기업진흥원이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "지정 주체(부처형·지역형)와 모집 공고를 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-PRE-SOCIAL"
+      ],
+      "official_link": "https://www.socialenterprise.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "ROOT-IND",
+      "name_ko": "뿌리기업 확인",
+      "official_name": "「뿌리산업 진흥과 첨단화에 관한 법률」에 따른 뿌리기업 확인",
+      "aliases": [
+        "뿌리기업",
+        "뿌리산업"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance"
+      ],
+      "target": "company",
+      "field": "기업 확인",
+      "issuing_authority": "산업통상자원부",
+      "assessment_body": "국가뿌리산업진흥센터",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "주조·금형·소성가공·용접·표면처리·열처리 등 뿌리기술을 활용하는 기업임을 확인하는 제도예요.",
+      "when": "뿌리산업 지원사업·인력 지원을 검토할 때 확인해요.",
+      "who_decides": "국가뿌리산업진흥센터이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "우리 회사 업종·공정이 뿌리기술 범위에 드는지 공식 기준을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ROOT-IND"
+      ],
+      "official_link": "https://www.kpic.re.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "DIRECT-PROD",
+      "name_ko": "직접생산확인",
+      "official_name": "「중소기업제품 구매촉진 및 판로지원에 관한 법률」에 따른 직접생산확인",
+      "aliases": [
+        "직접생산",
+        "직생확인",
+        "직접생산확인증명서"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement"
+      ],
+      "target": "both",
+      "field": "조달·판로",
+      "issuing_authority": "중소벤처기업부",
+      "assessment_body": "중소기업중앙회",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "중소기업자간 경쟁제품을 공공기관에 납품할 때 직접 생산하는지 확인하는 제도예요.",
+      "when": "중소기업자간 경쟁제품으로 공공조달 입찰에 참여할 때 필요해요.",
+      "who_decides": "중소기업중앙회이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "납품하려는 제품이 경쟁제품인지, 품목별 생산설비·인력 기준을 공식 시스템에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-DIRECT-PROD"
+      ],
+      "official_link": "https://www.smpp.go.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "PERF-CERT",
+      "name_ko": "성능인증",
+      "official_name": "중소기업 기술개발제품 성능인증",
+      "aliases": [
+        "성능인증",
+        "EPC"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement"
+      ],
+      "target": "product",
+      "field": "조달·판로",
+      "issuing_authority": "중소벤처기업부",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "중소기업이 개발한 기술개발제품의 성능을 확인해 주는 제도예요.",
+      "when": "기술개발제품으로 공공기관 우선구매·판로를 넓히려 할 때 확인해요.",
+      "who_decides": "중소벤처기업부이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "대상 제품·시험 항목·신청 절차를 공식 시스템에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-PERF-CERT"
+      ],
+      "official_link": "https://www.smpp.go.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "SHARE-PERF",
+      "name_ko": "성과공유기업 확인",
+      "official_name": "성과공유제 도입기업 확인",
+      "aliases": [
+        "성과공유제",
+        "성과공유기업"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance",
+        "brand"
+      ],
+      "target": "company",
+      "field": "기업 확인",
+      "issuing_authority": "중소벤처기업부",
+      "assessment_body": "대·중소기업·농어업협력재단",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "근로자와 성과를 나누는 제도를 도입한 중소기업을 확인하는 제도예요.",
+      "when": "인재 유치·정부 지원사업 우대를 검토할 때 확인해요.",
+      "who_decides": "대·중소기업·농어업협력재단이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "성과공유 유형과 확인 절차를 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-SHARE-PERF"
+      ],
+      "official_link": "https://www.winwinnuri.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "EXPORT-SME",
+      "name_ko": "수출유망중소기업 지정",
+      "official_name": "수출유망중소기업 지정",
+      "aliases": [
+        "수출유망중소기업",
+        "수출유망기업"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export",
+        "finance"
+      ],
+      "target": "company",
+      "field": "조달·판로",
+      "issuing_authority": "중소벤처기업부(지방중소벤처기업청)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "수출 실적·잠재력이 있는 중소기업을 지정해 수출 지원을 연계하는 제도예요.",
+      "when": "해외 진출 지원사업·수출 금융 우대를 검토할 때 확인해요.",
+      "who_decides": "중소벤처기업부(지방중소벤처기업청)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "모집 공고의 수출 실적 기준과 일정을 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-EXPORT-SME"
+      ],
+      "official_link": "https://www.exportcenter.go.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "SW-BIZ",
+      "name_ko": "소프트웨어사업자 신고",
+      "official_name": "「소프트웨어 진흥법」에 따른 소프트웨어사업자 신고",
+      "aliases": [
+        "SW사업자",
+        "소프트웨어사업자",
+        "SW사업자 신고"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "registration",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement"
+      ],
+      "target": "company",
+      "field": "조달·판로",
+      "issuing_authority": "과학기술정보통신부",
+      "assessment_body": "한국소프트웨어산업협회",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "소프트웨어사업자로 신고해 공공 소프트웨어사업 참여 자격을 갖추는 제도예요.",
+      "when": "공공기관 소프트웨어 사업 입찰에 참여하려 할 때 확인해요.",
+      "who_decides": "한국소프트웨어산업협회이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "신고 서류(기술인력 등)와 절차를 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-SW-BIZ"
+      ],
+      "official_link": "https://www.sw.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "RND-SERVICE",
+      "name_ko": "연구개발서비스업 신고",
+      "official_name": "연구개발서비스업 신고",
+      "aliases": [
+        "연구개발서비스업",
+        "R&D서비스업"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "registration",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "rnd"
+      ],
+      "target": "company",
+      "field": "R&D·기술",
+      "issuing_authority": "과학기술정보통신부",
+      "assessment_body": "한국산업기술진흥협회",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "연구개발을 대행·지원하는 서비스 기업을 신고하는 제도예요.",
+      "when": "연구개발 용역·서비스를 주된 사업으로 할 때 확인해요.",
+      "who_decides": "한국산업기술진흥협회이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "전문 연구인력·시설 기준을 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-RND-SERVICE"
+      ],
+      "official_link": "https://www.rnd.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "CREATIVE-LAB",
+      "name_ko": "기업부설창작연구소·기업창작전담부서",
+      "official_name": "기업부설창작연구소 및 기업창작전담부서 인정",
+      "aliases": [
+        "창작연구소",
+        "창작전담부서"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "rnd_institute_recognition",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "rnd",
+        "finance"
+      ],
+      "target": "company",
+      "field": "R&D·기술",
+      "issuing_authority": "과학기술정보통신부",
+      "assessment_body": "한국산업기술진흥협회",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "디자인·콘텐츠 등 창작 분야의 연구조직을 인정하는 제도예요.",
+      "when": "창작 분야 연구개발 활동으로 세제·벤처 연구개발유형 등을 검토할 때 확인해요.",
+      "who_decides": "한국산업기술진흥협회이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인정 대상 분야와 인력·공간 기준을 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-CREATIVE-LAB"
+      ],
+      "official_link": "https://www.rnd.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "GS-CERT",
+      "name_ko": "GS인증(소프트웨어 품질인증)",
+      "official_name": "「소프트웨어 진흥법」에 따른 소프트웨어 품질인증",
+      "aliases": [
+        "GS인증",
+        "GS",
+        "Good Software"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement",
+        "quality"
+      ],
+      "target": "product",
+      "field": "조달·판로",
+      "issuing_authority": "과학기술정보통신부",
+      "assessment_body": "한국정보통신기술협회(TTA) 등 인증기관",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "패키지 소프트웨어의 기능·품질을 시험해 인증하는 제도예요.",
+      "when": "공공기관에 소프트웨어를 납품하거나 우선구매를 검토할 때 확인해요.",
+      "who_decides": "한국정보통신기술협회(TTA) 등 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "시험 범위·기간·인증기관을 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-GS-CERT"
+      ],
+      "official_link": "https://www.tta.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "NEP",
+      "name_ko": "NEP 신제품 인증",
+      "official_name": "신제품 인증(NEP)",
+      "aliases": [
+        "NEP",
+        "신제품인증"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement",
+        "brand"
+      ],
+      "target": "product",
+      "field": "조달·판로",
+      "issuing_authority": "산업통상자원부(국가기술표준원)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "국내에서 처음 개발한 기술을 적용한 우수 신제품을 인증하는 제도예요.",
+      "when": "신제품으로 공공기관 의무구매·판로 지원을 검토할 때 확인해요.",
+      "who_decides": "산업통상자원부(국가기술표준원)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "신청 대상(신기술 적용 여부)과 심사 일정을 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-NEP"
+      ],
+      "official_link": "https://www.newproduct.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "NET",
+      "name_ko": "NET 신기술 인증",
+      "official_name": "신기술 인증(NET)",
+      "aliases": [
+        "NET",
+        "신기술인증"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement",
+        "rnd"
+      ],
+      "target": "product",
+      "field": "R&D·기술",
+      "issuing_authority": "산업통상자원부(국가기술표준원)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "국내에서 처음 개발한 신기술을 인증하는 제도예요.",
+      "when": "개발한 기술로 공공 판로·기술 신뢰도를 높이려 할 때 확인해요.",
+      "who_decides": "산업통상자원부(국가기술표준원)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "신청 대상 기술과 심사 절차를 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-NET"
+      ],
+      "official_link": "https://www.netmark.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "GREEN-CERT",
+      "name_ko": "녹색인증",
+      "official_name": "「기후위기 대응을 위한 탄소중립·녹색성장 기본법」 등에 따른 녹색인증",
+      "aliases": [
+        "녹색인증",
+        "녹색기술인증",
+        "녹색전문기업"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "finance",
+        "procurement"
+      ],
+      "target": "both",
+      "field": "ESG·사회적가치",
+      "issuing_authority": "관계부처 합동",
+      "assessment_body": "녹색인증 사무국",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "녹색기술·녹색사업·녹색전문기업을 인증하는 제도예요.",
+      "when": "친환경 기술로 정책자금·조달 우대를 검토할 때 확인해요.",
+      "who_decides": "녹색인증 사무국이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인증 유형(기술·제품·사업·전문기업)과 평가 기준을 공식 사이트에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-GREEN-CERT"
+      ],
+      "official_link": "https://www.greencertif.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "PPS-EXCELLENT",
+      "name_ko": "조달우수제품 지정",
+      "official_name": "조달청 우수제품 지정",
+      "aliases": [
+        "우수조달제품",
+        "조달우수제품",
+        "우수제품"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement"
+      ],
+      "target": "product",
+      "field": "조달·판로",
+      "issuing_authority": "조달청",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "기술·품질이 우수한 제품을 조달청이 지정해 수의계약 등으로 공공 판로를 여는 제도예요.",
+      "when": "공공기관 납품 확대를 위해 우수제품 지정을 검토할 때 확인해요.",
+      "who_decides": "조달청이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "신청 자격(인증·특허 등 기술 요건)과 접수 일정을 조달청 공고에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-PPS-EXCELLENT"
+      ],
+      "official_link": "https://www.pps.go.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "INNOV-PROD",
+      "name_ko": "혁신제품 지정",
+      "official_name": "혁신제품 지정(공공조달)",
+      "aliases": [
+        "혁신제품",
+        "혁신시제품"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement"
+      ],
+      "target": "product",
+      "field": "조달·판로",
+      "issuing_authority": "조달청 등 관계부처",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "혁신성이 인정된 제품을 지정해 공공기관이 시범구매할 수 있게 하는 제도예요.",
+      "when": "혁신 기술 제품으로 공공 첫 판로를 열고 싶을 때 확인해요.",
+      "who_decides": "조달청 등 관계부처이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "지정 경로(부처 추천·조달청 심사)와 모집 일정을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-INNOV-PROD"
+      ],
+      "official_link": "https://www.pps.go.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "KS",
+      "name_ko": "KS 인증",
+      "official_name": "「산업표준화법」에 따른 KS 인증",
+      "aliases": [
+        "KS",
+        "KS마크",
+        "한국산업표준"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "quality",
+        "procurement"
+      ],
+      "target": "product",
+      "field": "품질·안전",
+      "issuing_authority": "산업통상자원부(국가기술표준원)",
+      "assessment_body": "인증기관(한국표준협회 등)",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "제품·서비스가 한국산업표준(KS)에 맞는지 인증하는 제도예요.",
+      "when": "공공조달·거래처가 KS 제품을 요구할 때 확인해요.",
+      "who_decides": "인증기관(한국표준협회 등)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "해당 제품의 KS 표준번호와 공장 심사 기준을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-KS"
+      ],
+      "official_link": "https://www.ksa.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "HIGH-EFF",
+      "name_ko": "고효율에너지기자재 인증",
+      "official_name": "고효율에너지기자재 인증",
+      "aliases": [
+        "고효율인증",
+        "고효율에너지기자재"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement",
+        "quality"
+      ],
+      "target": "product",
+      "field": "품질·안전",
+      "issuing_authority": "산업통상자원부",
+      "assessment_body": "한국에너지공단",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "에너지 효율이 높은 기자재를 인증하는 제도예요.",
+      "when": "공공기관 납품·에너지 절약 제품으로 홍보하려 할 때 확인해요.",
+      "who_decides": "한국에너지공단이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "대상 품목과 효율 기준을 공식 사이트에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-HIGH-EFF"
+      ],
+      "official_link": "https://eep.energy.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "ENERGY-LABEL",
+      "name_ko": "에너지소비효율등급 표시",
+      "official_name": "에너지소비효율등급 표시제도",
+      "aliases": [
+        "효율등급",
+        "에너지효율등급"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "quality"
+      ],
+      "target": "product",
+      "field": "품질·안전",
+      "issuing_authority": "산업통상자원부",
+      "assessment_body": "한국에너지공단",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "대상 제품에 에너지소비효율 등급을 표시하도록 하는 제도예요.",
+      "when": "가전·조명 등 대상 품목을 국내에 판매할 때 확인해요.",
+      "who_decides": "한국에너지공단이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "우리 제품이 의무 대상 품목인지 공식 사이트에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ENERGY-LABEL"
+      ],
+      "official_link": "https://eep.energy.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "ECO-LABEL",
+      "name_ko": "환경표지 인증",
+      "official_name": "환경표지 인증",
+      "aliases": [
+        "환경마크",
+        "환경표지"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement",
+        "brand"
+      ],
+      "target": "product",
+      "field": "ESG·사회적가치",
+      "issuing_authority": "환경부",
+      "assessment_body": "한국환경산업기술원",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "같은 용도의 제품 중 환경성이 우수한 제품을 인증하는 제도예요.",
+      "when": "공공기관 녹색제품 구매·친환경 홍보를 검토할 때 확인해요.",
+      "who_decides": "한국환경산업기술원이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "대상 제품군과 인증 기준을 공식 사이트에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ECO-LABEL"
+      ],
+      "official_link": "https://el.keiti.re.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "GR-MARK",
+      "name_ko": "우수재활용제품(GR) 인증",
+      "official_name": "우수재활용제품 품질인증(GR)",
+      "aliases": [
+        "GR인증",
+        "GR마크",
+        "우수재활용"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement"
+      ],
+      "target": "product",
+      "field": "ESG·사회적가치",
+      "issuing_authority": "산업통상자원부",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "재활용 원료로 만든 품질 좋은 제품을 인증하는 제도예요.",
+      "when": "재활용 제품으로 공공구매 우대를 검토할 때 확인해요.",
+      "who_decides": "산업통상자원부이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "대상 품목·품질 기준을 공식 사이트에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-GR-MARK"
+      ],
+      "official_link": "https://www.buygr.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "GOOD-DESIGN",
+      "name_ko": "우수디자인(GD) 선정",
+      "official_name": "우수디자인(Good Design) 상품 선정",
+      "aliases": [
+        "GD",
+        "굿디자인"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "brand"
+      ],
+      "target": "product",
+      "field": "조달·판로",
+      "issuing_authority": "산업통상자원부",
+      "assessment_body": "한국디자인진흥원",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "디자인이 우수한 상품을 선정해 GD 마크를 부여하는 제도예요.",
+      "when": "제품 디자인 경쟁력을 알리고 싶을 때 확인해요.",
+      "who_decides": "한국디자인진흥원이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "공모 일정과 심사 기준을 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-GOOD-DESIGN"
+      ],
+      "official_link": "https://www.kidp.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "KR-MEDICAL",
+      "name_ko": "의료기기 허가·인증·신고",
+      "official_name": "「의료기기법」에 따른 의료기기 제조·수입 허가·인증·신고",
+      "aliases": [
+        "의료기기 허가",
+        "의료기기 인증",
+        "의료기기 신고",
+        "MFDS"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "authorization_clearance_approval",
+      "mandatory_status": "mandatory",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "quality"
+      ],
+      "target": "product",
+      "field": "품질·안전",
+      "issuing_authority": "식품의약품안전처",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "의료기기를 국내에서 제조·수입·판매하려면 등급에 따라 허가·인증·신고를 받아야 해요.",
+      "when": "의료기기를 만들거나 수입해 국내에서 팔 때 필요해요.",
+      "who_decides": "식품의약품안전처이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품이 의료기기에 해당하는지와 등급(1~4)을 식약처 기준으로 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-KR-MEDICAL"
+      ],
+      "official_link": "https://www.mfds.go.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "ISMS-P",
+      "name_ko": "ISMS-P 정보보호 관리체계 인증",
+      "official_name": "정보보호 및 개인정보보호 관리체계 인증(ISMS-P)",
+      "aliases": [
+        "ISMS",
+        "ISMS-P",
+        "정보보호인증"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "security",
+        "customer"
+      ],
+      "target": "company",
+      "field": "정보보호",
+      "issuing_authority": "과학기술정보통신부·개인정보보호위원회",
+      "assessment_body": "한국인터넷진흥원(KISA)",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "정보보호·개인정보보호 관리체계를 갖췄는지 인증하는 제도예요(일정 규모 이상은 의무).",
+      "when": "정보통신서비스 규모가 의무 기준에 해당하거나 고객사가 요구할 때 확인해요.",
+      "who_decides": "한국인터넷진흥원(KISA)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "의무 대상 기준(매출·이용자 수 등)에 해당하는지 공식 안내에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISMS-P"
+      ],
+      "official_link": "https://isms.kisa.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "CC-CERT",
+      "name_ko": "CC인증(정보보호제품 평가·인증)",
+      "official_name": "정보보호제품 공통평가기준(CC) 인증",
+      "aliases": [
+        "CC인증",
+        "Common Criteria"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR",
+        "GLOBAL"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "security",
+        "procurement"
+      ],
+      "target": "product",
+      "field": "정보보호",
+      "issuing_authority": "과학기술정보통신부(국가정보원 협력)",
+      "assessment_body": "IT보안인증사무국",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "정보보호제품의 보안성을 국제 공통평가기준으로 평가·인증하는 제도예요.",
+      "when": "보안제품을 공공기관에 납품할 때 확인해요.",
+      "who_decides": "IT보안인증사무국이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품 유형별 요구 인증(CC·보안기능 확인서 등)을 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-CC-CERT"
+      ],
+      "official_link": "https://itscc.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "KOSHA-MS",
+      "name_ko": "안전보건경영시스템(KOSHA-MS) 인증",
+      "official_name": "안전보건경영시스템 인증(KOSHA-MS)",
+      "aliases": [
+        "KOSHA-MS",
+        "안전보건경영"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer",
+        "quality"
+      ],
+      "target": "company",
+      "field": "품질·안전",
+      "issuing_authority": "고용노동부",
+      "assessment_body": "한국산업안전보건공단",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "사업장의 안전보건경영체계를 인증하는 제도예요.",
+      "when": "원청·발주처가 안전보건 관리 수준을 요구할 때 확인해요.",
+      "who_decides": "한국산업안전보건공단이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인증 범위와 심사 절차를 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-KOSHA-MS"
+      ],
+      "official_link": "https://www.kosha.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "DISABLED-WS",
+      "name_ko": "장애인표준사업장 인증",
+      "official_name": "「장애인고용촉진 및 직업재활법」에 따른 장애인표준사업장 인증",
+      "aliases": [
+        "장애인표준사업장"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "procurement",
+        "brand"
+      ],
+      "target": "company",
+      "field": "ESG·사회적가치",
+      "issuing_authority": "고용노동부",
+      "assessment_body": "한국장애인고용공단",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "장애인 고용 비율 등 요건을 갖춘 사업장을 인증하는 제도예요.",
+      "when": "장애인 고용을 확대하며 공공 우선구매를 검토할 때 확인해요.",
+      "who_decides": "한국장애인고용공단이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "고용 비율·시설 기준을 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-DISABLED-WS"
+      ],
+      "official_link": "https://www.kead.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "ECO-AGRI",
+      "name_ko": "친환경농산물 인증",
+      "official_name": "친환경농산물 인증(유기·무농약)",
+      "aliases": [
+        "유기농인증",
+        "무농약인증",
+        "친환경인증"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "quality",
+        "brand"
+      ],
+      "target": "product",
+      "field": "품질·안전",
+      "issuing_authority": "농림축산식품부(국립농산물품질관리원)",
+      "assessment_body": "인증기관",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "유기·무농약 농산물임을 인증하는 제도예요.",
+      "when": "농산물·가공품을 친환경으로 표시해 팔려 할 때 확인해요.",
+      "who_decides": "인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인증 종류와 생산 기준을 공식 사이트에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ECO-AGRI"
+      ],
+      "official_link": "https://www.enviagro.go.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "KCS-SAFETY",
+      "name_ko": "산업안전 KCs 안전인증",
+      "official_name": "「산업안전보건법」에 따른 안전인증(KCs)",
+      "aliases": [
+        "KCs",
+        "안전인증",
+        "방호장치 안전인증"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "mandatory",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "quality"
+      ],
+      "target": "product",
+      "field": "품질·안전",
+      "issuing_authority": "고용노동부",
+      "assessment_body": "한국산업안전보건공단 등",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "프레스·크레인 등 위험 기계·기구와 보호구가 안전기준에 맞는지 인증하는 제도예요.",
+      "when": "대상 기계·보호구를 제조·수입할 때 확인해요.",
+      "who_decides": "한국산업안전보건공단 등이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "우리 제품이 안전인증·자율안전확인 대상인지 공식 기관에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-KCS-SAFETY"
+      ],
+      "official_link": "https://www.kosha.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "CARBON-LABEL",
+      "name_ko": "환경성적표지(탄소발자국) 인증",
+      "official_name": "환경성적표지 인증",
+      "aliases": [
+        "탄소발자국",
+        "환경성적표지",
+        "EPD"
+      ],
+      "display_group": "domestic",
+      "jurisdiction_country": "KR",
+      "applicable_markets": [
+        "KR"
+      ],
+      "standard_origin": "KR_LAW",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "brand",
+        "customer"
+      ],
+      "target": "product",
+      "field": "ESG·사회적가치",
+      "issuing_authority": "환경부",
+      "assessment_body": "한국환경산업기술원",
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "제품의 전 과정 환경 영향(탄소배출 등)을 계산해 공개·인증하는 제도예요.",
+      "when": "거래처가 제품 탄소배출 정보를 요구할 때 확인해요.",
+      "who_decides": "한국환경산업기술원이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "산정 범위와 인증 절차를 공식 사이트에서 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-CARBON-LABEL"
+      ],
+      "official_link": "https://www.epd.or.kr",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "ISO50001",
+      "name_ko": "ISO 50001 에너지경영시스템",
+      "official_name": "ISO 50001 Energy management systems",
+      "aliases": [
+        "ISO50001",
+        "에너지경영"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer",
+        "brand"
+      ],
+      "target": "company",
+      "field": "경영시스템",
+      "issuing_authority": "인정받은 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "에너지 사용을 체계적으로 관리하는 경영시스템 국제표준이에요.",
+      "when": "에너지 다소비 사업장이거나 거래처가 요구할 때 확인해요.",
+      "who_decides": "인정받은 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인증 범위와 인정기관(KAB 등) 인정 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO50001"
+      ],
+      "official_link": "https://www.iso.org/iso-50001-energy-management.html",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "ISO37001",
+      "name_ko": "ISO 37001 부패방지경영시스템",
+      "official_name": "ISO 37001 Anti-bribery management systems",
+      "aliases": [
+        "ISO37001",
+        "부패방지"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer",
+        "brand"
+      ],
+      "target": "company",
+      "field": "경영시스템",
+      "issuing_authority": "인정받은 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "뇌물·부패를 예방하는 경영시스템 국제표준이에요.",
+      "when": "공공기관·대기업 거래에서 준법 체계를 요구받을 때 확인해요.",
+      "who_decides": "인정받은 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인증 범위와 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO37001"
+      ],
+      "official_link": "https://www.iso.org/iso-37001-anti-bribery-management.html",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "ISO37301",
+      "name_ko": "ISO 37301 규범준수경영시스템",
+      "official_name": "ISO 37301 Compliance management systems",
+      "aliases": [
+        "ISO37301",
+        "컴플라이언스"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer",
+        "brand"
+      ],
+      "target": "company",
+      "field": "경영시스템",
+      "issuing_authority": "인정받은 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "법규·규범 준수 체계를 운영하는 경영시스템 국제표준이에요.",
+      "when": "거래처가 컴플라이언스 체계를 요구할 때 확인해요.",
+      "who_decides": "인정받은 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인증 범위와 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO37301"
+      ],
+      "official_link": "https://www.iso.org/standard/75080.html",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "ISO27701",
+      "name_ko": "ISO/IEC 27701 개인정보경영시스템",
+      "official_name": "ISO/IEC 27701 Privacy information management",
+      "aliases": [
+        "ISO27701",
+        "개인정보 인증"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "security",
+        "customer"
+      ],
+      "target": "company",
+      "field": "정보보호",
+      "issuing_authority": "인정받은 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "ISO 27001을 확장해 개인정보 관리를 다루는 국제표준이에요.",
+      "when": "해외 고객사가 개인정보 처리 체계를 요구할 때 확인해요.",
+      "who_decides": "인정받은 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "ISO 27001 인증 여부와 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO27701"
+      ],
+      "official_link": "https://www.iso.org/standard/71670.html",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "ISO22301",
+      "name_ko": "ISO 22301 비즈니스연속성경영시스템",
+      "official_name": "ISO 22301 Business continuity management systems",
+      "aliases": [
+        "ISO22301",
+        "BCMS",
+        "업무연속성"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer"
+      ],
+      "target": "company",
+      "field": "경영시스템",
+      "issuing_authority": "인정받은 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "재해·장애에도 핵심 업무를 이어가는 체계에 관한 국제표준이에요.",
+      "when": "금융·IT 거래처가 업무연속성 계획을 요구할 때 확인해요.",
+      "who_decides": "인정받은 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인증 범위와 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO22301"
+      ],
+      "official_link": "https://www.iso.org/standard/75106.html",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "ISO20000",
+      "name_ko": "ISO/IEC 20000-1 IT서비스경영시스템",
+      "official_name": "ISO/IEC 20000-1 Service management system",
+      "aliases": [
+        "ISO20000",
+        "ITSM"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "ISO",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer",
+        "procurement"
+      ],
+      "target": "company",
+      "field": "경영시스템",
+      "issuing_authority": "인정받은 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "IT 서비스 운영·관리 체계에 관한 국제표준이에요.",
+      "when": "IT 운영·유지보수 사업에서 고객사가 요구할 때 확인해요.",
+      "who_decides": "인정받은 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인증 범위와 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-ISO20000"
+      ],
+      "official_link": "https://www.iso.org/standard/70636.html",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "IATF16949",
+      "name_ko": "IATF 16949 자동차 품질경영시스템",
+      "official_name": "IATF 16949 Automotive quality management system",
+      "aliases": [
+        "IATF16949",
+        "IATF",
+        "TS16949"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer",
+        "export"
+      ],
+      "target": "company",
+      "field": "경영시스템",
+      "issuing_authority": "IATF 인정 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "자동차 부품 공급망을 위한 품질경영시스템 요구사항이에요.",
+      "when": "완성차·부품사에 납품하려 할 때 확인해요.",
+      "who_decides": "IATF 인정 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "ISO 9001 기반 요구와 고객사 특정 요구사항(CSR)을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-IATF16949"
+      ],
+      "official_link": "https://www.iatfglobaloversight.org",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "AS9100",
+      "name_ko": "AS9100 항공우주 품질경영시스템",
+      "official_name": "AS9100 Quality management systems — Aviation, Space and Defense",
+      "aliases": [
+        "AS9100",
+        "항공우주 품질"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer",
+        "export"
+      ],
+      "target": "company",
+      "field": "경영시스템",
+      "issuing_authority": "IAQG 인정 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "항공·우주·방산 공급망을 위한 품질경영시스템 요구사항이에요.",
+      "when": "항공우주·방산 납품을 준비할 때 확인해요.",
+      "who_decides": "IAQG 인정 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "인증 범위와 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-AS9100"
+      ],
+      "official_link": "https://iaqg.org",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "FSSC22000",
+      "name_ko": "FSSC 22000 식품안전시스템",
+      "official_name": "FSSC 22000 Food Safety System Certification",
+      "aliases": [
+        "FSSC22000",
+        "FSSC"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "management_system_certification",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer",
+        "export",
+        "quality"
+      ],
+      "target": "company",
+      "field": "경영시스템",
+      "issuing_authority": "인정받은 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "ISO 22000에 추가 요구를 더한 식품안전 인증 체계(GFSI 승인)예요.",
+      "when": "해외 유통사·글로벌 식품기업에 납품할 때 확인해요.",
+      "who_decides": "인정받은 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "대상 식품 분류와 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-FSSC22000"
+      ],
+      "official_link": "https://www.fssc.com",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "SOC2",
+      "name_ko": "SOC 2 보고서",
+      "official_name": "SOC 2 (System and Organization Controls 2)",
+      "aliases": [
+        "SOC2",
+        "SOC 2",
+        "서비스 조직 통제"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "US",
+      "applicable_markets": [
+        "US",
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "other",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "security",
+        "customer",
+        "export"
+      ],
+      "target": "company",
+      "field": "정보보호",
+      "issuing_authority": "AICPA 기준에 따른 감사인",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "서비스 기업의 보안·가용성 등 통제를 감사인이 검토한 보고서예요(인증서가 아닌 감사 보고서).",
+      "when": "미국 고객사가 SaaS 보안 수준 증빙을 요구할 때 확인해요.",
+      "who_decides": "AICPA 기준에 따른 감사인이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "보고서 유형(Type 1·2)과 범위를 감사인과 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-SOC2"
+      ],
+      "official_link": "https://www.aicpa-cima.com",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "PCI-DSS",
+      "name_ko": "PCI DSS 카드 데이터 보안 표준",
+      "official_name": "Payment Card Industry Data Security Standard",
+      "aliases": [
+        "PCI DSS",
+        "PCI"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "other",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "security",
+        "customer"
+      ],
+      "target": "company",
+      "field": "정보보호",
+      "issuing_authority": "PCI SSC(평가는 QSA)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "카드 결제 정보를 다루는 기업의 보안 기준이에요.",
+      "when": "카드 데이터를 저장·처리·전송할 때 확인해요.",
+      "who_decides": "PCI SSC(평가는 QSA)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "카드 처리 규모(레벨)와 평가 방식을 카드사·결제대행사와 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-PCI-DSS"
+      ],
+      "official_link": "https://www.pcisecuritystandards.org",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "CMMI",
+      "name_ko": "CMMI 성숙도 평가",
+      "official_name": "CMMI (Capability Maturity Model Integration)",
+      "aliases": [
+        "CMMI"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "other",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "customer",
+        "procurement"
+      ],
+      "target": "company",
+      "field": "R&D·기술",
+      "issuing_authority": "ISACA(CMMI Institute) 공인 평가자",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "개발·서비스 프로세스 성숙도를 단계로 평가하는 모델이에요.",
+      "when": "공공·방산 SW 사업이나 해외 고객사가 요구할 때 확인해요.",
+      "who_decides": "ISACA(CMMI Institute) 공인 평가자이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "평가 범위·목표 레벨과 공인 평가자를 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-CMMI"
+      ],
+      "official_link": "https://cmmiinstitute.com",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "BCORP",
+      "name_ko": "B Corp 인증",
+      "official_name": "Certified B Corporation",
+      "aliases": [
+        "B Corp",
+        "비콥",
+        "B코퍼레이션"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "company_confirmation",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "brand",
+        "customer"
+      ],
+      "target": "company",
+      "field": "ESG·사회적가치",
+      "issuing_authority": "B Lab",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "사회·환경 성과와 책임 경영을 평가해 인증하는 민간 제도예요.",
+      "when": "ESG 경영을 대외에 알리거나 투자자가 요구할 때 확인해요.",
+      "who_decides": "B Lab이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "평가(B Impact Assessment) 기준과 절차를 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-BCORP"
+      ],
+      "official_link": "https://www.bcorporation.net",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "FSC",
+      "name_ko": "FSC 산림인증",
+      "official_name": "Forest Stewardship Council Certification",
+      "aliases": [
+        "FSC",
+        "FSC 인증"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "brand",
+        "export",
+        "customer"
+      ],
+      "target": "both",
+      "field": "ESG·사회적가치",
+      "issuing_authority": "FSC 인정 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "책임 있게 관리된 숲의 목재·종이 제품임을 인증하는 제도예요.",
+      "when": "종이·목재 포장재를 쓰는 제품을 수출하거나 거래처가 요구할 때 확인해요.",
+      "who_decides": "FSC 인정 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "산림경영(FM)·생산유통(CoC) 중 필요한 인증을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-FSC"
+      ],
+      "official_link": "https://fsc.org",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "CB-SCHEME",
+      "name_ko": "IECEE CB Scheme",
+      "official_name": "IECEE CB Scheme",
+      "aliases": [
+        "CB인증",
+        "CB Scheme",
+        "CB 시험성적서"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export",
+        "quality"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "IECEE 회원 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "전기·전자제품 안전 시험성적을 회원국 간 상호 인정하는 국제 제도예요.",
+      "when": "여러 나라에 전기제품을 수출하며 시험 중복을 줄이려 할 때 확인해요.",
+      "who_decides": "IECEE 회원 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "목표 국가가 CB 성적서를 인정하는지와 국가별 추가 요구를 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-CB-SCHEME"
+      ],
+      "official_link": "https://www.iecee.org",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "IECEX",
+      "name_ko": "IECEx 방폭 인증",
+      "official_name": "IECEx System",
+      "aliases": [
+        "IECEx",
+        "방폭인증"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export",
+        "quality"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "IECEx 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "폭발 위험 장소에서 쓰는 기기의 방폭 성능을 인증하는 국제 제도예요.",
+      "when": "방폭 기기를 해외에 수출할 때 확인해요.",
+      "who_decides": "IECEx 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "목표 국가의 방폭 규정(ATEX 등)과 IECEx 인정 여부를 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-IECEX"
+      ],
+      "official_link": "https://www.iecex.com",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "EU-ROHS",
+      "name_ko": "EU RoHS 유해물질 제한",
+      "official_name": "EU RoHS Directive 2011/65/EU",
+      "aliases": [
+        "RoHS",
+        "유해물질 제한"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "EU",
+      "applicable_markets": [
+        "EU"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "유럽연합",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "전기·전자제품의 특정 유해물질 사용을 제한하는 EU 규정이에요.",
+      "when": "전기·전자제품을 EU에 판매할 때 확인해요.",
+      "who_decides": "유럽연합이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품이 적용 범위에 드는지와 적용 제외 항목을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-EU-ROHS"
+      ],
+      "official_link": "https://environment.ec.europa.eu/topics/waste-and-recycling/rohs-directive_en",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "EU-REACH",
+      "name_ko": "EU REACH 화학물질 등록",
+      "official_name": "EU REACH Regulation (EC) No 1907/2006",
+      "aliases": [
+        "REACH",
+        "화학물질 등록"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "EU",
+      "applicable_markets": [
+        "EU"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "registration",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "유럽화학물질청(ECHA)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "EU에서 화학물질을 제조·수입할 때 등록·정보 제공 등을 요구하는 규정이에요.",
+      "when": "화학물질·혼합물·성형품을 EU로 수출할 때 확인해요.",
+      "who_decides": "유럽화학물질청(ECHA)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "연간 수입량과 고위험성 물질(SVHC) 포함 여부를 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-EU-REACH"
+      ],
+      "official_link": "https://echa.europa.eu",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "EU-MDR",
+      "name_ko": "EU 의료기기 규정(MDR)",
+      "official_name": "EU Medical Device Regulation (EU) 2017/745",
+      "aliases": [
+        "MDR",
+        "EU MDR",
+        "유럽 의료기기"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "EU",
+      "applicable_markets": [
+        "EU"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "유럽연합(인증기관: Notified Body)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "EU에서 의료기기를 판매하기 위한 적합성평가 규정이에요.",
+      "when": "의료기기를 EU에 수출할 때 확인해요.",
+      "who_decides": "유럽연합(인증기관: Notified Body)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품 등급과 인증기관(Notified Body) 필요 여부를 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-EU-MDR"
+      ],
+      "official_link": "https://health.ec.europa.eu/medical-devices-sector_en",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "UKCA",
+      "name_ko": "UKCA 마킹(영국)",
+      "official_name": "UK Conformity Assessed marking",
+      "aliases": [
+        "UKCA",
+        "영국 인증"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "GB",
+      "applicable_markets": [
+        "GB"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "영국 정부",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "영국(그레이트브리튼) 시장에서 쓰는 제품 적합성 표시예요.",
+      "when": "제품을 영국에 판매할 때 확인해요.",
+      "who_decides": "영국 정부이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품군별로 CE 표시 인정 여부와 UKCA 적용 시점을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-UKCA"
+      ],
+      "official_link": "https://www.gov.uk/guidance/using-the-ukca-marking",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "US-FDA-COS",
+      "name_ko": "미국 FDA 화장품(MoCRA) 등록",
+      "official_name": "FDA Modernization of Cosmetics Regulation Act (MoCRA)",
+      "aliases": [
+        "MoCRA",
+        "FDA 화장품",
+        "화장품 미국"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "US",
+      "applicable_markets": [
+        "US"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "registration",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "미국 FDA",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "미국에서 화장품을 판매할 때 시설 등록·제품 목록 제출 등을 요구하는 제도예요.",
+      "when": "화장품을 미국에 수출할 때 확인해요.",
+      "who_decides": "미국 FDA이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "시설 등록·제품 목록·안전성 입증 의무 대상인지 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-US-FDA-COS"
+      ],
+      "official_link": "https://www.fda.gov/cosmetics",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "US-NRTL",
+      "name_ko": "미국 NRTL 안전인증(UL 등)",
+      "official_name": "OSHA Nationally Recognized Testing Laboratory Program",
+      "aliases": [
+        "UL",
+        "NRTL",
+        "ETL",
+        "미국 안전인증"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "US",
+      "applicable_markets": [
+        "US"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export",
+        "quality"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "미국 OSHA(인정) · NRTL 시험기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "미국 작업장 전기제품 등에 요구되는 안전 시험·인증을 하는 인정 시험기관 제도예요.",
+      "when": "전기제품을 미국에 판매하며 거래처가 UL 등 인증을 요구할 때 확인해요.",
+      "who_decides": "미국 OSHA(인정) · NRTL 시험기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "거래처·규정이 요구하는 표준과 NRTL을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-US-NRTL"
+      ],
+      "official_link": "https://www.osha.gov/nationally-recognized-testing-laboratory-program",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "US-ENERGY-STAR",
+      "name_ko": "ENERGY STAR(미국)",
+      "official_name": "ENERGY STAR",
+      "aliases": [
+        "에너지스타",
+        "Energy Star"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "US",
+      "applicable_markets": [
+        "US"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export",
+        "brand"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "미국 환경보호청(EPA)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "에너지 효율이 높은 제품에 표시하는 미국 자율 프로그램이에요.",
+      "when": "가전·IT기기를 미국에 팔며 효율을 알리려 할 때 확인해요.",
+      "who_decides": "미국 환경보호청(EPA)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "대상 제품군과 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-US-ENERGY-STAR"
+      ],
+      "official_link": "https://www.energystar.gov",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "JP-PSE",
+      "name_ko": "일본 PSE 마크",
+      "official_name": "일본 전기용품안전법(PSE)",
+      "aliases": [
+        "PSE",
+        "일본 전기용품"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "JP",
+      "applicable_markets": [
+        "JP"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "일본 경제산업성(METI)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "일본에서 전기용품을 판매할 때 요구되는 안전 규정과 표시예요.",
+      "when": "전기용품을 일본에 수출할 때 확인해요.",
+      "who_decides": "일본 경제산업성(METI)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "특정·비특정 전기용품 구분과 수입사업자 신고 의무를 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-JP-PSE"
+      ],
+      "official_link": "https://www.meti.go.jp",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "CN-CCC",
+      "name_ko": "중국 CCC 강제인증",
+      "official_name": "China Compulsory Certification",
+      "aliases": [
+        "CCC",
+        "중국 인증",
+        "3C"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "CN",
+      "applicable_markets": [
+        "CN"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "중국 국가인증인가감독관리위원회(CNCA)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "중국 강제인증 목록 제품을 판매할 때 요구되는 인증이에요.",
+      "when": "목록에 있는 제품을 중국에 수출할 때 확인해요.",
+      "who_decides": "중국 국가인증인가감독관리위원회(CNCA)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "우리 제품이 CCC 목록에 있는지 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-CN-CCC"
+      ],
+      "official_link": "https://www.cnca.gov.cn",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "IN-BIS",
+      "name_ko": "인도 BIS 인증",
+      "official_name": "Bureau of Indian Standards Certification",
+      "aliases": [
+        "BIS",
+        "인도 인증"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "IN",
+      "applicable_markets": [
+        "IN"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "인도 표준국(BIS)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "인도 의무 인증 대상 제품에 요구되는 인증이에요.",
+      "when": "대상 제품을 인도에 수출할 때 확인해요.",
+      "who_decides": "인도 표준국(BIS)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "강제등록제(CRS) 등 대상 목록을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-IN-BIS"
+      ],
+      "official_link": "https://www.bis.gov.in",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "SA-SASO",
+      "name_ko": "사우디 SASO·SABER 적합성",
+      "official_name": "Saudi Standards, Metrology and Quality Organization",
+      "aliases": [
+        "SASO",
+        "SABER",
+        "사우디 인증"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "SA",
+      "applicable_markets": [
+        "SA"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "사우디 표준청(SASO)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "사우디아라비아에 제품을 수출할 때 요구되는 적합성 인증 체계예요.",
+      "when": "제품을 사우디에 수출할 때 확인해요.",
+      "who_decides": "사우디 표준청(SASO)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품 규정(기술규정)과 SABER 등록 절차를 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-SA-SASO"
+      ],
+      "official_link": "https://www.saso.gov.sa",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "EAEU-EAC",
+      "name_ko": "유라시아경제연합 EAC 인증",
+      "official_name": "EAEU Technical Regulations Conformity (EAC)",
+      "aliases": [
+        "EAC",
+        "유라시아 인증",
+        "러시아 인증"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "EAEU"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "유라시아경제위원회",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "유라시아경제연합 회원국 기술규정 적합성을 보여 주는 표시예요.",
+      "when": "러시아·카자흐스탄 등 회원국에 수출할 때 확인해요.",
+      "who_decides": "유라시아경제위원회이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "적용 기술규정과 인증·신고 구분을 확인하세요(제재 대상 여부도 확인).",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-EAEU-EAC"
+      ],
+      "official_link": "https://eec.eaeunion.org",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "CN-NMPA",
+      "name_ko": "중국 NMPA 의료기기 등록",
+      "official_name": "National Medical Products Administration Registration",
+      "aliases": [
+        "NMPA",
+        "중국 의료기기"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "CN",
+      "applicable_markets": [
+        "CN"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "authorization_clearance_approval",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "중국 국가약품감독관리국(NMPA)",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "중국에서 의료기기를 판매하기 위한 등록·신고 제도예요.",
+      "when": "의료기기를 중국에 수출할 때 확인해요.",
+      "who_decides": "중국 국가약품감독관리국(NMPA)이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품 등급과 현지 대리인 요건을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-CN-NMPA"
+      ],
+      "official_link": "https://www.nmpa.gov.cn",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "JP-PMDA",
+      "name_ko": "일본 의료기기 승인·인증(PMDA)",
+      "official_name": "Pharmaceuticals and Medical Devices Agency",
+      "aliases": [
+        "PMDA",
+        "일본 의료기기"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "JP",
+      "applicable_markets": [
+        "JP"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "authorization_clearance_approval",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "일본 후생노동성·PMDA",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "일본에서 의료기기를 판매하기 위한 승인·인증 제도예요.",
+      "when": "의료기기를 일본에 수출할 때 확인해요.",
+      "who_decides": "일본 후생노동성·PMDA이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품 분류와 현지 제조판매업자 요건을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-JP-PMDA"
+      ],
+      "official_link": "https://www.pmda.go.jp",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+    },
+    {
+      "scheme_id": "AU-TGA",
+      "name_ko": "호주 TGA 의료제품 등록",
+      "official_name": "Therapeutic Goods Administration (ARTG)",
+      "aliases": [
+        "TGA",
+        "호주 의료기기"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "AU",
+      "applicable_markets": [
+        "AU"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "authorization_clearance_approval",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "호주 TGA",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "호주에서 의료기기·의약품을 판매하려면 ARTG 등재가 필요해요.",
+      "when": "의료제품을 호주에 수출할 때 확인해요.",
+      "who_decides": "호주 TGA이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품 분류와 현지 스폰서 요건을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-AU-TGA"
+      ],
+      "official_link": "https://www.tga.gov.au",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "CA-HC-MD",
+      "name_ko": "캐나다 의료기기 허가(Health Canada)",
+      "official_name": "Health Canada Medical Device Licence",
+      "aliases": [
+        "Health Canada",
+        "캐나다 의료기기",
+        "MDL"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": "CA",
+      "applicable_markets": [
+        "CA"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "authorization_clearance_approval",
+      "mandatory_status": "needs_review",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "캐나다 보건부",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "캐나다에서 의료기기를 판매하기 위한 허가 제도예요.",
+      "when": "의료기기를 캐나다에 수출할 때 확인해요.",
+      "who_decides": "캐나다 보건부이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "제품 등급(I~IV)과 MDSAP 요구를 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-CA-HC-MD"
+      ],
+      "official_link": "https://www.canada.ca/en/health-canada.html",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+    },
+    {
+      "scheme_id": "HALAL-MY",
+      "name_ko": "할랄 인증(말레이시아 JAKIM 등)",
+      "official_name": "Halal Certification",
+      "aliases": [
+        "할랄",
+        "Halal",
+        "JAKIM"
+      ],
+      "display_group": "international",
+      "jurisdiction_country": null,
+      "applicable_markets": [
+        "GLOBAL"
+      ],
+      "standard_origin": "FOREIGN",
+      "scheme_type": "product_conformity_assessment",
+      "mandatory_status": "voluntary",
+      "industries": [
+        "all"
+      ],
+      "product_scopes": [],
+      "purpose_tags": [
+        "export"
+      ],
+      "target": "product",
+      "field": "해외 시장 진입",
+      "issuing_authority": "국가별 할랄 인증기관",
+      "assessment_body": null,
+      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
+      "what": "이슬람 율법에 맞는 식품·화장품 등임을 인증하는 제도예요.",
+      "when": "이슬람권(동남아·중동)에 식품·화장품을 수출할 때 확인해요.",
+      "who_decides": "국가별 할랄 인증기관이(가) 공식 기준에 따라 판단해요.",
+      "first_check": "수출국이 인정하는 할랄 인증기관을 확인하세요.",
+      "diagnosable": false,
+      "verified_status": "UNVERIFIED",
+      "sources": [
+        "S-HALAL-MY"
+      ],
+      "official_link": "https://www.halal.gov.my",
+      "last_verified_at": "2026-11-23",
+      "review_due_at": "2027-05-23",
+      "readiness_items": [],
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
     }
   ],
   "self_checks": {
@@ -448,14 +4636,62 @@
       "title": "경영시스템 인증 준비상태 자가점검",
       "note": "표준 원문이 아닌, 경영시스템 인증 심사에서 일반적으로 확인하는 운영 요소를 자가점검용으로 정리한 내부 체크리스트예요. 인증기관 요구사항은 별도로 확인하세요.",
       "items": [
-        { "item_id": "ISO-SCOPE", "label": "인증 범위(사업장·제품·서비스)를 정했다", "why": "범위가 정해져야 심사 대상이 확정돼요.", "where": "내부 결정", "required": true },
-        { "item_id": "ISO-POLICY", "label": "방침과 측정 가능한 목표를 문서로 정했다", "why": "운영 방향을 보여 주는 기본 자료예요.", "where": "내부 문서", "required": true },
-        { "item_id": "ISO-PROCESS", "label": "핵심 업무 절차와 운영 기록을 남기고 있다", "why": "실제로 운영되는지 기록으로 확인해요.", "where": "내부 기록", "required": true },
-        { "item_id": "ISO-AUDIT", "label": "내부심사를 실시하고 결과를 남겼다", "why": "스스로 점검하는 체계가 있는지 확인해요.", "where": "내부심사 보고서", "required": true },
-        { "item_id": "ISO-REVIEW", "label": "경영검토(경영진 점검)를 실시했다", "why": "경영진의 관여를 확인해요.", "where": "경영검토 회의록", "required": true },
-        { "item_id": "ISO-CAPA", "label": "문제 발생 시 시정조치 기록이 있다", "why": "개선 체계를 확인해요.", "where": "시정조치 기록", "required": true },
-        { "item_id": "ISO-CB", "label": "인증기관의 인정 여부·인정 범위를 확인했다", "why": "인정받지 않은 기관의 인증은 거래처가 인정하지 않을 수 있어요.", "where": "인정기구 공개 목록", "required": true },
-        { "item_id": "ISO-PERIOD", "label": "인증기관이 요구하는 최소 운영 기간을 확인했다", "why": "기관마다 요구가 다를 수 있어요.", "where": "인증기관 문의", "required": false }
+        {
+          "item_id": "ISO-SCOPE",
+          "label": "인증 범위(사업장·제품·서비스)를 정했다",
+          "why": "범위가 정해져야 심사 대상이 확정돼요.",
+          "where": "내부 결정",
+          "required": true
+        },
+        {
+          "item_id": "ISO-POLICY",
+          "label": "방침과 측정 가능한 목표를 문서로 정했다",
+          "why": "운영 방향을 보여 주는 기본 자료예요.",
+          "where": "내부 문서",
+          "required": true
+        },
+        {
+          "item_id": "ISO-PROCESS",
+          "label": "핵심 업무 절차와 운영 기록을 남기고 있다",
+          "why": "실제로 운영되는지 기록으로 확인해요.",
+          "where": "내부 기록",
+          "required": true
+        },
+        {
+          "item_id": "ISO-AUDIT",
+          "label": "내부심사를 실시하고 결과를 남겼다",
+          "why": "스스로 점검하는 체계가 있는지 확인해요.",
+          "where": "내부심사 보고서",
+          "required": true
+        },
+        {
+          "item_id": "ISO-REVIEW",
+          "label": "경영검토(경영진 점검)를 실시했다",
+          "why": "경영진의 관여를 확인해요.",
+          "where": "경영검토 회의록",
+          "required": true
+        },
+        {
+          "item_id": "ISO-CAPA",
+          "label": "문제 발생 시 시정조치 기록이 있다",
+          "why": "개선 체계를 확인해요.",
+          "where": "시정조치 기록",
+          "required": true
+        },
+        {
+          "item_id": "ISO-CB",
+          "label": "인증기관의 인정 여부·인정 범위를 확인했다",
+          "why": "인정받지 않은 기관의 인증은 거래처가 인정하지 않을 수 있어요.",
+          "where": "인정기구 공개 목록",
+          "required": true
+        },
+        {
+          "item_id": "ISO-PERIOD",
+          "label": "인증기관이 요구하는 최소 운영 기간을 확인했다",
+          "why": "기관마다 요구가 다를 수 있어요.",
+          "where": "인증기관 문의",
+          "required": false
+        }
       ]
     }
   }

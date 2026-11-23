@@ -188,7 +188,7 @@
               "label": "자본금 중 투자금 비율 10% 이상(문화산업 제작자 법인 7%)",
               "check": "venture_invest_ratio",
               "args": {
-                "invest": "ven_invest_total",
+                "invest": "ven_invest_total", "ratio_q": "ven_invest_ratio",
                 "capital": "ven_capital",
                 "culture": "ven_culture_producer",
                 "pct": 10,
@@ -354,7 +354,7 @@
                 "label": "같은 기간 매출액 대비 연구개발비 비율(업종·매출 규모별 5~10%) 이상",
                 "check": "venture_rd_ratio",
                 "args": {
-                  "spend": "ven_rd_spend",
+                  "spend": "ven_rd_spend", "ratio_q": "ven_rd_ratio",
                   "revenue": "ven_revenue",
                   "industry": "industry"
                 },
