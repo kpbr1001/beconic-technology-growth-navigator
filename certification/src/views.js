@@ -92,13 +92,23 @@ export function mbarSelectHTML(st, data) {
   const names = st.selected.map((id) => shortName(data.schemeMap[id])).join(' · ');
   return `<span class="c">${st.selected.length ? `${st.selected.length}개 선택 · ${esc(names)}` : `최대 ${MAX_SELECT}개까지 고를 수 있어요`}</span><button class="btn" type="button" data-act="go-answer"${st.selected.length ? '' : ' aria-disabled="true"'}>다음 ${ICON.arrow}</button>`;
 }
-export function selectView(st, data) {
+// 분야 목록(개수 포함)·모바일 필터 — 국내/해외 탭을 바꿀 때마다 다시 그린다
+export function fieldListHTML(st, data, compact = false) {
   const f = st.f;
   const inRegion = data.catalog.schemes.filter((s) => s.display_group === f.region);
-  const cnt = (fl) => inRegion.filter((s) => fieldOf(s) === fl).length;
+  const items = [['all', '전체', inRegion.length], ...FIELDS.map((x) => [x, x, inRegion.filter((s) => fieldOf(s) === x).length]).filter((x) => x[2])];
+  return items.map(([val, l, n]) => `<button type="button" data-act="field" data-v="${esc(val)}" aria-pressed="${f.field === val}">${esc(l)}${compact ? '' : ` <em>${n}</em>`}</button>`).join('');
+}
+export function mfiltersHTML(st, data) {
   const dom = data.catalog.schemes.filter((s) => s.display_group === 'domestic').length;
   const intl = data.catalog.schemes.length - dom;
-  const fieldBtns = (cls) => [['all', '전체', inRegion.length], ...FIELDS.map((x) => [x, x, cnt(x)]).filter((x) => x[2])].map(([v, l, n]) => `<button type="button" class="${cls}" data-act="field" data-v="${esc(v)}" aria-pressed="${f.field === v}">${esc(l)}${cls ? '' : ` <em>${n}</em>`}</button>`).join('');
+  const rb = (val, l) => `<button type="button" data-act="region" data-v="${val}" aria-pressed="${st.f.region === val && !st.f.q}">${l}</button>`;
+  return `${rb('domestic', `국내 ${dom}`)}${rb('international', `해외 ${intl}`)}${fieldListHTML(st, data, true)}`;
+}
+export function selectView(st, data) {
+  const f = st.f;
+  const dom = data.catalog.schemes.filter((s) => s.display_group === 'domestic').length;
+  const intl = data.catalog.schemes.length - dom;
   const regionBtn = (v, l) => `<button type="button" data-act="region" data-v="${v}" aria-pressed="${f.region === v && !f.q}">${l}</button>`;
   return `<section class="wrap">
   ${stepper('select', st)}
@@ -108,13 +118,13 @@ export function selectView(st, data) {
     <aside class="panel side-f" aria-label="인증 분류">
       <div class="tabs">${regionBtn('domestic', `국내 ${dom}`)}${regionBtn('international', `해외 ${intl}`)}</div>
       <h2 class="side-h">분야</h2>
-      <div class="flist">${fieldBtns('')}</div>
+      <div class="flist" id="flist">${fieldListHTML(st, data)}</div>
       <h2 class="side-h">목적으로 찾기</h2>
       <div class="flist">${PURPOSES.map(([v, l]) => `<button type="button" data-act="purpose" data-v="${v}" aria-pressed="${f.purpose === v}">${esc(l)}</button>`).join('')}</div>
     </aside>
     <section aria-label="인증 목록">
       <div class="searchbox" role="search">${ICON.search}<label class="sr-only" for="q-search">인증 이름·목적으로 검색</label><input id="q-search" type="search" value="${esc(f.q)}" placeholder="인증 이름·목적으로 검색 (예: 벤처, 연구소, ISO, 유럽 수출)" autocomplete="off" enterkeyhint="search" data-input="q"></div>
-      <div class="mfilters" aria-label="분류">${regionBtn('domestic', `국내 ${dom}`)}${regionBtn('international', `해외 ${intl}`)}${fieldBtns('').replace(/ <em>\d+<\/em>/g, '')}</div>
+      <div class="mfilters" id="mfilters" aria-label="분류">${mfiltersHTML(st, data)}</div>
       <div id="cards">${cardsHTML(st, data)}</div>
       <div class="more-ask"><span>찾는 인증이 목록에 없나요? 이 앱은 공식 근거를 확인한 인증만 진단해요.</span><a class="btn sm gh" href="${SITE.telHref}">전문가에게 문의</a></div>
     </section>

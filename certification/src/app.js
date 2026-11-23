@@ -103,6 +103,8 @@ function refreshSelect() {
   const cards = document.getElementById('cards'); if (cards) cards.innerHTML = V.cardsHTML(st, D);
   const tray = document.getElementById('tray'); if (tray) tray.innerHTML = V.trayHTML(st, D);
   const mbar = document.getElementById('mbar'); if (mbar) mbar.innerHTML = V.mbarSelectHTML(st, D);
+  const fl = document.getElementById('flist'); if (fl) fl.innerHTML = V.fieldListHTML(st, D);
+  const mf = document.getElementById('mfilters'); if (mf) mf.innerHTML = V.mfiltersHTML(st, D);
   document.querySelectorAll('[data-act="region"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.region === el.dataset.v && !st.f.q)));
   document.querySelectorAll('[data-act="field"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.field === el.dataset.v)));
   document.querySelectorAll('[data-act="purpose"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.purpose === el.dataset.v)));

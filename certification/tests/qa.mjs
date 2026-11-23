@@ -119,6 +119,22 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   await p.click('.side-f [data-act="region"][data-v="domestic"]'); await p.click('.side-f [data-act="purpose"][data-v="procurement"]'); await p.waitForTimeout(100);
   const rec = await p.$$eval('#cards .rec-mark', (e) => e.length); const all = (await names()).length;
   check('E04e 목적으로 찾기: 공공조달 목적 인증만, 목적 추천 표시', rec > 0 && rec === all, `${rec}/${all}`);
+  // 국내·해외 탭마다 분야별 숫자 = 실제 카드 수(탭 전환 후 분야 목록이 다시 그려지는지)
+  const mism = [];
+  for (const region of ['domestic', 'international']) {
+    await p.click(`.side-f [data-act="region"][data-v="${region}"]`); await p.waitForTimeout(80);
+    if (await p.$('.side-f [data-act="purpose"][aria-pressed="true"]')) { await p.click('.side-f [data-act="purpose"][aria-pressed="true"]'); await p.waitForTimeout(80); }
+    const items = await p.$$eval('.side-f .flist [data-act="field"]', (e) => e.map((x) => ({ v: x.dataset.v, n: Number((x.querySelector('em') || {}).textContent) })));
+    const sum = items.filter((x) => x.v !== 'all').reduce((a, x) => a + x.n, 0);
+    const all = items.find((x) => x.v === 'all').n;
+    if (sum !== all) mism.push(`${region} 분야 합 ${sum} ≠ 전체 ${all}`);
+    for (const it of items) {
+      await p.click(`.side-f .flist [data-act="field"][data-v="${it.v}"]`); await p.waitForTimeout(60);
+      const shown = (await p.$$('#cards .cc')).length;
+      if (shown !== it.n) mism.push(`${region}/${it.v} 표시 ${it.n} · 실제 ${shown}`);
+    }
+  }
+  check('E04g 국내·해외 탭 전환 시 분야별 숫자 = 실제 카드 수', mism.length === 0, mism.join(' | '));
   const total = await p.$eval('.side-f .tabs', (e) => e.textContent);
   check('E04f 인증 수 표시(국내·해외)', /국내 \d+/.test(total) && /해외 \d+/.test(total), total.trim());
   await p.context().close();
