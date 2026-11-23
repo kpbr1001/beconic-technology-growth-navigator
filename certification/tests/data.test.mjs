@@ -253,3 +253,17 @@ test('DATA-10 공식 수수료·처리기간: 금액·기간은 공식 원문 �
   const ven = D.catalog.schemes.find((s) => s.scheme_id === 'VEN').fees.items.find((i) => i.label === '벤처투자유형 신규');
   assert.equal(ven.company, 175000);
 });
+
+test('DATA-11 인증 목록: 120개 이하, 모든 공식 링크 https, 출처 접속 상태 기록, 분야는 정해진 목록 안', async () => {
+  const { FIELDS, fieldOf, levelOf } = await import('../src/ui.js');
+  const all = D.catalog.schemes;
+  assert.ok(all.length <= 120, `인증 ${all.length}개 — 상한 120`);
+  all.forEach((s) => {
+    assert.match(s.official_link, /^https:\/\//, s.scheme_id);
+    assert.ok(FIELDS.includes(fieldOf(s)), `${s.scheme_id} 분야 ${fieldOf(s)}`);
+    s.sources.forEach((r) => assert.ok(['OK', 'OK_IMAGE', 'BLOCKED', 'UNREACHABLE'].includes(D.sourceMap[r].access_status), `${s.scheme_id} 출처 상태`));
+    if (levelOf(s) === 'C') assert.ok(!s.fees || s.fees.unverified, `${s.scheme_id}: 정보 안내 인증에 대조 안 된 수수료 숫자 금지`);
+    (s.readiness_items || []).forEach((d) => { if (d.link) assert.match(d.link, /^https:\/\//); });
+    (s.guides || []).forEach((g) => assert.match(g.url, /^https:\/\//));
+  });
+});
