@@ -25,9 +25,11 @@ async function open(w = 1280) {
 async function pick(p, ids) { for (const id of ids) { await p.goto(`${BASE}#/scheme/${id}`); await p.click('[data-act="pick-go"]'); await p.waitForSelector('form[data-form="answer"]'); } }
 async function profile(p, name = '주식회사 비코닉테스트') {
   await p.fill('#q-company_name', name); await p.dispatchEvent('#q-company_name', 'input');
-  await choose(p, 'biz_status', 'corporation'); await choose(p, 'founded_on', 'r:3:7');
-  await choose(p, 'converted_from_individual', 'no'); await choose(p, 'suspended_period', 'no');
-  await choose(p, 'is_sme', 'yes'); await choose(p, 'company_size', 'small'); await choose(p, 'industry', 'software_582');
+  // 공통 질문은 고른 인증이 쓰는 것만 나온다(v2.1) — 화면에 있는 것만 답한다
+  const chooseIf = async (n, v) => { if (await p.locator(`input[name="${n}"]`).count()) await choose(p, n, v); };
+  await choose(p, 'biz_status', 'corporation'); await chooseIf('founded_on', 'r:3:7');
+  await chooseIf('converted_from_individual', 'no'); await chooseIf('suspended_period', 'no');
+  await chooseIf('is_sme', 'yes'); await chooseIf('company_size', 'small'); await chooseIf('industry', 'software_582');
 }
 async function toResult(p) { await p.goto(`${BASE}#/result`); await p.waitForSelector('#result-title'); }
 

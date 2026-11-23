@@ -53,10 +53,14 @@ async function ans(page, name, value) {
   await el.evaluate((x) => x.scrollIntoView({ block: 'center' }));
   await el.click();
 }
+// 공통 질문은 고른 인증이 쓰는 것만 나온다(v2.1) — 화면에 있는 것만 답한다
+async function ansIf(page, name, value) {
+  if (await page.locator(`input[name="${name}"]`).count()) await ans(page, name, value);
+}
 async function corp(page, { size = 'small', industry = 'software_582', age = 'r:3:7' } = {}) {
-  await ans(page, 'biz_status', 'corporation'); await ans(page, 'founded_on', age);
-  await ans(page, 'converted_from_individual', 'no'); await ans(page, 'suspended_period', 'no');
-  await ans(page, 'is_sme', 'yes'); await ans(page, 'company_size', size); await ans(page, 'industry', industry);
+  await ans(page, 'biz_status', 'corporation'); await ansIf(page, 'founded_on', age);
+  await ansIf(page, 'converted_from_individual', 'no'); await ansIf(page, 'suspended_period', 'no');
+  await ansIf(page, 'is_sme', 'yes'); await ansIf(page, 'company_size', size); await ansIf(page, 'industry', industry);
 }
 async function toResult(page) { await page.goto(`${BASE}#/result`); await page.waitForSelector('#result-title'); }
 const badgeOf = (page, id) => page.$eval(`#res-${id} .rc-h .badge`, (e) => e.textContent.trim());
@@ -245,6 +249,53 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   check('E27b 모바일 제목줄에 핵심 숫자(요건·서류·수수료·기간·할 일·근거)', res.sum.length === 5 && /충족/.test(res.sum[0]) && /개/.test(res.sum[1]) && /원|기관 확인/.test(res.sum[2]) && /일 이내|기관 확인/.test(res.sum[2]) && /출처/.test(res.sum[4]), res.sum.join(' | '));
   check('E27d 모바일 수수료 표: 숫자마다 이름표(합계·정부지원금·기업 부담금)', (res.feeLabels || []).join(',') === '합계,정부지원금,기업 부담금', (res.feeLabels || []).join(','));
   check('E27c 모바일 펼치기·접기(aria-expanded), 여러 개 동시에 열기, 가로 넘침 없음', res.afterOpen === 2 && res.docsShown && res.expanded === 'true' && res.afterClose === 1 && res.sw <= 390, JSON.stringify({ o: res.afterOpen, c: res.afterClose, sw: res.sw }));
+}
+
+// ── E28 업종 대분류 필터(빼는 방식)·고른 인증에 필요한 공통 질문만 ──
+{
+  const p = await newPage({ w: 1280, h: 900 });
+  await p.goto(`${BASE}#/select`); await p.waitForSelector('#cards .cc');
+  const names = () => p.$$eval('#cards .cc-name', (e) => e.map((x) => x.textContent));
+  const before = await names();
+  await p.click('.side-f [data-act="industry"][data-v="ict"]'); await p.waitForTimeout(80);
+  const ict = await names();
+  const note = await p.$eval('.result-count', (e) => e.textContent);
+  const fields = await p.$$eval('.side-f .flist [data-act="field"]', (e) => e.map((x) => ({ v: x.dataset.v, n: Number((x.querySelector('em') || {}).textContent) })));
+  const fsum = fields.filter((x) => x.v !== 'all').reduce((a, x) => a + x.n, 0);
+  const fit = await p.$$eval('#cards .rec-mark', (e) => e.filter((x) => x.textContent === '업종 맞춤').length);
+  const tab = await p.$eval('.side-f [data-act="region"][data-v="domestic"]', (e) => e.textContent.trim());
+  await p.click('.side-f [data-act="industry"][data-v="ict"]'); await p.waitForTimeout(80);
+  const off = await names();
+  check('E28 업종(소프트웨어·정보통신) 선택: 식품 전용(HACCP) 빠짐·공통 인증 유지·제외 개수 안내·분야 숫자 = 카드 수, 다시 누르면 해제',
+    before.some((x) => x.startsWith('HACCP')) && !ict.some((x) => x.startsWith('HACCP')) && ict.some((x) => x.startsWith('벤처')) && /다른 업종 전용 \d+개 제외/.test(note)
+    && fsum === ict.length && tab === `국내 ${ict.length}` && fit >= 1 && off.length === before.length, `${before.length}→${ict.length}→${off.length} · ${note} · 분야합 ${fsum} · 탭 ${tab} · 맞춤 ${fit}`);
+  // 세부 업종: 대분류로 좁혀서 보여 줌
+  await p.click('.side-f [data-act="industry"][data-v="ict"]'); await p.waitForTimeout(60);
+  await pick(p, ['VEN']);
+  const indOpts = await p.$$eval('input[name="industry"]', (e) => e.map((x) => x.value));
+  check('E28b 벤처 세부 업종: 고른 대분류(정보통신)에 해당하는 항목 + 모름만', indOpts.length >= 4 && indOpts.includes('software_582') && !indOpts.includes('pharma_21') && indOpts.includes('unknown'), indOpts.join(','));
+  await p.context().close();
+}
+{
+  const p = await newPage({ w: 1280, h: 900 });
+  await pick(p, ['EU-CE']);
+  const qids = await p.$$eval('form[data-form="answer"] .q[data-qid]', (e) => e.map((x) => x.dataset.qid));
+  const extra = ['founded_on', 'converted_from_individual', 'suspended_period', 'is_sme', 'company_size', 'industry'].filter((q) => qids.includes(q));
+  const navs = await p.$$eval('.q-nav button', (e) => e.map((x) => x.textContent.trim()));
+  check('E28c CE만 고르면 공통 질문은 사업자 형태 하나(업력·휴업·규모·업종 안 물음), 질문 0개 구역은 바로가기에 없음', qids.includes('biz_status') && extra.length === 0 && !navs.some((x) => / 0$/.test(x)), `${extra.join(',')} | ${navs.join(' · ')}`);
+  await p.context().close();
+}
+{
+  const p = await newPage({ w: 390, h: 844 });
+  await p.goto(`${BASE}#/select`); await p.waitForSelector('#cards .cc');
+  const vis = await p.$eval('.mselects', (e) => getComputedStyle(e).display);
+  await p.selectOption('select[data-input="industry"]', 'food'); await p.waitForTimeout(80);
+  const n = await p.$$eval('#cards .cc-name', (e) => e.map((x) => x.textContent));
+  await p.selectOption('select[data-input="purpose"]', 'export'); await p.waitForTimeout(80);
+  const n2 = (await p.$$('#cards .cc')).length;
+  const sw = await p.evaluate(() => document.documentElement.scrollWidth);
+  check('E28d 모바일: 업종·목적 고르기 상자로 필터(식품 → HACCP 유지, 목적 겹침), 가로 넘침 없음', vis === 'flex' && n.some((x) => x.startsWith('HACCP')) && n2 > 0 && n2 <= n.length && sw <= 390, `${n.length}→${n2} sw ${sw}`);
+  await p.context().close();
 }
 
 // ── E07 해외 제품 규제: 의무·승인 확정 표현 없음 ──

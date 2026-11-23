@@ -415,3 +415,13 @@ fieldset.q { margin: 0 0 14px; }
   .dt td[data-label] { display: flex; justify-content: space-between; gap: 12px; }
   .dt td[data-label]::before { content: attr(data-label); color: var(--m); font-weight: 600; }
 }
+
+/* ── 1단계 업종 필터 ── */
+.side-n { margin: -4px 0 8px; font-size: 12.5px; color: var(--m); line-height: 1.5; }
+.mselects { display: none; gap: 8px; margin: -4px 0 14px; }
+.mselects label { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; font-weight: 700; color: var(--m); }
+.mselects select { width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid var(--b); border-radius: 10px; background: #fff; font-size: 15px; color: var(--t); }
+@media (max-width: 760px) { .mselects { display: flex; } }
+.flist.chipset { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+.flist.chipset button { display: inline-flex; padding: 7px 11px; border-radius: 999px; border: 1px solid var(--b); background: #fff; font-size: 13.5px; }
+.flist.chipset button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }

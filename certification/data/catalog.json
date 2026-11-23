@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.23-2",
+  "version": "2026.11.23-3",
   "schemes": [
     {
       "scheme_id": "VEN",
@@ -291,6 +291,9 @@
           "url": "https://www.smes.go.kr/venturein/file/download?key=/public/requireguide/%EC%9D%B8%EA%B1%B4%EB%B9%84%20%EC%99%B8%20%EB%AA%A8%EB%93%A0%20%EA%B0%9C%EB%B0%9C%EB%B9%84%EC%9A%A9%20%EC%82%B0%EC%A0%95%EB%82%B4%EC%97%AD%EC%84%9C.hwp",
           "checked_at": "2026-11-23"
         }
+      ],
+      "industry_major": [
+        "all"
       ]
     },
     {
@@ -499,6 +502,9 @@
           "url": "https://www.innobiz.net/authen/%EC%9D%B4%EB%85%B8%EB%B9%84%EC%A6%88_%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98_%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8_%EC%97%B0%EC%9E%A5_Rev.05.pdf",
           "checked_at": "2026-11-23"
         }
+      ],
+      "industry_major": [
+        "all"
       ]
     },
     {
@@ -690,6 +696,9 @@
           "url": "https://www.smes.go.kr/mainbiz/usr/mainbizInfo/mainbizGuide.do",
           "checked_at": "2026-11-23"
         }
+      ],
+      "industry_major": [
+        "all"
       ]
     },
     {
@@ -871,6 +880,9 @@
           "url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B8%B0%EC%97%85%EB%B6%80%EC%84%A4%EC%97%B0%EA%B5%AC%EC%86%8C%EB%93%B1%EC%9D%98%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%A7%80%EC%9B%90%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99",
           "checked_at": "2026-11-23"
         }
+      ],
+      "industry_major": [
+        "all"
       ]
     },
     {
@@ -990,6 +1002,9 @@
           "url": "https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B8%B0%EC%97%85%EB%B6%80%EC%84%A4%EC%97%B0%EA%B5%AC%EC%86%8C%EB%93%B1%EC%9D%98%EC%97%B0%EA%B5%AC%EA%B0%9C%EB%B0%9C%EC%A7%80%EC%9B%90%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99",
           "checked_at": "2026-11-23"
         }
+      ],
+      "industry_major": [
+        "all"
       ]
     },
     {
@@ -1042,7 +1057,13 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요. 품목별 대상 여부·절차는 자동 판정하지 않아요."
+      "disclaimer": "정보 안내만 제공해요. 품목별 대상 여부·절차는 자동 판정하지 않아요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "chem",
+        "trade"
+      ]
     },
     {
       "scheme_id": "KC-RADIO",
@@ -1092,7 +1113,12 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요. 기자재별 대상 여부·절차는 자동 판정하지 않아요."
+      "disclaimer": "정보 안내만 제공해요. 기자재별 대상 여부·절차는 자동 판정하지 않아요.",
+      "industry_major": [
+        "elec",
+        "ict",
+        "trade"
+      ]
     },
     {
       "scheme_id": "HACCP",
@@ -1140,7 +1166,11 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요."
+      "disclaimer": "정보 안내만 제공해요.",
+      "industry_major": [
+        "food",
+        "agri"
+      ]
     },
     {
       "scheme_id": "WOMEN",
@@ -1184,7 +1214,10 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요. 링크 접속은 개발 환경에서 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요. 링크 접속은 개발 환경에서 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "DISABLED",
@@ -1227,7 +1260,10 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요. 링크 접속은 개발 환경에서 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요. 링크 접속은 개발 환경에서 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "FAMILY",
@@ -1271,7 +1307,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요. 주관기관 명칭은 미검증이고, 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
+      "disclaimer": "정보 안내만 제공해요. 주관기관 명칭은 미검증이고, 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "SOCIALV",
@@ -1316,7 +1355,10 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요. 운영기관·링크는 미검증이에요."
+      "disclaimer": "정보 안내만 제공해요. 운영기관·링크는 미검증이에요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO9001",
@@ -1366,7 +1408,10 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "신청 적격성 판정이 아닌 준비상태 자가점검만 제공해요. 표준 원문은 싣지 않았어요."
+      "disclaimer": "신청 적격성 판정이 아닌 준비상태 자가점검만 제공해요. 표준 원문은 싣지 않았어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO14001",
@@ -1415,7 +1460,10 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "준비상태 자가점검만 제공해요."
+      "disclaimer": "준비상태 자가점검만 제공해요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO45001",
@@ -1462,7 +1510,10 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "준비상태 자가점검만 제공해요."
+      "disclaimer": "준비상태 자가점검만 제공해요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO27001",
@@ -1511,7 +1562,10 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "준비상태 자가점검만 제공해요."
+      "disclaimer": "준비상태 자가점검만 제공해요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO22000",
@@ -1559,7 +1613,11 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "준비상태 자가점검만 제공해요."
+      "disclaimer": "준비상태 자가점검만 제공해요.",
+      "industry_major": [
+        "food",
+        "agri"
+      ]
     },
     {
       "scheme_id": "ISO13485",
@@ -1607,7 +1665,10 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "준비상태 자가점검만 제공해요."
+      "disclaimer": "준비상태 자가점검만 제공해요.",
+      "industry_major": [
+        "bio"
+      ]
     },
     {
       "scheme_id": "EU-CE",
@@ -1663,7 +1724,15 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "의무 여부·절차를 자동 판정하지 않아요. '적용 규정 확인 필요'로만 안내해요."
+      "disclaimer": "의무 여부·절차를 자동 판정하지 않아요. '적용 규정 확인 필요'로만 안내해요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "bio",
+        "food",
+        "chem",
+        "trade"
+      ]
     },
     {
       "scheme_id": "US-FDA-DEV",
@@ -1714,7 +1783,10 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "의무 여부·절차를 자동 판정하지 않아요."
+      "disclaimer": "의무 여부·절차를 자동 판정하지 않아요.",
+      "industry_major": [
+        "bio"
+      ]
     },
     {
       "scheme_id": "US-FDA-FOOD",
@@ -1761,7 +1833,11 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "의무 여부·절차를 자동 판정하지 않아요."
+      "disclaimer": "의무 여부·절차를 자동 판정하지 않아요.",
+      "industry_major": [
+        "food",
+        "agri"
+      ]
     },
     {
       "scheme_id": "US-FCC",
@@ -1809,7 +1885,11 @@
       "last_verified_at": "2026-11-22",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "의무 여부·절차를 자동 판정하지 않아요. 공식 페이지는 개발 환경에서 차단(403)돼 원문 재확인을 못 했어요."
+      "disclaimer": "의무 여부·절차를 자동 판정하지 않아요. 공식 페이지는 개발 환경에서 차단(403)돼 원문 재확인을 못 했어요.",
+      "industry_major": [
+        "elec",
+        "ict"
+      ]
     },
     {
       "scheme_id": "SME-CONF",
@@ -1854,7 +1934,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "SOCIAL-ENT",
@@ -1899,7 +1982,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "PRE-SOCIAL",
@@ -1942,7 +2028,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ROOT-IND",
@@ -1985,7 +2074,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "mach",
+        "elec",
+        "chem"
+      ]
     },
     {
       "scheme_id": "DIRECT-PROD",
@@ -2029,7 +2123,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "PERF-CERT",
@@ -2072,7 +2169,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "SHARE-PERF",
@@ -2116,7 +2216,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "GLOBAL-1000",
@@ -2162,7 +2265,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "SW-BIZ",
@@ -2206,7 +2312,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "ict"
+      ]
     },
     {
       "scheme_id": "RND-SERVICE",
@@ -2249,7 +2358,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "pro"
+      ]
     },
     {
       "scheme_id": "CREATIVE-LAB",
@@ -2293,7 +2405,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "culture",
+        "pro",
+        "ict"
+      ]
     },
     {
       "scheme_id": "GS-CERT",
@@ -2338,7 +2455,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "ict"
+      ]
     },
     {
       "scheme_id": "NEP",
@@ -2382,7 +2502,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "NET",
@@ -2426,7 +2549,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "GREEN-CERT",
@@ -2471,7 +2597,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "PPS-EXCELLENT",
@@ -2515,7 +2644,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "INNOV-PROD",
@@ -2558,7 +2690,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "KS",
@@ -2603,7 +2738,15 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "bio",
+        "food",
+        "chem",
+        "constr"
+      ]
     },
     {
       "scheme_id": "HIGH-EFF",
@@ -2647,7 +2790,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "constr"
+      ]
     },
     {
       "scheme_id": "ENERGY-LABEL",
@@ -2690,7 +2838,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "trade"
+      ]
     },
     {
       "scheme_id": "ECO-LABEL",
@@ -2734,7 +2887,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "GR-MARK",
@@ -2778,7 +2934,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23). 이 기관 사이트는 보안 연결(https)을 지원하지 않아 http 주소로 연결돼요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23). 이 기관 사이트는 보안 연결(https)을 지원하지 않아 http 주소로 연결돼요.",
+      "industry_major": [
+        "chem",
+        "mach",
+        "constr"
+      ]
     },
     {
       "scheme_id": "GOOD-DESIGN",
@@ -2821,7 +2982,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "KR-MEDICAL",
@@ -2866,7 +3030,11 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "bio",
+        "trade"
+      ]
     },
     {
       "scheme_id": "ISMS-P",
@@ -2911,7 +3079,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "CC-CERT",
@@ -2956,7 +3127,11 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "ict",
+        "elec"
+      ]
     },
     {
       "scheme_id": "KOSHA-MS",
@@ -3000,7 +3175,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "DISABLED-WS",
@@ -3043,7 +3221,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ECO-AGRI",
@@ -3088,7 +3269,11 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "agri",
+        "food"
+      ]
     },
     {
       "scheme_id": "KCS-SAFETY",
@@ -3132,7 +3317,11 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "mach",
+        "elec"
+      ]
     },
     {
       "scheme_id": "CARBON-LABEL",
@@ -3177,7 +3366,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23).",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO50001",
@@ -3221,7 +3413,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO37001",
@@ -3265,7 +3460,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO37301",
@@ -3309,7 +3507,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO27701",
@@ -3353,7 +3554,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO22301",
@@ -3397,7 +3601,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "ISO20000",
@@ -3441,7 +3648,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "ict",
+        "pro",
+        "svc"
+      ]
     },
     {
       "scheme_id": "IATF16949",
@@ -3486,7 +3698,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "mach",
+        "elec",
+        "chem"
+      ]
     },
     {
       "scheme_id": "AS9100",
@@ -3530,7 +3747,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "mach",
+        "elec",
+        "chem"
+      ]
     },
     {
       "scheme_id": "FSSC22000",
@@ -3575,7 +3797,11 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "food",
+        "agri"
+      ]
     },
     {
       "scheme_id": "SOC2",
@@ -3622,7 +3848,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "PCI-DSS",
@@ -3666,7 +3895,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "CMMI",
@@ -3709,7 +3941,11 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "ict",
+        "pro"
+      ]
     },
     {
       "scheme_id": "BCORP",
@@ -3754,7 +3990,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "all"
+      ]
     },
     {
       "scheme_id": "FSC",
@@ -3799,7 +4038,13 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "chem",
+        "agri",
+        "trade",
+        "culture"
+      ]
     },
     {
       "scheme_id": "CB-SCHEME",
@@ -3844,7 +4089,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "trade"
+      ]
     },
     {
       "scheme_id": "IECEX",
@@ -3888,7 +4138,13 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "chem",
+        "constr"
+      ]
     },
     {
       "scheme_id": "EU-ROHS",
@@ -3931,7 +4187,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "trade"
+      ]
     },
     {
       "scheme_id": "EU-REACH",
@@ -3974,7 +4235,15 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "bio",
+        "food",
+        "chem",
+        "trade"
+      ]
     },
     {
       "scheme_id": "EU-MDR",
@@ -4018,7 +4287,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "bio"
+      ]
     },
     {
       "scheme_id": "UKCA",
@@ -4061,7 +4333,15 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "bio",
+        "food",
+        "chem",
+        "trade"
+      ]
     },
     {
       "scheme_id": "US-FDA-COS",
@@ -4105,7 +4385,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "food",
+        "chem",
+        "trade"
+      ]
     },
     {
       "scheme_id": "US-NRTL",
@@ -4151,7 +4436,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "trade"
+      ]
     },
     {
       "scheme_id": "US-ENERGY-STAR",
@@ -4195,7 +4485,12 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "constr"
+      ]
     },
     {
       "scheme_id": "JP-PSE",
@@ -4238,7 +4533,11 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "elec",
+        "trade"
+      ]
     },
     {
       "scheme_id": "CN-CCC",
@@ -4282,7 +4581,15 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "bio",
+        "food",
+        "chem",
+        "trade"
+      ]
     },
     {
       "scheme_id": "IN-BIS",
@@ -4325,7 +4632,15 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "bio",
+        "food",
+        "chem",
+        "trade"
+      ]
     },
     {
       "scheme_id": "SA-SASO",
@@ -4369,7 +4684,15 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "bio",
+        "food",
+        "chem",
+        "trade"
+      ]
     },
     {
       "scheme_id": "EAEU-EAC",
@@ -4413,7 +4736,15 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "elec",
+        "mach",
+        "bio",
+        "food",
+        "chem",
+        "trade"
+      ]
     },
     {
       "scheme_id": "CN-NMPA",
@@ -4456,7 +4787,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "bio"
+      ]
     },
     {
       "scheme_id": "JP-PMDA",
@@ -4499,7 +4833,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "bio"
+      ]
     },
     {
       "scheme_id": "AU-TGA",
@@ -4542,7 +4879,11 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "bio",
+        "food"
+      ]
     },
     {
       "scheme_id": "CA-HC-MD",
@@ -4586,7 +4927,10 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요.",
+      "industry_major": [
+        "bio"
+      ]
     },
     {
       "scheme_id": "HALAL-MY",
@@ -4630,7 +4974,13 @@
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요.",
+      "industry_major": [
+        "food",
+        "agri",
+        "bio",
+        "chem"
+      ]
     }
   ],
   "self_checks": {

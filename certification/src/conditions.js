@@ -1,5 +1,5 @@
 // 데이터(JSON)에 적힌 표시·적용 조건식을 안전하게 해석한다. eval 사용 금지.
-// 문법: always | never | <절> [and <절>]...
+// 문법: always | never | <절> [and <절>]... [or <절> [and <절>]...]   (and가 or보다 먼저 묶인다)
 //   x in [a, b]   단일값이 목록 중 하나(배열 답변이면 교집합)
 //   x has [a, b]  배열 답변과 목록의 교집합이 있음
 //   x == v / x != v / x > n / x >= n / x < n / x <= n
@@ -81,12 +81,12 @@ function clause(c, answers, ctx) {
 
 export function evalExpr(expr, answers = {}, ctx = {}) {
   if (!expr) return true;
-  return String(expr).split(/\s+and\s+/).every((c) => clause(c.trim(), answers, ctx));
+  return String(expr).split(/\s+or\s+/).some((part) => part.split(/\s+and\s+/).every((c) => clause(c.trim(), answers, ctx)));
 }
 
 // 데이터 검증용: 조건식 문법만 확인
 export function assertExpr(expr) {
-  String(expr).split(/\s+and\s+/).forEach((c) => {
+  String(expr).split(/\s+(?:and|or)\s+/).forEach((c) => {
     const t = c.trim();
     if (t === 'always' || t === 'never' || CLAUSE_LIST.test(t) || CLAUSE_CMP.test(t)) return;
     throw new Error(`조건식 문법 오류: ${expr}`);

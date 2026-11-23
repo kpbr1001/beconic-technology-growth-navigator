@@ -1,6 +1,6 @@
 // 화면 렌더링(v2 · 3단계) — 문자열 템플릿. 사용자 입력·데이터는 모두 esc()/extLink()를 거친다.
 import { esc, extLink, badge, ICON, fmtDate, TYPE_LABEL, MANDATORY_LABEL, TARGET_LABEL, ACCESS_LABEL, LEVEL_LABEL, levelOf, FIELDS, fieldOf, FIELD_TONE, won } from './ui.js';
-import { S, leafLabel, rdRatioThresholds } from './engine.js';
+import { S, leafLabel, rdRatioThresholds, questionsUsedBy } from './engine.js';
 import { searchSchemes } from './search.js';
 import { TIMEFRAME } from './model.js';
 import { SITE } from './site.js';
@@ -52,20 +52,27 @@ export function home(data) {
 }
 
 // ── 1 인증 고르기 ──────────────────────────────────────────
+// 업종 대분류: 'all'이 아닌 인증은 그 업종을 고른 회사에게만 보인다(다른 업종 전용 인증은 뺀다)
+export const industryFits = (s, ind) => !ind || ind === 'unknown' || !s.industry_major || s.industry_major.includes('all') || s.industry_major.includes(ind);
+const industryOnly = (s, ind) => !!ind && ind !== 'unknown' && !!s.industry_major && !s.industry_major.includes('all') && s.industry_major.includes(ind);
+function baseList(st, data, region = st.f.region) {
+  const f = st.f;
+  return data.catalog.schemes.filter((s) => s.display_group === region && industryFits(s, f.industry) && (!f.purpose || (s.purpose_tags || []).includes(f.purpose)));
+}
 export function filterSchemes(st, data) {
   const f = st.f;
-  let list = f.q ? searchSchemes(data.catalog.schemes, f.q, {}).map((r) => r.scheme) : data.catalog.schemes.filter((s) => s.display_group === f.region);
+  let list = f.q ? searchSchemes(data.catalog.schemes, f.q, {}).map((r) => r.scheme) : baseList(st, data);
   if (f.field !== 'all') list = list.filter((s) => fieldOf(s) === f.field);
-  if (f.purpose) list = list.filter((s) => (s.purpose_tags || []).includes(f.purpose));
   const rank = { A: 0, B: 1, C: 2 };
   return f.q ? list : [...list].sort((x, y) => rank[levelOf(x)] - rank[levelOf(y)]);
 }
 function card(s, st) {
   const sel = st.selected.includes(s.scheme_id);
   const rec = st.f.purpose && (s.purpose_tags || []).includes(st.f.purpose);
+  const indFit = industryOnly(s, st.f.industry);
   return `<article class="cc" data-sel="${sel}">
     <button class="cc-hit" type="button" data-act="pick" data-id="${esc(s.scheme_id)}" aria-pressed="${sel}">
-      <span class="tags">${fieldTag(s)}${levelTag(s)}${rec ? '<span class="rec-mark">목적 추천</span>' : ''}</span>
+      <span class="tags">${fieldTag(s)}${levelTag(s)}${indFit ? '<span class="rec-mark">업종 맞춤</span>' : ''}${rec ? '<span class="rec-mark">목적 추천</span>' : ''}</span>
       <span class="cc-name">${esc(s.name_ko)}</span>
       <span class="cc-what">${esc(s.what)}</span>
       <span class="chk" aria-hidden="true">${sel ? '✓' : ''}</span>
@@ -76,9 +83,10 @@ function card(s, st) {
 export function cardsHTML(st, data) {
   const list = filterSchemes(st, data);
   if (!list.length) {
-    return `<p class="result-count">조건에 맞는 인증이 없어요.</p><div class="more-ask"><span>검색어를 바꾸거나 분야를 ‘전체’로 바꿔 보세요. 찾는 인증이 목록에 없으면 전문가에게 물어보세요.</span><a class="btn sm gh" href="${SITE.telHref}">${ICON.phone} 문의</a></div>`;
+    return `<p class="result-count">조건에 맞는 인증이 없어요.</p><div class="more-ask"><span>검색어를 바꾸거나 분야·업종·목적을 ‘전체’로 바꿔 보세요. 찾는 인증이 목록에 없으면 전문가에게 물어보세요.</span><a class="btn sm gh" href="${SITE.telHref}">${ICON.phone} 문의</a></div>`;
   }
-  return `<p class="result-count" aria-live="polite">${list.length}개 인증${st.f.q ? ` · ‘${esc(st.f.q)}’ 검색 결과(국내·해외 전체)` : ''}</p><div class="cards">${list.map((s) => card(s, st)).join('')}</div>`;
+  const hidden = !st.f.q && st.f.industry && st.f.industry !== 'unknown' ? data.catalog.schemes.filter((s) => s.display_group === st.f.region && !industryFits(s, st.f.industry)).length : 0;
+  return `<p class="result-count" aria-live="polite">${list.length}개 인증${st.f.q ? ` · ‘${esc(st.f.q)}’ 검색 결과(국내·해외 전체, 업종 필터 미적용)` : ''}${hidden ? ` · 다른 업종 전용 ${hidden}개 제외` : ''}</p><div class="cards">${list.map((s) => card(s, st)).join('')}</div>`;
 }
 export function trayHTML(st, data) {
   const items = st.selected.map((id) => data.schemeMap[id]).filter(Boolean);
@@ -95,36 +103,54 @@ export function mbarSelectHTML(st, data) {
 // 분야 목록(개수 포함)·모바일 필터 — 국내/해외 탭을 바꿀 때마다 다시 그린다
 export function fieldListHTML(st, data, compact = false) {
   const f = st.f;
-  const inRegion = data.catalog.schemes.filter((s) => s.display_group === f.region);
+  const inRegion = baseList(st, data);
   const items = [['all', '전체', inRegion.length], ...FIELDS.map((x) => [x, x, inRegion.filter((s) => fieldOf(s) === x).length]).filter((x) => x[2])];
   return items.map(([val, l, n]) => `<button type="button" data-act="field" data-v="${esc(val)}" aria-pressed="${f.field === val}">${esc(l)}${compact ? '' : ` <em>${n}</em>`}</button>`).join('');
 }
+// 국내·해외 탭(업종·목적 필터를 반영한 개수) — 필터가 바뀔 때마다 다시 그린다
+export function regionTabsHTML(st, data) {
+  const rb = (v, l) => `<button type="button" data-act="region" data-v="${v}" aria-pressed="${st.f.region === v && !st.f.q}">${l}</button>`;
+  return `${rb('domestic', `국내 ${baseList(st, data, 'domestic').length}`)}${rb('international', `해외 ${baseList(st, data, 'international').length}`)}`;
+}
 export function mfiltersHTML(st, data) {
-  const dom = data.catalog.schemes.filter((s) => s.display_group === 'domestic').length;
-  const intl = data.catalog.schemes.length - dom;
+  const dom = baseList(st, data, 'domestic').length;
+  const intl = baseList(st, data, 'international').length;
   const rb = (val, l) => `<button type="button" data-act="region" data-v="${val}" aria-pressed="${st.f.region === val && !st.f.q}">${l}</button>`;
   return `${rb('domestic', `국내 ${dom}`)}${rb('international', `해외 ${intl}`)}${fieldListHTML(st, data, true)}`;
 }
+function industryOpts(data) { return ((data.questionMap.industry_major && data.questionMap.industry_major.response_options) || []).filter((o) => o.value !== 'unknown'); }
+export function industryListHTML(st, data) {
+  return industryOpts(data).map((o) => `<button type="button" data-act="industry" data-v="${esc(o.value)}" aria-pressed="${st.f.industry === o.value}" title="KSIC ${esc(o.ksic)}">${esc(o.label)}</button>`).join('');
+}
+// 모바일: 업종·목적은 고르기 상자로(옆 패널이 숨겨지므로)
+function mselectsHTML(st, data) {
+  const opt = (v, l, cur) => `<option value="${esc(v)}"${cur === v ? ' selected' : ''}>${esc(l)}</option>`;
+  return `<div class="mselects">
+    <label><span>업종</span><select data-input="industry">${opt('', '전체 업종', st.f.industry || '')}${industryOpts(data).map((o) => opt(o.value, o.label, st.f.industry)).join('')}</select></label>
+    <label><span>목적</span><select data-input="purpose">${opt('', '전체 목적', st.f.purpose || '')}${PURPOSES.map(([v, l]) => opt(v, l, st.f.purpose)).join('')}</select></label>
+  </div>`;
+}
 export function selectView(st, data) {
   const f = st.f;
-  const dom = data.catalog.schemes.filter((s) => s.display_group === 'domestic').length;
-  const intl = data.catalog.schemes.length - dom;
-  const regionBtn = (v, l) => `<button type="button" data-act="region" data-v="${v}" aria-pressed="${f.region === v && !f.q}">${l}</button>`;
   return `<section class="wrap">
   ${stepper('select', st)}
   <h1 class="h1">어떤 인증을 진단할까요?</h1>
-  <p class="lead">최대 ${MAX_SELECT}개까지 고를 수 있어요. 잘 모르겠다면 왼쪽 <b>목적으로 찾기</b>를 눌러 보세요.</p>
+  <p class="lead">최대 ${MAX_SELECT}개까지 고를 수 있어요. 잘 모르겠다면 <b>업종·목적</b>으로 좁혀 보세요.</p>
   <div class="grid g-side">
     <aside class="panel side-f" aria-label="인증 분류">
-      <div class="tabs">${regionBtn('domestic', `국내 ${dom}`)}${regionBtn('international', `해외 ${intl}`)}</div>
+      <div class="tabs" id="rtabs">${regionTabsHTML(st, data)}</div>
       <h2 class="side-h">분야</h2>
       <div class="flist" id="flist">${fieldListHTML(st, data)}</div>
+      <h2 class="side-h">우리 업종</h2>
+      <p class="side-n">고르면 다른 업종 전용 인증을 빼고 보여 줘요. 한 번 더 누르면 해제돼요.</p>
+      <div class="flist chipset" id="ilist">${industryListHTML(st, data)}</div>
       <h2 class="side-h">목적으로 찾기</h2>
       <div class="flist">${PURPOSES.map(([v, l]) => `<button type="button" data-act="purpose" data-v="${v}" aria-pressed="${f.purpose === v}">${esc(l)}</button>`).join('')}</div>
     </aside>
     <section aria-label="인증 목록">
       <div class="searchbox" role="search">${ICON.search}<label class="sr-only" for="q-search">인증 이름·목적으로 검색</label><input id="q-search" type="search" value="${esc(f.q)}" placeholder="인증 이름·목적으로 검색 (예: 벤처, 연구소, ISO, 유럽 수출)" autocomplete="off" enterkeyhint="search" data-input="q"></div>
       <div class="mfilters" id="mfilters" aria-label="분류">${mfiltersHTML(st, data)}</div>
+      ${mselectsHTML(st, data)}
       <div id="cards">${cardsHTML(st, data)}</div>
       <div class="more-ask"><span>찾는 인증이 목록에 없나요? 이 앱은 공식 근거를 확인한 인증만 진단해요.</span><a class="btn sm gh" href="${SITE.telHref}">전문가에게 문의</a></div>
     </section>
@@ -138,16 +164,23 @@ export function selectView(st, data) {
 export function needsExport(st, data) {
   return st.selected.some((id) => data.schemeMap[id] && (data.schemeMap[id].triage || data.schemeMap[id].target === 'product'));
 }
-const relevantTo = (q, id) => { const m = q.show_when.match(/scheme in \[([^\]]*)\]/); return !!m && m[1].split(',').map((x) => x.trim()).includes(id); };
+const relevantTo = (q, id) => [...q.show_when.matchAll(/scheme in \[([^\]]*)\]/g)].some((m) => m[1].split(',').map((x) => x.trim()).includes(id));
+// 고른 인증의 판정 규칙이 실제로 읽는 질문
+export function usedQuestions(st, data) {
+  const out = new Set();
+  st.selected.forEach((id) => { const p = data.packs[id]; if (p) questionsUsedBy(p, data.questionMap).forEach((q) => out.add(q)); });
+  return out;
+}
 export function answerQuestions(st, data) {
   const Q = data.questions.questions;
-  const common = Q.filter((q) => q.group === 'profile' && q.question_id !== 'company_name');
+  const used = usedQuestions(st, data);
+  const common = Q.filter((q) => q.group === 'profile' && q.question_id !== 'company_name' && (q.core || used.has(q.question_id)));
   const exp = needsExport(st, data) ? [data.questionMap.markets, ...Q.filter((q) => q.group === 'export')] : [];
-  const used = new Set();
+  const seen = new Set();
   const per = st.selected.map((id) => {
     const s = data.schemeMap[id];
-    const list = Q.filter((q) => q.group === 'scheme' && relevantTo(q, id) && !used.has(q.question_id));
-    list.forEach((q) => used.add(q.question_id));
+    const list = Q.filter((q) => q.group === 'scheme' && relevantTo(q, id) && !seen.has(q.question_id));
+    list.forEach((q) => seen.add(q.question_id));
     const checks = s.self_check ? data.catalog.self_checks[s.self_check].items.map((it) => ({ id: `${id}:${it.item_id}`, label: it.label, why: it.why })) : [];
     return { s, list, checks };
   });
@@ -186,7 +219,11 @@ export function renderQ(q, st, data) {
   }
   let body;
   if (q.dynamic === 'rd_ratio') body = `<div id="dyn-${esc(q.question_id)}">${dynRatioHTML(q, st, data)}</div>`;
-  else body = chipList(q, isDate(v) ? undefined : v, q.data_type === 'multi' ? 'checkbox' : 'radio');
+  else if (q.response_options.some((o) => o.majors) && st.f && st.f.industry && st.f.industry !== 'unknown') {
+    const keep = q.response_options.filter((o) => !o.majors || o.majors.includes(st.f.industry) || o.value === v);
+    const major = industryOpts(data).find((o) => o.value === st.f.industry);
+    body = `${chipList({ ...q, response_options: keep }, v)}<p class="muted small">‘${esc(major ? major.label : '')}’ 업종에 해당하는 항목만 보여 줘요. 맞는 게 없으면 1단계에서 업종을 ‘전체’로 바꿔 주세요.</p>`;
+  } else body = chipList(q, isDate(v) ? undefined : v, q.data_type === 'multi' ? 'checkbox' : 'radio');
   const exact = q.allow_date ? `<details class="exact"${isDate(v) ? ' open' : ''}><summary>정확한 날짜로 입력</summary><label class="sr-only" for="${id}-date">${esc(q.label_plain_ko)} 날짜</label><input id="${id}-date" type="date" data-date-for="${esc(q.question_id)}" value="${isDate(v) ? esc(v) : ''}" min="1900-01-01" max="${esc(st.asOf)}"> <span class="muted small">날짜를 넣으면 진단 기준일(${esc(st.asOf)}) 기준 만 나이로 계산해요.</span></details>` : '';
   return `<fieldset class="q${answered ? ' answered' : ''}" ${common}><legend>${esc(q.label_plain_ko)}</legend>${help}${body}${exact}<p class="q-err" id="${id}-err" hidden></p>${why}</fieldset>`;
 }
@@ -214,7 +251,7 @@ export function answerView(st, data, R, prog) {
   const sec = (title, tag, inner, id = '') => `<h2 class="sec-t"${id ? ` id="${esc(id)}"` : ''}>${esc(title)}${tag ? ` <span>${esc(tag)}</span>` : ''}</h2>${inner}`;
   const qCount = (p) => p.list.length + p.checks.length;
   const jb = (id, label) => `<button type="button" data-act="jump" data-to="${esc(id)}">${esc(label)}</button>`;
-  const jump = `<nav class="q-nav" aria-label="질문 구역 바로가기">${jb('sec-common', `공통 ${common.length}`)}${exp.length ? jb('sec-export', `제품·시장 ${exp.length}`) : ''}${per.map((p) => jb(`sec-${p.s.scheme_id}`, `${shortName(p.s)} ${qCount(p)}`)).join('')}</nav>`;
+  const jump = `<nav class="q-nav" aria-label="질문 구역 바로가기">${jb('sec-common', `공통 ${common.length}`)}${exp.length ? jb('sec-export', `제품·시장 ${exp.length}`) : ''}${per.filter((p) => qCount(p) > 0).map((p) => jb(`sec-${p.s.scheme_id}`, `${shortName(p.s)} ${qCount(p)}`)).join('')}</nav>`;
   const blocks = per.map(({ s, list, checks }) => {
     let inner = list.map((q) => renderQ(q, st, data)).join('') + checks.map((c) => checkQ(c, st)).join('');
     if (!inner) {
@@ -232,7 +269,7 @@ export function answerView(st, data, R, prog) {
   ${jump}
   <div class="grid g-two">
     <form data-form="answer" novalidate aria-label="진단 질문">
-      ${sec('공통 질문', `모든 인증 · ${common.length}개`, common.map((q) => renderQ(q, st, data)).join(''), 'sec-common')}
+      ${sec('공통 질문', `고른 인증에 필요한 것만 · ${common.length}개`, common.map((q) => renderQ(q, st, data)).join(''), 'sec-common')}
       ${exp.length ? sec('제품·판매 시장', `${exp.length}개`, exp.map((q) => renderQ(q, st, data)).join(''), 'sec-export') : ''}
       ${blocks}
       ${sec('보고서 표지', '선택', renderQ(data.questionMap.company_name, st, data))}

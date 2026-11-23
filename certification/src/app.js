@@ -18,7 +18,7 @@ const st = {
   selected: [],
   docStatus: {}, // 요건 체크(자가 확인) 응답: '인증ID:항목ID' → have/none/unknown
   asOf: todayKST(),
-  f: { region: 'domestic', field: 'all', purpose: null, q: '' },
+  f: { region: 'domestic', field: 'all', purpose: null, industry: null, q: '' },
   visitedAnswer: false,
   edited: false,
 };
@@ -105,9 +105,13 @@ function refreshSelect() {
   const mbar = document.getElementById('mbar'); if (mbar) mbar.innerHTML = V.mbarSelectHTML(st, D);
   const fl = document.getElementById('flist'); if (fl) fl.innerHTML = V.fieldListHTML(st, D);
   const mf = document.getElementById('mfilters'); if (mf) mf.innerHTML = V.mfiltersHTML(st, D);
+  const rt = document.getElementById('rtabs'); if (rt) rt.innerHTML = V.regionTabsHTML(st, D);
   document.querySelectorAll('[data-act="region"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.region === el.dataset.v && !st.f.q)));
   document.querySelectorAll('[data-act="field"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.field === el.dataset.v)));
   document.querySelectorAll('[data-act="purpose"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.purpose === el.dataset.v)));
+  document.querySelectorAll('[data-act="industry"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.industry === el.dataset.v)));
+  document.querySelectorAll('select[data-input="industry"]').forEach((el) => { el.value = st.f.industry || ''; });
+  document.querySelectorAll('select[data-input="purpose"]').forEach((el) => { el.value = st.f.purpose || ''; });
 }
 function togglePick(id) {
   const D = st.data;
@@ -189,6 +193,7 @@ function onClick(e) {
     case 'region': st.f.region = el.dataset.v; st.f.field = 'all'; st.f.q = ''; { const s = document.getElementById('q-search'); if (s) s.value = ''; } refreshSelect(); break;
     case 'field': st.f.field = el.dataset.v; refreshSelect(); break;
     case 'purpose': st.f.purpose = st.f.purpose === el.dataset.v ? null : el.dataset.v; refreshSelect(); break;
+    case 'industry': st.f.industry = st.f.industry === el.dataset.v ? null : el.dataset.v; st.f.field = 'all'; refreshSelect(); break;
     case 'go-answer':
       if (!st.selected.length) { toast('진단할 인증을 하나 이상 골라 주세요.'); return; }
       go('#/answer'); break;
@@ -233,6 +238,8 @@ function onKey(e) {
 }
 function onChange(e) {
   const t = e.target;
+  if (t.matches('select[data-input="industry"]')) { st.f.industry = t.value || null; st.f.field = 'all'; refreshSelect(); return; }
+  if (t.matches('select[data-input="purpose"]')) { st.f.purpose = t.value || null; refreshSelect(); return; }
   if (t.matches('[data-sc]')) { st.docStatus[t.dataset.sc] = t.value; t.closest('.q').classList.add('answered'); refreshAnswerSide(); return; }
   if (t.matches('[data-date-for]')) { readDate(t); applyVisibility(); refreshAnswerSide(); return; }
   if (t.closest('form[data-form="answer"]') && t.name && (t.type === 'radio' || t.type === 'checkbox')) {
