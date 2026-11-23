@@ -2,7 +2,7 @@
 // 순수 함수만 둔다(DOM·네트워크·저장소 접근 없음). 브라우저와 Node 테스트가 같은 코드를 쓴다.
 import { isMissing, band, bandGte } from './conditions.js';
 
-export const ENGINE_VERSION = '2.0.0';
+export const ENGINE_VERSION = '2.1.0'; // 2.1: 구간 답 판정
 export const S = Object.freeze({ PASS: 'PASS', FAIL: 'FAIL', UNKNOWN: 'UNKNOWN', NA: 'NOT_APPLICABLE' });
 
 // ── 4값 결합 ───────────────────────────────────────────────
@@ -99,7 +99,7 @@ export const CHECKS = {
       const g = bandGte(b, min);
       return { status: bandStatus(g), inputs: [q], ...(g === null ? { missing: [q] } : {}), detail: `선택 ${bandText(b, unit)} / 기준 ${fmt(min)}${unit} 이상${g === null ? STRADDLE : ''}` };
     }
-    const v = num(ctx.answers[q]);
+    const v = b ? b.lo : null; // 숫자 답 또는 정확한 값 구간(예: '받은 적 없음' = r:0:0)
     if (v === null) return { status: S.UNKNOWN, missing: [q], inputs: [q], detail: `기준 ${fmt(min)}${unit} 이상` };
     return { status: v >= min ? S.PASS : S.FAIL, inputs: [q], detail: `입력 ${fmt(v)}${unit} / 기준 ${fmt(min)}${unit} 이상` };
   },
@@ -109,7 +109,7 @@ export const CHECKS = {
       const g = bandGte(b, max);
       return { status: g === null ? S.UNKNOWN : g ? S.FAIL : S.PASS, inputs: [q], ...(g === null ? { missing: [q] } : {}), detail: `선택 ${bandText(b, unit)} / 기준 ${fmt(max)}${unit} 미만${g === null ? STRADDLE : ''}` };
     }
-    const v = num(ctx.answers[q]);
+    const v = b ? b.lo : null;
     if (v === null) return { status: S.UNKNOWN, missing: [q], inputs: [q], detail: `기준 ${fmt(max)}${unit} 미만` };
     return { status: v < max ? S.PASS : S.FAIL, inputs: [q], detail: `입력 ${fmt(v)}${unit} / 기준 ${fmt(max)}${unit} 미만` };
   },

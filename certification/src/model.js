@@ -5,7 +5,7 @@ import { computeReadiness, readinessSentence, EVIDENCE } from './readiness.js';
 import { recommend, TIER_LABEL } from './recommend.js';
 import { triage } from './triage.js';
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '2.0.0';
 
 export const CATEGORY = {
   1: '신청 장애 요인 제거·확인',

@@ -266,9 +266,9 @@ async function saveHtml() {
     const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BECONIC 기업인증 진단 보고서 ${R.meta.doc_id}</title><style>body{margin:0;background:#DDE3EA;font-family:'Pretendard Variable',Pretendard,system-ui,sans-serif}.p-doc{background:#fff;max-width:820px;margin:24px auto;padding:48px 52px}${css.replace(/@media print\s*{/, '@media all {')}</style></head><body>${body}</body></html>`;
     const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
     const a = document.createElement('a');
-    a.href = url; a.download = `BECONIC_기업인증진단_${R.meta.doc_id}${st.edited ? '_편집본' : ''}.html`;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    a.href = url; a.download = `BECONIC_certification_report_${R.meta.doc_id}${st.edited ? '_edited' : ''}.html`; // 영문 파일명: 일부 브라우저가 한글 파일명을 무시함
+    a.hidden = true; document.body.appendChild(a); a.click();
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 3000);
     toast('HTML 보고서를 내 기기에 저장했어요.');
   } catch {
     toast('HTML을 저장하지 못했어요. PDF 저장을 이용해 주세요.');

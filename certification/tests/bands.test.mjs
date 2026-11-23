@@ -118,3 +118,18 @@ test('BAND-07 조건식: 구간 답도 서류·질문 표시 조건에 맞게 �
   assert.equal(evalExpr('rnd_researchers >= 10', { rnd_researchers: 'r:7:10' }), false);
   assert.equal(evalExpr('scheme in [VEN] and ven_invest_total in [r:5000:]', { ven_invest_total: 'r:5000:' }, { schemes: ['VEN'] }), true);
 });
+
+test('BAND-08 정확한 값 구간(받은 적 없음 = r:0:0·매출 없음)은 확인 필요가 아니라 확정 판정', () => {
+  const base = { biz_status: 'corporation', is_sme: 'yes' };
+  assert.equal(leafOf(run('VEN', { ...base, ven_invest_total: 'r:0:0' }), 'VEN-INV-AMT').status, S.FAIL);
+  assert.match(leafOf(run('VEN', { ...base, ven_invest_total: 'r:0:0' }), 'VEN-INV-AMT').detail, /입력 0만원/);
+  assert.equal(leafOf(run('RNDD', { ...base, rnd_researchers: 'r:0:0' }), 'RNDD-STAFF').status, S.FAIL);
+  // 정확한 값으로 고른 구간이 만든 '확인 필요'는 0건이어야 함
+  Object.keys(D.questionMap).forEach((q) => (D.questionMap[q].response_options || []).forEach((o) => {
+    const b = band(o.value); if (!b || !b.exact) return;
+    ['VEN', 'MAIN', 'RNDI', 'RNDD', 'INNO'].forEach((id) => {
+      const r = run(id, { ...base, [q]: o.value });
+      r.pathways.flatMap((p) => p.leaves).filter((l) => (l.inputs || []).includes(q) && (l.missing || []).includes(q)).forEach((l) => assert.fail(`${id}/${l.id}: ${q}=${o.value}(정확한 값)인데 확인 필요`));
+    });
+  }));
+});

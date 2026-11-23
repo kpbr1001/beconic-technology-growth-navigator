@@ -308,6 +308,7 @@ fieldset.q { margin: 0 0 14px; }
   .rc, .prep { padding: 18px; border-radius: 18px; } .rc-h { flex-direction: column; gap: 4px; } .rc-h .tt { font-size: 21px; }
   .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .tile { padding: 12px; } .tile b { font-size: 16px; }
   .cl { grid-template-columns: minmax(0, 1fr); } .rtabs button { padding: 10px 10px; font-size: 14px; }
+  .tbl-wrap .dt { min-width: 0; }
   .dt thead { display: none; } .dt tr { display: block; border: 1px solid var(--b); border-radius: 12px; padding: 8px 10px; margin-bottom: 8px; } .dt td { display: block; border: 0; padding: 3px 0; } .dt .num { text-align: left; }
   .next-grid { grid-template-columns: minmax(0, 1fr); }
   .home-hero { padding: 28px 22px; border-radius: 22px; } .home-hero h1 { font-size: 29px; } .home-hero p { font-size: 16px; }
