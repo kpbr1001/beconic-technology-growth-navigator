@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.23-1",
+  "version": "2026.11.23-2",
   "schemes": [
     {
       "scheme_id": "VEN",
@@ -1267,11 +1267,11 @@
       "sources": [
         "S-FAMILY"
       ],
-      "official_link": "https://www.ffm.go.kr",
-      "last_verified_at": "2026-11-22",
+      "official_link": "https://www.ffsb.kr",
+      "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-22",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요. 주관기관·링크는 미검증이에요."
+      "disclaimer": "정보 안내만 제공해요. 주관기관 명칭은 미검증이고, 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
     },
     {
       "scheme_id": "SOCIALV",
@@ -2119,12 +2119,14 @@
       "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
     },
     {
-      "scheme_id": "EXPORT-SME",
-      "name_ko": "수출유망중소기업 지정",
-      "official_name": "수출유망중소기업 지정",
+      "scheme_id": "GLOBAL-1000",
+      "name_ko": "글로벌 강소기업 1,000+ 프로젝트",
+      "official_name": "글로벌 강소기업 1,000+ 프로젝트",
       "aliases": [
-        "수출유망중소기업",
-        "수출유망기업"
+        "글로벌강소기업",
+        "글로벌 강소기업",
+        "강소기업 1000",
+        "수출유망중소기업"
       ],
       "display_group": "domestic",
       "jurisdiction_country": "KR",
@@ -2144,23 +2146,23 @@
       ],
       "target": "company",
       "field": "조달·판로",
-      "issuing_authority": "중소벤처기업부(지방중소벤처기업청)",
-      "assessment_body": null,
-      "scope_note": "정보 안내 인증이에요. 신청 요건·수수료·처리기간은 공식 기관 안내로 확인하세요.",
-      "what": "수출 실적·잠재력이 있는 중소기업을 지정해 수출 지원을 연계하는 제도예요.",
-      "when": "해외 진출 지원사업·수출 금융 우대를 검토할 때 확인해요.",
-      "who_decides": "중소벤처기업부(지방중소벤처기업청)이(가) 공식 기준에 따라 판단해요.",
-      "first_check": "모집 공고의 수출 실적 기준과 일정을 공식 기관에서 확인하세요.",
+      "issuing_authority": "중소벤처기업부",
+      "assessment_body": "중소벤처기업진흥공단(공식 안내 페이지)",
+      "scope_note": "정보 안내 사업이에요. 기존 「수출유망중소기업 지정」 대신 안내해요. 선정 요건·일정은 공식 모집 공고로 확인하세요.",
+      "what": "수출 성장 가능성이 있는 중소기업을 선정해 해외 진출 지원을 연계하는 정부 사업이에요.",
+      "when": "해외 진출 지원사업·수출 관련 우대를 검토할 때 확인해요.",
+      "who_decides": "중소벤처기업부·운영기관이 모집 공고 기준에 따라 선정해요.",
+      "first_check": "모집 공고의 선정 기준(수출 실적 등)과 일정을 공식 기관에서 확인하세요.",
       "diagnosable": false,
       "verified_status": "UNVERIFIED",
       "sources": [
-        "S-EXPORT-SME"
+        "S-GLOBAL-1000"
       ],
-      "official_link": "https://www.exportcenter.go.kr",
+      "official_link": "https://www.kosmes.or.kr/nsh/SH/RET/SHRET022M0.do",
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
     },
     {
       "scheme_id": "SW-BIZ",
@@ -2376,11 +2378,11 @@
       "sources": [
         "S-NEP"
       ],
-      "official_link": "https://www.newproduct.or.kr",
+      "official_link": "https://www.nepmark.or.kr/",
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
     },
     {
       "scheme_id": "NET",
@@ -2772,11 +2774,11 @@
       "sources": [
         "S-GR-MARK"
       ],
-      "official_link": "https://www.buygr.or.kr",
+      "official_link": "http://www.gr.or.kr/bbs/content.php?co_id=products&c_type=0",
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23). 이 기관 사이트는 보안 연결(https)을 지원하지 않아 http 주소로 연결돼요."
     },
     {
       "scheme_id": "GOOD-DESIGN",
@@ -2905,11 +2907,11 @@
       "sources": [
         "S-ISMS-P"
       ],
-      "official_link": "https://isms.kisa.or.kr",
+      "official_link": "https://www.kisa.or.kr/1050602",
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
     },
     {
       "scheme_id": "CC-CERT",
@@ -3171,11 +3173,11 @@
       "sources": [
         "S-CARBON-LABEL"
       ],
-      "official_link": "https://www.epd.or.kr",
+      "official_link": "https://ecosq.or.kr/websquare.do#w2xPath=/ui/cer/ic/oh/ICOH110M01.xml&valVl=tabs1&menuSn=20018000",
       "last_verified_at": "2026-11-23",
       "review_due_at": "2027-05-23",
       "readiness_items": [],
-      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 개발 환경에서 접속을 확인하지 못했어요."
+      "disclaimer": "정보 안내만 제공해요(자동 판정 없음). 요건·수수료·기간은 공식 기관에서 확인하세요. 공식 링크는 운영사가 브라우저로 접속을 확인했어요(2026-11-23)."
     },
     {
       "scheme_id": "ISO50001",
