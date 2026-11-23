@@ -195,7 +195,14 @@ function onClick(e) {
     case 'tab': {
       const card = el.dataset.card; const k = el.dataset.k;
       document.querySelectorAll(`[data-act="tab"][data-card="${CSS.escape(card)}"]`).forEach((t) => { const on = t.dataset.k === k; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
-      document.querySelectorAll(`[id^="tp-${CSS.escape(card)}-"]`).forEach((p) => { p.hidden = p.id !== `tp-${card}-${k}`; });
+      document.querySelectorAll(`[id^="tp-${CSS.escape(card)}-"]`).forEach((p) => { p.classList.toggle('on', p.id === `tp-${card}-${k}`); });
+      break;
+    }
+    case 'acc': { // 모바일 펼침: 제목줄을 누르면 바로 아래에서 열고 닫는다(여러 개 동시에 열 수 있음)
+      const panel = document.getElementById(`tp-${el.dataset.card}-${el.dataset.k}`);
+      if (!panel) return;
+      const open = !panel.classList.contains('open');
+      panel.classList.toggle('open', open); el.setAttribute('aria-expanded', String(open));
       break;
     }
     case 'print': printReport(); break;

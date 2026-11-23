@@ -327,7 +327,7 @@ function feePanel(x, data) {
   else {
     const hasGov = f.items.some((i) => i.gov !== undefined);
     fee = `<table class="dt"><thead><tr><th scope="col">구분</th>${hasGov ? '<th scope="col" class="num">합계</th><th scope="col" class="num">정부지원금</th>' : ''}<th scope="col" class="num">${hasGov ? '기업 부담금' : '금액'}</th></tr></thead><tbody>
-      ${f.items.map((i) => `<tr><td>${esc(i.label)}</td>${hasGov ? `<td class="num">${won(i.total)}</td><td class="num">${won(i.gov)}</td>` : ''}<td class="num"><b>${won(i.company !== undefined ? i.company : i.total)}</b></td></tr>`).join('')}
+      ${f.items.map((i) => `<tr><td class="lbl">${esc(i.label)}</td>${hasGov ? `<td class="num" data-label="합계">${won(i.total)}</td><td class="num" data-label="정부지원금">${won(i.gov)}</td>` : ''}<td class="num" data-label="${hasGov ? '기업 부담금' : '금액'}"><b>${won(i.company !== undefined ? i.company : i.total)}</b></td></tr>`).join('')}
       </tbody></table><p class="note">VAT ${esc(f.vat)}. ${esc(f.note || '')} ${esc(f.renew_note || '')}</p>`;
   }
   let proc = '';
@@ -375,6 +375,17 @@ function resultCard(x, data, R) {
   const s = x.scheme; const id = s.scheme_id;
   const t = tilesFor(x);
   const tabs = [['req', '요건'], ['docs', `서류 ${t.docs}`], ['fee', '비용·기간'], ['todo', '할 일'], ['src', '근거']];
+  // 모바일 펼침 제목줄: 열지 않아도 핵심 숫자를 보여 준다
+  const nTodo = R.actions.filter((a) => a.scheme_id === id).length;
+  const nSrc = s.sources.filter((r) => data.sourceMap[r]).length;
+  const accSum = {
+    req: t.req.b,
+    docs: t.docs ? `${t.docs}개${t.docsReq !== t.docs ? `(필수 ${t.docsReq})` : ''}` : '기관 안내',
+    fee: `${t.fee.b} · ${t.proc.b}`,
+    todo: `${nTodo}개`,
+    src: `공식 출처 ${nSrc}건`,
+  };
+  const accLabel = { req: '요건', docs: '서류', fee: '비용·기간', todo: '할 일', src: '근거' };
   const panels = { req: () => reqPanel(x, data), docs: () => docsPanel(x), fee: () => feePanel(x, data), todo: () => todoPanel(x, R), src: () => srcPanel(x, data) };
   let sub = x.label.sub || '';
   if (x.result && x.result.gate.active && x.result.basic === S.PASS) sub = `${t.pw.name} 기본요건 충족 · 남은 단계는 기관 평가(결과는 기관이 결정)`;
@@ -388,7 +399,8 @@ function resultCard(x, data, R) {
       <div class="tile"><span>처리기간</span><b>${esc(t.proc.b)}</b><small>${esc(t.proc.small)}</small></div>
     </div>
     <div class="rtabs" role="tablist" aria-label="${esc(shortName(s))} 상세">${tabs.map(([k, l], i) => `<button type="button" role="tab" id="tb-${esc(id)}-${k}" aria-controls="tp-${esc(id)}-${k}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-act="tab" data-card="${esc(id)}" data-k="${k}">${esc(l)}</button>`).join('')}</div>
-    ${tabs.map(([k], i) => `<div role="tabpanel" id="tp-${esc(id)}-${k}" aria-labelledby="tb-${esc(id)}-${k}"${i ? ' hidden' : ''}>${panels[k]()}</div>`).join('')}
+    <div class="acc">${tabs.map(([k], i) => `<button type="button" class="acc-h" id="ah-${esc(id)}-${k}" data-act="acc" data-card="${esc(id)}" data-k="${k}" aria-expanded="${i === 0}" aria-controls="tp-${esc(id)}-${k}"><span class="acc-l">${esc(accLabel[k])}</span><em>${esc(accSum[k])}</em><i aria-hidden="true">⌄</i></button>
+    <div class="tp${i === 0 ? ' on open' : ''}" role="tabpanel" id="tp-${esc(id)}-${k}" aria-labelledby="tb-${esc(id)}-${k}">${panels[k]()}</div>`).join('')}</div>
   </article>`;
 }
 export function headline(R) {
