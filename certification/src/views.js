@@ -28,7 +28,6 @@ const shortName = (s) => s.short_name || s.name_ko.replace(/\s*\(.*\)\s*$/, '');
 export function home(data) {
   const all = data.catalog.schemes;
   const auto = all.filter((s) => levelOf(s) === 'A');
-  const nSrc = data.sources.sources.length;
   // 보고서 예시: 데이터에서 계산(벤처 연구개발유형) — 숫자를 코드에 쓰지 않는다
   const ven = data.schemeMap.VEN;
   const rd = ven && ven.fees && !ven.fees.unverified ? ven.fees.items.find((x) => /연구개발/.test(x.label)) : null;
@@ -65,12 +64,6 @@ export function home(data) {
         <p class="hh-meta"><span><b>버튼으로 답하기</b> · 모르면 ‘모름’</span><span><b>회원가입 없음</b> · 입력값 저장 안 함</span></p>
       </div>
       ${sheet}
-    </div>
-    <div class="nums">
-      <div><b>${all.length}</b><span>국내·해외 인증 안내</span></div>
-      <div><b>${auto.length}</b><span>법령 원문 기준 자동 판정</span></div>
-      <div><b>${nSrc}</b><span>공식 출처 · 확인일 표시</span></div>
-      <div><b>0</b><span>서버에 저장되는 입력값</span></div>
     </div>
   </section>
   <section class="wrap home-sec">
@@ -196,13 +189,13 @@ export function selectView(st, data) {
   <div class="grid g-side">
     <aside class="panel side-f" aria-label="인증 분류">
       <div class="tabs" id="rtabs">${regionTabsHTML(st, data)}</div>
-      <h2 class="side-h">분야</h2>
-      <div class="flist" id="flist">${fieldListHTML(st, data)}</div>
-      <h2 class="side-h">우리 업종</h2>
-      <p class="side-n">고르면 다른 업종 전용 인증을 빼고 보여 줘요. 한 번 더 누르면 해제돼요.</p>
-      <div class="flist chipset" id="ilist">${industryListHTML(st, data)}</div>
-      <h2 class="side-h">목적으로 찾기</h2>
-      <div class="flist">${purposeOpts(data).map(([v, l]) => `<button type="button" data-act="purpose" data-v="${v}" aria-pressed="${f.purpose === v}">${esc(l)}</button>`).join('')}</div>
+      <div class="fgroup"><h2 class="side-h"><span class="fg-n">1</span>분야 <small>인증 종류별</small></h2>
+      <div class="flist" id="flist">${fieldListHTML(st, data)}</div></div>
+      <div class="fgroup"><h2 class="side-h"><span class="fg-n">2</span>우리 업종 <small>다른 업종 전용 인증 빼기</small></h2>
+      <p class="side-n">한 번 더 누르면 해제돼요.</p>
+      <div class="flist chipset" id="ilist">${industryListHTML(st, data)}</div></div>
+      <div class="fgroup"><h2 class="side-h"><span class="fg-n">3</span>목적으로 찾기 <small>쓰려는 곳</small></h2>
+      <div class="flist">${purposeOpts(data).map(([v, l]) => `<button type="button" data-act="purpose" data-v="${v}" aria-pressed="${f.purpose === v}">${esc(l)}</button>`).join('')}</div></div>
     </aside>
     <section aria-label="인증 목록">
       <div class="searchbox" role="search">${ICON.search}<label class="sr-only" for="q-search">인증 이름·목적으로 검색</label><input id="q-search" type="search" value="${esc(f.q)}" placeholder="인증 이름·목적으로 검색 (예: 벤처, 연구소, ISO, 유럽 수출)" autocomplete="off" enterkeyhint="search" data-input="q"></div>
@@ -429,9 +422,9 @@ export function procedureHTML(s, data, { compact = false } = {}) {
   return `<ol class="proc n${Math.min(p.steps.length, 8)}${compact ? ' sm' : ''}" aria-label="${esc(p.title)} ${p.steps.length}단계">${p.steps.map((x, i) => `<li class="ps${x.unverified ? ' u' : ''}"><i>${i + 1}</i><b>${esc(x.label)}</b>${x.sub || x.unverified ? `<small>${esc(x.sub || '')}${x.unverified ? ' (원문 미확보)' : ''}</small>` : ''}</li>`).join('')}</ol>
     ${compact ? '' : `<p class="proc-src">${p.note ? `${esc(p.note)} · ` : ''}출처: ${srcs.map((so) => `${extLink(so.official_url, so.title)} <span class="muted">(${esc(ACCESS_LABEL[so.access_status])}, 확인 ${esc(so.checked_at)})</span>`).join(' · ')}</p>`}`;
 }
-function feePanel(x, data) {
+function feePanel(x, data, { withProc = false } = {}) {
   const s = x.scheme; const f = s.fees; const p = s.processing;
-  const procTop = `<h3 class="sub-h">${esc((s.procedure && s.procedure.title) || '등록 절차')}</h3>${procedureHTML(s, data)}`;
+  const procTop = withProc ? `<h3 class="sub-h">${esc((s.procedure && s.procedure.title) || '등록 절차')}</h3>${procedureHTML(s, data)}` : '';
   const src = (refs) => [...new Set(refs)].map((r) => data.sourceMap[r]).filter(Boolean).map((so) => `${extLink(so.official_url, so.title)} <span class="muted small">· 확인 ${esc(so.fee_checked_at || so.checked_at)}</span>`).join('<br>');
   let fee = '';
   if (!f) fee = `<p class="note">공식 수수료를 아직 정리하지 못했어요. ${extLink(s.official_link, '공식 기관 안내')}에서 확인하세요.</p>`;
@@ -586,9 +579,11 @@ export function consultMailto(R) {
 // 고른 인증의 등록 절차를 한곳에 모아(취합) 단계 수와 함께 보여 준다
 function procZoneHTML(R, data) {
   const rows = R.schemes.map((x) => { const s = x.scheme; const n = s.procedure ? s.procedure.steps.length : 0;
-    return `<div class="proc-row"><div class="proc-nm"><b>${esc(shortName(s))}</b><span>${n ? `${n}단계` : '기관 안내'}</span></div>${procedureHTML(s, data, { compact: true })}</div>`; }).join('');
+    const srcs = n ? (s.procedure.source_refs || []).map((r) => data.sourceMap[r]).filter(Boolean) : [];
+    const src = srcs.length ? `<p class="proc-src sm">${s.procedure.note ? `${esc(s.procedure.note)} · ` : ''}출처: ${srcs.map((so) => `${extLink(so.official_url, so.title)} <span class="muted">(${esc(ACCESS_LABEL[so.access_status])}, 확인 ${esc(so.checked_at)})</span>`).join(' · ')}</p>` : '';
+    return `<div class="proc-row"><div class="proc-nm"><b>${esc(shortName(s))}</b><span>${n ? `${esc(s.procedure.title)} · ${n}단계` : '기관 안내'}</span></div><div>${procedureHTML(s, data, { compact: true })}${src}</div></div>`; }).join('');
   return `<section class="zone" aria-labelledby="proc-h"><h2 class="zone-h" id="proc-h"><span>2</span>등록 절차 한눈에 <em>${R.schemes.length}개 인증</em></h2>
-    <div class="proc-all">${rows}</div><p class="note">단계별 출처는 인증 카드의 ‘비용·기간’ 탭에 있어요. 점선 단계는 공식 원문을 확보하지 못한 단계예요.</p></section>`;
+    <div class="proc-all">${rows}</div><p class="note">점선 단계는 공식 원문을 확보하지 못한 단계예요. 인증별 수수료·처리기간은 카드의 ‘비용·기간’ 탭에 있어요.</p></section>`;
 }
 function prepHTML(R, no = 2) {
   const c = R.connect || { strategy: [], commonDocs: [] };
@@ -634,7 +629,7 @@ export function schemeDetail(st, data, id) {
     <dt>발급·확인</dt><dd>${esc(s.issuing_authority)}</dd>
     <dt>진단 방식</dt><dd>${{ A: '공식 원문으로 검증한 기본요건을 자동 판정', B: '핵심 요건·준비상태를 스스로 확인(판정 아님)', C: '정보 안내(자동 판정 없음)' }[levelOf(s)]}</dd>
   </dl></div>
-  ${s.fees || s.processing || s.procedure ? `<div class="card">${feePanel(x, data)}</div>` : ''}
+  ${s.fees || s.processing || s.procedure ? `<div class="card">${feePanel(x, data, { withProc: true })}</div>` : ''}
   <p class="notice info">${esc(s.scope_note)}</p>
   ${s.help_text ? `<p class="muted">${esc(s.help_text)}</p>` : ''}
   <h2 class="h2">공식 근거</h2>
