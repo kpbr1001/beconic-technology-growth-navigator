@@ -2,7 +2,7 @@
 import { loadData } from './data.js';
 import { buildReport, APP_VERSION } from './model.js';
 import { evalExpr } from './conditions.js';
-import { parseDate } from './engine.js';
+import { parseDate, ENGINE_VERSION } from './engine.js';
 import * as V from './views.js';
 import { renderPrint } from './print.js';
 import { SITE } from './site.js';
@@ -103,6 +103,8 @@ function refreshSelect() {
   const cards = document.getElementById('cards'); if (cards) cards.innerHTML = V.cardsHTML(st, D);
   const tray = document.getElementById('tray'); if (tray) tray.innerHTML = V.trayHTML(st, D);
   const mbar = document.getElementById('mbar'); if (mbar) mbar.innerHTML = V.mbarSelectHTML(st, D);
+  const fl = document.getElementById('flist'); if (fl) fl.innerHTML = V.fieldListHTML(st, D);
+  const mf = document.getElementById('mfilters'); if (mf) mf.innerHTML = V.mfiltersHTML(st, D);
   document.querySelectorAll('[data-act="region"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.region === el.dataset.v && !st.f.q)));
   document.querySelectorAll('[data-act="field"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.field === el.dataset.v)));
   document.querySelectorAll('[data-act="purpose"]').forEach((el) => el.setAttribute('aria-pressed', String(st.f.purpose === el.dataset.v)));
@@ -197,6 +199,9 @@ function onClick(e) {
       break;
     }
     case 'print': printReport(); break;
+    case 'dl': openDownload(el); break;
+    case 'jump': { const t = document.getElementById(el.dataset.to); if (t) { t.scrollIntoView({ block: 'start' }); t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); } break; }
+    case 'dl-close': document.getElementById('dl-dialog').close(); break;
     case 'rep-edit': {
       const doc = document.querySelector('#rep-stage .p-doc'); if (!doc) return;
       const on = doc.getAttribute('contenteditable') !== 'true';
@@ -236,6 +241,20 @@ function onInput(e) {
   if (t.matches('.q-text')) { const q = st.data.questionMap[t.name]; st.answers[t.name] = t.value.slice(0, (q && q.validation && q.validation.max_length) || 100); }
 }
 function onSubmit(e) { if (e.target.matches('form[data-form="answer"]')) e.preventDefault(); }
+
+// ── 공식 서식 내려받기 안내 창 ──────────────────────────────
+function openDownload(el) {
+  const dlg = document.getElementById('dl-dialog');
+  let host = '';
+  try { const u = new URL(el.dataset.url); if (u.protocol !== 'https:') return; host = u.hostname; } catch { return; }
+  document.getElementById('dl-name').textContent = el.dataset.title;
+  document.getElementById('dl-type').textContent = el.dataset.type;
+  document.getElementById('dl-host').textContent = `${host} (공식 사이트)`;
+  document.getElementById('dl-checked').textContent = el.dataset.checked || '-';
+  const go = document.getElementById('dl-go'); go.href = el.dataset.url;
+  go.onclick = () => setTimeout(() => dlg.close(), 0);
+  if (typeof dlg.showModal === 'function') dlg.showModal(); else window.open(el.dataset.url, '_blank', 'noopener');
+}
 
 // ── 보고서: PDF(인쇄)·HTML 저장 ────────────────────────────
 function markEdited(doc) {
@@ -303,7 +322,7 @@ async function boot() {
     if (ready && !document.getElementById('print-root').innerHTML) document.getElementById('print-root').innerHTML = renderPrint(st.data, report(), { edited: st.edited });
   });
   window.addEventListener('afterprint', () => { document.getElementById('print-root').innerHTML = ''; });
-  const ver = document.getElementById('ver'); if (ver) ver.textContent = `· v${APP_VERSION}`;
+  const ver = document.getElementById('ver'); if (ver) ver.textContent = `· v${APP_VERSION} · 판정엔진 ${ENGINE_VERSION}`;
   const yr = document.getElementById('year'); if (yr) yr.textContent = st.asOf.slice(0, 4);
   try {
     st.data = await loadData('');

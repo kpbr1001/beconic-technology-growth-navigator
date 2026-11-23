@@ -65,6 +65,8 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
 // ── E01 3단계 흐름·중복 질문·개인정보·CSP ──
 {
   const p = await newPage({ w: 1440, h: 900 });
+  const cta = (await p.textContent('.home-hero a.btn')).trim();
+  check('E22 시작 버튼 문구 = 기업인증 진단 시작', cta.startsWith('기업인증 진단 시작'), cta);
   await p.click('a.btn[href="#/select"]'); await p.waitForSelector('#cards');
   const stepOn = await p.$eval('.st[aria-current="step"]', (e) => e.textContent.trim());
   for (const id of ['VEN', 'INNO', 'RNDI']) await p.click(`[data-act="pick"][data-id="${id}"]`);
@@ -119,6 +121,22 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   await p.click('.side-f [data-act="region"][data-v="domestic"]'); await p.click('.side-f [data-act="purpose"][data-v="procurement"]'); await p.waitForTimeout(100);
   const rec = await p.$$eval('#cards .rec-mark', (e) => e.length); const all = (await names()).length;
   check('E04e 목적으로 찾기: 공공조달 목적 인증만, 목적 추천 표시', rec > 0 && rec === all, `${rec}/${all}`);
+  // 국내·해외 탭마다 분야별 숫자 = 실제 카드 수(탭 전환 후 분야 목록이 다시 그려지는지)
+  const mism = [];
+  for (const region of ['domestic', 'international']) {
+    await p.click(`.side-f [data-act="region"][data-v="${region}"]`); await p.waitForTimeout(80);
+    if (await p.$('.side-f [data-act="purpose"][aria-pressed="true"]')) { await p.click('.side-f [data-act="purpose"][aria-pressed="true"]'); await p.waitForTimeout(80); }
+    const items = await p.$$eval('.side-f .flist [data-act="field"]', (e) => e.map((x) => ({ v: x.dataset.v, n: Number((x.querySelector('em') || {}).textContent) })));
+    const sum = items.filter((x) => x.v !== 'all').reduce((a, x) => a + x.n, 0);
+    const all = items.find((x) => x.v === 'all').n;
+    if (sum !== all) mism.push(`${region} 분야 합 ${sum} ≠ 전체 ${all}`);
+    for (const it of items) {
+      await p.click(`.side-f .flist [data-act="field"][data-v="${it.v}"]`); await p.waitForTimeout(60);
+      const shown = (await p.$$('#cards .cc')).length;
+      if (shown !== it.n) mism.push(`${region}/${it.v} 표시 ${it.n} · 실제 ${shown}`);
+    }
+  }
+  check('E04g 국내·해외 탭 전환 시 분야별 숫자 = 실제 카드 수', mism.length === 0, mism.join(' | '));
   const total = await p.$eval('.side-f .tabs', (e) => e.textContent);
   check('E04f 인증 수 표시(국내·해외)', /국내 \d+/.test(total) && /해외 \d+/.test(total), total.trim());
   await p.context().close();
@@ -148,6 +166,9 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   await ans(p, 'ven_rd_ratio', 'r:10:');
   await ans(p, 'rnd_researchers', 'r:2:3'); await ans(p, 'rnd_is_venture', 'no'); await ans(p, 'rnd_founder_researcher', 'no');
   await ans(p, 'rnd_space', 'independent'); await ans(p, 'rnd_equipment', 'yes'); await ans(p, 'rnd_excluded_field', 'no');
+  await p.click('.q-nav [data-to="sec-RNDI"]');
+  const jumpOk = await p.waitForFunction(() => location.hash === '#/answer' && Math.abs(document.getElementById('sec-RNDI').getBoundingClientRect().top) < 200, null, { timeout: 4000 }).then(() => true).catch(() => false);
+  check('E25 질문 구역 바로가기: 같은 화면에서 해당 인증 질문으로 이동(오류 화면 아님)', jumpOk);
   const prev = await p.textContent('#preview');
   check('E19 답하기 화면 미리보기가 답에 따라 바뀜', prev.includes('기본요건 확인') || prev.includes('미충족'), prev.replace(/\s+/g, ' ').slice(0, 80));
   await toResult(p);
@@ -161,7 +182,14 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   check('E11c 비용·기간 탭: 벤처 유형별 수수료 5행 + 근거 링크', feeRows === 5 && (await p.$$('#tp-VEN-fee a.ext')).length >= 1, `${feeRows}행`);
   await p.click('[data-act="tab"][data-card="VEN"][data-k="docs"]');
   const docs = await p.$$eval('#tp-VEN-docs a.ext', (e) => e.map((x) => x.href));
-  check('E20 서류 탭: 공식 가이드라인·양식·발급처 링크', docs.some((h) => h.includes('smes.go.kr/venturein/file/download')) && docs.length >= 5, `${docs.length}개`);
+  const files = await p.$$eval('#tp-VEN-docs [data-act="dl"]', (e) => e.map((x) => x.dataset.url));
+  const nums = await p.$$eval('#tp-VEN-docs td.no', (e) => e.map((x) => x.textContent.trim()));
+  check('E20 서류 탭: 공식 서식(내려받기)·발급처 링크, 서류 번호 1~N', files.some((h) => h.includes('smes.go.kr/venturein/file/download')) && docs.length >= 5 && nums.join(',') === nums.map((_, i) => i + 1).join(','), `서식 ${files.length} · 링크 ${docs.length} · 번호 ${nums.length}`);
+  await p.click('#tp-VEN-docs [data-act="dl"]');
+  const dlg = await p.evaluate(() => ({ open: document.getElementById('dl-dialog').open, href: document.getElementById('dl-go').href, rel: document.getElementById('dl-go').rel, type: document.getElementById('dl-type').textContent }));
+  check('E20b 서식 내려받기 전 안내 창(형식·출처·확인일), 새 창 noopener', dlg.open && dlg.href.startsWith('https://www.smes.go.kr/') && dlg.rel.includes('noopener') && dlg.type === 'PDF', JSON.stringify(dlg).slice(0, 80));
+  await p.click('[data-act="dl-close"]');
+  check('E20c 안내 창 닫기', !(await p.evaluate(() => document.getElementById('dl-dialog').open)));
   check('E08 서류 보유(있음·없음) 입력 없음', (await p.$$('[data-doc]')).length === 0 && !(await p.textContent('main')).includes('보유 여부'));
   const tabSel = await p.$eval('[data-act="tab"][data-card="VEN"][data-k="docs"]', (e) => e.getAttribute('aria-selected'));
   await p.focus('[data-act="tab"][data-card="VEN"][data-k="docs"]'); await p.keyboard.press('ArrowRight');
@@ -174,6 +202,13 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   const links = await p.$$eval('.next-card a', (as) => as.map((a) => ({ href: a.href, rel: a.rel, target: a.target })));
   check('E16 다음 진단 추천 1~3개, BECONIC 서비스·새 창 noopener', links.length >= 1 && links.length <= 3 && links.every((l) => /^https:\/\/beconic-[a-z0-9-]+\.netlify\.app\//.test(l.href) && l.target === '_blank' && l.rel.includes('noopener')));
   check('E16b 벤처+이노비즈 공통 서류 묶음', (await p.$$('.common-docs li')).length >= 2);
+  const sizes = await p.$$eval('.side-r .btn', (e) => e.map((x) => `${Math.round(x.getBoundingClientRect().width)}x${Math.round(x.getBoundingClientRect().height)}`));
+  const nextBtns = await p.$$eval('.next-card .btn', (e) => e.map((x) => Math.round(x.getBoundingClientRect().bottom)));
+  check('E23 오른쪽 버튼 크기 동일·다음 진단 버튼 위치 동일', new Set(sizes).size === 1 && new Set(nextBtns).size === 1, `${[...new Set(sizes)]} / ${[...new Set(nextBtns)]}`);
+  const whos = await p.$$eval('.side-r .rm .who', (e) => e.map((x) => x.textContent));
+  check('E26 여러 인증 선택 시 할 일마다 인증 이름 표시', whos.length > 0 && whos.every(Boolean), whos.join('·'));
+  const labels = await p.$$eval('.side-r .rm .no2', (e) => e.map((x) => Math.round(x.getBoundingClientRect().width)));
+  check('E24 할 일 순서 라벨 폭 동일(먼저·신청 등)', labels.length > 0 && new Set(labels).size === 1, [...new Set(labels)].join(','));
   const mail = await p.getAttribute('.callout a[href^="mailto:"]', 'href');
   const body = decodeURIComponent((mail || '').split('&body=')[1] || '');
   check('E16c 상담 메일 초안: 문서번호·결과 포함', /BC-\d{8}-[0-9A-Z]{6}/.test(body) && body.includes('벤처기업확인'));
@@ -247,7 +282,7 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   check('E12 정적 HTML head에 OG·canonical (JS 실행 전)', missing.length === 0, missing.join(','));
   check('E12b og:image 절대 HTTPS 1200×630', /og:image" content="https:\/\/[^"]+og-certification\.png"/.test(html) && html.includes('content="1200"') && html.includes('content="630"'));
   check('E12c OG 이미지 로컬 200', (await fetch(`${BASE}assets/og-certification.png`)).status === 200);
-  check('E12f 헤더·푸터 로고는 방패만(글자 로고 없음)', !html.includes('growth-ventures-ko') && (html.match(/growth-shield-symbol-navy\.png/g) || []).length >= 2);
+  check('E12f 헤더·푸터: 방패 + BECONIC + by Growth Ventures(IR 진단과 같은 형태), 글자 로고 없음', !html.includes('growth-ventures-ko') && html.includes('assets/shield.png') && html.includes('assets/shield-white.png') && (html.match(/기업인증 진단 · by Growth Ventures/g) || []).length === 2 && html.includes('class="f-cert"'));
   const p = await newPage();
   const tel = await p.$$eval('a[href^="tel:"]', (e) => [...new Set(e.map((x) => x.getAttribute('href')))]);
   const mail = await p.$$eval('a[href^="mailto:"]', (e) => [...new Set(e.map((x) => x.getAttribute('href')))]);

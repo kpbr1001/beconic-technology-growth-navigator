@@ -5,7 +5,7 @@ import { computeReadiness, readinessSentence, EVIDENCE } from './readiness.js';
 import { recommend, TIER_LABEL } from './recommend.js';
 import { triage } from './triage.js';
 
-export const APP_VERSION = '2.0.0';
+export const APP_VERSION = '2.0.1';
 
 export const CATEGORY = {
   1: '신청 장애 요인 제거·확인',
@@ -166,16 +166,17 @@ export function buildActions(data, schemes) {
       if (r.basic === S.PASS || r.basic === S.UNKNOWN) {
         const assess = [];
         r.pathways.forEach((p) => { if (p.basic === S.PASS || p.basic === S.UNKNOWN) p.leaves.forEach((l) => { if (l.kind === 'assessment' && !l.inactive && !assess.includes(l.label)) assess.push(l.label); }); });
-        if (assess.length) push({ category: 3, timeframe: 'd60', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname} 평가 준비`, detail: `${assess.join(' · ')} — 공식 평가지표·제출서류로 근거 자료를 맞춰 두세요. 이 앱은 평가 점수를 예측하지 않아요.`, basis: '', owner: '대표·연구책임자', deliverable: '평가 대응 자료', done_when: '평가지표별 근거 자료 정리' });
-        push({ category: 3, timeframe: 'd90', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname} 신청·평가 일정 확정`, detail: '공식 시스템에서 신청서를 작성하고 평가 일정을 잡아요.', basis: s.scheme.official_link, owner: '대표', deliverable: '신청 접수', done_when: '접수 완료 확인' });
+        if (assess.length) push({ category: 3, timeframe: 'd60', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: '기관 평가 준비', detail: `${assess.join(' · ')} — 공식 평가지표에 맞춰 근거 자료를 준비하세요.`, basis: '', owner: '대표·연구책임자', deliverable: '평가 대응 자료', done_when: '평가지표별 근거 자료 정리' });
+        push({ category: 3, timeframe: 'd90', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: '신청서 작성·접수', detail: '공식 시스템에서 신청서를 작성하고 접수해요.', basis: s.scheme.official_link, owner: '대표', deliverable: '신청 접수', done_when: '접수 완료 확인' });
       }
     }
     if (s.readiness) {
       s.readiness.rows.filter((x) => x.applicable).forEach((d) => {
         if (d.status === EVIDENCE.NOT_AVAILABLE) push({ category: d.required ? 2 : 4, timeframe: d.required ? 'd30' : 'd90', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `서류 준비: ${d.label}`, detail: d.why, basis: d.where ? `발급·확인처: ${d.where}` : '', owner: '경영지원', deliverable: d.label, done_when: '서류 확보' });
       });
-      const req = s.readiness.rows.filter((x) => x.applicable && x.required && x.status !== EVIDENCE.NOT_AVAILABLE && x.status !== EVIDENCE.SELF_DECLARED_AVAILABLE);
-      if (req.length && !(r && r.gate.active && r.basic === S.FAIL)) push({ category: 2, timeframe: 'd30', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname} 신청서류 ${req.length}건 준비`, detail: req.slice(0, 4).map((x) => x.label).join(' · ') + (req.length > 4 ? ` 외 ${req.length - 4}건` : ''), basis: '', owner: '경영지원', deliverable: '신청서류', done_when: '발급·작성 완료' });
+      const all = s.readiness.rows.filter((x) => x.applicable && x.status !== EVIDENCE.NOT_AVAILABLE && x.status !== EVIDENCE.SELF_DECLARED_AVAILABLE);
+      const nReq = all.filter((x) => x.required).length;
+      if (all.length && !(r && r.gate.active && r.basic === S.FAIL)) push({ category: 2, timeframe: 'd30', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `신청서류 ${all.length}개 준비${nReq !== all.length ? `(필수 ${nReq})` : ''}`, detail: all.slice(0, 3).map((x) => x.label.replace(/\(.*?\)/g, '')).join(' · ') + (all.length > 3 ? ` 외 ${all.length - 3}개` : ''), basis: '', owner: '경영지원', deliverable: '신청서류', done_when: '발급·작성 완료' });
     }
     if (s.selfcheck) {
       s.selfcheck.rows.forEach((d) => {
@@ -188,7 +189,7 @@ export function buildActions(data, schemes) {
       push({ category: 4, timeframe: 'd30', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname}: 공식 요건 확인`, detail: s.scheme.first_check, basis: s.scheme.official_link, owner: '경영지원', deliverable: '요건 확인 메모', done_when: '공식 기관 안내 확인' });
     }
     if (s.ongoing && s.result && s.result.gate.active && s.result.basic !== S.NA && s.result.basic !== S.FAIL) {
-      push({ category: 5, timeframe: 'ongoing', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: `${sname} 사후관리`, detail: s.ongoing, basis: '', owner: '경영지원', deliverable: '관리 일정', done_when: '캘린더 등록' });
+      push({ category: 5, timeframe: 'ongoing', scheme_id: sid, scheme_name: sname, rank: tierRank(s), title: '유효기간·사후관리', detail: s.ongoing, basis: '', owner: '경영지원', deliverable: '관리 일정', done_when: '캘린더 등록' });
     }
   });
   return out.sort((a, b) => a.category - b.category || a.rank - b.rank).map((a, i) => ({ ...a, order: i + 1, category_label: CATEGORY[a.category], timeframe_label: TIMEFRAME[a.timeframe] }));

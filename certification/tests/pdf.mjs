@@ -83,6 +83,7 @@ for (const sc of SCEN.filter((x) => !process.env.SCEN || x.id.startsWith(process
   try { await sc.run(p); } catch (e) { await p.screenshot({ path: join(OUT, `${sc.id}-FAIL.png`), fullPage: true }); console.log(`❌ ${sc.id} 진행 실패: ${e.message.split('\n')[0]} (url ${p.url()})`); summary.push({ id: sc.id, ok: false, error: e.message.split('\n')[0] }); await p.context().close(); continue; }
   await p.goto(`${BASE}#/result`); await p.waitForSelector('#result-title');
   const screenStatus = await p.$$eval('.rc .rc-h .badge', (e) => e.map((x) => x.textContent.trim()));
+  const screenHead = (await p.textContent('#result-title')).trim();
   await p.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
   await p.emulateMedia({ media: 'print' });
   await p.evaluate(() => document.fonts.ready);
@@ -103,6 +104,7 @@ for (const sc of SCEN.filter((x) => !process.env.SCEN || x.id.startsWith(process
     feesSection: text.includes('신청서류와 공식 링크') && text.includes('공식 수수료'),
     noHolding: !/보유 여부|자가응답 기준|있음\s+필수/.test(text),
     notEdited: !text.includes('편집본 —'),
+    headlineMatch: text.replace(/\s+/g, '').includes(screenHead.replace(/\s+/g, '')),
     companyOk: sc.id === 'S6-no-judgement' || text.includes('비코닉테스트') || text.includes('기업명 미입력') || text.includes('가나다라'),
     statusMatch: screenStatus.every((s) => text.replace(/\s+/g, '').includes(s.replace(/\s+/g, ''))),
     fontsEmbedded: notEmbedded.length === 0,

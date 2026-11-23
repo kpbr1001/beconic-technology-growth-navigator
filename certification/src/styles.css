@@ -317,3 +317,78 @@ fieldset.q { margin: 0 0 14px; }
   .foot-in { padding: 22px 16px 120px; }
   .rep-bar { top: 60px; } .rep-stage .p-doc { padding: 24px 18px; }
 }
+
+/* ── v2.1 결과 화면 구역·버튼 통일·서류 번호·내려받기 안내 ── */
+.zone { margin: 0 0 28px; }
+.zone-h { display: flex; align-items: center; gap: 10px; font-size: 21px; margin: 0 0 14px; padding: 0 0 10px; border-bottom: 2px solid var(--navy); }
+.zone-h span { width: 28px; height: 28px; border-radius: 8px; background: var(--navy); color: #fff; display: grid; place-items: center; font-size: 15px; flex: none; }
+.zone-h em { font-style: normal; font-size: 14px; color: var(--m); font-weight: 600; }
+.zone .rc:last-child { margin-bottom: 0; }
+.prep { background: #fff; border: 1px solid var(--b); border-radius: 22px; padding: 22px 26px; margin: 0; }
+.side-r { display: grid; gap: 16px; }
+.side-r .panel, .side-r .callout { margin: 0; }
+.side-t { font-size: 17px; margin: 0 0 12px; }
+.act { display: grid; gap: 10px; }
+.side-r .btn { width: 100%; min-height: 52px; font-size: 16px; padding: 12px 16px; }
+.callout .btn + .btn { margin-top: 10px; }
+.rm .no2 { min-width: 78px; text-align: center; padding: 5px 8px; }
+.next-card { flex-direction: column; gap: 8px; }
+.next-top { display: flex; align-items: center; gap: 10px; }
+.next-top .next-name { margin: 0; }
+.next-why { margin: 0; font-size: 14px; color: var(--s); flex: 1; }
+.next-card .btn { width: 100%; margin-top: 4px; min-height: 44px; }
+.btn.sm.w { width: 100%; }
+.sub-h { font-size: 16px; margin: 0 0 10px; }
+.sub-h + .dt, .guide-list + .sub-h { margin-top: 0; }
+.guide-list { margin: 0 0 20px; padding-left: 22px; display: grid; gap: 6px; }
+.dt th.no, .dt td.no { width: 44px; text-align: center; color: var(--m); font-weight: 700; }
+.dl { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 2px 0; color: var(--pd); font-weight: 700; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.dl:hover { color: var(--p); }
+.dl-dialog { border: 0; border-radius: 20px; padding: 26px 28px; max-width: 480px; width: calc(100% - 32px); box-shadow: 0 20px 60px #0003; color: var(--t); }
+.dl-dialog::backdrop { background: rgba(15, 25, 50, .45); }
+.dl-dialog h2 { margin: 0 0 6px; font-size: 20px; }
+.dl-name { font-weight: 800; margin: 0 0 12px; }
+.dl-meta { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 4px 10px; margin: 0 0 12px; font-size: 15px; }
+.dl-meta dt { color: var(--m); } .dl-meta dd { margin: 0; word-break: break-all; }
+.dl-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.q-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: -8px 0 20px; }
+.q-nav button { padding: 8px 14px; border-radius: 999px; background: #fff; border: 1px solid var(--b); font-weight: 700; font-size: 14px; color: var(--s); min-height: 40px; }
+.q-nav button:hover { border-color: var(--p); color: var(--pd); }
+.rm .who { display: block; font-size: 13px; font-weight: 700; color: var(--pd); }
+.sec-t { scroll-margin-top: 90px; }
+@media (max-width: 760px) {
+  .zone-h { font-size: 18px; }
+  .prep { padding: 18px; }
+  .dt td.no { display: inline-block; width: auto; text-align: left; }
+  .dt td.no::before { content: 'No. '; }
+}
+.callout { padding: 24px; }
+
+/* ── 헤더·푸터: BECONIC 공통 형태(IR 진단과 동일) ── */
+.top-in { min-height: 60px; padding: 10px 40px; }
+.brand { gap: 10px; font-size: inherit; }
+.brand img { width: 34px; height: 34px; }
+.brand .txt { display: flex; flex-direction: column; line-height: 1.15; }
+.brand .txt b { font-size: 18px; font-weight: 800; letter-spacing: .02em; color: var(--navy); }
+.brand .txt small { font-size: 11.5px; color: var(--m); font-weight: 600; letter-spacing: 0; display: block; }
+.nav a.call { display: inline-flex; align-items: center; gap: 6px; background: var(--pw); color: var(--pd); }
+.nav a.call:hover { background: #dbe8ff; color: var(--pd); }
+.foot { background: #142044; color: #b8c3e0; border-top: 0; margin-top: 64px; }
+.foot-in { padding: 40px 40px calc(40px + var(--safe-b)); display: block; }
+.f-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.f-brand img { width: 40px; height: 40px; }
+.f-brand b { color: #fff; font-size: 18px; display: block; letter-spacing: .02em; }
+.f-brand small { font-size: 12px; color: #93a1cc; }
+.foot-in p { margin: 6px 0; font-size: 13px; line-height: 1.7; }
+.foot a, .foot .linkbtn { color: #dbe3f7; }
+.f-cert { color: #fff; font-weight: 600; }
+.f-legal { color: #93a1cc; }
+.f-ver { color: #7381ad; font-size: 12px; }
+@media (max-width: 760px) {
+  .top-in { padding: 8px 16px; }
+  .brand .txt small { display: block; font-size: 11px; }
+  .nav a.call { padding: 8px 12px; }
+  .foot-in { padding: 32px 16px calc(120px + var(--safe-b)); }
+}
+@media (max-width: 420px) { .nav a.call span { display: none; } }
+.foot a { text-decoration: underline; text-underline-offset: 3px; }
