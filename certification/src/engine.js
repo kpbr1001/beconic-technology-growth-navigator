@@ -2,7 +2,7 @@
 // 순수 함수만 둔다(DOM·네트워크·저장소 접근 없음). 브라우저와 Node 테스트가 같은 코드를 쓴다.
 import { isMissing, band, bandGte } from './conditions.js';
 
-export const ENGINE_VERSION = '2.1.0'; // 2.1: 구간 답 판정
+export const ENGINE_VERSION = '2.2.0'; // 2.1: 구간 답 판정 · 2.2: 규칙이 쓰는 질문 목록(질문 3층 구조)
 export const S = Object.freeze({ PASS: 'PASS', FAIL: 'FAIL', UNKNOWN: 'UNKNOWN', NA: 'NOT_APPLICABLE' });
 
 // ── 4값 결합 ───────────────────────────────────────────────
@@ -289,6 +289,32 @@ export const CHECKS = {
     return { status: S.UNKNOWN, unverified: true };
   },
 };
+
+// ── 규칙이 쓰는 질문 ──────────────────────────────────────
+// 규칙팩 args에 이름이 드러나지 않지만 판정 함수가 직접 읽는 질문. 함수가 새 답을 읽으면 여기에도 적는다
+// (tests/questions.test.mjs QS-02가 판정 결과의 inputs·missing과 대조해 누락을 잡는다).
+export const IMPLICIT_INPUTS = Object.freeze({
+  biz_age_gte: ['founded_on', 'suspended_period', 'converted_from_individual', 'biz_status'],
+  rnd_institute_staff: ['rnd_researchers', 'company_size', 'rnd_is_venture', 'rnd_founder_researcher', 'founded_on', 'rnd_became_medium_1y'],
+  // 업종(정보서비스·SW)은 전담부서(unit: dept)의 칸막이 예외에서만 읽는다
+  rnd_space: (args) => ['rnd_space', 'is_sme', 'rnd_is_venture', 'rnd_founder_researcher', 'rnd_space_over50_impossible', ...(args && args.unit === 'dept' ? ['industry'] : [])],
+});
+// 규칙팩 하나가 판정에 쓰는 질문 ID 목록(questionMap에 있는 것만)
+export function questionsUsedBy(pack, questionMap) {
+  const out = new Set();
+  const walk = (o) => {
+    if (typeof o === 'string') { if (questionMap[o]) out.add(o); return; }
+    if (Array.isArray(o)) { o.forEach(walk); return; }
+    if (o && typeof o === 'object') {
+      const imp = o.type === 'LEAF' && IMPLICIT_INPUTS[o.check];
+      if (imp) (typeof imp === 'function' ? imp(o.args) : imp).forEach((q) => { if (questionMap[q]) out.add(q); });
+      Object.values(o).forEach(walk);
+    }
+  };
+  walk(pack.pathways || []);
+  if (pack.applicability) walk(pack.applicability);
+  return out;
+}
 
 // ── 트리 평가 ─────────────────────────────────────────────
 function sourceOk(ref, ctx) {

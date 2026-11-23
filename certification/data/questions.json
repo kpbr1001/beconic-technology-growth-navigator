@@ -1,5 +1,5 @@
 {
-  "version": "2026.11.23-1",
+  "version": "2026.11.23-3",
   "groups": [
     {
       "group_id": "purpose",
@@ -160,6 +160,93 @@
       }
     },
     {
+      "question_id": "industry_major",
+      "version": 1,
+      "scheme_id": null,
+      "group": "purpose",
+      "label_plain_ko": "우리 회사 업종(대분류)",
+      "why_this_matters": "다른 업종 전용 인증(예: 식품 회사가 아니면 HACCP)을 목록에서 빼 줘요. 한국표준산업분류(KSIC) 대분류를 쉬운 말로 묶었어요. 요건 판정에는 쓰지 않아요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "elec",
+          "label": "전기·전자·반도체 제조",
+          "ksic": "C26~C28"
+        },
+        {
+          "value": "mach",
+          "label": "기계·장비·자동차 제조",
+          "ksic": "C29~C31"
+        },
+        {
+          "value": "bio",
+          "label": "바이오·의약·의료기기",
+          "ksic": "C21·C27"
+        },
+        {
+          "value": "food",
+          "label": "식품·화장품 제조",
+          "ksic": "C10~C11·C20 일부"
+        },
+        {
+          "value": "chem",
+          "label": "화학·소재·기타 제조",
+          "ksic": "그 밖의 C"
+        },
+        {
+          "value": "ict",
+          "label": "소프트웨어·정보통신",
+          "ksic": "J58·J61~J63"
+        },
+        {
+          "value": "trade",
+          "label": "도소매·유통·전자상거래",
+          "ksic": "G"
+        },
+        {
+          "value": "pro",
+          "label": "연구개발·디자인·컨설팅 서비스",
+          "ksic": "M"
+        },
+        {
+          "value": "constr",
+          "label": "건설·에너지·환경",
+          "ksic": "D·E·F"
+        },
+        {
+          "value": "agri",
+          "label": "농림어업",
+          "ksic": "A"
+        },
+        {
+          "value": "culture",
+          "label": "콘텐츠·문화·교육",
+          "ksic": "J59~J60·P·R"
+        },
+        {
+          "value": "svc",
+          "label": "기타 서비스",
+          "ksic": "그 밖"
+        },
+        {
+          "value": "unknown",
+          "label": "모름·전체 보기",
+          "ksic": ""
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "never",
+      "show_when": "never",
+      "evidence_examples": [
+        "사업자등록증 업태·종목"
+      ],
+      "rule_refs": [],
+      "source_refs": [],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
       "question_id": "company_name",
       "version": 1,
       "scheme_id": null,
@@ -225,7 +312,8 @@
       ],
       "privacy_level": "low",
       "help_text": "",
-      "validation": {}
+      "validation": {},
+      "core": true
     },
     {
       "question_id": "founded_on",
@@ -449,69 +537,127 @@
       "version": 1,
       "scheme_id": null,
       "group": "profile",
-      "label_plain_ko": "주 업종에 가장 가까운 것을 골라 주세요",
-      "why_this_matters": "벤처 연구개발유형은 업종·매출 규모별로 필요한 연구개발비 비율(5~10%)이 달라요. 공식 업종표 분류를 그대로 사용해요.",
+      "label_plain_ko": "세부 업종에 가장 가까운 것을 골라 주세요",
+      "why_this_matters": "벤처 연구개발유형은 업종·매출 규모별로 필요한 연구개발비 비율(5~10%)이 달라요. 연구개발전담부서의 칸막이 예외(정보서비스·소프트웨어업)에도 쓰여요. 공식 업종표 분류를 그대로 사용해요.",
       "data_type": "single",
       "response_options": [
         {
           "value": "pharma_21",
-          "label": "의약품 제조(21)"
+          "label": "의약품 제조(21)",
+          "majors": [
+            "bio"
+          ]
         },
         {
           "value": "machinery_29",
-          "label": "기계 및 장비 제조(29, 사무용기계 제외)"
+          "label": "기계 및 장비 제조(29, 사무용기계 제외)",
+          "majors": [
+            "mach"
+          ]
         },
         {
           "value": "computer_263",
-          "label": "컴퓨터 및 주변장치 제조(263)"
+          "label": "컴퓨터 및 주변장치 제조(263)",
+          "majors": [
+            "elec"
+          ]
         },
         {
           "value": "office_2918",
-          "label": "사무용기계 및 장비 제조(2918)"
+          "label": "사무용기계 및 장비 제조(2918)",
+          "majors": [
+            "mach",
+            "elec"
+          ]
         },
         {
           "value": "electric_28",
-          "label": "전기장비 제조(28)"
+          "label": "전기장비 제조(28)",
+          "majors": [
+            "elec"
+          ]
         },
         {
           "value": "semi_261_262",
-          "label": "반도체 및 전자부품 제조(261, 262)"
+          "label": "반도체 및 전자부품 제조(261, 262)",
+          "majors": [
+            "elec"
+          ]
         },
         {
           "value": "medical_27",
-          "label": "의료·정밀·광학기기 및 시계 제조(27)"
+          "label": "의료·정밀·광학기기 및 시계 제조(27)",
+          "majors": [
+            "bio",
+            "elec"
+          ]
         },
         {
           "value": "other_mfg",
-          "label": "기타 제조업"
+          "label": "기타 제조업",
+          "majors": [
+            "elec",
+            "mach",
+            "bio",
+            "food",
+            "chem"
+          ]
         },
         {
           "value": "retail_45_47",
-          "label": "도매 및 소매업(45~47)"
+          "label": "도매 및 소매업(45~47)",
+          "majors": [
+            "trade"
+          ]
         },
         {
           "value": "telecom_61",
-          "label": "통신업(61)"
+          "label": "통신업(61)",
+          "majors": [
+            "ict"
+          ]
         },
         {
           "value": "software_582",
-          "label": "소프트웨어 개발 및 공급업(582)"
+          "label": "소프트웨어 개발 및 공급업(582)",
+          "majors": [
+            "ict"
+          ]
         },
         {
           "value": "programming_62",
-          "label": "컴퓨터 프로그래밍, 시스템 통합 및 관리업(62)"
+          "label": "컴퓨터 프로그래밍, 시스템 통합 및 관리업(62)",
+          "majors": [
+            "ict"
+          ]
         },
         {
           "value": "info_63",
-          "label": "정보서비스업(63)"
+          "label": "정보서비스업(63)",
+          "majors": [
+            "ict"
+          ]
         },
         {
           "value": "internet",
-          "label": "인터넷산업"
+          "label": "인터넷산업",
+          "majors": [
+            "ict",
+            "trade",
+            "culture"
+          ]
         },
         {
           "value": "other",
-          "label": "기타 산업(서비스·건설·농업 등)"
+          "label": "기타 산업(서비스·건설·농업 등)",
+          "majors": [
+            "pro",
+            "constr",
+            "agri",
+            "culture",
+            "svc",
+            "trade"
+          ]
         },
         {
           "value": "unknown",
@@ -1475,7 +1621,7 @@
       "scheme_id": null,
       "group": "scheme",
       "label_plain_ko": "대학·정부출연연구기관 등의 연구원·교원이 창업한 회사인가요?",
-      "why_this_matters": "연구원·교원이 휴직·겸직 등으로 창업했거나 퇴직 후 3년 이내 창업한 연구개발형 중소기업은 연구전담요원 2명이면 돼요.",
+      "why_this_matters": "연구원·교원이 휴직·겸직 등으로 창업했거나 퇴직 후 3년 이내 창업한 연구개발형 중소기업은 연구전담요원 2명이면 돼요. 연구개발전담부서의 칸막이 예외 대상인지 판단할 때도 쓰여요.",
       "data_type": "single",
       "response_options": [
         {
@@ -1493,7 +1639,7 @@
       ],
       "unknown_allowed": true,
       "required_when": "never",
-      "show_when": "scheme in [RNDI]",
+      "show_when": "scheme in [RNDI] or scheme in [RNDD] and rnd_space == partition",
       "evidence_examples": [
         "연구원·교원 창업 증명 서류"
       ],
