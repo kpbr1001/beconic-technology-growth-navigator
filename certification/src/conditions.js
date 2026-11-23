@@ -14,6 +14,27 @@ export function isMissing(v) {
   return false;
 }
 
+// 구간 답: 'r:lo:hi' = lo 이상 hi 미만(hi 생략 = 상한 없음), lo와 hi가 같으면 정확히 그 값.
+// 숫자 답은 정확한 값. 구간 버튼(칩)으로 받은 답을 판정·조건식이 같은 방식으로 다룬다.
+const BAND = /^r:(\d+(?:\.\d+)?)?:(\d+(?:\.\d+)?)?$/;
+export function band(v) {
+  if (typeof v === 'number' && Number.isFinite(v)) return { lo: v, hi: v, exact: true };
+  if (typeof v !== 'string') return null;
+  const m = v.match(BAND);
+  if (!m) return null;
+  const lo = m[1] === undefined ? 0 : Number(m[1]);
+  const hi = m[2] === undefined ? Infinity : Number(m[2]);
+  if (hi < lo) return null;
+  return { lo, hi, exact: lo === hi };
+}
+export const isBand = (v) => typeof v === 'string' && BAND.test(v);
+// 구간 안의 모든 값이 t 이상이면 true, 모두 t 미만이면 false, 걸치면 null
+export function bandGte(b, t) {
+  if (b.lo >= t) return true;
+  if (b.exact ? b.lo < t : b.hi <= t) return false;
+  return null;
+}
+
 function listOf(raw) {
   return raw.split(',').map((s) => s.trim()).filter(Boolean);
 }
@@ -40,8 +61,16 @@ function clause(c, answers, ctx) {
       const eq = v !== undefined && v !== null && String(v) === rhs;
       return op === '==' ? eq : !eq;
     }
-    if (typeof v !== 'number' || Number.isNaN(v)) return false;
     const n = Number(rhs);
+    if (isBand(v)) {
+      // 구간 답: 모든 값이 조건을 만족하거나 일부라도 만족하면 참(구간이 걸치면 보수적으로 포함 — 서류·질문을 빠뜨리지 않기 위해)
+      const b = band(v);
+      if (op === '>') return b.exact ? b.lo > n : b.hi > n;
+      if (op === '>=') return b.exact ? b.lo >= n : b.hi > n;
+      if (op === '<') return b.lo < n;
+      return b.lo <= n;
+    }
+    if (typeof v !== 'number' || Number.isNaN(v)) return false;
     if (op === '>') return v > n;
     if (op === '>=') return v >= n;
     if (op === '<') return v < n;

@@ -74,7 +74,7 @@ test('DATA-04 모든 원자요건: 화이트리스트 판정 함수·존재하�
     assert.ok(CHECKS[n.check], `${pack.rule_pack_id}/${n.id} 판정 함수 ${n.check}`);
     (n.source_refs || []).forEach((r) => assert.ok(D.sourceMap[r], `${n.id} 출처 ${r} 없음`));
     const args = n.args || {};
-    ['q', 'invest', 'capital', 'culture', 'spend', 'revenue', 'industry'].forEach((k) => { if (args[k]) assert.ok(D.questionMap[args[k]], `${n.id} 질문 ${args[k]} 없음`); });
+    ['q', 'invest', 'capital', 'culture', 'spend', 'revenue', 'industry', 'ratio_q'].forEach((k) => { if (args[k]) assert.ok(D.questionMap[args[k]], `${n.id} 질문 ${args[k]} 없음`); });
   });
 });
 
