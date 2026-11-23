@@ -29,8 +29,11 @@
 .p-cover { height: 297mm; padding: 26mm 22mm 20mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; background: #fff; position: relative; }
 .p-cover::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 9mm; background: #1B2C55; }
 .p-cover-top { display: flex; align-items: center; justify-content: space-between; }
+.p-cover-id { display: flex; align-items: center; gap: 3.5mm; }
 .p-cover-logo { height: 13mm; width: auto; }
-.p-cover-brand { font-weight: 800; letter-spacing: .12em; color: #1B2C55; font-size: 13pt; }
+.p-cover-brand { display: flex; flex-direction: column; line-height: 1.2; color: #1B2C55; }
+.p-cover-brand b { font-weight: 800; letter-spacing: .04em; font-size: 16pt; }
+.p-cover-brand small { font-size: 8.5pt; color: #6B7684; font-weight: 600; letter-spacing: 0; }
 .p-kicker { color: #1769FF; font-weight: 700; letter-spacing: .04em; font-size: 10pt; margin: 0 0 4mm; }
 .p-title { font-size: 26pt; line-height: 1.25; margin: 0 0 6mm; color: #0F1B3D; font-weight: 800; letter-spacing: -0.01em; }
 .p-company { font-size: 15pt; font-weight: 700; margin: 0 0 12mm; color: #1B2C55; }

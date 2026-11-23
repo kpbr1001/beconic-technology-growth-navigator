@@ -328,9 +328,10 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   const sheet = await p.$eval('.sheet', (e) => e.textContent);
   await pick(p, ['VEN', 'RNDI', 'HACCP']); await corp(p); await toResult(p);
   const rows = await p.$$eval('#proc-h ~ .proc-all .proc-row', (e) => e.map((x) => ({ n: x.querySelector('.proc-nm b').textContent, steps: x.querySelectorAll('.ps').length })));
+  const dupProc = await p.$$eval('.rc [id$="-fee"] .proc', (e) => e.length);
   const bars = await p.$$eval('.rc .rbar', (e) => e.length);
-  check('E30 메인: 자동 판정 인증 비교표(신규 수수료)·숫자 띠·보고서 예시 / 결과: 등록 절차 취합(인증별 단계 수)·기본요건 진행 막대',
-    cmp.length === 5 && /벤처/.test(cmp[0]) && /원/.test(cmp[0]) && nums.length === 4 && /원/.test(sheet)
+  check('E30 메인: 비교표(신규 수수료)·보고서 예시, 숫자 띠 없음 / 결과: 등록 절차는 취합 구역에만(카드 중복 없음)·기본요건 진행 막대',
+    cmp.length === 5 && /벤처/.test(cmp[0]) && /원/.test(cmp[0]) && nums.length === 0 && /원/.test(sheet) && dupProc === 0
     && rows.length === 3 && rows.find((r) => /HACCP/.test(r.n)).steps === 7 && rows.find((r) => /벤처/.test(r.n)).steps >= 3 && bars >= 2,
     `${cmp.length}행 · ${JSON.stringify(rows)} · 막대 ${bars}`);
   await p.context().close();

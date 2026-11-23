@@ -577,3 +577,17 @@ h1[tabindex="-1"]:focus:not(:focus-visible), .home-a h1:focus { outline: none; }
 @media (max-width: 1080px) { .hs { grid-template-columns: 1fr; gap: 6px; } }
 @media (max-width: 760px) { .hero-r .k div { min-width: 0; } }
 .rbar { overflow: hidden; gap: 3px; } .rbar i { min-width: 0; flex: 1 1 0; display: block; }
+
+/* 고르기 화면 옆 패널: 분야·업종·목적을 상자로 구분 */
+.side-f .fgroup { background: var(--panel); border: 1px solid var(--b); border-radius: 14px; padding: 14px 14px 12px; margin-top: 14px; }
+.side-f .fgroup .side-h { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 15.5px; color: var(--t); flex-wrap: wrap; }
+.side-f .fgroup .side-h small { font-size: 12.5px; color: var(--m); font-weight: 600; }
+.side-f .fg-n { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 6px; background: var(--navy); color: #fff; font-size: 12px; font-weight: 800; flex: none; }
+.side-f .fgroup .side-n { margin: -4px 0 10px; }
+.side-f .fgroup .flist { gap: 2px; }
+.side-f .fgroup .flist button { padding: 9px 12px; line-height: 1.4; }
+.side-f .fgroup .flist button:hover { background: #fff; }
+.side-f .fgroup .flist button[aria-pressed="true"] { background: #fff; box-shadow: inset 0 0 0 1.5px var(--p); }
+.side-f .fgroup .flist.chipset { gap: 6px; }
+.side-f .fgroup .flist.chipset button[aria-pressed="true"] { background: var(--navy); box-shadow: none; }
+.proc-src.sm { margin: 8px 0 0; font-size: 12px; }

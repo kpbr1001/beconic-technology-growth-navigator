@@ -38,7 +38,7 @@ function readableUrl(u) { try { return decodeURI(u); } catch { return u; } }
 function cover(data, R, opt) {
   const m = R.meta;
   return `<section class="p-cover">
-  <div class="p-cover-top"><img src="assets/growth-shield-symbol-navy.png" alt="" class="p-cover-logo"><span class="p-cover-brand">BECONIC</span><span class="p-edit" data-edit-flag${opt.edited ? '' : ' hidden'}>편집본 — 진단 결과 문구를 사용자가 고침</span></div>
+  <div class="p-cover-top"><div class="p-cover-id"><img src="assets/shield.png" alt="" class="p-cover-logo"><span class="p-cover-brand"><b>BECONIC</b><small>기업인증 진단 · by Growth Ventures</small></span></div><span class="p-edit" data-edit-flag${opt.edited ? '' : ' hidden'}>편집본 — 진단 결과 문구를 사용자가 고침</span></div>
   <div class="p-cover-mid">
     <p class="p-kicker">BECONIC Certification Readiness Report</p>
     <h1 class="p-title">기업인증 진단 보고서</h1>
