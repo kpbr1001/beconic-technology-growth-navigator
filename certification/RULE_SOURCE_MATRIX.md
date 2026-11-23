@@ -1,6 +1,6 @@
 # 규칙–공식 근거 대조표 (RULE_SOURCE_MATRIX)
 
-> 자동 생성: `node scripts/matrix.mjs` · 데이터 2026.11.23-1 · 출처 2026.11.23-1
+> 자동 생성: `node scripts/matrix.mjs` · 데이터 2026.11.23-2 · 출처 2026.11.23-2
 
 검토 방법: 각 행의 **근거 문구**가 **출처 원문**에 있는지, 판정 함수·기준이 원문과 같은지 확인합니다. 숫자 기준 문구는 `tests/data.test.mjs` DATA-05가 출처 발췌와 자동 대조합니다(숫자 변조 시 실패).
 
@@ -130,7 +130,7 @@
 | S-HACCP | [HACCP(식품안전관리인증기준)](https://www.haccp.or.kr) | 식품의약품안전처 · 한국식품안전관리인증원 | - | 미기재 | 2026-11-22 | OK | - |
 | S-WOMEN | [여성기업 확인](https://www.wbiz.or.kr) | 중소벤처기업부 · 한국여성경제인협회 | - | 미기재 | 2026-11-22 | UNREACHABLE | - |
 | S-DISABLED | [장애인기업 확인](https://www.debc.or.kr) | 중소벤처기업부 · 장애인기업종합지원센터 | - | 미기재 | 2026-11-22 | UNREACHABLE | - |
-| S-FAMILY | [가족친화인증](https://www.ffm.go.kr) | 가족친화인증 운영기관(정부) | - | 미기재 | 2026-11-22 | UNREACHABLE | - |
+| S-FAMILY | [가족친화인증](https://www.ffsb.kr) | 가족친화인증 운영기관(정부) | - | 미기재 | 2026-11-23 | USER_OK | - |
 | S-SOCIALV | [소셜벤처 판별](https://www.kibo.or.kr) | 중소벤처기업부 · 기술보증기금(판별 운영) | - | 미기재 | 2026-11-22 | UNREACHABLE | - |
 | S-ISO | [ISO — Certification](https://www.iso.org/certification.html) | ISO (International Organization for Standardization) | - | 미기재 | 2026-11-22 | BLOCKED | - |
 | S-EU-CE | [Your Europe — CE marking](https://europa.eu/youreurope/business/product-rules-compliance/general-product-compliance/ce-marking/index_en.htm) | European Union | - | 미기재 | 2026-11-22 | OK | - |
@@ -146,12 +146,12 @@
 | S-DIRECT-PROD | [직접생산확인](https://www.smpp.go.kr) | 중소벤처기업부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-PERF-CERT | [성능인증](https://www.smpp.go.kr) | 중소벤처기업부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-SHARE-PERF | [성과공유기업 확인](https://www.winwinnuri.or.kr) | 중소벤처기업부 | - | 미기재 | 2026-11-23 | BLOCKED | - |
-| S-EXPORT-SME | [수출유망중소기업 지정](https://www.exportcenter.go.kr) | 중소벤처기업부(지방중소벤처기업청) | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-GLOBAL-1000 | [글로벌 강소기업 1,000+ 프로젝트](https://www.kosmes.or.kr/nsh/SH/RET/SHRET022M0.do) | 중소벤처기업부 · 중소벤처기업진흥공단 | - | 미기재 | 2026-11-23 | USER_OK | - |
 | S-SW-BIZ | [소프트웨어사업자 신고](https://www.sw.or.kr) | 과학기술정보통신부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-RND-SERVICE | [연구개발서비스업 신고](https://www.rnd.or.kr) | 과학기술정보통신부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-CREATIVE-LAB | [기업부설창작연구소·기업창작전담부서](https://www.rnd.or.kr) | 과학기술정보통신부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-GS-CERT | [GS인증(소프트웨어 품질인증)](https://www.tta.or.kr) | 과학기술정보통신부 | - | 미기재 | 2026-11-23 | OK | - |
-| S-NEP | [NEP 신제품 인증](https://www.newproduct.or.kr) | 산업통상자원부(국가기술표준원) | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-NEP | [NEP 신제품 인증](https://www.nepmark.or.kr/) | 산업통상자원부(국가기술표준원) | - | 미기재 | 2026-11-23 | USER_OK | - |
 | S-NET | [NET 신기술 인증](https://www.netmark.or.kr) | 산업통상자원부(국가기술표준원) | - | 미기재 | 2026-11-23 | OK | - |
 | S-GREEN-CERT | [녹색인증](https://www.greencertif.or.kr) | 관계부처 합동 | - | 미기재 | 2026-11-23 | OK | - |
 | S-PPS-EXCELLENT | [조달우수제품 지정](https://www.pps.go.kr) | 조달청 | - | 미기재 | 2026-11-23 | OK | - |
@@ -160,16 +160,16 @@
 | S-HIGH-EFF | [고효율에너지기자재 인증](https://eep.energy.or.kr) | 산업통상자원부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-ENERGY-LABEL | [에너지소비효율등급 표시](https://eep.energy.or.kr) | 산업통상자원부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-ECO-LABEL | [환경표지 인증](https://el.keiti.re.kr) | 환경부 | - | 미기재 | 2026-11-23 | OK | - |
-| S-GR-MARK | [우수재활용제품(GR) 인증](https://www.buygr.or.kr) | 산업통상자원부 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-GR-MARK | [우수재활용제품(GR) 인증](http://www.gr.or.kr/bbs/content.php?co_id=products&c_type=0) | 산업통상자원부 | - | 미기재 | 2026-11-23 | USER_OK | - |
 | S-GOOD-DESIGN | [우수디자인(GD) 선정](https://www.kidp.or.kr) | 산업통상자원부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-KR-MEDICAL | [의료기기 허가·인증·신고](https://www.mfds.go.kr) | 식품의약품안전처 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
-| S-ISMS-P | [ISMS-P 정보보호 관리체계 인증](https://isms.kisa.or.kr) | 과학기술정보통신부·개인정보보호위원회 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-ISMS-P | [ISMS-P 정보보호 관리체계 인증](https://www.kisa.or.kr/1050602) | 과학기술정보통신부·개인정보보호위원회 | - | 미기재 | 2026-11-23 | USER_OK | - |
 | S-CC-CERT | [CC인증(정보보호제품 평가·인증)](https://itscc.kr) | 과학기술정보통신부(국가정보원 협력) | - | 미기재 | 2026-11-23 | OK | - |
 | S-KOSHA-MS | [안전보건경영시스템(KOSHA-MS) 인증](https://www.kosha.or.kr) | 고용노동부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-DISABLED-WS | [장애인표준사업장 인증](https://www.kead.or.kr) | 고용노동부 | - | 미기재 | 2026-11-23 | OK | - |
 | S-ECO-AGRI | [친환경농산물 인증](https://www.enviagro.go.kr) | 농림축산식품부(국립농산물품질관리원) | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
 | S-KCS-SAFETY | [산업안전 KCs 안전인증](https://www.kosha.or.kr) | 고용노동부 | - | 미기재 | 2026-11-23 | OK | - |
-| S-CARBON-LABEL | [환경성적표지(탄소발자국) 인증](https://www.epd.or.kr) | 환경부 | - | 미기재 | 2026-11-23 | UNREACHABLE | - |
+| S-CARBON-LABEL | [환경성적표지(탄소발자국) 인증](https://ecosq.or.kr/websquare.do#w2xPath=/ui/cer/ic/oh/ICOH110M01.xml&valVl=tabs1&menuSn=20018000) | 환경부 | - | 미기재 | 2026-11-23 | USER_OK | - |
 | S-ISO50001 | [ISO 50001 에너지경영시스템](https://www.iso.org/iso-50001-energy-management.html) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
 | S-ISO37001 | [ISO 37001 부패방지경영시스템](https://www.iso.org/iso-37001-anti-bribery-management.html) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |
 | S-ISO37301 | [ISO 37301 규범준수경영시스템](https://www.iso.org/standard/75080.html) | 인정받은 인증기관 | - | 미기재 | 2026-11-23 | BLOCKED | - |

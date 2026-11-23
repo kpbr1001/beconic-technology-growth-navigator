@@ -15,7 +15,7 @@
     "target": { "enum": ["company", "product", "both"] },
     "diagnosable": { "type": "boolean" },
     "verified_status": { "enum": ["VERIFIED", "UNVERIFIED", "DRAFT", "CONFLICTED", "EXPIRED"] },
-    "official_link": { "type": "string", "pattern": "^https://" },
+    "official_link": { "type": "string", "pattern": "^(https://|http://www\\.gr\\.or\\.kr/)" },
     "sources": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "readiness_items": { "type": "array", "items": { "type": "object", "required": ["item_id", "label", "why", "where", "required", "applies_when", "source_refs"] } }
   }

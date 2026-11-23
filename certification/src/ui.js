@@ -5,10 +5,13 @@ export function esc(v) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 // 외부 링크: https만 허용, 새 창 + noopener
+export const HTTP_ONLY_HOSTS = ['www.gr.or.kr'];
 export function safeUrl(u) {
   try {
     const url = new URL(String(u));
-    return url.protocol === 'https:' ? url.href : null;
+    if (url.protocol === 'https:') return url.href;
+    // 보안 연결(https)을 지원하지 않는 공식 기관만 예외(운영사가 브라우저로 확인한 주소)
+    return url.protocol === 'http:' && HTTP_ONLY_HOSTS.includes(url.hostname) ? url.href : null;
   } catch { return null; }
 }
 export function extLink(u, text, cls = '') {
@@ -60,7 +63,7 @@ export const TYPE_LABEL = {
 };
 export const MANDATORY_LABEL = { mandatory: '법정 의무', voluntary: '선택(자율 신청)', needs_review: '제품·시장에 따라 판단 필요' };
 export const TARGET_LABEL = { company: '회사', product: '제품', both: '회사·제품' };
-export const ACCESS_LABEL = { OK: '원문 확인', OK_IMAGE: '게시 이미지 확인', BLOCKED: '접속 차단(내용 미확인)', UNREACHABLE: '접속 불가(링크 미검증)', NOT_FOUND: '주소 없음' };
+export const ACCESS_LABEL = { OK: '원문 확인', OK_IMAGE: '게시 이미지 확인', BLOCKED: '접속 차단(내용 미확인)', UNREACHABLE: '접속 불가(링크 미검증)', USER_OK: '운영사 접속 확인(내용 미대조)', NOT_FOUND: '주소 없음' };
 
 // ── v2: 진단 수준(등급)·분야 ──
 // A 자동 판정: 공식 원문 규칙으로 기본요건 판정 / B 요건 체크: 핵심 요건 자가 확인 / C 정보 안내: 무엇·어디서 + 공식 링크
