@@ -392,3 +392,26 @@ fieldset.q { margin: 0 0 14px; }
 }
 @media (max-width: 420px) { .nav a.call span { display: none; } }
 .foot a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ── 결과 상세: PC 탭 / 모바일 펼침 ── */
+.tp { display: none; }
+.tp.on { display: block; }
+.acc-h { display: none; }
+@media (max-width: 760px) {
+  .rtabs { display: none; }
+  .acc { border-top: 1px solid var(--b); margin-top: 16px; }
+  .acc-h { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 12px 2px; border: 0; border-bottom: 1px solid var(--b); background: none; text-align: left; font-size: 16px; color: var(--t); }
+  .acc-h .acc-l { font-weight: 800; flex: none; min-width: 64px; }
+  .acc-h em { font-style: normal; flex: 1; min-width: 0; color: var(--pd); font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .acc-h i { font-style: normal; flex: none; color: var(--m); transition: transform .15s; }
+  .acc-h[aria-expanded="true"] i { transform: rotate(180deg); }
+  .tp, .tp.on { display: none; }
+  .tp.open { display: block; padding: 14px 0 6px; border-bottom: 1px solid var(--b); }
+}
+
+/* 모바일 카드형 표: 숫자마다 이름표(머리글이 숨겨지므로) */
+@media (max-width: 760px) {
+  .dt td.lbl { font-weight: 800; padding-bottom: 6px; }
+  .dt td[data-label] { display: flex; justify-content: space-between; gap: 12px; }
+  .dt td[data-label]::before { content: attr(data-label); color: var(--m); font-weight: 600; }
+}

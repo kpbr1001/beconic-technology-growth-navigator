@@ -215,6 +215,38 @@ const tile = (page, id, n) => page.$eval(`#res-${id} .tiles .tile:nth-child(${n}
   await p.context().close();
 }
 
+// ── E27 결과 상세: PC는 탭, 모바일은 펼침(제목줄에 핵심 숫자) ──
+{
+  const res = {};
+  for (const w of [1280, 390]) {
+    const p = await newPage({ w, h: 900 });
+    await pick(p, ['VEN']); await corp(p);
+    await ans(p, 'ven_excluded_industry', 'no'); await ans(p, 'ven_invest_total', 'r:0:0'); await ans(p, 'rnd_unit', 'institute');
+    await ans(p, 'ven_rd_spend', 'r:5000:'); await ans(p, 'ven_revenue', 'r:1:500000'); await p.waitForTimeout(80); await ans(p, 'ven_rd_ratio', 'r:10:');
+    await toResult(p);
+    const vis = (sel) => p.$$eval(sel, (e) => e.filter((x) => x.offsetParent !== null).length);
+    res[w] = { tabs: await vis('#res-VEN .rtabs [role="tab"]'), acc: await vis('#res-VEN .acc-h'), panels: await vis('#res-VEN .tp') };
+    if (w === 390) {
+      res.sum = await p.$$eval('#res-VEN .acc-h em', (e) => e.map((x) => x.textContent));
+      await p.click('#ah-VEN-docs');
+      res.afterOpen = await vis('#res-VEN .tp');
+      res.docsShown = await p.$eval('#tp-VEN-docs', (e) => e.offsetParent !== null && e.querySelectorAll('td.no').length > 0);
+      res.expanded = await p.getAttribute('#ah-VEN-docs', 'aria-expanded');
+      await p.click('#ah-VEN-req');
+      res.afterClose = await vis('#res-VEN .tp');
+      await p.click('#ah-VEN-fee');
+      res.feeLabels = await p.$$eval('#tp-VEN-fee tbody tr:first-child td[data-label]', (e) => e.map((x) => getComputedStyle(x, '::before').content.replace(/"/g, '')));
+      res.sw = await p.evaluate(() => document.documentElement.scrollWidth);
+    }
+    await p.context().close();
+  }
+  check('E27 PC: 탭 5개·패널 1개만 보임 / 모바일: 탭 숨김·펼침 제목 5개·처음엔 요건만 열림',
+    res[1280].tabs === 5 && res[1280].acc === 0 && res[1280].panels === 1 && res[390].tabs === 0 && res[390].acc === 5 && res[390].panels === 1, JSON.stringify({ pc: res[1280], m: res[390] }));
+  check('E27b 모바일 제목줄에 핵심 숫자(요건·서류·수수료·기간·할 일·근거)', res.sum.length === 5 && /충족/.test(res.sum[0]) && /개/.test(res.sum[1]) && /원|기관 확인/.test(res.sum[2]) && /일 이내|기관 확인/.test(res.sum[2]) && /출처/.test(res.sum[4]), res.sum.join(' | '));
+  check('E27d 모바일 수수료 표: 숫자마다 이름표(합계·정부지원금·기업 부담금)', (res.feeLabels || []).join(',') === '합계,정부지원금,기업 부담금', (res.feeLabels || []).join(','));
+  check('E27c 모바일 펼치기·접기(aria-expanded), 여러 개 동시에 열기, 가로 넘침 없음', res.afterOpen === 2 && res.docsShown && res.expanded === 'true' && res.afterClose === 1 && res.sw <= 390, JSON.stringify({ o: res.afterOpen, c: res.afterClose, sw: res.sw }));
+}
+
 // ── E07 해외 제품 규제: 의무·승인 확정 표현 없음 ──
 {
   const p = await newPage({ w: 1280 });
