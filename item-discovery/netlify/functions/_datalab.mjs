@@ -38,8 +38,17 @@ export function cleanKeywords(list) {
 }
 
 // 시계열 → 지표. ratio 는 호출 내 최대값=100 상대값이므로 같은 그룹 안의 변화율만 의미가 있다.
-export function trendMetrics(series) {
-  const v = (Array.isArray(series) ? series : []).map((d) => Number(d?.ratio) || 0);
+// 네이버는 검색량이 0인 달을 빼고 돌려줄 수 있다 → 기간의 모든 달을 만들고 빈 달은 0으로 채운다
+export function fillMonths(series, range) {
+  const arr = Array.isArray(series) ? series : [];
+  if (!range) return arr.map((d) => Number(d?.ratio) || 0);
+  const map = new Map(arr.map((d) => [String(d?.period || "").slice(0, 7), Number(d?.ratio) || 0]));
+  const out = []; const [y0, m0] = range.startDate.split("-").map(Number); const [y1, m1] = range.endDate.split("-").map(Number);
+  for (let y = y0, m = m0; y < y1 || (y === y1 && m <= m1); m === 12 ? (y++, m = 1) : m++) out.push(map.get(`${y}-${String(m).padStart(2, "0")}`) ?? 0);
+  return out;
+}
+export function trendMetrics(series, range) {
+  const v = fillMonths(series, range);
   if (v.length < 24) return null;
   const mean = (a) => a.reduce((s, x) => s + x, 0) / Math.max(a.length, 1);
   const last12 = v.slice(-12), prev12 = v.slice(-24, -12);
@@ -104,7 +113,7 @@ export async function fetchTrends(groups, deps = {}) {
     json = await res.json();
   } catch (e) { meta.skipped = "error"; console.warn("[datalab]", String(e?.message || e).slice(0, 80)); return { data: {}, meta }; }
   const results = Array.isArray(json?.results) ? json.results : [];
-  const byIndex = results.map((r) => trendMetrics(r?.data));
+  const byIndex = results.map((r) => trendMetrics(r?.data, range));
   const fetchedAt = new Date().toISOString().slice(0, 10);
   if (store) { try { await store.setJSON(cacheId, { ts: Date.now(), fetchedAt, byIndex }); } catch { /* noop */ } }
   return { data: remap(byIndex, g), meta, fetchedAt };

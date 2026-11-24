@@ -14,8 +14,9 @@ export const SEARCH = {
   cacheDays: 7,
   dailyLimitDefault: 20000,   // 검색 API 하루 25,000의 80%
   recentDays: 90,
-  // '의미 있는 신호' 기준 — 이 이상이면 근거 1종으로 인정
-  min: { kin: 20, blogRecent: 10, newsRecent: 3 },
+  // '의미 있는 신호' 기준 — 검색어 핵심 단어가 모두 들어간(관련) 결과만 센다
+  min: { kinRelevant: 5, blogRecent: 10, newsRecent: 3 },
+  kinDisplay: 20,
 };
 // 네이버쇼핑 대분류(쇼핑인사이트 category param)
 export const SHOP_CATS = {
@@ -34,6 +35,13 @@ async function withTimeout(f, url, opt) {
   try { return await f(url, { ...opt, signal: ctrl.signal }); } finally { clearTimeout(t); }
 }
 const daysAgo = (d, now) => (now - d) / 864e5;
+// 관련도: 검색어의 2자 이상 단어가 제목+요약에 모두 들어가야 '관련'으로 본다(띄어쓰기 무시)
+export function tokensOf(q) { return String(q || "").split(/\s+/).map((x) => x.replace(/[^\p{L}\p{N}]/gu, "")).filter((x) => x.length >= 2).slice(0, 4); }
+export function isRelevant(item, tokens) {
+  if (!tokens.length) return false;
+  const text = stripTags((item?.title || "") + " " + (item?.description || "")).replace(/\s+/g, "").toLowerCase();
+  return tokens.every((t) => text.includes(t.toLowerCase()));
+}
 // blog postdate "20261120", news pubDate "Mon, 23 Nov 2026 10:00:00 +0900"
 const parseBlogDate = (s) => { const m = String(s || "").match(/^(\d{4})(\d{2})(\d{2})$/); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : NaN; };
 const parseNewsDate = (s) => { const t = Date.parse(String(s || "")); return isFinite(t) ? t : NaN; };
@@ -49,23 +57,29 @@ export async function searchOne(query, deps = {}) {
       return await r.json();
     } catch (e) { return { err: "error" }; }
   };
+  const tokens = tokensOf(query);
   const [kin, blog, news] = await Promise.all([
-    get("kin", "&display=5&sort=sim&format=json"),
+    get("kin", `&display=${SEARCH.kinDisplay}&sort=sim&format=json`),
     get("blog", "&display=100&sort=date&format=json"),
     get("news", "&display=100&sort=date&format=json"),
   ]);
   const out = { query, calls: 3 };
-  if (!kin.err) out.kin = {
-    total: Number(kin.total) || 0,
-    samples: (kin.items || []).slice(0, 3).map((it) => ({ title: stripTags(it.title).slice(0, 80), link: safeUrl(it.link) })).filter((x) => x.title),
-  };
+  if (!kin.err) {
+    const items = kin.items || [];
+    const rel = items.filter((it) => isRelevant(it, tokens));
+    out.kin = {
+      total: Number(kin.total) || 0, sampled: items.length, relevant: rel.length,
+      samples: rel.slice(0, 3).map((it) => ({ title: stripTags(it.title).slice(0, 80), link: safeUrl(it.link) })).filter((x) => x.title),
+    };
+  }
   if (!blog.err) {
-    const ds = (blog.items || []).map((it) => parseBlogDate(it.postdate)).filter(isFinite);
-    out.blog = { total: Number(blog.total) || 0, recent: ds.filter((d) => daysAgo(d, now) <= SEARCH.recentDays).length, sampled: ds.length };
+    const items = blog.items || [];
+    const ds = items.filter((it) => isRelevant(it, tokens)).map((it) => parseBlogDate(it.postdate)).filter(isFinite);
+    out.blog = { total: Number(blog.total) || 0, recent: ds.filter((d) => daysAgo(d, now) <= SEARCH.recentDays).length, relevant: ds.length, sampled: items.length };
   }
   if (!news.err) {
-    const items = (news.items || []).map((it) => ({ t: parseNewsDate(it.pubDate), title: stripTags(it.title).slice(0, 80), link: safeUrl(it.link || it.originallink) }));
-    out.news = { total: Number(news.total) || 0, recent: items.filter((x) => isFinite(x.t) && daysAgo(x.t, now) <= SEARCH.recentDays).length,
+    const items = (news.items || []).filter((it) => isRelevant(it, tokens)).map((it) => ({ t: parseNewsDate(it.pubDate), title: stripTags(it.title).slice(0, 80), link: safeUrl(it.link || it.originallink) }));
+    out.news = { total: Number(news.total) || 0, relevant: items.length, recent: items.filter((x) => isFinite(x.t) && daysAgo(x.t, now) <= SEARCH.recentDays).length,
       sampled: items.length, latest: items.filter((x) => isFinite(x.t)).slice(0, 2).map((x) => ({ title: x.title, link: x.link, date: new Date(x.t).toISOString().slice(0, 10) })) };
   }
   return out;
@@ -123,7 +137,7 @@ export async function fetchShopping(catIds, deps = {}) {
 export function meaningfulTypes(sig) {
   const t = [];
   if (!sig) return t;
-  if (sig.kin && sig.kin.total >= SEARCH.min.kin) t.push("qna");
+  if (sig.kin && sig.kin.relevant >= SEARCH.min.kinRelevant) t.push("qna");
   if (sig.blog && sig.blog.recent >= SEARCH.min.blogRecent) t.push("blog");
   if (sig.news && sig.news.recent >= SEARCH.min.newsRecent) t.push("news");
   return t;

@@ -100,6 +100,8 @@ console.log("3a. 유치·상투 이름 걸러내기(대표 피드백)");
   console.log("    선택:", picked.join(" | "));
   ok(picked.every((n) => !CHILDISH_RE.test(n.replace(/\s+/g, ""))), "유치한 이름(체온계·레이더·맥박·반장·리허설) 모두 교체");
   ok(picked[0] === "코스트핏" && picked[3] === "팩토리노트", "조어형 대안 우선 채택");
+  const p2 = chooseNames([["그로스핏","그로스온","성장 전략 설계"],["스타트핏","스타트레일","전략 진단 SaaS"],["코어진","코어랩","조직 진단"]].map(([n,a,b]) => ({ c, d: { narrative: { name: n, nameOptions: [a, b] } } }))).map((x) => x.pick);
+  ok(p2[0] === "그로스핏" && p2[1] !== "스타트핏", "끝 글자 겹침(~핏) 회피: " + p2.join(", "));
   ok(!CHILDISH_RE.test("캐시노트") && !CHILDISH_RE.test("페이북") && !CHILDISH_RE.test("코스트핏"), "정상 브랜드형은 통과");
   ok(["세무짝꿍", "검사콕", "서류끝", "비용지기", "창업 나침반", "AI 비서"].every((n) => CHILDISH_RE.test(n.replace(/\s+/g, ""))), "의인화·구어·상투 은유 차단");
 }

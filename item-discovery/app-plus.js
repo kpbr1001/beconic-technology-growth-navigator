@@ -237,7 +237,7 @@ const Plus = {
     const v = o.voice; if (!v || typeof v !== "object") return null;
     const num = x => (isFinite(Number(x)) ? Math.max(0, Math.round(Number(x))) : null);
     const link = u => (/^https:\/\/[^\s"'<>]+$/.test(String(u || "")) ? String(u) : "");
-    const kin = v.kin && num(v.kin.total) != null ? { total: num(v.kin.total), samples: (Array.isArray(v.kin.samples) ? v.kin.samples : []).slice(0, 3).map(s => ({ title: this.str(s?.title, 80), link: link(s?.link) })).filter(s => s.title) } : null;
+    const kin = v.kin && num(v.kin.total) != null ? { total: num(v.kin.total), relevant: num(v.kin.relevant), sampled: num(v.kin.sampled), samples: (Array.isArray(v.kin.samples) ? v.kin.samples : []).slice(0, 3).map(s => ({ title: this.str(s?.title, 80), link: link(s?.link) })).filter(s => s.title) } : null;
     const blog = v.blog && num(v.blog.recent) != null ? { recent: num(v.blog.recent), total: num(v.blog.total) || 0 } : null;
     const news = v.news && num(v.news.recent) != null ? { recent: num(v.news.recent), latest: (Array.isArray(v.news.latest) ? v.news.latest : []).slice(0, 2).map(s => ({ title: this.str(s?.title, 80), link: link(s?.link), date: this.str(s?.date, 10) })).filter(s => s.title) } : null;
     if (!kin && !blog && !news) return null;

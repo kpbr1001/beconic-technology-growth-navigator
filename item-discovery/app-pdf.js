@@ -205,7 +205,7 @@ const PDFLayout = {
     if(!rows.length) return "";
     return `<h3 class="pdf-h3">실제 데이터 · 네이버 검색 추이 <span class="pdf-tag">데이터랩</span></h3>
       <table class="pdf-info pdf-tight"><tr><th>후보</th><th>검색 추이(전년 대비)</th><th>지식iN 질문</th><th>최근 90일 블로그·뉴스</th></tr>
-      ${rows.map(({i,o,t})=>{const v=Plus.voiceInfo(o);return `<tr><td>${i+1}. ${esc(this.clip(o.narrative?.name||o.title,14))}</td><td>${t.insufficient?'검색량 부족':`<b>${esc(t.yoy)}</b>`}<br><span class="pdf-sub">${esc(t.kw.slice(0,2).join(", "))}</span></td><td>${v?.kin?Plus.fmt(v.kin.total)+'건':'-'}</td><td>${v?.blog?(v.blog.recent>=100?'100+':v.blog.recent):'-'} · ${v?.news?(v.news.recent>=100?'100+':v.news.recent):'-'}</td></tr>`;}).join("")}</table>
+      ${rows.map(({i,o,t})=>{const v=Plus.voiceInfo(o);return `<tr><td>${i+1}. ${esc(this.clip(o.narrative?.name||o.title,14))}</td><td>${t.insufficient?'검색량 부족':`<b>${esc(t.yoy)}</b>`}<br><span class="pdf-sub">${esc(t.kw.slice(0,2).join(", "))}</span></td><td>${v?.kin?(v.kin.relevant!=null?`관련 ${v.kin.relevant}/${v.kin.sampled}`:Plus.fmt(v.kin.total)+'건'):'-'}</td><td>${v?.blog?(v.blog.recent>=100?'100+':v.blog.recent):'-'} · ${v?.news?(v.news.recent>=100?'100+':v.news.recent):'-'}</td></tr>`;}).join("")}</table>
       <p class="pdf-small">검색 관심도는 구매 수요·시장 규모가 아닌 상대값입니다. 조회 ${esc(rows.find(x=>x.t.date)?.t.date||"")}.</p>`;
   },
   methodPage(R,esc){

@@ -1,16 +1,22 @@
 // 네이버 데이터랩 연동 오프라인 검증 — node tests/datalab.mjs (가짜 응답, 실제 호출 없음)
-import { fetchTrends, trendMetrics, cleanKeywords, periodRange, DATALAB } from "../netlify/functions/_datalab.mjs";
+import { fetchTrends, trendMetrics, cleanKeywords, periodRange, fillMonths, DATALAB } from "../netlify/functions/_datalab.mjs";
+import { isRelevant, tokensOf } from "../netlify/functions/_search.mjs";
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) { pass++; console.log("  ✓", m); } else { fail++; console.log("  ✗", m); } };
-const series = (fn) => Array.from({ length: 36 }, (_, i) => ({ period: `p${i}`, ratio: fn(i) }));
+// 실제 응답처럼 기간의 월 날짜(yyyy-mm-01)로 만든다
+const RANGE = periodRange();
+const monthAt = (i) => { const [y, m] = RANGE.startDate.split("-").map(Number); const d = new Date(Date.UTC(y, m - 1 + i, 1)); return d.toISOString().slice(0, 10); };
+const series = (fn) => Array.from({ length: 36 }, (_, i) => ({ period: monthAt(i), ratio: fn(i) }));
 const memStore = () => { const m = new Map(); return { get: async (k) => m.get(k) ?? null, setJSON: async (k, v) => { m.set(k, v); }, _m: m }; };
 
 console.log("1. 지표 계산");
-const up = trendMetrics(series((i) => 20 + i * 2));
+const up = trendMetrics(series((i) => 20 + i * 2), RANGE);
 ok(up.yoy > 0.3 && up.score === 90, "꾸준히 증가 → 전년 대비 +, 점수 90 (" + up.yoy + ")");
-const down = trendMetrics(series((i) => 90 - i * 2));
+const down = trendMetrics(series((i) => 90 - i * 2), RANGE);
 ok(down.yoy < -0.2 && down.score === 20, "꾸준히 감소 → 점수 20");
-ok(trendMetrics(series(() => 0.1)).insufficient, "검색량 거의 없음 → 판단 안 함");
+ok(trendMetrics(series(() => 0.1), RANGE).insufficient, "검색량 거의 없음 → 판단 안 함");
+const sparse = series((i) => 20 + i * 2).filter((_, i) => i % 3 !== 0); // 네이버가 빈 달을 뺀 경우
+ok(fillMonths(sparse, RANGE).length === 36 && trendMetrics(sparse, RANGE) && !trendMetrics(sparse, RANGE).insufficient, "빈 달이 빠진 응답도 36개월로 채워 계산(실배포에서 추이가 비던 원인)");
 ok(trendMetrics([]) === null, "데이터 없음 → null");
 ok(cleanKeywords(["방문요양 일지", "<script>", "a", "요양보호사!!", "x".repeat(30), "방문요양 일지"]).join("|") === "방문요양 일지|script|요양보호사", "검색어 정리(특수문자·길이·중복)");
 const r = periodRange(new Date(Date.UTC(2026, 10, 24)));
@@ -22,9 +28,13 @@ let calls = [];
 const day = (n) => { const d = new Date(Date.now() - n * 864e5); return d; };
 const fakeSearch = (url) => {
   const svc = url.match(/search\/v1\/(\w+)/)[1];
-  if (svc === "kin") return { total: 342, items: [{ title: "<b>방문요양</b> 일지 어떻게 쓰나요?", link: "https://kin.naver.com/qna/1" }, { title: "요양 기록 앱 추천", link: "javascript:alert(1)" }] };
-  if (svc === "blog") return { total: 5000, items: Array.from({ length: 100 }, (_, i) => ({ postdate: day(i).toISOString().slice(0, 10).replace(/-/g, "") })) };
-  return { total: 120, items: Array.from({ length: 10 }, (_, i) => ({ pubDate: day(i * 20).toUTCString(), title: "<b>요양</b> 기사 " + i, link: "https://n.news.naver.com/" + i })) };
+  const q = decodeURIComponent(url.match(/query=([^&]*)/)[1]);
+  const kinItems = [{ title: `<b>${q}</b> 어떻게 쓰나요?`, link: "https://kin.naver.com/qna/1" }, { title: `${q} 앱 추천`, link: "javascript:alert(1)" },
+    ...Array.from({ length: 6 }, (_, i) => ({ title: `${q} 질문 ${i}`, description: "", link: "https://kin.naver.com/qna/" + (i + 2) })),
+    ...Array.from({ length: 12 }, (_, i) => ({ title: "중소기업 건강검진 대상자 " + i, description: "무관한 질문", link: "https://kin.naver.com/x" }))];
+  if (svc === "kin") return { total: 342, items: kinItems };
+  if (svc === "blog") return { total: 5000, items: Array.from({ length: 100 }, (_, i) => ({ title: i < 40 ? q + " 후기" : "무관한 글", description: "", postdate: day(i).toISOString().slice(0, 10).replace(/-/g, "") })) };
+  return { total: 120, items: Array.from({ length: 10 }, (_, i) => ({ pubDate: day(i * 20).toUTCString(), title: `<b>${q}</b> 기사 ` + i, description: "", link: "https://n.news.naver.com/" + i })) };
 };
 const fakeFetch = async (url, opt) => { calls.push({ url, opt });
   if (url.includes("/search/v1/")) return { ok: true, json: async () => fakeSearch(url) };
@@ -59,7 +69,7 @@ const { orchestrate, providers } = await import("../netlify/functions/_core.mjs"
 const { normalizeInput } = await import("../netlify/functions/_guard.mjs");
 const A = { customer: { type: "B2B", roles: { user: "x" } },
   segments: [{ key: "s1", field: "care", type: "B2B", user: "방문요양센터", buyer: "센터장" }, { key: "s2", field: "edu", type: "B2B", user: "학원 원장", buyer: "원장" }],
-  problems: [{ key: "p1", segment: "s1", statement: "요양 기록이 수기라 느리다", searchKeywords: ["방문요양 일지", "요양 기록"], types: ["Time"], severity: 4, frequency: "daily", alternatives: [{ type: "수기", dissatisfaction: ["느림"] }] },
+  problems: [{ key: "p1", segment: "s1", statement: "요양 기록이 수기라 느리다", searchKeywords: ["방문요양 일지", "요양 기록"], voiceQuery: "요양 기록 수기", types: ["Time"], severity: 4, frequency: "daily", alternatives: [{ type: "수기", dissatisfaction: ["느림"] }] },
     { key: "p2", segment: "s2", statement: "출결 문자 보내기가 번거롭다", searchKeywords: ["학원 출결"], types: ["Time"], severity: 3, frequency: "daily", alternatives: [{ type: "문자", dissatisfaction: ["번거로움"] }] }],
   gaps: [{ key: "g1", statement: "소형 기관용 자동화", underserved: ["소형"] }],
   whyNow: [{ category: "TECHNOLOGY", signal: "x", trendStrength: "medium", problemPersistence: "STRUCTURAL" }],
@@ -74,9 +84,11 @@ const c2 = R.top5.find((x) => x.problem.statement.includes("출결"));
 ok(calls.filter((x) => x.url === DATALAB.endpoint).length === 1, "탐색 1건에 데이터랩 1회");
 ok(calls.filter((x) => x.url.includes("/search/v1/")).length === 6, "문제 2개 × 지식iN·블로그·뉴스 = 검색 6회");
 ok(c1.signals.evidenceConfidence === "L2" && c1.trend && c1.trend.yoy > 0, "검색 추이 + 지식iN·블로그·뉴스 → 근거 L2 (L3는 자동 부여 안 함)");
-ok(c1.voice.kin.total === 342 && c1.voice.kin.samples[0].title === "방문요양 일지 어떻게 쓰나요?", "지식iN 질문 수·실제 질문 제목(태그 제거)");
+ok(c1.voice.kin.relevant === 8 && c1.voice.kin.samples[0].title === "요양 기록 수기 어떻게 쓰나요?", "지식iN: 관련 질문만(20개 중 8개) · 제목 태그 제거 (" + c1.voice.kin.relevant + ")");
+ok(c1.voice.kin.samples.every((x) => !x.title.includes("건강검진")), "무관한 질문(건강검진)은 제외");
 ok(c1.voice.kin.samples[1].link === "", "위험한 링크(javascript:) 제거");
-ok(c1.voice.blog.recent >= 90 && c1.voice.news.recent === 5, "최근 90일 블로그·뉴스 건수 (" + c1.voice.blog.recent + "," + c1.voice.news.recent + ")");
+ok(c1.voice.blog.recent === 40 && c1.voice.news.recent === 5, "관련 글만 센 최근 90일 블로그·뉴스 (" + c1.voice.blog.recent + "," + c1.voice.news.recent + ")");
+ok(tokensOf("중소기업 진단").join() === "중소기업,진단" && !isRelevant({ title: "중소기업 건강검진 대상자" }, tokensOf("중소기업 진단")) && isRelevant({ title: "중소기업 경영 <b>진단</b> 비용" }, tokensOf("중소기업 진단")), "관련도: 핵심 단어가 모두 있어야 관련");
 ok(c2.trend && c2.signals.timingSignal.raw < c1.signals.timingSignal.raw, "검색이 줄면 타이밍 점수도 낮아짐 (" + c1.signals.timingSignal.raw + " > " + c2.signals.timingSignal.raw + ")");
 ok(R.dataSources.datalab === "called", "결과에 데이터 출처 상태");
 ok(calls.every((x) => !x.url.includes(encodeURIComponent("창업자")) && !String(x.opt.body || "").includes("창업자")), "네이버로는 검색어만 전송(사용자 입력 원문 미전송)");
