@@ -81,5 +81,20 @@ ok(c2.trend && c2.signals.timingSignal.raw < c1.signals.timingSignal.raw, "검�
 ok(R.dataSources.datalab === "called", "결과에 데이터 출처 상태");
 ok(calls.every((x) => !x.url.includes(encodeURIComponent("창업자")) && !String(x.opt.body || "").includes("창업자")), "네이버로는 검색어만 전송(사용자 입력 원문 미전송)");
 
+console.log("4. 문제가 6개 이상이어도 최종 5개 후보 모두 조회");
+{
+  const A6 = JSON.parse(JSON.stringify(A));
+  A6.problems = Array.from({ length: 7 }, (_, i) => ({ key: "p" + i, segment: i % 2 ? "s2" : "s1", statement: "문제 " + i, searchKeywords: ["검색어 " + i], types: ["Time"], severity: 5 - (i % 3), frequency: "daily", alternatives: [{ type: "수기", dissatisfaction: ["느림"] }] }));
+  A6.candidateSeeds = A6.problems.map((p, i) => ({ customerKey: i % 2 ? "s2" : "s1", problemKey: p.key, gapKey: "g1", field: i % 2 ? "edu" : "care", solutionTypeHint: ["SaaS", "App", "Service", "Education"][i % 4], resourceHint: "SW" }));
+  globalThis.fetch = fakeFetch; calls = [];
+  providers.claude.call = async ({ user }) => user.includes("구조화하라") ? JSON.stringify(A6) : JSON.stringify({ candidates: [] });
+  const R6 = await orchestrate(normalizeInput({ userType: "창업자", budget: "under300만", fields: ["care", "edu"] }));
+  globalThis.fetch = origFetch;
+  const sent = JSON.parse(calls.find((x) => x.url === DATALAB.endpoint).opt.body).keywordGroups.map((g) => g.keywords[0]);
+  const top = R6.top5.map((c) => c.problem.searchKeywords[0]);
+  ok(top.every((k) => sent.includes(k)), "최종 후보의 검색어가 모두 조회됨 " + JSON.stringify({ top, sent }));
+  ok(R6.top5.every((c) => c.trend), "최종 5개 모두 추이 결과(있음/부족) 보유");
+}
+
 console.log(`\n결과: ${pass} 통과 / ${fail} 실패`);
 process.exit(fail ? 1 : 0);

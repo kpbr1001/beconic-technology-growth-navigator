@@ -1130,7 +1130,6 @@ async function orchestrate(input) {
 
   // [확장지점] 외부 데이터 보강 (현재 no-op)
   let extMeta = null;
-  pool = await providers.external.enrich(pool, { onMeta: (m) => { extMeta = m; } });
 
   // STAGE 7~8: score + softPenalty
   pool = pool.map((c) => RuleEngine.softPenalty(RuleEngine.score(c)));
@@ -1153,6 +1152,11 @@ async function orchestrate(input) {
     const alt = pref.includes(offenderType) ? [] : top10.filter((c) => c.solution?.solutionType !== offenderType);
     if (alt.length >= 3) top5 = RuleEngine.diversitySelect(alt, pref, spread).map((c) => RuleEngine.premortem(c));
   }
+
+  // STAGE 11.5: 외부 데이터(네이버) — 최종 후보의 문제만 조회(최대 5개 = 데이터랩 1회) 후 신호 다시 계산
+  //   선정 순서는 바꾸지 않는다(외부 데이터는 '근거'이지 선발 기준이 아님). 타이밍·근거 수준만 갱신.
+  top5 = await providers.external.enrich(top5, { onMeta: (m) => { extMeta = m; } });
+  top5 = top5.map((c) => RuleEngine.premortem(RuleEngine.softPenalty(RuleEngine.score(c))));
 
   // STAGE 12: CALL B (서술)
   let described = null;
