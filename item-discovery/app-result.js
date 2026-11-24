@@ -98,8 +98,8 @@ const Result = {
         <div class="opp-body-inner">
           <div class="grid16">
             ${this.f("이런 문제를 풉니다",n.problem)}
-            ${this.f("고객은 지금 이렇게 해결해요",n.currentWorkaround)}
-            ${this.f("기존 방식의 한계",n.whatsBroken)}
+            ${this.f("고객은 지금 이렇게 해결해요",Plus.altText(o).how)}
+            ${this.f("기존 방식의 한계",Plus.altText(o).broken)}
             ${this.f("시장의 빈틈",n.marketGap||o.marketGap?.statement)}
             ${this.f("어떻게 해결하나",n.solutionConcept)}
             ${this.f("왜 지금인가",n.whyNow||(o.whyNow||[]).map(w=>w.signal).filter(Boolean).join(", "))}
@@ -400,7 +400,7 @@ const Result = {
     return `<details class="method">
       <summary>평가 방법 공개 (규칙 ${PLUS_DATA.rulesVersion})</summary>
       <div class="method-body">
-        <p><b>1. 3가지 신호</b> — 문제 강도(고통의 크기·빈도), 시장 공백(기존 대안의 부족함), 타이밍(지금 시작하기 좋은 시장 변화). AI가 고객·문제·대안·변화를 정해진 항목으로 구조화하면, 규칙 엔진이 항목값으로 0~100 값을 계산하고 5단계 막대로 표시합니다. 막대 옆 작은 숫자가 그 계산값입니다.</p>
+        <p><b>1. 3가지 신호</b> — 문제 강도(고통의 크기·빈도), 시장 공백(기존 대안의 부족함), 타이밍(지금 시작하기 좋은 시장 변화). AI가 고객·문제·대안·변화를 정해진 항목으로 구조화하면, 규칙 엔진이 항목값으로 0~100 값을 계산합니다(값이 없는 항목은 빼고 남은 가중치로 다시 계산). 막대 옆 작은 숫자가 그 계산값이고, 20 이하 매우 낮음 · 40 이하 낮음 · 60 이하 보통 · 80 이하 높음 · 81 이상 매우 높음으로 표시합니다.</p>
         <p><b>2. 근거 수준</b> — ${Object.entries(ev).map(([k,v])=>`${k} ${v.n}: ${v.d}`).join(" · ")}</p>
         <p><b>3. 모르면 빈칸</b> — 데이터가 없는 항목은 추정하지 않고 '확인 필요'로 둡니다. 확인 필요는 감점이 아닙니다.</p>
         <p><b>4. 나와의 적합도</b> — 점수를 매기지 않고, 입력한 예산·선호 형태·자원과 부딪히는 '걸림돌'만 표시합니다. 정밀 적합도는 PMF 진단 단계에서 봅니다.</p>

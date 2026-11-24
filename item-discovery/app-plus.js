@@ -39,7 +39,7 @@ const PLUS_DATA = {
   sourceByCategory: {
     DEMOGRAPHIC: ["KOSIS"], SOCIAL: ["KOSIS", "DATALAB"], BEHAVIOR: ["DATALAB"], CULTURE: ["DATALAB"],
     TECHNOLOGY: ["NTIS", "KIPRIS"], REGULATION: ["LAW", "BIZINFO"], POLICY: ["BIZINFO", "LAW"],
-    ECONOMIC: ["KOSIS"], ECONOMY: ["KOSIS"], CHANNEL: ["DATAGO", "DATALAB"], MARKET: ["KOSIS", "DATALAB"],
+    ECONOMIC: ["KOSIS"], ECONOMY: ["KOSIS"], ENVIRONMENTAL: ["LAW", "KOSIS"], CHANNEL: ["DATAGO", "DATALAB"], MARKET: ["KOSIS", "DATALAB"],
   },
 
   // BECONIC 31 — 주소 응답 200 확인(2026-11-24)한 진단만 연결
@@ -74,6 +74,11 @@ const PLUS_DATA = {
     "교육/콘텐츠": ["Education", "Content", "Community"],
     "제품": ["Product", "ProductPlusService", "Hardware"],
   },
+  // 서버(CALL A) alternatives 코드 → 한글
+  altKo: { Excel: "엑셀", Phone: "전화", Human: "사람에게 직접 의뢰", AI: "범용 AI", Manual: "수작업", Search: "검색", None: "대안 없음(포기)",
+    Expert: "전문가 상담", InternalStaff: "내부 인력", Paper: "종이·수기", Messenger: "메신저", App: "기존 앱", Agency: "대행사", Offline: "오프라인 방문", Community: "커뮤니티·지인" },
+  dissatKo: { expensive: "비싸다", slow: "느리다", complex: "복잡하다", unreliable: "믿기 어렵다", inaccurate: "부정확하다", inconvenient: "불편하다",
+    inaccessible: "접근하기 어렵다", fragmented: "정보가 흩어져 있다", manual: "손이 많이 간다", generic: "내 상황에 안 맞는다", timeConsuming: "시간이 오래 걸린다" },
   budgetLabel: { "under1000만": "1천만원 미만", "1000_5000만": "1천~5천만원", "5000만_1억": "5천만~1억", "1억이상": "1억 이상" },
 };
 
@@ -179,12 +184,22 @@ const Plus = {
     return /매장|카페|음식점|식당|외식|점포|가게|공방|학원|오프라인 ?(매장|점)/.test(txt);
   },
 
+  // 고객의 현재 대안 — narrative 문장이 없으면 서버 코드값을 한글로
+  altText(o) {
+    const n = o.narrative || {};
+    if (n.currentWorkaround) return { how: this.str(n.currentWorkaround, 200), broken: this.str(n.whatsBroken, 200) };
+    const alts = Array.isArray(o.currentAlternative) ? o.currentAlternative : [];
+    const how = [...new Set(alts.map(a => PLUS_DATA.altKo[a?.type] || (a?.type && /^[A-Za-z]+$/.test(a.type) ? null : this.str(a?.type, 20))).filter(Boolean))].join(" · ");
+    const dis = [...new Set(alts.flatMap(a => Array.isArray(a?.dissatisfaction) ? a.dissatisfaction : []).map(d => PLUS_DATA.dissatKo[d] || (/^[A-Za-z]+$/.test(String(d)) ? null : this.str(d, 30))).filter(Boolean))].join(" · ");
+    return { how, broken: dis ? "불만: " + dis : "" };
+  },
+
   // ---------- ② 검증 첫 3걸음 ----------
   validationPlan(o) {
     const n = o.narrative || {};
     const who = this.str(n.who || o.customer?.roles?.user || "대상 고객", 60);
     const prob = this.str(n.problem || o.problem?.statement || "이 문제", 80);
-    const alt = this.str(n.currentWorkaround || (o.currentAlternative || []).map(a => a.type).filter(Boolean).join("·") || "지금 쓰는 방법", 60);
+    const alt = this.str(this.altText(o).how || "지금 쓰는 방법", 60);
     const buyer = this.str(n.buyer || o.buyer || o.customer?.roles?.buyer || who, 50);
     const b2b = o.customer?.type === "B2B";
     const unknowns = Array.isArray(o.unknowns) ? o.unknowns : (n.unknowns ? String(n.unknowns).split(/[,·]/) : []);
@@ -334,7 +349,7 @@ const Plus = {
     const add = (k, v) => { v = this.str(v, 300); if (v && v !== "확인 필요") L.push(`- ${k}: ${v}`); };
     add("대상 고객", n.who || o.customer?.roles?.user);
     add("고객 문제", n.problem);
-    add("현재 대안", n.currentWorkaround);
+    add("현재 대안", this.altText(o).how);
     add("시장의 빈틈", n.marketGap || o.marketGap?.statement);
     add("왜 지금", n.whyNow);
     add("해결 방식", n.solutionConcept);

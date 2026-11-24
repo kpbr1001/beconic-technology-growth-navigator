@@ -189,7 +189,7 @@ const PDFLayout = {
         <span class="pdf-sig"><em>근거</em><b>${EVIDENCE_LABEL[s.evidenceConfidence]}</b></span></div>
       <table class="pdf-opp-grid">
         ${row("문제",n.problem)}
-        ${row("현재 대안",n.currentWorkaround)}
+        ${row("현재 대안",[Plus.altText(o).how,Plus.altText(o).broken].filter(Boolean).join(" — "))}
         ${row("시장 공백",n.marketGap||o.marketGap?.statement)}
         ${row("왜 지금",n.whyNow)}
         ${row("해결 방식",n.solutionConcept)}

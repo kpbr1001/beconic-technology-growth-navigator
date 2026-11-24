@@ -150,6 +150,25 @@ console.log("3. 보안 — 악성 결과·오류 메시지·조작 파일");
   await ctx.close();
 }
 
+console.log("3b. 실제 서버 형태(narrative에 현재 대안 문장 없음, 코드값만)");
+{
+  const { page, errs, ctx } = await newPage();
+  const r = await page.evaluate(() => {
+    const R = JSON.parse(JSON.stringify(SAMPLE_RESULT));
+    R.top5.forEach(o => { delete o.narrative.currentWorkaround; delete o.narrative.whatsBroken; });
+    R.top5[0].currentAlternative = [{ type: "Excel", dissatisfaction: ["slow", "expensive"] }, { type: "Phone", dissatisfaction: ["slow"] }];
+    R.top5[0].whyNow = [{ category: "ENVIRONMENTAL", signal: "x" }];
+    State.result = R; State.isSample = false; Result.render(); App.show("result");
+    return { txt: document.getElementById("card_kif_ops_001").innerText, pdf: PDFLayout.build(R, { date: "x" }) };
+  });
+  ok(r.txt.includes("엑셀 · 전화") && r.txt.includes("불만: 느리다 · 비싸다"), "코드값 → 한글 현재 대안·불만");
+  ok(!/\bExcel\b|\bslow\b/.test(r.txt), "영어 코드 노출 없음");
+  ok(r.txt.includes("국가법령정보센터"), "ENVIRONMENTAL 범주 확인처");
+  ok(r.pdf.includes("엑셀 · 전화 — 불만"), "PDF 현재 대안");
+  ok(errs.length === 0, "오류 0 " + (errs[0] || ""));
+  await ctx.close();
+}
+
 console.log("4. 모바일 390px — 가로 넘침");
 {
   const { page, errs, ctx } = await newPage(390);
