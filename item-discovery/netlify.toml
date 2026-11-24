@@ -1,0 +1,74 @@
+# ============================================================
+# K-ITEM FINDER — Netlify 배포 설정
+# GitHub·빌드 없이 폴더 드래그&드롭 또는 CLI 배포용
+# ============================================================
+
+[build]
+  # 빌드 단계 없음 (정적 index.html + serverless function)
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  # Node 런타임 (ESM export default handler)
+  node_bundler = "esbuild"
+
+# /api/opportunity 로 깔끔하게 접근 (health 체크 등)
+[[redirects]]
+  from = "/api/opportunity"
+  to = "/.netlify/functions/opportunity"
+  status = 200
+
+# 탐색 제출 (background function)
+[[redirects]]
+  from = "/api/discover"
+  to = "/.netlify/functions/discover-background"
+  status = 200
+
+# 탐색 상태 조회 (polling)
+[[redirects]]
+  from = "/api/status"
+  to = "/.netlify/functions/status"
+  status = 200
+
+# ------------------------------------------------------------
+# 배포 후 반드시 설정할 환경변수 (Netlify 대시보드 > Site settings > Environment variables)
+#   ANTHROPIC_API_KEY = sk-ant-...   (필수, Client 미노출)
+#   KIF_DEBUG         = 1            (선택, 오류 상세 확인 시에만)
+# ------------------------------------------------------------
+
+# ------------------------------------------------------------
+# v0.4.0 보안: 서버 함수 원본·설정·문서는 공개 URL로 내려주지 않음
+# (publish = "." 이라 폴더 전체가 공개되므로 강제 404로 가림)
+# ------------------------------------------------------------
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/*.md"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/package.json"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/package-lock.json"
+  to = "/404.html"
+  status = 404
+  force = true
+
+# 보안 헤더
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
