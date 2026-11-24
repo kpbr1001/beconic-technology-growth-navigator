@@ -57,14 +57,16 @@ curl -s -o /dev/null -w '%{http_code}\n' -X POST https://beconic-diagnosis-busin
 
 3. **키 교체(권장)**: 공개 상태였던 기간이 있으므로 Anthropic 콘솔에서 새 키를 만들어 이 사이트 전용으로 넣고, 옛 키는 폐기. 콘솔에서 키별 월 사용 한도도 함께 설정.
 
-## 화면 프롬프트를 고쳤을 때
-서버는 화면과 글자 단위로 같은 프롬프트만 통과시키므로, `index.html` 의 프롬프트·모델을 바꾸면 반드시:
+## 화면 프롬프트를 고쳤을 때 — 자동
+`index.html` 만 고쳐서 올리면 됩니다. Netlify 가 배포할 때마다 빌드 첫 단계에서:
 
-```bash
-npm run sync-prompts
-```
+1. `scripts/sync-prompts.mjs` — 화면의 프롬프트·모델로 서버 허용 목록(`lib/allowed-prompts.mjs`)을 다시 만들고
+2. `tests/proxy.test.mjs` — 새 목록으로 잠금 테스트 21개를 돌린 뒤
+3. 통과해야만 화면·함수를 배포합니다.
 
-`npm test` 가 화면과 허용 목록이 다르면 실패합니다(배포 전 확인용).
+화면 구조가 크게 바뀌어 프롬프트를 못 찾거나 테스트가 실패하면 **빌드가 실패하고 기존 버전이 그대로 운영**됩니다(사이트가 깨지지 않음). 이때는 Netlify 배포 로그의 오류 문장을 확인하세요.
+
+허용 목록은 저장소의 화면 파일에서만 만들어지므로 자동화해도 외부에서 끼어들 틈은 없습니다. 저장소의 `lib/allowed-prompts.mjs` 를 최신으로 맞춰 두고 싶으면 `bm` 에서 `npm run sync-prompts` 를 실행해 커밋하면 됩니다(선택).
 
 ## 이상 호출 점검 방법
 - Netlify → Logs → Functions `claude` / Edge Functions `claude-stream` 에서 `bm-ai-blocked` 로 검색하면 차단된 호출(사유·출처·User-Agent)이 보입니다. 사유: `origin_missing`·`origin_foreign`·`cross_site`·`system_not_allowed`·`keys`·`ip_limit`·`daily_limit` 등.
@@ -77,7 +79,7 @@ bm/
 ├─ og-image.png · favicon.ico            # 운영 사이트에서 가져온 정적 파일
 ├─ lib/guard.mjs                          # 잠금 3단(출처·형식·한도) — 두 함수 공용
 ├─ lib/allowed-prompts.mjs               # 자동 생성: 화면의 시스템 프롬프트 8개·모델·max_tokens 상한
-├─ scripts/sync-prompts.mjs              # index.html → 허용 목록 생성/검사
+├─ scripts/sync-prompts.mjs              # index.html → 허용 목록 생성/검사(배포 빌드 때 자동 실행)
 ├─ netlify/functions/claude.mjs          # 비스트리밍(폴백) + 상태 확인
 ├─ netlify/edge-functions/claude-stream.js # 스트리밍
 └─ tests/proxy.test.mjs                  # 21개: 화면 요청 통과 / 변형·외부 호출 차단 / 한도
