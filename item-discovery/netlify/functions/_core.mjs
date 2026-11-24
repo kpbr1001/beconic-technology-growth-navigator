@@ -18,14 +18,15 @@
 // ============================================================
 
 import { fetchTrends, datalabReady } from "./_datalab.mjs";
+import { fetchSearchSignals, fetchShopping, meaningfulTypes, SHOP_CATS } from "./_search.mjs";
 
 // ------------------------------------------------------------
 // 0. CONFIG (서버측 단일 소스)
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.8.0",
-  promptVersion: "v1.7.0",
+  appVersion: "v0.9.0",
+  promptVersion: "v1.8.0",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
 };
@@ -268,10 +269,26 @@ const providers = {
       if (!groups.length) return dnaList;
       let store = null;
       try { const { getStore } = await import("@netlify/blobs"); store = getStore("kif-ext"); } catch { /* 로컬 테스트 등 */ }
-      const { data, meta, fetchedAt } = await fetchTrends(groups, { store, ...opts });
-      opts.onMeta?.(meta);
+      const [{ data, meta, fetchedAt }, srch] = await Promise.all([
+        fetchTrends(groups, { store, ...opts }),
+        fetchSearchSignals(groups.map((g) => ({ key: g.key, query: g.keywords[0] })), { store, ...opts }),
+      ]);
+      // 쇼핑인사이트: 실물 제품·기기·구독 후보의 쇼핑 대분류(최대 3개)
+      const cats = [...new Set(dnaList.filter((c) => ["Product", "Hardware", "Subscription", "ProductPlusService"].includes(c.solution?.solutionType) && c.shoppingCategory).map((c) => c.shoppingCategory))];
+      const shop = cats.length ? await fetchShopping(cats, opts) : {};
+      opts.onMeta?.({ ...meta, search: srch.meta, shop: Object.keys(shop).length });
       for (const c of dnaList) {
         const key = c._keys?.p || c.problem?.statement;
+        const sg = srch.data[key];
+        if (sg) {
+          c._search = sg;
+          const now = new Date().toISOString().slice(0, 10);
+          for (const type of meaningfulTypes(sg)) c.sources = [...(c.sources || []), { evidenceType: type, name: { qna: "네이버 지식iN", blog: "네이버 블로그", news: "네이버 뉴스" }[type], fetchedAt: now, query: sg.query }];
+        }
+        if (c.shoppingCategory && shop[c.shoppingCategory]) {
+          c._shop = shop[c.shoppingCategory];
+          c.sources = [...(c.sources || []), { evidenceType: "shopping_trend", name: "네이버 쇼핑인사이트", fetchedAt: new Date().toISOString().slice(0, 10), category: c._shop.name, yoy: c._shop.yoy }];
+        }
         const t = data[key];
         if (!t) continue;
         c._trend = t;
@@ -364,7 +381,7 @@ ${JSON.stringify(input)}
     "switchingFriction":["Price|Habit|..."] }],
   "whyNow": [{ "category":"TECHNOLOGY|DEMOGRAPHIC|SOCIAL|ECONOMIC|ENVIRONMENTAL|REGULATION|CHANNEL",
     "signal":"", "trendStrength":"weak|medium|strong|unknown", "problemPersistence":"TEMPORARY|EMERGING|STRUCTURAL" }],
-  "candidateSeeds": [{ "customerKey":"s1", "problemKey":"p1", "gapKey":"g1", "field":"분야 key|null",
+  "candidateSeeds": [{ "customerKey":"s1", "problemKey":"p1", "gapKey":"g1", "field":"분야 key|null", "shoppingCategory":"실물 제품·기기·구독 seed만: 네이버쇼핑 대분류 id(50000000 패션의류·50000001 패션잡화·50000002 화장품/미용·50000003 디지털/가전·50000004 가구/인테리어·50000005 출산/육아·50000006 식품·50000007 스포츠/레저·50000008 생활/건강·50000009 여가/생활편의·50000011 도서) 아니면 null",
     "solutionTypeHint":"SaaS|App|Platform|Marketplace|Service|Consulting|Education|Content|Product|ProductPlusService|Hardware|Subscription|Store|Community",
     "resourceHint":"HW|SW|Human|Hybrid" }],
   "uncertainties": ["아직 모르는 것"]
@@ -427,6 +444,7 @@ function toDNA(seed, A, idx, input) {
     clusterId: null,
     customer,
     // AI가 목록에 없는 분야 코드(예: ai_service)를 주면 버리고, 고른 분야가 1개면 그것으로
+    shoppingCategory: SHOP_CATS[seed.shoppingCategory] ? seed.shoppingCategory : null,
     field: [seed.field, seg.field].find((f) => FIELD_LABEL[f]) || ((input?.fields || []).length === 1 ? input.fields[0] : null),
     context: A.contexts?.[0] || {},
     jobs: A.jobs || [],
@@ -616,7 +634,8 @@ const RuleEngine = {
     let evidence = "L0";
     if (srcCount >= 1) evidence = "L1";
     if (srcCount >= 2 && types.size >= 2) evidence = "L2";
-    if ([...types].some((t) => ["review", "community", "customer"].includes(t))) evidence = "L3";
+    // L3(직접 고객근거)는 실제 인터뷰·판매 등 고객 확인으로만 — 검색·질문 데이터로는 자동 부여하지 않음
+    if ([...types].some((t) => ["customer"].includes(t))) evidence = "L3";
 
     c.signals = {
       problemSignal:   { raw: problemSignal, band: bandOf(problemSignal) },
@@ -1158,8 +1177,10 @@ async function orchestrate(input) {
   const merged = described ? mergeExplainOnly(top5, described) : top5.map((c) => ({ ...c, title: refineItemName(c.title, c) }));
 
   // 내부 필드(_) 제거 후 반환
-  const clean = merged.map(({ _seed, _seedProblem, _seedSolution, _gapStatement, _persistence, _softPenalty, _premortem, _input, _keys, _extra, _trend, ...rest }) =>
-    ({ ...rest, trend: _trend ? { insufficient: !!_trend.insufficient, yoy: _trend.yoy ?? null, recent: _trend.recent ?? null, keywords: _trend.keywords || [], spark: _trend.spark || [], fetchedAt: rest.sources?.find((x) => x.evidenceType === "search_trend")?.fetchedAt || null } : null }));
+  const clean = merged.map(({ _seed, _seedProblem, _seedSolution, _gapStatement, _persistence, _softPenalty, _premortem, _input, _keys, _extra, _trend, _search, _shop, ...rest }) =>
+    ({ ...rest, trend: _trend ? { insufficient: !!_trend.insufficient, yoy: _trend.yoy ?? null, recent: _trend.recent ?? null, keywords: _trend.keywords || [], spark: _trend.spark || [], fetchedAt: rest.sources?.find((x) => x.evidenceType === "search_trend")?.fetchedAt || null } : null,
+      voice: _search ? { query: _search.query, kin: _search.kin || null, blog: _search.blog || null, news: _search.news || null } : null,
+      shop: _shop || null }));
 
   return {
     meta: { ...APP_META, sessionId: null, candidatePool: pool.length, fields: input.fields || [] },
@@ -1169,7 +1190,8 @@ async function orchestrate(input) {
     comparisonNotes: described?.comparisonNotes || [],
     comparisonInsight: described?.comparisonInsight || "",
     marketPerspective: described?.marketPerspective || "",
-    dataSources: { datalab: extMeta ? (extMeta.called ? "called" : extMeta.cached ? "cached" : extMeta.skipped || "none") : (datalabReady() ? "none" : "no_key") },
+    dataSources: { datalab: extMeta ? (extMeta.called ? "called" : extMeta.cached ? "cached" : extMeta.skipped || "none") : (datalabReady() ? "none" : "no_key"),
+      search: extMeta?.search ? { calls: extMeta.search.calls, cached: extMeta.search.cached, skipped: extMeta.search.skipped } : null, shop: extMeta?.shop ?? 0 },
     _debug: process.env.KIF_DEBUG === "1" ? { callB: callBStatus } : undefined,
   };
 }

@@ -436,8 +436,23 @@ const Result = {
       <div class="ev-title">📚 근거 확인처 <span class="ev-lv">현재 ${this.esc(o.signals.evidenceConfidence)} · ${this.esc(ev.n)}</span></div>
       <p class="ev-d">${this.esc(ev.d)} <b>다음 단계:</b> ${this.esc(ev.up)}.</p>
       ${this.trendRow(o)}
+      ${this.voiceRow(o)}
       <ul class="ev-list">${src.map(x=>`<li><a href="${this.esc(x.url)}" target="_blank" rel="noopener noreferrer">${this.esc(x.n)} ↗</a><span>${this.esc(x.what)}</span></li>`).join("")}</ul>
       <p class="ev-note">AI가 이 사이트를 조회한 것이 아니라, 가설을 직접 확인할 공식 확인처예요 · 주소 확인 ${PLUS_DATA.checked}</p>
+    </div>`;
+  },
+  voiceRow(o){
+    const v=Plus.voiceInfo(o), sh=Plus.shopInfo(o);
+    if(!v && !sh) return "";
+    const a=(x)=>x.link?`<a href="${this.esc(x.link)}" target="_blank" rel="noopener noreferrer">${this.esc(x.title)}</a>`:this.esc(x.title);
+    return `<div class="voice-row">
+      ${v?`<div class="vr-k">사람들이 이 문제를 이야기하나요? <span class="tr-kw">검색어 "${this.esc(v.query)}" · 네이버 검색</span></div>
+      <ul class="vr-list">
+        ${v.kin?`<li><b>지식iN 질문 ${Plus.fmt(v.kin.total)}건</b>${v.kin.samples.length?` — 실제 질문: ${v.kin.samples.map(a).join(" · ")}`:''}</li>`:''}
+        ${v.blog?`<li><b>최근 90일 블로그 ${v.blog.recent>=100?'100건 이상':Plus.fmt(v.blog.recent)+'건'}</b> <span class="tr-kw">(최신 100건 기준)</span></li>`:''}
+        ${v.news?`<li><b>최근 90일 뉴스 ${v.news.recent>=100?'100건 이상':Plus.fmt(v.news.recent)+'건'}</b>${v.news.latest.length?` — ${v.news.latest.map(x=>`${a(x)} <span class="tr-kw">${this.esc(x.date)}</span>`).join(" · ")}`:''}</li>`:''}
+      </ul>`:''}
+      ${sh?`<div class="vr-shop ${sh.dir}"><b>네이버쇼핑 '${this.esc(sh.name)}' 분야 클릭</b> 최근 12개월이 그 전보다 <b>${this.esc(sh.yoy)}</b> <span class="tr-kw">분야 전체 흐름이며 이 아이템의 수요가 아니에요</span></div>`:''}
     </div>`;
   },
   trendRow(o){

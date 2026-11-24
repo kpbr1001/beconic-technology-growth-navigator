@@ -19,7 +19,17 @@ ok(r.endDate === "2026-10-31" && r.startDate === "2023-11-01", "기간: 지난�
 console.log("2. 호출·캐시·한도 (가짜 응답)");
 process.env.NAVER_HUB_KEY_ID = "test-id"; process.env.NAVER_HUB_KEY_SECRET = "test-secret";
 let calls = [];
-const fakeFetch = async (url, opt) => { calls.push({ url, opt }); const b = JSON.parse(opt.body);
+const day = (n) => { const d = new Date(Date.now() - n * 864e5); return d; };
+const fakeSearch = (url) => {
+  const svc = url.match(/search\/v1\/(\w+)/)[1];
+  if (svc === "kin") return { total: 342, items: [{ title: "<b>방문요양</b> 일지 어떻게 쓰나요?", link: "https://kin.naver.com/qna/1" }, { title: "요양 기록 앱 추천", link: "javascript:alert(1)" }] };
+  if (svc === "blog") return { total: 5000, items: Array.from({ length: 100 }, (_, i) => ({ postdate: day(i).toISOString().slice(0, 10).replace(/-/g, "") })) };
+  return { total: 120, items: Array.from({ length: 10 }, (_, i) => ({ pubDate: day(i * 20).toUTCString(), title: "<b>요양</b> 기사 " + i, link: "https://n.news.naver.com/" + i })) };
+};
+const fakeFetch = async (url, opt) => { calls.push({ url, opt });
+  if (url.includes("/search/v1/")) return { ok: true, json: async () => fakeSearch(url) };
+  if (url.includes("/shopping/v1/")) { const b = JSON.parse(opt.body); return { ok: true, json: async () => ({ results: b.category.map(() => ({ data: series((k) => 40 + k) })) }) }; }
+  const b = JSON.parse(opt.body);
   return { ok: true, json: async () => ({ results: b.keywordGroups.map((g, i) => ({ title: g.groupName, keywords: g.keywords, data: series((k) => i === 0 ? 20 + k * 2 : i === 1 ? 90 - k * 2 : 0.1) })) }) }; };
 const store = memStore();
 const groups = [{ key: "p1", keywords: ["방문요양 일지"] }, { key: "p2", keywords: ["학원 출결"] }, { key: "p3", keywords: ["희귀 검색어"] }];
@@ -62,10 +72,14 @@ globalThis.fetch = origFetch;
 const c1 = R.top5.find((x) => x.problem.statement.includes("요양"));
 const c2 = R.top5.find((x) => x.problem.statement.includes("출결"));
 ok(calls.filter((x) => x.url === DATALAB.endpoint).length === 1, "탐색 1건에 데이터랩 1회");
-ok(c1.signals.evidenceConfidence === "L1" && c1.trend && c1.trend.yoy > 0, "검색 추이 있는 후보 → 근거 L1 + 추이 표시");
+ok(calls.filter((x) => x.url.includes("/search/v1/")).length === 6, "문제 2개 × 지식iN·블로그·뉴스 = 검색 6회");
+ok(c1.signals.evidenceConfidence === "L2" && c1.trend && c1.trend.yoy > 0, "검색 추이 + 지식iN·블로그·뉴스 → 근거 L2 (L3는 자동 부여 안 함)");
+ok(c1.voice.kin.total === 342 && c1.voice.kin.samples[0].title === "방문요양 일지 어떻게 쓰나요?", "지식iN 질문 수·실제 질문 제목(태그 제거)");
+ok(c1.voice.kin.samples[1].link === "", "위험한 링크(javascript:) 제거");
+ok(c1.voice.blog.recent >= 90 && c1.voice.news.recent === 5, "최근 90일 블로그·뉴스 건수 (" + c1.voice.blog.recent + "," + c1.voice.news.recent + ")");
 ok(c2.trend && c2.signals.timingSignal.raw < c1.signals.timingSignal.raw, "검색이 줄면 타이밍 점수도 낮아짐 (" + c1.signals.timingSignal.raw + " > " + c2.signals.timingSignal.raw + ")");
 ok(R.dataSources.datalab === "called", "결과에 데이터 출처 상태");
-ok(calls[0] && !JSON.stringify(calls[0].opt.body).includes("창업자"), "네이버로는 검색어만 전송(사용자 입력 원문 미전송)");
+ok(calls.every((x) => !x.url.includes(encodeURIComponent("창업자")) && !String(x.opt.body || "").includes("창업자")), "네이버로는 검색어만 전송(사용자 입력 원문 미전송)");
 
 console.log(`\n결과: ${pass} 통과 / ${fail} 실패`);
 process.exit(fail ? 1 : 0);

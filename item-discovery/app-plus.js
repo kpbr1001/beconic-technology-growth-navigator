@@ -232,6 +232,22 @@ const Plus = {
     const spark = (Array.isArray(t.spark) ? t.spark : []).map(Number).filter(isFinite).slice(-24);
     return { kw, yoy: pct(yoy), recent: isFinite(recent) ? pct(recent) : "", dir, word, spark, date: this.str(t.fetchedAt, 10) };
   },
+  // 지식iN·블로그·뉴스(사람들이 이 문제를 이야기하는가) + 쇼핑 분야 흐름 — 형식 검증 후 표시
+  voiceInfo(o) {
+    const v = o.voice; if (!v || typeof v !== "object") return null;
+    const num = x => (isFinite(Number(x)) ? Math.max(0, Math.round(Number(x))) : null);
+    const link = u => (/^https:\/\/[^\s"'<>]+$/.test(String(u || "")) ? String(u) : "");
+    const kin = v.kin && num(v.kin.total) != null ? { total: num(v.kin.total), samples: (Array.isArray(v.kin.samples) ? v.kin.samples : []).slice(0, 3).map(s => ({ title: this.str(s?.title, 80), link: link(s?.link) })).filter(s => s.title) } : null;
+    const blog = v.blog && num(v.blog.recent) != null ? { recent: num(v.blog.recent), total: num(v.blog.total) || 0 } : null;
+    const news = v.news && num(v.news.recent) != null ? { recent: num(v.news.recent), latest: (Array.isArray(v.news.latest) ? v.news.latest : []).slice(0, 2).map(s => ({ title: this.str(s?.title, 80), link: link(s?.link), date: this.str(s?.date, 10) })).filter(s => s.title) } : null;
+    if (!kin && !blog && !news) return null;
+    return { query: this.str(v.query, 20), kin, blog, news };
+  },
+  shopInfo(o) {
+    const s = o.shop; if (!s || !isFinite(Number(s.yoy))) return null;
+    const y = Number(s.yoy); return { name: this.str(s.name, 20), yoy: (y >= 0 ? "+" : "") + Math.round(y * 100) + "%", dir: y >= 0.1 ? "up" : y <= -0.1 ? "down" : "flat" };
+  },
+  fmt(n) { return Number(n).toLocaleString("ko-KR"); },
   sparkSvg(v, w = 120, h = 28) {
     if (!v || v.length < 2) return "";
     const max = Math.max(...v, 1), min = Math.min(...v, 0);
