@@ -53,7 +53,9 @@ export function trendMetrics(series, range) {
   const mean = (a) => a.reduce((s, x) => s + x, 0) / Math.max(a.length, 1);
   const last12 = v.slice(-12), prev12 = v.slice(-24, -12);
   const m = mean(v);
-  if (m < DATALAB.minMeanRatio || mean(prev12) <= 0) return { insufficient: true, mean: round1(m) };
+  // 각 12개월 구간에 검색이 있는 달이 4개월 이상이어야 증감을 계산(어쩌다 한 번 잡힌 검색으로 −100% 같은 이상값 방지)
+  const active = (a) => a.filter((x) => x > 0).length;
+  if (m < DATALAB.minMeanRatio || mean(prev12) <= 0 || active(last12) < 4 || active(prev12) < 4) return { insufficient: true, mean: round1(m) };
   const yoy = mean(last12) / mean(prev12) - 1;               // 최근 12개월 vs 그 전 12개월
   const recent = mean(v.slice(-3)) / Math.max(mean(v.slice(-6, -3)), 0.0001) - 1; // 최근 3개월 vs 직전 3개월
   // 규칙(0~100): 전년 대비 증감 → 타이밍 점수

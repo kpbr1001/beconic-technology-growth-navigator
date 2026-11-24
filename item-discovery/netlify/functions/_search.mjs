@@ -37,10 +37,13 @@ async function withTimeout(f, url, opt) {
 const daysAgo = (d, now) => (now - d) / 864e5;
 // 관련도: 검색어의 2자 이상 단어가 제목+요약에 모두 들어가야 '관련'으로 본다(띄어쓰기 무시)
 export function tokensOf(q) { return String(q || "").split(/\s+/).map((x) => x.replace(/[^\p{L}\p{N}]/gu, "")).filter((x) => x.length >= 2).slice(0, 4); }
+// 제목+요약에 모든 단어가 있고, 제목에도 절반 이상이 있어야 관련(요약에만 흩어진 경우 제외)
 export function isRelevant(item, tokens) {
   if (!tokens.length) return false;
-  const text = stripTags((item?.title || "") + " " + (item?.description || "")).replace(/\s+/g, "").toLowerCase();
-  return tokens.every((t) => text.includes(t.toLowerCase()));
+  const norm = (s) => stripTags(s).replace(/\s+/g, "").toLowerCase();
+  const title = norm(item?.title || ""), text = title + norm(item?.description || "");
+  const inTitle = tokens.filter((t) => title.includes(t.toLowerCase())).length;
+  return tokens.every((t) => text.includes(t.toLowerCase())) && inTitle >= Math.ceil(tokens.length / 2);
 }
 // blog postdate "20261120", news pubDate "Mon, 23 Nov 2026 10:00:00 +0900"
 const parseBlogDate = (s) => { const m = String(s || "").match(/^(\d{4})(\d{2})(\d{2})$/); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : NaN; };

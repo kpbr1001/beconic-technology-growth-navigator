@@ -15,6 +15,8 @@ ok(up.yoy > 0.3 && up.score === 90, "꾸준히 증가 → 전년 대비 +, 점�
 const down = trendMetrics(series((i) => 90 - i * 2), RANGE);
 ok(down.yoy < -0.2 && down.score === 20, "꾸준히 감소 → 점수 20");
 ok(trendMetrics(series(() => 0.1), RANGE).insufficient, "검색량 거의 없음 → 판단 안 함");
+const spike = series((i) => (i === 5 || i === 8 ? 60 : 0));
+ok(trendMetrics(spike, RANGE).insufficient, "어쩌다 몇 번 잡힌 검색(−100% 이상값) → 판단 안 함");
 const sparse = series((i) => 20 + i * 2).filter((_, i) => i % 3 !== 0); // 네이버가 빈 달을 뺀 경우
 ok(fillMonths(sparse, RANGE).length === 36 && trendMetrics(sparse, RANGE) && !trendMetrics(sparse, RANGE).insufficient, "빈 달이 빠진 응답도 36개월로 채워 계산(실배포에서 추이가 비던 원인)");
 ok(trendMetrics([]) === null, "데이터 없음 → null");
@@ -88,6 +90,7 @@ ok(c1.voice.kin.relevant === 8 && c1.voice.kin.samples[0].title === "요양 기�
 ok(c1.voice.kin.samples.every((x) => !x.title.includes("건강검진")), "무관한 질문(건강검진)은 제외");
 ok(c1.voice.kin.samples[1].link === "", "위험한 링크(javascript:) 제거");
 ok(c1.voice.blog.recent === 40 && c1.voice.news.recent === 5, "관련 글만 센 최근 90일 블로그·뉴스 (" + c1.voice.blog.recent + "," + c1.voice.news.recent + ")");
+ok(!isRelevant({ title: "돌아온 젠슨 황에 현대차 자율주행 협력", description: "기술 시장진입 로드맵을 발표했다" }, tokensOf("기술 시장진입 로드맵")), "요약에만 단어가 흩어진 기사는 관련 아님(실배포 사례)");
 ok(tokensOf("중소기업 진단").join() === "중소기업,진단" && !isRelevant({ title: "중소기업 건강검진 대상자" }, tokensOf("중소기업 진단")) && isRelevant({ title: "중소기업 경영 <b>진단</b> 비용" }, tokensOf("중소기업 진단")), "관련도: 핵심 단어가 모두 있어야 관련");
 ok(c2.trend && c2.signals.timingSignal.raw < c1.signals.timingSignal.raw, "검색이 줄면 타이밍 점수도 낮아짐 (" + c1.signals.timingSignal.raw + " > " + c2.signals.timingSignal.raw + ")");
 ok(R.dataSources.datalab === "called", "결과에 데이터 출처 상태");

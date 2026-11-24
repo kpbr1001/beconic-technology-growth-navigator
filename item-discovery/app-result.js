@@ -448,7 +448,7 @@ const Result = {
     return `<div class="voice-row">
       ${v?`<div class="vr-k">사람들이 이 문제를 이야기하나요? <span class="tr-kw">검색어 "${this.esc(v.query)}" · 네이버 검색</span></div>
       <ul class="vr-list">
-        ${v.kin?(v.kin.relevant!=null?(v.kin.relevant>=5?`<li><b>지식iN 관련 질문 ${v.kin.relevant}/${v.kin.sampled}건</b> <span class="tr-kw">(상위 표본 기준)</span>${v.kin.samples.length?` — 실제 질문: ${v.kin.samples.map(a).join(" · ")}`:''}</li>`:`<li class="vr-weak">지식iN: 관련 질문이 표본 ${v.kin.sampled}건 중 ${v.kin.relevant}건뿐이라 판단하지 않았어요${v.kin.samples.length?` — ${v.kin.samples.map(a).join(" · ")}`:''}</li>`):`<li><b>지식iN 질문 ${Plus.fmt(v.kin.total)}건</b></li>`):''}
+        ${v.kin?(v.kin.relevant!=null?(v.kin.relevant>=5?`<li><b>지식iN 관련 질문 ${v.kin.relevant}/${v.kin.sampled}건</b> <span class="tr-kw">(상위 표본 기준)</span>${v.kin.samples.length?` — 실제 질문: ${v.kin.samples.map(a).join(" · ")}`:''}</li>`:`<li class="vr-weak">지식iN: 관련 질문이 표본 ${v.kin.sampled}건 중 ${v.kin.relevant}건뿐이라 판단하지 않았어요. 고객이 이 문제를 검색으로 잘 묻지 않는다는 뜻일 수 있어요.</li>`):`<li><b>지식iN 질문 ${Plus.fmt(v.kin.total)}건</b></li>`):''}
         ${v.blog?`<li><b>최근 90일 블로그 ${v.blog.recent>=100?'100건 이상':Plus.fmt(v.blog.recent)+'건'}</b> <span class="tr-kw">(최신 100건 기준)</span></li>`:''}
         ${v.news?`<li><b>최근 90일 뉴스 ${v.news.recent>=100?'100건 이상':Plus.fmt(v.news.recent)+'건'}</b>${v.news.latest.length?` — ${v.news.latest.map(x=>`${a(x)} <span class="tr-kw">${this.esc(x.date)}</span>`).join(" · ")}`:''}</li>`:''}
       </ul>`:''}

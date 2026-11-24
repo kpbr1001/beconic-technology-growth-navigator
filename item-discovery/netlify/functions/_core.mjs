@@ -25,7 +25,7 @@ import { fetchSearchSignals, fetchShopping, meaningfulTypes, SHOP_CATS } from ".
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.9.2",
+  appVersion: "v0.9.3",
   promptVersion: "v1.9.1",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
