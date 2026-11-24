@@ -344,7 +344,8 @@ const Result = {
   solTypeKo(t){
     const map={SaaS:"SaaS(구독형 소프트웨어)",Marketplace:"매칭 플랫폼",Platform:"플랫폼",
       Service:"전문 서비스",Education:"교육/클래스",Content:"콘텐츠",Product:"제품/솔루션",
-      App:"모바일 앱",Community:"커뮤니티",Subscription:"구독 서비스"};
+      App:"모바일 앱",Community:"커뮤니티",Subscription:"구독 서비스",Dashboard:"대시보드(SaaS)",
+      ProfessionalService:"전문 서비스",ProductPlusService:"제품+서비스",Consulting:"컨설팅",Hardware:"하드웨어",Software:"소프트웨어",Tool:"도구",API:"API",AI:"AI 솔루션"};
     return map[t]||t||"";
   },
   resourceKo(t){
@@ -380,8 +381,8 @@ const Result = {
         </div>
         <div class="qp-box">
           <div class="qp-k">후보 다양성 <small>(규칙 계산)</small></div>
-          <div class="qp-v">제공 형태 ${d.forms}종 <span class="qp-tag ${d.ok?'ok':'mid'}">${d.ok?'서로 다름':'비슷한 형태 많음'}</span></div>
-          <p class="qp-d">고객 유형 ${d.custs}종 · 시장 변화 범주 ${d.cats}종. 같은 아이디어의 변형 5개가 아니라, 성격이 다른 후보를 비교하도록 걸러냈어요.</p>
+          <div class="qp-v">제공 형태 ${d.forms}종 <span class="qp-tag ${d.ok?'ok':'mid'}">${d.ok?'서로 다름':d.sameProblem?'같은 문제의 다른 해법':'비슷한 형태 많음'}</span></div>
+          <p class="qp-d">고객 유형 ${d.custs}종 · 시장 변화 범주 ${d.cats}종. ${d.sameProblem?'이번 후보들은 <b>같은 고객·같은 문제</b>를 서로 다른 방식으로 푸는 안이에요. 문제 자체를 넓혀 보려면 관심 고객을 비우거나 다른 고객을 넣어 다시 탐색해 보세요.':'같은 아이디어의 변형 5개가 아니라, 성격이 다른 후보를 비교하도록 걸러냈어요.'}</p>
         </div>
         <div class="qp-box">
           <div class="qp-k">누가 무엇을 계산했나</div>

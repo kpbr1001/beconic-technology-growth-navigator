@@ -68,7 +68,7 @@ const PLUS_DATA = {
 
   // 선호 사업형태 ↔ solutionType 대응(입력 조건 점검)
   formMap: {
-    "SaaS/앱": ["SaaS", "App", "Platform", "Subscription"],
+    "SaaS/앱": ["SaaS", "App", "Platform", "Subscription", "Dashboard", "Software", "Tool", "API", "AI"],
     "서비스": ["Service", "ProfessionalService", "Consulting", "ProductPlusService"],
     "마켓플레이스": ["Marketplace", "Platform"],
     "교육/콘텐츠": ["Education", "Content", "Community"],
@@ -132,7 +132,7 @@ const Plus = {
     const resCount = (res.hw || []).length + (res.sw || []).length + (res.human || []).length;
     const items = [
       { k: "경험·역량 서술", ok: real(inp.experience) && String(inp.experience).trim().length >= 10, tip: "경험·역량을 한 줄 이상 적으면 적합도 코멘트와 걸림돌 점검이 구체적이 됩니다." },
-      { k: "관심 고객·산업 직접 입력", ok: real(inp.industry), tip: "관심 고객을 적으면 시장 신호를 그 고객 기준으로 좁힙니다." },
+      { k: "관심 고객·산업 직접 입력", ok: real(inp.industry) || (inp === State.input && (State.customerTags || []).length > 0), tip: "관심 고객을 적으면 시장 신호를 그 고객 기준으로 좁힙니다." },
       { k: "알고 있는 문제 직접 입력", ok: real(inp.knownProblem), tip: "직접 겪거나 들은 문제를 적으면 AI 가설 의존도가 낮아집니다." },
       { k: "활용 자원 1개 이상", ok: resCount > 0, tip: "보유 자원을 적으면 실행 가능성 점검이 정확해집니다." },
       { k: "지역·연령·형태 중 1개 이상", ok: real(inp.region) || real(inp.targetAge) || (inp.preferredForm && inp.preferredForm !== "상관없어요" && !String(inp.preferredForm).startsWith("__")), tip: "선택 조건이 있으면 후보가 내 상황에 더 맞춰집니다." },
@@ -152,7 +152,8 @@ const Plus = {
     if (inp.budget === "under1000만" && rt === "HW") out.push({ lv: "warn", t: "하드웨어 중심 후보예요. 입력한 초기 예산(1천만원 미만)으로는 시제품·장비 비용이 부담될 수 있어요." });
     else if (inp.budget === "under1000만" && rt === "Hybrid") out.push({ lv: "info", t: "제품+서비스 복합형이에요. 1천만원 미만 예산이면 서비스부터 시작하는 순서를 검토하세요." });
     const pf = inp.preferredForm;
-    if (pf && PLUS_DATA.formMap[pf] && st && !PLUS_DATA.formMap[pf].includes(st)) out.push({ lv: "info", t: `선호 형태(${pf})와 다른 형태(${Result.solTypeKo(st) || st})예요. 형태를 바꿔도 같은 문제를 풀 수 있는지 검토해 보세요.` });
+    const known = Object.values(PLUS_DATA.formMap).some(a => a.includes(st));
+    if (pf && PLUS_DATA.formMap[pf] && st && known && !PLUS_DATA.formMap[pf].includes(st)) out.push({ lv: "info", t: `선호 형태(${pf})와 다른 형태(${Result.solTypeKo(st) || st})예요. 형태를 바꿔도 같은 문제를 풀 수 있는지 검토해 보세요.` });
     if (o.founderFit?.hasMisfit) out.push({ lv: "warn", t: "실행 걸림돌이 있어요(위 적합도 참고). 보완 계획 없이 바로 시작하기는 어려워요." });
     return out;
   },
@@ -164,8 +165,10 @@ const Plus = {
     const forms = uniq(t.map(o => o.solution?.solutionType || o._seedSolution));
     const custs = uniq(t.map(o => o.customer?.type));
     const cats = uniq(t.flatMap(o => (o.whyNow || []).map(w => w.category)));
-    const ok = forms >= 3;
-    return { forms, custs, cats, ok, n: t.length };
+    const probs = uniq(t.map(o => [o.signals?.problemSignal?.raw, o.signals?.marketGapSignal?.raw, o.narrative?.problem ? String(o.narrative.problem).slice(0, 12) : ""].join("|")));
+    const sameProblem = t.length > 1 && custs <= 1 && probs <= 2;
+    const ok = forms >= 3 && !sameProblem;
+    return { forms, custs, cats, ok, sameProblem, n: t.length };
   },
 
   // ---------- ③ 근거 확인처 ----------
@@ -194,11 +197,18 @@ const Plus = {
     return { how, broken: dis ? "불만: " + dis : "" };
   },
 
+  shortProblem(t) {
+    t = this.str(t, 200);
+    const cut = t.split(/(?<=[,.])\s|(?<=고)\s|(?<=며)\s/)[0];
+    const x = (cut && cut.length >= 8 ? cut : t).replace(/[,.]$/, "");
+    return x.length > 45 ? x.slice(0, 44) + "…" : x;
+  },
+
   // ---------- ② 검증 첫 3걸음 ----------
   validationPlan(o) {
     const n = o.narrative || {};
     const who = this.str(n.who || o.customer?.roles?.user || "대상 고객", 60);
-    const prob = this.str(n.problem || o.problem?.statement || "이 문제", 80);
+    const prob = this.shortProblem(n.problem || o.problem?.statement || "이 문제");
     const alt = this.str(this.altText(o).how || "지금 쓰는 방법", 60);
     const buyer = this.str(n.buyer || o.buyer || o.customer?.roles?.buyer || who, 50);
     const b2b = o.customer?.type === "B2B";

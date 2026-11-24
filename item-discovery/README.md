@@ -1,6 +1,6 @@
 # K-ITEM FINDER (BECONIC 31 · S1 아이템 발굴)
 
-운영: https://beconic-diagnosis-item-discovery.netlify.app · 현재 v0.4.0
+운영: https://beconic-diagnosis-item-discovery.netlify.app · 현재 v0.4.1
 
 이 폴더는 **프론트 파일만** 있습니다. 서버 함수(`netlify/functions/_core.mjs`, `discover-background.mjs`, `status.mjs`, `opportunity.js`)와 `netlify.toml`은 기존 `k-item-finder-deploy.zip`의 것을 그대로 씁니다(v0.4.0에서 변경 없음).
 
