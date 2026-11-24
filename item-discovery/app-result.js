@@ -578,7 +578,7 @@ const SAMPLE_RESULT = {
   summary:{ generatedCount:5, disclaimer:"사업 성공 가능성 순위가 아니라, 서로 다른 강점을 가진 후보들입니다." },
   top5:[
     {
-      opportunityId:"kif_ops_001", title:"안심일감",
+      opportunityId:"kif_ops_001", title:"시니어잡링크",
       customer:{ type:"B2C", roles:{ user:"퇴직 직후 시니어", buyer:"본인/자녀", decisionMaker:"본인" } },
       context:{ triggerEvent:"정년퇴직" },
       problem:{ types:["Information","Uncertainty","Trust"], severity:4, frequency:"weekly" },
@@ -592,7 +592,7 @@ const SAMPLE_RESULT = {
       signals:{ problemSignal:{raw:78,band:"high"}, marketGapSignal:{raw:71,band:"high"}, timingSignal:{raw:83,band:"veryHigh"}, founderMatch:{raw:null,band:"unknown"}, evidenceConfidence:"L1" },
       founderFit:{ band:"unknown", note:"금융·상담 경험이 있다면 시니어의 신뢰 확보에 유리하게 작용할 수 있습니다. 정밀 적합도는 검증 단계에서 평가됩니다.", misfits:[], hasMisfit:false },
       explainPath:["고령화 사회","퇴직 후 소득 필요","정보 파편화·불신","일반 구인앱은 시니어 부적합","미충족 시니어 세그먼트","신뢰 기반 매칭"],
-      narrative:{ tagline:"신뢰 검증된 시니어 일감 매칭", differentiator:"일감 검증에 집중해 사기·미스매치 위험을 낮춘 점이 다르다", valueProp:"검증된 일감으로 퇴직 후 소득 공백을 안전하게 메웁니다", strength:"검증된 일감 풀이 신뢰를 만들어 재이용률이 높다", caution:"공급(일감)과 수요(시니어) 양쪽을 동시에 모아야 해 초기 견인이 어렵다", sustainability:"지역별로 복제 확장이 쉽고, 데이터가 쌓일수록 매칭 품질이 좋아진다", name:"안심일감", who:"정년퇴직 직후 새 수입원을 찾는 55~64세",
+      narrative:{ tagline:"신뢰 검증된 시니어 일감 매칭", differentiator:"일감 검증에 집중해 사기·미스매치 위험을 낮춘 점이 다르다", valueProp:"검증된 일감으로 퇴직 후 소득 공백을 안전하게 메웁니다", strength:"검증된 일감 풀이 신뢰를 만들어 재이용률이 높다", caution:"공급(일감)과 수요(시니어) 양쪽을 동시에 모아야 해 초기 견인이 어렵다", sustainability:"지역별로 복제 확장이 쉽고, 데이터가 쌓일수록 매칭 품질이 좋아진다", name:"시니어잡링크", who:"정년퇴직 직후 새 수입원을 찾는 55~64세",
         context:"퇴직 직후 고정 수입이 끊기고 재취업 정보는 흩어져 있는 상황",
         problem:"신뢰할 수 있는 시니어 적합 일감·창업 정보를 한곳에서 찾기 어렵다",
         emotionMotive:"노후 불안 회피(AVOID)와 자립 통제(CONTROL) 욕구",
@@ -606,7 +606,7 @@ const SAMPLE_RESULT = {
         unknowns:"실제 지불의향과 초기 공급자 확보 경로" },
     },
     {
-      opportunityId:"kif_ops_002", title:"검사콕",
+      opportunityId:"kif_ops_002", title:"비전QC",
       customer:{ type:"B2B", roles:{ user:"현장 검사인력", buyer:"대표", decisionMaker:"대표" } },
       context:{ triggerEvent:"인건비 상승" },
       problem:{ types:["Labor","Cost","Repetition"], severity:4, frequency:"daily" },
@@ -620,7 +620,7 @@ const SAMPLE_RESULT = {
       signals:{ problemSignal:{raw:82,band:"veryHigh"}, marketGapSignal:{raw:64,band:"high"}, timingSignal:{raw:70,band:"high"}, founderMatch:{raw:null,band:"unknown"}, evidenceConfidence:"L1" },
       founderFit:{ band:"unknown", note:"제조 현장 경험이 있다면 검사 기준 설계와 현장 설득에 유리할 수 있습니다.", misfits:[], hasMisfit:false },
       explainPath:["인건비 상승","반복 검사 노동","스마트팩토리는 과·고가","저비용 비전 AI 등장","소상공인 미충족","경량 검사 보조"],
-      narrative:{ tagline:"스마트폰 카메라로 하는 품질검사", differentiator:"전용 장비 없이 기존 스마트폰만으로 시작하는 점이 다르다", valueProp:"비싼 설비 없이 검사 인력을 줄이고 불량을 잡습니다", strength:"기존 장비 대비 도입 문턱이 낮아 소상공인 접근성이 높다", caution:"검사 정확도에 대한 현장 신뢰를 얻기까지 검증 데이터가 필요하다", sustainability:"업종별 검사 모델을 늘려가며 수평 확장할 수 있다", name:"검사콕", who:"검사에 사람을 많이 쓰는 소규모 제조사",
+      narrative:{ tagline:"스마트폰 카메라로 하는 품질검사", differentiator:"전용 장비 없이 기존 스마트폰만으로 시작하는 점이 다르다", valueProp:"비싼 설비 없이 검사 인력을 줄이고 불량을 잡습니다", strength:"기존 장비 대비 도입 문턱이 낮아 소상공인 접근성이 높다", caution:"검사 정확도에 대한 현장 신뢰를 얻기까지 검증 데이터가 필요하다", sustainability:"업종별 검사 모델을 늘려가며 수평 확장할 수 있다", name:"비전QC", who:"검사에 사람을 많이 쓰는 소규모 제조사",
         context:"인건비는 오르는데 검사 인력 확보가 어려운 상황",
         problem:"반복적 육안검사에 인력·시간이 과다 투입된다",
         emotionMotive:"비용 절감(SAVE)과 업무 단순화(SIMPLIFY)",
@@ -634,7 +634,7 @@ const SAMPLE_RESULT = {
         unknowns:"현장이 수용 가능한 검사 정확도 기준" },
     },
     {
-      opportunityId:"kif_ops_003", title:"상권 나침반",
+      opportunityId:"kif_ops_003", title:"상권핏",
       customer:{ type:"B2B", roles:{ user:"소상공인", buyer:"소상공인", decisionMaker:"소상공인" } },
       context:{ triggerEvent:"창업/폐업 결정" },
       problem:{ types:["Information","Risk","Uncertainty"], severity:3, frequency:"monthly" },
@@ -648,7 +648,7 @@ const SAMPLE_RESULT = {
       signals:{ problemSignal:{raw:66,band:"high"}, marketGapSignal:{raw:69,band:"high"}, timingSignal:{raw:58,band:"medium"}, founderMatch:{raw:null,band:"unknown"}, evidenceConfidence:"L2" },
       founderFit:{ band:"unknown", note:"컨설팅·상권 분석 경험은 이 기회의 핵심 역량과 직접 맞닿아 있습니다.", misfits:[], hasMisfit:false },
       explainPath:["창업/폐업 리스크","정보는 많지만 실행 어려움","고가 컨설팅 부담","공공데이터 개방","중간층 공백","데이터+전문가 진단"],
-      narrative:{ tagline:"상권 데이터 기반 창업 컨설팅", differentiator:"컨설턴트 감이 아닌 지역 데이터를 근거로 삼는 점이 다르다", valueProp:"감이 아니라 데이터로 창업·업종전환을 결정합니다", strength:"공공데이터라는 객관적 근거가 컨설팅 신뢰도를 높인다", caution:"데이터 해석을 실행으로 잇는 후속 서비스가 없으면 일회성에 그친다", sustainability:"컨설팅 사례가 쌓이면 자체 예측모델로 고도화 가능하다", name:"상권 나침반", who:"창업·업종전환을 앞둔 소상공인",
+      narrative:{ tagline:"상권 데이터 기반 창업 컨설팅", differentiator:"컨설턴트 감이 아닌 지역 데이터를 근거로 삼는 점이 다르다", valueProp:"감이 아니라 데이터로 창업·업종전환을 결정합니다", strength:"공공데이터라는 객관적 근거가 컨설팅 신뢰도를 높인다", caution:"데이터 해석을 실행으로 잇는 후속 서비스가 없으면 일회성에 그친다", sustainability:"컨설팅 사례가 쌓이면 자체 예측모델로 고도화 가능하다", name:"상권핏", who:"창업·업종전환을 앞둔 소상공인",
         context:"창업/폐업 결정 앞에서 리스크 판단 근거가 부족한 상황",
         problem:"무료 정보는 실행이 어렵고 전문 컨설팅은 비싸다",
         emotionMotive:"실패 회피(AVOID)와 성과 달성(ACHIEVE)",
@@ -662,7 +662,7 @@ const SAMPLE_RESULT = {
         unknowns:"소상공인이 수용 가능한 단가 범위" },
     },
     {
-      opportunityId:"kif_ops_004", title:"실무 한입",
+      opportunityId:"kif_ops_004", title:"리스킬업",
       customer:{ type:"B2C", roles:{ user:"중장년 구직자", buyer:"본인/정부지원", decisionMaker:"본인" } },
       context:{ triggerEvent:"경력 단절" },
       problem:{ types:["Access","Complexity"], severity:3, frequency:"weekly" },
@@ -676,7 +676,7 @@ const SAMPLE_RESULT = {
       signals:{ problemSignal:{raw:61,band:"high"}, marketGapSignal:{raw:73,band:"high"}, timingSignal:{raw:66,band:"high"}, founderMatch:{raw:null,band:"unknown"}, evidenceConfidence:"L1" },
       founderFit:{ band:"unknown", note:"콘텐츠·교육 제작 역량이 없다면 초기 제작 부담이 있을 수 있습니다.", misfits:[{type:"CONTENT_GAP",message:"교육 콘텐츠 제작 자원 확보 여부를 확인해야 합니다."}], hasMisfit:true },
       explainPath:["경력 단절","재취업 실무격차","에듀테크는 청년 중심","정부 지원 확대","중장년 미충족","마이크로러닝+자격연계"],
-      narrative:{ tagline:"중장년 실무역량 15분 학습", differentiator:"자격증이 아닌 실무 즉시 투입 역량에 집중한 점이 다르다", valueProp:"짧은 학습으로 재취업 실무 격차를 빠르게 좁힙니다", strength:"짧은 학습 단위로 완주율이 높고 즉시 효과를 체감시킨다", caution:"재취업 성공이라는 최종 성과 입증에 시간이 걸린다", sustainability:"기업 연계 채용까지 확장하면 B2B 매출로 이어진다", name:"실무 한입", who:"경력 단절 후 재취업을 준비하는 중장년",
+      narrative:{ tagline:"중장년 실무역량 15분 학습", differentiator:"자격증이 아닌 실무 즉시 투입 역량에 집중한 점이 다르다", valueProp:"짧은 학습으로 재취업 실무 격차를 빠르게 좁힙니다", strength:"짧은 학습 단위로 완주율이 높고 즉시 효과를 체감시킨다", caution:"재취업 성공이라는 최종 성과 입증에 시간이 걸린다", sustainability:"기업 연계 채용까지 확장하면 B2B 매출로 이어진다", name:"리스킬업", who:"경력 단절 후 재취업을 준비하는 중장년",
         context:"재취업 시장이 요구하는 실무 역량과 본인 역량 사이 격차",
         problem:"짧게·실무 중심으로 배울 수 있는 재교육 경로가 부족",
         emotionMotive:"목표 달성(ACHIEVE)과 자기주도 통제(CONTROL)",
@@ -690,7 +690,7 @@ const SAMPLE_RESULT = {
         unknowns:"양질 콘텐츠의 지속 제작 자원" },
     },
     {
-      opportunityId:"kif_ops_005", title:"세무짝꿍",
+      opportunityId:"kif_ops_005", title:"택스플로",
       customer:{ type:"B2B", roles:{ user:"1인 사업자", buyer:"1인 사업자", decisionMaker:"1인 사업자" } },
       context:{ triggerEvent:"사업자 등록" },
       problem:{ types:["Complexity","Time","Uncertainty"], severity:4, frequency:"monthly" },
@@ -704,7 +704,7 @@ const SAMPLE_RESULT = {
       signals:{ problemSignal:{raw:69,band:"high"}, marketGapSignal:{raw:60,band:"medium"}, timingSignal:{raw:64,band:"high"}, founderMatch:{raw:null,band:"unknown"}, evidenceConfidence:"L1" },
       founderFit:{ band:"unknown", note:"세무·행정 도메인 지식이 없다면 규제 준수 설계에 외부 협업이 필요할 수 있습니다.", misfits:[], hasMisfit:false },
       explainPath:["사업자 등록 급증","세무·행정 복잡","세무사는 부담·셀프는 불안","전자세금계산서 API 확대","1인 규모 공백","자동 안내 도우미"],
-      narrative:{ tagline:"1인 사업자 행정 자동 비서", differentiator:"세무를 넘어 행정 전반을 자동 알림하는 점이 다르다", valueProp:"세무사 없이도 놓치기 쉬운 행정을 자동으로 챙깁니다", strength:"반복 행정을 자동화해 명확한 시간 절약 가치를 준다", caution:"세무·법규 변화에 상시 대응하는 운영 부담이 있다", sustainability:"고객 사업 성장에 따라 상위 요금제로 자연 확장된다", name:"세무짝꿍", who:"막 시작한 프리랜서·1인 사업자",
+      narrative:{ tagline:"1인 사업자 행정 자동 비서", differentiator:"세무를 넘어 행정 전반을 자동 알림하는 점이 다르다", valueProp:"세무사 없이도 놓치기 쉬운 행정을 자동으로 챙깁니다", strength:"반복 행정을 자동화해 명확한 시간 절약 가치를 준다", caution:"세무·법규 변화에 상시 대응하는 운영 부담이 있다", sustainability:"고객 사업 성장에 따라 상위 요금제로 자연 확장된다", name:"택스플로", who:"막 시작한 프리랜서·1인 사업자",
         context:"사업자 등록 직후 세무·행정 의무가 몰려오는 상황",
         problem:"무엇을 언제 해야 하는지 몰라 실수·과태료 위험",
         emotionMotive:"복잡함 제거(SIMPLIFY)와 실수 회피(AVOID)",
@@ -755,11 +755,11 @@ const SAMPLE_RESULT = {
 // v0.5.0 — 샘플에 분야·다른 이름 후보(실제 응답 형태와 동일하게)
 (function(){
   const extra={
-    kif_ops_001:{field:"care",nameOptions:["시니어 안심일감","은퇴 후 일감 연결"],nameReason:"‘검증된 일감’이라는 신뢰 포인트가 이름에서 바로 보이게 했어요."},
-    kif_ops_002:{field:"mfg",nameOptions:["폰카 검사 보조","불량 잡는 카메라"],nameReason:"전용 장비 없이 ‘스마트폰’으로 한다는 차별점을 앞세웠어요."},
-    kif_ops_003:{field:"local",nameOptions:["동네상권 리포트","창업 전 상권 체크"],nameReason:"감이 아닌 ‘데이터’ 근거라는 점을 이름에 담았어요."},
-    kif_ops_004:{field:"edu",nameOptions:["15분 재취업 실무","중장년 실무 스낵러닝"],nameReason:"짧은 학습 단위와 대상(중장년)을 한 번에 떠올리게 했어요."},
-    kif_ops_005:{field:"finance",nameOptions:["1인 세무 비서","신고일 알림 도우미"],nameReason:"‘자동으로 챙겨 준다’는 결과를 이름의 중심에 뒀어요."},
+    kif_ops_001:{field:"care",nameOptions:["안심잡","시니어 일감 매칭"],nameReason:"시니어(Senior)·일(Job)·연결(Link)을 합쳐 무엇을 이어 주는 서비스인지 바로 드러나게 했어요."},
+    kif_ops_002:{field:"mfg",nameOptions:["큐체크","스마트폰 외관검사"],nameReason:"비전(영상)과 품질관리(QC)를 결합해 제조 현장 용어로 기능을 바로 알 수 있게 했어요."},
+    kif_ops_003:{field:"local",nameOptions:["로컬핏","상권 데이터 진단"],nameReason:"상권과 적합(Fit)을 결합해 ‘내 업종에 맞는 자리인지’를 판단해 준다는 가치를 담았어요."},
+    kif_ops_004:{field:"edu",nameOptions:["커리어업","중장년 실무 재교육"],nameReason:"재교육(Reskill)과 상승(Up)을 결합해 재취업 역량을 끌어올린다는 결과를 담았어요."},
+    kif_ops_005:{field:"finance",nameOptions:["택스캘린더","1인 사업자 신고 관리"],nameReason:"세금(Tax)과 흐름(Flow)을 결합해 신고 일정이 자동으로 흘러간다는 기능을 담았어요."},
   };
   const defs={kif_ops_001:"퇴직 시니어를 위한 검증된 일감 매칭 플랫폼",kif_ops_002:"소규모 제조사를 위한 스마트폰 품질검사 앱",
     kif_ops_003:"창업 전 소상공인을 위한 상권 데이터 진단 서비스",kif_ops_004:"재취업 중장년을 위한 15분 실무 학습 클래스",kif_ops_005:"1인 사업자를 위한 세무·행정 신고 알림 SaaS"};

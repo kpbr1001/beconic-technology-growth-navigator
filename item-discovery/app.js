@@ -7,8 +7,8 @@
 const APP_META = {
   productName: "K-ITEM FINDER",
   productDescription: "Customer & Market Opportunity Discovery Engine",
-  appVersion: "v0.9.0",
-  promptVersion: "v1.8.0",
+  appVersion: "v0.9.1",
+  promptVersion: "v1.9.0",
   updatedAt: "2026.11.24",
   copyrightYear: "2023~2026",
 };

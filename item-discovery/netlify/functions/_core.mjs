@@ -25,8 +25,8 @@ import { fetchSearchSignals, fetchShopping, meaningfulTypes, SHOP_CATS } from ".
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.9.0",
-  promptVersion: "v1.8.0",
+  appVersion: "v0.9.1",
+  promptVersion: "v1.9.0",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
 };
@@ -804,26 +804,29 @@ const SYSTEM_B = `당신은 K-ITEM FINDER의 후보 서술 엔진이자 시니�
 - 창업자가 바로 이해하고 의사결정에 쓸 수 있는 실용적 언어. 추상적 수사 배제.
 
 [가장 중요 — 아이템명(name) + 아이템 정의(definition)]
-화면 제목은 "name — definition" 으로 함께 보인다. 둘 다 반드시 채운다.
+화면 제목은 "name — definition" 으로 함께 보인다. 읽는 사람은 창업자·기업 대표·투자자·지원기관 심사위원이다.
+이름은 실제 출시되는 서비스처럼 **전문적이고 신뢰감** 있어야 한다. 유치하거나 장난스러우면 실패다.
 
-1) name = 고객이 기억하고 부르고 싶은 '브랜드형 이름'. 2~8자(공백 포함 최대 10자).
-- 좋은 이름의 조건: 짧다 · 소리 내어 읽기 쉽다 · 고객이 얻는 결과나 장면이 떠오른다 · 다른 4개와 확연히 다르다.
-- 만드는 법(하나 골라 쓴다): ① 결과 압축형 "검사콕", "서류끝", "재고제로" ② 장면·은유형 "사장님 비서실", "창업 나침반" ③ 합성 조어형 "멘토링크", "펫스테이" ④ 의인화형 "세무짝꿍", "공장 반장"
-- 금지: 기능 나열("~관리 시스템", "~진단 플랫폼", "~추적 SaaS"), 일반어만으로 된 이름("경영진단", "컨설팅"), 직위·고객유형("대표","중소기업","소상공인","시니어"), 문제 서술("~어려움","~부재"), 영어 약어만.
-- ★ 5개 이름의 핵심 단어(예: 진단·검진·매칭·컨설팅·플랫폼·리포트)가 겹치면 실패다.
+1) name = 브랜드형 서비스명. 아래 두 방식 중 하나.
+  (A) 조어형: 의미 단서가 있는 한글 2~5자 또는 영문 1~2단어 합성(한글 표기). 짧고 발음이 쉽고, 기억에 남는다.
+      만드는 법: 핵심 가치어(비용·원가·성과·인증·정산·채용·품질·데이터 등)의 음절·영문 어근을 줄이거나 결합.
+      톤 참고(실제 회사명이므로 그대로 쓰지 말 것): 캐시노트, 리멤버, 그리팅, 플렉스, 채널톡, 클로바노트
+  (B) 전문 서술형: [대상 또는 업무] + [핵심 기능] 6~12자, 업계 용어 사용. 예시 형태: "[업종] 원가 진단", "[업무] 자동 정산"
+- 금지(하나라도 해당하면 실패):
+  · 의인화·직함: 반장, 짝꿍, 비서, 선생, 박사, 도우미, 집사
+  · 신체·의료 은유: 체온계, 맥박, 청진기, 처방전, 건강검진, 주치의, 수술
+  · 상투 은유: 레이더, 나침반, 탐정, 리허설, 내비, 지도, 렌즈, 엔진
+  · 구어·의성의태: ~콕, ~쏙, ~뚝딱, ~끝, ~톡톡, 반말, 감탄사, 이모티콘
+  · 일반어만으로 된 이름("경영진단", "컨설팅"), 직위·고객유형("대표","소상공인"), 문제 서술("~어려움")
+  · 이 프롬프트에 나온 어떤 단어도 이름에 그대로 쓰지 말 것
+- ★ 5개 이름의 핵심 단어가 겹치면 실패다. 5개의 이름 방식도 섞는다((A) 3개 이상 권장).
 
-2) definition = 이 아이템이 무엇인지 한 줄 정의. 18~34자. "[누구]를 위한 [무엇을 해 주는] [제공 형태]" 형식.
-  예) "소규모 제조사를 위한 스마트폰 품질검사 앱", "예비창업자를 위한 주 1회 사업계획 첨삭 클래스"
+2) definition = 한 줄 정의 18~34자. "[누구]를 위한 [무엇을 해 주는] [제공 형태]".
   - 제공 형태(앱·SaaS·플랫폼·서비스·클래스·제품·기기·구독·매장·커뮤니티)는 실제 solutionType 과 일치해야 한다.
   - ★ 제공형태가 '실물 제품'·'기기'인 후보는 정의에 실제 물건(키트·세트·박스·교구·기기·장비·용품·식품 등)이 드러나야 한다. "도구+자문", "서비스", "SaaS"로 정의하면 실패다.
 
-3) nameOptions: 같은 후보의 다른 이름 2개(위 ①~④ 중 name 과 다른 방법으로).
-4) nameReason: 왜 이 이름인지 한 문장(고객이 무엇을 떠올리게 하려는지).
-
-나쁜 예 → 좋은 예
-  "아키텍처 건강검진 플랫폼" → name "코드닥", definition "개발자 없는 스타트업을 위한 코드 구조 자동 점검 SaaS"
-  "커머스 병목 추적 SaaS" → name "매출 레이더", definition "온라인 셀러를 위한 매출 하락 원인 실시간 알림 앱"
-  "투자설득 검증리포트" → name "IR 리허설", definition "첫 투자 유치를 앞둔 창업자를 위한 사업성 모의심사 서비스"
+3) nameOptions: 다른 이름 2개 — 하나는 (A) 조어형, 하나는 (B) 전문 서술형. 금지 규칙 동일.
+4) nameReason: 왜 이 이름인지 한 문장(어떤 가치어에서 왔고 고객이 무엇을 떠올리게 하는지).
 
 [필수 필드 — 반드시 채움]
 각 후보마다 아래를 "확인 필요"로 남기지 말고 후보 정보에 근거해 1~2문장으로 구체 서술:
@@ -870,9 +873,9 @@ function buildUserB(top5, userProfile) {
 ${JSON.stringify(skeleton)}
 
 각 후보에 대해 아래 필드만 채운다(간결하게, 각 1~2문장):
-- name: 브랜드형 이름 2~8자(결과 압축·장면 은유·합성 조어·의인화 중 하나). 기능 나열·일반어·직위 금지. 5개 핵심 단어 겹침 금지.
+- name: 전문적인 브랜드형 이름((A) 조어형 한글 2~5자·영문 합성 또는 (B) 전문 서술형 6~12자). 의인화·신체/의료 은유·상투 은유(레이더·나침반 등)·구어(~콕·~끝) 금지. 5개 핵심 단어 겹침 금지.
 - definition: "[누구]를 위한 [무엇을 해 주는] [제공 형태]" 18~34자. 제공 형태는 위 제품형태와 일치.
-- nameOptions: 다른 방법으로 지은 이름 2개
+- nameOptions: [조어형 1개, 전문 서술형 1개]
 - nameReason: 왜 이 이름인지 한 문장
 - tagline: 이 아이템을 한 줄로 정의(15~30자). 예 "데이터로 성장 병목을 3분 만에 진단"
 - problem: 이 고객의 핵심 문제(구체적으로, 한 문장)
@@ -904,6 +907,8 @@ marketPerspective: 이 시장을 바라보는 핵심 관점 한 문장(통념을
 }
 
 // 아이템명 정제: CALL B가 고객/문제 서술을 name으로 준 경우 아이템형으로 교체
+// 유치·상투 이름(대표 피드백 2026-11-24): 이런 단어가 들어간 이름은 다른 후보 이름으로 교체
+const CHILDISH_RE = /(반장|짝꿍|비서|선생|박사|도우미|집사|체온계|맥박|청진기|처방전|건강검진|주치의|레이더|나침반|탐정|리허설|내비|콕|쏙|뚝딱|톡톡|끝$|지기$)/;
 const BAD_NAME_TOKENS = ["대표","임원","담당자","소상공인","시니어","수도권","팀장","경영진 ","CEO","CFO","이사",
   "진단 불가","진단불가","미파악","접근 어려움","접근어려움","원인 진단","성장정체","복잡성"];
 function refineItemName(rawName, c) {
@@ -913,7 +918,9 @@ function refineItemName(rawName, c) {
     || name.includes("(")                          // "...(고객)" 형태
     || /^[A-Za-z]+\s*:/.test(name)                 // "SaaS: ..." 콜론 앞 형태
     || /(SaaS|Service|Marketplace|Product|Education|Content|Platform|App)\s*:/.test(name)
-    || BAD_NAME_TOKENS.some((t) => name.includes(t));
+    || BAD_NAME_TOKENS.some((t) => name.includes(t))
+    || CHILDISH_RE.test(name.replace(/\s+/g, ""))
+    || /^(캐시노트|리멤버|그리팅|플렉스|채널톡|클로바노트)$/.test(name.replace(/\s+/g, "")); // 톤 참고로 준 실제 회사명 복사 방지
   if (!looksBad) return name;
   const sol = solutionLabel(c._seedSolution || c.solution?.solutionType);
   let core = coreWord(c._gapStatement || c._seedProblem || "");
@@ -1204,4 +1211,4 @@ async function orchestrate(input) {
 
 export { orchestrate, APP_META, API_CONFIG, providers, FIELD_LABEL };
 // 테스트 전용(동작 영향 없음)
-export const __test = { fixPhysicalDefinition, defaultDefinition, FORM_TYPES, toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };
+export const __test = { CHILDISH_RE, fixPhysicalDefinition, defaultDefinition, FORM_TYPES, toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };

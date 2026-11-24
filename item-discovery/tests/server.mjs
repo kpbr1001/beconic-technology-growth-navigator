@@ -88,6 +88,28 @@ ok(Object.values(cnt).every((v) => v <= 2), "같은 핵심 명사 최대 2번: "
 ok(t.every((c) => Array.isArray(c.narrative.nameOptions)), "다른 이름 후보 제공");
 ok(__test.refineItemName("수도권 중소기업 대표 · 진단 불가", t[0]) !== "수도권 중소기업 대표 · 진단 불가", "나쁜 이름 교정");
 
+console.log("3a. 유치·상투 이름 걸러내기(대표 피드백)");
+{
+  const { chooseNames, CHILDISH_RE } = __test;
+  const c = { customer: { roles: { user: "대표" } }, solution: { solutionType: "SaaS" }, _gapStatement: "원가 진단", _seedSolution: "SaaS" };
+  const pairs = [
+    ["경영 체온계", "코스트핏", "제조원가 진단"], ["매출 레이더", "셀러링크", "채널 수익 분석"], ["조직 맥박", "피플스코프", "조직 진단 리포트"],
+    ["공장 반장", "팩토리노트", "공정 원가 키트"], ["IR 리허설", "딜레디", "투자 준비 점검"],
+  ].map(([n, a, b]) => ({ c, d: { narrative: { name: n, nameOptions: [a, b] } } }));
+  const picked = chooseNames(pairs).map((x) => x.pick);
+  console.log("    선택:", picked.join(" | "));
+  ok(picked.every((n) => !CHILDISH_RE.test(n.replace(/\s+/g, ""))), "유치한 이름(체온계·레이더·맥박·반장·리허설) 모두 교체");
+  ok(picked[0] === "코스트핏" && picked[3] === "팩토리노트", "조어형 대안 우선 채택");
+  ok(!CHILDISH_RE.test("캐시노트") && !CHILDISH_RE.test("페이북") && !CHILDISH_RE.test("코스트핏"), "정상 브랜드형은 통과");
+  ok(["세무짝꿍", "검사콕", "서류끝", "비용지기", "창업 나침반", "AI 비서"].every((n) => CHILDISH_RE.test(n.replace(/\s+/g, ""))), "의인화·구어·상투 은유 차단");
+}
+{
+  const { buildUserB } = __test;
+  const dummy = [{ opportunityId: "kif_ops_001", customer: { roles: { user: "x" } }, problem: {}, solution: { solutionType: "SaaS" } }];
+  const prompt = buildUserB(dummy, {});
+  ok(!/매출 레이더|IR 리허설|공장 반장|검사콕|코드닥/.test(prompt), "프롬프트에 베낄 수 있는 예시 이름 없음");
+}
+
 console.log("3b. 선호 사업형태 반영(실물 제품을 고르면 SaaS로 바뀌지 않게)");
 {
   const inp = normalizeInput({ ...INPUT, preferredForm: undefined, preferredForms: ["product", "hardware", "store"] });

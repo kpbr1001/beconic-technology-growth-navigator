@@ -78,10 +78,10 @@ console.log("1. 샘플 결과 — 보강 섹션 렌더");
   await page.evaluate(() => Result.handoff());
   await page.waitForTimeout(900);
   ok(opened[0] === "https://beconic-diagnosis-item-pmf.netlify.app/?from=finder", "검증하기 → S2(입력 데이터 URL 미포함)");
-  ok((await page.evaluate(() => window.__copied || "")).includes("안심일감"), "아이템 요약 클립보드 복사");
+  ok((await page.evaluate(() => window.__copied || "")).includes("시니어잡링크"), "아이템 요약 클립보드 복사");
   const mail = await page.locator('a[href^="mailto:"]').first().getAttribute("href");
   ok(mail.includes("start%40gven.kr") || mail.startsWith("mailto:start@gven.kr"), "메일 상담 mailto");
-  ok(decodeURIComponent(mail).includes("검토하려는 아이템: 안심일감"), "메일 초안에 선택 아이템");
+  ok(decodeURIComponent(mail).includes("검토하려는 아이템: 시니어잡링크"), "메일 초안에 선택 아이템");
   // PDF
   const pdf = await page.evaluate(() => { const h = PDFLayout.build(State.result, { org: "테스트", person: "-", purpose: "x", conf: "일반", date: "2026" }); return { n: (h.match(/class="pdf-page/g) || []).length, plan: h.includes("검증 첫 3걸음"), trust: h.includes("평가 방법"), next: h.includes("AI 아이템 진단(PMF)"), lab: h.includes("K-ITEM PMF LAB") }; });
   ok(pdf.plan && pdf.trust && pdf.next, `PDF 부록(검증 계획·평가 방법·다음 진단) · ${pdf.n}쪽`);
