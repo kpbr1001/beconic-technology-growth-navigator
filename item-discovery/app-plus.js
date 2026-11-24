@@ -144,7 +144,8 @@ const Plus = {
     const out = [];
     const rt = o.solution?.resourceType, st = o.solution?.solutionType || o._seedSolution || "";
     if (inp.budget === "under1000만" && rt === "HW") out.push({ lv: "warn", t: "하드웨어 중심 후보예요. 입력한 초기 예산(1천만원 미만)으로는 시제품·장비 비용이 부담될 수 있어요." });
-    else if (inp.budget === "under1000만" && rt === "Hybrid") out.push({ lv: "info", t: "제품+서비스 복합형이에요. 1천만원 미만 예산이면 서비스부터 시작하는 순서를 검토하세요." });
+    else if (inp.budget === "under1000만" && st === "Product") out.push({ lv: "info", t: "실물 제품은 시제품·초도 생산 비용이 들어요. 1천만원 미만이면 소량 제작·사전 판매(크라우드펀딩 등)로 수요부터 확인하세요." });
+    else if (inp.budget === "under1000만" && rt === "Hybrid" && st !== "Product") out.push({ lv: "info", t: "제품+서비스 복합형이에요. 1천만원 미만 예산이면 서비스부터 시작하는 순서를 검토하세요." });
     const FO = typeof FORM_OPTIONS !== "undefined" ? FORM_OPTIONS : [];
     const pfs = (inp.preferredForms || []).filter(k => FO.some(f => f.k === k));
     const pfTypes = pfs.flatMap(k => FO.find(f => f.k === k).t);
