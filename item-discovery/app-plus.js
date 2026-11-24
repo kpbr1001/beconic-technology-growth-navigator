@@ -218,6 +218,27 @@ const Plus = {
     return x.length > 45 ? x.slice(0, 44) + "…" : x;
   },
 
+  // ---------- ③ 실제 데이터: 네이버 검색 추이 ----------
+  trendInfo(o) {
+    const t = o.trend;
+    if (!t || typeof t !== "object") return null;
+    const kw = (Array.isArray(t.keywords) ? t.keywords : []).map(k => this.str(k, 20)).filter(Boolean).slice(0, 5);
+    if (t.insufficient) return { insufficient: true, kw };
+    const yoy = Number(t.yoy), recent = Number(t.recent);
+    if (!isFinite(yoy)) return null;
+    const pct = x => (x >= 0 ? "+" : "") + Math.round(x * 100) + "%";
+    const dir = yoy >= 0.1 ? "up" : yoy <= -0.1 ? "down" : "flat";
+    const word = { up: "늘고 있어요", down: "줄고 있어요", flat: "비슷해요" }[dir];
+    const spark = (Array.isArray(t.spark) ? t.spark : []).map(Number).filter(isFinite).slice(-24);
+    return { kw, yoy: pct(yoy), recent: isFinite(recent) ? pct(recent) : "", dir, word, spark, date: this.str(t.fetchedAt, 10) };
+  },
+  sparkSvg(v, w = 120, h = 28) {
+    if (!v || v.length < 2) return "";
+    const max = Math.max(...v, 1), min = Math.min(...v, 0);
+    const pts = v.map((x, i) => `${(i / (v.length - 1) * (w - 2) + 1).toFixed(1)},${(h - 2 - (x - min) / (max - min || 1) * (h - 4)).toFixed(1)}`).join(" ");
+    return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="최근 24개월 검색 추이"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+  },
+
   // ---------- ② 검증 첫 3걸음 ----------
   validationPlan(o) {
     const n = o.narrative || {};

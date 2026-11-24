@@ -206,6 +206,32 @@ console.log("3b. PDF — 극단값(모든 문장 200자, 경로 8단계)");
   await ctx.close();
 }
 
+console.log("3c. 네이버 검색 추이 표시(화면·PDF) + 주입 방어");
+{
+  const { ctx, page, errs } = await open();
+  const r = await page.evaluate(() => {
+    const R = JSON.parse(JSON.stringify(SAMPLE_RESULT));
+    const sp = Array.from({ length: 24 }, (_, i) => 30 + i * 2);
+    R.top5[0].trend = { insufficient: false, yoy: 0.27, recent: 0.08, keywords: ["방문요양 일지", '<img src=x onerror="window.__t=1">'], spark: sp, fetchedAt: "2026-11-24" };
+    R.top5[1].trend = { insufficient: true, keywords: ["희귀 검색어"] };
+    R.top5[2].trend = { yoy: "<b>", keywords: "bad" };
+    R.top5[0].signals.evidenceConfidence = "L1";
+    State.result = R; State.isSample = false; Result.render(); App.show("result");
+    const h = document.createElement("div"); h.innerHTML = PDFLayout.build(R, { date: "x" }); document.body.appendChild(h); PDFLayout.fit(h);
+    return { card: document.getElementById("card_kif_ops_001").innerText, card2: document.getElementById("card_kif_ops_002").innerText, card3: document.getElementById("card_kif_ops_003").innerText,
+      spark: !!document.querySelector("#card_kif_ops_001 svg.spark"), pdf: h.innerText, over: [...h.querySelectorAll(".pdf-page")].some(p => p.scrollHeight > 297 * 96 / 25.4 + 1) };
+  });
+  ok(/\+27%/.test(r.card) && /늘고 있어요/.test(r.card) && r.spark, "후보 카드에 검색 추이(+27%·추이선)");
+  ok(/검색량이 너무 적어/.test(r.card2), "검색량 부족은 '판단 안 함'으로 표시");
+  ok(!/네이버 검색 추이/.test(r.card3), "형식이 깨진 추이 데이터는 표시 안 함");
+  ok(/실제 데이터 · 네이버 검색 추이/.test(r.pdf) && /\+27%/.test(r.pdf), "PDF에 데이터 근거 표");
+  ok(/구매 수요·시장 규모가 아/.test(r.card) && /구매 수요·시장 규모가 아닌/.test(r.pdf), "한계(관심≠수요) 함께 표시");
+  ok(!(await page.evaluate(() => window.__t)), "검색어 주입 실행 안 됨");
+  ok(!r.over, "PDF 넘침 없음");
+  ok(errs.length === 0, "오류 0 " + (errs[0] || ""));
+  await ctx.close();
+}
+
 console.log("4. 전수 조합 — 유형 8 × 예산 11(신규 9+예전 2) × 형태 6 × 분야 3패턴 = 1,584개 결과 렌더");
 {
   const { ctx, page, errs } = await open();

@@ -4,6 +4,7 @@
 // ============================================================
 import { APP_META, API_CONFIG } from "./_core.mjs";
 import { json } from "./_guard.mjs";
+import { datalabReady } from "./_datalab.mjs";
 
 export default async (req) => {
   if (req.method !== "POST" && req.method !== "GET") return json(405, { error: "METHOD_NOT_ALLOWED" });
@@ -12,6 +13,7 @@ export default async (req) => {
     status: ready ? "ready" : "no_key",
     ready,
     models: ready ? { structure: API_CONFIG.modelA, narrative: API_CONFIG.modelB } : null,
+    dataLab: datalabReady(),
     version: APP_META.appVersion,
   });
 };

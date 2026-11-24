@@ -189,7 +189,8 @@ const PDFLayout = {
     return `<h2 class="pdf-h2">근거 확인처와 결과 신뢰도</h2>
       <h3 class="pdf-h3" style="margin-top:0">근거 확인처 · ${esc(o.narrative?.name||o.title)} <span class="pdf-tag">주소 확인 ${PLUS_DATA.checked}</span></h3>
       <table class="pdf-info pdf-tight">${src.map(x=>`<tr><th>${esc(x.n)}</th><td>${esc(x.what)}<br><span class="pdf-url">${esc(x.url)}</span></td></tr>`).join("")}</table>
-      <p class="pdf-small">확인처는 AI가 조회한 출처가 아니라, 가설을 직접 확인할 공식 사이트입니다.</p>
+      <p class="pdf-small">확인처는 가설을 직접 확인할 공식 사이트입니다.</p>
+      ${this.trendTable(R,esc)}
       <h3 class="pdf-h3">결과 신뢰도</h3>
       <table class="pdf-info pdf-tight">
         <tr><th>입력 충실도</th><td>${State.isSample?'샘플 결과(해당 없음)':`${q.n}/${q.total} · <b>${q.level.k}</b> — ${esc(q.level.d)}`}</td></tr>
@@ -199,6 +200,14 @@ const PDFLayout = {
       </table>`;
   },
 
+  trendTable(R,esc){
+    const rows=R.top5.map((o,i)=>({i,o,t:Plus.trendInfo(o)})).filter(x=>x.t);
+    if(!rows.length) return "";
+    return `<h3 class="pdf-h3">실제 데이터 · 네이버 검색 추이 <span class="pdf-tag">데이터랩</span></h3>
+      <table class="pdf-info pdf-tight"><tr><th>후보</th><th>최근 12개월 vs 전년</th><th>검색어</th></tr>
+      ${rows.map(({i,o,t})=>`<tr><td>${i+1}. ${esc(this.clip(o.narrative?.name||o.title,16))}</td><td>${t.insufficient?'검색량 부족(판단 안 함)':`<b>${esc(t.yoy)}</b> ${esc(t.word)}`}</td><td>${esc(t.kw.join(", "))}</td></tr>`).join("")}</table>
+      <p class="pdf-small">검색 관심도는 구매 수요·시장 규모가 아닌 상대값입니다. 조회 ${esc(rows.find(x=>x.t.date)?.t.date||"")}.</p>`;
+  },
   methodPage(R,esc){
     const nx=Plus.nextDiagnoses(R); const ev=PLUS_DATA.evidence;
     return `<h2 class="pdf-h2">평가 방법과 다음 진단</h2>

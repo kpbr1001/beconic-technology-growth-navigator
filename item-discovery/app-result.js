@@ -411,7 +411,7 @@ const Result = {
     return `<details class="method">
       <summary>평가 방법 공개 (규칙 ${PLUS_DATA.rulesVersion})</summary>
       <div class="method-body">
-        <p><b>1. 3가지 신호</b> — 문제 강도(고통의 크기·빈도), 시장 공백(기존 대안의 부족함), 타이밍(지금 시작하기 좋은 시장 변화). AI가 고객·문제·대안·변화를 정해진 항목으로 구조화하면, 규칙 엔진이 항목값으로 0~100 값을 계산합니다(값이 없는 항목은 빼고 남은 가중치로 다시 계산). 막대 옆 작은 숫자가 그 계산값이고, 20 이하 매우 낮음 · 40 이하 낮음 · 60 이하 보통 · 80 이하 높음 · 81 이상 매우 높음으로 표시합니다.</p>
+        <p><b>1. 3가지 신호</b> — 문제 강도(고통의 크기·빈도), 시장 공백(기존 대안의 부족함), 타이밍(지금 시작하기 좋은 시장 변화). 타이밍은 네이버 검색 추이(최근 12개월 vs 그 전 12개월)가 조회되면 AI 판단과 반반 섞어 계산합니다. AI가 고객·문제·대안·변화를 정해진 항목으로 구조화하면, 규칙 엔진이 항목값으로 0~100 값을 계산합니다(값이 없는 항목은 빼고 남은 가중치로 다시 계산). 막대 옆 작은 숫자가 그 계산값이고, 20 이하 매우 낮음 · 40 이하 낮음 · 60 이하 보통 · 80 이하 높음 · 81 이상 매우 높음으로 표시합니다.</p>
         <p><b>2. 근거 수준</b> — ${Object.entries(ev).map(([k,v])=>`${k} ${v.n}: ${v.d}`).join(" · ")}</p>
         <p><b>3. 모르면 빈칸</b> — 데이터가 없는 항목은 추정하지 않고 '확인 필요'로 둡니다. 확인 필요는 감점이 아닙니다.</p>
         <p><b>4. 나와의 적합도</b> — 점수를 매기지 않고, 입력한 예산·선호 형태·자원과 부딪히는 '걸림돌'만 표시합니다. 정밀 적합도는 PMF 진단 단계에서 봅니다.</p>
@@ -435,8 +435,19 @@ const Result = {
     return `<div class="ev-block">
       <div class="ev-title">📚 근거 확인처 <span class="ev-lv">현재 ${this.esc(o.signals.evidenceConfidence)} · ${this.esc(ev.n)}</span></div>
       <p class="ev-d">${this.esc(ev.d)} <b>다음 단계:</b> ${this.esc(ev.up)}.</p>
+      ${this.trendRow(o)}
       <ul class="ev-list">${src.map(x=>`<li><a href="${this.esc(x.url)}" target="_blank" rel="noopener noreferrer">${this.esc(x.n)} ↗</a><span>${this.esc(x.what)}</span></li>`).join("")}</ul>
       <p class="ev-note">AI가 이 사이트를 조회한 것이 아니라, 가설을 직접 확인할 공식 확인처예요 · 주소 확인 ${PLUS_DATA.checked}</p>
+    </div>`;
+  },
+  trendRow(o){
+    const t=Plus.trendInfo(o); if(!t) return "";
+    if(t.insufficient) return `<div class="trend-row flat solo"><b>네이버 검색 추이</b> 검색어(${t.kw.map(k=>this.esc(k)).join(", ")})의 검색량이 너무 적어 판단하지 않았어요. 아직 사람들이 이 말로 찾지 않는 문제일 수 있어요.</div>`;
+    return `<div class="trend-row ${t.dir}">
+      <div class="tr-main"><b>네이버 검색 추이</b> 최근 12개월이 그 전 12개월보다 <b>${t.yoy}</b> — 관심이 ${t.word}${t.recent?` · 최근 3개월 ${t.recent}`:''}
+        <span class="tr-kw">검색어: ${t.kw.map(k=>this.esc(k)).join(", ")} · 조회 ${this.esc(t.date)} · 네이버 데이터랩</span></div>
+      ${Plus.sparkSvg(t.spark)}
+      <p class="tr-note">검색 관심도는 구매 수요·시장 규모가 아니에요. 같은 시기 다른 문제와 비교한 상대값이에요.</p>
     </div>`;
   },
   planBlock(o){
