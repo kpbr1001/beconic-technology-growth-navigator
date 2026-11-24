@@ -50,7 +50,13 @@ const oneOf = (v, list, d = "") => (list.includes(v) ? v : d);
 export const FIELD_KEYS = ["mfg", "it", "knowledge", "edu", "health", "food", "commerce", "local", "content", "green",
   "agri", "travel", "care", "pet", "finance", "mobility", "construction", "public"];
 export const USER_TYPES = ["예비창업자", "창업자", "기존기업", "소상공인", "스타트업", "중소기업", "신사업 담당자", "컨설턴트"];
-export const BUDGETS = ["under1000만", "1000_5000만", "5000만_1억", "1억이상"];
+// 초기 투자 가능 범위(만원 단위 상한). v0.7.0 9단계 + 예전 4단계 값도 받는다(이전 세션·기록 호환)
+export const BUDGET_MAX = {
+  "under300만": 300, "300_1000만": 1000, "1000_3000만": 3000, "3000_5000만": 5000, "5000만_1억": 10000,
+  "1억_3억": 30000, "3억_5억": 50000, "5억이상": 99999, "undecided": null,
+  "under1000만": 1000, "1000_5000만": 5000, "1억이상": 30000,
+};
+export const BUDGETS = Object.keys(BUDGET_MAX);
 // 선호 사업형태(최대 2개) — 화면 FORM_OPTIONS 와 같은 키
 export const FORM_KEYS = ["software", "platform", "service", "edu", "product", "hardware", "subscription", "store", "community"];
 const LEGACY_FORM = { "SaaS/앱": "software", "서비스": "service", "마켓플레이스": "platform", "교육/콘텐츠": "edu", "제품": "product" };

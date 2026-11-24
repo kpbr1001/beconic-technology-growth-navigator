@@ -371,7 +371,7 @@ textarea.input{resize:vertical;min-height:88px}
   color:#DDE6FA;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:1}
 .ep-step:last-child .ep-num{background:var(--blue);color:#fff}
 .ep-c{display:flex;flex-direction:column;gap:2px;padding-top:1px}
-.ep-label{font-size:10.5px;font-weight:700;color:#8FB4FF;letter-spacing:.3px}
+.ep-label{font-size:11.5px;font-weight:700;color:#8FB4FF;letter-spacing:.3px}
 .ep-step.ep-last .ep-label{color:#B9CCFF}
 .ep-text{color:#E6ECF9;font-size:13.5px;line-height:1.5}
 .ep-step:last-child .ep-text{color:#fff;font-weight:600}
@@ -392,7 +392,7 @@ textarea.input{resize:vertical;min-height:88px}
 .pm-box{position:relative;height:230px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin:26px 34px}
 .pm-grid-x{position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line)}
 .pm-grid-y{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--line)}
-.pm-ax{position:absolute;font-size:10.5px;font-weight:700;color:var(--slate);white-space:nowrap}
+.pm-ax{position:absolute;font-size:11.5px;font-weight:700;color:var(--slate);white-space:nowrap}
 .pm-ax-t{top:-20px;left:50%;transform:translateX(-50%)}
 .pm-ax-b{bottom:-20px;left:50%;transform:translateX(-50%)}
 .pm-ax-l{left:-30px;top:50%;transform:translateY(-50%) rotate(-90deg)}
@@ -404,7 +404,7 @@ textarea.input{resize:vertical;min-height:88px}
 .pm-key{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:22px}
 .pm-key-item{font-size:11.5px;color:var(--slate);display:flex;align-items:center;gap:5px}
 .pm-key-item b{width:18px;height:18px;border-radius:50%;background:var(--navy);color:#fff;
-  font-size:10.5px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+  font-size:11.5px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
 .section-head{margin:0 0 16px}
 .section-head .sec-title{font-size:17px;font-weight:800;color:var(--navy);margin:0 0 4px}
 .section-head .sec-sub{font-size:13px;color:var(--slate);margin:0}
@@ -630,7 +630,7 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
 .qp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .qp-box{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;background:var(--paper)}
 .qp-k{font-size:12px;font-weight:700;color:var(--slate-weak);margin-bottom:4px}
-.qp-k small{font-weight:500}
+.qp-k small{font-weight:500;font-size:11.5px}
 .qp-v{font-size:17px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .qp-tag{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px}
 .qp-tag.ok{background:#E3F4EC;color:var(--ok)} .qp-tag.mid{background:var(--blue-weak);color:var(--blue)} .qp-tag.low{background:var(--amber-weak);color:#B5601F}
@@ -644,7 +644,7 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
 .method-body{margin-top:10px;display:grid;gap:8px}
 .method-body p{font-size:13px;color:var(--slate);line-height:1.65}
 .method-body b{color:var(--navy)}
-.sname em small.raw{font-size:10.5px;font-weight:600;color:var(--slate-weak);margin-left:5px;font-style:normal}
+.sname em small.raw{font-size:11.5px;font-weight:600;color:var(--slate-weak);margin-left:5px;font-style:normal}
 .fit-check,.ev-block,.plan-block{margin-top:16px;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;background:var(--paper)}
 .fc-title,.ev-title,.pb-title{font-size:13.5px;font-weight:800;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .fc-title small,.pb-title small{font-size:11.5px;font-weight:600;color:var(--slate-weak)}
@@ -723,6 +723,24 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
 .hb-tip{display:block;font-size:13px;color:var(--slate);line-height:1.6;padding-top:3px}
 .hb-tip b{color:var(--navy)}
 .help-box .ex-chip{margin:0;background:#fff}
+.opts-budget{grid-template-columns:repeat(3,1fr)}
+@media (max-width:640px){.opts-budget{grid-template-columns:1fr 1fr!important}}
+.disc-beam.hide,.disc-hint.hide{display:none}
+/* v0.7.0 터치 대상 크기(모바일 손가락 기준 36~44px) */
+@media (pointer:coarse),(max-width:768px){
+  .ex-chip{min-height:36px;padding:7px 12px}
+  .eb-tags .tag-t{padding:9px 6px 9px 14px}
+  .eb-tags .tag-x{width:36px;height:36px}
+  .header-cta{min-height:40px;padding:0 12px}
+  .sample-banner button{min-height:36px;padding:0 12px}
+  .lead-info{min-height:36px;padding:6px 4px}
+  .result-nav button{min-height:36px}
+}
+.sample-banner button{min-height:32px;padding:0 10px}
+.lead-info{min-height:32px;padding:6px 2px}
+.ai-note{margin-top:10px;font-size:13px;color:var(--navy-soft);background:var(--blue-weak);border-radius:10px;padding:10px 14px;line-height:1.6}
+.ai-note b{color:var(--navy)}
+.lbl-req{font-size:11px;font-weight:800;color:#fff;background:var(--blue);border-radius:99px;padding:2px 7px;margin-left:4px;vertical-align:1px}
 .conflict-box{margin-top:10px;border:1px solid #F3C99E;background:var(--amber-weak);color:#7A4214;border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.6}
 .conflict-box b{color:#5C300C}
 .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
@@ -861,11 +879,11 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
   <!-- ============ DISCOVERY LOADING ============ -->
   <section class="screen" id="screen-discovery">
     <div class="disc wrap">
-      <div class="disc-beam">
+      <div class="disc-beam" id="discBeam">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M5 9l7-7 7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <h2>사업기회를 탐색하고 있어요</h2>
-      <p class="disc-hint">AI가 고객·시장·역량을 구조적으로 분석합니다 · 보통 2~3분 걸려요</p>
+      <h2 id="discTitle">사업기회를 탐색하고 있어요</h2>
+      <p class="disc-hint" id="discHint">AI가 고객·시장·역량을 구조적으로 분석합니다 · 보통 2~3분 걸려요</p>
       <div class="disc-steps" id="discSteps"></div>
     </div>
   </section>
@@ -890,16 +908,16 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
       <p>제출·상담·멘토링에 사용할 보고서를 생성합니다.</p>
     </div>
     <div class="modal-body">
-      <div class="field"><label>수신 기업/기관명 <span style="color:var(--slate-weak);font-weight:500">(권장)</span></label>
+      <div class="field"><label for="rpOrg">수신 기업/기관명 <span style="color:var(--slate-weak);font-weight:500">(권장)</span></label>
         <input class="input" id="rpOrg" placeholder="예) OO투자, OO창업지원센터" /></div>
-      <div class="field"><label>담당자 <span style="color:var(--slate-weak);font-weight:500">(선택)</span></label>
+      <div class="field"><label for="rpPerson">담당자 <span style="color:var(--slate-weak);font-weight:500">(선택)</span></label>
         <input class="input" id="rpPerson" placeholder="예) 홍길동 팀장" /></div>
-      <div class="field"><label>작성 목적</label>
+      <div class="field"><label for="rpPurpose">작성 목적</label>
         <select class="select" id="rpPurpose">
           <option>창업아이템 탐색 참고</option><option>신사업 검토</option><option>창업상담 참고</option>
           <option>멘토링 참고</option><option>내부 검토</option><option>기관 상담 참고</option><option>기타</option>
         </select></div>
-      <div class="field"><label>문서 기밀등급</label>
+      <div class="field"><label for="rpConf">문서 기밀등급</label>
         <select class="select" id="rpConf">
           <option>일반</option><option>대외 참고용</option><option>관계자 외 열람 제한</option><option>내부 검토용</option>
         </select></div>

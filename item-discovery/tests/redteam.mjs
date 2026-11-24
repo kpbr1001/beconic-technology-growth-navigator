@@ -58,7 +58,7 @@ console.log("1. 고객 여정 — 실제 클릭으로 6단계 끝까지");
   ok((await page.locator("#heroSteps").innerText()) === "6", "시작 화면 질문 수 = 실제 단계 수(6)");
   await page.click("text=사업기회 찾아보기");
   await page.click("button.opt:has-text('창업자')");
-  await page.click("button.opt:has-text('1천만원 미만')");
+  await page.click('.opt:text-is("300만~1천만원")');
   await page.click(".ex-chip:has-text('금융권 20년')");
   ok((await page.inputValue("#f_experience")).includes("금융권 20년"), "예시 눌러 경험 채우기");
   await page.click("#obNext");
@@ -129,6 +129,24 @@ console.log("1c. 분야↔형태 충돌 안내");
   await ctx.close();
 }
 
+console.log("1d. 분야 필수 · 'AI가 찾아주세요' 버튼 삭제");
+{
+  const { ctx, page, errs } = await open();
+  await page.evaluate(() => { Object.assign(State.input, { userType: "창업자", budget: "under300만", fields: [], fieldOther: "" }); State.step = 1; App.show("onboarding"); Onboarding.render(); });
+  await page.click("#obNext");
+  ok((await page.evaluate(() => State.step)) === 1, "분야 없이 다음으로 못 감");
+  await page.click(".fld:has-text('반려동물')"); await page.click("#obNext");
+  ok((await page.evaluate(() => State.step)) === 2, "분야 1개 고르면 진행");
+  ok((await page.locator("button.escape").count()) === 0, "고객 단계에 'AI가 찾아주세요' 버튼 없음");
+  await page.click("#obNext");
+  ok((await page.locator("button.escape").count()) === 0, "문제 단계에도 없음");
+  ok(/비워 두세요/.test(await page.locator(".ai-note").innerText()), "비워 두면 AI가 찾는다는 안내");
+  const sent = await page.evaluate(() => { let x; const f = window.fetch; window.fetch = (u, o) => { if (String(u).includes("/api/discover")) { x = JSON.parse(o.body); return Promise.resolve({ status: 202, json: async () => ({}) }); } return f(u, o); }; Discovery.poll = () => new Promise(() => {}); Onboarding.submit(); return new Promise(r => setTimeout(() => r(x), 300)); });
+  ok(sent.input.industry === "__AI_FIND__" && sent.input.knownProblem === "__AI_FIND__", "빈칸 → AI가 고른 분야 안에서 탐색");
+  ok(errs.length === 0, "오류 0 " + (errs[0] || ""));
+  await ctx.close();
+}
+
 console.log("2. 조작된 이어하기 세션(localStorage) — 입력칸 주입");
 {
   const { ctx, page, errs } = await open(1280, true);
@@ -188,12 +206,12 @@ console.log("3b. PDF — 극단값(모든 문장 200자, 경로 8단계)");
   await ctx.close();
 }
 
-console.log("4. 전수 조합 — 유형 8 × 예산 4 × 형태 6 × 분야 3패턴 = 576개 결과 렌더");
+console.log("4. 전수 조합 — 유형 8 × 예산 11(신규 9+예전 2) × 형태 6 × 분야 3패턴 = 1,584개 결과 렌더");
 {
   const { ctx, page, errs } = await open();
   const r = await page.evaluate(() => {
     const types = ["예비창업자", "창업자", "기존기업", "소상공인", "스타트업", "중소기업", "신사업 담당자", "컨설턴트"];
-    const budgets = ["under1000만", "1000_5000만", "5000만_1억", "1억이상"];
+    const budgets = ["under300만", "300_1000만", "1000_3000만", "3000_5000만", "5000만_1억", "1억_3억", "3억_5억", "5억이상", "undecided", "under1000만", "1억이상"];
     const forms = [[], ["software"], ["service"], ["platform", "edu"], ["product", "hardware"], ["store", "community"]];
     const fieldSets = [[], ["food", "local"], ["it", "mfg", "finance"]];
     let n = 0, bad = 0, gNoPre = 0, minNext = 9, sample;
@@ -210,7 +228,7 @@ console.log("4. 전수 조합 — 유형 8 × 예산 4 × 형태 6 × 분야 3�
     }
     return { n, bad, gNoPre, minNext, sample };
   });
-  ok(r.n === 576, "조합 수 " + r.n);
+  ok(r.n === 1584, "조합 수 " + r.n);
   ok(r.bad === 0, "깨진 문구 0건 " + (r.sample || ""));
   ok(r.gNoPre === 0, "예비창업자에게 G 추천 0건(31 규칙)");
   ok(r.minNext >= 3, "다음 진단 항상 3개 이상");

@@ -7,8 +7,8 @@
 const APP_META = {
   productName: "K-ITEM FINDER",
   productDescription: "Customer & Market Opportunity Discovery Engine",
-  appVersion: "v0.6.2",
-  promptVersion: "v1.5.1",
+  appVersion: "v0.7.0",
+  promptVersion: "v1.6.0",
   updatedAt: "2026.11.24",
   copyrightYear: "2023~2026",
 };
@@ -194,6 +194,18 @@ const FORM_OPTIONS = [
   { k:"community", n:"커뮤니티·멤버십", d:"모임·회원제 운영", t:["Community"] },
 ];
 const FORM_NAME = Object.fromEntries(FORM_OPTIONS.map(f=>[f.k,f.n]));
+// 초기 투자 가능 범위(9단계) — 서버 BUDGET_INFO 와 같은 키, max=만원 상한
+const BUDGET_OPTIONS = [
+  { k:"under300만", n:"300만원 미만", max:300 }, { k:"300_1000만", n:"300만~1천만원", max:1000 },
+  { k:"1000_3000만", n:"1천만~3천만원", max:3000 }, { k:"3000_5000만", n:"3천만~5천만원", max:5000 },
+  { k:"5000만_1억", n:"5천만~1억원", max:10000 }, { k:"1억_3억", n:"1억~3억원", max:30000 },
+  { k:"3억_5억", n:"3억~5억원", max:50000 }, { k:"5억이상", n:"5억원 이상", max:99999 },
+  { k:"undecided", n:"아직 모르겠어요", max:null },
+];
+// 예전 값(이전 세션·결과 파일) 호환
+const BUDGET_LEGACY = { "under1000만":["1천만원 미만",1000], "1000_5000만":["1천~5천만원",5000], "1억이상":["1억원 이상",30000] };
+function budgetMax(k){ const o=BUDGET_OPTIONS.find(b=>b.k===k); return o?o.max:(BUDGET_LEGACY[k]?BUDGET_LEGACY[k][1]:null); }
+function budgetName(k){ const o=BUDGET_OPTIONS.find(b=>b.k===k); return o?o.n:(BUDGET_LEGACY[k]?BUDGET_LEGACY[k][0]:""); }
 // 분야↔형태 충돌 안내(막지 않고 알려만 줌): 물건·공간이 필요한 형태 vs 무형 중심 분야
 const PHYSICAL_FORMS = ["product","hardware","store"];
 const INTANGIBLE_FIELDS = ["it","knowledge","finance","content"];
@@ -215,8 +227,8 @@ const EXAMPLES = {
 
 const STEPS = [
   { key:"profile", q:"나에 대해 알려주세요", help:"당신의 유형과 강점을 알면 실행 가능한 기회를 더 잘 찾을 수 있어요." },
-  { key:"field", q:"어떤 분야에서 사업기회를 찾을까요?", help:"최대 3개까지 고를 수 있어요. 고른 분야 안에서 서로 다른 후보를 찾고, 고르지 않으면 경험과 가까운 분야까지 넓게 찾아요." },
-  { key:"customer", q:"어떤 고객에게 팔고 싶나요?", help:"아직 정하지 않았다면 AI가 고른 분야 안에서 함께 찾아드립니다." },
+  { key:"field", q:"어떤 분야에서 사업기회를 찾을까요?", help:"1~3개를 골라 주세요. 고른 분야 안에서 서로 다른 고객·문제의 후보를 찾아요." },
+  { key:"customer", q:"어떤 고객에게 팔고 싶나요?", help:"정해 둔 고객이 있으면 적어 주세요. 없으면 비워 두셔도 돼요." },
   { key:"problem", q:"알고 있는 불편함이나 문제가 있나요?", help:"떠오르는 게 없어도 괜찮아요. 시장 신호에서 찾아냅니다." },
   { key:"resource", q:"활용할 수 있는 자원은 무엇인가요?", help:"기회를 당신이 실제로 실행할 수 있는지 판단하는 데 씁니다." },
   { key:"optional", q:"조금 더 좁혀볼까요?", help:"모두 선택 사항입니다. 상관없으면 건너뛰어도 됩니다." },
@@ -297,10 +309,10 @@ const Onboarding = {
     const sel=State.input.fields||[];
     const cts=[["B2B","기업·기관에 판매(B2B)"],["B2C","개인 소비자에게 판매(B2C)"],["B2G","정부·공공기관(B2G)"],["__ANY__","상관없어요"]];
     return `
-      <div class="field"><label>관심 분야 <span class="lbl-sub">${sel.length}/3 선택</span></label>
+      <div class="field"><label>관심 분야 <span class="lbl-req">필수</span> <span class="lbl-sub">${sel.length}/3 선택</span></label>
         <div class="field-grid">${FIELDS.map(f=>`<button type="button" class="fld ${sel.includes(f.k)?'sel':''}" aria-pressed="${sel.includes(f.k)}" onclick="Onboarding.toggleField('${f.k}')"><b>${f.n}</b><span>${f.ex}</span></button>`).join("")}</div>
         <input class="input" style="margin-top:10px" maxlength="40" placeholder="목록에 없으면 직접 입력 (예: 웨딩, 드론 촬영)" value="${App.esc(State.input.fieldOther||'')}" oninput="Onboarding.setText('fieldOther',this.value)" />
-        ${this.helpBox(null,null,"아무것도 고르지 않으면 AI가 내 경험과 가까운 분야부터 서로 다른 분야 3곳 이상을 넓게 찾아요.")}</div>
+        ${this.helpBox(null,null,"<b>최소 1개</b>는 골라 주세요. 분야를 정해야 후보가 내 경력 한 곳에 몰리지 않고, 고른 분야 안에서 서로 다른 고객·문제를 찾아요. 아직 고민 중이라면 경력과 <b>다른</b> 분야도 하나 넣어 보세요.")}</div>
       <div class="field"><label>누구에게 팔고 싶나요?</label>
         <div class="opts">${cts.map(([v,l])=>`<button class="opt ${State.input.customerType===v?'sel':''}" onclick="Onboarding.pick('customerType','${v}')"><span class="ck"></span>${l}</button>`).join("")}</div></div>`;
   },
@@ -312,7 +324,7 @@ const Onboarding = {
   },
   render_profile(){
     const types=["예비창업자","창업자","기존기업","소상공인","스타트업","중소기업","신사업 담당자","컨설턴트"];
-    const budgets=[["under1000만","1천만원 미만"],["1000_5000만","1천~5천만원"],["5000만_1억","5천만~1억"],["1억이상","1억 이상"]];
+    const budgets=BUDGET_OPTIONS;
     return `
       <div class="field"><label>어떤 유형에 가까운가요?</label>
         <div class="opts">${types.map(t=>`<button class="opt ${State.input.userType===t?'sel':''}" onclick="Onboarding.pick('userType','${t}')"><span class="ck"></span>${t}</button>`).join("")}</div></div>
@@ -320,35 +332,22 @@ const Onboarding = {
         <textarea class="input" id="f_experience" maxlength="400" placeholder="예) 금융권 20년, 영업/기획, 제조 현장 관리 경험" oninput="Onboarding.setText('experience',this.value)">${App.esc(State.input.experience)}</textarea>
         ${this.helpBox(EXAMPLES.experience,"exExp","<b>분야</b> + <b>연차</b> + <b>해 본 일</b>을 쉼표로 이어 적어 주세요. 자격·학위·창업 경험도 좋아요.")}</div>
       <div class="field"><label>초기 투자 가능 범위</label>
-        <div class="opts">${budgets.map(([v,l])=>`<button class="opt ${State.input.budget===v?'sel':''}" onclick="Onboarding.pick('budget','${v}')"><span class="ck"></span>${l}</button>`).join("")}</div></div>`;
+        <div class="opts opts-budget">${budgets.map(b=>`<button class="opt ${State.input.budget===b.k?'sel':''}" onclick="Onboarding.pick('budget','${b.k}')"><span class="ck"></span>${b.n}</button>`).join("")}</div>
+        ${this.helpBox(null,null,"처음 판매까지 쓸 수 있는 돈(자기자본+지원금)을 기준으로 골라 주세요. 범위를 넘는 후보에는 '단계적으로 시작하는 방법'과 예산 걸림돌을 함께 보여 드려요.")}</div>`;
   },
   render_customer(){
-    const hint = State.input.industry==='__AI_FIND__' ? '🔦 AI가 시장 신호에서 유망한 고객·시장을 대신 찾아드립니다.'
-               : State.input.industry==='__UNKNOWN__' ? '🔦 괜찮아요. 시장 신호에서 함께 찾아드릴게요.' : '';
     return `
-      <div class="field"><label>관심 있는 고객·산업 <span class="lbl-sub">${State.customerTags.length}/5</span></label>
-        ${this.entryBox("customer","예) 제조 중소기업, 1인 사업자 — 쉼표로 여러 개")}
+      <div class="field"><label>관심 있는 고객·산업 <span class="lbl-sub">선택 · ${State.customerTags.length}/5</span></label>
+        ${this.entryBox("customer","예) 제조 중소기업, 1인 사업자")}
         ${this.helpBox(EXAMPLES.customer,"exCust","<b>누구</b>(직군·업종) + <b>규모·연령</b>으로 적어요. 쉼표로 구분하면 한 번에 여러 개가 들어가고, 넣은 항목은 눌러서 고칠 수 있어요.")}
-        <div class="escape-row">
-          <button class="escape ${State.input.industry==='__UNKNOWN__'?'sel':''}" onclick="Onboarding.escape('customer','__UNKNOWN__')">잘 모르겠어요</button>
-          <button class="escape ${State.input.industry==='__AI_FIND__'?'sel':''}" onclick="Onboarding.escape('customer','__AI_FIND__')">AI가 찾아주세요</button>
-        </div>
-        <p class="escape-desc">딱 정해두지 않았다면 눌러보세요. AI가 고른 분야 안에서 유망한 고객을 대신 골라 줍니다.</p>
-        ${hint?`<div class="ai-hint">${hint}</div>`:''}</div>`;
+        <div class="ai-note">💡 정하지 않았다면 <b>비워 두세요.</b> 2단계에서 고른 분야 안에서 AI가 유망한 고객을 찾아요.</div></div>`;
   },
   render_problem(){
-    const hint = State.input.knownProblem==='__AI_FIND__' ? '🔦 AI가 고객의 반복되는 문제를 대신 발굴합니다.'
-               : State.input.knownProblem==='__NONE__' ? '🔦 아직 없어도 괜찮아요. AI가 문제를 찾아드립니다.' : '';
     return `
-      <div class="field"><label>고객이 겪는 불편함이나 문제를 적어주세요</label>
+      <div class="field"><label>고객이 겪는 불편함이나 문제 <span class="lbl-sub">선택</span></label>
         <textarea class="input" id="f_problem" maxlength="400" placeholder="예) 퇴직 후 안정적 수입원을 찾기 어렵다 · 제조사가 품질검사에 사람을 많이 쓴다" oninput="Onboarding.setText('knownProblem',this.value)">${App.esc(State.input.knownProblem&&!State.input.knownProblem.startsWith('__')?State.input.knownProblem:'')}</textarea>
         ${this.helpBox(EXAMPLES.problem,"exProb","<b>누가</b> + <b>언제·어떤 상황에서</b> + <b>무엇 때문에 불편한지</b>. 지금은 어떻게 해결하는지(비용·시간)까지 적으면 더 정확해요.")}
-        <div class="escape-row">
-          <button class="escape ${State.input.knownProblem==='__AI_FIND__'?'sel':''}" onclick="Onboarding.escape('problem','__AI_FIND__')">AI가 찾아주세요</button>
-          <button class="escape ${State.input.knownProblem==='__NONE__'?'sel':''}" onclick="Onboarding.escape('problem','__NONE__')">아직 없습니다</button>
-        </div>
-        <p class="escape-desc">떠오르는 문제가 없어도 괜찮아요. 눌러두면 AI가 시장에서 자주 언급되는 불편·문제를 대신 찾아냅니다.</p>
-        ${hint?`<div class="ai-hint">${hint}</div>`:''}</div>`;
+        <div class="ai-note">💡 떠오르는 문제가 없으면 <b>비워 두세요.</b> 고른 분야·고객에서 자주 반복되는 불편을 AI가 찾아요. 직접 적으면 그 문제를 중심으로 찾아요.</div></div>`;
   },
   render_resource(){
     const grp=(title,key,ph)=>`<div class="res-group"><div class="rg-title">${title} <span class="lbl-sub">${State.input.resources[key].length}/8</span></div>
@@ -408,6 +407,9 @@ const Onboarding = {
       if(!State.input.userType){ App.toast("유형을 선택해 주세요"); return; }
       if(!State.input.budget){ App.toast("투자 범위를 선택해 주세요"); return; }
     }
+    if(STEPS[State.step].key==="field" && !(State.input.fields||[]).length && !String(State.input.fieldOther||"").trim()){
+      App.toast("관심 분야를 1개 이상 골라 주세요"); return;
+    }
     if(STEPS[State.step].key==="customer"){
       const el=document.getElementById("in_customer"); if(el&&el.value.trim()) this.addFrom("customer"); // 추가 안 누르고 넘어가도 반영
       if(State.customerTags.length) State.input.industry=State.customerTags.join(", ");
@@ -419,7 +421,8 @@ const Onboarding = {
   submit(){
     // sentinel 정리
     const inp=JSON.parse(JSON.stringify(State.input));
-    inp.industry = State.customerTags.length ? State.customerTags.join(", ") : (inp.industry||"__UNKNOWN__");
+    // 비워 두면 AI가 고른 분야 안에서 찾음(예전 '잘 모르겠어요/AI가 찾아주세요' 버튼 대체)
+    inp.industry = State.customerTags.length ? State.customerTags.join(", ") : "__AI_FIND__";
     inp.knownCustomer = inp.knownCustomer || "__NONE__";
     inp.knownProblem = inp.knownProblem || "__AI_FIND__";
     inp.region = inp.region || "__ANY__";
@@ -446,13 +449,18 @@ const Discovery = {
   async run(input){
     App.show("discovery");
     this.animate();
-    const jobId = (crypto.randomUUID?.() || ("job_"+Date.now()+"_"+Math.random().toString(36).slice(2)));
+    let jobId = (crypto.randomUUID?.() || ("job_"+Date.now()+"_"+Math.random().toString(36).slice(2)));
     try{
       // 1) 탐색 제출 (background function → 즉시 202)
-      const submit = await fetch("/api/discover", {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ jobId, input }),
-      });
+      // 접수 실패(일시적 5xx·네트워크)는 새 jobId로 1회 자동 재시도
+      const send = (id) => fetch("/api/discover", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ jobId:id, input }) });
+      let submit;
+      try { submit = await send(jobId); } catch(e){ submit = { status: 599, json: async()=>({}) }; }
+      if(submit.status>=500){
+        await new Promise(r=>setTimeout(r,1500));
+        jobId = (crypto.randomUUID?.() || ("job_"+Date.now()+"_"+Math.random().toString(36).slice(2)));
+        submit = await send(jobId);
+      }
       // background 함수는 202 Accepted 반환. 4xx/5xx면 제출 실패.
       if(submit.status>=400){
         const e=await submit.json().catch(()=>({}));
@@ -491,6 +499,9 @@ const Discovery = {
     throw new Error("탐색이 예상보다 오래 걸립니다. 잠시 후 다시 시도해 주세요.");
   },
   animate(){
+    // 오류 화면에서 바꾼 제목·아이콘 되돌리기
+    const t=document.getElementById("discTitle"); if(t) t.textContent="사업기회를 탐색하고 있어요";
+    document.getElementById("discBeam")?.classList.remove("hide"); document.getElementById("discHint")?.classList.remove("hide");
     const box=document.getElementById("discSteps");
     box.innerHTML=DISC_STEPS.map((t,i)=>`<div class="disc-step" id="ds${i}"><span class="ico">${i+1}</span>${t}</div>`).join("");
     this._t0=Date.now(); let i=0;
@@ -509,9 +520,10 @@ const Discovery = {
   _minWait(){ const el=Math.max(0, 3200-(Date.now()-this._t0)); return new Promise(r=>setTimeout(r,el)); },
   error(msg){
     clearTimeout(this._anim);
+    const t=document.getElementById("discTitle"); if(t) t.textContent="탐색을 마치지 못했어요";
+    document.getElementById("discBeam")?.classList.add("hide"); document.getElementById("discHint")?.classList.add("hide");
     document.getElementById("discSteps").innerHTML=`
       <div style="text-align:center">
-        <p style="font-size:16px;color:var(--navy);font-weight:700;margin-bottom:8px">탐색 중 문제가 발생했어요</p>
         <p style="font-size:14px;color:var(--slate);margin-bottom:20px;white-space:pre-line;word-break:break-word">${App.esc(msg||"잠시 후 다시 시도해 주세요.")}</p>
         <button class="btn btn-primary btn-sm" onclick="Onboarding.submit()">다시 시도</button>
         <button class="btn btn-ghost btn-sm" onclick="App.showSample()" style="margin-left:8px">샘플 결과 보기</button>

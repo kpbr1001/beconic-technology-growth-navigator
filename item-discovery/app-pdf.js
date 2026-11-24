@@ -93,7 +93,7 @@ const PDFLayout = {
     const rows = [
       ["사용자 유형", inp.userType], ["관심 분야", fields.join(", ") || (State.isSample?"":"AI가 넓게 탐색")], ["판매 대상", ct],
       ["관심 고객", val(inp.industry)], ["알고 있는 문제", val(inp.knownProblem)], ["경험·역량", inp.experience],
-      ["활용 자원", res.join(", ")], ["초기 투자", PLUS_DATA.budgetLabel[inp.budget]], ["지역 · 고객층", [val(inp.region),val(inp.targetAge)].filter(Boolean).join(" · ")],
+      ["활용 자원", res.join(", ")], ["초기 투자", budgetName(inp.budget)], ["지역 · 고객층", [val(inp.region),val(inp.targetAge)].filter(Boolean).join(" · ")],
       ["선호 형태", (inp.preferredForms||[]).map(k=>FORM_NAME[k]).filter(Boolean).join(", ")],
     ].filter(r=>r[1]);
     const q = Plus.inputQuality();
@@ -154,11 +154,11 @@ const PDFLayout = {
     const known=(primary?.explainPath||[]).slice(0,4);
     const unk=Plus.validationPlan(primary||R.top5[0]).unknowns;
     return `<h2 class="pdf-h2">후보 비교</h2>
-      ${R.comparisonInsight?`<div class="pdf-view"><span>${R.top5.length}개를 어떻게 나눠 볼까</span>${esc(this.clip(Result.cleanInsight(R.comparisonInsight),190))}</div>`:''}
+      ${R.comparisonInsight?`<div class="pdf-view"><span>${R.top5.length}개를 어떻게 나눠 볼까</span>${esc(this.clip(Result.cleanInsight(R.comparisonInsight),320))}</div>`:''}
       <table class="pdf-cmp pdf-cmp-wide">
         <thead><tr><th></th>${cmp.rows.map((r,i)=>`<th>${i+1}. ${esc((r.title||'').slice(0,16))}</th>`).join("")}</tr></thead>
         <tbody>${rowMap.map(([l,k])=>`<tr><th>${l}</th>${cmp.rows.map(r=>`<td>${cell(r,k,oOf(r))}</td>`).join("")}</tr>`).join("")}
-          <tr><th>차별점</th>${cmp.rows.map(r=>`<td class="pdf-left">${esc(String(oOf(r).narrative?.differentiator||"-").slice(0,40))}</td>`).join("")}</tr></tbody>
+          <tr><th>차별점</th>${cmp.rows.map(r=>`<td class="pdf-left">${esc(this.clip(String(oOf(r).narrative?.differentiator||"-"),80))}</td>`).join("")}</tr></tbody>
       </table>
       <p class="pdf-note">※ 단일 1등을 강요하지 않습니다. 후보마다 서로 다른 강점이 있습니다.</p>
       ${primary?`<h3 class="pdf-h3">선택 후보 · ${esc(primary.narrative?.name||primary.title)}</h3>

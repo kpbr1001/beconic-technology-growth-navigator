@@ -57,6 +57,8 @@ ok(checkOrigin(mk({ origin: "https://evil.com", "content-type": "application/jso
 ok(checkOrigin(mk({ "content-type": "application/json" })) === "origin_missing", "출처 없는 요청 차단");
 ok(checkOrigin(mk({ origin: "https://site.netlify.app", "content-type": "application/json" })) === null, "같은 사이트 통과");
 
+ok(["under300만","300_1000만","1000_3000만","3000_5000만","5000만_1억","1억_3억","3억_5억","5억이상","undecided","under1000만"].every(b => normalizeInput({ userType: "창업자", budget: b })), "예산 9단계 + 예전 값 허용");
+ok(normalizeInput({ userType: "창업자", budget: "10억" }) === null, "허용 밖 예산 거부");
 console.log("2. 후보 다양성(고객·문제 키 연결)");
 const R = await orchestrate(INPUT);
 const t = R.top5;
@@ -94,6 +96,25 @@ console.log("3b. 선호 사업형태 반영(실물 제품을 고르면 SaaS로 �
   ok(new Set(R3.top5.map(c => c.problem.statement)).size >= 3, "선호 형태 반영 후에도 문제 3종 이상");
   ok(calls[0].includes("선호 사업형태") && calls[0].includes("바꾸지 말 것") && calls[0].includes("물건"), "CALL A 에 선호 형태 지시");
   ok(R3.top5.every(c => c.narrative?.definition), "아이템 정의(definition) 항상 채움");
+}
+
+console.log("3c. 분야 미선택 — 경력 분야 쏠림 방지");
+{
+  const inp = normalizeInput({ userType: "예비창업자", budget: "under300만", experience: "IT 개발 7년" });
+  const A2 = JSON.parse(JSON.stringify(A));
+  A2.segments = [{ key: "s1", field: "ai_service", type: "B2B", user: "AI 개발팀", buyer: "팀장" }, { key: "s2", field: "it", type: "B2B", user: "데이터 분석가", buyer: "팀장" },
+    { key: "s3", field: "edu", type: "B2C", user: "코딩 입문 학부모", buyer: "학부모" }, { key: "s4", field: "local", type: "B2B", user: "동네 학원 원장", buyer: "원장" }];
+  A2.problems = [1,2,3,4,5,6,7].map(i => ({ key: "p"+i, statement: "문제 "+i, types: ["Time"], severity: i < 5 ? 5 : 3, frequency: "daily", alternatives: [{ type: "엑셀", dissatisfaction: ["느림"] }] }));
+  A2.candidateSeeds = [["s1","p1","ai_service"],["s1","p2","it"],["s2","p3","it"],["s2","p4","it"],["s3","p5","edu"],["s4","p6","local"],["s4","p7","local"]].map(([c,p,f], i) => ({ customerKey: c, problemKey: p, gapKey: "g1", field: f, solutionTypeHint: ["SaaS","Service","Education","Platform"][i % 4], resourceHint: "SW" }));
+  calls = []; const oldCall = providers.claude.call;
+  providers.claude.call = async (a) => { calls.push(a.user); return calls.length === 1 ? JSON.stringify(A2) : oldCall(a); };
+  const R4 = await orchestrate(inp);
+  const fc = {}; R4.top5.forEach(c => fc[c.field] = (fc[c.field] || 0) + 1);
+  console.log("    분야:", JSON.stringify(fc));
+  ok(Object.keys(fc).every(k => ["it","edu","local","null"].includes(k)), "목록 밖 분야 코드 없음");
+  ok((fc.it || 0) <= 2 && Object.keys(fc).length >= 3, "IT 경력이어도 IT 분야 2개 이하, 분야 3종 이상");
+  ok(calls[0].includes("segments 마다 field 를 반드시"), "분야 미선택 지시");
+  providers.claude.call = oldCall;
 }
 
 console.log("4. 하위 호환 — AI가 key 없이 옛 형식으로 답해도 동작");

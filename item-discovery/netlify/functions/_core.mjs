@@ -23,7 +23,7 @@
 const APP_META = {
   productName: "K-ITEM FINDER",
   appVersion: "v0.6.1",
-  promptVersion: "v1.5.1",
+  promptVersion: "v1.6.0",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
 };
@@ -85,6 +85,14 @@ const FORM_TYPES = {
   store: { n: "매장·오프라인 공간", t: ["Store"] },
   community: { n: "커뮤니티·멤버십", t: ["Community"] },
 };
+// 초기 투자 가능 범위(만원 상한) — 화면 BUDGET_OPTIONS·_guard BUDGET_MAX 와 같은 키
+const BUDGET_INFO = {
+  "under300만": [300, "300만원 미만"], "300_1000만": [1000, "300만~1천만원"], "1000_3000만": [3000, "1천만~3천만원"],
+  "3000_5000만": [5000, "3천만~5천만원"], "5000만_1억": [10000, "5천만~1억원"], "1억_3억": [30000, "1억~3억원"],
+  "3억_5억": [50000, "3억~5억원"], "5억이상": [99999, "5억원 이상"], "undecided": [null, "아직 정하지 않음"],
+  "under1000만": [1000, "1천만원 미만"], "1000_5000만": [5000, "1천만~5천만원"], "1억이상": [30000, "1억원 이상"],
+};
+const budgetMaxOf = (k) => (BUDGET_INFO[k] ? BUDGET_INFO[k][0] : null);
 const prefTypesOf = (input) => (input?.preferredForms || []).flatMap((k) => FORM_TYPES[k]?.t || []);
 
 // 입력 sentinel — UNKNOWN 처리 대상 (0점 아님)
@@ -291,9 +299,12 @@ function fieldsLine(input) {
   const parts = [];
   if (f.length) parts.push(`관심 분야(fields): ${f.map((k) => `${k}=${FIELD_LABEL[k]}`).join(", ")}${input.fieldOther ? `, 기타=${input.fieldOther}` : ""} → 후보는 이 분야 안에서, 분야마다 고르게.`);
   else if (input.fieldOther) parts.push(`관심 분야: ${input.fieldOther}`);
-  else parts.push("관심 분야 미정 → 사용자 경험의 인접 분야를 포함해 서로 다른 분야 3개 이상으로 넓게.");
+  else parts.push(`관심 분야 미정 → segments 마다 field 를 반드시 적고(아래 key 중 하나), 서로 다른 field 를 3개 이상 쓴다. 경력과 같은 분야는 segments 중 1개만, 나머지는 경력을 '활용'할 수 있는 다른 분야(예: IT 경력 → 교육·헬스케어·로컬의 디지털화). field key: ${Object.keys(FIELD_LABEL).join(", ")}`);
   const pf = (input.preferredForms || []).filter((k) => FORM_TYPES[k]);
   if (pf.length) parts.push(`선호 사업형태: ${pf.map((k) => `${FORM_TYPES[k].n}(solutionTypeHint=${FORM_TYPES[k].t.join("|")})`).join(", ")} → candidateSeeds 의 절반 이상을 이 형태로. 실물 제품·기기를 고르면 소프트웨어(SaaS)·도구+자문으로 바꾸지 말 것.${pf.some((k) => k === "product" || k === "hardware") ? " 실물 제품·기기 seed 는 고객이 '물건'을 사는 구조여야 한다(예: 교구·키트·진단 키트·카드 세트·워크북 박스·센서 기기). 소프트웨어는 물건에 딸린 보조로만." : ""}`);
+  const bi = BUDGET_INFO[input.budget];
+  if (bi && bi[0] != null) parts.push(`초기 투자 가능: ${bi[1]} → 이 범위로 첫 판매까지 갈 수 있는 후보를 우선(설비·재고·대규모 개발이 필요한 후보는 ${bi[0] <= 1000 ? "피하거나 아주 작게 시작하는 방법으로" : bi[0] >= 30000 ? "허용하되 단계적 투자로" : "단계적으로"}).`);
+  else if (bi) parts.push("초기 투자 미정 → 저비용으로 시작 가능한 후보와 투자형 후보를 섞어서.");
   if (input.customerType && input.customerType !== "__ANY__") parts.push(`선호 고객 유형: ${input.customerType} (segments 의 절반 이상을 이 유형으로)`);
   return parts.join("\n") + "\n";
 }
@@ -389,7 +400,8 @@ function toDNA(seed, A, idx, input) {
     title: makeFallbackTitle(seed, A, idx),
     clusterId: null,
     customer,
-    field: seed.field || seg.field || null,
+    // AI가 목록에 없는 분야 코드(예: ai_service)를 주면 버리고, 고른 분야가 1개면 그것으로
+    field: [seed.field, seg.field].find((f) => FIELD_LABEL[f]) || ((input?.fields || []).length === 1 ? input.fields[0] : null),
     context: A.contexts?.[0] || {},
     jobs: A.jobs || [],
     problem: {
@@ -561,7 +573,7 @@ const RuleEngine = {
     if (c.technologyReadiness === "R_AND_D_REQUIRED" && !userHasTechCapacity(c._input)) {
       misfits.push({ type: "R_AND_D_GAP", message: "R&D가 필요하나 기술 역량 근거가 확인되지 않습니다." });
     }
-    if (c.resourceBurden === "high" && (c._input?.budget === "under1000만")) {
+    if (c.resourceBurden === "high" && budgetMaxOf(c._input?.budget) != null && budgetMaxOf(c._input?.budget) <= 1000) {
       misfits.push({ type: "CAPITAL_GAP", message: "초기 자원 부담이 높은 편이라 예산 범위를 확인해야 합니다." });
     }
     if (c.solution?.resourceType === "HW" && !(c._input?.resources?.hw?.length)) {
@@ -638,7 +650,7 @@ const RuleEngine = {
   },
 
   // 6-7. Diversity → TOP 5 (2축 이상 상이)
-  diversitySelect(list, pref = []) {
+  diversitySelect(list, pref = [], spreadFields = false) {
     const axes = (c) => [
       c._keys?.c || c.customer?.type, c._keys?.p || c.problem?.types?.[0],
       c.solution?.solutionType, c.solution?.resourceType, c.field || c.buyer || "?",
@@ -656,6 +668,19 @@ const RuleEngine = {
       const newProblem = !c._keys?.p || !picked.some((p) => p._keys?.p === c._keys.p);
       if (newProblem && distinct(c, picked)) picked.push(c);
     }
+    // 분야 미선택: 같은 분야는 2개까지만(경력 분야 쏠림 방지) — 다른 분야·새 문제 후보가 있을 때만 교체
+    const spread = () => {
+      if (!spreadFields) return;
+      const fieldCount = (f) => picked.filter((x) => x.field && x.field === f).length;
+      for (let i = picked.length - 1; i >= 1; i--) {
+        const c = picked[i];
+        if (!c.field || fieldCount(c.field) <= 2) continue;
+        const alt = list.find((x) => !picked.includes(x) && x.field && fieldCount(x.field) < 2
+          && (!x._keys?.p || !picked.some((p) => p !== c && p._keys?.p === x._keys.p))
+          && (!pref.length || pref.includes(x.solution?.solutionType) || !pref.includes(c.solution?.solutionType)));
+        if (alt) picked[i] = alt;
+      }
+    };
     // 1-2차: 문제 키가 새로운 후보면 축 조건 없이도 우선(같은 문제는 1개만 — 대표 결정 2026-11-24)
     for (const c of list.slice(1)) {
       if (picked.length >= FILTER_CONFIG.finalTop) break;
@@ -666,6 +691,7 @@ const RuleEngine = {
       if (picked.length >= FILTER_CONFIG.finalTop) break;
       if (!picked.includes(c) && distinct(c, picked)) picked.push(c);
     }
+    spread();
     // 선호 형태: 5개 중 최소 3개(가능한 만큼)를 선호 형태로 — 맞지 않는 아래쪽 후보부터 교체
     if (pref.length) {
       const want = Math.min(3, list.filter((c) => pref.includes(c.solution?.solutionType)).length);
@@ -691,6 +717,7 @@ const RuleEngine = {
       if (picked.length >= FILTER_CONFIG.finalTop) break;
       if (!picked.includes(c)) picked.push(c);
     }
+    spread();
     return picked.slice(0, FILTER_CONFIG.finalTop);
   },
 
@@ -1061,7 +1088,10 @@ async function orchestrate(input) {
   // STAGE 9~10: rank → diversity → TOP5
   const pref = prefTypesOf(input);
   const top10 = RuleEngine.rank(pool, pref);
-  let top5 = RuleEngine.diversitySelect(top10, pref);
+  const spread = !(input.fields || []).length;
+  // 분야 미선택이면 분야가 다른 후보도 풀에 남긴다(top10 밖이라도)
+  const pool10 = spread ? [...top10, ...pool.filter((c) => !top10.includes(c) && c.field && !top10.some((t) => t.field === c.field)).slice(0, 6)] : top10;
+  let top5 = RuleEngine.diversitySelect(pool10, pref, spread);
 
   // STAGE 11: premortem + post-guard
   top5 = top5.map((c) => RuleEngine.premortem(c));
@@ -1071,7 +1101,7 @@ async function orchestrate(input) {
     const offenderType = top5[top5.length - 1]?.solution?.solutionType;
     // 선호 형태로 모인 것은 다양성 실패가 아님
     const alt = pref.includes(offenderType) ? [] : top10.filter((c) => c.solution?.solutionType !== offenderType);
-    if (alt.length >= 3) top5 = RuleEngine.diversitySelect(alt, pref).map((c) => RuleEngine.premortem(c));
+    if (alt.length >= 3) top5 = RuleEngine.diversitySelect(alt, pref, spread).map((c) => RuleEngine.premortem(c));
   }
 
   // STAGE 12: CALL B (서술)

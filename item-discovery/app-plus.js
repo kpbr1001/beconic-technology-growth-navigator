@@ -71,7 +71,7 @@ const PLUS_DATA = {
     Expert: "전문가 상담", InternalStaff: "내부 인력", Paper: "종이·수기", Messenger: "메신저", App: "기존 앱", Agency: "대행사", Offline: "오프라인 방문", Community: "커뮤니티·지인" },
   dissatKo: { expensive: "비싸다", slow: "느리다", complex: "복잡하다", unreliable: "믿기 어렵다", inaccurate: "부정확하다", inconvenient: "불편하다",
     inaccessible: "접근하기 어렵다", fragmented: "정보가 흩어져 있다", manual: "손이 많이 간다", generic: "내 상황에 안 맞는다", timeConsuming: "시간이 오래 걸린다" },
-  budgetLabel: { "under1000만": "1천만원 미만", "1000_5000만": "1천~5천만원", "5000만_1억": "5천만~1억", "1억이상": "1억 이상" },
+  // 예산 이름은 app.js budgetName() 한 곳에서 관리
 };
 
 // ============================================================
@@ -143,12 +143,16 @@ const Plus = {
     inp = inp || State.input || {};
     const out = [];
     const rt = o.solution?.resourceType, st = o.solution?.solutionType || o._seedSolution || "";
-    if (inp.budget === "under1000만" && rt === "HW") out.push({ lv: "warn", t: "하드웨어 중심 후보예요. 입력한 초기 예산(1천만원 미만)으로는 시제품·장비 비용이 부담될 수 있어요." });
-    else if (inp.budget === "under1000만" && st === "Product") out.push({ lv: "info", t: "실물 제품은 시제품·초도 생산 비용이 들어요. 1천만원 미만이면 소량 제작·사전 판매(크라우드펀딩 등)로 수요부터 확인하세요." });
-    else if (inp.budget === "under1000만" && rt === "Hybrid" && st !== "Product") out.push({ lv: "info", t: "제품+서비스 복합형이에요. 1천만원 미만 예산이면 서비스부터 시작하는 순서를 검토하세요." });
+    const bmax = typeof budgetMax === "function" ? budgetMax(inp.budget) : null;
+    const small = bmax != null && bmax <= 1000, bname = typeof budgetName === "function" ? budgetName(inp.budget) : "";
+    if (small && rt === "HW") out.push({ lv: "warn", t: `하드웨어 중심 후보예요. 입력한 초기 예산(${bname})으로는 시제품·장비 비용이 부담될 수 있어요.` });
+    else if (small && st === "Product") out.push({ lv: "info", t: `실물 제품은 시제품·초도 생산 비용이 들어요. ${bname}이면 소량 제작·사전 판매(크라우드펀딩 등)로 수요부터 확인하세요.` });
+    else if (small && rt === "Hybrid" && st !== "Product") out.push({ lv: "info", t: `제품+서비스 복합형이에요. ${bname} 예산이면 서비스부터 시작하는 순서를 검토하세요.` });
     const FO = typeof FORM_OPTIONS !== "undefined" ? FORM_OPTIONS : [];
     const pfs = (inp.preferredForms || []).filter(k => FO.some(f => f.k === k));
     const pfTypes = pfs.flatMap(k => FO.find(f => f.k === k).t);
+    // 실물 제품·기기를 고른 경우 '제품(기기)+서비스' 복합형은 같은 계열로 본다
+    if (pfs.some(k => k === "product" || k === "hardware")) pfTypes.push("ProductPlusService");
     const pf = pfs.map(k => FORM_NAME[k]).join("·");
     if (pfs.length && st && FO.some(f => f.t.includes(st)) && !pfTypes.includes(st)) out.push({ lv: "info", t: `선호 형태(${pf})와 다른 형태(${Result.solTypeKo(st) || st})예요. 형태를 바꿔도 같은 문제를 풀 수 있는지 검토해 보세요.` });
     if (["Product", "Hardware"].includes(st) && n_def(o) && !/(키트|세트|박스|교구|기기|장비|디바이스|센서|용품|제품|식품|굿즈|카드|워크북|책|패키지|하드웨어|단말|부품|소재)/.test(n_def(o))) out.push({ lv: "info", t: "실물 제품 후보인데 정의에 물건이 드러나지 않아요. 무엇을 손에 쥐어 파는지 먼저 정해 보세요." });
@@ -181,7 +185,8 @@ const Plus = {
     return [...new Set(ids)].slice(0, 4).map(id => ({ id, ...PLUS_DATA.sources[id] }));
   },
   isStoreLike(o, inp) {
-    const txt = [o.title, o.narrative?.solutionConcept, o.narrative?.channel, o.channel, (inp || State.input || {}).industry].join(" ");
+    // 이름(예: "AI부품가게")은 비유일 수 있어 제외 — 해결 방식·채널·관심 고객으로만 판단
+    const txt = [o.narrative?.solutionConcept, o.narrative?.channel, o.channel, (inp || State.input || {}).industry].join(" ");
     if (["food", "local"].includes(o.field) || o.solution?.solutionType === "Store") return true;
     return /매장|카페|음식점|식당|외식|점포|가게|공방|학원|오프라인 ?(매장|점)/.test(txt);
   },
@@ -217,7 +222,8 @@ const Plus = {
   validationPlan(o) {
     const n = o.narrative || {};
     const who = this.str(n.who || o.customer?.roles?.user || "대상 고객", 60);
-    const prob = this.shortProblem(o.problem?.statement || n.problem || "이 문제");
+    // 문장이 자연스러운 서술(narrative)을 먼저, 없으면 구조화 문장
+    const prob = this.shortProblem(n.problem || o.problem?.statement || "이 문제");
     const alt = this.str(this.altText(o).how || "지금 쓰는 방법", 60);
     const buyer = this.str(n.buyer || o.buyer || o.customer?.roles?.buyer || who, 50);
     const b2b = o.customer?.type === "B2B";
@@ -253,7 +259,7 @@ const Plus = {
     const cond = {
       always: true, existing, pre,
       startup: ["예비창업자", "창업자", "소상공인", "스타트업"].includes(ut) || !ut,
-      bigBudget: ["5000만_1억", "1억이상"].includes(inp.budget),
+      bigBudget: (typeof budgetMax === "function" ? budgetMax(inp.budget) : 0) >= 10000,
       store: (R.top5 || []).some(o => this.isStoreLike(o, inp)) || (inp.preferredForms || []).includes("store"),
     };
     const out = [], used = new Set();
