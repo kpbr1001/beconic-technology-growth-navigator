@@ -78,6 +78,21 @@ ok(Object.values(cnt).every((v) => v <= 2), "같은 핵심 명사 최대 2번: "
 ok(t.every((c) => Array.isArray(c.narrative.nameOptions)), "다른 이름 후보 제공");
 ok(__test.refineItemName("수도권 중소기업 대표 · 진단 불가", t[0]) !== "수도권 중소기업 대표 · 진단 불가", "나쁜 이름 교정");
 
+console.log("3b. 선호 사업형태 반영(실물 제품을 고르면 SaaS로 바뀌지 않게)");
+{
+  const inp = normalizeInput({ ...INPUT, preferredForm: undefined, preferredForms: ["product", "hardware", "store"] });
+  ok(inp.preferredForms.join() === "product,hardware", "형태 최대 2개");
+  ok(normalizeInput({ userType: "창업자", budget: "1억이상", preferredForm: "제품" }).preferredForms.join() === "product", "옛 값(제품) → product");
+  calls = [];
+  const R3 = await orchestrate(inp);
+  const types = R3.top5.map(c => c.solution.solutionType);
+  console.log("    형태:", types.join(", "));
+  ok(types.filter(t => ["Product", "ProductPlusService", "Hardware"].includes(t)).length >= 3, "5개 중 3개 이상 선호 형태");
+  ok(new Set(R3.top5.map(c => c.problem.statement)).size >= 3, "선호 형태 반영 후에도 문제 3종 이상");
+  ok(calls[0].includes("선호 사업형태") && calls[0].includes("SaaS)로 바꾸지 말 것"), "CALL A 에 선호 형태 지시");
+  ok(R3.top5.every(c => c.narrative?.definition), "아이템 정의(definition) 항상 채움");
+}
+
 console.log("4. 하위 호환 — AI가 key 없이 옛 형식으로 답해도 동작");
 {
   const old = JSON.parse(JSON.stringify(A));

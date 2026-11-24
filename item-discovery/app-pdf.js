@@ -94,7 +94,7 @@ const PDFLayout = {
       ["사용자 유형", inp.userType], ["관심 분야", fields.join(", ") || (State.isSample?"":"AI가 넓게 탐색")], ["판매 대상", ct],
       ["관심 고객", val(inp.industry)], ["알고 있는 문제", val(inp.knownProblem)], ["경험·역량", inp.experience],
       ["활용 자원", res.join(", ")], ["초기 투자", PLUS_DATA.budgetLabel[inp.budget]], ["지역 · 고객층", [val(inp.region),val(inp.targetAge)].filter(Boolean).join(" · ")],
-      ["선호 형태", inp.preferredForm && inp.preferredForm!=="상관없어요" ? inp.preferredForm : ""],
+      ["선호 형태", (inp.preferredForms||[]).map(k=>FORM_NAME[k]).filter(Boolean).join(", ")],
     ].filter(r=>r[1]);
     const q = Plus.inputQuality();
     return `<h2 class="pdf-h2">요약 (Executive Summary)</h2>
@@ -102,7 +102,7 @@ const PDFLayout = {
       <p class="pdf-lead">입력한 조건에서 <b>검토할 가치가 있는 사업기회 ${R.top5.length}개</b>를 찾았습니다. 순서는 성공 가능성 순위가 아닙니다.</p>
       <table class="pdf-cmp pdf-exec">
         <thead><tr><th>#</th><th style="text-align:left">아이템</th><th>분야</th><th>문제</th><th>공백</th><th>타이밍</th></tr></thead>
-        <tbody>${R.top5.map((o,i)=>`<tr><td>${i+1}</td><td style="text-align:left"><b>${esc(this.clip(o.narrative?.name||o.title,40))}</b><br><span class="pdf-sub">${esc(this.clip(o.narrative?.tagline||"",60))}</span></td>
+        <tbody>${R.top5.map((o,i)=>`<tr><td>${i+1}</td><td style="text-align:left"><b>${esc(this.clip(o.narrative?.name||o.title,30))}</b><br><span class="pdf-sub">${esc(this.clip(o.narrative?.definition||o.narrative?.tagline||"",60))}</span></td>
           <td>${esc(Plus.fieldName(o)||"-")}</td><td>${bandKo(o.signals.problemSignal.band)}</td><td>${bandKo(o.signals.marketGapSignal.band)}</td><td>${bandKo(o.signals.timingSignal.band)}</td></tr>`).join("")}</tbody>
       </table>
       <h3 class="pdf-h3">탐색 조건 ${State.isSample?'':`<span class="pdf-tag">입력 충실도 ${q.n}/${q.total} · ${q.level.k}</span>`}</h3>
@@ -118,7 +118,7 @@ const PDFLayout = {
     const path=(o.explainPath||[]).slice(0,6);
     return `<div class="pdf-opp">
       <div class="pdf-opp-head"><span class="rk">${i+1}</span>
-        <div><h4>${esc(this.clip(n.name||o.title,40))}</h4><span class="who">${Plus.fieldName(o)?esc(Plus.fieldName(o))+' · ':''}${esc(this.clip(n.tagline||n.who||'',80))}</span></div></div>
+        <div><h4>${esc(this.clip(n.name||o.title,30))}${n.definition?` <span class="pdf-def">— ${esc(this.clip(n.definition,60))}</span>`:''}</h4><span class="who">${Plus.fieldName(o)?esc(Plus.fieldName(o))+' · ':''}${esc(this.clip(n.tagline||n.who||'',80))}</span></div></div>
       <div class="pdf-sigs">${sig("문제",s.problemSignal)}${sig("시장공백",s.marketGapSignal)}${sig("타이밍",s.timingSignal)}
         <span class="pdf-sig"><em>근거</em><b>${esc(EVIDENCE_LABEL[s.evidenceConfidence]||"-")}</b></span></div>
       <table class="pdf-opp-grid">

@@ -7,8 +7,8 @@
 const APP_META = {
   productName: "K-ITEM FINDER",
   productDescription: "Customer & Market Opportunity Discovery Engine",
-  appVersion: "v0.5.0",
-  promptVersion: "v1.4.0",
+  appVersion: "v0.6.0",
+  promptVersion: "v1.5.0",
   updatedAt: "2026.11.24",
   copyrightYear: "2023~2026",
 };
@@ -35,7 +35,7 @@ const State = {
   input: {
     userType:"", experience:"", fields:[], fieldOther:"", customerType:"", industry:"", knownCustomer:"", knownProblem:"",
     resources:{ hw:[], sw:[], human:[] }, budget:"",
-    region:"", targetAge:"", preferredForm:"",
+    region:"", targetAge:"", preferredForm:"", preferredForms:[],
   },
   industryTags:[], customerTags:[],
   result:null, shortlist:[], primary:null, isSample:false, aiReady:null, compareWith:null,
@@ -60,6 +60,8 @@ const State = {
     const base={ userType:"",experience:"",fields:[],fieldOther:"",customerType:"",industry:"",knownCustomer:"",knownProblem:"",resources:{hw:[],sw:[],human:[]},budget:"",region:"",targetAge:"",preferredForm:"" };
     const inp=Object.assign(base, s.input&&typeof s.input==="object"?s.input:{});
     inp.fields=Array.isArray(inp.fields)?inp.fields.filter(f=>FIELDS.some(x=>x.k===f)).slice(0,3):[];
+    inp.preferredForms=Array.isArray(inp.preferredForms)?inp.preferredForms.filter(f=>FORM_NAME[f]).slice(0,2):[];
+    inp.preferredForm=inp.preferredForms.map(x=>FORM_NAME[x]).join(", ");
     inp.resources={ hw:Array.isArray(inp.resources?.hw)?inp.resources.hw:[], sw:Array.isArray(inp.resources?.sw)?inp.resources.sw:[], human:Array.isArray(inp.resources?.human)?inp.resources.human:[] };
     this.input=inp; this.customerTags=Array.isArray(s.customerTags)?s.customerTags.map(String):[];
   },
@@ -73,7 +75,8 @@ const App = {
   esc(s){ return String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); },
   init(){
     // Footer / Header Config 주입
-    document.getElementById("hdrVer").textContent = " · " + APP_META.appVersion;
+    // 헤더에는 버전을 표시하지 않음(바닥글·서비스 정보에만)
+    document.getElementById("hdrVer")?.remove();
     document.getElementById("footCert").textContent = COMPANY_INFO.certification;
     const tel=document.getElementById("footTel"); tel.textContent="📞 "+COMPANY_INFO.phone; tel.href="tel:"+COMPANY_INFO.phoneTel;
     const em=document.getElementById("footEmail"); em.textContent="✉ "+COMPANY_INFO.email; em.href="mailto:"+COMPANY_INFO.email;
@@ -133,7 +136,7 @@ const App = {
   restart(){
     State.clear();
     State.step=0; State.input={ userType:"",experience:"",fields:[],fieldOther:"",customerType:"",industry:"",knownCustomer:"",knownProblem:"",
-      resources:{hw:[],sw:[],human:[]},budget:"",region:"",targetAge:"",preferredForm:"" };
+      resources:{hw:[],sw:[],human:[]},budget:"",region:"",targetAge:"",preferredForm:"",preferredForms:[] };
     State.industryTags=[]; State.customerTags=[]; State.result=null; State.shortlist=[]; State.primary=null; State.isSample=false; State.compareWith=null;
     document.getElementById("sampleBanner").classList.remove("show");
     this.show("start");
@@ -178,6 +181,19 @@ const FIELDS = [
   { k:"public", n:"공공·사회문제", ex:"소셜벤처, 지역 문제, 취약계층" },
 ];
 const FIELD_NAME = Object.fromEntries(FIELDS.map(f=>[f.k,f.n]));
+// 선호 사업형태(최대 2개) — 서버 FORM_TYPES 와 같은 키
+const FORM_OPTIONS = [
+  { k:"software", n:"SaaS·앱", d:"소프트웨어를 구독·판매", t:["SaaS","App"] },
+  { k:"platform", n:"플랫폼·중개", d:"공급자와 고객을 연결, 수수료", t:["Platform","Marketplace"] },
+  { k:"service", n:"전문 서비스·대행", d:"사람이 직접 해 주고 건별·월 비용", t:["Service","Consulting","ProfessionalService"] },
+  { k:"edu", n:"교육·콘텐츠", d:"강의·클래스·콘텐츠 판매", t:["Education","Content"] },
+  { k:"product", n:"실물 제품", d:"소비재·식품 등 만들어 판매", t:["Product","ProductPlusService"] },
+  { k:"hardware", n:"기기·하드웨어", d:"장비·IoT·디바이스", t:["Hardware"] },
+  { k:"subscription", n:"구독·정기배송", d:"매달 정기 결제", t:["Subscription"] },
+  { k:"store", n:"매장·오프라인", d:"점포·공간을 직접 운영", t:["Store"] },
+  { k:"community", n:"커뮤니티·멤버십", d:"모임·회원제 운영", t:["Community"] },
+];
+const FORM_NAME = Object.fromEntries(FORM_OPTIONS.map(f=>[f.k,f.n]));
 // 문항 예시(눌러서 채우기) — 실제 입력 패턴 기준
 const EXAMPLES = {
   experience:["금융권 20년 · 영업/기획","제조 현장 품질관리 10년","마케팅 대행 5년 · 콘텐츠 제작","간호사 12년 · 요양병원 근무","IT 개발 7년 · 백엔드"],
@@ -211,18 +227,61 @@ const Onboarding = {
     document.getElementById("obContent").innerHTML=html;
     document.getElementById("obPrev").style.visibility = State.step===0 ? "hidden":"visible";
     document.getElementById("obNext").textContent = State.step===STEPS.length-1 ? "사업기회 탐색하기" : "다음";
-    if(s.key==="customer") this.renderTags("customer");
+    
     if(s.key==="problem") this.syncProblem();
     State.save(); // 이탈 방지: 매 스텝 저장
   },
 
-  exChips(list, fn){
-    return `<div class="ex-row"><span class="ex-k">예시</span>${list.map((e,i)=>`<button type="button" class="ex-chip" onclick="Onboarding.${fn}(${i})">${App.esc(e)}</button>`).join("")}</div>`;
+  // ---------- 입력 도우미(예시·작성법) — 입력칸과 분리된 박스 ----------
+  helpBox(examples, fn, tip){
+    return `<div class="help-box">
+      ${examples&&examples.length?`<div class="hb-row"><span class="hb-k">예시</span><div class="hb-v">${examples.map((e,i)=>`<button type="button" class="ex-chip" onclick="Onboarding.${fn}(${i})">${App.esc(e)}</button>`).join("")}</div></div>`:''}
+      ${tip?`<div class="hb-row"><span class="hb-k">작성법</span><div class="hb-v hb-tip">${tip}</div></div>`:''}
+    </div>`;
   },
-  exExp(i){ const v=EXAMPLES.experience[i]; State.input.experience = State.input.experience ? State.input.experience+" · "+v : v; this.render(); },
-  exCust(i){ const v=EXAMPLES.customer[i]; if(!State.customerTags.includes(v)) State.customerTags.push(v); State.input.industry=""; this.render(); },
+  // 단어(태그) 입력 박스: 입력칸+추가 버튼 / 넣은 단어(눌러서 수정·×로 삭제)
+  listOf(key){ return key==="customer" ? State.customerTags : State.input.resources[key]; },
+  entryBox(key, ph){
+    const list=this.listOf(key);
+    return `<div class="entry-box">
+      <div class="eb-row"><input class="input" id="in_${key}" maxlength="80" placeholder="${ph}" autocomplete="off"
+        onkeydown="Onboarding.onKey(event,'${key}')" />
+        <button type="button" class="btn btn-primary btn-sm eb-add" onclick="Onboarding.addFrom('${key}')">추가</button></div>
+      <div class="eb-tags" id="tags_${key}">${list.length?list.map((v,i)=>`<span class="tag"><button type="button" class="tag-t" title="눌러서 수정" onclick="Onboarding.editTag('${key}',${i})">${App.esc(v)}</button><button type="button" class="tag-x" aria-label="${App.esc(v)} 삭제" onclick="Onboarding.rmItem('${key}',${i})">×</button></span>`).join(""):`<span class="eb-empty">추가한 항목이 여기에 보여요 · 눌러서 수정할 수 있어요</span>`}</div>
+    </div>`;
+  },
+  // 한글 조합 중 Enter는 무시(마지막 글자 빠짐·두 번 입력 방지)
+  onKey(e,key){
+    if(e.key!=="Enter") return;
+    if(e.isComposing || e.keyCode===229) return;
+    e.preventDefault(); this.addFrom(key);
+  },
+  addFrom(key){
+    const el=document.getElementById("in_"+key); if(!el) return;
+    const max = key==="customer" ? 5 : 8;
+    const list=this.listOf(key);
+    // 쉼표·줄바꿈으로 여러 개를 한 번에
+    const parts=el.value.split(/[,\n，]/).map(x=>x.trim().slice(0,40)).filter(Boolean);
+    if(!parts.length) return;
+    let over=false;
+    parts.forEach(v=>{ if(list.includes(v)) return; if(list.length>=max){ over=true; return; } list.push(v); });
+    if(over) App.toast(`${key==="customer"?"고객":"항목"}은 ${max}개까지 넣을 수 있어요`);
+    if(key==="customer") State.input.industry="";
+    el.value="";
+    this.render();
+    document.getElementById("in_"+key)?.focus();
+  },
+  editTag(key,i){
+    const list=this.listOf(key); const v=list[i]; list.splice(i,1);
+    this.render();
+    const el=document.getElementById("in_"+key); if(el){ el.value=v; el.focus(); el.setSelectionRange(v.length,v.length); }
+  },
+  rmItem(key,i){ this.listOf(key).splice(i,1); this.render(); },
+  exExp(i){ const v=EXAMPLES.experience[i]; State.input.experience = State.input.experience ? State.input.experience+", "+v : v; this.render(); },
+  exCust(i){ const v=EXAMPLES.customer[i]; if(!State.customerTags.includes(v)&&State.customerTags.length<5) State.customerTags.push(v); State.input.industry=""; this.render(); },
   exProb(i){ State.input.knownProblem=EXAMPLES.problem[i]; this.render(); },
-  exRes(key,i){ const v=EXAMPLES[key][i]; if(!State.input.resources[key].includes(v)) State.input.resources[key].push(v); this.render(); },
+  exRes(key,i){ const v=EXAMPLES[key][i]; const l=State.input.resources[key]; if(!l.includes(v)&&l.length<8) l.push(v); this.render(); },
+
   render_field(){
     const sel=State.input.fields||[];
     const cts=[["B2B","기업·기관에 판매(B2B)"],["B2C","개인 소비자에게 판매(B2C)"],["B2G","정부·공공기관(B2G)"],["__ANY__","상관없어요"]];
@@ -230,7 +289,7 @@ const Onboarding = {
       <div class="field"><label>관심 분야 <span class="lbl-sub">${sel.length}/3 선택</span></label>
         <div class="field-grid">${FIELDS.map(f=>`<button type="button" class="fld ${sel.includes(f.k)?'sel':''}" aria-pressed="${sel.includes(f.k)}" onclick="Onboarding.toggleField('${f.k}')"><b>${f.n}</b><span>${f.ex}</span></button>`).join("")}</div>
         <input class="input" style="margin-top:10px" maxlength="40" placeholder="목록에 없으면 직접 입력 (예: 웨딩, 드론 촬영)" value="${App.esc(State.input.fieldOther||'')}" oninput="Onboarding.setText('fieldOther',this.value)" />
-        <p class="escape-desc">👆 아무것도 고르지 않으면 AI가 내 경험과 가까운 분야부터 서로 다른 분야 3곳 이상을 넓게 찾아요.</p></div>
+        ${this.helpBox(null,null,"아무것도 고르지 않으면 AI가 내 경험과 가까운 분야부터 서로 다른 분야 3곳 이상을 넓게 찾아요.")}</div>
       <div class="field"><label>누구에게 팔고 싶나요?</label>
         <div class="opts">${cts.map(([v,l])=>`<button class="opt ${State.input.customerType===v?'sel':''}" onclick="Onboarding.pick('customerType','${v}')"><span class="ck"></span>${l}</button>`).join("")}</div></div>`;
   },
@@ -247,8 +306,8 @@ const Onboarding = {
       <div class="field"><label>어떤 유형에 가까운가요?</label>
         <div class="opts">${types.map(t=>`<button class="opt ${State.input.userType===t?'sel':''}" onclick="Onboarding.pick('userType','${t}')"><span class="ck"></span>${t}</button>`).join("")}</div></div>
       <div class="field"><label>보유한 경험이나 역량을 알려주세요</label>
-        <textarea class="input" id="f_experience" maxlength="400" placeholder="예) 금융권 20년 · 영업/기획 · 제조 현장 관리 경험" oninput="Onboarding.setText('experience',this.value)">${App.esc(State.input.experience)}</textarea>
-        ${this.exChips(EXAMPLES.experience,"exExp")}</div>
+        <textarea class="input" id="f_experience" maxlength="400" placeholder="예) 금융권 20년, 영업/기획, 제조 현장 관리 경험" oninput="Onboarding.setText('experience',this.value)">${App.esc(State.input.experience)}</textarea>
+        ${this.helpBox(EXAMPLES.experience,"exExp","<b>분야</b> + <b>연차</b> + <b>해 본 일</b>을 쉼표로 이어 적어 주세요. 자격·학위·창업 경험도 좋아요.")}</div>
       <div class="field"><label>초기 투자 가능 범위</label>
         <div class="opts">${budgets.map(([v,l])=>`<button class="opt ${State.input.budget===v?'sel':''}" onclick="Onboarding.pick('budget','${v}')"><span class="ck"></span>${l}</button>`).join("")}</div></div>`;
   },
@@ -256,16 +315,14 @@ const Onboarding = {
     const hint = State.input.industry==='__AI_FIND__' ? '🔦 AI가 시장 신호에서 유망한 고객·시장을 대신 찾아드립니다.'
                : State.input.industry==='__UNKNOWN__' ? '🔦 괜찮아요. 시장 신호에서 함께 찾아드릴게요.' : '';
     return `
-      <div class="field"><label>관심 있는 고객·산업을 입력해 보세요 (여러 개 가능)</label>
-        <div class="tag-input"><input class="input" id="f_customerTag" maxlength="40" placeholder="예) 시니어, 제조 중소기업, 로컬 소상공인" onkeydown="if(event.key==='Enter'){Onboarding.addTag('customer',this);}" />
-          <button type="button" class="btn btn-ghost btn-sm" onclick="Onboarding.addTag('customer',document.getElementById('f_customerTag'))">추가</button></div>
-        ${this.exChips(EXAMPLES.customer,"exCust")}
-        <div class="tags" id="customerTags"></div>
+      <div class="field"><label>관심 있는 고객·산업 <span class="lbl-sub">${State.customerTags.length}/5</span></label>
+        ${this.entryBox("customer","예) 제조 중소기업, 1인 사업자 — 쉼표로 여러 개")}
+        ${this.helpBox(EXAMPLES.customer,"exCust","<b>누구</b>(직군·업종) + <b>규모·연령</b>으로 적어요. 쉼표로 구분하면 한 번에 여러 개가 들어가고, 넣은 항목은 눌러서 고칠 수 있어요.")}
         <div class="escape-row">
           <button class="escape ${State.input.industry==='__UNKNOWN__'?'sel':''}" onclick="Onboarding.escape('customer','__UNKNOWN__')">잘 모르겠어요</button>
           <button class="escape ${State.input.industry==='__AI_FIND__'?'sel':''}" onclick="Onboarding.escape('customer','__AI_FIND__')">AI가 찾아주세요</button>
         </div>
-        <p class="escape-desc">👆 딱 정해두지 않았다면 눌러보세요. 입력을 비워두면 AI가 시장 데이터에서 유망한 고객·시장을 대신 골라줍니다.</p>
+        <p class="escape-desc">딱 정해두지 않았다면 눌러보세요. AI가 고른 분야 안에서 유망한 고객을 대신 골라 줍니다.</p>
         ${hint?`<div class="ai-hint">${hint}</div>`:''}</div>`;
   },
   render_problem(){
@@ -274,39 +331,48 @@ const Onboarding = {
     return `
       <div class="field"><label>고객이 겪는 불편함이나 문제를 적어주세요</label>
         <textarea class="input" id="f_problem" maxlength="400" placeholder="예) 퇴직 후 안정적 수입원을 찾기 어렵다 · 제조사가 품질검사에 사람을 많이 쓴다" oninput="Onboarding.setText('knownProblem',this.value)">${App.esc(State.input.knownProblem&&!State.input.knownProblem.startsWith('__')?State.input.knownProblem:'')}</textarea>
-        ${this.exChips(EXAMPLES.problem,"exProb")}
-        <p class="ex-tip">💡 좋은 문제 문장 = <b>누가</b> + <b>언제/어떤 상황에서</b> + <b>무엇 때문에 불편한지</b></p>
+        ${this.helpBox(EXAMPLES.problem,"exProb","<b>누가</b> + <b>언제·어떤 상황에서</b> + <b>무엇 때문에 불편한지</b>. 지금은 어떻게 해결하는지(비용·시간)까지 적으면 더 정확해요.")}
         <div class="escape-row">
           <button class="escape ${State.input.knownProblem==='__AI_FIND__'?'sel':''}" onclick="Onboarding.escape('problem','__AI_FIND__')">AI가 찾아주세요</button>
           <button class="escape ${State.input.knownProblem==='__NONE__'?'sel':''}" onclick="Onboarding.escape('problem','__NONE__')">아직 없습니다</button>
         </div>
-        <p class="escape-desc">👆 떠오르는 문제가 없어도 괜찮아요. 눌러두면 AI가 시장에서 자주 언급되는 불편·문제를 대신 찾아냅니다.</p>
+        <p class="escape-desc">떠오르는 문제가 없어도 괜찮아요. 눌러두면 AI가 시장에서 자주 언급되는 불편·문제를 대신 찾아냅니다.</p>
         ${hint?`<div class="ai-hint">${hint}</div>`:''}</div>`;
   },
   render_resource(){
-    const r=State.input.resources;
-    const grp=(title,key,ph)=>`<div class="res-group"><div class="rg-title">${title}</div>
-      <div class="tag-input"><input class="input" id="res_in_${key}" maxlength="40" placeholder="${ph}" onkeydown="if(event.key==='Enter'){Onboarding.addRes('${key}',this);}" />
-      <button type="button" class="btn btn-ghost btn-sm" onclick="Onboarding.addRes('${key}',document.getElementById('res_in_${key}'))">추가</button></div>
-      <div class="ex-row"><span class="ex-k">예시</span>${EXAMPLES[key].map((e,i)=>`<button type="button" class="ex-chip" onclick="Onboarding.exRes('${key}',${i})">${App.esc(e)}</button>`).join("")}</div>
-      <div class="tags" id="res_${key}">${r[key].map((v,i)=>`<span class="tag">${App.esc(v)}<button aria-label="삭제" onclick="Onboarding.rmRes('${key}',${i})">×</button></span>`).join("")}</div></div>`;
+    const grp=(title,key,ph)=>`<div class="res-group"><div class="rg-title">${title} <span class="lbl-sub">${State.input.resources[key].length}/8</span></div>
+      ${this.entryBox(key,ph)}
+      ${this.helpBox(EXAMPLES[key],"exRes_"+key,null)}</div>`;
     return `<div class="field">
-      <p class="ex-tip">없으면 비워 두셔도 돼요. 적어 주시면 '실행 걸림돌' 점검이 정확해져요.</p>
-      ${grp("🔧 하드웨어 (Hardware)","hw","예) 센서, 장비, 제조설비 — 입력 후 Enter")}
-      ${grp("💻 소프트웨어 (Software)","sw","예) 앱, 데이터, AI 모델 — 입력 후 Enter")}
-      ${grp("👤 사람·전문성 (Humanware)","human","예) 개발, 영업, 도메인 전문지식 — 입력 후 Enter")}
+      ${this.helpBox(null,null,"없으면 비워 두셔도 돼요. <b>쉼표로 여러 개</b>를 한 번에 넣을 수 있고, 넣은 항목은 눌러서 고칠 수 있어요. 적어 주시면 '실행 걸림돌' 점검이 정확해져요.")}
+      ${grp("🔧 하드웨어 (Hardware)","hw","예) 3D 프린터, 작업 공간, 배송 차량")}
+      ${grp("💻 소프트웨어 (Software)","sw","예) 자사 쇼핑몰, 고객 DB, AI 모델")}
+      ${grp("👤 사람·전문성 (Humanware)","human","예) 강의 경력, 영업 네트워크, 심사·평가위원")}
     </div>`;
   },
+  exRes_hw(i){ this.exRes("hw",i); }, exRes_sw(i){ this.exRes("sw",i); }, exRes_human(i){ this.exRes("human",i); },
   render_optional(){
-    const forms=["상관없어요","SaaS/앱","서비스","마켓플레이스","교육/콘텐츠","제품"];
+    const sel=State.input.preferredForms||[];
     return `
       <div class="field"><label>사업할 지역</label>
         <input class="input" maxlength="60" placeholder="예) 수도권, 부산·경남, 온라인 전국 (선택)" value="${App.esc(State.input.region&&!State.input.region.startsWith('__')?State.input.region:'')}" oninput="Onboarding.setText('region',this.value)" /></div>
       <div class="field"><label>주요 고객층 (연령·직군)</label>
         <input class="input" maxlength="60" placeholder="예) 30~50대 기업 대표, 2030 직장인, 70대 이상 (선택)" value="${App.esc(State.input.targetAge&&!State.input.targetAge.startsWith('__')?State.input.targetAge:'')}" oninput="Onboarding.setText('targetAge',this.value)" /></div>
-      <div class="field"><label>선호 사업형태</label>
-        <div class="opts">${forms.map(f=>`<button class="opt ${State.input.preferredForm===f?'sel':''}" onclick="Onboarding.pick('preferredForm','${f}')"><span class="ck"></span>${f}</button>`).join("")}</div></div>`;
+      <div class="field"><label>선호 사업형태 <span class="lbl-sub">${sel.length?sel.length+"/2 선택":"상관없음"}</span></label>
+        ${this.helpBox(null,null,"<b>어떻게 팔지</b> 정해 두셨다면 최대 <b>2개</b>를 고르세요. 고른 형태로 후보 5개 중 <b>3개 이상</b>을 찾고, 나머지는 비교용으로 다른 형태를 보여 드려요. 정하지 않았다면 그대로 두세요.")}
+        <div class="form-grid">
+          <button type="button" class="fld ${sel.length?'':'sel'}" onclick="Onboarding.clearForms()"><b>상관없어요</b><span>형태 제한 없이 넓게</span></button>
+          ${FORM_OPTIONS.map(f=>`<button type="button" class="fld ${sel.includes(f.k)?'sel':''}" aria-pressed="${sel.includes(f.k)}" onclick="Onboarding.toggleForm('${f.k}')"><b>${f.n}</b><span>${f.d}</span></button>`).join("")}
+        </div></div>`;
   },
+  toggleForm(k){
+    const a=State.input.preferredForms=State.input.preferredForms||[];
+    const i=a.indexOf(k);
+    if(i>-1) a.splice(i,1); else { if(a.length>=2){ App.toast("사업형태는 2개까지 고를 수 있어요"); return; } a.push(k); }
+    State.input.preferredForm=a.map(x=>FORM_NAME[x]).join(", ");
+    this.render();
+  },
+  clearForms(){ State.input.preferredForms=[]; State.input.preferredForm=""; this.render(); },
 
   // --- helpers ---
   pick(key,val){ State.input[key]=val; this.render(); },
@@ -316,20 +382,11 @@ const Onboarding = {
     if(step==="problem"){ State.input.knownProblem=val; }
     this.render();
   },
-  addTag(type,el){
-    const v=(el?.value||"").trim().slice(0,40); if(!v)return;
-    if(State.customerTags.length>=5){ App.toast("고객은 5개까지 적을 수 있어요"); return; }
-    if(!State.customerTags.includes(v)) State.customerTags.push(v);
-    State.input.industry=""; el.value="";
-    this.render();
-  },
-  renderTags(type){
-    const box=document.getElementById("customerTags"); if(!box)return;
-    box.innerHTML=State.customerTags.map((t,i)=>`<span class="tag">${App.esc(t)}<button aria-label="삭제" onclick="Onboarding.rmTag(${i})">×</button></span>`).join("");
-  },
-  rmTag(i){ State.customerTags.splice(i,1); this.render(); },
-  addRes(key,el){ const v=(el?.value||"").trim().slice(0,40); if(!v)return; if(State.input.resources[key].length>=8){App.toast("항목은 8개까지예요");return;} if(!State.input.resources[key].includes(v)) State.input.resources[key].push(v); el.value=""; this.render(); },
-  rmRes(key,i){ State.input.resources[key].splice(i,1); this.render(); },
+  addTag(type,el){ this.addFrom("customer"); },   // 하위 호환
+  addRes(key,el){ this.addFrom(key); },           // 하위 호환
+  renderTags(){},
+  rmTag(i){ this.rmItem("customer",i); },
+  rmRes(key,i){ this.rmItem(key,i); },
   syncProblem(){},
 
   prev(){ if(State.step>0){State.step--; this.render();} },
@@ -340,10 +397,10 @@ const Onboarding = {
       if(!State.input.budget){ App.toast("투자 범위를 선택해 주세요"); return; }
     }
     if(STEPS[State.step].key==="customer"){
-      const el=document.getElementById("f_customerTag"); if(el&&el.value.trim()) this.addTag("customer",el); // 추가 안 누르고 넘어가도 반영
+      const el=document.getElementById("in_customer"); if(el&&el.value.trim()) this.addFrom("customer"); // 추가 안 누르고 넘어가도 반영
       if(State.customerTags.length) State.input.industry=State.customerTags.join(", ");
     }
-    if(STEPS[State.step].key==="resource"){ ["hw","sw","human"].forEach(k=>{ const el=document.getElementById("res_in_"+k); if(el&&el.value.trim()) this.addRes(k,el); }); }
+    if(STEPS[State.step].key==="resource"){ ["hw","sw","human"].forEach(k=>{ const el=document.getElementById("in_"+k); if(el&&el.value.trim()) this.addFrom(k); }); }
     if(State.step<STEPS.length-1){ State.step++; this.render(); }
     else { this.submit(); }
   },
@@ -355,7 +412,8 @@ const Onboarding = {
     inp.knownProblem = inp.knownProblem || "__AI_FIND__";
     inp.region = inp.region || "__ANY__";
     inp.targetAge = inp.targetAge || "__ANY__";
-    inp.preferredForm = (inp.preferredForm && inp.preferredForm!=="상관없어요") ? inp.preferredForm : "__ANY__";
+    inp.preferredForms = (inp.preferredForms||[]).filter(f=>FORM_NAME[f]).slice(0,2);
+    delete inp.preferredForm;
     inp.customerType = inp.customerType || "__ANY__";
     inp.fields = (inp.fields||[]).slice(0,3);
     Discovery.run(inp);

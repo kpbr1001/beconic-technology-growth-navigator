@@ -51,7 +51,9 @@ export const FIELD_KEYS = ["mfg", "it", "knowledge", "edu", "health", "food", "c
   "agri", "travel", "care", "pet", "finance", "mobility", "construction", "public"];
 export const USER_TYPES = ["예비창업자", "창업자", "기존기업", "소상공인", "스타트업", "중소기업", "신사업 담당자", "컨설턴트"];
 export const BUDGETS = ["under1000만", "1000_5000만", "5000만_1억", "1억이상"];
-export const FORMS = ["SaaS/앱", "서비스", "마켓플레이스", "교육/콘텐츠", "제품", "__ANY__"];
+// 선호 사업형태(최대 2개) — 화면 FORM_OPTIONS 와 같은 키
+export const FORM_KEYS = ["software", "platform", "service", "edu", "product", "hardware", "subscription", "store", "community"];
+const LEGACY_FORM = { "SaaS/앱": "software", "서비스": "service", "마켓플레이스": "platform", "교육/콘텐츠": "edu", "제품": "product" };
 export const CUSTOMER_TYPES = ["B2B", "B2C", "B2G", "__ANY__"];
 
 export function normalizeInput(raw) {
@@ -71,7 +73,8 @@ export function normalizeInput(raw) {
     resources: { hw: cleanList(r.hw, 8, 40), sw: cleanList(r.sw, 8, 40), human: cleanList(r.human, 8, 40) },
     region: keepSent(raw.region, 60) || "__ANY__",
     targetAge: keepSent(raw.targetAge, 60) || "__ANY__",
-    preferredForm: oneOf(raw.preferredForm, FORMS, "__ANY__"),
+    preferredForms: [...new Set([...(Array.isArray(raw.preferredForms) ? raw.preferredForms : []), LEGACY_FORM[raw.preferredForm]]
+      .filter((f) => FORM_KEYS.includes(f)))].slice(0, 2),
   };
   if (!input.userType || !input.budget) return null; // 화면 1단계 필수값
   return input;

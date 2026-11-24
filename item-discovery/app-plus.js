@@ -66,14 +66,6 @@ const PLUS_DATA = {
     { id: "N-MATCH", tool: "MATCH", when: "always",   why: "지금 신청할 수 있는 정부·공공 지원사업을 찾아봐요." },
   ],
 
-  // 선호 사업형태 ↔ solutionType 대응(입력 조건 점검)
-  formMap: {
-    "SaaS/앱": ["SaaS", "App", "Platform", "Subscription", "Dashboard", "Software", "Tool", "API", "AI"],
-    "서비스": ["Service", "ProfessionalService", "Consulting", "ProductPlusService"],
-    "마켓플레이스": ["Marketplace", "Platform"],
-    "교육/콘텐츠": ["Education", "Content", "Community"],
-    "제품": ["Product", "ProductPlusService", "Hardware"],
-  },
   // 서버(CALL A) alternatives 코드 → 한글
   altKo: { Excel: "엑셀", Phone: "전화", Human: "사람에게 직접 의뢰", AI: "범용 AI", Manual: "수작업", Search: "검색", None: "대안 없음(포기)",
     Expert: "전문가 상담", InternalStaff: "내부 인력", Paper: "종이·수기", Messenger: "메신저", App: "기존 앱", Agency: "대행사", Offline: "오프라인 방문", Community: "커뮤니티·지인" },
@@ -136,7 +128,7 @@ const Plus = {
       { k: "관심 고객·산업 직접 입력", ok: real(inp.industry) || (inp === State.input && (State.customerTags || []).length > 0), tip: "관심 고객을 적으면 시장 신호를 그 고객 기준으로 좁힙니다." },
       { k: "알고 있는 문제 직접 입력", ok: real(inp.knownProblem), tip: "직접 겪거나 들은 문제를 적으면 AI 가설 의존도가 낮아집니다." },
       { k: "활용 자원 1개 이상", ok: resCount > 0, tip: "보유 자원을 적으면 실행 가능성 점검이 정확해집니다." },
-      { k: "지역·연령·형태 중 1개 이상", ok: real(inp.region) || real(inp.targetAge) || (inp.preferredForm && inp.preferredForm !== "상관없어요" && !String(inp.preferredForm).startsWith("__")), tip: "선택 조건이 있으면 후보가 내 상황에 더 맞춰집니다." },
+      { k: "지역·연령·형태 중 1개 이상", ok: real(inp.region) || real(inp.targetAge) || (inp.preferredForms || []).length > 0, tip: "선택 조건이 있으면 후보가 내 상황에 더 맞춰집니다." },
     ];
     const n = items.filter(i => i.ok).length;
     const level = n >= 5 ? { k: "충실", c: "ok", d: "입력이 충분해 결과가 내 상황을 잘 반영합니다." }
@@ -152,9 +144,11 @@ const Plus = {
     const rt = o.solution?.resourceType, st = o.solution?.solutionType || o._seedSolution || "";
     if (inp.budget === "under1000만" && rt === "HW") out.push({ lv: "warn", t: "하드웨어 중심 후보예요. 입력한 초기 예산(1천만원 미만)으로는 시제품·장비 비용이 부담될 수 있어요." });
     else if (inp.budget === "under1000만" && rt === "Hybrid") out.push({ lv: "info", t: "제품+서비스 복합형이에요. 1천만원 미만 예산이면 서비스부터 시작하는 순서를 검토하세요." });
-    const pf = inp.preferredForm;
-    const known = Object.values(PLUS_DATA.formMap).some(a => a.includes(st));
-    if (pf && PLUS_DATA.formMap[pf] && st && known && !PLUS_DATA.formMap[pf].includes(st)) out.push({ lv: "info", t: `선호 형태(${pf})와 다른 형태(${Result.solTypeKo(st) || st})예요. 형태를 바꿔도 같은 문제를 풀 수 있는지 검토해 보세요.` });
+    const FO = typeof FORM_OPTIONS !== "undefined" ? FORM_OPTIONS : [];
+    const pfs = (inp.preferredForms || []).filter(k => FO.some(f => f.k === k));
+    const pfTypes = pfs.flatMap(k => FO.find(f => f.k === k).t);
+    const pf = pfs.map(k => FORM_NAME[k]).join("·");
+    if (pfs.length && st && FO.some(f => f.t.includes(st)) && !pfTypes.includes(st)) out.push({ lv: "info", t: `선호 형태(${pf})와 다른 형태(${Result.solTypeKo(st) || st})예요. 형태를 바꿔도 같은 문제를 풀 수 있는지 검토해 보세요.` });
     if (o.founderFit?.hasMisfit) out.push({ lv: "warn", t: "실행 걸림돌이 있어요(위 적합도 참고). 보완 계획 없이 바로 시작하기는 어려워요." });
     return out;
   },
@@ -185,7 +179,7 @@ const Plus = {
   },
   isStoreLike(o, inp) {
     const txt = [o.title, o.narrative?.solutionConcept, o.narrative?.channel, o.channel, (inp || State.input || {}).industry].join(" ");
-    if (["food", "local"].includes(o.field)) return true;
+    if (["food", "local"].includes(o.field) || o.solution?.solutionType === "Store") return true;
     return /매장|카페|음식점|식당|외식|점포|가게|공방|학원|오프라인 ?(매장|점)/.test(txt);
   },
 
@@ -257,7 +251,7 @@ const Plus = {
       always: true, existing, pre,
       startup: ["예비창업자", "창업자", "소상공인", "스타트업"].includes(ut) || !ut,
       bigBudget: ["5000만_1억", "1억이상"].includes(inp.budget),
-      store: (R.top5 || []).some(o => this.isStoreLike(o, inp)),
+      store: (R.top5 || []).some(o => this.isStoreLike(o, inp)) || (inp.preferredForms || []).includes("store"),
     };
     const out = [], used = new Set();
     for (const r of PLUS_DATA.nextRules) {
@@ -368,7 +362,7 @@ const Plus = {
   // ---------- ⑥ 연계: S2 이관 · 메일 상담 ----------
   handoffText(o) {
     const n = o.narrative || {};
-    const L = [`[K-ITEM FINDER 선택 아이템] ${n.name || o.title}`];
+    const L = [`[K-ITEM FINDER 선택 아이템] ${n.name || o.title}${n.definition ? " — " + n.definition : ""}`];
     const add = (k, v) => { v = this.str(v, 300); if (v && v !== "확인 필요") L.push(`- ${k}: ${v}`); };
     add("대상 고객", n.who || o.customer?.roles?.user);
     add("고객 문제", n.problem);

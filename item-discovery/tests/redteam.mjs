@@ -67,23 +67,51 @@ console.log("1. 고객 여정 — 실제 클릭으로 6단계 끝까지");
   ok((await page.locator(".fld.sel").count()) === 3, "분야 최대 3개 제한");
   await page.click("button.opt:has-text('B2B')");
   await page.click("#obNext");
-  await page.fill("#f_customerTag", "제조 중소기업");          // '추가' 안 누르고 다음
+  await page.fill("#in_customer", "제조 중소기업");          // '추가' 안 누르고 다음
   await page.click("#obNext");
   ok(/문제/.test(await page.locator(".ob-q").innerText()), "고객 입력 후 다음 단계");
   await page.click(".ex-chip:has-text('정부지원사업 서류')");
   await page.click("#obNext");
-  await page.fill("#res_in_human", "강의 경력");
+  await page.fill("#in_human", "강의 경력");
   await page.click("#obNext");
   await page.fill("input[placeholder^='예) 30~50대']", "30~50대 기업 대표");
-  await page.click("button.opt:has-text('서비스')");
+  await page.click(".fld:has-text('실물 제품')"); await page.click(".fld:has-text('전문 서비스')"); await page.click(".fld:has-text('기기·하드웨어')");
+  ok((await page.locator("#screen-onboarding .form-grid .fld.sel").count()) === 2, "사업형태 최대 2개");
   await page.click("#obNext");
   await page.waitForSelector("#screen-discovery.active");
   await page.waitForFunction(() => /탐색 횟수/.test(document.getElementById("discSteps").innerText), null, { timeout: 15000 });
   ok(sent && sent.input.fields.join() === "knowledge,edu,finance", "서버로 분야 3개 전송");
   ok(sent.input.customerType === "B2B" && sent.input.industry === "제조 중소기업", "고객 유형·관심 고객(추가 버튼 없이도) 전송");
   ok(sent.input.resources.human.includes("강의 경력"), "자원 입력(추가 버튼 없이도) 전송");
+  ok(sent.input.preferredForms.join() === "product,service", "선호 사업형태 2개 전송");
   ok(/^[A-Za-z0-9_-]{8,64}$/.test(sent.jobId), "jobId 형식");
   ok(/탐색 횟수/.test(await page.locator("#discSteps").innerText()), "한도 초과를 친절한 문장으로 안내");
+  ok(errs.length === 0, "오류 0 " + (errs[0] || ""));
+  await ctx.close();
+}
+
+console.log("1b. 단어 입력 — 한글 조합 Enter·쉼표 여러 개·항목 수정");
+{
+  const { ctx, page, errs } = await open();
+  ok((await page.locator("#hdrVer").count()) === 0, "헤더 버전 표시 없음");
+  ok(/v0\.\d/.test(await page.locator("#footAppMeta").innerText()), "버전은 바닥글에만");
+  await page.evaluate(() => { State.step = 4; App.show("onboarding"); Onboarding.render(); });
+  // 조합 중 Enter(keyCode 229)는 무시되어야 함
+  await page.fill("#in_human", "학교강");
+  await page.dispatchEvent("#in_human", "keydown", { key: "Enter", keyCode: 229, isComposing: true });
+  ok((await page.evaluate(() => State.input.resources.human.length)) === 0, "한글 조합 중 Enter는 추가하지 않음");
+  await page.fill("#in_human", "학교강의,  기술영업의 전문가 네트워크, 기관의 심사/평가/컨설턴트/멘토");
+  await page.press("#in_human", "Enter");
+  ok((await page.evaluate(() => State.input.resources.human.join("|"))) === "학교강의|기술영업의 전문가 네트워크|기관의 심사/평가/컨설턴트/멘토", "쉼표로 3개 한 번에");
+  ok((await page.inputValue("#in_human")) === "", "추가 후 입력칸 비움");
+  await page.click("#tags_human .tag-t >> nth=1");
+  ok((await page.inputValue("#in_human")) === "기술영업의 전문가 네트워크", "항목 눌러 수정(입력칸으로 되돌림)");
+  await page.fill("#in_human", "기술영업 네트워크");
+  await page.click("#tags_human ~ * >> nth=0").catch(() => {});
+  await page.evaluate(() => Onboarding.addFrom("human"));
+  ok((await page.evaluate(() => State.input.resources.human.length)) === 3 && (await page.evaluate(() => State.input.resources.human.includes("기술영업 네트워크"))), "수정 후 다시 추가");
+  const box = await page.evaluate(() => { const a = document.querySelector(".help-box .hb-k").getBoundingClientRect(), b = document.querySelector(".help-box .hb-v").getBoundingClientRect(); return { gap: b.left - a.right, inBox: !!document.querySelector(".entry-box .eb-add") }; });
+  ok(box.inBox && box.gap >= 6, "추가 버튼은 입력 박스 안, 예시는 별도 박스(라벨-내용 정렬)");
   ok(errs.length === 0, "오류 0 " + (errs[0] || ""));
   await ctx.close();
 }
@@ -107,7 +135,7 @@ console.log("3. PDF — 긴 실제 문장에서도 쪽 넘침 없음");
 {
   const { ctx, page, errs } = await open();
   const R = await longResult(page);
-  await page.evaluate((R) => { State.result = R; State.isSample = false; Object.assign(State.input, { userType: "창업자", budget: "under1000만", fields: ["knowledge", "edu"], experience: "경영학박사·창업지도사·창직지도사, 기술영업 10년, 창업 2회", industry: "AI 탐색", region: "수도권", targetAge: "30~50대 기업 대표", preferredForm: "서비스", resources: { hw: [], sw: [], human: ["컨설팅"] } }); Result.render(); App.show("result"); }, R);
+  await page.evaluate((R) => { State.result = R; State.isSample = false; Object.assign(State.input, { userType: "창업자", budget: "under1000만", fields: ["knowledge", "edu"], experience: "경영학박사·창업지도사·창직지도사, 기술영업 10년, 창업 2회", industry: "AI 탐색", region: "수도권", targetAge: "30~50대 기업 대표", preferredForms: ["service"], resources: { hw: [], sw: [], human: ["컨설팅"] } }); Result.render(); App.show("result"); }, R);
   const pages = await page.evaluate(() => {
     const h = document.createElement("div"); h.id = "pdfPreview"; h.innerHTML = PDFLayout.build(State.result, { org: "", person: "", purpose: "창업아이템 탐색 참고", conf: "일반", date: "2026년 11월 24일" });
     document.body.appendChild(h); window.__fit1 = PDFLayout.fit(h);
@@ -153,11 +181,11 @@ console.log("4. 전수 조합 — 유형 8 × 예산 4 × 형태 6 × 분야 3�
   const r = await page.evaluate(() => {
     const types = ["예비창업자", "창업자", "기존기업", "소상공인", "스타트업", "중소기업", "신사업 담당자", "컨설턴트"];
     const budgets = ["under1000만", "1000_5000만", "5000만_1억", "1억이상"];
-    const forms = ["상관없어요", "SaaS/앱", "서비스", "마켓플레이스", "교육/콘텐츠", "제품"];
+    const forms = [[], ["software"], ["service"], ["platform", "edu"], ["product", "hardware"], ["store", "community"]];
     const fieldSets = [[], ["food", "local"], ["it", "mfg", "finance"]];
     let n = 0, bad = 0, gNoPre = 0, minNext = 9, sample;
     for (const t of types) for (const b of budgets) for (const f of forms) for (const fs of fieldSets) {
-      Object.assign(State.input, { userType: t, budget: b, preferredForm: f, fields: fs });
+      Object.assign(State.input, { userType: t, budget: b, preferredForms: f, fields: fs });
       State.result = JSON.parse(JSON.stringify(SAMPLE_RESULT)); State.isSample = false;
       Result.render(); n++;
       const txt = document.getElementById("resultContent").innerText;

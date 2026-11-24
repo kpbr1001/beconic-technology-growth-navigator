@@ -22,8 +22,8 @@
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.5.0",
-  promptVersion: "v1.4.0",
+  appVersion: "v0.6.0",
+  promptVersion: "v1.5.0",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
 };
@@ -72,6 +72,20 @@ const FIELD_LABEL = {
   agri: "농식품·스마트팜", travel: "관광·여가·스포츠", care: "시니어·돌봄·복지", pet: "반려동물",
   finance: "핀테크·보험·자산관리", mobility: "모빌리티·물류", construction: "건설·부동산·인테리어", public: "공공·사회문제(소셜벤처)",
 };
+
+// 선호 사업형태 → solutionType (화면 FORM_OPTIONS 와 같은 키)
+const FORM_TYPES = {
+  software: { n: "SaaS·앱(소프트웨어)", t: ["SaaS", "App"] },
+  platform: { n: "플랫폼·중개", t: ["Platform", "Marketplace"] },
+  service: { n: "전문 서비스·대행", t: ["Service", "Consulting", "ProfessionalService"] },
+  edu: { n: "교육·콘텐츠", t: ["Education", "Content"] },
+  product: { n: "실물 제품(소비재·식품 등)", t: ["Product", "ProductPlusService"] },
+  hardware: { n: "기기·하드웨어", t: ["Hardware"] },
+  subscription: { n: "구독·정기배송", t: ["Subscription"] },
+  store: { n: "매장·오프라인 공간", t: ["Store"] },
+  community: { n: "커뮤니티·멤버십", t: ["Community"] },
+};
+const prefTypesOf = (input) => (input?.preferredForms || []).flatMap((k) => FORM_TYPES[k]?.t || []);
 
 // 입력 sentinel — UNKNOWN 처리 대상 (0점 아님)
 const SENTINELS = ["__UNKNOWN__", "__NONE__", "__AI_FIND__", "__ANY__", "", null, undefined];
@@ -278,6 +292,8 @@ function fieldsLine(input) {
   if (f.length) parts.push(`관심 분야(fields): ${f.map((k) => `${k}=${FIELD_LABEL[k]}`).join(", ")}${input.fieldOther ? `, 기타=${input.fieldOther}` : ""} → 후보는 이 분야 안에서, 분야마다 고르게.`);
   else if (input.fieldOther) parts.push(`관심 분야: ${input.fieldOther}`);
   else parts.push("관심 분야 미정 → 사용자 경험의 인접 분야를 포함해 서로 다른 분야 3개 이상으로 넓게.");
+  const pf = (input.preferredForms || []).filter((k) => FORM_TYPES[k]);
+  if (pf.length) parts.push(`선호 사업형태: ${pf.map((k) => `${FORM_TYPES[k].n}(solutionTypeHint=${FORM_TYPES[k].t.join("|")})`).join(", ")} → candidateSeeds 의 절반 이상을 이 형태로. 실물 제품·기기를 고르면 소프트웨어(SaaS)로 바꾸지 말 것.`);
   if (input.customerType && input.customerType !== "__ANY__") parts.push(`선호 고객 유형: ${input.customerType} (segments 의 절반 이상을 이 유형으로)`);
   return parts.join("\n") + "\n";
 }
@@ -312,7 +328,7 @@ ${JSON.stringify(input)}
   "whyNow": [{ "category":"TECHNOLOGY|DEMOGRAPHIC|SOCIAL|ECONOMIC|ENVIRONMENTAL|REGULATION|CHANNEL",
     "signal":"", "trendStrength":"weak|medium|strong|unknown", "problemPersistence":"TEMPORARY|EMERGING|STRUCTURAL" }],
   "candidateSeeds": [{ "customerKey":"s1", "problemKey":"p1", "gapKey":"g1", "field":"분야 key|null",
-    "solutionTypeHint":"SaaS|Service|Marketplace|Product|Education|Content|Subscription|Community|App|Platform",
+    "solutionTypeHint":"SaaS|App|Platform|Marketplace|Service|Consulting|Education|Content|Product|ProductPlusService|Hardware|Subscription|Store|Community",
     "resourceHint":"HW|SW|Human|Hybrid" }],
   "uncertainties": ["아직 모르는 것"]
 }`;
@@ -325,7 +341,8 @@ function solutionLabel(hint) {
   const map = {
     SaaS: "SaaS", Marketplace: "매칭 플랫폼", Platform: "플랫폼",
     Service: "서비스", Education: "클래스", Content: "콘텐츠",
-    Product: "솔루션", App: "앱", Community: "커뮤니티", Subscription: "구독",
+    Product: "제품", App: "앱", Community: "커뮤니티", Subscription: "구독",
+    Hardware: "기기", Store: "매장", Consulting: "컨설팅", ProductPlusService: "제품+서비스",
   };
   return map[hint] || (hint ? hint : "서비스");
 }
@@ -425,7 +442,9 @@ function toDNA(seed, A, idx, input) {
 function generateCandidates(A, input) {
   const seeds = Array.isArray(A.candidateSeeds) ? A.candidateSeeds : [];
   // 조합 확장: seed × solutionType 변주로 후보 증식(Cartesian 전체 아님, guided)
-  const solTypes = ["SaaS", "Service", "Marketplace", "Education", "Content", "ProductPlusService"];
+  // 선호 사업형태가 있으면 변주를 그 형태부터 만든다(실물 제품을 골랐는데 SaaS만 나오는 문제 방지)
+  const pref = prefTypesOf(input);
+  const solTypes = [...new Set([...pref, "SaaS", "Service", "Marketplace", "Education", "Content", "ProductPlusService"])];
   const resTypes = ["SW", "Human", "Hybrid"];
   const out = [];
   for (const [i, s0] of seeds.entries()) {
@@ -434,7 +453,9 @@ function generateCandidates(A, input) {
     // 각 seed당 1~2개 변주만 추가하여 폭발 방지
     const altSol = solTypes.find((x) => x !== s.solutionTypeHint);
     const altRes = resTypes.find((x) => x !== s.resourceHint);
-    if (altSol) out.push({ ...s, solutionTypeHint: altSol });
+    // 선호 형태가 2개면 두 번째 형태 변주도 추가
+    if (pref.length > 1) { const alt2 = pref.find((x) => x !== s.solutionTypeHint && x !== altSol); if (alt2) out.push({ ...s, solutionTypeHint: alt2, resourceHint: alt2 === "Hardware" ? "HW" : s.resourceHint }); }
+    if (altSol) out.push({ ...s, solutionTypeHint: altSol, resourceHint: altSol === "Hardware" ? "HW" : altSol === "Product" ? "Hybrid" : s.resourceHint });
     if (altRes) out.push({ ...s, resourceHint: altRes });
     if (out.length >= FILTER_CONFIG.candidateMax) break;
   }
@@ -589,7 +610,7 @@ const RuleEngine = {
   },
 
   // 6-6. Rank (compositeOrder): Problem→Gap→Timing, 동점 softPenalty↓, Evidence↑
-  rank(list) {
+  rank(list, pref = []) {
     const evOrder = { L3: 3, L2: 2, L1: 1, L0: 0 };
     const val = (s) => (s?.raw ?? -1);
     return list.slice().sort((a, b) => {
@@ -605,11 +626,16 @@ const RuleEngine = {
       const k = c._keys?.p; if (!k) return true;
       const before = arr.slice(0, arr.indexOf(c)).filter((x) => x._keys?.p === k).length;
       return before < 2;
-    }).slice(0, FILTER_CONFIG.rankTarget);
+    }).reduce((acc, c, _i, arr) => {
+      // 상위 rankTarget 개 + 선호 형태 후보를 최대 5개까지 추가로 남긴다
+      if (acc.length < FILTER_CONFIG.rankTarget) acc.push(c);
+      else if (pref.includes(c.solution?.solutionType) && acc.filter((x) => x._extra).length < 5) acc.push(Object.assign(c, { _extra: true }));
+      return acc;
+    }, []);
   },
 
   // 6-7. Diversity → TOP 5 (2축 이상 상이)
-  diversitySelect(list) {
+  diversitySelect(list, pref = []) {
     const axes = (c) => [
       c._keys?.c || c.customer?.type, c._keys?.p || c.problem?.types?.[0],
       c.solution?.solutionType, c.solution?.resourceType, c.field || c.buyer || "?",
@@ -631,6 +657,26 @@ const RuleEngine = {
     for (const c of list.slice(1)) {
       if (picked.length >= FILTER_CONFIG.finalTop) break;
       if (!picked.includes(c) && distinct(c, picked)) picked.push(c);
+    }
+    // 선호 형태: 5개 중 최소 3개(가능한 만큼)를 선호 형태로 — 맞지 않는 아래쪽 후보부터 교체
+    if (pref.length) {
+      const want = Math.min(3, list.filter((c) => pref.includes(c.solution?.solutionType)).length);
+      const isPref = (c) => pref.includes(c.solution?.solutionType);
+      const pk = (c) => c._keys?.p || "";
+      let guard = 10;
+      while (picked.filter(isPref).length < want && guard-- > 0) {
+        // 빼는 쪽: 선호 형태가 아닌 후보 중 '문제가 다른 후보와 겹치는 것' 우선, 없으면 가장 아래
+        const nonPref = [...picked].reverse().filter((c) => !isPref(c));
+        if (!nonPref.length) break;
+        const out = nonPref.find((c) => pk(c) && picked.filter((x) => pk(x) === pk(c)).length > 1) || nonPref[0];
+        const rest = picked.filter((x) => x !== out);
+        // 넣는 쪽: 선호 형태 중 '남은 후보와 문제가 겹치지 않는 것' 우선, 없으면 빠지는 후보와 같은 문제
+        const spare = list.filter((c) => !picked.includes(c) && isPref(c));
+        const inn = spare.find((c) => !pk(c) || !rest.some((x) => pk(x) === pk(c)))
+          || spare.find((c) => pk(c) === pk(out));
+        if (!inn) break;
+        picked[picked.indexOf(out)] = inn;
+      }
     }
     // 부족 시 최고점 순 보충
     for (const c of list) {
@@ -673,23 +719,26 @@ const SYSTEM_B = `당신은 K-ITEM FINDER의 후보 서술 엔진이자 시니�
 - marketPerspective·comparisonInsight는 통념을 뒤집거나 본질을 짚는 컨설턴트의 "so what". 분류·나열이 아니라 판단을 도와야 한다.
 - 창업자가 바로 이해하고 의사결정에 쓸 수 있는 실용적 언어. 추상적 수사 배제.
 
-[가장 중요 — 아이템명(name) 규칙]
-narrative.name 은 "판매할 제품/서비스의 이름"이다. 반드시 아래를 지켜라.
-- 직무·직위·직급·고객유형을 name에 절대 넣지 마라: "대표", "임원", "담당자", "중소기업", "소상공인", "시니어", "수도권" 등 금지.
-- 문제 서술을 name으로 쓰지 마라: "~진단 불가", "~어려움", "~부재", "~수요", "~정체" 등 금지.
-- name은 무엇을 파는지(제품 형태)와 핵심 기능/가치가 드러나는 서비스 브랜드명처럼 짓는다. 8~18자.
-- 이름 = [이 후보만의 차별 키워드(장면·대상 사물·결과)] + [제공 형태]. 차별 키워드는 그 후보의 문제·해결 방식에서 가져온다.
-  예) 검사값을 현장에서 바로 입력 → "검사값 바로입력 앱", 납품 서류 자동화 → "납품서류 원클릭 SaaS"
-- ★ 5개 이름의 핵심 명사(예: 진단·매칭·컨설팅·플랫폼)가 겹치면 실패다. 같은 단어는 5개 중 최대 2번.
-- "진단", "컨설팅", "플랫폼", "솔루션", "서비스" 같은 일반어만으로 된 이름 금지(반드시 차별 키워드와 함께).
-- nameOptions 에 같은 후보의 다른 이름 2개를 더 준다(서로 다른 콘셉트: 기능형 / 결과형 / 브랜드형).
-- nameReason 은 "왜 이 이름인지" 한 문장(고객이 무엇을 떠올리게 하려는지).
-나쁜 예(절대 금지):
-  "수도권 중소기업 대표 · 성장정체 원인 진단 불가 (SaaS)"  ← 고객+문제 나열
-  "컨설팅 대안 탐색 중인 소규모 기업 대표"  ← 고객 서술
-좋은 예(이렇게):
-  "3분 경영건강진단 SaaS" / "성장병목 AI 리포트" / "중소기업 전문가 매칭 마켓"
-  "사장님 재무 코칭 구독" / "비개발자용 경영 대시보드"
+[가장 중요 — 아이템명(name) + 아이템 정의(definition)]
+화면 제목은 "name — definition" 으로 함께 보인다. 둘 다 반드시 채운다.
+
+1) name = 고객이 기억하고 부르고 싶은 '브랜드형 이름'. 2~8자(공백 포함 최대 10자).
+- 좋은 이름의 조건: 짧다 · 소리 내어 읽기 쉽다 · 고객이 얻는 결과나 장면이 떠오른다 · 다른 4개와 확연히 다르다.
+- 만드는 법(하나 골라 쓴다): ① 결과 압축형 "검사콕", "서류끝", "재고제로" ② 장면·은유형 "사장님 비서실", "창업 나침반" ③ 합성 조어형 "멘토링크", "펫스테이" ④ 의인화형 "세무짝꿍", "공장 반장"
+- 금지: 기능 나열("~관리 시스템", "~진단 플랫폼", "~추적 SaaS"), 일반어만으로 된 이름("경영진단", "컨설팅"), 직위·고객유형("대표","중소기업","소상공인","시니어"), 문제 서술("~어려움","~부재"), 영어 약어만.
+- ★ 5개 이름의 핵심 단어(예: 진단·검진·매칭·컨설팅·플랫폼·리포트)가 겹치면 실패다.
+
+2) definition = 이 아이템이 무엇인지 한 줄 정의. 18~34자. "[누구]를 위한 [무엇을 해 주는] [제공 형태]" 형식.
+  예) "소규모 제조사를 위한 스마트폰 품질검사 앱", "예비창업자를 위한 주 1회 사업계획 첨삭 클래스"
+  - 제공 형태(앱·SaaS·플랫폼·서비스·클래스·제품·기기·구독·매장·커뮤니티)는 실제 solutionType 과 일치해야 한다.
+
+3) nameOptions: 같은 후보의 다른 이름 2개(위 ①~④ 중 name 과 다른 방법으로).
+4) nameReason: 왜 이 이름인지 한 문장(고객이 무엇을 떠올리게 하려는지).
+
+나쁜 예 → 좋은 예
+  "아키텍처 건강검진 플랫폼" → name "코드닥", definition "개발자 없는 스타트업을 위한 코드 구조 자동 점검 SaaS"
+  "커머스 병목 추적 SaaS" → name "매출 레이더", definition "온라인 셀러를 위한 매출 하락 원인 실시간 알림 앱"
+  "투자설득 검증리포트" → name "IR 리허설", definition "첫 투자 유치를 앞둔 창업자를 위한 사업성 모의심사 서비스"
 
 [필수 필드 — 반드시 채움]
 각 후보마다 아래를 "확인 필요"로 남기지 말고 후보 정보에 근거해 1~2문장으로 구체 서술:
@@ -735,8 +784,9 @@ function buildUserB(top5, userProfile) {
 ${JSON.stringify(skeleton)}
 
 각 후보에 대해 아래 필드만 채운다(간결하게, 각 1~2문장):
-- name: 판매할 서비스/제품명. 직위·고객·문제서술 금지. [차별 키워드+제공 형태], 8~18자. 5개 이름의 핵심 명사가 겹치지 않게.
-- nameOptions: 같은 후보의 다른 이름 2개(기능형·결과형·브랜드형 중 name 과 다른 콘셉트)
+- name: 브랜드형 이름 2~8자(결과 압축·장면 은유·합성 조어·의인화 중 하나). 기능 나열·일반어·직위 금지. 5개 핵심 단어 겹침 금지.
+- definition: "[누구]를 위한 [무엇을 해 주는] [제공 형태]" 18~34자. 제공 형태는 위 제품형태와 일치.
+- nameOptions: 다른 방법으로 지은 이름 2개
 - nameReason: 왜 이 이름인지 한 문장
 - tagline: 이 아이템을 한 줄로 정의(15~30자). 예 "데이터로 성장 병목을 3분 만에 진단"
 - problem: 이 고객의 핵심 문제(구체적으로, 한 문장)
@@ -764,7 +814,7 @@ comparisonInsight: 아래 3가지를 담아 3~4문장. 단순 분류·나열 금
 marketPerspective: 이 시장을 바라보는 핵심 관점 한 문장(통념을 뒤집거나 본질을 짚는 인사이트). ID·전문용어 남발 금지, 창업자가 바로 이해할 수 있게.
 
 응답(오직 JSON, 첫 글자 {, 마지막 글자 }):
-{"candidates":[{"opportunityId":"id","narrative":{"name":"","nameOptions":["",""],"nameReason":"","tagline":"","problem":"","solutionConcept":"","whyNow":"","valueProp":"","differentiator":"","strength":"","caution":"","sustainability":"","buyer":"","unknowns":"","founderMatchReason":""},"explainPath":["고객: ","문제: ","시장 공백: ","전환점: ","솔루션: ","가치 실현: "]}],"comparisonInsight":"","marketPerspective":"","comparisonNotes":[""]}`;
+{"candidates":[{"opportunityId":"id","narrative":{"name":"","definition":"","nameOptions":["",""],"nameReason":"","tagline":"","problem":"","solutionConcept":"","whyNow":"","valueProp":"","differentiator":"","strength":"","caution":"","sustainability":"","buyer":"","unknowns":"","founderMatchReason":""},"explainPath":["고객: ","문제: ","시장 공백: ","전환점: ","솔루션: ","가치 실현: "]}],"comparisonInsight":"","marketPerspective":"","comparisonNotes":[""]}`;
 }
 
 // 아이템명 정제: CALL B가 고객/문제 서술을 name으로 준 경우 아이템형으로 교체
@@ -786,16 +836,24 @@ function refineItemName(rawName, c) {
 }
 
 // 이름의 핵심 명사(마지막 형태어 앞 단어) — 5개 이름 중복 판정용
-const GENERIC_HEADS = ["진단","컨설팅","플랫폼","솔루션","서비스","매칭","관리","분석","코칭","교육","마켓","SaaS","앱","구독","클래스"];
+const GENERIC_HEADS = ["진단","검진","컨설팅","플랫폼","솔루션","서비스","매칭","관리","분석","코칭","교육","마켓","SaaS","앱","구독","클래스","리포트","추적","검증","시스템"];
 function headWords(name) {
   return String(name || "").split(/\s+/).flatMap((w) => GENERIC_HEADS.filter((g) => w.includes(g)));
+}
+// 정의가 비면 [고객]을 위한 [제공 형태] 로 채운다
+function defaultDefinition(c) {
+  const who = String(c.customer?.roles?.user || "").slice(0, 20);
+  if (!who) return "";
+  const last = who.charCodeAt(who.length - 1);
+  const josa = last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 ? "을" : "를";
+  return `${who}${josa} 위한 ${solutionLabel(c.solution?.solutionType)}`;
 }
 // 후보별 [name, ...nameOptions] 중 나쁜 이름을 빼고, 이미 2번 쓰인 핵심 명사를 피하는 이름을 고른다
 function chooseNames(list) {
   const used = {};
   return list.map(({ c, d }) => {
     const opts = [d?.narrative?.name, ...(Array.isArray(d?.narrative?.nameOptions) ? d.narrative.nameOptions : [])]
-      .map((x) => String(x || "").trim()).filter((x) => x && x.length <= 26);
+      .map((x) => String(x || "").trim()).filter((x) => x && x.length <= 20);
     const good = opts.filter((x) => refineItemName(x, c) === x);
     const pool = good.length ? good : [refineItemName(opts[0] || c.title, c)];
     const pick = pool.find((x) => headWords(x).every((h) => (used[h] || 0) < 2)) || pool[0];
@@ -820,7 +878,8 @@ function mergeExplainOnly(top5, described) {
     return {
       ...c,
       title: refinedName,
-      narrative: nv ? { ...nv, name: refinedName, nameOptions: names[i].others, nameReason: String(nv.nameReason || "").slice(0, 160) } : null,
+      narrative: nv ? { ...nv, name: refinedName, nameOptions: names[i].others, nameReason: String(nv.nameReason || "").slice(0, 160),
+        definition: String(nv.definition || "").slice(0, 60) || defaultDefinition(c) } : null,
       explainPath: Array.isArray(d.explainPath) ? d.explainPath.slice(0, 8) : [],
       solution: { ...c.solution, concept: d.narrative?.solutionConcept || c.solution.concept },
       channel: d.narrative?.channel || c.channel,
@@ -981,8 +1040,9 @@ async function orchestrate(input) {
   pool = pool.map((c) => RuleEngine.softPenalty(RuleEngine.score(c)));
 
   // STAGE 9~10: rank → diversity → TOP5
-  const top10 = RuleEngine.rank(pool);
-  let top5 = RuleEngine.diversitySelect(top10);
+  const pref = prefTypesOf(input);
+  const top10 = RuleEngine.rank(pool, pref);
+  let top5 = RuleEngine.diversitySelect(top10, pref);
 
   // STAGE 11: premortem + post-guard
   top5 = top5.map((c) => RuleEngine.premortem(c));
@@ -990,8 +1050,9 @@ async function orchestrate(input) {
   if (!guard.ok && top10.length > 5) {
     // 다양성 실패 시 offender 제외하고 1회 재구성
     const offenderType = top5[top5.length - 1]?.solution?.solutionType;
-    const alt = top10.filter((c) => c.solution?.solutionType !== offenderType);
-    if (alt.length >= 3) top5 = RuleEngine.diversitySelect(alt).map((c) => RuleEngine.premortem(c));
+    // 선호 형태로 모인 것은 다양성 실패가 아님
+    const alt = pref.includes(offenderType) ? [] : top10.filter((c) => c.solution?.solutionType !== offenderType);
+    if (alt.length >= 3) top5 = RuleEngine.diversitySelect(alt, pref).map((c) => RuleEngine.premortem(c));
   }
 
   // STAGE 12: CALL B (서술)
@@ -1017,7 +1078,7 @@ async function orchestrate(input) {
   const merged = described ? mergeExplainOnly(top5, described) : top5.map((c) => ({ ...c, title: refineItemName(c.title, c) }));
 
   // 내부 필드(_) 제거 후 반환
-  const clean = merged.map(({ _seed, _seedProblem, _seedSolution, _gapStatement, _persistence, _softPenalty, _premortem, _input, _keys, ...rest }) => rest);
+  const clean = merged.map(({ _seed, _seedProblem, _seedSolution, _gapStatement, _persistence, _softPenalty, _premortem, _input, _keys, _extra, ...rest }) => rest);
 
   return {
     meta: { ...APP_META, sessionId: null, candidatePool: pool.length, fields: input.fields || [] },
@@ -1035,4 +1096,4 @@ async function orchestrate(input) {
 
 export { orchestrate, APP_META, API_CONFIG, providers, FIELD_LABEL };
 // 테스트 전용(동작 영향 없음)
-export const __test = { toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };
+export const __test = { defaultDefinition, FORM_TYPES, toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };
