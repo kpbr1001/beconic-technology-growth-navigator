@@ -1,5 +1,5 @@
 /* ============================================================
-   K-ITEM FINDER — v0.4.0 보강 모듈 (A등급 개선)
+   K-ITEM FINDER — 보강 모듈 (v0.4.0 신설 · v0.5.0 분야·네이밍·PDF)
    - 규칙 기반(결정론) 계산만 한다. AI 호출·서버 전송 없음.
    - ① 타당성: 입력 충실도 · 입력 조건 점검 · 후보 다양성 · 평가 방법 공개
    - ② 실행가치: 후보별 검증 첫 3걸음(먼저·다음·그다음) + 인터뷰 질문
@@ -131,6 +131,7 @@ const Plus = {
     const res = inp.resources || {};
     const resCount = (res.hw || []).length + (res.sw || []).length + (res.human || []).length;
     const items = [
+      { k: "관심 분야 선택", ok: (inp.fields || []).length > 0 || real(inp.fieldOther), tip: "분야를 고르면 그 분야 안에서 서로 다른 후보를 찾습니다." },
       { k: "경험·역량 서술", ok: real(inp.experience) && String(inp.experience).trim().length >= 10, tip: "경험·역량을 한 줄 이상 적으면 적합도 코멘트와 걸림돌 점검이 구체적이 됩니다." },
       { k: "관심 고객·산업 직접 입력", ok: real(inp.industry) || (inp === State.input && (State.customerTags || []).length > 0), tip: "관심 고객을 적으면 시장 신호를 그 고객 기준으로 좁힙니다." },
       { k: "알고 있는 문제 직접 입력", ok: real(inp.knownProblem), tip: "직접 겪거나 들은 문제를 적으면 AI 가설 의존도가 낮아집니다." },
@@ -138,8 +139,8 @@ const Plus = {
       { k: "지역·연령·형태 중 1개 이상", ok: real(inp.region) || real(inp.targetAge) || (inp.preferredForm && inp.preferredForm !== "상관없어요" && !String(inp.preferredForm).startsWith("__")), tip: "선택 조건이 있으면 후보가 내 상황에 더 맞춰집니다." },
     ];
     const n = items.filter(i => i.ok).length;
-    const level = n >= 4 ? { k: "충실", c: "ok", d: "입력이 충분해 결과가 내 상황을 잘 반영합니다." }
-      : n >= 2 ? { k: "보통", c: "mid", d: "일부 항목은 AI가 시장 신호로 채웠습니다. 결과를 가설로 읽어 주세요." }
+    const level = n >= 5 ? { k: "충실", c: "ok", d: "입력이 충분해 결과가 내 상황을 잘 반영합니다." }
+      : n >= 3 ? { k: "보통", c: "mid", d: "일부 항목은 AI가 시장 신호로 채웠습니다. 결과를 가설로 읽어 주세요." }
       : { k: "AI 가설 위주", c: "low", d: "대부분을 AI가 채웠습니다. 결과는 출발점(가설)으로만 쓰고, 아래 항목을 채워 다시 탐색하길 권장합니다." };
     return { items, n, total: items.length, level };
   },
@@ -184,8 +185,19 @@ const Plus = {
   },
   isStoreLike(o, inp) {
     const txt = [o.title, o.narrative?.solutionConcept, o.narrative?.channel, o.channel, (inp || State.input || {}).industry].join(" ");
+    if (["food", "local"].includes(o.field)) return true;
     return /매장|카페|음식점|식당|외식|점포|가게|공방|학원|오프라인 ?(매장|점)/.test(txt);
   },
+
+  // 시장의 빈틈 — 후보별 문장(서술 > explainPath '시장 공백' 단계 > 공통 gap)
+  gapText(o) {
+    const n = o.narrative || {};
+    if (n.marketGap) return this.str(n.marketGap, 200);
+    const step = (o.explainPath || []).map(String).find(p => /^\s*\d*\.?\s*시장\s*공백\s*[:：]/.test(p));
+    if (step) return this.str(step.replace(/^[^:：]*[:：]\s*/, ""), 200);
+    return this.str(o.marketGap?.statement, 200);
+  },
+  fieldName(o) { return (typeof FIELD_NAME !== "undefined" && FIELD_NAME[o.field]) || ""; },
 
   // 고객의 현재 대안 — narrative 문장이 없으면 서버 코드값을 한글로
   altText(o) {
@@ -193,7 +205,7 @@ const Plus = {
     if (n.currentWorkaround) return { how: this.str(n.currentWorkaround, 200), broken: this.str(n.whatsBroken, 200) };
     const alts = Array.isArray(o.currentAlternative) ? o.currentAlternative : [];
     const how = [...new Set(alts.map(a => PLUS_DATA.altKo[a?.type] || (a?.type && /^[A-Za-z]+$/.test(a.type) ? null : this.str(a?.type, 20))).filter(Boolean))].join(" · ");
-    const dis = [...new Set(alts.flatMap(a => Array.isArray(a?.dissatisfaction) ? a.dissatisfaction : []).map(d => PLUS_DATA.dissatKo[d] || (/^[A-Za-z]+$/.test(String(d)) ? null : this.str(d, 30))).filter(Boolean))].join(" · ");
+    const dis = [...new Set(alts.flatMap(a => Array.isArray(a?.dissatisfaction) ? a.dissatisfaction : []).map(d => PLUS_DATA.dissatKo[d] || (/^[A-Za-z]+$/.test(String(d)) ? null : this.str(d, 30))).filter(Boolean))].slice(0, 4).join(" · ");
     return { how, broken: dis ? "불만: " + dis : "" };
   },
 
@@ -208,11 +220,12 @@ const Plus = {
   validationPlan(o) {
     const n = o.narrative || {};
     const who = this.str(n.who || o.customer?.roles?.user || "대상 고객", 60);
-    const prob = this.shortProblem(n.problem || o.problem?.statement || "이 문제");
+    const prob = this.shortProblem(o.problem?.statement || n.problem || "이 문제");
     const alt = this.str(this.altText(o).how || "지금 쓰는 방법", 60);
     const buyer = this.str(n.buyer || o.buyer || o.customer?.roles?.buyer || who, 50);
     const b2b = o.customer?.type === "B2B";
-    const unknowns = Array.isArray(o.unknowns) ? o.unknowns : (n.unknowns ? String(n.unknowns).split(/[,·]/) : []);
+    // 후보별 서술(narrative.unknowns)을 먼저, 없으면 공통 불확실성
+    const unknowns = n.unknowns ? String(n.unknowns).split(/[,·]/) : (Array.isArray(o.unknowns) ? o.unknowns : []);
     const ev = o.signals?.evidenceConfidence || "L0";
     return {
       ev,
@@ -360,7 +373,8 @@ const Plus = {
     add("대상 고객", n.who || o.customer?.roles?.user);
     add("고객 문제", n.problem);
     add("현재 대안", this.altText(o).how);
-    add("시장의 빈틈", n.marketGap || o.marketGap?.statement);
+    add("분야", this.fieldName(o));
+    add("시장의 빈틈", this.gapText(o));
     add("왜 지금", n.whyNow);
     add("해결 방식", n.solutionConcept);
     add("비용 지불자", n.buyer || o.buyer);

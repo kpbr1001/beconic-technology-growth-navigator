@@ -271,6 +271,7 @@ textarea.input{resize:vertical;min-height:88px}
 .ei-chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--paper);
   border:1px solid var(--line);color:var(--slate)}
 .ei-chip-type{background:var(--blue-weak);color:var(--blue);border-color:transparent}
+.ei-chip-field{background:var(--navy);color:#fff;border-color:transparent}
 .ei-chip-rev{background:#E4F4EA;color:#2E7D46;border-color:transparent}
 .ei-diff{font-size:12.5px;color:var(--navy-soft);line-height:1.5;background:#fff;
   padding:7px 11px;border-radius:8px;border:1px solid var(--line)}
@@ -685,9 +686,51 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
 .np-b b{font-size:14px;color:var(--navy)} .np-b span{font-size:12.5px;color:var(--slate);line-height:1.5}
 @media (max-width:768px){.result-nav{top:56px}.qp-grid,.np-list{grid-template-columns:1fr}.quality-panel,.history-panel,.next-panel{padding:20px 16px}}
 .pdf-plan td,.pdf-plan th{vertical-align:top}
+/* v0.5.0 온보딩: 분야·예시 */
+.lbl-sub{font-size:12px;font-weight:600;color:var(--blue);margin-left:6px}
+.field-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fld{text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;transition:border-color .15s,background .15s}
+.fld b{font-size:14px;color:var(--navy)} .fld span{font-size:11.5px;color:var(--slate-weak);line-height:1.4}
+.fld:hover{border-color:var(--blue)} .fld.sel{border-color:var(--blue);background:var(--blue-weak)} .fld.sel b{color:var(--blue)}
+.ex-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.ex-k{font-size:11.5px;font-weight:700;color:var(--slate-weak);margin-right:2px}
+.ex-chip{font-size:12.5px;color:var(--navy-soft);background:#F3F5F9;border:1px dashed #C9D1DF;border-radius:99px;padding:4px 10px}
+.ex-chip:hover{border-color:var(--blue);color:var(--blue)}
+.ex-tip{font-size:12.5px;color:var(--slate);margin-top:8px} .ex-tip b{color:var(--navy)}
+.tag-input{display:flex;gap:8px;align-items:stretch} .tag-input .input{flex:1} .tag-input .btn{flex:none}
+.opp-field{display:inline-block;font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-weak);border-radius:99px;padding:2px 8px;margin-right:6px;vertical-align:2px}
+.name-alt{font-size:12.5px;color:var(--slate);margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--paper);border:1px dashed var(--line)}
+.name-alt b{color:var(--navy)} .name-alt .na-chip{display:inline-block;margin:2px 4px 2px 0;padding:2px 9px;border-radius:99px;background:#fff;border:1px solid var(--line);color:var(--navy-soft);font-weight:600}
+@media (max-width:640px){.field-grid{grid-template-columns:repeat(2,1fr)}}
 .pdf-qs{margin:4px 0 0 16px}
 .pdf-url{font-size:9pt;color:#5A6472}
 .pdf-method li{margin-bottom:4px}
+.pdf-view{background:var(--navy);color:#fff;border-radius:3mm;padding:4mm 5mm;font-size:10pt;line-height:1.6;margin-bottom:5mm}
+.pdf-view span{display:block;font-size:8pt;color:#9FB6E8;font-weight:700;margin-bottom:1mm}
+.pdf-exec td{font-size:8.8pt;padding:2mm} .pdf-sub{font-size:8pt;color:var(--slate)}
+.pdf-tight th,.pdf-tight td{padding:2mm 3mm;font-size:9pt}
+.pdf-tag{font-size:8pt;font-weight:700;color:var(--blue);background:var(--blue-weak);border-radius:99px;padding:1mm 3mm;margin-left:2mm;vertical-align:1mm}
+.pdf-toc{margin:0 0 5mm 5mm;font-size:9.5pt;color:var(--navy-soft);line-height:1.8}
+.pdf-left{text-align:left!important;font-size:8.3pt;line-height:1.45}
+.pdf-mini{font-size:9.5pt;color:var(--navy)}
+.pdf-opp{border:none!important;padding:0!important}
+.pdf-opp-grid td .mf{color:#B5601F;font-size:8.6pt}
+/* v0.5.0 후보 1쪽 맞춤 */
+.pdf-opp .pdf-opp-grid th{padding:1.4mm 2.5mm;font-size:8.4pt;width:21mm}
+.pdf-opp .pdf-opp-grid td{padding:1.4mm 2.5mm;font-size:8.6pt;line-height:1.45}
+.pdf-opp .pdf-why{margin-top:2.5mm;padding:2.5mm 3.5mm}
+.pdf-opp .pdf-why-list{display:grid;grid-template-columns:1fr 1fr;column-gap:6mm;font-size:8.3pt;line-height:1.45}
+.pdf-opp .pdf-why-list li{margin-bottom:.6mm}
+.pdf-opp .pdf-sigs{margin-bottom:2mm}
+.pdf-cmp-wide th,.pdf-cmp-wide td{padding:1.5mm 1.5mm;font-size:8.3pt;line-height:1.4}
+.pdf-view{font-size:9.3pt;padding:3mm 4mm}
+.pdf-ul-tight li{padding:1mm 0 1mm 5mm;font-size:8.6pt}
+.pdf-plan th,.pdf-plan td{padding:2.2mm 3mm;font-size:8.8pt;line-height:1.5}
+.pdf-plan .pdf-qs li{margin-bottom:.5mm}
+.pdf-plan{table-layout:fixed}
+.pdf-plan tr>*:nth-child(1){width:17mm!important;white-space:nowrap}
+.pdf-plan tr>*:nth-child(3){width:46mm!important}
+.pdf-plan tr>*:nth-child(2){width:auto!important}
 </style>
 </head>
 <body>
@@ -727,7 +770,7 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
         <button class="btn btn-primary" onclick="App.startFlow()">사업기회 찾아보기</button>
         <button class="btn btn-ghost" onclick="App.showSample()">샘플 결과 보기</button>
       </div>
-      <p class="hero-note">⏱ 질문 5단계 · 약 3~5분 · 꼭 답할 것은 1단계(유형·예산)뿐이에요. 사업성을 확정하는 것이 아니라 검토할 가치가 있는 후보를 찾는 참고 도구입니다</p>
+      <p class="hero-note">⏱ 질문 <span id="heroSteps">6</span>단계 · 약 3~5분 · 꼭 답할 것은 1단계(유형·예산)뿐이에요. 사업성을 확정하는 것이 아니라 검토할 가치가 있는 후보를 찾는 참고 도구입니다</p>
 
       <!-- 시그니처: 탐색 흐름 -->
       <div class="flow-hero" aria-hidden="true">
@@ -765,7 +808,7 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
       <div class="trust-strip">
         <span class="trust-item">🎯 아이템 없어도 시작</span>
         <span class="trust-dot">·</span>
-        <span class="trust-item">⚡ 3분이면 결과 확인</span>
+        <span class="trust-item">⚡ 5분이면 결과 확인</span>
         <span class="trust-dot">·</span>
         <span class="trust-item">🔦 왜 이 아이템인지까지</span>
       </div>
@@ -792,7 +835,7 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M5 9l7-7 7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <h2>사업기회를 탐색하고 있어요</h2>
-      <p class="disc-hint">AI가 고객·시장·역량을 구조적으로 분석합니다 · 보통 1~2분 걸려요</p>
+      <p class="disc-hint">AI가 고객·시장·역량을 구조적으로 분석합니다 · 보통 2~3분 걸려요</p>
       <div class="disc-steps" id="discSteps"></div>
     </div>
   </section>

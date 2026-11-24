@@ -1,12 +1,15 @@
 # K-ITEM FINDER (BECONIC 31 · S1 아이템 발굴)
 
-운영: https://beconic-diagnosis-item-discovery.netlify.app · 현재 v0.4.1
+운영: https://beconic-diagnosis-item-discovery.netlify.app · 현재 v0.5.0
 
-이 폴더는 **프론트 파일만** 있습니다. 서버 함수(`netlify/functions/_core.mjs`, `discover-background.mjs`, `status.mjs`, `opportunity.js`)와 `netlify.toml`은 기존 `k-item-finder-deploy.zip`의 것을 그대로 씁니다(v0.4.0에서 변경 없음).
+v0.5.0부터 서버 함수(`netlify/functions/`)까지 이 폴더가 원본입니다.
 
 ## 배포
-기존 zip을 풀고 아래 파일만 덮어쓴 뒤 Netlify에 드래그:
-`index.html`, `app.js`, `app-result.js`, `app-pdf.js`, `app-plus.js`(신규)
+`docs/k-item-finder-deploy-v0.5.0.zip`을 풀어 폴더째 Netlify에 드래그(서버 함수 포함 완성본).
+환경변수: `ANTHROPIC_API_KEY`(필수), 선택 `KIF_DAILY_LIMIT`(기본 300)·`KIF_IP_LIMIT`(기본 15)·`KIF_DISABLED=true`(긴급 중지)·`KIF_DEBUG=1`.
+
+## 테스트
+`node tests/server.mjs` · `node tests/e2e.mjs` · `node tests/redteam.mjs`
 
 ## 파일
 | 파일 | 역할 |
