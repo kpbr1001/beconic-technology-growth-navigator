@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net data:; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
 <title>K-ITEM FINDER · 고객과 시장에서 찾는 사업기회</title>
 <meta name="description" content="고객문제·시장공백·시장변화·나의 역량을 연결해 검토할 가치가 있는 사업기회를 발견합니다." />
 
@@ -613,6 +615,79 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
   font-size:9.5pt;color:var(--navy);line-height:1.6;margin-bottom:5mm}
 .pdf-cta-box b{color:var(--blue)}
 .pdf-small{font-size:8.6pt;color:var(--slate);line-height:1.6}
+
+/* ============ v0.4.0 보강 (결과 신뢰도·근거·검증·재탐색·연계) ============ */
+.doc-meta{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;font-size:12px;color:var(--slate-weak);margin:-6px 0 14px}
+.doc-meta b{color:var(--navy-soft)}
+.result-nav{position:sticky;top:64px;z-index:20;display:flex;gap:6px;overflow-x:auto;padding:10px 2px;margin-bottom:18px;background:var(--paper);border-bottom:1px solid var(--line);scrollbar-width:none}
+.result-nav::-webkit-scrollbar{display:none}
+.result-nav button{flex:none;font-size:13px;font-weight:600;color:var(--navy-soft);background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 12px}
+.result-nav button:hover{border-color:var(--blue);color:var(--blue)}
+.quality-panel,.history-panel,.next-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;margin:22px 0;scroll-margin-top:120px}
+.quality-panel h3,.history-panel h3,.next-panel h3{font-size:16px;color:var(--navy);margin-bottom:14px}
+.quality-panel h3 small,.history-panel h3 small,.next-panel h3 small{font-size:12px;color:var(--slate-weak);font-weight:600;margin-left:6px}
+.qp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.qp-box{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;background:var(--paper)}
+.qp-k{font-size:12px;font-weight:700;color:var(--slate-weak);margin-bottom:4px}
+.qp-k small{font-weight:500}
+.qp-v{font-size:17px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qp-tag{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px}
+.qp-tag.ok{background:#E3F4EC;color:var(--ok)} .qp-tag.mid{background:var(--blue-weak);color:var(--blue)} .qp-tag.low{background:var(--amber-weak);color:#B5601F}
+.qp-d{font-size:13px;color:var(--slate);margin:6px 0 8px;line-height:1.55}
+.qp-list{list-style:none;font-size:12.5px;color:var(--ink);display:grid;gap:4px}
+.qp-list li.ok{color:var(--ok)} .qp-list li.no{color:var(--slate)}
+.qp-list li span{display:block;color:var(--slate-weak);font-size:12px;margin-left:12px}
+.qp-list.plain li{color:var(--slate)} .qp-list.plain b{color:var(--navy)}
+.method{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+.method summary{cursor:pointer;font-size:13.5px;font-weight:700;color:var(--blue)}
+.method-body{margin-top:10px;display:grid;gap:8px}
+.method-body p{font-size:13px;color:var(--slate);line-height:1.65}
+.method-body b{color:var(--navy)}
+.sname em small.raw{font-size:10.5px;font-weight:600;color:var(--slate-weak);margin-left:5px;font-style:normal}
+.fit-check,.ev-block,.plan-block{margin-top:16px;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;background:var(--paper)}
+.fc-title,.ev-title,.pb-title{font-size:13.5px;font-weight:800;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fc-title small,.pb-title small{font-size:11.5px;font-weight:600;color:var(--slate-weak)}
+.fc-item{font-size:13px;line-height:1.55;padding:6px 10px;border-radius:8px;margin-top:4px}
+.fc-item.warn{background:var(--amber-weak);color:#8A4A17} .fc-item.info{background:var(--blue-weak);color:#1F4FBF} .fc-item.ok{background:#E3F4EC;color:#1F7350}
+.ev-lv{font-size:11.5px;font-weight:700;background:var(--blue-weak);color:var(--blue);padding:3px 9px;border-radius:99px}
+.ev-d{font-size:13px;color:var(--slate);line-height:1.6;margin-bottom:8px}
+.ev-d b{color:var(--navy)}
+.ev-list{list-style:none;display:grid;gap:6px}
+.ev-list li{font-size:13px;display:flex;flex-wrap:wrap;gap:2px 10px}
+.ev-list a{font-weight:700;color:var(--blue);text-decoration:underline;text-underline-offset:2px}
+.ev-list span{color:var(--slate)}
+.ev-note{font-size:11.5px;color:var(--slate-weak);margin-top:8px}
+.pb-steps{list-style:none;display:grid;gap:10px}
+.pb-steps>li{display:flex;gap:10px;align-items:flex-start}
+.pb-when{flex:none;min-width:54px;text-align:center;font-size:11.5px;font-weight:800;color:#fff;background:var(--navy);border-radius:99px;padding:3px 10px;margin-top:2px}
+.pb-steps b{font-size:13.5px;color:var(--navy)}
+.pb-steps p{font-size:13px;color:var(--slate);line-height:1.55;margin-top:2px}
+.pb-qs{margin:6px 0 2px 16px;font-size:13px;color:var(--ink);display:grid;gap:3px}
+.pb-done{color:var(--ok)!important;font-weight:600}
+.pb-unk{font-size:12.5px;color:var(--slate);margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.hp-d{font-size:13.5px;color:var(--slate);line-height:1.6;margin-bottom:10px}
+.hp-sum{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.hp-sum span{font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:99px}
+.hp-sum .ok{background:#E3F4EC;color:var(--ok)} .hp-sum .new{background:var(--blue-weak);color:var(--blue)} .hp-sum .drop{background:#F1F2F5;color:var(--slate)}
+.hp-table th:first-child{text-align:left;min-width:160px}
+.hp-line{font-size:13px;color:var(--slate);margin-top:8px} .hp-line b{color:var(--navy);margin-right:6px}
+.hp-note{font-size:12.5px;color:var(--slate-weak);margin-top:10px}
+.hp-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.hp-file{cursor:pointer}
+.consult-note{font-size:12px!important;color:var(--slate-weak)!important;margin:12px 0 0!important}
+.opp-card,.section-head,#sec-summary,#sec-compare,#sec-select{scroll-margin-top:120px}
+.np-d{font-size:13.5px;color:var(--slate);margin-bottom:12px}
+.np-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.np-item{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:var(--r);padding:14px;background:var(--paper);transition:border-color .15s}
+.np-item:hover{border-color:var(--blue)}
+.np-n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.np-b{display:flex;flex-direction:column;gap:3px}
+.np-b b{font-size:14px;color:var(--navy)} .np-b span{font-size:12.5px;color:var(--slate);line-height:1.5}
+@media (max-width:768px){.result-nav{top:56px}.qp-grid,.np-list{grid-template-columns:1fr}.quality-panel,.history-panel,.next-panel{padding:20px 16px}}
+.pdf-plan td,.pdf-plan th{vertical-align:top}
+.pdf-qs{margin:4px 0 0 16px}
+.pdf-url{font-size:9pt;color:#5A6472}
+.pdf-method li{margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -652,7 +727,7 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
         <button class="btn btn-primary" onclick="App.startFlow()">사업기회 찾아보기</button>
         <button class="btn btn-ghost" onclick="App.showSample()">샘플 결과 보기</button>
       </div>
-      <p class="hero-note">⏱ 3~5분 · 사업성을 확정하는 것이 아니라 검토할 가치가 있는 후보를 찾는 참고 도구입니다</p>
+      <p class="hero-note">⏱ 질문 5단계 · 약 3~5분 · 꼭 답할 것은 1단계(유형·예산)뿐이에요. 사업성을 확정하는 것이 아니라 검토할 가치가 있는 후보를 찾는 참고 도구입니다</p>
 
       <!-- 시그니처: 탐색 흐름 -->
       <div class="flow-hero" aria-hidden="true">
@@ -802,6 +877,7 @@ table.cmp tbody th{text-align:left;font-weight:700;color:var(--navy);font-size:1
 
 <div class="toast" id="toast"></div>
 
+<script src="./app-plus.js"></script>
 <script src="./app.js"></script>
 <script src="./app-result.js"></script>
 <script src="./app-pdf.js"></script>

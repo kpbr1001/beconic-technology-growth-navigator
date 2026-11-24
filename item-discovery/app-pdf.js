@@ -39,7 +39,8 @@ const PDFLayout = {
         <tr><th>작성 목적</th><td>${esc(info.purpose)}</td></tr>
         <tr><th>기밀 등급</th><td>${esc(info.conf)}</td></tr>
         <tr><th>작성일</th><td>${info.date}</td></tr>
-        <tr><th>Version</th><td>${APP_META.appVersion} · Updated ${APP_META.updatedAt}</td></tr>
+        <tr><th>문서번호</th><td>${esc(Plus.docNo(R))} (탐색일 ${esc(Plus.dateKo(R._createdAt))})</td></tr>
+        <tr><th>Version</th><td>앱 ${APP_META.appVersion} · 규칙 ${PLUS_DATA.rulesVersion} · Prompt ${esc(APP_META.promptVersion)} · Updated ${APP_META.updatedAt}</td></tr>
         <tr><th>작성기관</th><td>${COMPANY_INFO.companyName} · ${COMPANY_INFO.platformName}</td></tr>
         <tr><th>인증</th><td>${COMPANY_INFO.certification}</td></tr>
       </table>
@@ -106,7 +107,7 @@ const PDFLayout = {
     const next=`<section class="pdf-page">${this.header()}
       <h2 class="pdf-h2">아직 검증이 필요합니다</h2>
       <p class="pdf-lead">아래 후보는 <b>발견된 기회</b>이며 검증된 사업이 아닙니다.
-        선택한 아이템은 K-ITEM PMF LAB에서 증거 기반으로 검증하시길 권장합니다.</p>
+        선택한 아이템은 BECONIC AI 아이템 진단(PMF)에서 증거 기반으로 검증하시길 권장합니다.</p>
       <div class="pdf-two">
         <div><h3 class="pdf-h3">알고 있는 것 (Known)</h3><ul class="pdf-ul">
           ${(primary?.explainPath||[]).slice(0,4).map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
@@ -114,7 +115,7 @@ const PDFLayout = {
           ${(primary?.unknowns||["실제 고객 지불의향","초기 고객 접근 채널"]).map(u=>`<li>${esc(u)}</li>`).join("")}</ul></div>
       </div>
       <div class="pdf-cta-box">
-        <b>다음 단계</b><br>K-ITEM PMF LAB에서 증거 기반 검증(고객문제·시장매력도·PMF·실행계획)을 진행하세요.
+        <b>다음 단계</b><br>아래 '검증 첫 3걸음'을 2~3주 안에 진행한 뒤, AI 아이템 진단(PMF)에서 증거 기반 검증(고객문제·시장매력도·PMF·실행계획)을 이어가세요.
       </div>
       <h3 class="pdf-h3">방법론 및 한계</h3>
       <p class="pdf-small">본 결과는 구조화된 Opportunity Discovery Process(고객→문제→감정/동기→대안→시장공백→시장변화→역량)를 통해 도출되었습니다.
@@ -122,12 +123,61 @@ const PDFLayout = {
       ${this.footer(5+Math.ceil(R.top5.length/2))}
     </section>`;
 
-    return cover+docinfo+exec+pages.join("")+compare+next;
+    // v0.4.0 — 검증 계획 · 결과 신뢰도·평가 방법 · 다음 진단 (부록)
+    let pg=6+Math.ceil(R.top5.length/2);
+    const plan=primary?this.planPage(primary,esc,pg++):'';
+    const trust=this.trustPage(R,esc,pg++);
+    return cover+docinfo+exec+pages.join("")+compare+next+plan+trust;
+  },
+
+  planPage(o,esc,page){
+    const p=Plus.validationPlan(o);
+    const src=Plus.sourcesFor(o);
+    const ev=PLUS_DATA.evidence[o.signals.evidenceConfidence]||PLUS_DATA.evidence.L0;
+    return `<section class="pdf-page">${this.header()}
+      <h2 class="pdf-h2">검증 첫 3걸음 · ${esc(o.narrative?.name||o.title)}</h2>
+      <p class="pdf-lead">현재 근거 수준 <b>${esc(o.signals.evidenceConfidence)} ${esc(ev.n)}</b>. 아래 순서로 2~3주 안에 확인하면 근거 수준을 L3(직접 고객근거)까지 올릴 수 있습니다.</p>
+      <table class="pdf-info pdf-plan">
+        <tr><th style="width:16%">순서</th><th>할 일 · 방법</th><th style="width:30%">완료 판단</th></tr>
+        ${p.steps.map(st=>`<tr><td><b>${st.when}</b></td><td><b>${esc(st.t)}</b><br>${esc(st.how)}${st.qs.length?`<ol class="pdf-qs">${st.qs.map(q=>`<li>${esc(q)}</li>`).join("")}</ol>`:''}</td><td>${esc(st.done)}</td></tr>`).join("")}
+      </table>
+      ${p.unknowns.length?`<p class="pdf-small">함께 확인할 점: ${p.unknowns.map(esc).join(" · ")}</p>`:''}
+      <h3 class="pdf-h3">근거 확인처 (주소 확인 ${PLUS_DATA.checked})</h3>
+      <table class="pdf-info">${src.map(x=>`<tr><th>${esc(x.n)}</th><td>${esc(x.what)}<br><span class="pdf-url">${esc(x.url)}</span></td></tr>`).join("")}</table>
+      <p class="pdf-small">확인처는 AI가 조회한 출처가 아니라, 가설을 직접 확인할 공식 사이트입니다.</p>
+      ${this.footer(page)}
+    </section>`;
+  },
+  trustPage(R,esc,page){
+    const q=Plus.inputQuality(); const d=Plus.diversity(R); const nx=Plus.nextDiagnoses(R);
+    const ev=PLUS_DATA.evidence;
+    const fit=R.top5.map((o,i)=>({i,list:Plus.fitChecks(o)})).filter(x=>x.list.length);
+    return `<section class="pdf-page">${this.header()}
+      <h2 class="pdf-h2">부록 · 결과 신뢰도와 평가 방법</h2>
+      <table class="pdf-info">
+        <tr><th>입력 충실도</th><td>${State.isSample?'샘플 결과(해당 없음)':`${q.n}/${q.total} · <b>${q.level.k}</b> — ${esc(q.level.d)}`}</td></tr>
+        <tr><th>후보 다양성</th><td>제공 형태 ${d.forms}종 · 고객 유형 ${d.custs}종 · 시장 변화 범주 ${d.cats}종</td></tr>
+        <tr><th>입력 조건 점검</th><td>${State.isSample?'샘플 결과(해당 없음)':fit.length?fit.map(x=>`${x.i+1}번: ${x.list.map(f=>esc(f.t)).join(" / ")}`).join("<br>"):'입력한 예산·선호 형태와 부딪히는 후보 없음'}</td></tr>
+        <tr><th>계산 주체</th><td>규칙 엔진(코드): 신호 막대·근거 수준·다양성·입력 조건 점검 · AI: 구조화와 문장 서술 · 계산하지 않음: 성공확률·매출·투자등급·시장규모</td></tr>
+      </table>
+      <h3 class="pdf-h3">평가 방법 (규칙 ${PLUS_DATA.rulesVersion})</h3>
+      <ol class="pdf-ul pdf-method">
+        <li>3가지 신호(문제 강도·시장 공백·타이밍)는 AI가 구조화한 항목값으로 규칙 엔진이 0~100 값을 계산해 5단계로 표시합니다.</li>
+        <li>근거 수준: ${Object.entries(ev).map(([k,v])=>`${k} ${v.n}(${esc(v.d)})`).join(" · ")}</li>
+        <li>데이터가 없는 항목은 추정하지 않고 '확인 필요'로 둡니다. 확인 필요는 감점이 아닙니다.</li>
+        <li>나와의 적합도는 점수화하지 않고, 예산·형태·자원과 부딪히는 걸림돌만 표시합니다.</li>
+        <li>5개 후보는 성공 가능성 순위가 아니며, 형태·고객이 겹치지 않도록 다양성 필터를 거쳤습니다.</li>
+      </ol>
+      <h3 class="pdf-h3">추천 연계 진단 (BECONIC 31)</h3>
+      <table class="pdf-info">${nx.map((x,i)=>`<tr><th>${i+1}. ${esc(x.n)}</th><td>${esc(x.why)}<br><span class="pdf-url">${esc(x.url)}</span></td></tr>`).join("")}</table>
+      <p class="pdf-small">상담: ${esc(COMPANY_INFO.email)} · ${esc(COMPANY_INFO.phone)} — 문서번호(${esc(Plus.docNo(R))})를 알려 주시면 이 결과로 바로 상담합니다. 재탐색 권장 주기 ${PLUS_DATA.rediagnoseDays}일.</p>
+      ${this.footer(page)}
+    </section>`;
   },
 
   oppBlock(o,i,bandKo,esc){
     const s=o.signals; const n=o.narrative||{};
-    const sig=(name,b)=>`<span class="pdf-sig"><em>${name}</em><b class="b-${b.band}">${bandKo(b.band)}</b></span>`;
+    const sig=(name,b)=>`<span class="pdf-sig"><em>${name}</em><b class="b-${b.band}">${bandKo(b.band)}${typeof b.raw==="number"?` (${b.raw})`:''}</b></span>`;
     const row=(th,v)=>{ v=(v==null?'':String(v)).trim(); return v?`<tr><th>${th}</th><td>${esc(v)}</td></tr>`:''; };
     const pathHtml=(o.explainPath||[]).length
       ? `<div class="pdf-why"><div class="pdf-why-t">왜 이 아이템인가</div><ol class="pdf-why-list">${(o.explainPath||[]).map(p=>`<li>${esc(p)}</li>`).join("")}</ol></div>`
@@ -139,6 +189,7 @@ const PDFLayout = {
         <span class="pdf-sig"><em>근거</em><b>${EVIDENCE_LABEL[s.evidenceConfidence]}</b></span></div>
       <table class="pdf-opp-grid">
         ${row("문제",n.problem)}
+        ${row("현재 대안",n.currentWorkaround)}
         ${row("시장 공백",n.marketGap||o.marketGap?.statement)}
         ${row("왜 지금",n.whyNow)}
         ${row("해결 방식",n.solutionConcept)}

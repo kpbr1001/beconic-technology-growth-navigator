@@ -8,17 +8,24 @@
 const Result = {
   render(){
     const R=State.result; if(!R){return;}
+    Plus.sanitizeResult(R);
+    if(!R._createdAt) R._createdAt=Date.now();
     const c=document.getElementById("resultContent");
     c.innerHTML = `
       ${this.head()}
-      ${this.execSummary(R)}
+      ${this.docMeta(R)}
+      ${this.resultNav()}
+      <div id="sec-summary">${this.execSummary(R)}</div>
+      ${this.qualityPanel(R)}
       ${this.legend()}
-      <div class="section-head"><h3 class="sec-title">📁 발굴된 사업기회 ${R.top5.length}개</h3><p class="sec-sub">각 카드를 펼치면 상세 내용과 '왜 이 아이템인가'를 볼 수 있어요.</p></div>
+      <div class="section-head" id="sec-cards"><h3 class="sec-title">📁 발굴된 사업기회 ${R.top5.length}개</h3><p class="sec-sub">각 카드를 펼치면 상세 내용, '왜 이 아이템인가', 근거 확인처와 검증 첫 3걸음을 볼 수 있어요.</p></div>
       ${R.top5.map((o,i)=>this.card(o,i)).join("")}
-      ${this.compare(R.comparison)}
+      <div id="sec-compare">${this.compare(R.comparison)}</div>
+      ${this.historyPanel(R)}
       ${this.selectPanel()}
+      ${this.nextPanel(R)}
       ${this.disclaimerFull()}
-      ${R._debug?`<div style="text-align:center;font-size:11px;color:#B0B8C4;margin-top:16px">진단: CALL B ${R._debug.callB||'?'}</div>`:''}
+      ${R._debug?`<div style="text-align:center;font-size:11px;color:#B0B8C4;margin-top:16px">진단: CALL B ${this.esc(R._debug.callB||'?')}</div>`:''}
     `;
     this.bindShortlist();
     // 첫 번째 카드는 자동으로 펼쳐 무엇을 보게 될지 즉시 노출
@@ -31,7 +38,7 @@ const Result = {
       <p>이 결과는 <b>사업성을 확정한 것이 아니라</b>, 현재 입력과 시장 신호를 기반으로 추가 검토할 가치가 있는 사업기회입니다.
       성공확률·투자등급·매출·지원사업 선정 가능성을 의미하지 않습니다.
       AI 분석과 외부 데이터에는 오류·시차가 있을 수 있으니, 실제 사업화 전 <b>고객·시장·기술·재무·규제 검증</b>이 필요합니다.
-      선택한 아이템은 K-ITEM PMF LAB에서 증거 기반으로 검증하시길 권장합니다.</p>
+      선택한 아이템은 BECONIC <b>AI 아이템 진단(PMF)</b>에서 증거 기반으로 검증하시길 권장합니다.</p>
     </div>`;
   },
   head(){
@@ -69,7 +76,7 @@ const Result = {
   card(o,i){
     const s=o.signals; const n=o.narrative||{};
     const sbar=(name,band,raw)=>`<div class="sbar">
-      <div class="sname"><span>${name}</span><em class="band-${band}">${BAND_LABEL[band]}</em></div>
+      <div class="sname"><span>${name}</span><em class="band-${band}">${BAND_LABEL[band]}${typeof raw==="number"?`<small class="raw" title="규칙 엔진 계산값(0~100) · AI가 매긴 점수가 아님">${raw}</small>`:''}</em></div>
       <div class="track"><div class="ticks"><i></i><i></i><i></i></div><div class="fill band-${band}" style="width:${BAND_PCT[band]}%"></div></div></div>`;
     const ff=o.founderFit||{band:"unknown",note:"",misfits:[]};
     const inShort=State.shortlist.includes(o.opportunityId);
@@ -91,6 +98,8 @@ const Result = {
         <div class="opp-body-inner">
           <div class="grid16">
             ${this.f("이런 문제를 풉니다",n.problem)}
+            ${this.f("고객은 지금 이렇게 해결해요",n.currentWorkaround)}
+            ${this.f("기존 방식의 한계",n.whatsBroken)}
             ${this.f("시장의 빈틈",n.marketGap||o.marketGap?.statement)}
             ${this.f("어떻게 해결하나",n.solutionConcept)}
             ${this.f("왜 지금인가",n.whyNow||(o.whyNow||[]).map(w=>w.signal).filter(Boolean).join(", "))}
@@ -128,9 +137,13 @@ const Result = {
             </div>
           </div>
 
+          ${this.fitBlock(o)}
+          ${this.evidenceBlock(o)}
+          ${this.planBlock(o)}
+
           <div class="opp-actions">
             <button class="chip-add ${inShort?'added':''}" id="add_${o.opportunityId}" onclick="Result.toggleShort('${o.opportunityId}')">${inShort?'✓ 담김':'+ Shortlist 담기'}</button>
-            <span class="evidence-tag">근거 수준: ${EVIDENCE_LABEL[s.evidenceConfidence]||s.evidenceConfidence}</span>
+            <span class="evidence-tag" title="${this.esc(PLUS_DATA.evidence[s.evidenceConfidence]?.d||'')}">근거 수준: ${EVIDENCE_LABEL[s.evidenceConfidence]||this.esc(s.evidenceConfidence)}</span>
           </div>
         </div>
       </div>
@@ -222,15 +235,17 @@ const Result = {
           <button class="st-remove" onclick="Result.toggleShort('${id}')">×</button></div>`;
       }).join("");
     }
-    return `<div class="select-panel">
+    return `<div class="select-panel" id="sec-select">
       <h3>✅ 검증할 아이템 선택</h3>
-      <p>Shortlist(최대 3개) 중 하나를 <b>Primary</b>로 선택해 K-ITEM PMF LAB 검증으로 넘길 수 있습니다.</p>
+      <p>Shortlist(최대 3개) 중 하나를 <b>Primary</b>로 선택하면, 아이템 요약을 복사한 뒤 <b>AI 아이템 진단(PMF)</b>을 새 창으로 엽니다. 진단 화면 입력칸에 붙여넣어 이어서 검증하세요.</p>
       ${inner}
       <div class="result-cta">
         <button class="btn btn-primary btn-sm" ${State.primary?'':'disabled'} onclick="Result.handoff()">선택한 아이템 검증하기 →</button>
         <button class="btn btn-ghost btn-sm" onclick="Report.open()">📄 결과보고서 PDF</button>
+        <a class="btn btn-ghost btn-sm" href="${Plus.mailHref(State.result)}">✉ 결과 담아 메일 상담</a>
         <button class="btn btn-ghost btn-sm" onclick="App.restart()">다시 탐색</button>
       </div>
+      <p class="consult-note">메일 상담은 고객님 메일 앱에서 초안(문서번호·후보 목록)이 열립니다. 입력하신 경험·자원은 담기지 않고, 서버로 전송되지 않습니다. · ${this.esc(COMPANY_INFO.certification)}</p>
     </div>`;
   },
 
@@ -299,26 +314,16 @@ const Result = {
     if(panel){ panel.outerHTML=this.selectPanel(); }
   },
   bindShortlist(){},
-  handoff(){
+  async handoff(){
     const o=State.result.top5.find(x=>x.opportunityId===State.primary);
     if(!o){App.toast("Primary 아이템을 선택해 주세요");return;}
-    const transfer=this.buildTransfer(o);
-    // localStorage에도 백업 저장(같은 브라우저 폴백용)
-    try{ localStorage.setItem("kif_handoff", JSON.stringify(transfer)); }catch(e){}
-    // K-ITEM PMF LAB으로 이관 데이터와 함께 이동
-    const PMF_LAB_URL = "https://item-jindan-2026.netlify.app/";
-    let url = PMF_LAB_URL;
-    try{
-      // 핵심 데이터를 URL 파라미터로 전달(용량 큰 경우 대비 title/id만 기본 전달)
-      const payload = encodeURIComponent(JSON.stringify(transfer));
-      // URL 길이 제한(약 2000자) 고려: 너무 크면 요약본만 전달
-      const compact = payload.length < 1800 ? payload
-        : encodeURIComponent(JSON.stringify({ source:transfer.source, opportunity:transfer.opportunity,
-            customer:transfer.customer, problem:transfer.problem, solution:transfer.solution }));
-      url = `${PMF_LAB_URL}?from=finder&data=${compact}`;
-    }catch(e){}
-    App.toast("K-ITEM PMF LAB으로 이동합니다…");
-    setTimeout(()=>{ window.open(url, "_blank", "noopener"); }, 600);
+    // 같은 브라우저 백업(입력 원문은 담지 않음)
+    try{ localStorage.setItem("kif_handoff", JSON.stringify(this.buildTransfer(o))); }catch(e){}
+    const ok=await Plus.copy(Plus.handoffText(o));
+    // 개인 입력이 URL·서버 로그에 남지 않도록 데이터는 URL로 넘기지 않음
+    const url=PLUS_DATA.tools.S2.url+"?from=finder";
+    App.toast(ok?"아이템 요약을 복사했어요. PMF 진단 입력칸에 붙여넣으세요.":"복사가 막혀 있어요. 결과보고서 PDF의 요약을 참고해 입력해 주세요.");
+    setTimeout(()=>{ window.open(url, "_blank", "noopener,noreferrer"); }, 700);
   },
   buildTransfer(o){
     return {
@@ -346,7 +351,132 @@ const Result = {
     const map={SW:"소프트웨어",HW:"하드웨어",Human:"인적 자원",Hybrid:"복합"};
     return map[t]||t;
   },
-  esc(s){ return String(s??"").replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); },
+  esc(s){ return String(s??"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); },
+
+  // ===================== v0.4.0 보강 섹션 =====================
+  docMeta(R){
+    return `<div class="doc-meta">
+      <span>문서번호 <b>${this.esc(Plus.docNo(R))}</b></span>
+      <span>탐색일 ${this.esc(Plus.dateKo(R._createdAt))}</span>
+      <span>앱 ${this.esc(APP_META.appVersion)} · 규칙 ${PLUS_DATA.rulesVersion} · Prompt ${this.esc(APP_META.promptVersion)}</span>
+    </div>`;
+  },
+  resultNav(){
+    const L=[["sec-summary","한눈에"],["sec-quality","결과 신뢰도"],["sec-cards","후보 상세"],["sec-compare","비교"],["sec-history","이전 탐색"],["sec-select","선택·상담"],["sec-next","다음 진단"]];
+    return `<nav class="result-nav" aria-label="결과 목차">${L.map(([id,l])=>`<button type="button" onclick="document.getElementById('${id}')?.scrollIntoView({behavior:'smooth',block:'start'})">${l}</button>`).join("")}</nav>`;
+  },
+  qualityPanel(R){
+    const q=Plus.inputQuality(); const d=Plus.diversity(R);
+    const sample=State.isSample;
+    return `<div class="quality-panel" id="sec-quality">
+      <h3>🔎 이 결과를 얼마나 믿을 수 있나요?</h3>
+      <div class="qp-grid">
+        <div class="qp-box">
+          <div class="qp-k">입력 충실도</div>
+          ${sample?`<div class="qp-v">샘플 결과 <span class="qp-tag mid">예시</span></div><p class="qp-d">직접 탐색하면 입력 충실도를 함께 보여 드려요.</p>`:
+          `<div class="qp-v">${q.n} / ${q.total} <span class="qp-tag ${q.level.c}">${q.level.k}</span></div>
+          <p class="qp-d">${q.level.d}</p>
+          <ul class="qp-list">${q.items.map(i=>`<li class="${i.ok?'ok':'no'}">${i.ok?'✓':'·'} ${i.k}${i.ok?'':`<span>${i.tip}</span>`}</li>`).join("")}</ul>`}
+        </div>
+        <div class="qp-box">
+          <div class="qp-k">후보 다양성 <small>(규칙 계산)</small></div>
+          <div class="qp-v">제공 형태 ${d.forms}종 <span class="qp-tag ${d.ok?'ok':'mid'}">${d.ok?'서로 다름':'비슷한 형태 많음'}</span></div>
+          <p class="qp-d">고객 유형 ${d.custs}종 · 시장 변화 범주 ${d.cats}종. 같은 아이디어의 변형 5개가 아니라, 성격이 다른 후보를 비교하도록 걸러냈어요.</p>
+        </div>
+        <div class="qp-box">
+          <div class="qp-k">누가 무엇을 계산했나</div>
+          <ul class="qp-list plain">
+            <li><b>규칙 엔진(코드)</b> 신호 막대·근거 수준·다양성·입력 조건 점검</li>
+            <li><b>AI(Claude)</b> 고객·문제 구조화와 카드 문장 서술</li>
+            <li><b>계산하지 않음</b> 성공확률·매출·투자등급·시장규모</li>
+          </ul>
+        </div>
+      </div>
+      ${this.methodDetails()}
+    </div>`;
+  },
+  methodDetails(){
+    const ev=PLUS_DATA.evidence;
+    return `<details class="method">
+      <summary>평가 방법 공개 (규칙 ${PLUS_DATA.rulesVersion})</summary>
+      <div class="method-body">
+        <p><b>1. 3가지 신호</b> — 문제 강도(고통의 크기·빈도), 시장 공백(기존 대안의 부족함), 타이밍(지금 시작하기 좋은 시장 변화). AI가 고객·문제·대안·변화를 정해진 항목으로 구조화하면, 규칙 엔진이 항목값으로 0~100 값을 계산하고 5단계 막대로 표시합니다. 막대 옆 작은 숫자가 그 계산값입니다.</p>
+        <p><b>2. 근거 수준</b> — ${Object.entries(ev).map(([k,v])=>`${k} ${v.n}: ${v.d}`).join(" · ")}</p>
+        <p><b>3. 모르면 빈칸</b> — 데이터가 없는 항목은 추정하지 않고 '확인 필요'로 둡니다. 확인 필요는 감점이 아닙니다.</p>
+        <p><b>4. 나와의 적합도</b> — 점수를 매기지 않고, 입력한 예산·선호 형태·자원과 부딪히는 '걸림돌'만 표시합니다. 정밀 적합도는 PMF 진단 단계에서 봅니다.</p>
+        <p><b>5. 다양성 필터</b> — 비슷한 후보가 몰리지 않도록 제공 형태·고객 유형이 겹치는 후보를 걸러 5개를 고릅니다. 순위는 성공 가능성 순서가 아닙니다.</p>
+        <p><b>6. 확인처</b> — 카드의 '근거 확인처'는 AI가 조회한 출처가 아니라, 가설을 직접 확인할 공식 사이트입니다(주소 확인일 ${PLUS_DATA.checked}).</p>
+      </div>
+    </details>`;
+  },
+  fitBlock(o){
+    const fc=Plus.fitChecks(o);
+    if(State.isSample) return "";
+    return `<div class="fit-check">
+      <div class="fc-title">🧩 입력 조건 점검 <small>(규칙 계산)</small></div>
+      ${fc.length?fc.map(x=>`<div class="fc-item ${x.lv}">${x.lv==='warn'?'⚠':'ℹ'} ${this.esc(x.t)}</div>`).join(""):
+      `<div class="fc-item ok">✓ 입력한 예산·선호 형태와 부딪히는 점이 없어요.</div>`}
+    </div>`;
+  },
+  evidenceBlock(o){
+    const ev=PLUS_DATA.evidence[o.signals.evidenceConfidence]||PLUS_DATA.evidence.L0;
+    const src=Plus.sourcesFor(o);
+    return `<div class="ev-block">
+      <div class="ev-title">📚 근거 확인처 <span class="ev-lv">현재 ${this.esc(o.signals.evidenceConfidence)} · ${this.esc(ev.n)}</span></div>
+      <p class="ev-d">${this.esc(ev.d)} <b>다음 단계:</b> ${this.esc(ev.up)}.</p>
+      <ul class="ev-list">${src.map(x=>`<li><a href="${this.esc(x.url)}" target="_blank" rel="noopener noreferrer">${this.esc(x.n)} ↗</a><span>${this.esc(x.what)}</span></li>`).join("")}</ul>
+      <p class="ev-note">AI가 이 사이트를 조회한 것이 아니라, 가설을 직접 확인할 공식 확인처예요 · 주소 확인 ${PLUS_DATA.checked}</p>
+    </div>`;
+  },
+  planBlock(o){
+    const p=Plus.validationPlan(o);
+    return `<div class="plan-block">
+      <div class="pb-title">🧪 검증 첫 3걸음 <small>2~3주 · 비용 거의 없음</small></div>
+      <ol class="pb-steps">${p.steps.map(st=>`<li>
+        <span class="pb-when">${st.when}</span>
+        <div><b>${this.esc(st.t)}</b><p>${this.esc(st.how)}</p>
+        ${st.qs.length?`<ul class="pb-qs">${st.qs.map(q=>`<li>“${this.esc(q)}”</li>`).join("")}</ul>`:''}
+        <p class="pb-done">완료 판단: ${this.esc(st.done)}</p></div></li>`).join("")}</ol>
+      ${p.unknowns.length?`<p class="pb-unk">이 3걸음에서 함께 확인: ${p.unknowns.map(u=>this.esc(u)).join(" · ")}</p>`:''}
+    </div>`;
+  },
+  historyPanel(R){
+    const prev=Plus.previousOf(R);
+    const cur=Plus.snapshot(R);
+    let body;
+    if(!prev){
+      body=`<p class="hp-d">${State.isSample?'직접 탐색하면 결과가 이 브라우저에 저장되어 다음 탐색 때 자동으로 비교됩니다.':'첫 탐색이에요. 결과는 이 브라우저에만 저장되고(서버 저장 없음), 다음 탐색 때 변화를 비교해 드려요.'} 다른 기기에서 비교하려면 결과 파일을 저장해 두세요.</p>`;
+    }else{
+      const c=Plus.compareSnapshots(prev,cur);
+      const bandCell=(a,b)=>a===b?`<span class="cmp-band band-${b}">${BAND_LABEL[b]}</span>`:`<span class="cmp-band band-${a}">${BAND_LABEL[a]}</span> → <span class="cmp-band band-${b}">${BAND_LABEL[b]}</span>`;
+      body=`<p class="hp-d">비교 대상: <b>${this.esc(Plus.dateKo(prev.ts))}</b> 탐색 (${this.esc(prev.docNo)})${prev.input.industry?` · 관심 시장 ${this.esc(prev.input.industry)}`:''}</p>
+        <div class="hp-sum"><span class="ok">유지 ${c.kept.length}</span><span class="new">새로 등장 ${c.added.length}</span><span class="drop">빠짐 ${c.dropped.length}</span></div>
+        ${c.kept.length?`<div class="compare-scroll"><table class="cmp hp-table"><thead><tr><th>다시 나온 후보</th><th>문제</th><th>시장 공백</th><th>타이밍</th><th>근거</th></tr></thead><tbody>
+          ${c.kept.map(k=>`<tr><th>${this.esc(k.cur.title)}</th><td>${bandCell(k.prev.p,k.cur.p)}</td><td>${bandCell(k.prev.g,k.cur.g)}</td><td>${bandCell(k.prev.t,k.cur.t)}</td><td>${k.prev.e===k.cur.e?this.esc(k.cur.e):this.esc(k.prev.e)+' → '+this.esc(k.cur.e)}</td></tr>`).join("")}
+        </tbody></table></div>`:''}
+        ${c.added.length?`<p class="hp-line"><b>새로 등장</b> ${c.added.map(a=>this.esc(a.title)).join(" · ")}</p>`:''}
+        ${c.dropped.length?`<p class="hp-line"><b>이번엔 빠짐</b> ${c.dropped.map(a=>this.esc(a.title)).join(" · ")}</p>`:''}
+        <p class="hp-note">두 번 연속 나온 후보는 입력이 바뀌어도 유지된 기회예요. 우선 검토 후보로 보세요.</p>`;
+    }
+    return `<div class="history-panel" id="sec-history">
+      <h3>🔁 이전 탐색과 비교 <small>재탐색 권장 ${PLUS_DATA.rediagnoseDays}일</small></h3>
+      ${body}
+      <div class="hp-actions">
+        ${State.isSample?'':`<button class="btn btn-ghost btn-sm" onclick="Plus.exportFile(State.result)">💾 결과 파일 저장</button>`}
+        <label class="btn btn-ghost btn-sm hp-file">📂 이전 결과 파일 불러와 비교<input type="file" accept="application/json,.json" onchange="Plus.importFile(this)" hidden></label>
+        ${State.isSample?'':`<button class="btn btn-ghost btn-sm" onclick="Plus.icsReminder(State.result)">📅 ${PLUS_DATA.rediagnoseDays}일 뒤 알림(캘린더)</button>`}
+      </div>
+    </div>`;
+  },
+  nextPanel(R){
+    const list=Plus.nextDiagnoses(R);
+    return `<div class="next-panel" id="sec-next">
+      <h3>🧭 추천 연계 진단 <small>BECONIC 31</small></h3>
+      <p class="np-d">이번 결과와 입력한 유형·예산을 기준으로 다음에 이어 볼 진단이에요. 새 창으로 열리며 입력 정보는 넘어가지 않습니다.</p>
+      <div class="np-list">${list.map((x,i)=>`<a class="np-item" href="${this.esc(x.url)}" target="_blank" rel="noopener noreferrer">
+        <span class="np-n">${i+1}</span><span class="np-b"><b>${this.esc(x.n)} ↗</b><span>${this.esc(x.why)}</span></span></a>`).join("")}</div>
+    </div>`;
+  },
 };
 
 // ============================================================
@@ -386,10 +516,12 @@ const About = {
         <div class="grid16" style="grid-template-columns:1fr">
           ${Result.f("제품",APP_META.productName+" ("+APP_META.appVersion+")")}
           ${Result.f("역할","고객문제·시장공백·시장변화·실행역량을 연결해 검토할 가치가 있는 사업기회를 발견 (FIND→COMPARE→SELECT→HANDOFF)")}
-          ${Result.f("검증은?","선택한 아이템의 상세 검증은 K-ITEM PMF LAB이 담당합니다. 본 도구는 성공확률·투자등급·매출을 산출하지 않습니다.")}
+          ${Result.f("검증은?","선택한 아이템의 상세 검증은 BECONIC AI 아이템 진단(PMF)이 담당합니다. 본 도구는 성공확률·투자등급·매출을 산출하지 않습니다.")}
+          ${Result.f("데이터 처리","입력 내용은 탐색에만 쓰이고, 탐색 기록은 이 브라우저(localStorage)에만 저장됩니다. 결과 파일·메일 상담은 고객님 기기에서 직접 저장·발송합니다.")}
+          ${Result.f("평가 규칙",PLUS_DATA.rulesVersion+" · 근거 확인처 주소 확인 "+PLUS_DATA.checked)}
           ${Result.f("작성기관",COMPANY_INFO.companyName+" · "+COMPANY_INFO.platformName)}
           ${Result.f("인증",COMPANY_INFO.certification)}
-          ${Result.f("버전","앱 "+APP_META.appVersion+" · Prompt "+APP_META.promptVersion+" · Updated "+APP_META.updatedAt)}
+          ${Result.f("버전","앱 "+APP_META.appVersion+" · Prompt "+APP_META.promptVersion+" · 규칙 "+PLUS_DATA.rulesVersion+" · Updated "+APP_META.updatedAt)}
         </div>
       </div>
       <div class="ob-nav"><button class="btn btn-ghost btn-sm" onclick="App.restart()">← 처음으로</button><span></span></div>`;

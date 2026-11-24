@@ -7,9 +7,9 @@
 const APP_META = {
   productName: "K-ITEM FINDER",
   productDescription: "Customer & Market Opportunity Discovery Engine",
-  appVersion: "v0.3.0",
+  appVersion: "v0.4.0",
   promptVersion: "v1.3.0",
-  updatedAt: "2026.08.11",
+  updatedAt: "2026.11.24",
   copyrightYear: "2023~2026",
 };
 const COMPANY_INFO = {
@@ -38,7 +38,7 @@ const State = {
     region:"", targetAge:"", preferredForm:"",
   },
   industryTags:[], customerTags:[],
-  result:null, shortlist:[], primary:null, isSample:false, aiReady:null,
+  result:null, shortlist:[], primary:null, isSample:false, aiReady:null, compareWith:null,
 
   // 이탈 방지: 온보딩 진행 상황을 localStorage에 저장/복원
   save(){
@@ -126,7 +126,7 @@ const App = {
     State.clear();
     State.step=0; State.input={ userType:"",experience:"",industry:"",knownCustomer:"",knownProblem:"",
       resources:{hw:[],sw:[],human:[]},budget:"",region:"",targetAge:"",preferredForm:"" };
-    State.industryTags=[]; State.customerTags=[]; State.result=null; State.shortlist=[]; State.primary=null; State.isSample=false;
+    State.industryTags=[]; State.customerTags=[]; State.result=null; State.shortlist=[]; State.primary=null; State.isSample=false; State.compareWith=null;
     document.getElementById("sampleBanner").classList.remove("show");
     this.show("start");
   },
@@ -134,7 +134,7 @@ const App = {
     State.isSample=true;
     document.getElementById("sampleBanner").classList.add("show");
     State.result = SAMPLE_RESULT;
-    State.shortlist=[]; State.primary=null;
+    State.shortlist=[]; State.primary=null; State.compareWith=null;
     Result.render();
     this.show("result");
   },
@@ -312,8 +312,10 @@ const Discovery = {
       // 2) 상태 폴링 (최대 ~3분, 3초 간격)
       const data = await this.poll(jobId);
       await this._minWait();
-      State.result=data; State.shortlist=[]; State.primary=null; State.isSample=false; State.clear();
-      Result.render(); App.show("result");
+      if(!data || !Array.isArray(data.top5) || !data.top5.length) throw new Error("결과가 비어 있어요. 입력을 조금 바꿔 다시 시도해 주세요.");
+      data._createdAt=Date.now();
+      State.result=data; State.shortlist=[]; State.primary=null; State.isSample=false; State.compareWith=null; State.clear();
+      Result.render(); Plus.saveHistory(data); App.show("result");
     }catch(err){
       this.error(err.message);
     }
@@ -360,10 +362,10 @@ const Discovery = {
     document.getElementById("discSteps").innerHTML=`
       <div style="text-align:center">
         <p style="font-size:16px;color:var(--navy);font-weight:700;margin-bottom:8px">탐색 중 문제가 발생했어요</p>
-        <p style="font-size:14px;color:var(--slate);margin-bottom:20px">${msg||"잠시 후 다시 시도해 주세요."}</p>
+        <p style="font-size:14px;color:var(--slate);margin-bottom:20px;white-space:pre-line;word-break:break-word">${App.esc(msg||"잠시 후 다시 시도해 주세요.")}</p>
         <button class="btn btn-primary btn-sm" onclick="Onboarding.submit()">다시 시도</button>
         <button class="btn btn-ghost btn-sm" onclick="App.showSample()" style="margin-left:8px">샘플 결과 보기</button>
-        <p style="font-size:12px;color:var(--slate-weak);margin-top:16px">문의 ${COMPANY_INFO.email}</p>
+        <p style="font-size:12px;color:var(--slate-weak);margin-top:16px">입력하신 내용은 이 브라우저에 남아 있어 다시 시도해도 처음부터 입력하지 않아요 · 문의 ${App.esc(COMPANY_INFO.email)}</p>
       </div>`;
   },
 };
