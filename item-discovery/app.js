@@ -7,8 +7,8 @@
 const APP_META = {
   productName: "K-ITEM FINDER",
   productDescription: "Customer & Market Opportunity Discovery Engine",
-  appVersion: "v0.6.0",
-  promptVersion: "v1.5.0",
+  appVersion: "v0.6.1",
+  promptVersion: "v1.5.1",
   updatedAt: "2026.11.24",
   copyrightYear: "2023~2026",
 };
@@ -194,6 +194,17 @@ const FORM_OPTIONS = [
   { k:"community", n:"커뮤니티·멤버십", d:"모임·회원제 운영", t:["Community"] },
 ];
 const FORM_NAME = Object.fromEntries(FORM_OPTIONS.map(f=>[f.k,f.n]));
+// 분야↔형태 충돌 안내(막지 않고 알려만 줌): 물건·공간이 필요한 형태 vs 무형 중심 분야
+const PHYSICAL_FORMS = ["product","hardware","store"];
+const INTANGIBLE_FIELDS = ["it","knowledge","finance","content"];
+function formConflict(inp){
+  const forms=(inp.preferredForms||[]).filter(f=>PHYSICAL_FORMS.includes(f));
+  const fields=inp.fields||[];
+  if(!forms.length || !fields.length || !fields.every(f=>INTANGIBLE_FIELDS.includes(f))) return null;
+  const fn=fields.map(f=>FIELD_NAME[f]).join("·"), pn=forms.map(f=>FORM_NAME[f]).join("·");
+  const ex={product:"교구·카드 키트·워크북 박스",hardware:"센서·측정 기기",store:"체험 공간·오프라인 거점"};
+  return `고르신 분야(${fn})는 주로 소프트웨어·서비스로 사업을 해요. 그래도 <b>${pn}</b>으로 찾으면 ${forms.map(f=>ex[f]).join(", ")}처럼 <b>손에 잡히는 물건·공간</b> 후보를 찾아요. 물건을 팔 생각이 아니라면 'SaaS·앱'이나 '전문 서비스'를 골라 보세요.`;
+}
 // 문항 예시(눌러서 채우기) — 실제 입력 패턴 기준
 const EXAMPLES = {
   experience:["금융권 20년 · 영업/기획","제조 현장 품질관리 10년","마케팅 대행 5년 · 콘텐츠 제작","간호사 12년 · 요양병원 근무","IT 개발 7년 · 백엔드"],
@@ -359,6 +370,7 @@ const Onboarding = {
       <div class="field"><label>주요 고객층 (연령·직군)</label>
         <input class="input" maxlength="60" placeholder="예) 30~50대 기업 대표, 2030 직장인, 70대 이상 (선택)" value="${App.esc(State.input.targetAge&&!State.input.targetAge.startsWith('__')?State.input.targetAge:'')}" oninput="Onboarding.setText('targetAge',this.value)" /></div>
       <div class="field"><label>선호 사업형태 <span class="lbl-sub">${sel.length?sel.length+"/2 선택":"상관없음"}</span></label>
+        ${formConflict(State.input)?`<div class="conflict-box" role="status">⚠ ${formConflict(State.input)}</div>`:''}
         ${this.helpBox(null,null,"<b>어떻게 팔지</b> 정해 두셨다면 최대 <b>2개</b>를 고르세요. 고른 형태로 후보 5개 중 <b>3개 이상</b>을 찾고, 나머지는 비교용으로 다른 형태를 보여 드려요. 정하지 않았다면 그대로 두세요.")}
         <div class="form-grid">
           <button type="button" class="fld ${sel.length?'':'sel'}" onclick="Onboarding.clearForms()"><b>상관없어요</b><span>형태 제한 없이 넓게</span></button>

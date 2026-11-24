@@ -87,9 +87,12 @@ console.log("3b. 선호 사업형태 반영(실물 제품을 고르면 SaaS로 �
   const R3 = await orchestrate(inp);
   const types = R3.top5.map(c => c.solution.solutionType);
   console.log("    형태:", types.join(", "));
-  ok(types.filter(t => ["Product", "ProductPlusService", "Hardware"].includes(t)).length >= 3, "5개 중 3개 이상 선호 형태");
+  ok(types.filter(t => ["Product", "Hardware"].includes(t)).length >= 3, "5개 중 3개 이상 실물 제품·기기(제품+서비스 제외)");
+  ok(new Set(R3.top5.map(c => c.problem.statement)).size === Math.min(4, R3.top5.length), "같은 문제는 1개만(문제 4종 fixture → 4종)");
+  ok(__test.fixPhysicalDefinition("스타트업 대표를 위한 진단 도구+자문", { customer: { roles: { user: "스타트업 대표" } }, solution: { solutionType: "Product" } }) === "스타트업 대표를 위한 실물 제품", "실물 후보 정의에 물건이 없으면 서버가 교정");
+  ok(__test.fixPhysicalDefinition("예비창업자를 위한 사업계획 카드 키트", { solution: { solutionType: "Product" } }) === "예비창업자를 위한 사업계획 카드 키트", "물건이 드러난 정의는 유지");
   ok(new Set(R3.top5.map(c => c.problem.statement)).size >= 3, "선호 형태 반영 후에도 문제 3종 이상");
-  ok(calls[0].includes("선호 사업형태") && calls[0].includes("SaaS)로 바꾸지 말 것"), "CALL A 에 선호 형태 지시");
+  ok(calls[0].includes("선호 사업형태") && calls[0].includes("바꾸지 말 것") && calls[0].includes("물건"), "CALL A 에 선호 형태 지시");
   ok(R3.top5.every(c => c.narrative?.definition), "아이템 정의(definition) 항상 채움");
 }
 

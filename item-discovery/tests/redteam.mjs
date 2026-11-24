@@ -116,6 +116,19 @@ console.log("1b. 단어 입력 — 한글 조합 Enter·쉼표 여러 개·항�
   await ctx.close();
 }
 
+console.log("1c. 분야↔형태 충돌 안내");
+{
+  const { ctx, page, errs } = await open();
+  await page.evaluate(() => { Object.assign(State.input, { fields: ["it", "knowledge"], preferredForms: [] }); State.step = 5; App.show("onboarding"); Onboarding.render(); });
+  ok((await page.locator(".conflict-box").count()) === 0, "형태 미선택 시 안내 없음");
+  await page.click(".fld:has-text('실물 제품')");
+  ok(/손에 잡히는 물건/.test(await page.locator(".conflict-box").innerText()), "IT·지식서비스 + 실물 제품 → 안내");
+  await page.evaluate(() => { State.input.fields = ["it", "food"]; Onboarding.render(); });
+  ok((await page.locator(".conflict-box").count()) === 0, "물건 분야(식품)가 섞이면 안내 없음");
+  ok(errs.length === 0, "오류 0");
+  await ctx.close();
+}
+
 console.log("2. 조작된 이어하기 세션(localStorage) — 입력칸 주입");
 {
   const { ctx, page, errs } = await open(1280, true);

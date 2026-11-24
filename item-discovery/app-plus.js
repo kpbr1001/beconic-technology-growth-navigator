@@ -75,6 +75,7 @@ const PLUS_DATA = {
 };
 
 // ============================================================
+const n_def = (o) => String(o?.narrative?.definition || "");
 const Plus = {
   esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); },
   str(v, max = 400) { return (v == null ? "" : String(v)).replace(/[\u0000-\u001f]/g, " ").trim().slice(0, max); },
@@ -149,6 +150,7 @@ const Plus = {
     const pfTypes = pfs.flatMap(k => FO.find(f => f.k === k).t);
     const pf = pfs.map(k => FORM_NAME[k]).join("·");
     if (pfs.length && st && FO.some(f => f.t.includes(st)) && !pfTypes.includes(st)) out.push({ lv: "info", t: `선호 형태(${pf})와 다른 형태(${Result.solTypeKo(st) || st})예요. 형태를 바꿔도 같은 문제를 풀 수 있는지 검토해 보세요.` });
+    if (["Product", "Hardware"].includes(st) && n_def(o) && !/(키트|세트|박스|교구|기기|장비|디바이스|센서|용품|제품|식품|굿즈|카드|워크북|책|패키지|하드웨어|단말|부품|소재)/.test(n_def(o))) out.push({ lv: "info", t: "실물 제품 후보인데 정의에 물건이 드러나지 않아요. 무엇을 손에 쥐어 파는지 먼저 정해 보세요." });
     if (o.founderFit?.hasMisfit) out.push({ lv: "warn", t: "실행 걸림돌이 있어요(위 적합도 참고). 보완 계획 없이 바로 시작하기는 어려워요." });
     return out;
   },

@@ -22,8 +22,8 @@
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.6.0",
-  promptVersion: "v1.5.0",
+  appVersion: "v0.6.1",
+  promptVersion: "v1.5.1",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
 };
@@ -79,8 +79,8 @@ const FORM_TYPES = {
   platform: { n: "플랫폼·중개", t: ["Platform", "Marketplace"] },
   service: { n: "전문 서비스·대행", t: ["Service", "Consulting", "ProfessionalService"] },
   edu: { n: "교육·콘텐츠", t: ["Education", "Content"] },
-  product: { n: "실물 제품(소비재·식품 등)", t: ["Product", "ProductPlusService"] },
-  hardware: { n: "기기·하드웨어", t: ["Hardware"] },
+  product: { n: "실물 제품(손에 잡히는 물건: 소비재·식품·교구·키트·용품)", t: ["Product"] },
+  hardware: { n: "기기·하드웨어(장비·IoT·디바이스)", t: ["Hardware"] },
   subscription: { n: "구독·정기배송", t: ["Subscription"] },
   store: { n: "매장·오프라인 공간", t: ["Store"] },
   community: { n: "커뮤니티·멤버십", t: ["Community"] },
@@ -268,7 +268,7 @@ const SYSTEM_A = `당신은 K-ITEM FINDER의 고객·시장 구조화 엔진이�
   문제(type/severity/frequency), 감정(8종)·동기(8종), 현재대안·불만,
   시장공백(underserved/nonConsumption/switchingFriction), Why Now(problemPersistence)를 도출한다.
 - segments 는 서로 다른 고객 세그먼트를 3~4개 도출한다(각각 key·user·buyer·type).
-- problems 는 서로 다른 각도로 4개 이상 도출한다(같은 문제의 변형이 아니라 실제로 다른 문제). 각 problem 에 key·statement·그 문제의 현재 대안(alternatives)을 붙인다.
+- problems 는 서로 다른 각도로 5개 도출한다(같은 문제의 변형이 아니라 실제로 다른 문제). 각 problem 에 key·statement·그 문제의 현재 대안(alternatives)을 붙인다.
 - gaps 도 서로 다른 시장공백을 4개 이상 도출한다(각각 key).
 - ★ 관심 분야(fields)가 주어지면 segments·problems 는 그 분야 안에서 찾고, 분야가 2개 이상이면 분야마다 최소 1개 problem 을 배정한다.
 - ★ 사용자 경험·역량은 '실행 강점'으로만 쓴다. 경험 분야의 문제만 반복하지 말고(예: 컨설턴트 → 모든 후보가 '진단'), 경험을 활용할 수 있는 인접 고객·문제로 넓힌다. 경험과 직접 같은 분야의 seed 는 최대 2개.
@@ -293,14 +293,14 @@ function fieldsLine(input) {
   else if (input.fieldOther) parts.push(`관심 분야: ${input.fieldOther}`);
   else parts.push("관심 분야 미정 → 사용자 경험의 인접 분야를 포함해 서로 다른 분야 3개 이상으로 넓게.");
   const pf = (input.preferredForms || []).filter((k) => FORM_TYPES[k]);
-  if (pf.length) parts.push(`선호 사업형태: ${pf.map((k) => `${FORM_TYPES[k].n}(solutionTypeHint=${FORM_TYPES[k].t.join("|")})`).join(", ")} → candidateSeeds 의 절반 이상을 이 형태로. 실물 제품·기기를 고르면 소프트웨어(SaaS)로 바꾸지 말 것.`);
+  if (pf.length) parts.push(`선호 사업형태: ${pf.map((k) => `${FORM_TYPES[k].n}(solutionTypeHint=${FORM_TYPES[k].t.join("|")})`).join(", ")} → candidateSeeds 의 절반 이상을 이 형태로. 실물 제품·기기를 고르면 소프트웨어(SaaS)·도구+자문으로 바꾸지 말 것.${pf.some((k) => k === "product" || k === "hardware") ? " 실물 제품·기기 seed 는 고객이 '물건'을 사는 구조여야 한다(예: 교구·키트·진단 키트·카드 세트·워크북 박스·센서 기기). 소프트웨어는 물건에 딸린 보조로만." : ""}`);
   if (input.customerType && input.customerType !== "__ANY__") parts.push(`선호 고객 유형: ${input.customerType} (segments 의 절반 이상을 이 유형으로)`);
   return parts.join("\n") + "\n";
 }
 
 function buildUserA(input) {
   return `다음 사용자 입력을 구조화하라. sentinel(__UNKNOWN__ 등)은 "unknown"으로 간주한다.
-각 필드 값은 짧게(핵심 키워드 5~15자, 나열 최소화). segments 3~4개, problems·gaps 4개, candidateSeeds 8~10개.
+각 필드 값은 짧게(핵심 키워드 5~15자, 나열 최소화). segments 3~4개, problems 5개(모두 다른 문제), gaps 4~5개, candidateSeeds 8~10개(problemKey 5개를 모두 쓴다).
 key 는 영문 소문자·숫자 짧은 식별자(예: s1, p2, g3). gap.statement 는 서술어(불가/어려움/미파악 등) 없이 명사형. 예: "저비용 경영진단", "전문가 매칭".
 problem.statement 는 고객 입장의 한 문장(15~40자).
 ${fieldsLine(input)}
@@ -341,7 +341,7 @@ function solutionLabel(hint) {
   const map = {
     SaaS: "SaaS", Marketplace: "매칭 플랫폼", Platform: "플랫폼",
     Service: "서비스", Education: "클래스", Content: "콘텐츠",
-    Product: "제품", App: "앱", Community: "커뮤니티", Subscription: "구독",
+    Product: "실물 제품", App: "앱", Community: "커뮤니티", Subscription: "구독",
     Hardware: "기기", Store: "매장", Consulting: "컨설팅", ProductPlusService: "제품+서비스",
   };
   return map[hint] || (hint ? hint : "서비스");
@@ -624,12 +624,15 @@ const RuleEngine = {
     }).filter((c, _i, arr) => {
       // 같은 문제 키는 상위 2개까지만 남겨 TOP5 가 한 문제로 쏠리지 않게
       const k = c._keys?.p; if (!k) return true;
-      const before = arr.slice(0, arr.indexOf(c)).filter((x) => x._keys?.p === k).length;
-      return before < 2;
+      const prior = arr.slice(0, arr.indexOf(c)).filter((x) => x._keys?.p === k);
+      // 선호 형태 후보는 따로 세어 2개까지 더 남긴다(형태 교체용 예비)
+      const isPref = pref.includes(c.solution?.solutionType);
+      return isPref ? prior.filter((x) => pref.includes(x.solution?.solutionType)).length < 2 : prior.filter((x) => !pref.includes(x.solution?.solutionType)).length < 2;
     }).reduce((acc, c, _i, arr) => {
       // 상위 rankTarget 개 + 선호 형태 후보를 최대 5개까지 추가로 남긴다
       if (acc.length < FILTER_CONFIG.rankTarget) acc.push(c);
-      else if (pref.includes(c.solution?.solutionType) && acc.filter((x) => x._extra).length < 5) acc.push(Object.assign(c, { _extra: true }));
+      else if (c._keys?.p && !acc.some((x) => x._keys?.p === c._keys.p)) acc.push(Object.assign(c, { _extra: "problem" })); // 아직 없는 문제는 보존
+      else if (pref.includes(c.solution?.solutionType) && acc.filter((x) => x._extra === "pref").length < 8) acc.push(Object.assign(c, { _extra: "pref" }));
       return acc;
     }, []);
   },
@@ -653,7 +656,12 @@ const RuleEngine = {
       const newProblem = !c._keys?.p || !picked.some((p) => p._keys?.p === c._keys.p);
       if (newProblem && distinct(c, picked)) picked.push(c);
     }
-    // 2차: 2축 이상 상이
+    // 1-2차: 문제 키가 새로운 후보면 축 조건 없이도 우선(같은 문제는 1개만 — 대표 결정 2026-11-24)
+    for (const c of list.slice(1)) {
+      if (picked.length >= FILTER_CONFIG.finalTop) break;
+      if (!picked.includes(c) && c._keys?.p && !picked.some((p) => p._keys?.p === c._keys.p)) picked.push(c);
+    }
+    // 2차: 새 문제가 더 없을 때만 2축 이상 상이한 후보로 보충
     for (const c of list.slice(1)) {
       if (picked.length >= FILTER_CONFIG.finalTop) break;
       if (!picked.includes(c) && distinct(c, picked)) picked.push(c);
@@ -731,6 +739,7 @@ const SYSTEM_B = `당신은 K-ITEM FINDER의 후보 서술 엔진이자 시니�
 2) definition = 이 아이템이 무엇인지 한 줄 정의. 18~34자. "[누구]를 위한 [무엇을 해 주는] [제공 형태]" 형식.
   예) "소규모 제조사를 위한 스마트폰 품질검사 앱", "예비창업자를 위한 주 1회 사업계획 첨삭 클래스"
   - 제공 형태(앱·SaaS·플랫폼·서비스·클래스·제품·기기·구독·매장·커뮤니티)는 실제 solutionType 과 일치해야 한다.
+  - ★ 제공형태가 '실물 제품'·'기기'인 후보는 정의에 실제 물건(키트·세트·박스·교구·기기·장비·용품·식품 등)이 드러나야 한다. "도구+자문", "서비스", "SaaS"로 정의하면 실패다.
 
 3) nameOptions: 같은 후보의 다른 이름 2개(위 ①~④ 중 name 과 다른 방법으로).
 4) nameReason: 왜 이 이름인지 한 문장(고객이 무엇을 떠올리게 하려는지).
@@ -777,6 +786,7 @@ function buildUserB(top5, userProfile) {
     시장공백: c.marketGap?.statement || "",
     왜지금: (c.whyNow || []).map((w) => w.signal).filter(Boolean).join(", "),
     제품형태: c.solution?.solutionType || "",
+    제공형태: ["Product", "Hardware"].includes(c.solution?.solutionType) ? `${solutionLabel(c.solution.solutionType)} — 손에 잡히는 물건을 판다(소프트웨어·자문으로 바꾸지 말 것)` : solutionLabel(c.solution?.solutionType),
   }));
   return `사용자 프로필: ${JSON.stringify(userProfile)}
 
@@ -840,6 +850,15 @@ const GENERIC_HEADS = ["진단","검진","컨설팅","플랫폼","솔루션","�
 function headWords(name) {
   return String(name || "").split(/\s+/).flatMap((w) => GENERIC_HEADS.filter((g) => w.includes(g)));
 }
+// 실물 제품·기기 후보의 정의에 물건이 드러나는지(아니면 서버가 정의를 고친다)
+const PHYSICAL_RE = /(키트|세트|박스|교구|기기|장비|디바이스|센서|용품|제품|식품|굿즈|카드|워크북|책|패키지|도구 세트|하드웨어|단말|부품|소재)/;
+function fixPhysicalDefinition(def, c) {
+  const t = c.solution?.solutionType;
+  if (!["Product", "Hardware"].includes(t)) return def;
+  if (def && PHYSICAL_RE.test(def) && !/(SaaS|자문|컨설팅)/.test(def)) return def;
+  const base = defaultDefinition(c);
+  return base;
+}
 // 정의가 비면 [고객]을 위한 [제공 형태] 로 채운다
 function defaultDefinition(c) {
   const who = String(c.customer?.roles?.user || "").slice(0, 20);
@@ -879,7 +898,7 @@ function mergeExplainOnly(top5, described) {
       ...c,
       title: refinedName,
       narrative: nv ? { ...nv, name: refinedName, nameOptions: names[i].others, nameReason: String(nv.nameReason || "").slice(0, 160),
-        definition: String(nv.definition || "").slice(0, 60) || defaultDefinition(c) } : null,
+        definition: fixPhysicalDefinition(String(nv.definition || "").slice(0, 60), c) || defaultDefinition(c) } : null,
       explainPath: Array.isArray(d.explainPath) ? d.explainPath.slice(0, 8) : [],
       solution: { ...c.solution, concept: d.narrative?.solutionConcept || c.solution.concept },
       channel: d.narrative?.channel || c.channel,
@@ -1096,4 +1115,4 @@ async function orchestrate(input) {
 
 export { orchestrate, APP_META, API_CONFIG, providers, FIELD_LABEL };
 // 테스트 전용(동작 영향 없음)
-export const __test = { defaultDefinition, FORM_TYPES, toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };
+export const __test = { fixPhysicalDefinition, defaultDefinition, FORM_TYPES, toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };
