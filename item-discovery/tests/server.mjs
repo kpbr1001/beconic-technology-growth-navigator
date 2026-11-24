@@ -46,6 +46,14 @@ providers.claude.call = async ({ system, user }) => {
   return JSON.stringify({ candidates: ids.map((id, i) => ({ opportunityId: id, narrative: { name: names[i][0], nameOptions: names[i].slice(1), nameReason: "이유", problem: "p", solutionConcept: "s" }, explainPath: ["고객: a"] })), comparisonInsight: "", marketPerspective: "" });
 };
 
+// 화면·서버 버전 일치(배포 후 상태 응답으로 서버 버전을 확인하므로 어긋나면 안 됨)
+{
+  const fs = await import("node:fs");
+  const front = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
+  const fv = front.match(/appVersion: "([^"]+)"/)[1], fp = front.match(/promptVersion: "([^"]+)"/)[1];
+  const { APP_META } = await import("../netlify/functions/_core.mjs");
+  ok(APP_META.appVersion === fv && APP_META.promptVersion === fp, `화면·서버 버전 일치 (${fv}/${fp} vs ${APP_META.appVersion}/${APP_META.promptVersion})`);
+}
 console.log("1. 입력 정규화(_guard)");
 ok(INPUT && !("evil" in INPUT), "허용 밖 항목 제거");
 ok(INPUT.fields.join() === "knowledge,edu", "허용 밖 분야 제거");

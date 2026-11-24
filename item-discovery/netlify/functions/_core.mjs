@@ -22,7 +22,7 @@
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.6.1",
+  appVersion: "v0.7.0",
   promptVersion: "v1.6.0",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
