@@ -1321,8 +1321,13 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
           <div class="err-tip">⚠ 업종을 선택해 주세요.</div>
         </div>
 
+        <div class="field" data-k="form" id="fld-form" style="display:none">
+          <label>업태<span class="opt">선택 · 업종에 맞춰 문항 문구와 '해당 없음'이 바뀝니다</span></label>
+          <div class="chips" id="c-form"></div>
+        </div>
+
         <div class="field" data-k="biztype">
-          <label>업태 또는 세부 사업내용<span class="opt">선택</span></label>
+          <label>세부 사업내용<span class="opt">선택 · 보고서 표기용</span></label>
           <input type="text" id="f-biztype" placeholder="예: 정밀부품 가공, 온라인 식품 판매, B2B SaaS 등" maxlength="60" autocomplete="off">
         </div>
       </div>
@@ -1546,9 +1551,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.5.0";
+const APP_VERSION = "v6.6.0";
 const APP_UPDATED = "2026-11-25";
-const APP_BUILD   = "2026.11.25.3";  // 배포 빌드 식별자
+const APP_BUILD   = "2026.11.25.4";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
 const LEGAL_BASIS_DATE = "2026-10-26";  // 법령·제도 출처를 마지막으로 확인한 날(도구 버전 날짜와 별개)
 
@@ -1719,6 +1724,8 @@ const SRC = {
   L_FTA:{k:"법령",s:"FTA관세법",f:"자유무역협정의 이행을 위한 관세법의 특례에 관한 법률 — 원산지 결정·증명."},
   L_TM:{k:"법령",s:"상표법 제35조",f:"상표법 제35조 — 선출원주의(먼저 출원한 자가 등록)."},
   L_PAT:{k:"법령",s:"특허법 제29조",f:"특허법 제29조 — 신규성·진보성(공개 전 출원 필요)."},
+  L_FOOD:{k:"법령",s:"식품위생법",f:"식품위생법 — 식품접객업 영업 신고, 영업자 위생교육, 종사자 건강진단, 위생 관리 기준."},
+  L_ORIGIN:{k:"법령",s:"원산지표시법",f:"농수산물의 원산지 표시 등에 관한 법률 — 음식점 등의 원산지 표시 의무."},
   P_HT:{k:"공공",s:"국세청 홈택스",f:"국세청 홈택스(hometax.go.kr) — 사업자등록·업종코드 조회."},
   P_KS:{k:"공공",s:"K-Startup",f:"K-Startup(k-startup.go.kr) — 창업지원사업 통합 공고."},
   P_BIZ:{k:"공공",s:"기업마당",f:"기업마당(bizinfo.go.kr) — 중앙부처·지자체 지원사업 통합 공고."},
@@ -1875,7 +1882,123 @@ const Q_EX = {
   D1:{mfg:"생산·재고 기록(ERP·MES)", food:"POS·배달앱 주문 데이터", com:"재고·주문 관리 프로그램", it:"CRM·이슈 관리 도구", svc:"고객 명단·예약·상담 기록"},
   E1:{mfg:"대상국 규격·HS코드·현지 유통 구조", food:"수출국 식품 등록·표시 규정", com:"해외 오픈마켓·대상국 인증", it:"해외 결제·현지화·데이터 규제", svc:"해외 고객 대상 서비스 방식"}
 };
-function qExample(q, ind){ const m=Q_EX[q.id]; return m ? (m[IND_GROUP[ind]||"svc"]||"") : ""; }
+function qExample(q, ind){ if(q._var) return ""; const m=Q_EX[q.id]; return m ? (m[IND_GROUP[ind]||"svc"]||"") : ""; }
+
+/* ③ 업태 — 업종 아래 선택지(선택 입력). 문항·점수 체계는 그대로 두고, 업태에 따라 '해당 없음'을 허용하는 문항을 바꾼다.
+   (자유 입력 '세부 사업내용'은 보고서 표기용으로 유지) */
+const FORM = {
+  mfg:[{v:"parts",t:"부품·소재(OEM·협력사)"},{v:"product",t:"완제품(자체 브랜드)"},{v:"consumer",t:"식품·화장품 등 소비재 제조"}],
+  food:[{v:"hall",t:"홀 영업 중심"},{v:"delivery",t:"배달·포장 중심"},{v:"franchisee",t:"프랜차이즈 가맹점"},{v:"franchisor",t:"프랜차이즈 본사"}],
+  retail:[{v:"online",t:"온라인 판매"},{v:"offline",t:"오프라인 매장"},{v:"wholesale",t:"도매·유통"}],
+  it:[{v:"saas",t:"B2B 솔루션·SaaS"},{v:"app",t:"앱·B2C 서비스"},{v:"si",t:"SI·외주 개발"}],
+  platform:[{v:"market",t:"중개·마켓플레이스"},{v:"sub",t:"구독·커뮤니티"}],
+  content:[{v:"media",t:"영상·미디어 제작"},{v:"design",t:"디자인·출판"},{v:"creator",t:"크리에이터·1인 미디어"}],
+  edu:[{v:"academy",t:"학원·교습소"},{v:"online",t:"온라인 교육"},{v:"corp",t:"기업 교육·강의"}],
+  pro:[{v:"consult",t:"컨설팅·자문"},{v:"agency",t:"마케팅·디자인 대행"},{v:"eng",t:"기술 용역·설계"}],
+  svc:[{v:"life",t:"생활 서비스(미용·세탁 등)"},{v:"biz",t:"사업 지원 서비스(시설·청소 등)"}],
+  trade:[{v:"export",t:"수출 중심"},{v:"import",t:"수입·국내 유통 중심"}],
+  etc:[]
+};
+/* 업태별로 추가로 '해당 없음'을 고를 수 있는 문항(가맹점의 브랜드·메뉴 개발처럼 본사 몫인 경우 등) */
+const FORM_NA = {
+  "food.franchisee":{M1:"브랜드는 가맹 본사가 관리", R2:"상표·지식재산은 가맹 본사가 보유", R3:"메뉴 개발은 가맹 본사가 담당"},
+  "retail.wholesale":{R3:"직접 상품 개발 없이 유통만 함"},
+  "trade.import":{R3:"직접 개발 없이 수입해 판매"}
+};
+function formOf(d){ const f=d.form; return (FORM[d.industry]||[]).some(o=>o.v===f) ? f : null; }
+function formNm(d){ const f=formOf(d); return f ? (FORM[d.industry].find(o=>o.v===f)||{}).t : ""; }
+
+/* ① 업종별 문구 변형 — 재는 행동 수준(0 미착수·1 시작·2 정례화·3 체계화)은 같고, 질문·단계 문구만 업종군 언어로.
+   같은 문항 ID·같은 점수라 업종 간·재진단 비교가 유지된다. 변형이 없으면 공통 문구 */
+const Q_VAR = {
+  F1:{
+    food:{src:["L_FOOD","P_HT"],t:"영업신고·위생교육·보건증 등 음식점 필수 요건을 어떻게 관리하나요?",
+      lv:["영업신고 전이거나 필요한 요건을 아직 모름","영업신고는 했지만 위생교육·보건증 등은 따로 챙기지 않음","영업신고·위생교육·종사자 보건증 등 필수 요건을 모두 갖춤","모두 갖춘 데 더해 갱신 시기와 변경 신고를 일정으로 관리"]},
+    mfg:{t:"공장등록·제조 관련 인허가와 업종코드를 어떻게 관리하나요?",
+      lv:["필요한 등록·인허가를 아직 모름","사업자등록은 했지만 공장등록·제품별 인허가 요건은 따로 확인하지 않음","공장등록(해당 시)·제품별 필수 인허가·신고를 확인해 모두 갖춤","모두 갖춘 데 더해 설비 증설·이전·품목 추가 때마다 점검하는 절차가 있음"]},
+    com:{t:"통신판매업 신고와 취급 품목별 신고·허가를 어떻게 관리하나요?",
+      lv:["필요한 신고·허가를 아직 모름","사업자등록은 했지만 통신판매업·품목별 요건은 따로 확인하지 않음","통신판매업 신고(온라인 판매 시)와 취급 품목별 신고·허가를 모두 갖춤","모두 갖춘 데 더해 품목·판매 채널을 늘릴 때마다 요건을 점검하는 절차가 있음"]}
+  },
+  S1:{
+    food:{t:"새 손님은 주로 어떻게 오나요?",
+      lv:["손님을 늘리는 경로를 따로 두지 않음(지나가는 손님 위주)","지인·단골 소개와 우연한 방문에 의존","지도 검색·배달앱·SNS 등 손님이 오는 경로가 2개 이상 있음","경로별 방문·주문 수를 확인하고 잘되는 경로에 집중"]},
+    mfg:{t:"새 거래처는 주로 어떻게 확보하나요?",
+      lv:["확보 경로가 아직 없음","대표 인맥·기존 거래처 소개에 의존","전시회·B2B 플랫폼·입찰·대리점 등 반복 가능한 경로가 2개 이상 있음","경로별 상담→계약 전환율을 측정하고 개선"]},
+    com:{t:"새 구매 고객은 주로 어떻게 확보하나요?",
+      lv:["판매 채널이 아직 없음","지인 소개나 판매 채널 1곳에 의존","오픈마켓·자사몰·오프라인 등 판매 채널이 2개 이상 있음","채널별 유입→구매 전환율·광고 효율을 측정하고 개선"]},
+    it:{t:"새 고객(사용자)은 주로 어떻게 확보하나요?",
+      lv:["확보 경로가 아직 없음","대표 인맥·지인 소개에 의존","검색·콘텐츠·광고·파트너 등 반복 가능한 유입 경로가 2개 이상 있음","경로별 가입→유료 전환율을 측정하고 개선"]}
+  },
+  M2:{
+    food:{t:"손님이 온라인에서 우리 가게를 찾을 수 있나요?",
+      lv:["온라인에 등록된 곳이 없음","지도 등록 등 기본 1곳만 있음","지도·배달앱·SNS를 정기적으로 관리(메뉴·사진·리뷰 응대)","검색·리뷰·주문 데이터를 보고 채널 운영을 개선"]},
+    mfg:{t:"거래처가 온라인에서 우리 회사·제품을 찾을 수 있나요?",
+      lv:["온라인 접점이 없음","회사 소개 정도만 있음","홈페이지 제품 페이지·B2B 플랫폼 등록을 정기적으로 관리","문의 데이터를 측정해 채널을 개선"]},
+    com:{t:"고객이 온라인에서 우리 상품을 찾을 수 있나요?",
+      lv:["온라인 판매·노출 채널이 없음","채널 1곳에 상품만 등록","상세페이지·검색 노출을 정기적으로 관리","유입·전환 데이터를 보고 상품·채널을 개선"]}
+  },
+  R1:{
+    food:{t:"다른 가게와 다른 점(메뉴·맛·가격·서비스)을 근거로 설명할 수 있나요?",
+      lv:["차별점을 정리하지 않음","'맛있다' 같은 주장은 있지만 근거는 없음","대표 메뉴·원재료·가격 비교와 손님 리뷰 등으로 차별점을 정리","차별점을 지키고 늘릴 메뉴 개선 계획이 있음"]},
+    com:{t:"다른 판매처와 다른 점(상품 구성·가격·배송·서비스)을 근거로 설명할 수 있나요?",
+      lv:["차별점을 정리하지 않음","차별점 주장은 있으나 근거 자료는 없음","상품·가격·배송 조건 비교표와 후기 데이터로 차별점을 정리","차별점을 유지·확대할 상품 기획 계획이 있음"]},
+    svc:{t:"다른 업체와 다른 점(전문성·결과·서비스 방식)을 근거로 설명할 수 있나요?",
+      lv:["차별점을 정리하지 않음","차별점 주장은 있으나 근거 자료는 없음","수행 사례·고객 후기·결과 데이터로 차별점을 정리","차별점을 유지·확대할 서비스 개선 계획이 있음"]}
+  },
+  R3:{
+    food:{t:"메뉴 개발·개선은 어떤 체계로 하나요?",
+      lv:["메뉴 개발 계획이 없음","대표 감각으로 그때그때 바꿈","신메뉴 일정과 레시피·원가표를 정해 진행","시즌 메뉴 계획과 판매 데이터 기반 개선을 정기적으로 함"], na:"메뉴 개발이 필요 없는 업태"},
+    com:{t:"상품 기획·소싱은 어떤 체계로 하나요?",
+      lv:["상품 기획 계획이 없음","대표 판단으로 그때그때 들여옴","시즌·카테고리별 상품 기획 일정과 소싱처를 정해 진행","판매 데이터로 상품을 정기적으로 정리·추가하고 자체 상품(PB)까지 기획"], na:"상품 기획·소싱이 필요 없는 사업"},
+    it:{t:"제품(서비스) 개발은 어떤 체계로 하나요?",
+      lv:["개발 계획이 없음","대표·개인 역량에 의존해 그때그때 개발","개발 일정(스프린트)·버전 관리·담당 인력을 정해 진행","연구소·전담부서를 두거나 정부 R&D 과제를 수행한 경험이 있음"]}
+  },
+  C1:{
+    food:{src:["L_FOOD","L_ORIGIN"],t:"음식점에 필요하거나 유리한 위생·표시 기준과 인증을 파악했나요?",
+      lv:["파악하지 않음","일부만 들어서 앎","원산지 표시·위생 기준과 유리한 인증(위생등급·HACCP 등) 요건을 정리","필요한 기준을 지키고 인증을 취득해 유지·갱신 관리"]},
+    mfg:{t:"제품에 필요하거나 유리한 인증·규격(KC·ISO 등)을 파악했나요?",
+      lv:["파악하지 않음","일부만 들어서 앎","제품별 필수·유리 인증 목록과 요건을 정리","필요한 인증을 취득해 유지·갱신 관리"]},
+    com:{t:"취급 상품에 필요한 인증·표시 기준을 파악했나요?",
+      lv:["파악하지 않음","일부만 들어서 앎","품목별 필수 인증(KC 등)·표시 기준을 정리","입고 상품의 인증·표시를 확인하는 절차가 있고 기록을 관리"]},
+    it:{src:["S_ISO27","S_ISO9"],t:"서비스에 필요하거나 유리한 인증·기준(정보보호·품질 인증 등)을 파악했나요?",
+      lv:["파악하지 않음","일부만 들어서 앎","필수·유리 인증 목록과 요건을 정리","필요한 인증을 취득해 유지·갱신 관리"]}
+  },
+  C2:{
+    food:{src:["L_FOOD"],t:"위생과 음식 품질은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","문제가 생기면 그때 대응","위생 점검표·식재료 온도·유통기한 기록이 있음","점검 기록과 손님 불만을 관리하고 원인 개선까지 함"]},
+    mfg:{t:"제품 품질은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","불량이 나면 그때 대응","검사 기준과 기록(입고·공정·출하 검사)이 있음","불량률·클레임 지표를 관리하고 원인 개선까지 함"]},
+    com:{t:"상품 품질과 배송·반품은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","문제가 생기면 그때 대응","입고 검수 기준과 반품 사유 기록이 있음","반품률·클레임 지표를 관리하고 공급처 개선까지 함"]},
+    it:{t:"서비스 품질(오류·장애)은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","오류가 나면 그때 대응","배포 전 테스트 기준과 오류·장애 기록이 있음","장애·오류 지표를 관리하고 재발 방지 개선까지 함"]},
+    svc:{t:"서비스 품질은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","불만이 생기면 그때 대응","서비스 기준(체크리스트)과 고객 불만 기록이 있음","고객 만족·불만 지표를 관리하고 원인 개선까지 함"]}
+  },
+  D1:{
+    food:{t:"매출·주문·재고 데이터를 어떻게 관리하나요?",
+      lv:["종이·기억에 의존","포스(POS)·배달앱에 쌓이기만 하고 따로 보지 않음","포스·배달앱·재고 기록을 한곳에서 정기적으로 확인","메뉴별·채널별 현황을 한 화면(현황판)으로 보고 의사결정에 씀"]},
+    mfg:{t:"생산·재고·거래 데이터를 어떻게 관리하나요?",
+      lv:["종이·기억에 의존","엑셀 등 개인 파일로 관리","공유 도구(클라우드·ERP 일부)로 한곳에 관리","ERP·MES 등 시스템으로 관리하고 현황판을 봄"]},
+    com:{t:"주문·재고·고객 데이터를 어떻게 관리하나요?",
+      lv:["종이·기억에 의존","채널마다 따로 확인(엑셀 등 개인 파일)","주문·재고를 통합 관리 프로그램으로 한곳에서 관리","통합 시스템으로 채널별 판매·재고·고객 현황을 보고 의사결정에 씀"]}
+  },
+  D2:{
+    food:{t:"주문·예약·재고 업무에 자동화 도구를 쓰나요?",
+      lv:["쓰지 않음","개인적으로 가끔 사용","키오스크·테이블오더·예약·재고 알림 등 정해진 업무에 사용","업무 절차에 정착시키고 절감 시간·인건비 효과를 측정"]},
+    mfg:{t:"생산·사무 업무에 자동화·AI 도구를 쓰나요?",
+      lv:["쓰지 않음","개인적으로 가끔 사용","정해진 업무(견적·생산계획·검사 등)에 정해서 사용","업무 절차에 정착시키고 생산성·절감 효과를 측정"]}
+  }
+};
+/* 화면·보고서에 쓰는 문항 = 공통 문항 + 업종 문구 변형 + 업태 '해당 없음' */
+function qView(q, d){
+  d = d||{};
+  const v = (Q_VAR[q.id]||{})[IND_GROUP[d.industry]];
+  const fna = (FORM_NA[(d.industry||"")+"."+(formOf(d)||"")]||{})[q.id];
+  if(!v && !fna) return q;
+  return {...q, t:v?v.t:q.t, lv:v?v.lv:q.lv, na:fna||(v&&v.na)||q.na, src:(v&&v.src)||q.src, _var:!!v};
+}
+function viewQuestions(d){ return askedQuestions(d.depth, d.stage).map(q=>qView(q, d)); }
 
 /* ---------- 3. 창업 연차별 플레이북 + 단계 기대수준 ---------- */
 const STAGE = {
@@ -2036,7 +2159,7 @@ const LIB = [
    when:"매출 확대기",docs:"채널별 성과 데이터",dur:"4~8주",
    kpi:"채널별 전환율 / 고객획득비용(CAC)",caution:"광고 표현은 과장·부당광고 규정을 확인하세요.",expert:false,
    stages:["y13","y35","y57"]},
-  {id:"r1",area:"rnd",needsDev:true,q:["R3"],own:"rnd_lab",src:["L_RND","P_KOITA"],title:"기업부설연구소/연구개발전담부서 검토",
+  {id:"r1",area:"rnd",needsDev:true,notInd:["food","retail"],q:["R3"],own:"rnd_lab",src:["L_RND","P_KOITA"],title:"기업부설연구소/연구개발전담부서 검토",
    why:"R&D 인력·세제·과제 참여의 기반이 됩니다. 요건을 갖추면 이후 R&D 활동의 출발점이 됩니다.",
    when:"R&D 인력 확보 시",docs:"연구인력·연구공간 요건 자료",dur:"검토 2~4주",
    kpi:"R&D 과제 준비율",caution:"설립 요건·인정 기준은 관할 기관 최신 기준 확인이 필요합니다.",expert:false,
@@ -2051,7 +2174,7 @@ const LIB = [
    when:"제품 출시 전후",docs:"경쟁 제품 목록, 성능·가격 비교 데이터",dur:"2~3주",
    kpi:"근거가 있는 차별점 수",caution:"비교 광고 시 사실 확인과 표현 규정을 지켜야 합니다.",expert:false,
    stages:["pre","y1","y13"]},
-  {id:"r3",area:"rnd",needsDev:true,q:["R3"],own:"",src:["P_IRIS"],title:"정부 R&D 과제기획 준비",
+  {id:"r3",area:"rnd",needsDev:true,notInd:["food","retail"],q:["R3"],own:"",src:["P_IRIS"],title:"정부 R&D 과제기획 준비",
    why:"기술개발 자금을 외부에서 조달하는 통로입니다. 과제기획·실적이 미리 준비돼야 신청이 수월합니다.",
    when:"공고 시즌 전",docs:"연구개발계획(안), 수행실적",dur:"기획 4~8주",
    kpi:"R&D 과제 신청 건수",caution:"선정을 보장하지 않으며 공고별 요건 확인이 필요합니다.",expert:false,
@@ -2284,7 +2407,7 @@ const PUBLIC = {
 function scoreEngine(d){
   const w = industryWeights(d.industry);
   const ans = d.ans||{};
-  const asked = askedQuestions(d.depth, d.stage);
+  const asked = viewQuestions(d);
   const areaScore={}, status={}, expected={}, gap={}, detail={}, filled={}, evidence={};
   let nAns=0, nUnk=0, nNa=0;
   AREA_KEYS.forEach(a=>{
@@ -2292,7 +2415,7 @@ function scoreEngine(d){
     const vals=[]; let na=0, unk=0;
     detail[a] = qs.map(q=>{
       const v = ans[q.id];
-      if(v==="na"){ na++; return {q, v:"na"}; }
+      if(v==="na" && q.na){ na++; return {q, v:"na"}; }   // 업태가 바뀌어 더는 '해당 없음'이 허용되지 않으면 아래에서 미응답 처리
       if(typeof v==="number" && v>=0 && v<=3){ vals.push(LV_SCORE[v]); return {q, v}; }
       unk++; return {q, v:"u"};
     });
@@ -2503,10 +2626,12 @@ function pickActivities(d, sc){
   const cand = [];
   LIB.forEach(a=>{
     if(a.ind && !a.ind.includes(d.industry)) return;
+    if(a.notInd && a.notInd.includes(d.industry)) return;
     if(a.stages && !a.stages.includes(st)) return;
     if(sc.status[a.area]==="na") return;                              // 해당 없음 영역(예: 내수 전용 → 수출)
     if(a.needsDev && ans.R3==="na") return;                           // '제품·기술 개발이 필요 없는 사업'이면 개발 체계 과제 제외
     if(!staffOk(d, a)) return;
+    const linked=(a.q||[]).filter(id=>asked.has(id)); if(linked.length && linked.every(id=>ans[id]==="na")) return;   // 연결 문항이 모두 '해당 없음'(예: 가맹점의 브랜드·상표)
     if(a.cust && d.customer && !a.cust.includes(d.customer)) return;   // 주요 고객이 맞지 않는 과제(예: 일반소비자 대상 → 공공판로) 제외                                        // 직원 관련 과제: 대표 1인·인원 구간 조건(점수에는 인원 미사용)
     const rel = relevanceOf(d.industry, a.area, st);
     const con = concernAreas.includes(a.area);
@@ -2527,7 +2652,7 @@ function pickActivities(d, sc){
     const reasons=[];
     if(areaSc!=null) reasons.push(`${AREA[a.area].short} ${areaSc}점 · 단계 기대 ${sc.expected[a.area]}점(${gapTxt(g)})`);
     else reasons.push(`${AREA[a.area].short} 응답 없음 — 현황 확인 필요`);
-    (a.q||[]).forEach(id=>{ if(asked.has(id)){ const v=ans[id]; const q=Q_BY_ID[id];
+    (a.q||[]).forEach(id=>{ if(asked.has(id)){ const v=ans[id]; const q=qView(Q_BY_ID[id], d);
       reasons.push(`${id} ${q.t.replace(/\?$/,"")} → ${typeof v==="number"?LV_NM[v]+" 단계":"모름"}`); } });
     if(con) reasons.push("가장 큰 고민으로 선택한 영역");
     if(focus.includes(a.area)) reasons.push(`${STAGE[st].nm} 핵심 영역`);
@@ -2539,7 +2664,7 @@ function pickActivities(d, sc){
     const KEYS=["pre","y1","y13","y35","y57","y7"]; const nx=KEYS[Math.min(5,KEYS.indexOf(st)+1)];
     const have=new Set(cand.map(c=>c.id));
     const extra=(filterFn, reason, base)=>LIB.forEach(a=>{
-      if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own)) || (a.needsDev && ans.R3==="na") || !staffOk(d, a) || (a.cust && d.customer && !a.cust.includes(d.customer))) return;
+      if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || (a.notInd && a.notInd.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own)) || (a.needsDev && ans.R3==="na") || !staffOk(d, a) || (a.cust && d.customer && !a.cust.includes(d.customer))) return;
       const rel=relevanceOf(d.industry, a.area, st); if(rel<=P.relExclude || !filterFn(a)) return;
       have.add(a.id);
       cand.push({...a, _p:base*rel, _tag:"plan", _areaSc:sc.areaScore[a.area], _qSc:qScoreOf(a.q), _rel:rel,
@@ -2773,7 +2898,7 @@ function buildDiagnosisData(d, isSample){
     depth:     d.depth||"standard", depthNm: `${d.depth==="quick"?"간이":"표준"} 진단(${askedQuestions(d.depth, d.stage).length}문항)`,
     stage:     d.stage,      stageNm:   STAGE[d.stage] ? STAGE[d.stage].nm : "-",
     ctype:     d.ctype,      ctypeNm:   nmOf(OPT.ctype, d.ctype),
-    industry:  d.industry,   industryNm:nmOf(OPT.industry, d.industry),
+    industry:  d.industry,   industryNm:nmOf(OPT.industry, d.industry), form:formOf(d), formNm:formNm(d),
     revenue:   d.revenue,    revenueNm: nmOf(OPT.revenue, d.revenue),
     emp:       d.emp,        empNm:     nmOf(OPT.emp, d.emp),
     customer:  d.customer,   customerNm:nmOf(OPT.customer, d.customer),
@@ -3075,7 +3200,7 @@ function renderResult(d, isSample, baseline){
       <div class="col info"><h4><span class="pl"></span>기업 기본정보</h4>
         <div class="info-table">
           <div class="k">기업명</div><div class="v">${esc(d.name||"-")}</div>
-          <div class="k">업종/업태</div><div class="v">${esc(indNm)}${d.biztype?" · "+esc(d.biztype):""}</div>
+          <div class="k">업종/업태</div><div class="v">${esc(indNm)}${formNm(d)?" · "+esc(formNm(d)):""}${d.biztype?" · "+esc(d.biztype):""}</div>
           <div class="k">창업연차</div><div class="v">${esc(stageNm)}</div>
           <div class="k">기업유형</div><div class="v">${esc(ctypeNm)}</div>
           <div class="k">매출구간</div><div class="v">${esc(revNm)}</div>
@@ -3283,7 +3408,7 @@ function mailtoHref(diag){
 
 /* ---------- 11. 앱 컨트롤러 ---------- */
 const GAN = (function(){
-  const emptyData = ()=>({depth:"standard",stage:null,ctype:null,industry:null,revenue:null,emp:null,customer:null,concern:[],ans:{},prep:[],memo:{overview:"",risk:"",kpiData:[]}});
+  const emptyData = ()=>({depth:"standard",stage:null,ctype:null,industry:null,form:null,revenue:null,emp:null,customer:null,concern:[],ans:{},prep:[],memo:{overview:"",risk:"",kpiData:[]}});
   let state = {step:1, totalSteps:5, data:emptyData(), isShared:false, isSample:false, mode:"all", reportInfo:null, baseline:null};
   const $ = s=>document.querySelector(s);
   const $$ = s=>document.querySelectorAll(s);
@@ -3306,12 +3431,24 @@ const GAN = (function(){
           box.querySelectorAll(".chip-btn").forEach(b=>{ b.classList.remove("sel"); b.setAttribute("aria-pressed","false"); });
           btn.classList.add("sel"); btn.setAttribute("aria-pressed","true");
           if(key==="depth") renderQuestions();
-          if(key==="stage" || key==="industry") renderQuestions();
+          if(key==="industry"){ if(!formOf(state.data)) state.data.form=null; buildFormChips(); }
+          if(key==="stage" || key==="industry" || key==="form") renderQuestions();
         }
         clearErr(box);
         save();
       });
     });
+  }
+  /* 업태 칩 — 선택한 업종의 업태만, 다시 누르면 선택 해제(선택 입력) */
+  function buildFormChips(){
+    const opts=FORM[state.data.industry]||[], fld=document.getElementById("fld-form"), box=document.getElementById("c-form");
+    if(!fld||!box) return;
+    fld.style.display = opts.length ? "" : "none";
+    box.innerHTML = opts.map(o=>`<button type="button" class="chip-btn${state.data.form===o.v?" sel":""}" data-v="${o.v}" aria-pressed="${state.data.form===o.v}">${esc(o.t)}</button>`).join("");
+    box.querySelectorAll(".chip-btn").forEach(btn=>btn.addEventListener("click",()=>{
+      state.data.form = state.data.form===btn.dataset.v ? null : btn.dataset.v;
+      buildFormChips(); renderQuestions(); save();
+    }));
   }
   /* 토글(보유 현황) 빌드 */
   function buildToggles(){
@@ -3334,7 +3471,7 @@ const GAN = (function(){
   /* 성숙도 문항 렌더 (STEP 3) */
   function renderQuestions(){
     const box=document.getElementById("q-list"); if(!box) return;
-    const d=state.data; const asked=askedQuestions(d.depth, d.stage);
+    const d=state.data; const asked=viewQuestions(d);
     let html="";
     AREA_KEYS.forEach((a,ai)=>{
       const qs=asked.filter(q=>q.area===a); if(!qs.length) return;
@@ -3657,7 +3794,7 @@ const GAN = (function(){
     try{
       const d=state.data;
       // 공유 링크에는 컨설턴트 메모를 넣지 않음(내부 의견 유출 방지)
-      const payload={v:6,dp:d.depth,s:d.stage,c:d.ctype,i:d.industry,bt:d.biztype,r:d.revenue,e:d.emp,cu:d.customer,co:d.concern,p:d.prep,a:d.ans};
+      const payload={v:6,dp:d.depth,s:d.stage,c:d.ctype,i:d.industry,fm:formOf(d),bt:d.biztype,r:d.revenue,e:d.emp,cu:d.customer,co:d.concern,p:d.prep,a:d.ans};
       if(includeName && d.name) payload.n=d.name;
       const enc=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
       return getBaseURL()+"#r="+enc;
@@ -3666,16 +3803,18 @@ const GAN = (function(){
   /* 외부 입력(공유 링크·파일)은 허용 값만 남겨 정제 */
   function sanitize(raw){
     const pickV=(arr,v)=> arr.some(o=>o.v===v) ? v : null;
+    const ind = pickV(OPT.industry, raw.industry||raw.i);
+    const fm = (FORM[ind]||[]).some(o=>o.v===(raw.form||raw.fm)) ? (raw.form||raw.fm) : null;
     const ans={}; const a=raw.ans||raw.a||{};
     if(a && typeof a==="object") QUESTIONS.forEach(q=>{ const v=a[q.id];
-      if(v===0||v===1||v===2||v===3||v==="u"||(v==="na"&&q.na)) ans[q.id]=v; });
+      if(v===0||v===1||v===2||v===3||v==="u"||(v==="na"&&qView(q,{industry:ind, form:fm}).na)) ans[q.id]=v; });
     const prepOk=new Set(PREP_ALL.map(p=>p.v));
     return {
       name: typeof raw.name==="string"? raw.name.slice(0,40) : (typeof raw.n==="string"? raw.n.slice(0,40) : ""),
       biztype: String(raw.biztype||raw.bt||"").slice(0,60),
       depth: (raw.depth||raw.dp)==="quick"?"quick":"standard",
       stage: pickV(OPT.stage, raw.stage||raw.s), ctype: pickV(OPT.ctype, raw.ctype||raw.c),
-      industry: pickV(OPT.industry, raw.industry||raw.i), revenue: pickV(OPT.revenue, raw.revenue||raw.r),
+      industry: ind, form: fm, revenue: pickV(OPT.revenue, raw.revenue||raw.r),
       emp: pickV(OPT.emp, raw.emp||raw.e), customer: pickV(OPT.customer, raw.customer||raw.cu),
       concern: (Array.isArray(raw.concern||raw.co)?(raw.concern||raw.co):[]).filter(v=>OPT.concern.some(o=>o.v===v)).slice(0,RULES.input.maxConcern),
       prep: (Array.isArray(raw.prep||raw.p)?(raw.prep||raw.p):[]).filter(v=>prepOk.has(v)),
@@ -3877,6 +4016,7 @@ const GAN = (function(){
       if(d[k]){ const b=document.querySelector(`#${id} .chip-btn[data-v="${d[k]}"]`); if(b){ b.classList.add("sel"); b.setAttribute("aria-pressed","true"); } }
     });
     (d.concern||[]).forEach(v=>{ const b=document.querySelector(`#c-concern .chip-btn[data-v="${v}"]`); if(b){ b.classList.add("sel"); b.setAttribute("aria-pressed","true"); } });
+    buildFormChips();
     (d.prep||[]).forEach(v=>{ const b=document.querySelector(`.tg[data-v="${v}"]`); if(b){ b.classList.add("on"); b.setAttribute("aria-pressed","true"); } });
     renderQuestions();
   }

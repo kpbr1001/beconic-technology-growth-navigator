@@ -1,4 +1,4 @@
-# BECONIC 기업 성장활동 진단 내비게이터 (v6.5.0) — BECONIC 31 · G 기업성장 종합진단(구 Tool 12)
+# BECONIC 기업 성장활동 진단 내비게이터 (v6.6.0) — BECONIC 31 · G 기업성장 종합진단(구 Tool 12)
 
 그로스벤처스 주식회사 · 중소벤처기업부 공식 인증 중소기업상담회사 제2025-684호
 서비스 주소: https://beconic-diagnosis-business-growth.netlify.app
@@ -27,7 +27,7 @@ growth/
 ├─ logo-mark.png           # 헤더·보고서 표지 로고
 ├─ og-business-growth.jpg  # 카카오톡·SNS 공유 이미지 1200×632
 ├─ netlify.toml · package.json
-├─ tests/qa.mjs            # Chromium QA 100항목(결과 유익성·사용자 흐름·하드코딩·레드팀 회귀·웹폰트 포함 · 엔진 원칙·클릭 플로우·재진단·공유 링크 정제·모바일 375px·A4 PDF)
+├─ tests/qa.mjs            # Chromium QA 109항목(결과 유익성·사용자 흐름·하드코딩·레드팀 회귀·웹폰트 포함 · 엔진 원칙·클릭 플로우·재진단·공유 링크 정제·모바일 375px·A4 PDF)
 ├─ tests/sweep.mjs         # 전수 조합 3,168개 렌더 점검(예외·깨진 문구·추천 부족)
 └─ docs/  CHANGELOG.md(개선 내역·27개 Tool 진단 대응표) · REDTEAM_2026-10-26.md · REDTEAM_2026-11-25.md(자가부검·레드팀·고객여정)
 ```
@@ -40,6 +40,8 @@ growth/
 | 산식 상수(가점·신뢰도 기준·기대수준 보정 범위·추천 개수)·실행계획 기간(`plan.cycleDays` 90일)·구간별 과제 수·고민 최대 수(`input`)·조직·인력 조건(`people`) | `RULES` — 화면의 '진단 방법·공개 산식' 설명도 자동으로 바뀜 |
 | 단계 기대수준 | `EXPECT` · 업종/단계 적합도 `IND_RELEVANCE`·`STAGE_RELEVANCE` |
 | 문항 | `QUESTIONS` — 홈·진단 화면의 문항 수 표기 자동 반영 |
+| 업종별 문구 변형 · 업태 · 업태별 '해당 없음' | `Q_VAR`(업종군: `IND_GROUP`) · `FORM` · `FORM_NA` — 점수 체계는 공통 문항과 같음 |
+| 단계별 간이 문항 · 업종 예시 | `QUICK_BY_STAGE` · `Q_EX` |
 | 출처 | `SRC` · 법령 확인일 `LEGAL_BASIS_DATE` |
 
 `<meta>` 설명문(SNS 미리보기)만은 정적 문구라 문항 수가 바뀌면 직접 고칩니다.

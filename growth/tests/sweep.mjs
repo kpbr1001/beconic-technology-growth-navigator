@@ -1,7 +1,7 @@
-// 전수 조합 점검: 6단계 × 11업종 × 간이/표준 × 응답 8패턴 × 인원 3구간(1인·5~9명·10명 이상) = 3,168개을 렌더해 예외·깨진 문구·중복·추천 부족을 찾는다.
+// 전수 조합 점검: 6단계 × 11업종 × 간이/표준 × 응답 8패턴 × 인원 3구간(1인·5~9명·10명 이상) = 3,168개 · 업태는 응답 패턴마다 바꿔 섞음을 렌더해 예외·깨진 문구·중복·추천 부족을 찾는다.
 // 실행: node growth/tests/sweep.mjs http://127.0.0.1:8792/
 import { chromium } from 'playwright';
-/* global OPT, QUESTIONS, renderResult -- page.evaluate 안에서 앱 전역 호출 */
+/* global FORM, OPT, QUESTIONS, renderResult -- page.evaluate 안에서 앱 전역 호출 */
 const b = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined }); const pg = await b.newPage();
 const errs=[]; pg.on('pageerror',e=>errs.push(String(e)));
 await pg.goto(process.argv[2] || "http://127.0.0.1:8792/");
@@ -10,7 +10,7 @@ const r = await pg.evaluate(()=>{
     all0:()=>0, all1:()=>1, all2:()=>2, all3:()=>3, mix:(q,i)=>i%4, rev:(q,i)=>3-(i%4), unk:(q,i)=>i%3?'u':1, na:(q)=>q.na?'na':2 };
   for(const st of OPT.stage.map(o=>o.v)) for(const ind of OPT.industry.map(o=>o.v)) for(const dp of ['quick','standard']) for(const emp of ['e1','e59','e1029']) for(const [pn,pf] of Object.entries(pats)){
     const ans={}; QUESTIONS.forEach((q,i)=>{ans[q.id]=pf(q,i)});
-    const d={name:'X',depth:dp,stage:st,ctype:'small',industry:ind,revenue:'r15',emp,customer:'b2b',concern:['org'],prep:[],ans,memo:{}};
+    const d={name:'X',depth:dp,stage:st,ctype:'small',industry:ind,form:((FORM[ind]||[])[Object.keys(pats).indexOf(pn)%Math.max(1,(FORM[ind]||[]).length)]||{}).v||null,revenue:'r15',emp,customer:'b2b',concern:['org'],prep:[],ans,memo:{}};
     let html, diag;
     try{ diag=renderResult(d,false); html=document.getElementById('resultRoot').innerText; }catch(e){ out.bad.push([st,ind,dp,pn,emp,'EXC '+e.message]); continue; }
     out.n++;

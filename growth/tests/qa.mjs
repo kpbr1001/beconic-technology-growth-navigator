@@ -1,4 +1,4 @@
-/* global QUICK_BY_STAGE, AREA_KEYS, Q_BY_ID, askedQuestions, rootCauses, areaPriority, kpiBoard, hrDeepNeeded, mailtoHref, planPhaseDays, COMPANY, RULES, OPT, renderResult, scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB, buildDiagnosisData, buildDiagnosisNarrative, buildCTA, Q_BY_ID, ACT_METRIC -- page.evaluate 안에서 앱 전역을 호출 */
+/* global Q_VAR, qView, FORM, OPT, QUICK_BY_STAGE, AREA_KEYS, Q_BY_ID, askedQuestions, rootCauses, areaPriority, kpiBoard, hrDeepNeeded, mailtoHref, planPhaseDays, COMPANY, RULES, OPT, renderResult, scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB, buildDiagnosisData, buildDiagnosisNarrative, buildCTA, Q_BY_ID, ACT_METRIC -- page.evaluate 안에서 앱 전역을 호출 */
 // BECONIC 성장진단(12번) QA — 실제 Chromium으로 규칙 엔진 원칙·사용자 플로우·모바일·재진단·A4 PDF를 확인한다.
 // 실행: (growth 폴더를 정적 서버로 띄운 뒤) node growth/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -438,9 +438,51 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   await page.click('#c-revenue .chip-btn[data-v="r15"]'); await page.click('#c-emp .chip-btn[data-v="e59"]'); await page.click('#c-customer .chip-btn[data-v="b2c"]');
   await page.click('#c-concern .chip-btn[data-v="revenue"]'); await page.click('#btnNext');
   const s3 = await page.locator('#fstep-3').innerText();
-  const ex = await page.locator('.qa-card[data-q="F1"] .qa-ex').innerText().catch(() => '');
+  const f1 = await page.locator('.qa-card[data-q="F1"] .qa-t').innerText();
+  const ex = await page.locator('.qa-card[data-q="E1"] .qa-ex').innerText().catch(() => '');
+  const formShown = await page.evaluate(() => document.getElementById('fld-form').style.display !== 'none' && document.querySelectorAll('#c-form .chip-btn').length === FORM.food.length);
   check('A3 응답 기준 기간 안내(최근 N개월 실제 행동)', s3.includes(`최근 ${await page.evaluate(() => RULES.recallMonths)}개월 동안 실제로 한 행동`));
-  check('A4 업종 예시: 외식 F1 → 영업신고·위생교육', /영업신고/.test(ex) && /외식/.test(ex), ex);
+  check('① 업종 문구: 외식 F1 질문 = 영업신고·위생교육, 문구 변형 없는 문항(E1)은 업종 예시', /영업신고/.test(f1) && /외식/.test(ex), `${f1} | ${ex}`);
+  check('③ 업태 선택지: 업종을 고르면 업태 칸 표시', formShown);
+  // ③ 가맹점 → M1 '해당 없음' 선택지 표시
+  // ③ 화면: STEP1로 돌아가 '가맹점'을 고르면 STEP3 M1에 '해당 없음' 선택지가 생김
+  await page.click('#btnPrev'); await page.click('#btnPrev');
+  await page.click('#c-form .chip-btn[data-v="franchisee"]');
+  await page.click('#btnNext'); await page.click('#btnNext');
+  const naBtn = await page.locator('.qa-card[data-q="M1"] .qa-x[data-v="na"]').innerText().catch(() => '');
+  check("③ 화면: 가맹점 선택 → M1에 '해당 없음 · 브랜드는 가맹 본사가 관리' 표시", naBtn.includes('가맹 본사'), naBtn);
+}
+
+// 13. v6.6.0 업종별 문구 변형(①)·업태(③)
+{
+  const r = await page.evaluate((b) => {
+    const A = (v) => Object.fromEntries(QUESTIONS.map((q) => [q.id, v]));
+    const ans = { ...A(1), F1: 2, C2: 3, D1: 0 };
+    // ① 문구만 다르고 점수는 같음
+    const sFood = scoreEngine({ ...b, industry: 'food', ans }), sSvc = scoreEngine({ ...b, industry: 'svc', ans });
+    const same = JSON.stringify(sFood.areaScore) === JSON.stringify(sSvc.areaScore);
+    const varOk = Object.entries(Q_VAR).every(([id, m]) => Object.values(m).every((v) => v.t && v.lv.length === 4 && v.lv.every((t) => t && t !== Q_BY_ID[id].lv[0] || true)));
+    const foodT = qView(Q_BY_ID.C2, { industry: 'food' }).t, mfgT = qView(Q_BY_ID.C2, { industry: 'mfg' }).t, baseT = qView(Q_BY_ID.C2, { industry: 'etc' }).t;
+    // ③ 가맹점: M1·R2·R3 '해당 없음' 허용, 브랜드·상표 과제 제외 / 업태 없으면 M1 '해당 없음'은 미응답 처리
+    const fr = { ...b, industry: 'food', stage: 'y13', form: 'franchisee', ans: { ...A(1), M1: 'na', R2: 'na', R3: 'na' } };
+    const frSc = scoreEngine(fr); const frActs = pickActivities(fr, frSc).map((a) => a.id);
+    const noForm = scoreEngine({ ...fr, form: null });
+    const sanit = GAN._sanitize({ industry: 'food', form: 'franchisee', ans: { M1: 'na' } }).ans.M1 === 'na' && GAN._sanitize({ industry: 'food', ans: { M1: 'na' } }).ans.M1 === undefined
+      && GAN._sanitize({ industry: 'mfg', form: 'franchisee' }).form === null;
+    // 외식·유통에는 연구소·정부 R&D 과제 없음
+    const rnd = ['food', 'retail'].every((ind) => { const x = { ...b, industry: ind, stage: 'y35', ans: A(0) }; return !pickActivities(x, scoreEngine(x)).some((a) => a.id === 'r1' || a.id === 'r3'); });
+    const formsOk = OPT.industry.every((o) => Array.isArray(FORM[o.v]));
+    return { same, varOk, c2: foodT !== mfgT && mfgT !== baseT, frNa: frSc.detail.marketing.find((x) => x.q.id === 'M1').v === 'na',
+      frBrand: !frActs.some((id) => ['m0', 'm2', 'm7', 'r2'].includes(id)), noFormUnk: noForm.detail.marketing.find((x) => x.q.id === 'M1').v === 'u', sanit, rnd, formsOk };
+  }, base);
+  check('① 업종 문구 변형: 문구만 달라지고 같은 응답이면 영역 점수 동일', r.same && r.varOk);
+  check('① 업종별로 다른 문구(C2 품질: 외식·제조·공통이 서로 다름)', r.c2);
+  const srcOk = await page.evaluate(() => Object.values(Q_VAR).flatMap((m) => Object.values(m)).every((v) => !v.src || v.src.every((id) => SRC[id])) && qView(Q_BY_ID.C2, { industry: 'food' }).src[0] === 'L_FOOD');
+  check('① 업종 문구의 출처도 업종에 맞춤(외식 C2 → 식품위생법), 존재하는 출처만', srcOk);
+  check("③ 가맹점: 브랜드(M1)·상표(R2)·메뉴개발(R3) '해당 없음' 허용, 관련 과제 미추천", r.frNa && r.frBrand);
+  check("③ 업태가 맞지 않으면 그 '해당 없음'은 미응답 처리 · 공유 링크 정제", r.noFormUnk && r.sanit);
+  check('외식·유통에는 연구소·정부 R&D 과제 미추천', r.rnd);
+  check('모든 업종에 업태 목록 정의', r.formsOk);
 }
 
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));
