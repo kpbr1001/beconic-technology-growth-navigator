@@ -149,6 +149,23 @@ console.log("3c. 분야 미선택 — 경력 분야 쏠림 방지");
   providers.claude.call = oldCall;
 }
 
+console.log("3d. 다른 방향으로 다시 찾기(exclude)");
+{
+  const exIn = normalizeInput({ ...INPUT, exclude: ["지원사업 서류를 매번 처음부터 쓴다", "공고서류 자동작성 SaaS", "<script>x</script>", ...Array(20).fill("x")] });
+  ok(exIn.exclude.length === 15 && exIn.exclude.every((x) => x.length <= 60), "제외 목록 최대 15개·60자");
+  calls = [];
+  const R5 = await orchestrate(exIn);
+  ok(calls[0].includes("이미 본 후보(제외)") && calls[0].includes("지원사업 서류를 매번"), "CALL A 에 제외 목록 전달");
+  ok(!R5.top5.some((c) => c.problem.statement === "정부지원사업 서류를 매번 처음부터 쓴다"), "이전과 같은 문제 후보 제외");
+  ok(R5.top5.length === 5, "제외 후에도 5개 유지");
+  ok(!R5.top5.some((c) => c.title === "공고서류 자동작성 SaaS"), "이전 이름 재사용 안 함");
+  ok(R5.meta.rediscover === true, "결과에 '다른 방향' 표시");
+  const all = normalizeInput({ ...INPUT, exclude: A.problems.map((p) => p.statement) });
+  calls = [];
+  const R6 = await orchestrate(all);
+  ok(R6.top5.length === 5, "모든 문제가 제외 대상이면 품질 보호를 위해 제외하지 않고 5개 유지");
+}
+
 console.log("4. 하위 호환 — AI가 key 없이 옛 형식으로 답해도 동작");
 {
   const old = JSON.parse(JSON.stringify(A));

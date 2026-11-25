@@ -1,11 +1,11 @@
 # K-ITEM FINDER (BECONIC 31 · S1 아이템 발굴)
 
-운영: https://beconic-diagnosis-item-discovery.netlify.app · 현재 v0.9.3
+운영: https://beconic-diagnosis-item-discovery.netlify.app · 현재 v0.9.4
 
 v0.5.0부터 서버 함수(`netlify/functions/`)까지 이 폴더가 원본입니다.
 
 ## 배포
-`docs/k-item-finder-deploy-v0.9.3.zip`을 풀어 폴더째 Netlify에 드래그(서버 함수 포함 완성본).
+`docs/k-item-finder-deploy-v0.9.4.zip`을 풀어 폴더째 Netlify에 드래그(서버 함수 포함 완성본).
 환경변수: `ANTHROPIC_API_KEY`(필수), 선택 `KIF_DAILY_LIMIT`(기본 300)·`KIF_IP_LIMIT`(기본 15)·`KIF_DISABLED=true`(긴급 중지)·`NAVER_HUB_KEY_ID`·`NAVER_HUB_KEY_SECRET`(데이터랩)·`KIF_DEBUG=1`.
 
 ## 테스트

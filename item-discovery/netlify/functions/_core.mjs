@@ -25,8 +25,8 @@ import { fetchSearchSignals, fetchShopping, meaningfulTypes, SHOP_CATS } from ".
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.9.3",
-  promptVersion: "v1.9.1",
+  appVersion: "v0.9.4",
+  promptVersion: "v1.9.2",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
 };
@@ -271,7 +271,8 @@ const providers = {
       try { const { getStore } = await import("@netlify/blobs"); store = getStore("kif-ext"); } catch { /* 로컬 테스트 등 */ }
       const [{ data, meta, fetchedAt }, srch] = await Promise.all([
         fetchTrends(groups, { store, ...opts }),
-        fetchSearchSignals(groups.map((g) => ({ key: g.key, query: g.voiceQuery || g.keywords[0] })), { store, ...opts }),
+        // 검색 문구 2가지(고객 질문형 + 핵심 검색어)로 조회해 서비스별로 더 관련 있는 쪽 채택 — 실행마다 근거 등급이 흔들리던 문제 완화
+        fetchSearchSignals(groups.map((g) => ({ key: g.key, queries: [g.voiceQuery, g.keywords[0]].filter(Boolean) })), { store, ...opts }),
       ]);
       // 쇼핑인사이트: 실물 제품·기기·구독 후보의 쇼핑 대분류(최대 3개)
       const cats = [...new Set(dnaList.filter((c) => ["Product", "Hardware", "Subscription", "ProductPlusService"].includes(c.solution?.solutionType) && c.shoppingCategory).map((c) => c.shoppingCategory))];
@@ -342,6 +343,8 @@ function fieldsLine(input) {
   if (f.length) parts.push(`관심 분야(fields): ${f.map((k) => `${k}=${FIELD_LABEL[k]}`).join(", ")}${input.fieldOther ? `, 기타=${input.fieldOther}` : ""} → 후보는 이 분야 안에서, 분야마다 고르게.`);
   else if (input.fieldOther) parts.push(`관심 분야: ${input.fieldOther}`);
   else parts.push(`관심 분야 미정 → segments 마다 field 를 반드시 적고(아래 key 중 하나), 서로 다른 field 를 3개 이상 쓴다. 경력과 같은 분야는 segments 중 1개만, 나머지는 경력을 '활용'할 수 있는 다른 분야(예: IT 경력 → 교육·헬스케어·로컬의 디지털화). field key: ${Object.keys(FIELD_LABEL).join(", ")}`);
+  const ex = (input.exclude || []).filter(Boolean);
+  if (ex.length) parts.push(`이미 본 후보(제외): ${ex.join(" / ")} → 이와 같은 고객·문제·해법은 다시 내지 말고, 고른 분야 안에서 다른 고객 세그먼트·다른 문제로 찾는다(분야·형태 조건은 그대로 지킨다).`);
   const pf = (input.preferredForms || []).filter((k) => FORM_TYPES[k]);
   if (pf.length) parts.push(`선호 사업형태: ${pf.map((k) => `${FORM_TYPES[k].n}(solutionTypeHint=${FORM_TYPES[k].t.join("|")})`).join(", ")} → candidateSeeds 의 절반 이상을 이 형태로. 실물 제품·기기를 고르면 소프트웨어(SaaS)·도구+자문으로 바꾸지 말 것.${pf.some((k) => k === "product" || k === "hardware") ? " 실물 제품·기기 seed 는 고객이 '물건'을 사는 구조여야 한다(예: 교구·키트·진단 키트·카드 세트·워크북 박스·센서 기기). 소프트웨어는 물건에 딸린 보조로만." : ""}`);
   const bi = BUDGET_INFO[input.budget];
@@ -931,6 +934,13 @@ function refineItemName(rawName, c) {
   return `${core} ${sol}`.replace(/\s+/g, " ").trim().slice(0, 22);
 }
 
+// 문장 유사도(2글자 묶음 자카드) — 이전 결과와 같은 문제인지 판단
+function similarText(a, b) {
+  const bg = (s) => { s = String(s || "").replace(/\s+/g, ""); const o = new Set(); for (let i = 0; i < s.length - 1; i++) o.add(s.slice(i, i + 2)); return o; };
+  const A = bg(a), B = bg(b); if (!A.size || !B.size) return 0;
+  let n = 0; A.forEach((x) => { if (B.has(x)) n++; });
+  return n / (A.size + B.size - n);
+}
 // 이름의 핵심 명사(마지막 형태어 앞 단어) — 5개 이름 중복 판정용
 const GENERIC_HEADS = ["진단","검진","컨설팅","플랫폼","솔루션","서비스","매칭","관리","분석","코칭","교육","마켓","SaaS","앱","구독","클래스","리포트","추적","검증","시스템"];
 function headWords(name) {
@@ -954,12 +964,13 @@ function defaultDefinition(c) {
   return `${who}${josa} 위한 ${solutionLabel(c.solution?.solutionType)}`;
 }
 // 후보별 [name, ...nameOptions] 중 나쁜 이름을 빼고, 이미 2번 쓰인 핵심 명사를 피하는 이름을 고른다
-function chooseNames(list) {
+function chooseNames(list, excludeNames = []) {
   const used = {};
+  const exNames = new Set(excludeNames.map((x) => String(x).replace(/\s+/g, "")));
   return list.map(({ c, d }) => {
     const opts = [d?.narrative?.name, ...(Array.isArray(d?.narrative?.nameOptions) ? d.narrative.nameOptions : [])]
       .map((x) => String(x || "").trim()).filter((x) => x && x.length <= 20);
-    const good = opts.filter((x) => refineItemName(x, c) === x);
+    const good = opts.filter((x) => refineItemName(x, c) === x && !exNames.has(x.replace(/\s+/g, "")));
     const pool = good.length ? good : [refineItemName(opts[0] || c.title, c)];
     // 끝 글자(예: ~핏·~온·~링크)가 이미 쓰였으면 다른 후보 우선 — '그로스핏·스타트핏' 같은 겹침 방지
     const tail = (x) => x.replace(/\s+/g, "").slice(-2);
@@ -974,12 +985,12 @@ function chooseNames(list) {
 }
 
 // explain 필드만 화이트리스트 병합 (점수/신호 보호)
-function mergeExplainOnly(top5, described) {
+function mergeExplainOnly(top5, described, excludeNames = []) {
   const list = described?.candidates || [];
   const map = {};
   for (const d of list) if (d.opportunityId) map[d.opportunityId] = d;
   const pairs = top5.map((c, i) => ({ c, d: map[c.opportunityId] || list[i] }));
-  const names = chooseNames(pairs);
+  const names = chooseNames(pairs, excludeNames);
   const out = pairs.map(({ c, d }, i) => {
     // ID 매칭 우선, 실패 시 같은 순서(index)로 폴백
     if (!d) return { ...c, title: refineItemName(c.title, c) };
@@ -1140,6 +1151,13 @@ async function orchestrate(input) {
 
   // STAGE 4~6: 필터 → dedup → cluster
   candidates = RuleEngine.hardFilter(candidates);
+  // '다른 방향으로 다시 찾기': 이전 결과와 문제가 비슷한 후보 제외(남는 후보가 5개 미만이면 품질 보호를 위해 제외하지 않음)
+  const exList = (input.exclude || []).filter(Boolean);
+  if (exList.length) {
+    const fresh = candidates.filter((c) => !exList.some((e) => similarText(e, c.problem?.statement || c._seedProblem || "") >= 0.45));
+    const freshProblems = new Set(fresh.map((c) => c._keys?.p || c.problem?.statement)).size;
+    if (fresh.length >= 5 && freshProblems >= 3) candidates = fresh;
+  }
   candidates = RuleEngine.dedup(candidates);
   let pool = RuleEngine.cluster(candidates);
 
@@ -1193,7 +1211,7 @@ async function orchestrate(input) {
     console.warn("[CALL B] threw:", callBStatus);
   }
 
-  const merged = described ? mergeExplainOnly(top5, described) : top5.map((c) => ({ ...c, title: refineItemName(c.title, c) }));
+  const merged = described ? mergeExplainOnly(top5, described, input.exclude || []) : top5.map((c) => ({ ...c, title: refineItemName(c.title, c) }));
 
   // 내부 필드(_) 제거 후 반환
   const clean = merged.map(({ _seed, _seedProblem, _seedSolution, _gapStatement, _persistence, _softPenalty, _premortem, _input, _keys, _extra, _trend, _search, _shop, ...rest }) =>
@@ -1202,7 +1220,7 @@ async function orchestrate(input) {
       shop: _shop || null }));
 
   return {
-    meta: { ...APP_META, sessionId: null, candidatePool: pool.length, fields: input.fields || [] },
+    meta: { ...APP_META, sessionId: null, candidatePool: pool.length, fields: input.fields || [], rediscover: (input.exclude || []).length > 0 },
     top5: clean,
     comparison: buildComparison(clean),
     summary: buildSummary(clean),
@@ -1219,4 +1237,4 @@ async function orchestrate(input) {
 
 export { orchestrate, APP_META, API_CONFIG, providers, FIELD_LABEL };
 // 테스트 전용(동작 영향 없음)
-export const __test = { CHILDISH_RE, fixPhysicalDefinition, defaultDefinition, FORM_TYPES, toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };
+export const __test = { similarText, CHILDISH_RE, fixPhysicalDefinition, defaultDefinition, FORM_TYPES, toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };

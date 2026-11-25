@@ -7,8 +7,8 @@
 const APP_META = {
   productName: "K-ITEM FINDER",
   productDescription: "Customer & Market Opportunity Discovery Engine",
-  appVersion: "v0.9.3",
-  promptVersion: "v1.9.1",
+  appVersion: "v0.9.4",
+  promptVersion: "v1.9.2",
   updatedAt: "2026.11.24",
   copyrightYear: "2023~2026",
 };
@@ -137,7 +137,7 @@ const App = {
     State.clear();
     State.step=0; State.input={ userType:"",experience:"",fields:[],fieldOther:"",customerType:"",industry:"",knownCustomer:"",knownProblem:"",
       resources:{hw:[],sw:[],human:[]},budget:"",region:"",targetAge:"",preferredForm:"",preferredForms:[] };
-    State.industryTags=[]; State.customerTags=[]; State.result=null; State.shortlist=[]; State.primary=null; State.isSample=false; State.compareWith=null;
+    State.industryTags=[]; State.customerTags=[]; State.result=null; State.shortlist=[]; State.primary=null; State.isSample=false; State.compareWith=null; State.lastInput=null; State.excludeChain=[];
     document.getElementById("sampleBanner").classList.remove("show");
     this.show("start");
   },
@@ -431,6 +431,8 @@ const Onboarding = {
     delete inp.preferredForm;
     inp.customerType = inp.customerType || "__ANY__";
     inp.fields = (inp.fields||[]).slice(0,3);
+    delete inp.exclude;
+    State.lastInput = JSON.parse(JSON.stringify(inp)); State.excludeChain = []; // '다른 방향으로 다시 찾기'에 재사용
     Discovery.run(inp);
   },
 };
@@ -471,6 +473,7 @@ const Discovery = {
       await this._minWait();
       if(!data || !Array.isArray(data.top5) || !data.top5.length) throw new Error("결과가 비어 있어요. 입력을 조금 바꿔 다시 시도해 주세요.");
       data._createdAt=Date.now();
+      data._rediscover = Array.isArray(input.exclude) && input.exclude.length>0;
       State.result=data; State.shortlist=[]; State.primary=null; State.isSample=false; State.compareWith=null; State.clear();
       Result.render(); Plus.saveHistory(data); App.show("result");
     }catch(err){

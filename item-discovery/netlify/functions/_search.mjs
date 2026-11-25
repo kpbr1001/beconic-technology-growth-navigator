@@ -88,7 +88,17 @@ export async function searchOne(query, deps = {}) {
   return out;
 }
 
-/** groups: [{key, query}] (최대 5) → { data:{[key]:signals}, meta } */
+/** 여러 검색 문구 결과 중 서비스별로 '관련 결과가 더 많은 쪽'을 고른다(같은 수면 앞 문구) — 근거 등급의 실행 간 흔들림 감소 */
+export function mergeSignals(list) {
+  const ok = list.filter(Boolean);
+  if (!ok.length) return null;
+  const best = (svc) => ok.map((v) => v[svc]).filter(Boolean).reduce((a, b) => (!a || (b.relevant ?? -1) > (a.relevant ?? -1) ? b : a), null);
+  const kin = best("kin"), blog = best("blog"), news = best("news");
+  const kq = ok.find((v) => v.kin === kin)?.query || ok[0].query;
+  return { query: kq, queries: ok.map((v) => v.query), kin, blog, news };
+}
+
+/** groups: [{key, queries:[문구1, 문구2]}] (최대 5) → { data:{[key]:signals}, meta } · 문구마다 지식iN·블로그·뉴스 3회 */
 export async function fetchSearchSignals(groups, deps = {}) {
   const meta = { calls: 0, cached: 0, skipped: null };
   if (!datalabReady()) { meta.skipped = "no_key"; return { data: {}, meta }; }
@@ -98,14 +108,23 @@ export async function fetchSearchSignals(groups, deps = {}) {
   let used = 0;
   if (store) { try { used = (await store.get("susage_" + day, { type: "json" }))?.n || 0; } catch { /* noop */ } }
   const data = {};
-  const g = groups.filter((x) => x.query && String(x.query).length >= 2).slice(0, 5);
-  await Promise.all(g.map(async (x) => {
-    const ck = "s_" + encodeURIComponent(x.query).slice(0, 200);
-    if (store) { try { const hit = await store.get(ck, { type: "json" }); if (hit && Date.now() - hit.ts < SEARCH.cacheDays * 864e5) { data[x.key] = hit.v; meta.cached++; return; } } catch { /* noop */ } }
-    if (used + meta.calls + 3 > limit) { meta.skipped = "daily_limit"; return; }
+  const norm = (q) => String(q || "").replace(/\s+/g, " ").trim();
+  const g = groups.map((x) => ({ key: x.key, queries: [...new Set((x.queries || [x.query]).map(norm).filter((q) => q.length >= 2))].slice(0, 2) }))
+    .filter((x) => x.queries.length).slice(0, 5);
+  const one = async (q) => {
+    const ck = "s_" + encodeURIComponent(q).slice(0, 200);
+    if (store) { try { const hit = await store.get(ck, { type: "json" }); if (hit && Date.now() - hit.ts < SEARCH.cacheDays * 864e5) { meta.cached++; return hit.v; } } catch { /* noop */ } }
+    if (used + meta.calls + 3 > limit) { meta.skipped = "daily_limit"; return null; }
     meta.calls += 3;
-    const v = await searchOne(x.query, deps);
-    if (v.kin || v.blog || v.news) { data[x.key] = v; if (store) { try { await store.setJSON(ck, { ts: Date.now(), v }); } catch { /* noop */ } } }
+    const v = await searchOne(q, deps);
+    if (!(v.kin || v.blog || v.news)) return null;
+    if (store) { try { await store.setJSON(ck, { ts: Date.now(), v }); } catch { /* noop */ } }
+    return v;
+  };
+  await Promise.all(g.map(async (x) => {
+    const res = await Promise.all(x.queries.map(one));
+    const m = mergeSignals(res);
+    if (m) data[x.key] = m;
   }));
   if (store && meta.calls) { try { await store.setJSON("susage_" + day, { n: used + meta.calls }); } catch { /* noop */ } }
   return { data, meta };

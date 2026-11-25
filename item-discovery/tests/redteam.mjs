@@ -147,6 +147,31 @@ console.log("1d. 분야 필수 · 'AI가 찾아주세요' 버튼 삭제");
   await ctx.close();
 }
 
+console.log("1e. 다른 방향으로 다시 찾기 버튼");
+{
+  const { ctx, page, errs } = await open();
+  ok((await page.evaluate(() => { App.showSample(); return document.body.innerText.includes("다른 방향으로 다시 찾기"); })) === false, "샘플에서는 버튼 없음");
+  const r = await page.evaluate(async () => {
+    const R = JSON.parse(JSON.stringify(SAMPLE_RESULT));
+    State.lastInput = { userType: "창업자", budget: "under300만", fields: ["care"], industry: "__AI_FIND__", knownProblem: "__AI_FIND__", resources: { hw: [], sw: [], human: [] }, preferredForms: [] };
+    State.result = R; State.isSample = false; Result.render(); App.show("result");
+    let sent = []; window.fetch = (u, o) => { if (String(u).includes("/api/discover")) { sent.push(JSON.parse(o.body)); return Promise.resolve({ status: 202, json: async () => ({}) }); } return new Promise(() => {}); };
+    const has = document.body.innerText.includes("다른 방향으로 다시 찾기");
+    Result.rediscover(); await new Promise((res) => setTimeout(res, 200));
+    const first = sent[0]?.input?.exclude || [];
+    State.result = JSON.parse(JSON.stringify(SAMPLE_RESULT)); State.result.top5.forEach((o, i) => { o.title = o.narrative.name = "새 이름 " + i; o.narrative.problem = "새 문제 " + i; o.problem = { statement: "새 문제 " + i }; });
+    Result.rediscover(); await new Promise((res) => setTimeout(res, 200));
+    const second = sent[1]?.input?.exclude || [];
+    return { has, first, second, fields: sent[0]?.input?.fields };
+  });
+  ok(r.has, "실제 결과에는 버튼 표시");
+  ok(r.first.includes("시니어잡링크") && r.first.length === 10, "1차: 지금 후보 5개의 이름·문제 10개 제외");
+  ok(r.second.length === 15 && r.second[0] === "새 이름 0" && r.second.includes("시니어잡링크"), "2차: 누적 제외(최대 15개, 최신 우선)");
+  ok(r.fields.join() === "care", "분야 등 원래 조건 유지");
+  ok(errs.length === 0, "오류 0 " + (errs[0] || ""));
+  await ctx.close();
+}
+
 console.log("2. 조작된 이어하기 세션(localStorage) — 입력칸 주입");
 {
   const { ctx, page, errs } = await open(1280, true);

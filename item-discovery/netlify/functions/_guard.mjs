@@ -79,6 +79,8 @@ export function normalizeInput(raw) {
     resources: { hw: cleanList(r.hw, 8, 40), sw: cleanList(r.sw, 8, 40), human: cleanList(r.human, 8, 40) },
     region: keepSent(raw.region, 60) || "__ANY__",
     targetAge: keepSent(raw.targetAge, 60) || "__ANY__",
+    // '다른 방향으로 다시 찾기': 이전 결과의 아이템 이름·문제(최대 15개)
+    exclude: cleanList(raw.exclude, 15, 60),
     preferredForms: [...new Set([...(Array.isArray(raw.preferredForms) ? raw.preferredForms : []), LEGACY_FORM[raw.preferredForm]]
       .filter((f) => FORM_KEYS.includes(f)))].slice(0, 2),
   };

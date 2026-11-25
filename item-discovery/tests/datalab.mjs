@@ -84,7 +84,7 @@ globalThis.fetch = origFetch;
 const c1 = R.top5.find((x) => x.problem.statement.includes("요양"));
 const c2 = R.top5.find((x) => x.problem.statement.includes("출결"));
 ok(calls.filter((x) => x.url === DATALAB.endpoint).length === 1, "탐색 1건에 데이터랩 1회");
-ok(calls.filter((x) => x.url.includes("/search/v1/")).length === 6, "문제 2개 × 지식iN·블로그·뉴스 = 검색 6회");
+ok(calls.filter((x) => x.url.includes("/search/v1/")).length === 9, "문제 1은 문구 2개, 문제 2는 1개 × 지식iN·블로그·뉴스 = 검색 9회");
 ok(c1.signals.evidenceConfidence === "L2" && c1.trend && c1.trend.yoy > 0, "검색 추이 + 지식iN·블로그·뉴스 → 근거 L2 (L3는 자동 부여 안 함)");
 ok(c1.voice.kin.relevant === 8 && c1.voice.kin.samples[0].title === "요양 기록 수기 어떻게 쓰나요?", "지식iN: 관련 질문만(20개 중 8개) · 제목 태그 제거 (" + c1.voice.kin.relevant + ")");
 ok(c1.voice.kin.samples.every((x) => !x.title.includes("건강검진")), "무관한 질문(건강검진)은 제외");
@@ -109,6 +109,20 @@ console.log("4. 문제가 6개 이상이어도 최종 5개 후보 모두 조회"
   const top = R6.top5.map((c) => c.problem.searchKeywords[0]);
   ok(top.every((k) => sent.includes(k)), "최종 후보의 검색어가 모두 조회됨 " + JSON.stringify({ top, sent }));
   ok(R6.top5.every((c) => c.trend), "최종 5개 모두 추이 결과(있음/부족) 보유");
+}
+
+console.log("5. 근거 안정화 — 문구 2개 중 관련 결과가 많은 쪽 채택");
+{
+  const { mergeSignals } = await import("../netlify/functions/_search.mjs");
+  const weak = { query: "초기창업 경영진단 비용", kin: { relevant: 2, sampled: 20, total: 50, samples: [] }, blog: { relevant: 3, recent: 1 }, news: null };
+  const strong = { query: "스타트업 경영진단", kin: { relevant: 11, sampled: 20, total: 900, samples: [{ title: "스타트업 경영진단 어디서" }] }, blog: { relevant: 1, recent: 0 }, news: { relevant: 4, recent: 3 } };
+  const m = mergeSignals([weak, strong]);
+  ok(m.kin.relevant === 11 && m.query === "스타트업 경영진단", "지식iN은 관련 11건 쪽 채택");
+  ok(m.blog.relevant === 3 && m.news.relevant === 4, "블로그·뉴스도 서비스별로 더 나은 쪽");
+  ok(mergeSignals([null, weak]).kin.relevant === 2 && mergeSignals([null, null]) === null, "한쪽 실패·모두 실패 처리");
+  // 실행마다 AI 문구가 달라져도(약한 문구) 핵심 검색어 쪽이 받쳐 주면 등급이 유지됨
+  const { meaningfulTypes } = await import("../netlify/functions/_search.mjs");
+  ok(meaningfulTypes(mergeSignals([weak, strong])).includes("qna") && !meaningfulTypes(weak).includes("qna"), "약한 문구만이면 근거 없음 → 2문구 병합 시 근거 유지");
 }
 
 console.log(`\n결과: ${pass} 통과 / ${fail} 실패`);

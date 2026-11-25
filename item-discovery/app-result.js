@@ -44,7 +44,7 @@ const Result = {
   head(){
     const n=State.result.top5.length;
     return `<div class="result-head">
-      <div class="result-badge">✨ 탐색 완료</div>
+      <div class="result-badge">${State.result._rediscover?'🔄 다른 방향으로 찾은 결과':'✨ 탐색 완료'}</div>
       <h2>당신에게 맞는 ${n}개의 사업기회를 찾았어요</h2>
       <p class="result-lead">각 기회는 서로 다른 강점을 가지고 있어요. 아래에서 비교하고, 검토하고 싶은 것을 골라보세요.
         <button class="lead-info" onclick="Result.scrollDisclaimer()">이 결과는 어떻게 봐야 하나요? ▾</button></p>
@@ -247,13 +247,24 @@ const Result = {
         <button class="btn btn-primary btn-sm" ${State.primary?'':'disabled'} onclick="Result.handoff()">선택한 아이템 검증하기 →</button>
         <button class="btn btn-ghost btn-sm" onclick="Report.open()">📄 결과보고서 PDF</button>
         <a class="btn btn-ghost btn-sm" href="${Plus.mailHref(State.result)}">✉ 결과 담아 메일 상담</a>
-        <button class="btn btn-ghost btn-sm" onclick="App.restart()">다시 탐색</button>
+        ${this.canRediscover()?`<button class="btn btn-ghost btn-sm" onclick="Result.rediscover()" title="같은 조건으로, 지금 나온 후보와 다른 고객·문제를 찾아요">🔄 다른 방향으로 다시 찾기</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="App.restart()">처음부터 다시</button>
       </div>
       <p class="consult-note">메일 상담은 고객님 메일 앱에서 초안(문서번호·후보 목록)이 열립니다. 입력하신 경험·자원은 담기지 않고, 서버로 전송되지 않습니다. · ${this.esc(COMPANY_INFO.certification)}</p>
     </div>`;
   },
 
   // --- interactions ---
+  // 같은 입력으로, 지금(그리고 앞서 '다른 방향'으로 본) 후보를 빼고 다시 탐색
+  canRediscover(){ return !State.isSample && !!State.lastInput; },
+  rediscover(){
+    if(!this.canRediscover()) return;
+    const R=State.result;
+    const cur=(R.top5||[]).flatMap(o=>[o.narrative?.name||o.title, o.problem?.statement||o.narrative?.problem]).map(x=>String(x||"").slice(0,60)).filter(Boolean);
+    State.excludeChain=[...cur, ...(State.excludeChain||[])].filter((x,i,a)=>a.indexOf(x)===i).slice(0,15);
+    App.toast("지금 후보와 다른 방향으로 찾고 있어요");
+    Discovery.run({ ...State.lastInput, exclude: State.excludeChain });
+  },
   toggle(id){ document.getElementById("card_"+id).classList.toggle("open"); },
   cleanInsight(text){
     if(!text) return "";
