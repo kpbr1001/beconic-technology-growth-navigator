@@ -580,6 +580,12 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 .hr-guide{margin-top:14px;border:1px solid #d4e6f7;border-left:4px solid var(--blue);border-radius:var(--r-md);background:#f7fbff;padding:14px 16px;}
 .hr-guide b{color:var(--navy);}
 .hr-guide p{margin:6px 0 0;font-size:13.8px;color:var(--ink-soft);line-height:1.6;}
+.qa-ex{margin:6px 0 2px;font-size:12.5px;color:var(--ink-soft);background:#f7f9fc;border-radius:8px;padding:6px 10px;line-height:1.45;}
+.cause-box{margin:14px 0 4px;border:1px solid #f3d9b0;border-left:4px solid var(--amber-deep);border-radius:var(--r-md);background:#fffaf2;padding:12px 16px;}
+.cause-box b{color:var(--navy);font-size:14px;}
+.cause-box ul{margin:8px 0 6px;padding-left:18px;}
+.cause-box li{font-size:13.5px;color:var(--ink-soft);line-height:1.55;margin:4px 0;}
+.cause-box small{font-size:12px;color:var(--muted);}
 .qa-hint{margin:2px 0 10px;font-size:13px;color:var(--ink-soft);background:#f7fbff;border:1px dashed #cfe0f5;border-radius:10px;padding:8px 12px;}
 .risk-box{background:linear-gradient(180deg,#fffaf0,#fff);border:1px solid #f6e2b6;border-radius:var(--r-md);
   padding:22px 24px;box-shadow:var(--sh-sm);}
@@ -1288,7 +1294,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
         <div class="field" data-k="depth">
           <label>진단 깊이<span class="req">*</span></label>
           <div class="chips" id="c-depth"></div>
-          <p class="help" style="margin:8px 0 0">간이 진단은 영역별 핵심 1문항으로 방향만 봅니다(신뢰도 최대 '보통'). 보고서 제출·상담용이면 <b>표준 진단</b>을 권장합니다.</p>
+          <p class="help" style="margin:8px 0 0">간이 진단은 창업 단계에 맞춘 영역별 핵심 1문항으로 방향만 봅니다(신뢰도 최대 '보통'). 보고서 제출·상담용이면 <b>표준 진단</b>을 권장합니다.</p>
         </div>
 
         <div class="field" data-k="name">
@@ -1315,8 +1321,13 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
           <div class="err-tip">⚠ 업종을 선택해 주세요.</div>
         </div>
 
+        <div class="field" data-k="form" id="fld-form" style="display:none">
+          <label>업태<span class="opt">선택 · 업종에 맞춰 문항 문구와 '해당 없음'이 바뀝니다</span></label>
+          <div class="chips" id="c-form"></div>
+        </div>
+
         <div class="field" data-k="biztype">
-          <label>업태 또는 세부 사업내용<span class="opt">선택</span></label>
+          <label>세부 사업내용<span class="opt">선택 · 보고서 표기용</span></label>
           <input type="text" id="f-biztype" placeholder="예: 정밀부품 가공, 온라인 식품 판매, B2B SaaS 등" maxlength="60" autocomplete="off">
         </div>
       </div>
@@ -1356,7 +1367,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
       <div class="step-card" id="fstep-3" style="display:none;">
         <div class="q-no">STEP 03 · 성숙도 진단</div>
         <h3>지금 실제로 하고 있는 것에 가장 가까운 단계를 골라 주세요</h3>
-        <p class="help">회사 규모와 상관없이 <b>현재 행동</b>만 봅니다. 0 미착수 · 1 시작 · 2 정례화 · 3 체계화. 잘 모르면 <b>'모름'</b>을 누르세요 — 0점이 아니라 '응답 없음'으로 처리되고 신뢰도에만 반영됩니다. 영역 옆 숫자는 같은 단계 기업의 기대수준입니다.</p>
+        <p class="help">회사 규모와 상관없이 <b>최근 <span data-cnt="recall"></span>개월 동안 실제로 한 행동</b>만 봅니다(계획·예정은 제외). 0 미착수 · 1 시작 · 2 정례화 · 3 체계화. 잘 모르면 <b>'모름'</b>을 누르세요 — 0점이 아니라 '응답 없음'으로 처리되고 신뢰도에만 반영됩니다. 영역 옆 숫자는 같은 단계 기업의 기대수준입니다.</p>
         <div class="q-prog"><div class="q-bar"><div class="q-fill" id="q-fill"></div></div><span id="q-count"></span></div>
         <div id="q-list"></div>
         <div class="err-tip" id="q-err"></div>
@@ -1540,9 +1551,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.4.1";
+const APP_VERSION = "v6.6.0";
 const APP_UPDATED = "2026-11-25";
-const APP_BUILD   = "2026.11.25.2";  // 배포 빌드 식별자
+const APP_BUILD   = "2026.11.25.4";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
 const LEGAL_BASIS_DATE = "2026-10-26";  // 법령·제도 출처를 마지막으로 확인한 날(도구 버전 날짜와 별개)
 
@@ -1560,13 +1571,15 @@ const copyYears = ()=>{ const y=new Date().getFullYear(); return y>COMPANY.since
 const RULES = {
   minutes:{quick:5, standard:13},                // 화면 안내용 예상 소요 시간
   expect:{indMin:0.6, indMax:1.1, cap:75},       // 기대수준 = 단계 기준값 × 업종 보정(indMin~indMax), 상한 cap(정례화 67~체계화 사이)
-  priority:{concern:15, unknownArea:10, legal:20, gapToAct:0.15, focus:8, doneCut:100, halfCut:67, half:0.5,
+  priority:{concern:15, unknownArea:10, legal:20, rootCause:8, gapToAct:0.15, focus:8, doneCut:100, halfCut:67, half:0.5,
             relExclude:0.22, relFloor:0.6, nowGap:-15, nowRel:0.8, maxNow:3, acts:6, perArea:{early:3, other:2},
             fillNext:12, fillKeep:6},
   strong:{min:60, margin:10},                    // 강점 = max(min, 기대+margin) 이상
   people:{bylawEmp:["e1029","e3049","e50"], bylawMin:10, soloEmp:"e1", deepMin:"15~25분"},   // 조직·인력: 취업규칙 과제는 상시 10인 이상만(근로기준법 제93조), 1인 기업은 직원 관련 과제 제외 — 점수·기대수준에는 인원 미사용
   plan:{cycleDays:90, perPhase:2},                // 실행계획 기간(=재진단 주기, BECONIC 31 브랜드 약속 90일)·구간별 과제 수
-  input:{maxConcern:3, maxCustom:6},              // 고민 최대 선택 수 · 컨설턴트 직접 추가 과제/KPI 최대 수
+  input:{maxConcern:3, maxCustom:6},
+  recallMonths:3,                                // 문항 응답 기준 기간: 최근 N개월 동안 실제로 한 행동
+  maxCauses:2,                                    // 원인 가설 최대 표시 수              // 고민 최대 선택 수 · 컨설턴트 직접 추가 과제/KPI 최대 수
   conf:{flagPenalty:8, straightCap:60, quickCap:70, straightMin:9, high:75, mid:50, minCoverage:0.5}
 };
 const STORE_KEY = "gan_state_v6";   // v5 이하 저장값(구조 다름)은 읽지 않음
@@ -1711,6 +1724,8 @@ const SRC = {
   L_FTA:{k:"법령",s:"FTA관세법",f:"자유무역협정의 이행을 위한 관세법의 특례에 관한 법률 — 원산지 결정·증명."},
   L_TM:{k:"법령",s:"상표법 제35조",f:"상표법 제35조 — 선출원주의(먼저 출원한 자가 등록)."},
   L_PAT:{k:"법령",s:"특허법 제29조",f:"특허법 제29조 — 신규성·진보성(공개 전 출원 필요)."},
+  L_FOOD:{k:"법령",s:"식품위생법",f:"식품위생법 — 식품접객업 영업 신고, 영업자 위생교육, 종사자 건강진단, 위생 관리 기준."},
+  L_ORIGIN:{k:"법령",s:"원산지표시법",f:"농수산물의 원산지 표시 등에 관한 법률 — 음식점 등의 원산지 표시 의무."},
   P_HT:{k:"공공",s:"국세청 홈택스",f:"국세청 홈택스(hometax.go.kr) — 사업자등록·업종코드 조회."},
   P_KS:{k:"공공",s:"K-Startup",f:"K-Startup(k-startup.go.kr) — 창업지원사업 통합 공고."},
   P_BIZ:{k:"공공",s:"기업마당",f:"기업마당(bizinfo.go.kr) — 중앙부처·지자체 지원사업 통합 공고."},
@@ -1747,7 +1762,7 @@ const LV_SCORE = [0,33,67,100];
 const LV_NM = ["미착수","시작","정례화","체계화"];
 const QUESTIONS = [
   {id:"F1",area:"foundation",core:true,t:"사업자등록·업종코드·필수 인허가(신고)를 어떻게 관리하고 있나요?",
-   lv:["사업자등록 전이거나 필요한 인허가를 아직 모름","등록은 했지만 업종코드·인허가 요건은 따로 확인하지 않음","업종코드·필수 인허가·신고를 확인해 모두 갖춤","갖춘 데 더해 업종 추가·이전 등 변경 때마다 점검하는 절차가 있음"],
+   lv:["사업자등록 전이거나 필요한 인허가를 아직 모름","등록은 했지만 업종코드·인허가 요건은 따로 확인하지 않음","업종코드·필수 인허가·신고를 확인해 모두 갖춤","모두 갖춘 데 더해 업종 추가·이전 등 변경 때마다 점검하는 절차가 있음"],
    src:["P_HT","L_ECOM"]},
   {id:"F2",area:"foundation",t:"거래할 때 계약서·견적서 같은 거래서류를 쓰나요?",
    lv:["주로 말이나 메신저로 거래","일부 거래만 계약서·견적서를 작성","표준 계약서·견적서·거래명세 양식을 정해 대부분 거래에 사용","표준 양식의 핵심 조항(대금·지연·지식재산)을 전문가 검토받고 정기적으로 고침"],
@@ -1768,7 +1783,7 @@ const QUESTIONS = [
    lv:["확보 경로가 아직 없음","대표 개인 인맥·소개에 의존","반복 가능한 채널이 2개 이상 있음(온라인·제휴·입찰 등)","채널별 문의→계약 전환율을 측정하고 개선"],
    src:["S_MC"]},
   {id:"S2",area:"sales",t:"영업에 쓰는 자료와 절차가 있나요?",
-   lv:["따로 없음","회사·제품 소개서만 있음","소개서·제안서·고객 사례(레퍼런스)를 갖춤","잠재고객 목록·단계별 후속 절차가 정해져 누구나 같은 방식으로 영업"],
+   lv:["따로 없음","소개서·제안서·고객 사례(레퍼런스) 중 1~2가지만 있음","소개서·제안서·고객 사례 3가지를 모두 갖춤","3가지에 더해 잠재고객 목록·단계별 후속 절차가 정해져 누구나 같은 방식으로 영업"],
    src:["B_RULE"]},
   {id:"S3",area:"sales",t:"기존 고객의 재구매·이탈을 관리하나요?",
    lv:["관리하지 않음","거래 기록만 남김","핵심 고객 목록을 두고 정기적으로 연락","재구매율·이탈률을 측정하고 이탈 신호에 대응"],
@@ -1777,7 +1792,7 @@ const QUESTIONS = [
    lv:["온라인 접점이 없음","SNS·지도 등록 등 기본 채널 1개만 있음","홈페이지(또는 스토어)와 핵심 채널을 정기적으로 운영","유입·문의 데이터를 측정해 채널을 개선"],
    src:["S_MC"]},
   {id:"M1",area:"marketing",t:"브랜드(이름·핵심 메시지)를 어떻게 관리하나요?",
-   lv:["이름·한 줄 소개가 아직 없음","이름만 정함","이름·한 줄 소개·핵심 메시지를 정리하고 상표 검색을 함","상표 출원(등록)과 디자인·문구 기준을 갖춰 일관되게 사용"],
+   lv:["이름·한 줄 소개가 아직 없음","이름만 정함","이름·한 줄 소개·핵심 메시지를 문서로 정리하고 상표 검색까지 함","정리·검색에 더해 상표를 출원(등록)하고 디자인·문구 기준을 정해 일관되게 사용"],
    src:["L_TM","P_KIPRIS"]},
   {id:"M3",area:"marketing",t:"마케팅 성과를 관리하나요?",
    lv:["마케팅 활동이 없음","필요할 때 비정기적으로 홍보","월간 계획(콘텐츠·광고 일정)에 따라 운영","채널별 비용·전환(고객획득비용 등)을 측정해 예산을 재배분"],
@@ -1825,20 +1840,165 @@ const QUESTIONS = [
    lv:["쓰지 않음","개인적으로 가끔 사용","정해진 업무(문서·견적·고객응대 등)에 정해서 사용","업무 절차에 정착시키고 절감 시간 등 효과를 측정"],
    src:["B_RULE"]},
   {id:"D3",area:"digital",t:"정보보안·개인정보 보호는 어떻게 하나요?",
-   lv:["점검한 적 없음","비밀번호 등 기본만 지킴","접근 권한·백업·개인정보 처리방침을 갖춤","정기 점검·교육을 하고 사고 대응 절차가 있음"],
+   lv:["점검한 적 없음","접근 권한·백업·개인정보 처리방침 중 1~2가지만 갖춤(비밀번호 등 기본만 지키는 경우 포함)","접근 권한·백업·개인정보 처리방침 3가지를 모두 갖춤","3가지에 더해 연 1회 이상 점검·교육을 하고 사고 대응 절차가 있음"],
    src:["L_PIPA","S_ISO27"]},
   {id:"H1",area:"people",core:true,t:"필요한 사람을 어떻게 확보하고 적응시키나요?",
    lv:["필요한 인력·역할을 따로 계획하지 않음","필요할 때 지인 소개·급한 공고로 뽑음","직무별 역할·채용 기준(직무기술서·면접 기준)을 정해 뽑음","연간 인력계획을 세우고 채용 후 적응(온보딩) 절차까지 운영"],
    src:["S_HU","S_GR"]},
   {id:"H2",area:"people",t:"근로계약·임금 등 노무 기본을 갖췄나요?",
-   lv:["점검한 적 없음","근로계약서를 일부 직원과만 작성","모든 직원과 서면 근로계약·임금명세서 교부·4대보험 가입을 갖춤","갖춘 데 더해 취업규칙(해당 시)·정기 노무 점검으로 법 개정까지 반영"],
+   lv:["점검한 적 없음","서면 근로계약·임금명세서 교부·4대보험 중 일부만 갖춤","모든 직원에게 3가지(서면 근로계약·임금명세서 교부·4대보험)를 모두 갖춤","3가지에 더해 취업규칙(상시 10명 이상)·연 1회 이상 노무 점검으로 법 개정까지 반영"],
    na:"직원 없음(대표 1인)", src:["L_LSA"]},
   {id:"H3",area:"people",t:"직원의 성과 평가·보상·성장은 어떻게 관리하나요?",
-   lv:["평가·보상 기준이 없음","대표 판단으로 가끔(연 1회 정도) 결정","목표·평가 기준과 보상 원칙을 문서로 정해 직원과 공유","정기 면담·교육을 운영하고 핵심인재 유지(이직률 등)를 측정"],
+   lv:["평가·보상 기준이 없음","대표 판단으로 가끔(연 1회 정도) 결정","목표·평가 기준과 보상 원칙을 문서로 정해 직원과 공유","문서화에 더해 정기 면담(분기 1회 이상)·교육을 운영하고 핵심인재 이직률을 측정"],
    na:"직원 없음(대표 1인)", src:["S_HU","B_RULE"]}
 ];
 const Q_BY_ID = {}; QUESTIONS.forEach(q=>{ Q_BY_ID[q.id]=q; });
-function askedQuestions(depth){ return depth==="quick" ? QUESTIONS.filter(q=>q.core) : QUESTIONS; }
+
+/* A5 간이 진단(영역별 1문항)을 창업 단계에 맞춰 고른다 — 문항 수는 그대로(영역 수와 같음).
+   단계마다 그 시기에 가장 차이가 나는 행동을 묻는다(BECONIC 실무기준). 단계가 없으면 core 문항 */
+const QUICK_BY_STAGE = {
+  pre:["F1","B1","S1","M1","R1","C1","I2","E1","D1","H1"],
+  y1: ["F2","B3","S1","M2","R1","C2","I1","E1","D1","H1"],
+  y13:["F3","B2","S1","M2","R1","C1","I1","E1","D1","H2"],
+  y35:["F3","B2","S3","M3","R3","C3","I2","E2","D2","H3"],
+  y57:["F3","B3","S3","M3","R3","C3","I3","E2","D2","H3"],
+  y7: ["F3","B2","S3","M1","R1","C3","I1","E2","D1","H3"]
+};
+function askedQuestions(depth, stage){
+  if(depth!=="quick") return QUESTIONS;
+  const ids = QUICK_BY_STAGE[stage];
+  return ids ? QUESTIONS.filter(q=>ids.includes(q.id)) : QUESTIONS.filter(q=>q.core);
+}
+
+/* A4 업종별 예시 — 문항은 같고, 이해를 돕는 예시만 업종군에 맞춰 보여 준다(점수와 무관) */
+const IND_GROUP = {mfg:"mfg", food:"food", retail:"com", trade:"com", it:"it", platform:"it", svc:"svc", pro:"svc", edu:"svc", content:"svc", etc:"svc"};
+const Q_EX = {
+  F1:{mfg:"공장등록(해당 시)·업종별 제조 허가", food:"영업신고(일반·휴게음식점)·위생교육·보건증", com:"통신판매업 신고·취급 품목별 신고·허가", it:"통신판매업 신고(유료 판매 시)·부가통신사업 신고(해당 시)", svc:"업종별 등록·자격 요건(학원 등록 등 해당 시)"},
+  S1:{mfg:"대리점·B2B 전시회·입찰·기존 거래처 소개", food:"배달앱·지도 검색·단골·지역 커뮤니티", com:"오픈마켓·자사몰·스마트스토어·도매처", it:"검색광고·마켓플레이스·파트너 리셀러", svc:"소개·제휴·플랫폼 등록"},
+  M2:{mfg:"홈페이지 제품 페이지·B2B 플랫폼 등록", food:"지도 등록·리뷰 관리·SNS", com:"스토어 상세페이지·검색 노출", it:"서비스 소개 페이지·앱스토어 페이지", svc:"홈페이지·블로그·포트폴리오"},
+  R3:{mfg:"시제품 제작·공정 개선 일정", food:"신메뉴 개발·레시피 표준화", com:"신상품 기획·소싱 일정", it:"개발 일정(스프린트)·버전 관리", svc:"서비스 프로그램 개발·개선 일정"},
+  C1:{mfg:"KC 인증·ISO 9001·직접생산확인", food:"HACCP(해당 품목)·위생등급제", com:"취급 품목 KC 인증·식품 표시 기준·수출국 인증", it:"GS인증·정보보호 인증(해당 시)", svc:"업종별 자격·서비스 인증(해당 시)"},
+  C2:{mfg:"출하 검사 기록·불량률 관리", food:"위생 점검표·식재료 온도·유통기한 기록", com:"입고 검수·반품 사유 기록", it:"배포 전 테스트·장애 기록", svc:"고객 만족·클레임 기록"},
+  D1:{mfg:"생산·재고 기록(ERP·MES)", food:"POS·배달앱 주문 데이터", com:"재고·주문 관리 프로그램", it:"CRM·이슈 관리 도구", svc:"고객 명단·예약·상담 기록"},
+  E1:{mfg:"대상국 규격·HS코드·현지 유통 구조", food:"수출국 식품 등록·표시 규정", com:"해외 오픈마켓·대상국 인증", it:"해외 결제·현지화·데이터 규제", svc:"해외 고객 대상 서비스 방식"}
+};
+function qExample(q, ind){ if(q._var) return ""; const m=Q_EX[q.id]; return m ? (m[IND_GROUP[ind]||"svc"]||"") : ""; }
+
+/* ③ 업태 — 업종 아래 선택지(선택 입력). 문항·점수 체계는 그대로 두고, 업태에 따라 '해당 없음'을 허용하는 문항을 바꾼다.
+   (자유 입력 '세부 사업내용'은 보고서 표기용으로 유지) */
+const FORM = {
+  mfg:[{v:"parts",t:"부품·소재(OEM·협력사)"},{v:"product",t:"완제품(자체 브랜드)"},{v:"consumer",t:"식품·화장품 등 소비재 제조"}],
+  food:[{v:"hall",t:"홀 영업 중심"},{v:"delivery",t:"배달·포장 중심"},{v:"franchisee",t:"프랜차이즈 가맹점"},{v:"franchisor",t:"프랜차이즈 본사"}],
+  retail:[{v:"online",t:"온라인 판매"},{v:"offline",t:"오프라인 매장"},{v:"wholesale",t:"도매·유통"}],
+  it:[{v:"saas",t:"B2B 솔루션·SaaS"},{v:"app",t:"앱·B2C 서비스"},{v:"si",t:"SI·외주 개발"}],
+  platform:[{v:"market",t:"중개·마켓플레이스"},{v:"sub",t:"구독·커뮤니티"}],
+  content:[{v:"media",t:"영상·미디어 제작"},{v:"design",t:"디자인·출판"},{v:"creator",t:"크리에이터·1인 미디어"}],
+  edu:[{v:"academy",t:"학원·교습소"},{v:"online",t:"온라인 교육"},{v:"corp",t:"기업 교육·강의"}],
+  pro:[{v:"consult",t:"컨설팅·자문"},{v:"agency",t:"마케팅·디자인 대행"},{v:"eng",t:"기술 용역·설계"}],
+  svc:[{v:"life",t:"생활 서비스(미용·세탁 등)"},{v:"biz",t:"사업 지원 서비스(시설·청소 등)"}],
+  trade:[{v:"export",t:"수출 중심"},{v:"import",t:"수입·국내 유통 중심"}],
+  etc:[]
+};
+/* 업태별로 추가로 '해당 없음'을 고를 수 있는 문항(가맹점의 브랜드·메뉴 개발처럼 본사 몫인 경우 등) */
+const FORM_NA = {
+  "food.franchisee":{M1:"브랜드는 가맹 본사가 관리", R2:"상표·지식재산은 가맹 본사가 보유", R3:"메뉴 개발은 가맹 본사가 담당"},
+  "retail.wholesale":{R3:"직접 상품 개발 없이 유통만 함"},
+  "trade.import":{R3:"직접 개발 없이 수입해 판매"}
+};
+function formOf(d){ const f=d.form; return (FORM[d.industry]||[]).some(o=>o.v===f) ? f : null; }
+function formNm(d){ const f=formOf(d); return f ? (FORM[d.industry].find(o=>o.v===f)||{}).t : ""; }
+
+/* ① 업종별 문구 변형 — 재는 행동 수준(0 미착수·1 시작·2 정례화·3 체계화)은 같고, 질문·단계 문구만 업종군 언어로.
+   같은 문항 ID·같은 점수라 업종 간·재진단 비교가 유지된다. 변형이 없으면 공통 문구 */
+const Q_VAR = {
+  F1:{
+    food:{src:["L_FOOD","P_HT"],t:"영업신고·위생교육·보건증 등 음식점 필수 요건을 어떻게 관리하나요?",
+      lv:["영업신고 전이거나 필요한 요건을 아직 모름","영업신고는 했지만 위생교육·보건증 등은 따로 챙기지 않음","영업신고·위생교육·종사자 보건증 등 필수 요건을 모두 갖춤","모두 갖춘 데 더해 갱신 시기와 변경 신고를 일정으로 관리"]},
+    mfg:{t:"공장등록·제조 관련 인허가와 업종코드를 어떻게 관리하나요?",
+      lv:["필요한 등록·인허가를 아직 모름","사업자등록은 했지만 공장등록·제품별 인허가 요건은 따로 확인하지 않음","공장등록(해당 시)·제품별 필수 인허가·신고를 확인해 모두 갖춤","모두 갖춘 데 더해 설비 증설·이전·품목 추가 때마다 점검하는 절차가 있음"]},
+    com:{t:"통신판매업 신고와 취급 품목별 신고·허가를 어떻게 관리하나요?",
+      lv:["필요한 신고·허가를 아직 모름","사업자등록은 했지만 통신판매업·품목별 요건은 따로 확인하지 않음","통신판매업 신고(온라인 판매 시)와 취급 품목별 신고·허가를 모두 갖춤","모두 갖춘 데 더해 품목·판매 채널을 늘릴 때마다 요건을 점검하는 절차가 있음"]}
+  },
+  S1:{
+    food:{t:"새 손님은 주로 어떻게 오나요?",
+      lv:["손님을 늘리는 경로를 따로 두지 않음(지나가는 손님 위주)","지인·단골 소개와 우연한 방문에 의존","지도 검색·배달앱·SNS 등 손님이 오는 경로가 2개 이상 있음","경로별 방문·주문 수를 확인하고 잘되는 경로에 집중"]},
+    mfg:{t:"새 거래처는 주로 어떻게 확보하나요?",
+      lv:["확보 경로가 아직 없음","대표 인맥·기존 거래처 소개에 의존","전시회·B2B 플랫폼·입찰·대리점 등 반복 가능한 경로가 2개 이상 있음","경로별 상담→계약 전환율을 측정하고 개선"]},
+    com:{t:"새 구매 고객은 주로 어떻게 확보하나요?",
+      lv:["판매 채널이 아직 없음","지인 소개나 판매 채널 1곳에 의존","오픈마켓·자사몰·오프라인 등 판매 채널이 2개 이상 있음","채널별 유입→구매 전환율·광고 효율을 측정하고 개선"]},
+    it:{t:"새 고객(사용자)은 주로 어떻게 확보하나요?",
+      lv:["확보 경로가 아직 없음","대표 인맥·지인 소개에 의존","검색·콘텐츠·광고·파트너 등 반복 가능한 유입 경로가 2개 이상 있음","경로별 가입→유료 전환율을 측정하고 개선"]}
+  },
+  M2:{
+    food:{t:"손님이 온라인에서 우리 가게를 찾을 수 있나요?",
+      lv:["온라인에 등록된 곳이 없음","지도 등록 등 기본 1곳만 있음","지도·배달앱·SNS를 정기적으로 관리(메뉴·사진·리뷰 응대)","검색·리뷰·주문 데이터를 보고 채널 운영을 개선"]},
+    mfg:{t:"거래처가 온라인에서 우리 회사·제품을 찾을 수 있나요?",
+      lv:["온라인 접점이 없음","회사 소개 정도만 있음","홈페이지 제품 페이지·B2B 플랫폼 등록을 정기적으로 관리","문의 데이터를 측정해 채널을 개선"]},
+    com:{t:"고객이 온라인에서 우리 상품을 찾을 수 있나요?",
+      lv:["온라인 판매·노출 채널이 없음","채널 1곳에 상품만 등록","상세페이지·검색 노출을 정기적으로 관리","유입·전환 데이터를 보고 상품·채널을 개선"]}
+  },
+  R1:{
+    food:{t:"다른 가게와 다른 점(메뉴·맛·가격·서비스)을 근거로 설명할 수 있나요?",
+      lv:["차별점을 정리하지 않음","'맛있다' 같은 주장은 있지만 근거는 없음","대표 메뉴·원재료·가격 비교와 손님 리뷰 등으로 차별점을 정리","차별점을 지키고 늘릴 메뉴 개선 계획이 있음"]},
+    com:{t:"다른 판매처와 다른 점(상품 구성·가격·배송·서비스)을 근거로 설명할 수 있나요?",
+      lv:["차별점을 정리하지 않음","차별점 주장은 있으나 근거 자료는 없음","상품·가격·배송 조건 비교표와 후기 데이터로 차별점을 정리","차별점을 유지·확대할 상품 기획 계획이 있음"]},
+    svc:{t:"다른 업체와 다른 점(전문성·결과·서비스 방식)을 근거로 설명할 수 있나요?",
+      lv:["차별점을 정리하지 않음","차별점 주장은 있으나 근거 자료는 없음","수행 사례·고객 후기·결과 데이터로 차별점을 정리","차별점을 유지·확대할 서비스 개선 계획이 있음"]}
+  },
+  R3:{
+    food:{t:"메뉴 개발·개선은 어떤 체계로 하나요?",
+      lv:["메뉴 개발 계획이 없음","대표 감각으로 그때그때 바꿈","신메뉴 일정과 레시피·원가표를 정해 진행","시즌 메뉴 계획과 판매 데이터 기반 개선을 정기적으로 함"], na:"메뉴 개발이 필요 없는 업태"},
+    com:{t:"상품 기획·소싱은 어떤 체계로 하나요?",
+      lv:["상품 기획 계획이 없음","대표 판단으로 그때그때 들여옴","시즌·카테고리별 상품 기획 일정과 소싱처를 정해 진행","판매 데이터로 상품을 정기적으로 정리·추가하고 자체 상품(PB)까지 기획"], na:"상품 기획·소싱이 필요 없는 사업"},
+    it:{t:"제품(서비스) 개발은 어떤 체계로 하나요?",
+      lv:["개발 계획이 없음","대표·개인 역량에 의존해 그때그때 개발","개발 일정(스프린트)·버전 관리·담당 인력을 정해 진행","연구소·전담부서를 두거나 정부 R&D 과제를 수행한 경험이 있음"]}
+  },
+  C1:{
+    food:{src:["L_FOOD","L_ORIGIN"],t:"음식점에 필요하거나 유리한 위생·표시 기준과 인증을 파악했나요?",
+      lv:["파악하지 않음","일부만 들어서 앎","원산지 표시·위생 기준과 유리한 인증(위생등급·HACCP 등) 요건을 정리","필요한 기준을 지키고 인증을 취득해 유지·갱신 관리"]},
+    mfg:{t:"제품에 필요하거나 유리한 인증·규격(KC·ISO 등)을 파악했나요?",
+      lv:["파악하지 않음","일부만 들어서 앎","제품별 필수·유리 인증 목록과 요건을 정리","필요한 인증을 취득해 유지·갱신 관리"]},
+    com:{t:"취급 상품에 필요한 인증·표시 기준을 파악했나요?",
+      lv:["파악하지 않음","일부만 들어서 앎","품목별 필수 인증(KC 등)·표시 기준을 정리","입고 상품의 인증·표시를 확인하는 절차가 있고 기록을 관리"]},
+    it:{src:["S_ISO27","S_ISO9"],t:"서비스에 필요하거나 유리한 인증·기준(정보보호·품질 인증 등)을 파악했나요?",
+      lv:["파악하지 않음","일부만 들어서 앎","필수·유리 인증 목록과 요건을 정리","필요한 인증을 취득해 유지·갱신 관리"]}
+  },
+  C2:{
+    food:{src:["L_FOOD"],t:"위생과 음식 품질은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","문제가 생기면 그때 대응","위생 점검표·식재료 온도·유통기한 기록이 있음","점검 기록과 손님 불만을 관리하고 원인 개선까지 함"]},
+    mfg:{t:"제품 품질은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","불량이 나면 그때 대응","검사 기준과 기록(입고·공정·출하 검사)이 있음","불량률·클레임 지표를 관리하고 원인 개선까지 함"]},
+    com:{t:"상품 품질과 배송·반품은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","문제가 생기면 그때 대응","입고 검수 기준과 반품 사유 기록이 있음","반품률·클레임 지표를 관리하고 공급처 개선까지 함"]},
+    it:{t:"서비스 품질(오류·장애)은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","오류가 나면 그때 대응","배포 전 테스트 기준과 오류·장애 기록이 있음","장애·오류 지표를 관리하고 재발 방지 개선까지 함"]},
+    svc:{t:"서비스 품질은 어떻게 관리하나요?",
+      lv:["별도 관리 없음","불만이 생기면 그때 대응","서비스 기준(체크리스트)과 고객 불만 기록이 있음","고객 만족·불만 지표를 관리하고 원인 개선까지 함"]}
+  },
+  D1:{
+    food:{t:"매출·주문·재고 데이터를 어떻게 관리하나요?",
+      lv:["종이·기억에 의존","포스(POS)·배달앱에 쌓이기만 하고 따로 보지 않음","포스·배달앱·재고 기록을 한곳에서 정기적으로 확인","메뉴별·채널별 현황을 한 화면(현황판)으로 보고 의사결정에 씀"]},
+    mfg:{t:"생산·재고·거래 데이터를 어떻게 관리하나요?",
+      lv:["종이·기억에 의존","엑셀 등 개인 파일로 관리","공유 도구(클라우드·ERP 일부)로 한곳에 관리","ERP·MES 등 시스템으로 관리하고 현황판을 봄"]},
+    com:{t:"주문·재고·고객 데이터를 어떻게 관리하나요?",
+      lv:["종이·기억에 의존","채널마다 따로 확인(엑셀 등 개인 파일)","주문·재고를 통합 관리 프로그램으로 한곳에서 관리","통합 시스템으로 채널별 판매·재고·고객 현황을 보고 의사결정에 씀"]}
+  },
+  D2:{
+    food:{t:"주문·예약·재고 업무에 자동화 도구를 쓰나요?",
+      lv:["쓰지 않음","개인적으로 가끔 사용","키오스크·테이블오더·예약·재고 알림 등 정해진 업무에 사용","업무 절차에 정착시키고 절감 시간·인건비 효과를 측정"]},
+    mfg:{t:"생산·사무 업무에 자동화·AI 도구를 쓰나요?",
+      lv:["쓰지 않음","개인적으로 가끔 사용","정해진 업무(견적·생산계획·검사 등)에 정해서 사용","업무 절차에 정착시키고 생산성·절감 효과를 측정"]}
+  }
+};
+/* 화면·보고서에 쓰는 문항 = 공통 문항 + 업종 문구 변형 + 업태 '해당 없음' */
+function qView(q, d){
+  d = d||{};
+  const v = (Q_VAR[q.id]||{})[IND_GROUP[d.industry]];
+  const fna = (FORM_NA[(d.industry||"")+"."+(formOf(d)||"")]||{})[q.id];
+  if(!v && !fna) return q;
+  return {...q, t:v?v.t:q.t, lv:v?v.lv:q.lv, na:fna||(v&&v.na)||q.na, src:(v&&v.src)||q.src, _var:!!v};
+}
+function viewQuestions(d){ return askedQuestions(d.depth, d.stage).map(q=>qView(q, d)); }
 
 /* ---------- 3. 창업 연차별 플레이북 + 단계 기대수준 ---------- */
 const STAGE = {
@@ -1954,7 +2114,7 @@ const LIB = [
    when:"첫 고객 확보 후",docs:"채널 후보 목록, 채널별 문의·계약 기록",dur:"4~8주",
    kpi:"채널별 문의 수 / 문의→계약 전환율",caution:"채널을 한꺼번에 늘리기보다 1개씩 검증 후 확대하세요.",expert:false,
    stages:["y1","y13","y35"]},
-  {id:"s2",area:"sales",q:["S1"],own:"channel",src:["L_DP","P_SMPP"],title:"공공판로(조달) 진입 검토",
+  {id:"s2",area:"sales",cust:["b2b","b2g","mix"],q:["S1"],own:"channel",src:["L_DP","P_SMPP"],title:"공공판로(조달) 진입 검토",
    why:"B2G는 안정적 매출처가 될 수 있지만 등록·인증 요건이 선행됩니다. 준비 순서를 맞추는 게 중요합니다.",
    when:"인증 기반 마련 후",docs:"직접생산확인·인증 관련 서류(해당 시)",dur:"검토 4~8주",
    kpi:"공공/기업 제안 건수",caution:"조달 등록·심사 기준은 최신 공고 확인이 필요합니다.",expert:false,
@@ -1999,7 +2159,7 @@ const LIB = [
    when:"매출 확대기",docs:"채널별 성과 데이터",dur:"4~8주",
    kpi:"채널별 전환율 / 고객획득비용(CAC)",caution:"광고 표현은 과장·부당광고 규정을 확인하세요.",expert:false,
    stages:["y13","y35","y57"]},
-  {id:"r1",area:"rnd",needsDev:true,q:["R3"],own:"rnd_lab",src:["L_RND","P_KOITA"],title:"기업부설연구소/연구개발전담부서 검토",
+  {id:"r1",area:"rnd",needsDev:true,notInd:["food","retail"],q:["R3"],own:"rnd_lab",src:["L_RND","P_KOITA"],title:"기업부설연구소/연구개발전담부서 검토",
    why:"R&D 인력·세제·과제 참여의 기반이 됩니다. 요건을 갖추면 이후 R&D 활동의 출발점이 됩니다.",
    when:"R&D 인력 확보 시",docs:"연구인력·연구공간 요건 자료",dur:"검토 2~4주",
    kpi:"R&D 과제 준비율",caution:"설립 요건·인정 기준은 관할 기관 최신 기준 확인이 필요합니다.",expert:false,
@@ -2014,7 +2174,7 @@ const LIB = [
    when:"제품 출시 전후",docs:"경쟁 제품 목록, 성능·가격 비교 데이터",dur:"2~3주",
    kpi:"근거가 있는 차별점 수",caution:"비교 광고 시 사실 확인과 표현 규정을 지켜야 합니다.",expert:false,
    stages:["pre","y1","y13"]},
-  {id:"r3",area:"rnd",needsDev:true,q:["R3"],own:"",src:["P_IRIS"],title:"정부 R&D 과제기획 준비",
+  {id:"r3",area:"rnd",needsDev:true,notInd:["food","retail"],q:["R3"],own:"",src:["P_IRIS"],title:"정부 R&D 과제기획 준비",
    why:"기술개발 자금을 외부에서 조달하는 통로입니다. 과제기획·실적이 미리 준비돼야 신청이 수월합니다.",
    when:"공고 시즌 전",docs:"연구개발계획(안), 수행실적",dur:"기획 4~8주",
    kpi:"R&D 과제 신청 건수",caution:"선정을 보장하지 않으며 공고별 요건 확인이 필요합니다.",expert:false,
@@ -2247,7 +2407,7 @@ const PUBLIC = {
 function scoreEngine(d){
   const w = industryWeights(d.industry);
   const ans = d.ans||{};
-  const asked = askedQuestions(d.depth);
+  const asked = viewQuestions(d);
   const areaScore={}, status={}, expected={}, gap={}, detail={}, filled={}, evidence={};
   let nAns=0, nUnk=0, nNa=0;
   AREA_KEYS.forEach(a=>{
@@ -2255,7 +2415,7 @@ function scoreEngine(d){
     const vals=[]; let na=0, unk=0;
     detail[a] = qs.map(q=>{
       const v = ans[q.id];
-      if(v==="na"){ na++; return {q, v:"na"}; }
+      if(v==="na" && q.na){ na++; return {q, v:"na"}; }   // 업태가 바뀌어 더는 '해당 없음'이 허용되지 않으면 아래에서 미응답 처리
       if(typeof v==="number" && v>=0 && v<=3){ vals.push(LV_SCORE[v]); return {q, v}; }
       unk++; return {q, v:"u"};
     });
@@ -2307,7 +2467,7 @@ function scoreEngine(d){
 /* 응답 점검: 성숙도 응답 ↔ 보유 현황·기본 정보가 서로 맞지 않으면 신뢰도에 반영하고 확인 항목으로 표시 */
 function consistencyFlags(d){
   const a = d.ans||{}, p = new Set(d.prep||[]); const out=[];
-  const asked = new Set(askedQuestions(d.depth).map(q=>q.id));
+  const asked = new Set(askedQuestions(d.depth, d.stage).map(q=>q.id));
   const v = id => asked.has(id) && typeof a[id]==="number" ? a[id] : null;
   const f = (id,q,msg)=>out.push({id,q,msg});
   if(p.has("export_rec") && v("E2")!=null && v("E2")<=1) f("X1","E2","수출실적 보유로 체크했지만 수출 실행 기반은 1단계 이하로 응답");
@@ -2329,6 +2489,16 @@ function consistencyFlags(d){
   if(exNA && p.has("export_rec")) f("X17","E1","수출실적 보유로 체크했지만 수출을 '해당 없음'으로 응답");
   if(a.S3==="na" && asked.has("S3") && d.revenue && d.revenue!=="r0") f("X18","S3","매출이 있는데 기존 고객 관리를 '아직 고객이 없음'으로 응답");
   if(a.F2==="na" && asked.has("F2") && d.revenue && d.revenue!=="r0") f("X19","F2","매출이 있는데 거래서류를 '아직 거래 전'으로 응답");
+  // 응답끼리 맞지 않는 조합(측정·체계화 응답인데 그 기반이 되는 응답은 미착수 수준)
+  if(v("S1")===3 && v("D1")===0) f("X22","S1","채널별 전환율을 측정한다고 했지만 고객·거래 데이터는 종이·기억에 의존한다고 응답");
+  if(v("S3")===3 && v("D1")===0) f("X23","S3","재구매율·이탈률을 측정한다고 했지만 고객·거래 데이터는 종이·기억에 의존한다고 응답");
+  if(v("M3")===3 && v("I1")!=null && v("I1")<=1) f("X24","M3","채널별 비용·전환을 측정한다고 했지만 매출·비용은 세무 신고 때만 확인한다고 응답");
+  if(v("B2")===3 && v("I1")!=null && v("I1")<=1) f("X25","B2","판매·이익 데이터로 가격을 조정한다고 했지만 손익은 세무 신고 때만 확인한다고 응답");
+  if(v("I2")===3 && v("I1")!=null && v("I1")<=1) f("X26","I2","12개월 자금계획을 세운다고 했지만 월 손익은 확인하지 않는다고 응답");
+  if(v("E2")===3 && v("E1")!=null && v("E1")<=1) f("X27","E2","수출 실적이 있다고 했지만 해외 시장은 검토하지 않았거나 관심만 있다고 응답");
+  if(v("C3")===3 && v("C1")===0) f("X28","C3","기업 인증을 보유한다고 했지만 업종 인증·규격은 파악하지 않았다고 응답");
+  if(v("H1")===3 && v("F3")===0) f("X29","H1","연간 인력계획·온보딩을 운영한다고 했지만 모든 업무·결정을 대표가 처리한다고 응답");
+  if(v("R3")===3 && v("R1")===0) f("X30","R3","연구소·R&D 과제 경험이 있다고 했지만 경쟁 대비 차별점은 정리하지 않았다고 응답");
   const solo = d.emp===RULES.people.soloEmp;
   if(d.emp && !solo && (a.H2==="na"||a.H3==="na") && (asked.has("H2")||asked.has("H3"))) f("X20",a.H2==="na"?"H2":"H3","직원이 있다고(2명 이상) 골랐지만 노무·평가 문항을 '직원 없음'으로 응답");
   if(solo && v("H2")!=null && v("H2")>=2) f("X21","H2","직원 수를 '1명(대표만)'으로 골랐지만 전 직원 근로계약·임금명세서를 갖췄다고 응답");
@@ -2357,6 +2527,33 @@ function lvlWord(s){ return s==null?"–":s<17?LV_NM[0]:s<50?LV_NM[1]:s<84?LV_NM
 function gapTxt(g){ return g==null?"–":(g>=0?"+"+g:String(g)); }
 function gapCls(g){ return g==null?"gp-na":g>=0?"gp-ok":g>=-15?"gp-mid":"gp-bad"; }
 
+/* ---------- 5-1. 원인 가설 (B1) ----------
+   원인 문항이 '시작' 이하이고, 그 영향을 받는 영역이 단계 기대수준보다 낮으면 '가능성'으로 연결한다.
+   확정이 아니라 가설이며, 원인 확정은 상담(심화 진단)에서 한다. 원인 영역은 우선순위 가점(RULES.priority.rootCause) */
+const CAUSE_LINKS = [
+  {q:"B1", effects:["sales","marketing"], msg:"목표 고객·핵심 문제 정의(B1)가 흐려, 고객 확보·마케팅 효과가 낮게 나타났을 가능성"},
+  {q:"R1", effects:["marketing","sales"], msg:"경쟁 대비 차별점 근거(R1)가 없어, 영업·홍보 메시지가 약하게 전달될 가능성"},
+  {q:"C1", effects:["export","sales"], msg:"필요한 인증·규격(C1)이 정리되지 않아, 수출·판로 진입이 막히고 있을 가능성"},
+  {q:"F3", effects:["people","digital"], msg:"업무·의사결정이 대표에게 몰려 있어(F3), 인력 체계와 데이터 관리가 자리 잡기 어려울 가능성"},
+  {q:"I1", effects:["bm","finance"], msg:"손익을 정기적으로 보지 않아(I1), 가격·수익 구조와 자금 판단의 근거가 부족할 가능성"},
+  {q:"D1", effects:["sales","marketing"], msg:"고객·거래 데이터가 흩어져 있어(D1), 재구매·마케팅 성과를 관리하기 어려울 가능성"},
+  {q:"B2", effects:["finance"], msg:"가격·수익 구조(B2)가 정리되지 않아, 외부 자금 심사에서 설명 근거가 약할 가능성"},
+  {q:"C2", effects:["sales"], msg:"품질 점검 기록(C2)이 없어, 재구매·이탈 관리가 흔들릴 가능성"}
+];
+function rootCauses(d, sc){
+  const asked = new Set(askedQuestions(d.depth, d.stage).map(q=>q.id)), ans=d.ans||{};
+  const out=[];
+  CAUSE_LINKS.forEach(c=>{
+    const v=ans[c.q]; if(!asked.has(c.q) || typeof v!=="number" || v>1) return;
+    const cause=Q_BY_ID[c.q].area;
+    const hit=c.effects.filter(a=>a!==cause && sc.status[a]==="ok" && sc.gap[a]!=null && sc.gap[a]<0);
+    if(!hit.length) return;
+    out.push({q:c.q, cause, effects:hit, msg:c.msg, weight:hit.reduce((t,a)=>t-sc.gap[a],0)});
+  });
+  out.sort((x,y)=>y.weight-x.weight);
+  const seen=new Set(); return out.filter(x=>!seen.has(x.cause) && seen.add(x.cause)).slice(0, RULES.maxCauses);
+}
+
 /* ---------- 6. 우선순위 (공개 산식) ----------
    영역 우선도 = max(0, 기대수준 − 점수) × 적합도(업종×단계) + 고민 가점 15
    활동 우선도 = 영역 우선도 + (100 − 연결 문항 점수) × 0.15 × 적합도 + 단계 핵심영역 8 × 적합도
@@ -2367,7 +2564,8 @@ function areaPriority(d, sc, a){
   const P = RULES.priority, cb = con ? P.concern : 0;
   if(sc.areaScore[a]==null) return {p: sc.status[a]==="na"?0:(P.unknownArea*rel + cb), rel, con, gap:null};
   const g = sc.gap[a];
-  return {p: Math.max(0,-g)*rel + cb, rel, con, gap:g};
+  const rc = rootCauses(d, sc).some(x=>x.cause===a) ? P.rootCause : 0;   // 다른 영역 병목의 원인으로 보이는 영역은 먼저
+  return {p: Math.max(0,-g)*rel + cb + rc, rel, con, gap:g, rootCause:!!rc};
 }
 function strengthsWeak(sc, d){
   const arr = AREA_KEYS.filter(a=>sc.areaScore[a]!=null).map(a=>{
@@ -2406,7 +2604,7 @@ function areaComment(a, s, e, isStrong){
 
 /* 직원 관련 과제 조건 — 인원은 점수·기대수준에 넣지 않고, 해당 없는 과제를 거르는 데만 쓴다 */
 function staffOk(d, a){
-  const ans=d.ans||{}, P=RULES.people, asked=new Set(askedQuestions(d.depth).map(q=>q.id));
+  const ans=d.ans||{}, P=RULES.people, asked=new Set(askedQuestions(d.depth, d.stage).map(q=>q.id));
   const naStaff = ["H2","H3"].some(id=>asked.has(id) && ans[id]==="na");   // 간이 진단으로 바꿨을 때 남아 있는 표준 응답은 보지 않음
   if(a.needsStaff && (d.emp===P.soloEmp || naStaff)) return false;
   if(a.emp && !a.emp.includes(d.emp)) return false;
@@ -2419,7 +2617,7 @@ function pickActivities(d, sc){
   const ans = d.ans||{};
   const prep = new Set(d.prep||[]);
   const concernAreas = (d.concern||[]).map(c=>CONCERN_AREA[c]).filter(Boolean);
-  const asked = new Set(askedQuestions(d.depth).map(q=>q.id));
+  const asked = new Set(askedQuestions(d.depth, d.stage).map(q=>q.id));
   const qScoreOf = ids=>{
     const vs=(ids||[]).filter(id=>asked.has(id) && typeof ans[id]==="number").map(id=>LV_SCORE[ans[id]]);
     return vs.length? Math.round(vs.reduce((s,x)=>s+x,0)/vs.length) : null;
@@ -2428,10 +2626,13 @@ function pickActivities(d, sc){
   const cand = [];
   LIB.forEach(a=>{
     if(a.ind && !a.ind.includes(d.industry)) return;
+    if(a.notInd && a.notInd.includes(d.industry)) return;
     if(a.stages && !a.stages.includes(st)) return;
     if(sc.status[a.area]==="na") return;                              // 해당 없음 영역(예: 내수 전용 → 수출)
     if(a.needsDev && ans.R3==="na") return;                           // '제품·기술 개발이 필요 없는 사업'이면 개발 체계 과제 제외
-    if(!staffOk(d, a)) return;                                        // 직원 관련 과제: 대표 1인·인원 구간 조건(점수에는 인원 미사용)
+    if(!staffOk(d, a)) return;
+    const linked=(a.q||[]).filter(id=>asked.has(id)); if(linked.length && linked.every(id=>ans[id]==="na")) return;   // 연결 문항이 모두 '해당 없음'(예: 가맹점의 브랜드·상표)
+    if(a.cust && d.customer && !a.cust.includes(d.customer)) return;   // 주요 고객이 맞지 않는 과제(예: 일반소비자 대상 → 공공판로) 제외                                        // 직원 관련 과제: 대표 1인·인원 구간 조건(점수에는 인원 미사용)
     const rel = relevanceOf(d.industry, a.area, st);
     const con = concernAreas.includes(a.area);
     if(rel <= P.relExclude && !con) return;
@@ -2451,7 +2652,7 @@ function pickActivities(d, sc){
     const reasons=[];
     if(areaSc!=null) reasons.push(`${AREA[a.area].short} ${areaSc}점 · 단계 기대 ${sc.expected[a.area]}점(${gapTxt(g)})`);
     else reasons.push(`${AREA[a.area].short} 응답 없음 — 현황 확인 필요`);
-    (a.q||[]).forEach(id=>{ if(asked.has(id)){ const v=ans[id]; const q=Q_BY_ID[id];
+    (a.q||[]).forEach(id=>{ if(asked.has(id)){ const v=ans[id]; const q=qView(Q_BY_ID[id], d);
       reasons.push(`${id} ${q.t.replace(/\?$/,"")} → ${typeof v==="number"?LV_NM[v]+" 단계":"모름"}`); } });
     if(con) reasons.push("가장 큰 고민으로 선택한 영역");
     if(focus.includes(a.area)) reasons.push(`${STAGE[st].nm} 핵심 영역`);
@@ -2463,7 +2664,7 @@ function pickActivities(d, sc){
     const KEYS=["pre","y1","y13","y35","y57","y7"]; const nx=KEYS[Math.min(5,KEYS.indexOf(st)+1)];
     const have=new Set(cand.map(c=>c.id));
     const extra=(filterFn, reason, base)=>LIB.forEach(a=>{
-      if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own)) || (a.needsDev && ans.R3==="na") || !staffOk(d, a)) return;
+      if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || (a.notInd && a.notInd.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own)) || (a.needsDev && ans.R3==="na") || !staffOk(d, a) || (a.cust && d.customer && !a.cust.includes(d.customer))) return;
       const rel=relevanceOf(d.industry, a.area, st); if(rel<=P.relExclude || !filterFn(a)) return;
       have.add(a.id);
       cand.push({...a, _p:base*rel, _tag:"plan", _areaSc:sc.areaScore[a.area], _qSc:qScoreOf(a.q), _rel:rel,
@@ -2694,10 +2895,10 @@ function buildDiagnosisData(d, isSample){
   const profile = {
     name:      d.name || "우리 회사",
     biztype:   d.biztype || "",
-    depth:     d.depth||"standard", depthNm: `${d.depth==="quick"?"간이":"표준"} 진단(${askedQuestions(d.depth).length}문항)`,
+    depth:     d.depth||"standard", depthNm: `${d.depth==="quick"?"간이":"표준"} 진단(${askedQuestions(d.depth, d.stage).length}문항)`,
     stage:     d.stage,      stageNm:   STAGE[d.stage] ? STAGE[d.stage].nm : "-",
     ctype:     d.ctype,      ctypeNm:   nmOf(OPT.ctype, d.ctype),
-    industry:  d.industry,   industryNm:nmOf(OPT.industry, d.industry),
+    industry:  d.industry,   industryNm:nmOf(OPT.industry, d.industry), form:formOf(d), formNm:formNm(d),
     revenue:   d.revenue,    revenueNm: nmOf(OPT.revenue, d.revenue),
     emp:       d.emp,        empNm:     nmOf(OPT.emp, d.emp),
     customer:  d.customer,   customerNm:nmOf(OPT.customer, d.customer),
@@ -2721,6 +2922,7 @@ function buildDiagnosisData(d, isSample){
                 timing:a._tag, areaScore:a._areaSc, priority:Math.round(a._p), why:a.why, kpi:a.kpi, reasons:a._reasons })),
     plan90:  p90, roadmap: road, kpis,
     consultantMemo: d.memo || null,
+    causes: rootCauses(d, sc).map(c=>({q:c.q, cause:c.cause, effects:c.effects, msg:c.msg})),
     _internal:{ sc, band, acts, sw, p90, road, kpis }
   };
 }
@@ -2788,6 +2990,7 @@ function renderResult(d, isSample, baseline){
   const {sc, band, acts, sw, p90, road, kpis} = diag._internal;
   const narrative = buildDiagnosisNarrative(diag);
   const cta = buildCTA(diag);
+  const causes = diag.causes;
   const stageNm = diag.profile.stageNm, indNm = diag.profile.industryNm, ctypeNm = diag.profile.ctypeNm;
   const revNm = diag.profile.revenueNm, empNm = diag.profile.empNm, custNm = diag.profile.customerNm;
   const concernNms = diag.profile.concernNms.join(", ")||"-";
@@ -2978,6 +3181,7 @@ function renderResult(d, isSample, baseline){
     <h3><span class="ix">1</span>핵심 요약 (Executive Summary)</h3>
     <p class="sub">지금 가장 먼저 봐야 할 것들을 한 페이지로 정리했습니다.</p>
     <div class="core-line"><span>핵심 문제</span><b>${esc(narrative.core)}</b></div>
+    ${causes.length?`<div class="cause-box"><b>원인 가설 — 병목끼리의 연결</b><ul>${causes.map(c=>`<li>${esc(c.msg)} <span style="color:var(--muted)">(영향: ${c.effects.map(a=>esc(AREA[a].short)).join(", ")})</span></li>`).join("")}</ul><small>응답 조합으로 세운 가설입니다. 실제 원인 확정과 해결 순서는 상담에서 함께 진단합니다.</small></div>`:""}
     <div class="ai-summary">
       <div class="ai-sum-lab">진단 요약 <span class="ai-sum-src">규칙 기반 자동 생성</span></div>
       ${narrative.paragraphs.map(t=>`<p>${esc(t)}</p>`).join("")}
@@ -2996,7 +3200,7 @@ function renderResult(d, isSample, baseline){
       <div class="col info"><h4><span class="pl"></span>기업 기본정보</h4>
         <div class="info-table">
           <div class="k">기업명</div><div class="v">${esc(d.name||"-")}</div>
-          <div class="k">업종/업태</div><div class="v">${esc(indNm)}${d.biztype?" · "+esc(d.biztype):""}</div>
+          <div class="k">업종/업태</div><div class="v">${esc(indNm)}${formNm(d)?" · "+esc(formNm(d)):""}${d.biztype?" · "+esc(d.biztype):""}</div>
           <div class="k">창업연차</div><div class="v">${esc(stageNm)}</div>
           <div class="k">기업유형</div><div class="v">${esc(ctypeNm)}</div>
           <div class="k">매출구간</div><div class="v">${esc(revNm)}</div>
@@ -3141,13 +3345,13 @@ function renderResult(d, isSample, baseline){
       <div class="cbody">
         <p>이 도구는 공개된 규칙으로만 계산합니다(규칙 기반 진단). 같은 입력에는 항상 같은 결과가 나오며, 입력값은 서버로 전송되지 않습니다.</p>
         <h5>1) 성숙도 점수</h5>
-        ${AREA_KEYS.length}개 영역 × ${QUESTIONS.length/AREA_KEYS.length}문항(간이 진단은 영역별 1문항, 총 ${QUESTIONS.filter(q=>q.core).length}문항)에 대해 행동 기준 ${LV_NM.length}단계로 응답합니다: ${LV_NM.map((n,i)=>`<code>${i} ${n}=${LV_SCORE[i]}</code>`).join(" · ")}. 영역점수 = 응답 문항 평균. <b>'모름'과 미응답은 0점이 아닌 결측</b>으로 계산에서 빼고 신뢰도에 반영하며, '해당 없음'(예: 내수 전용 사업의 수출)은 그 영역을 종합점수에서 제외합니다. <b>매출·인원·업력은 점수에 넣지 않습니다.</b>
+        ${AREA_KEYS.length}개 영역 × ${QUESTIONS.length/AREA_KEYS.length}문항(간이 진단은 영역별 1문항, 총 ${QUESTIONS.filter(q=>q.core).length}문항, 간이 문항은 창업 단계별로 선택)에 대해 최근 ${RULES.recallMonths}개월 동안의 행동 기준 ${LV_NM.length}단계로 응답합니다: ${LV_NM.map((n,i)=>`<code>${i} ${n}=${LV_SCORE[i]}</code>`).join(" · ")}. 영역점수 = 응답 문항 평균. <b>'모름'과 미응답은 0점이 아닌 결측</b>으로 계산에서 빼고 신뢰도에 반영하며, '해당 없음'(예: 내수 전용 사업의 수출)은 그 영역을 종합점수에서 제외합니다. <b>매출·인원·업력은 점수에 넣지 않습니다.</b>
         <h5>2) 종합점수</h5>
         영역점수 × 업종 가중치(기본 배점 ${AREA_KEYS.map(a=>`${AREA[a].short} ${BASE_W[a]}`).join("·")}에 업종 배수 적용, 합 100 — 현재 ${esc(indNm)}: ${AREA_KEYS.map(a=>`${AREA[a].short} <code>${sc.w[a]}</code>`).join(" · ")})의 가중평균. 점수가 없는 영역은 빼고 가중치를 재정규화합니다.
         <h5>3) 단계 기대수준</h5>
         기대수준 = 단계 기준값 × 업종 보정(업종 적합도 ${RULES.expect.indMin}~${RULES.expect.indMax} 범위), 상한 ${RULES.expect.cap}. 현재 ${esc(stageNm)} · ${esc(indNm)} 기준: ${AREA_KEYS.map(a=>`${AREA[a].short} <code>${sc.expected[a]}</code>`).join(" · ")}. 통계 평균이 아닌 BECONIC 실무 기준이며, 실사용 데이터가 쌓이면 보정합니다.
         <h5>4) 우선순위</h5>
-        영역 우선도 = max(0, 기대수준 − 점수) × 적합도(업종×단계) + 고민 선택 시 ${RULES.priority.concern}. 활동 우선도 = 영역 우선도 + (100 − 관련 문항 점수) × ${RULES.priority.gapToAct} × 적합도 + 단계 핵심영역 ${RULES.priority.focus} × 적합도 + 법정 의무 과제(근로계약·취업규칙, 관련 응답이 정례화 미만) ${RULES.priority.legal}. 관련 문항이 '체계화'면 제외, '정례화' 이상이면 ×${RULES.priority.half}, 이미 보유한 과제(보유 현황)는 제외합니다. 우선도 상위 ${RULES.priority.acts}개를 추천하고, '지금 착수'는 그중 상위 ${RULES.priority.maxNow}개까지 표시합니다. <b>고민은 점수를 깎지 않고 우선순위에만 반영</b>합니다(조직관리 → 기초·체계 영역).
+        영역 우선도 = max(0, 기대수준 − 점수) × 적합도(업종×단계) + 고민 선택 시 ${RULES.priority.concern} + 다른 영역 병목의 원인 가설로 연결된 영역 ${RULES.priority.rootCause}. 활동 우선도 = 영역 우선도 + (100 − 관련 문항 점수) × ${RULES.priority.gapToAct} × 적합도 + 단계 핵심영역 ${RULES.priority.focus} × 적합도 + 법정 의무 과제(근로계약·취업규칙, 관련 응답이 정례화 미만) ${RULES.priority.legal}. 관련 문항이 '체계화'면 제외, '정례화' 이상이면 ×${RULES.priority.half}, 이미 보유한 과제(보유 현황)는 제외합니다. 우선도 상위 ${RULES.priority.acts}개를 추천하고, '지금 착수'는 그중 상위 ${RULES.priority.maxNow}개까지 표시합니다. <b>고민은 점수를 깎지 않고 우선순위에만 반영</b>합니다(조직관리 → 기초·체계 영역).
         <h5>5) 진단 신뢰도 (점수와 분리)</h5>
         신뢰도 = 응답률(모름·미응답 제외) − 응답·보유현황 불일치 1건당 ${RULES.conf.flagPenalty}. 일률 응답은 최대 ${RULES.conf.straightCap}, 간이 진단은 최대 ${RULES.conf.quickCap}이며, 응답률 ${RULES.conf.minCoverage*100}% 미만이면 성숙도 구간을 판정하지 않습니다. ${RULES.conf.high} 이상 높음 · ${RULES.conf.mid} 이상 보통 · 그 미만 낮음. 보유 현황은 점수에 더하지 않고 이 교차 확인과 추천 제외에만 씁니다.
         <h5>6) 근거·출처 (${esc(LEGAL_BASIS_DATE)} 확인 기준)</h5>
@@ -3195,6 +3399,7 @@ function mailtoHref(diag){
     `종합 성숙도: ${s.total==null?"판정 보류":s.total+"점"} (단계 기대 ${s.expected==null?"–":s.expected}점) · 신뢰도 ${s.confidence.label}`,
     `핵심 병목: ${diag.bottlenecks.map(b=>`${b.name} ${b.score}점(기대 ${b.expected})`).join(", ")||"없음"}`,
     `우선과제: ${diag.activities.slice(0,3).map(a=>a.title).join(" / ")}`,
+    ...(diag.causes.length ? [`원인 가설: ${diag.causes.map(c=>c.msg).join(" / ")}`] : []),
     ...(hrDeepNeeded(diag) ? [`조직·인력: ${diag.areas.find(a=>a.key==="people").score??"응답 없음"}점(기대 ${diag.areas.find(a=>a.key==="people").expected}) — HR 심화 진단 안내 희망`] : []),
     "", "상담 희망 내용:", ""
   ];
@@ -3203,7 +3408,7 @@ function mailtoHref(diag){
 
 /* ---------- 11. 앱 컨트롤러 ---------- */
 const GAN = (function(){
-  const emptyData = ()=>({depth:"standard",stage:null,ctype:null,industry:null,revenue:null,emp:null,customer:null,concern:[],ans:{},prep:[],memo:{overview:"",risk:"",kpiData:[]}});
+  const emptyData = ()=>({depth:"standard",stage:null,ctype:null,industry:null,form:null,revenue:null,emp:null,customer:null,concern:[],ans:{},prep:[],memo:{overview:"",risk:"",kpiData:[]}});
   let state = {step:1, totalSteps:5, data:emptyData(), isShared:false, isSample:false, mode:"all", reportInfo:null, baseline:null};
   const $ = s=>document.querySelector(s);
   const $$ = s=>document.querySelectorAll(s);
@@ -3226,12 +3431,24 @@ const GAN = (function(){
           box.querySelectorAll(".chip-btn").forEach(b=>{ b.classList.remove("sel"); b.setAttribute("aria-pressed","false"); });
           btn.classList.add("sel"); btn.setAttribute("aria-pressed","true");
           if(key==="depth") renderQuestions();
-          if(key==="stage" || key==="industry") renderQuestions();
+          if(key==="industry"){ if(!formOf(state.data)) state.data.form=null; buildFormChips(); }
+          if(key==="stage" || key==="industry" || key==="form") renderQuestions();
         }
         clearErr(box);
         save();
       });
     });
+  }
+  /* 업태 칩 — 선택한 업종의 업태만, 다시 누르면 선택 해제(선택 입력) */
+  function buildFormChips(){
+    const opts=FORM[state.data.industry]||[], fld=document.getElementById("fld-form"), box=document.getElementById("c-form");
+    if(!fld||!box) return;
+    fld.style.display = opts.length ? "" : "none";
+    box.innerHTML = opts.map(o=>`<button type="button" class="chip-btn${state.data.form===o.v?" sel":""}" data-v="${o.v}" aria-pressed="${state.data.form===o.v}">${esc(o.t)}</button>`).join("");
+    box.querySelectorAll(".chip-btn").forEach(btn=>btn.addEventListener("click",()=>{
+      state.data.form = state.data.form===btn.dataset.v ? null : btn.dataset.v;
+      buildFormChips(); renderQuestions(); save();
+    }));
   }
   /* 토글(보유 현황) 빌드 */
   function buildToggles(){
@@ -3254,7 +3471,7 @@ const GAN = (function(){
   /* 성숙도 문항 렌더 (STEP 3) */
   function renderQuestions(){
     const box=document.getElementById("q-list"); if(!box) return;
-    const d=state.data; const asked=askedQuestions(d.depth);
+    const d=state.data; const asked=viewQuestions(d);
     let html="";
     AREA_KEYS.forEach((a,ai)=>{
       const qs=asked.filter(q=>q.area===a); if(!qs.length) return;
@@ -3262,7 +3479,7 @@ const GAN = (function(){
       if(a==="people" && d.emp===RULES.people.soloEmp) html+=`<p class="qa-hint">직원 수를 '1명(대표만)'으로 골랐어요. 직원이 없으면 노무·평가 문항은 <b>'해당 없음'</b>을 고르세요. 채용 계획(H1)은 그대로 답하면 됩니다.</p>`;
       qs.forEach(q=>{
         const v=d.ans[q.id];
-        html+=`<div class="qa-card${v===undefined?"":" done"}" data-q="${q.id}"><div class="qa-t"><span class="qa-id">${q.id}</span>${esc(q.t)}</div>
+        html+=`<div class="qa-card${v===undefined?"":" done"}" data-q="${q.id}"><div class="qa-t"><span class="qa-id">${q.id}</span>${esc(q.t)}</div>${qExample(q,d.industry)?`<div class="qa-ex">예(${esc(nmOf(OPT.industry,d.industry))}): ${esc(qExample(q,d.industry))}</div>`:""}
           <div class="qa-opts" role="radiogroup" aria-label="${esc(q.t)}">
             ${q.lv.map((t,i)=>`<button type="button" class="qa-opt${v===i?" on":""}" data-q="${q.id}" data-v="${i}" role="radio" aria-checked="${v===i}"><span class="qa-lv">${i}</span><span class="qa-tx"><b>${LV_NM[i]}</b>${esc(t)}</span></button>`).join("")}
           </div>
@@ -3289,7 +3506,7 @@ const GAN = (function(){
     updateQCount();
   }
   function updateQCount(){
-    const asked=askedQuestions(state.data.depth);
+    const asked=askedQuestions(state.data.depth, state.data.stage);
     const done=asked.filter(q=>state.data.ans[q.id]!==undefined).length;
     const el=document.getElementById("q-count"); if(el) el.innerHTML=`<b>${done}</b> / ${asked.length} 응답`;
     const fl=document.getElementById("q-fill"); if(fl) fl.style.width=(asked.length?done/asked.length*100:0)+"%";
@@ -3317,7 +3534,7 @@ const GAN = (function(){
       if(!state.data.concern.length){ showErr("concern"); return false; }
     }
     if(n===3){
-      const asked=askedQuestions(state.data.depth);
+      const asked=askedQuestions(state.data.depth, state.data.stage);
       const miss=asked.filter(q=>state.data.ans[q.id]===undefined);
       document.querySelectorAll(".qa-card.miss").forEach(c=>c.classList.remove("miss"));
       if(miss.length){
@@ -3577,7 +3794,7 @@ const GAN = (function(){
     try{
       const d=state.data;
       // 공유 링크에는 컨설턴트 메모를 넣지 않음(내부 의견 유출 방지)
-      const payload={v:6,dp:d.depth,s:d.stage,c:d.ctype,i:d.industry,bt:d.biztype,r:d.revenue,e:d.emp,cu:d.customer,co:d.concern,p:d.prep,a:d.ans};
+      const payload={v:6,dp:d.depth,s:d.stage,c:d.ctype,i:d.industry,fm:formOf(d),bt:d.biztype,r:d.revenue,e:d.emp,cu:d.customer,co:d.concern,p:d.prep,a:d.ans};
       if(includeName && d.name) payload.n=d.name;
       const enc=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
       return getBaseURL()+"#r="+enc;
@@ -3586,16 +3803,18 @@ const GAN = (function(){
   /* 외부 입력(공유 링크·파일)은 허용 값만 남겨 정제 */
   function sanitize(raw){
     const pickV=(arr,v)=> arr.some(o=>o.v===v) ? v : null;
+    const ind = pickV(OPT.industry, raw.industry||raw.i);
+    const fm = (FORM[ind]||[]).some(o=>o.v===(raw.form||raw.fm)) ? (raw.form||raw.fm) : null;
     const ans={}; const a=raw.ans||raw.a||{};
     if(a && typeof a==="object") QUESTIONS.forEach(q=>{ const v=a[q.id];
-      if(v===0||v===1||v===2||v===3||v==="u"||(v==="na"&&q.na)) ans[q.id]=v; });
+      if(v===0||v===1||v===2||v===3||v==="u"||(v==="na"&&qView(q,{industry:ind, form:fm}).na)) ans[q.id]=v; });
     const prepOk=new Set(PREP_ALL.map(p=>p.v));
     return {
       name: typeof raw.name==="string"? raw.name.slice(0,40) : (typeof raw.n==="string"? raw.n.slice(0,40) : ""),
       biztype: String(raw.biztype||raw.bt||"").slice(0,60),
       depth: (raw.depth||raw.dp)==="quick"?"quick":"standard",
       stage: pickV(OPT.stage, raw.stage||raw.s), ctype: pickV(OPT.ctype, raw.ctype||raw.c),
-      industry: pickV(OPT.industry, raw.industry||raw.i), revenue: pickV(OPT.revenue, raw.revenue||raw.r),
+      industry: ind, form: fm, revenue: pickV(OPT.revenue, raw.revenue||raw.r),
       emp: pickV(OPT.emp, raw.emp||raw.e), customer: pickV(OPT.customer, raw.customer||raw.cu),
       concern: (Array.isArray(raw.concern||raw.co)?(raw.concern||raw.co):[]).filter(v=>OPT.concern.some(o=>o.v===v)).slice(0,RULES.input.maxConcern),
       prep: (Array.isArray(raw.prep||raw.p)?(raw.prep||raw.p):[]).filter(v=>prepOk.has(v)),
@@ -3730,7 +3949,7 @@ const GAN = (function(){
       <section class="rp-docinfo">
         <h2>문서 정보</h2>
         <table class="rp-info-table">
-          <tr><th>진단유형</th><td>기업 성장활동 자가진단 (규칙 기반)</td><th>진단깊이</th><td>${d.depth==="quick"?"간이":"표준"} · ${askedQuestions(d.depth).length}문항</td></tr>
+          <tr><th>진단유형</th><td>기업 성장활동 자가진단 (규칙 기반)</td><th>진단깊이</th><td>${d.depth==="quick"?"간이":"표준"} · ${askedQuestions(d.depth, d.stage).length}문항</td></tr>
           <tr><th>작성일</th><td>${esc(ri.date)}</td><th>기밀등급</th><td>${esc(ri.confid)}</td></tr>
           <tr><th>수신처</th><td>${esc(ri.client)}</td><th>도구 버전</th><td>${esc(APP_VERSION)} (${esc(APP_UPDATED)})</td></tr>
         </table>
@@ -3797,6 +4016,7 @@ const GAN = (function(){
       if(d[k]){ const b=document.querySelector(`#${id} .chip-btn[data-v="${d[k]}"]`); if(b){ b.classList.add("sel"); b.setAttribute("aria-pressed","true"); } }
     });
     (d.concern||[]).forEach(v=>{ const b=document.querySelector(`#c-concern .chip-btn[data-v="${v}"]`); if(b){ b.classList.add("sel"); b.setAttribute("aria-pressed","true"); } });
+    buildFormChips();
     (d.prep||[]).forEach(v=>{ const b=document.querySelector(`.tg[data-v="${v}"]`); if(b){ b.classList.add("on"); b.setAttribute("aria-pressed","true"); } });
     renderQuestions();
   }
@@ -3808,7 +4028,7 @@ const GAN = (function(){
       certShort:`중기부 인증 중소기업상담회사 ${COMPANY.certNo}`, certFull:`${COMPANY.certLabel} ${COMPANY.certNo}`};
     const cnt = {areas:AREA_KEYS.length, q:QUESTIONS.length, qQuick:askedQuestions("quick").length, qPer:QUESTIONS.length/AREA_KEYS.length,
       lv:LV_NM.length, ind:OPT.industry.length, src:Object.keys(SRC).length, minQuick:RULES.minutes.quick, minStd:RULES.minutes.standard,
-      cycle:RULES.plan.cycleDays, maxConcern:RULES.input.maxConcern};
+      cycle:RULES.plan.cycleDays, maxConcern:RULES.input.maxConcern, recall:RULES.recallMonths};
     $$("[data-co]").forEach(el=>{ const v=co[el.dataset.co]; if(v!=null) el.textContent=v; });
     $$("[data-cnt]").forEach(el=>{ const v=cnt[el.dataset.cnt]; if(v!=null) el.textContent=v; });
     $$("a[data-tel]").forEach(a=>{ a.href=telHref(); });
