@@ -12,7 +12,7 @@ export default async (req) => {
   return json(200, {
     status: ready ? "ready" : "no_key",
     ready,
-    models: ready ? { structure: API_CONFIG.modelA, narrative: API_CONFIG.modelB } : null,
+    models: ready ? { structure: (API_CONFIG.modelAExperiment || []).length ? API_CONFIG.modelAExperiment.join(" ↔ ") : API_CONFIG.modelA, narrative: API_CONFIG.modelB } : null,
     dataLab: datalabReady(),
     version: APP_META.appVersion,
   });

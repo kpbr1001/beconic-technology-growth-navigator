@@ -188,5 +188,37 @@ console.log("4. 하위 호환 — AI가 key 없이 옛 형식으로 답해도 �
   providers.claude.call = oldCall;
 }
 
+console.log("5. 모델 실측 모드 · 사용량 기록 · 하루 한도");
+{
+  const { settings } = await import("../netlify/functions/_guard.mjs");
+  const { API_CONFIG } = await import("../netlify/functions/_core.mjs");
+  delete process.env.KIF_DAILY_LIMIT;
+  ok(settings().dailyLimit === 50, "하루 전체 탐색 한도 기본 50건");
+  process.env.KIF_DAILY_LIMIT = "120"; ok(settings().dailyLimit === 120, "환경변수로 늘릴 수 있음"); delete process.env.KIF_DAILY_LIMIT;
+  // 실제 provider(가짜 HTTP)로 본문·폴백·사용량 확인
+  const realCall = __test.claudeCall;
+  const mod = await import("../netlify/functions/_core.mjs");
+  process.env.ANTHROPIC_API_KEY = "test";
+  const sent = []; const orig = globalThis.fetch;
+  globalThis.fetch = async (url, opt) => {
+    const b = JSON.parse(opt.body); sent.push(b);
+    if (b.model === "claude-sonnet-5-5") return { ok: true, json: async () => ({ model: b.model, stop_reason: "refusal", content: [], usage: { input_tokens: 10, output_tokens: 0 } }) };
+    return { ok: true, json: async () => ({ model: b.model, stop_reason: "end_turn", content: [{ type: "thinking", thinking: "" }, { type: "text", text: "{\"ok\":1}" }], usage: { input_tokens: 2500, output_tokens: 3400 } }) };
+  };
+  const r1 = await realCall.call(providers.claude, { system: "s", user: "u", maxTokens: 100, model: "claude-haiku-5-5", withMeta: true });
+  ok(sent[0].output_config?.effort === "low", "Haiku 5.5·Sonnet 5.5 에는 effort low 전송");
+  ok(r1.text === '{"ok":1}' && r1.usage.in === 2500 && r1.usage.out === 3400, "생각 블록 제외한 본문 + 실제 토큰 사용량 반환");
+  await realCall.call(providers.claude, { system: "s", user: "u", maxTokens: 100, model: API_CONFIG.modelB });
+  ok(!("output_config" in sent[1]), "Opus 4.8(CALL B)에는 effort 미전송(기존 동작 유지)");
+  let refused = null; try { await realCall.call(providers.claude, { system: "s", user: "u", maxTokens: 100, model: "claude-sonnet-5-5" }); } catch (e) { refused = e.message; }
+  ok(refused === "LLM_REFUSAL", "안전 거절은 오류로 올려 폴백 모델로 재시도되게");
+  globalThis.fetch = orig;
+  ok(JSON.stringify(API_CONFIG.modelAExperiment) === JSON.stringify(["claude-sonnet-5-5", "claude-haiku-5-5"]), "실측 후보: Sonnet 5.5 ↔ Haiku 5.5");
+  // orchestrate 결과에 사용량 기록
+  calls = [];
+  const R7 = await orchestrate(INPUT);
+  ok(R7.meta.usage && "A" in R7.meta.usage && "B" in R7.meta.usage && typeof R7.meta.usage.ms.A === "number", "결과에 CALL A·B 사용량·시간 기록");
+}
+
 console.log(`\n결과: ${pass} 통과 / ${fail} 실패`);
 process.exit(fail ? 1 : 0);

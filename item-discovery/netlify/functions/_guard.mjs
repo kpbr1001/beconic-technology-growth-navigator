@@ -16,7 +16,7 @@ export function settings() {
   const env = (k) => (typeof process !== "undefined" ? process.env[k] : undefined);
   const num = (k, d) => { const n = Number(env(k)); return Number.isFinite(n) && n > 0 ? n : d; };
   return {
-    dailyLimit: num("KIF_DAILY_LIMIT", 300),   // 하루 전체 탐색 수(1회 ≈ AI 2콜)
+    dailyLimit: num("KIF_DAILY_LIMIT", 50),    // 하루 전체 탐색 수(대표 결정 2026-11-25: 50건, 늘릴 때는 환경변수로)
     ipLimit: num("KIF_IP_LIMIT", 15),          // IP당 하루 탐색 수
     origins: [env("URL"), env("DEPLOY_PRIME_URL"), env("DEPLOY_URL"), env("KIF_ALLOWED_ORIGIN")].filter(Boolean),
     disabled: env("KIF_DISABLED") === "true",

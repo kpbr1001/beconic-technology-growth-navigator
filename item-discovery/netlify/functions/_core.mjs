@@ -25,7 +25,7 @@ import { fetchSearchSignals, fetchShopping, meaningfulTypes, SHOP_CATS } from ".
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.9.5",
+  appVersion: "v0.9.6",
   promptVersion: "v1.9.2",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
@@ -54,7 +54,11 @@ const API_CONFIG = {
   model: "claude-sonnet-4-6",
   modelA: "claude-haiku-4-5-20251001",  // 구조화=빠른 Haiku (속도 개선)
   modelB: "claude-opus-4-8",             // 서술=Opus 4.8 (고차원 인사이트·해석 품질). 입력$5/출력$25, 느리지만 서술 우수
-  maxTokensA: 6500,
+  maxTokensA: 9000,          // 생각(thinking) 토큰 포함 여유
+  // CALL A 모델 실측(대표 결정 2026-11-25): 요청마다 번갈아 사용 → 측정 후 하나로 고정
+  modelAExperiment: ["claude-sonnet-5-5", "claude-haiku-5-5"],
+  // 생각 기능이 기본으로 켜지는 모델은 effort low 로 고정(구조화 작업 — 속도·비용 우선)
+  lowEffortModels: ["claude-sonnet-5-5", "claude-haiku-5-5"],
   maxTokensB: 7000,
   maxRetries: 0,           // 재시도 제거(속도 우선, 잘려도 복구로직이 처리)
   anthropicVersion: "2023-06-01",
@@ -208,7 +212,7 @@ function safeParse(text) {
 const providers = {
   // 3-1. Claude LLM 어댑터
   claude: {
-    async call({ system, user, maxTokens, model }) {
+    async call({ system, user, maxTokens, model, withMeta = false }) {
       const key = process.env.ANTHROPIC_API_KEY;
       if (!key) throw new Error("MISSING_API_KEY");
 
@@ -225,6 +229,7 @@ const providers = {
             max_tokens: maxTokens,
             system,
             messages: [{ role: "user", content: user }],
+            ...(API_CONFIG.lowEffortModels.includes(model) ? { output_config: { effort: "low" } } : {}),
           }),
         });
         if (!res.ok) {
@@ -239,7 +244,9 @@ const providers = {
         if (data.stop_reason === "max_tokens") {
           console.warn("[LLM] response truncated by max_tokens");
         }
-        return text;
+        if (data.stop_reason === "refusal") throw new Error("LLM_REFUSAL");   // 폴백 모델로 재시도되게
+        // 실제 토큰 사용량 기록(비용 실측용)
+        return withMeta ? { text, usage: { model: data.model || model, in: data.usage?.input_tokens ?? null, out: data.usage?.output_tokens ?? null } } : text;
       };
 
       // retry 1회
@@ -1115,20 +1122,43 @@ function buildSummary(top5) {
 // ------------------------------------------------------------
 // 10. ORCHESTRATION
 // ------------------------------------------------------------
-async function orchestrate(input) {
-  // STAGE 1: CALL A (구조화 — 빠른 모델 우선, 실패 시 기본 모델 폴백)
-  let rawA;
+// CALL A 모델 실측: 저장소 카운터로 후보 모델을 정확히 번갈아 배정(저장소가 없으면 무작위)
+async function pickModelA() {
+  const list = API_CONFIG.modelAExperiment || [];
+  if (!list.length) return API_CONFIG.modelA;
+  let n = Math.floor(Math.random() * 1000);
   try {
-    rawA = await providers.claude.call({
-      system: SYSTEM_A, user: buildUserA(input), maxTokens: API_CONFIG.maxTokensA, model: API_CONFIG.modelA,
-    });
+    const { getStore } = await import("@netlify/blobs");
+    const st = getStore("kif-exp");
+    n = ((await st.get("modelA", { type: "json" }))?.n || 0);
+    await st.setJSON("modelA", { n: n + 1 });
+  } catch { /* 로컬 테스트 등 */ }
+  return list[n % list.length];
+}
+
+async function orchestrate(input) {
+  // STAGE 1: CALL A (구조화 — 실측 기간에는 후보 모델을 번갈아, 실패 시 Haiku 4.5 → 기본 모델 폴백)
+  const usage = { A: null, B: null, ms: {} };
+  const unwrap = (r) => (typeof r === "string" ? { text: r, usage: null } : r || { text: "", usage: null });
+  const modelA = await pickModelA();
+  let rawA;
+  let tA = Date.now();
+  try {
+    const r = unwrap(await providers.claude.call({
+      system: SYSTEM_A, user: buildUserA(input), maxTokens: API_CONFIG.maxTokensA, model: modelA, withMeta: true,
+    }));
+    rawA = r.text; usage.A = r.usage || { model: modelA };
   } catch (e) {
-    // 모델명 오류 등으로 실패 시 기본 모델로 재시도
-    console.warn("[CALL A] modelA failed, fallback to default:", String(e.message||e).slice(0,80));
-    rawA = await providers.claude.call({
-      system: SYSTEM_A, user: buildUserA(input), maxTokens: API_CONFIG.maxTokensA, model: API_CONFIG.model,
-    });
+    console.warn("[CALL A] modelA failed, fallback:", modelA, String(e.message||e).slice(0,80));
+    try {
+      const r = unwrap(await providers.claude.call({ system: SYSTEM_A, user: buildUserA(input), maxTokens: API_CONFIG.maxTokensA, model: API_CONFIG.modelA, withMeta: true }));
+      rawA = r.text; usage.A = { ...(r.usage || { model: API_CONFIG.modelA }), fallbackFrom: modelA };
+    } catch (e2) {
+      const r = unwrap(await providers.claude.call({ system: SYSTEM_A, user: buildUserA(input), maxTokens: API_CONFIG.maxTokensA, model: API_CONFIG.model, withMeta: true }));
+      rawA = r.text; usage.A = { ...(r.usage || { model: API_CONFIG.model }), fallbackFrom: modelA };
+    }
   }
+  usage.ms.A = Date.now() - tA;
   let A = safeParse(rawA);
   // 파싱 실패 또는 핵심 필드(customer) 누락 시 에러. 나머지는 기본값 보정.
   if (!A || typeof A !== "object" || !A.customer) {
@@ -1195,9 +1225,11 @@ async function orchestrate(input) {
   let described = null;
   let callBStatus = "ok";
   try {
-    const rawB = await providers.claude.call({
-      system: SYSTEM_B, user: buildUserB(top5, input), maxTokens: API_CONFIG.maxTokensB, model: API_CONFIG.modelB,
-    });
+    const tB = Date.now();
+    const rB = unwrap(await providers.claude.call({
+      system: SYSTEM_B, user: buildUserB(top5, input), maxTokens: API_CONFIG.maxTokensB, model: API_CONFIG.modelB, withMeta: true,
+    }));
+    const rawB = rB.text; usage.B = rB.usage || { model: API_CONFIG.modelB }; usage.ms.B = Date.now() - tB;
     described = safeParse(rawB);
     if (!described || !Array.isArray(described.candidates) || described.candidates.length === 0) {
       callBStatus = "parse_failed";
@@ -1220,7 +1252,7 @@ async function orchestrate(input) {
       shop: _shop || null }));
 
   return {
-    meta: { ...APP_META, sessionId: null, candidatePool: pool.length, fields: input.fields || [], rediscover: (input.exclude || []).length > 0 },
+    meta: { ...APP_META, sessionId: null, usage, candidatePool: pool.length, fields: input.fields || [], rediscover: (input.exclude || []).length > 0 },
     top5: clean,
     comparison: buildComparison(clean),
     summary: buildSummary(clean),
@@ -1237,4 +1269,5 @@ async function orchestrate(input) {
 
 export { orchestrate, APP_META, API_CONFIG, providers, FIELD_LABEL };
 // 테스트 전용(동작 영향 없음)
-export const __test = { similarText, CHILDISH_RE, fixPhysicalDefinition, defaultDefinition, FORM_TYPES, toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };
+const _origClaudeCall = providers.claude.call; // 테스트에서 가짜로 바꾼 뒤에도 원래 HTTP 호출을 검사하기 위해
+export const __test = { claudeCall: _origClaudeCall, similarText, CHILDISH_RE, fixPhysicalDefinition, defaultDefinition, FORM_TYPES, toDNA, generateCandidates, RuleEngine, chooseNames, refineItemName, headWords, buildUserA, buildUserB };
