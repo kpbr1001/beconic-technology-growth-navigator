@@ -25,7 +25,7 @@ import { fetchSearchSignals, fetchShopping, meaningfulTypes, SHOP_CATS } from ".
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.9.4",
+  appVersion: "v0.9.5",
   promptVersion: "v1.9.2",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
@@ -271,8 +271,8 @@ const providers = {
       try { const { getStore } = await import("@netlify/blobs"); store = getStore("kif-ext"); } catch { /* 로컬 테스트 등 */ }
       const [{ data, meta, fetchedAt }, srch] = await Promise.all([
         fetchTrends(groups, { store, ...opts }),
-        // 검색 문구 2가지(고객 질문형 + 핵심 검색어)로 조회해 서비스별로 더 관련 있는 쪽 채택 — 실행마다 근거 등급이 흔들리던 문제 완화
-        fetchSearchSignals(groups.map((g) => ({ key: g.key, queries: [g.voiceQuery, g.keywords[0]].filter(Boolean) })), { store, ...opts }),
+        // v0.9.5: 문구 2개 병합(v0.9.4)은 일반 검색어가 이겨 근거를 부풀려 되돌림 — 문구 하나(고객 질문형 우선)
+        fetchSearchSignals(groups.map((g) => ({ key: g.key, queries: [g.voiceQuery || g.keywords[0]].filter(Boolean) })), { store, ...opts }),
       ]);
       // 쇼핑인사이트: 실물 제품·기기·구독 후보의 쇼핑 대분류(최대 3개)
       const cats = [...new Set(dnaList.filter((c) => ["Product", "Hardware", "Subscription", "ProductPlusService"].includes(c.solution?.solutionType) && c.shoppingCategory).map((c) => c.shoppingCategory))];

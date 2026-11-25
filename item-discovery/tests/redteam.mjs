@@ -154,6 +154,7 @@ console.log("1e. 다른 방향으로 다시 찾기 버튼");
   const r = await page.evaluate(async () => {
     const R = JSON.parse(JSON.stringify(SAMPLE_RESULT));
     State.lastInput = { userType: "창업자", budget: "under300만", fields: ["care"], industry: "__AI_FIND__", knownProblem: "__AI_FIND__", resources: { hw: [], sw: [], human: [] }, preferredForms: [] };
+    Result.REDISCOVER_ON = true; // 기능 자체 회귀 확인용(운영에서는 꺼 둠)
     State.result = R; State.isSample = false; Result.render(); App.show("result");
     let sent = []; window.fetch = (u, o) => { if (String(u).includes("/api/discover")) { sent.push(JSON.parse(o.body)); return Promise.resolve({ status: 202, json: async () => ({}) }); } return new Promise(() => {}); };
     const has = document.body.innerText.includes("다른 방향으로 다시 찾기");
@@ -168,6 +169,7 @@ console.log("1e. 다른 방향으로 다시 찾기 버튼");
   ok(r.first.includes("시니어잡링크") && r.first.length === 10, "1차: 지금 후보 5개의 이름·문제 10개 제외");
   ok(r.second.length === 15 && r.second[0] === "새 이름 0" && r.second.includes("시니어잡링크"), "2차: 누적 제외(최대 15개, 최신 우선)");
   ok(r.fields.join() === "care", "분야 등 원래 조건 유지");
+  ok(await page.evaluate(() => { Result.REDISCOVER_ON = false; Result.render(); return !document.body.innerText.includes("다른 방향으로 다시 찾기"); }), "운영 설정(v0.9.5)에서는 버튼 숨김");
   ok(errs.length === 0, "오류 0 " + (errs[0] || ""));
   await ctx.close();
 }

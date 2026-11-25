@@ -84,7 +84,7 @@ globalThis.fetch = origFetch;
 const c1 = R.top5.find((x) => x.problem.statement.includes("요양"));
 const c2 = R.top5.find((x) => x.problem.statement.includes("출결"));
 ok(calls.filter((x) => x.url === DATALAB.endpoint).length === 1, "탐색 1건에 데이터랩 1회");
-ok(calls.filter((x) => x.url.includes("/search/v1/")).length === 9, "문제 1은 문구 2개, 문제 2는 1개 × 지식iN·블로그·뉴스 = 검색 9회");
+ok(calls.filter((x) => x.url.includes("/search/v1/")).length === 6, "문제 2개 × 문구 1개 × 지식iN·블로그·뉴스 = 검색 6회(v0.9.5 문구 병합 되돌림)");
 ok(c1.signals.evidenceConfidence === "L2" && c1.trend && c1.trend.yoy > 0, "검색 추이 + 지식iN·블로그·뉴스 → 근거 L2 (L3는 자동 부여 안 함)");
 ok(c1.voice.kin.relevant === 8 && c1.voice.kin.samples[0].title === "요양 기록 수기 어떻게 쓰나요?", "지식iN: 관련 질문만(20개 중 8개) · 제목 태그 제거 (" + c1.voice.kin.relevant + ")");
 ok(c1.voice.kin.samples.every((x) => !x.title.includes("건강검진")), "무관한 질문(건강검진)은 제외");

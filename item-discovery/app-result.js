@@ -256,7 +256,9 @@ const Result = {
 
   // --- interactions ---
   // 같은 입력으로, 지금(그리고 앞서 '다른 방향'으로 본) 후보를 빼고 다시 탐색
-  canRediscover(){ return !State.isSample && !!State.lastInput; },
+  // v0.9.5: 실측에서 5개 중 3개가 같은 콘셉트로 다시 나와(표현만 바뀜) 버튼을 내림 — 서버 exclude 지원은 유지(재도입 시 사용)
+  REDISCOVER_ON: false,
+  canRediscover(){ return this.REDISCOVER_ON && !State.isSample && !!State.lastInput; },
   rediscover(){
     if(!this.canRediscover()) return;
     const R=State.result;
