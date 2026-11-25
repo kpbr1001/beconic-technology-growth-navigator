@@ -4,6 +4,9 @@
 
 - 서비스: https://beconic-diagnosis-tech.netlify.app
 - IR 진단: https://beconic-diagnosis-ir.netlify.app (`ir/`, [ir/README.md](ir/README.md))
+- 창업 준비 가이드(예비창업자, 09번): https://beconic-diagnosis-pre-startup.netlify.app (`prestartup/`, [prestartup/README.md](prestartup/README.md))
+- 고객문제·솔루션 적합성 진단(20번): https://beconic-diagnosis-psf.netlify.app (`psf/`, [psf/README.md](psf/README.md))
+- 기업인증 준비도 진단: https://beconic-diagnosis-certification.netlify.app (`certification/`, [certification/README.md](certification/README.md))
 - ESG 경영준비도 진단: https://beconic-diagnosis-esg.netlify.app (예정, `esg/`, [esg/README.md](esg/README.md))
 - 회사: 서울시 구로구 디지털로27길 24, 209호 · 02-6124-5960 · start@gven.kr · www.beconic.kr
 
@@ -75,7 +78,9 @@ PR·main push마다 `.github/workflows/ci.yml`이 4개 검사를 실행합니다
 | Lint · 저장소 위생 | .env·비밀키·PDF 원본·2MB 초과 파일 차단, ESLint |
 | Build | 타입체크, Vite 빌드, 번들 비밀키 검사 |
 | Unit · v0.9 Regression | Rule Engine 원칙 테스트 + v0.9 원본 대비 308 시나리오 + 로드맵 파서·색인 |
-| E2E · 사용자 플로우 · PDF QA | 6개 화면 크기, v0.9 대비 실제 클릭 플로우, A4 PDF 7종 페이지별 검수 |
+| E2E · 사용자 플로우 · PDF QA | 앱별 E2E(`E2E · tech/hr/growth/grants/ir/prestartup/esg/finance`)를 **병렬**로 돌린 결과 요약. PR은 바뀐 폴더의 앱만(`scripts/ci/changed-apps.mjs`, 문서만 바뀌면 생략), main push는 전체. 앱별 명령은 `scripts/ci/app-qa.sh`, Chromium·한글 폰트는 캐시 |
+
+새 앱을 추가하면 `scripts/ci/changed-apps.mjs`의 `APPS`와 `scripts/ci/app-qa.sh`에 한 줄씩 넣으면 E2E에 병렬로 붙어요(전체 시간은 가장 느린 앱 기준).
 
 main 보호: Settings → Rules → Rulesets → main 대상 **Require status checks to pass**에 위 4개 Check 등록.
 

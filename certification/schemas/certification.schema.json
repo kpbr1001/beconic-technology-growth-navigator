@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "beconic/certification.schema.json",
+  "title": "제도 카탈로그 항목",
+  "type": "object",
+  "required": ["scheme_id", "name_ko", "official_name", "aliases", "display_group", "applicable_markets", "scheme_type", "mandatory_status", "purpose_tags", "target", "issuing_authority", "scope_note", "what", "when", "who_decides", "first_check", "diagnosable", "verified_status", "sources", "official_link", "last_verified_at", "review_due_at", "readiness_items", "disclaimer", "industry_major"],
+  "properties": {
+    "scheme_id": { "type": "string", "pattern": "^[A-Z0-9-]+$" },
+    "aliases": { "type": "array", "items": { "type": "string" } },
+    "display_group": { "enum": ["domestic", "international"] },
+    "jurisdiction_country": { "type": ["string", "null"] },
+    "applicable_markets": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "scheme_type": { "enum": ["company_confirmation", "rnd_institute_recognition", "management_system_certification", "product_conformity_assessment", "registration", "authorization_clearance_approval", "other"] },
+    "mandatory_status": { "enum": ["mandatory", "voluntary", "needs_review"] },
+    "target": { "enum": ["company", "product", "both"] },
+    "industry_major": { "type": "array", "minItems": 1, "items": { "enum": ["all", "elec", "mach", "bio", "food", "chem", "ict", "trade", "pro", "constr", "agri", "culture", "svc"] } },
+    "diagnosable": { "type": "boolean" },
+    "verified_status": { "enum": ["VERIFIED", "UNVERIFIED", "DRAFT", "CONFLICTED", "EXPIRED"] },
+    "official_link": { "type": "string", "pattern": "^(https://|http://www\\.gr\\.or\\.kr/)" },
+    "sources": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "readiness_items": { "type": "array", "items": { "type": "object", "required": ["item_id", "label", "why", "where", "required", "applies_when", "source_refs"] } }
+  }
+}

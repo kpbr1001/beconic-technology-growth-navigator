@@ -1,4 +1,4 @@
-/* global COMPANY, RULES, OPT, renderResult, scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB, buildDiagnosisData, buildDiagnosisNarrative, buildCTA, Q_BY_ID, ACT_METRIC -- page.evaluate 안에서 앱 전역을 호출 */
+/* global kpiBoard, hrDeepNeeded, mailtoHref, planPhaseDays, COMPANY, RULES, OPT, renderResult, scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB, buildDiagnosisData, buildDiagnosisNarrative, buildCTA, Q_BY_ID, ACT_METRIC -- page.evaluate 안에서 앱 전역을 호출 */
 // BECONIC 성장진단(12번) QA — 실제 Chromium으로 규칙 엔진 원칙·사용자 플로우·모바일·재진단·A4 PDF를 확인한다.
 // 실행: (growth 폴더를 정적 서버로 띄운 뒤) node growth/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -34,7 +34,7 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   check('홈: "AI 사전 분석"·"AI 기반"·"룰 기반" 표기 없음', !/AI 사전 분석|AI 기반|AI 요약|룰 기반/.test(body));
   const html = await page.content();
   check('소스: "AI 사전 분석" 라벨 제거(규칙 기반 사전 분석)', !html.includes('AI 사전 분석') && html.includes('규칙 기반 사전 분석'));
-  check('문항 수 = 27, 간이 = 9, 영역별 3문항', await page.evaluate(() => QUESTIONS.length === 27 && QUESTIONS.filter((q) => q.core).length === 9 && ['foundation','bm','sales','marketing','rnd','cert','finance','export','digital'].every((a) => QUESTIONS.filter((q) => q.area === a).length === 3 && QUESTIONS.filter((q) => q.area === a && q.core).length === 1)));
+  check('문항 수 = 30, 간이 = 10, 영역별 3문항(조직·인력 포함)', await page.evaluate(() => QUESTIONS.length === 30 && QUESTIONS.filter((q) => q.core).length === 10 && ['foundation','bm','sales','marketing','rnd','cert','finance','export','digital','people'].every((a) => QUESTIONS.filter((q) => q.area === a).length === 3 && QUESTIONS.filter((q) => q.area === a && q.core).length === 1)));
   const nSrc = await page.evaluate(() => Object.keys(SRC).length);
   check('홈: 근거 수 표기 = 출처 레지스트리 수', body.includes(`${nSrc}개 근거`), `SRC=${nSrc}`);
   check('모든 문항·활동에 출처 연결(존재하는 id)', await page.evaluate(() => [...QUESTIONS, ...LIB].every((x) => x.src && x.src.length && x.src.every((id) => SRC[id]))));
@@ -52,9 +52,9 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   const c0 = await run({ ...base, ans: a2, concern: [] });
   const c1 = await run({ ...base, ans: a2, concern: ['cert', 'rnd', 'org'] });
   check('고민을 골라도 점수 감점 없음', JSON.stringify(c0.areaScore) === JSON.stringify(c1.areaScore));
-  check("고민 '조직관리' → 기초·체계 영역(디지털 오매핑 수정)", await page.evaluate(() => CONCERN_AREA.org === 'foundation'));
-  const pr = await page.evaluate(([d, a]) => { const x = { ...d, ans: a, concern: ['org'] }; const sc = scoreEngine(x); return strengthsWeak(sc, x).weak.map((w) => w.a); }, [base, { ...a2, F1: 1, F2: 1, F3: 1 }]);
-  check('조직 고민 + 경영체계 응답 낮음 → 기초·체계가 병목 1순위', pr[0] === 'foundation', pr.join(','));
+  check("고민 '조직·인력' → 조직·인력 영역(v6.4)", await page.evaluate(() => CONCERN_AREA.org === 'people'));
+  const pr = await page.evaluate(([d, a]) => { const x = { ...d, ans: a, concern: ['org'] }; const sc = scoreEngine(x); return strengthsWeak(sc, x).weak.map((w) => w.a); }, [base, { ...a2, H1: 0, H2: 1, H3: 0 }]);
+  check('조직·인력 고민 + 인력 응답 낮음 → 조직·인력이 병목 1순위', pr[0] === 'people', pr.join(','));
   const unk = await run({ ...base, ans: { ...a2, B1: 'u', B2: 'u', B3: 3 } });
   check("'모름'은 0점이 아닌 결측(남은 문항만 평균)", unk.areaScore.bm === 100 && unk.confidence.nUnk === 2);
   const allU = await run({ ...base, ans: await allAns('u') });
@@ -69,7 +69,7 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   const fl = await page.evaluate(([d, a]) => consistencyFlags({ ...d, ans: a, prep: ['export_rec', 'patent'] }).map((f) => f.id), [base, { ...a2, E2: 0, R2: 0 }]);
   check('응답·보유현황 불일치 탐지(수출실적·특허)', fl.includes('X1') && fl.includes('X3'), fl.join(','));
   const q = await run({ ...base, depth: 'quick', ans: a2 });
-  check('간이 진단: 9문항만 사용, 신뢰도 상한 70', q.confidence.asked === 9 && q.confidence.score <= 70);
+  check('간이 진단: 10문항만 사용, 신뢰도 상한 70', q.confidence.asked === 10 && q.confidence.score <= 70);
 }
 
 // 3. 추천: 응답 근거 연결·보유 과제 제외
@@ -112,20 +112,20 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   await page.click('#c-customer .chip-btn[data-v="b2b"]');
   await page.click('#c-concern .chip-btn[data-v="org"]');
   await page.click('#btnNext');
-  check('STEP3: 표준 진단 27문항 렌더', (await page.locator('.qa-card').count()) === 27);
+  check('STEP3: 표준 진단 30문항 렌더', (await page.locator('.qa-card').count()) === 30);
   await page.click('#btnNext');
-  check('STEP3: 미응답 있으면 진행 차단 + 안내', await page.locator('#q-err.on').isVisible() && (await page.locator('.qa-card.miss').count()) === 27);
+  check('STEP3: 미응답 있으면 진행 차단 + 안내', await page.locator('#q-err.on').isVisible() && (await page.locator('.qa-card.miss').count()) === 30);
   // 키보드로 첫 문항 선택(button 요소 → Enter)
   await page.locator('.qa-card').first().locator('.qa-opt').nth(2).focus();
   await page.keyboard.press('Enter');
   check('문항 선택지 키보드 선택 가능(aria-checked)', (await page.locator('.qa-card').first().locator('.qa-opt[aria-checked="true"]').count()) === 1);
   const cards = page.locator('.qa-card');
-  for (let i = 1; i < 27; i++) {
+  for (let i = 1; i < 30; i++) {
     const c = cards.nth(i);
     if (i % 9 === 4) await c.locator('.qa-x[data-v="u"]').click();
     else await c.locator('.qa-opt').nth(i % 4).click();
   }
-  check('응답 진행률 27/27', (await page.locator('#q-count').innerText()).includes('27 / 27'));
+  check('응답 진행률 30/30', (await page.locator('#q-count').innerText()).includes('30 / 30'));
   await page.click('#btnNext');
   check('STEP4 보유 현황: "점수에 더하지 않습니다" 안내', (await page.locator('#fstep-4').innerText()).includes('점수에 더하지 않습니다'));
   await page.click('#col-3 .collapse-h'); await page.waitForTimeout(450);
@@ -139,7 +139,7 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   const r = await page.locator('#resultRoot').innerText();
   check('결과: 핵심 문제 한 문장·단계 기대수준·응답 근거 섹션', r.includes('핵심 문제') && r.includes('기대') && r.includes('영역별 응답 근거와 다음 단계'));
   check('결과: 공공 지원 + 응답 점검 섹션', r.includes('공공 지원과 함께 쓰기') && r.includes('응답 점검 결과'));
-  check('결과: 외부 BECONIC 진단 연계 없음(다른 진단 링크·추천 미노출)', !r.includes('BECONIC 진단') && !r.includes('HR 진단') && !/beconic-diagnosis-(?!business-growth)/.test(await page.content()));
+  check('결과: 외부 진단 링크 없음 — HR 심화 진단은 링크 없는 문구 안내만', !r.includes('BECONIC 진단') && !/beconic-diagnosis-(?!business-growth)/.test(await page.content()) && (await page.locator('.hr-guide a').count()) === 0);
   check("결과: '모름' 문항 목록 표시", /'모름' 문항: .*[A-Z]\d/.test(r));
   // 임시 저장 → 새로고침 후 이어하기
   await page.goto(BASE);
@@ -150,7 +150,7 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   const [dl] = await Promise.all([page.waitForEvent('download'), page.click('button:has-text("결과 파일 저장")')]);
   const fp = path.join(OUT, 'saved.json'); await dl.saveAs(fp);
   const saved = JSON.parse(readFileSync(fp, 'utf8'));
-  check('결과 파일: schema·응답·요약 포함', saved.schema === 'beconic-growth/6' && Object.keys(saved.data.ans).length === 27 && saved.summary.areas);
+  check('결과 파일: schema·응답·요약 포함', saved.schema === 'beconic-growth/6' && Object.keys(saved.data.ans).length === 30 && saved.summary.areas);
   await page.evaluate(() => GAN.restart());
   await page.goto(BASE);
   await page.setInputFiles('.sample-banner .file-in', fp);
@@ -328,6 +328,75 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   check('같은 영역 안 실행 순서: 목표고객 정의(b1) → 가격 구조(b5)', r.order[0] >= 0 && (r.order[1] < 0 || r.order[0] < r.order[1]), r.order.join('→'));
   check('점수 의미 범례(0 미착수 · 33 시작 · 67 정례화 · 100 체계화)', r.html.includes('33 시작') && r.html.includes('67 정례화'));
   check('기대 미달 차이 색 = 주황(파란색 아님)', !/rgb\(37, 99, 235\)/.test(r.midColor), r.midColor);
+}
+
+// 10. v6.4 조직·인력(HR) 영역
+{
+  const h = await page.evaluate((b) => {
+    const A = (v) => Object.fromEntries(QUESTIONS.map((q) => [q.id, v]));
+    const ids = (x) => pickActivities(x, scoreEngine(x)).map((a) => a.id);
+    // 인원은 점수에 넣지 않음
+    const s1 = scoreEngine({ ...b, emp: 'e24', ans: A(1) }), s2 = scoreEngine({ ...b, emp: 'e50', ans: A(1) });
+    // 1인 기업: H2·H3 해당 없음 → 직원 과제·KPI 제외, 영역은 H1으로만
+    const solo = { ...b, stage: 'y13', emp: 'e1', ans: { ...A(1), H2: 'na', H3: 'na' } };
+    const soloSc = scoreEngine(solo);
+    const soloActs = pickActivities(solo, soloSc).filter((a) => a.needsStaff).length;
+    const soloKpi = kpiBoard(solo, soloSc).some((k) => /근로계약|이탈률|이직률/.test(k.name));
+    // 취업규칙 과제: 10인 이상에서만
+    const low = { ...b, stage: 'y35', industry: 'food', concern: ['org'], ans: { ...A(2), H1: 1, H2: 1, H3: 0 } };
+    const big = ids({ ...low, emp: 'e1029' }), small = ids({ ...low, emp: 'e59' });
+    // 모순 탐지
+    const fl = (x) => consistencyFlags(x).map((f) => f.id);
+    const f20 = fl({ ...b, emp: 'e59', ans: { ...A(2), H2: 'na' } }), f21 = fl({ ...b, emp: 'e1', ans: { ...A(2) } });
+    renderResult({ ...low, emp: 'e1029' }, false);
+    const html = document.getElementById('resultRoot').innerText;
+    const guide = !!document.querySelector('.hr-guide') && document.querySelectorAll('.hr-guide a').length === 0;
+    const radar = (document.querySelector('.radar-box svg circle') ? document.querySelectorAll('.radar-box svg text').length : 0);
+    renderResult({ ...b, ans: A(3), concern: ['cert'] }, false);
+    const noGuide = !document.querySelector('.hr-guide');
+    // 구버전(27문항) 결과로 재진단해도 오류 없음
+    let oldOk = true; try { const old = A(2); delete old.H1; delete old.H2; delete old.H3;
+      const x = { ...b, ans: { ...A(2) } }; const base0 = { total: 60, areas: { foundation: 67, bm: 67, sales: 67, marketing: 67, rnd: 67, cert: 67, finance: 67, export: 67, digital: 67 }, date: '2026-10-01' };
+      renderResult(x, false, base0); oldOk = document.getElementById('resultRoot').innerText.includes('재진단 비교') && scoreEngine({ ...b, ans: old }).areaScore.people === null; } catch { oldOk = false; }
+    return { same: JSON.stringify(s1.areaScore) === JSON.stringify(s2.areaScore), soloPeople: soloSc.areaScore.people, soloActs, soloKpi,
+      big: big.includes('h2'), small: small.includes('h2'), hrActs: big.filter((i) => /^h|^o1/.test(i)).length,
+      f20: f20.includes('X20'), f21: f21.includes('X21'), legal: /취업규칙 작성·신고 의무/.test(html), guide, noGuide, radar, oldOk };
+  }, base);
+  check('조직·인력: 인원이 달라도 같은 응답이면 점수 동일', h.same);
+  check("1인 기업: H2·H3 '해당 없음' → H1로만 점수, 직원 과제·KPI 미추천", h.soloPeople === 33 && h.soloActs === 0 && !h.soloKpi, `${h.soloPeople}/${h.soloActs}/${h.soloKpi}`);
+  check('취업규칙 과제는 상시 10명 이상에서만 추천', h.big && !h.small);
+  check('조직·인력 병목 + 고민 → HR 과제 추천', h.hrActs >= 1, String(h.hrActs));
+  check('모순 탐지 X20(직원 있는데 직원 없음 응답)·X21(1인인데 노무 체계 응답)', h.f20 && h.f21);
+  check('10명 이상 + 노무 기본 미흡 → 취업규칙 법정 의무 알림', h.legal);
+  check('조직·인력 기대 미달 → HR 심화 진단 문구 안내(링크 없음), 충분하면 미표시', h.guide && h.noGuide);
+  check('구버전(27문항) 결과 파일 기준 재진단 비교 정상', h.oldOk);
+  check('레이더 10축 라벨 렌더', h.radar >= 10, String(h.radar));
+}
+
+// 11. v6.4.1 고객여정·레드팀 회귀
+{
+  const html = readFileSync(path.join(here, '..', 'index.html'), 'utf8');
+  check("'무료' 표기 없음(화면·보고서·소스 전체)", !html.includes('무료'));
+  const r = await page.evaluate((b) => {
+    const A = (v) => Object.fromEntries(QUESTIONS.map((q) => [q.id, v]));
+    // 표준에서 H2·H3 '해당 없음'으로 답한 뒤 간이로 바꿔도, 묻지 않은 문항 때문에 과제가 빠지거나 법정 알림이 뜨지 않음
+    const stale = { ...b, depth: 'quick', stage: 'y35', emp: 'e1029', concern: ['org'], ans: { ...A(1), H2: 'na', H3: 'na' } };
+    const staleActs = pickActivities(stale, scoreEngine(stale)).filter((a) => a.needsStaff).length;
+    const stale2 = { ...b, depth: 'quick', emp: 'e1029', ans: { ...A(1), H2: 0 } };
+    renderResult(stale2, false); const legalQuick = document.getElementById('resultRoot').innerText.includes('취업규칙 작성·신고 의무');
+    // 상담 메일과 화면 안내가 같은 조건
+    const low = { ...b, concern: ['org'], ans: { ...A(2), H1: 0, H2: 1, H3: 0 } };
+    const diag = buildDiagnosisData(low, false); renderResult(low, false);
+    const same = hrDeepNeeded(diag) === !!document.querySelector('.hr-guide') && decodeURIComponent(mailtoHref(diag)).includes('HR 심화');
+    const txt = document.getElementById('resultRoot').innerText;
+    const [d1, d2, d3] = planPhaseDays();
+    return { staleActs, legalQuick, same, plan: txt.includes(`${d1}·${d2}·${d3}일에 ${RULES.plan.perPhase}개 과제씩`) && txt.includes(`0~${d1}일`),
+      concernLbl: document.querySelector('[data-cnt="maxConcern"]')?.textContent === String(RULES.input.maxConcern) };
+  }, base);
+  check('간이로 바꾼 뒤 남은 표준 응답(H2·H3 해당 없음)으로 직원 과제가 빠지지 않음', r.staleActs > 0, String(r.staleActs));
+  check('간이 진단에서는 묻지 않은 H2로 취업규칙 알림을 띄우지 않음', !r.legalQuick);
+  check('HR 심화 진단: 화면 안내 = 상담 메일 문구(같은 조건)', r.same);
+  check('실행계획 구간·과제 수 = RULES.plan, 고민 최대 수 = RULES.input', r.plan && r.concernLbl);
 }
 
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));

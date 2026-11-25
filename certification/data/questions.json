@@ -1,0 +1,1868 @@
+{
+  "version": "2026.11.23-5",
+  "groups": [
+    {
+      "group_id": "purpose",
+      "title": "진단 목적",
+      "step_label": "목적"
+    },
+    {
+      "group_id": "profile",
+      "title": "기업 기본정보",
+      "step_label": "기본정보"
+    },
+    {
+      "group_id": "export",
+      "title": "해외 판매 제품 정보",
+      "step_label": "제품·시장"
+    },
+    {
+      "group_id": "scheme",
+      "title": "인증별 확인 질문",
+      "step_label": "인증별 질문"
+    }
+  ],
+  "questions": [
+    {
+      "question_id": "purposes",
+      "version": 1,
+      "scheme_id": null,
+      "group": "purpose",
+      "label_plain_ko": "인증을 어디에 쓰고 싶으세요? (여러 개 선택 가능)",
+      "why_this_matters": "목적에 따라 먼저 볼 인증이 달라져요. 추천 순서를 정할 때만 쓰고 요건 판정에는 쓰지 않아요.",
+      "data_type": "multi",
+      "response_options": [
+        {
+          "value": "finance",
+          "label": "정책자금·보증·투자",
+          "short": "정책자금·투자"
+        },
+        {
+          "value": "rnd",
+          "label": "R&D·세액공제·연구인력",
+          "short": "R&D·세액공제"
+        },
+        {
+          "value": "procurement",
+          "label": "공공조달·입찰 가점",
+          "short": "공공조달 가점"
+        },
+        {
+          "value": "export",
+          "label": "해외 수출·판매",
+          "short": "해외 수출"
+        },
+        {
+          "value": "quality",
+          "label": "품질·안전 관리",
+          "short": "품질·안전"
+        },
+        {
+          "value": "security",
+          "label": "정보보호",
+          "short": "정보보호"
+        },
+        {
+          "value": "customer",
+          "label": "고객사·거래처 요구",
+          "short": "거래처 요구"
+        },
+        {
+          "value": "brand",
+          "label": "대외 신뢰·홍보",
+          "short": "대외 신뢰"
+        },
+        {
+          "value": "other",
+          "label": "기타·아직 모르겠어요"
+        }
+      ],
+      "unknown_allowed": false,
+      "required_when": "always",
+      "show_when": "always",
+      "evidence_examples": [],
+      "rule_refs": [],
+      "source_refs": [],
+      "privacy_level": "low",
+      "help_text": "정확하지 않아도 괜찮아요. 결과 화면에서 언제든 바꿀 수 있어요.",
+      "validation": {
+        "min_items": 1
+      }
+    },
+    {
+      "question_id": "target",
+      "version": 1,
+      "scheme_id": null,
+      "group": "purpose",
+      "label_plain_ko": "무엇에 대한 인증을 찾고 계세요?",
+      "why_this_matters": "회사 자체를 확인받는 제도(벤처·이노비즈 등)와 제품에 붙는 규제(KC·CE·FDA 등)는 완전히 다른 절차예요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "company",
+          "label": "회사(기업확인·경영시스템)"
+        },
+        {
+          "value": "product",
+          "label": "제품(안전·수출 규제)"
+        },
+        {
+          "value": "both",
+          "label": "둘 다"
+        },
+        {
+          "value": "unknown",
+          "label": "잘 모르겠어요"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "always",
+      "show_when": "always",
+      "evidence_examples": [],
+      "rule_refs": [],
+      "source_refs": [],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "markets",
+      "version": 1,
+      "scheme_id": null,
+      "group": "purpose",
+      "label_plain_ko": "어느 시장에서 쓰실 건가요? (여러 개 선택 가능)",
+      "why_this_matters": "해외 규제는 판매하는 나라(시장)의 법이 정해요. 회사가 한국에 있어도 마찬가지예요.",
+      "data_type": "multi",
+      "response_options": [
+        {
+          "value": "KR",
+          "label": "국내"
+        },
+        {
+          "value": "EU",
+          "label": "유럽연합(EU)"
+        },
+        {
+          "value": "US",
+          "label": "미국"
+        },
+        {
+          "value": "OTHER",
+          "label": "기타 해외"
+        },
+        {
+          "value": "unknown",
+          "label": "아직 정하지 않았어요"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "always",
+      "show_when": "always",
+      "evidence_examples": [],
+      "rule_refs": [],
+      "source_refs": [],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {
+        "min_items": 1
+      }
+    },
+    {
+      "question_id": "industry_major",
+      "version": 1,
+      "scheme_id": null,
+      "group": "purpose",
+      "label_plain_ko": "우리 회사 업종(대분류)",
+      "why_this_matters": "다른 업종 전용 인증(예: 식품 회사가 아니면 HACCP)을 목록에서 빼 줘요. 한국표준산업분류(KSIC) 대분류를 쉬운 말로 묶었어요. 요건 판정에는 쓰지 않아요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "elec",
+          "label": "전기·전자·반도체 제조",
+          "ksic": "C26~C28"
+        },
+        {
+          "value": "mach",
+          "label": "기계·장비·자동차 제조",
+          "ksic": "C29~C31"
+        },
+        {
+          "value": "bio",
+          "label": "바이오·의약·의료기기",
+          "ksic": "C21·C27"
+        },
+        {
+          "value": "food",
+          "label": "식품·화장품 제조",
+          "ksic": "C10~C11·C20 일부"
+        },
+        {
+          "value": "chem",
+          "label": "화학·소재·기타 제조",
+          "ksic": "그 밖의 C"
+        },
+        {
+          "value": "ict",
+          "label": "소프트웨어·정보통신",
+          "ksic": "J58·J61~J63"
+        },
+        {
+          "value": "trade",
+          "label": "도소매·유통·전자상거래",
+          "ksic": "G"
+        },
+        {
+          "value": "pro",
+          "label": "연구개발·디자인·컨설팅 서비스",
+          "ksic": "M"
+        },
+        {
+          "value": "constr",
+          "label": "건설·에너지·환경",
+          "ksic": "D·E·F"
+        },
+        {
+          "value": "agri",
+          "label": "농림어업",
+          "ksic": "A"
+        },
+        {
+          "value": "culture",
+          "label": "콘텐츠·문화·교육",
+          "ksic": "J59~J60·P·R"
+        },
+        {
+          "value": "svc",
+          "label": "기타 서비스",
+          "ksic": "그 밖"
+        },
+        {
+          "value": "unknown",
+          "label": "모름·전체 보기",
+          "ksic": ""
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "never",
+      "show_when": "never",
+      "evidence_examples": [
+        "사업자등록증 업태·종목"
+      ],
+      "rule_refs": [],
+      "source_refs": [],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "company_name",
+      "version": 1,
+      "scheme_id": null,
+      "group": "profile",
+      "label_plain_ko": "회사 이름 (선택)",
+      "why_this_matters": "PDF 보고서 표지에만 표시돼요. 비워 두면 '기업명 미입력'으로 표시해요. 서버로 보내지 않아요.",
+      "data_type": "text",
+      "response_options": [],
+      "unknown_allowed": false,
+      "required_when": "never",
+      "show_when": "always",
+      "evidence_examples": [],
+      "rule_refs": [],
+      "source_refs": [],
+      "privacy_level": "medium",
+      "help_text": "",
+      "validation": {
+        "max_length": 60
+      }
+    },
+    {
+      "question_id": "biz_status",
+      "version": 1,
+      "scheme_id": null,
+      "group": "profile",
+      "label_plain_ko": "지금 사업자 형태는 무엇인가요?",
+      "why_this_matters": "예비창업자는 벤처 '예비벤처유형'만 해당되고, 업력을 따지는 제도(이노비즈·메인비즈)는 신청 대상이 아니에요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "pre",
+          "label": "예비창업자(사업자등록 전)"
+        },
+        {
+          "value": "individual",
+          "label": "개인사업자"
+        },
+        {
+          "value": "corporation",
+          "label": "법인사업자"
+        },
+        {
+          "value": "unknown",
+          "label": "모름·확인 필요"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "always",
+      "show_when": "always",
+      "evidence_examples": [
+        "사업자등록증"
+      ],
+      "rule_refs": [
+        "VEN",
+        "INNO",
+        "MAIN",
+        "RNDI",
+        "RNDD"
+      ],
+      "source_refs": [
+        "S-VEN-D",
+        "S-INNO-RULE"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {},
+      "core": true
+    },
+    {
+      "question_id": "founded_on",
+      "version": 2,
+      "scheme_id": null,
+      "group": "profile",
+      "label_plain_ko": "사업을 시작한 지 얼마나 됐나요? (업력)",
+      "why_this_matters": "업력(사업 기간)으로 신청 자격이 갈리는 제도가 있어요. 이노비즈 운영규정은 개인은 사업자등록증의 '사업개시일', 법인은 등기부의 '회사성립일'부터 계산해요.",
+      "data_type": "single",
+      "as_of_required": true,
+      "response_options": [
+        {
+          "value": "r:0:1",
+          "label": "1년 미만"
+        },
+        {
+          "value": "r:1:3",
+          "label": "1년~3년 미만"
+        },
+        {
+          "value": "r:3:7",
+          "label": "3년~7년 미만"
+        },
+        {
+          "value": "r:7:",
+          "label": "7년 이상"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "biz_status in [individual, corporation]",
+      "show_when": "biz_status in [individual, corporation, unknown]",
+      "evidence_examples": [
+        "사업자등록증(개업연월일)",
+        "법인등기부등본(회사성립연월일)"
+      ],
+      "rule_refs": [
+        "INNO-AGE",
+        "MAIN-AGE",
+        "VEN-RD-RATIO-WHEN",
+        "RNDI-STAFF"
+      ],
+      "source_refs": [
+        "S-INNO-RULE"
+      ],
+      "privacy_level": "low",
+      "help_text": "법인은 등기부의 '회사성립일', 개인은 사업자등록증의 '개업일'부터 오늘까지예요. 3년 전후로 몇 달 차이라면 '정확한 날짜로 입력'을 눌러 주세요.",
+      "validation": {},
+      "allow_date": true
+    },
+    {
+      "question_id": "converted_from_individual",
+      "version": 1,
+      "scheme_id": null,
+      "group": "profile",
+      "label_plain_ko": "개인사업자에서 법인으로 바꾼 적이 있나요?",
+      "why_this_matters": "법인전환 기업은 요건을 갖추면 개인사업자 시절 업력을 이어받을 수 있어요(이노비즈 운영규정 제5조). 그래서 법인 업력만으로 바로 '부족'이라고 판단하지 않아요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "yes",
+          "label": "네, 전환했어요"
+        },
+        {
+          "value": "no",
+          "label": "아니요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "biz_status == corporation",
+      "show_when": "biz_status == corporation",
+      "evidence_examples": [
+        "법인전환 관련 서류(현물출자·사업양수도 계약 등)"
+      ],
+      "rule_refs": [
+        "INNO-AGE",
+        "MAIN-AGE"
+      ],
+      "source_refs": [
+        "S-INNO-RULE"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "suspended_period",
+      "version": 1,
+      "scheme_id": null,
+      "group": "profile",
+      "label_plain_ko": "휴업했던 기간이 있나요?",
+      "why_this_matters": "이노비즈 업력에는 휴업 기간이 포함되지 않아요. 휴업 이력이 있으면 업력을 다시 계산해야 해요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "없어요"
+        },
+        {
+          "value": "yes",
+          "label": "있어요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "biz_status in [individual, corporation]",
+      "show_when": "biz_status in [individual, corporation, unknown]",
+      "evidence_examples": [
+        "휴업·폐업 사실증명(홈택스)"
+      ],
+      "rule_refs": [
+        "INNO-AGE"
+      ],
+      "source_refs": [
+        "S-INNO-RULE"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "is_sme",
+      "version": 1,
+      "scheme_id": null,
+      "group": "profile",
+      "label_plain_ko": "「중소기업기본법」상 중소기업에 해당하나요?",
+      "why_this_matters": "벤처(예비벤처 제외)·이노비즈·메인비즈는 모두 중소기업이어야 신청할 수 있어요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "yes",
+          "label": "네 (중소기업확인서 있음·해당)"
+        },
+        {
+          "value": "no",
+          "label": "아니요 (중견·대기업 등)"
+        },
+        {
+          "value": "unknown",
+          "label": "모름·확인 필요"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "biz_status in [individual, corporation]",
+      "show_when": "biz_status in [individual, corporation, unknown]",
+      "evidence_examples": [
+        "중소기업확인서(중소기업현황정보시스템 sminfo.mss.go.kr)"
+      ],
+      "rule_refs": [
+        "VEN-SME",
+        "INNO-SME",
+        "MAIN-SME"
+      ],
+      "source_refs": [
+        "S-VEN-A",
+        "S-INNO-RULE",
+        "S-MAIN-GUIDE"
+      ],
+      "privacy_level": "low",
+      "help_text": "중소기업현황정보시스템에서 중소기업확인서를 발급받을 수 있으면 대체로 '네'예요.",
+      "validation": {}
+    },
+    {
+      "question_id": "company_size",
+      "version": 1,
+      "scheme_id": null,
+      "group": "profile",
+      "label_plain_ko": "회사 규모는 어디에 해당하나요?",
+      "why_this_matters": "기업부설연구소에 필요한 연구전담요원 수가 규모(소기업·중기업·중견기업)에 따라 2명~10명으로 달라요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "small",
+          "label": "소기업"
+        },
+        {
+          "value": "medium",
+          "label": "중기업"
+        },
+        {
+          "value": "midsize",
+          "label": "중견기업"
+        },
+        {
+          "value": "large",
+          "label": "그 밖의 기업(대기업 등)"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [RNDI]",
+      "show_when": "biz_status in [individual, corporation, unknown]",
+      "evidence_examples": [
+        "중소기업확인서(소기업/중기업 구분 표기)"
+      ],
+      "rule_refs": [
+        "RNDI-STAFF"
+      ],
+      "source_refs": [
+        "S-RND-DEC"
+      ],
+      "privacy_level": "low",
+      "help_text": "중소기업확인서에 '소기업' 또는 '중기업'으로 표시돼요.",
+      "validation": {}
+    },
+    {
+      "question_id": "industry",
+      "version": 1,
+      "scheme_id": null,
+      "group": "profile",
+      "label_plain_ko": "세부 업종에 가장 가까운 것을 골라 주세요",
+      "why_this_matters": "벤처 연구개발유형은 업종·매출 규모별로 필요한 연구개발비 비율(5~10%)이 달라요. 연구개발전담부서의 칸막이 예외(정보서비스·소프트웨어업)에도 쓰여요. 공식 업종표 분류를 그대로 사용해요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "pharma_21",
+          "label": "의약품 제조(21)",
+          "majors": [
+            "bio"
+          ]
+        },
+        {
+          "value": "machinery_29",
+          "label": "기계 및 장비 제조(29, 사무용기계 제외)",
+          "majors": [
+            "mach"
+          ]
+        },
+        {
+          "value": "computer_263",
+          "label": "컴퓨터 및 주변장치 제조(263)",
+          "majors": [
+            "elec"
+          ]
+        },
+        {
+          "value": "office_2918",
+          "label": "사무용기계 및 장비 제조(2918)",
+          "majors": [
+            "mach",
+            "elec"
+          ]
+        },
+        {
+          "value": "electric_28",
+          "label": "전기장비 제조(28)",
+          "majors": [
+            "elec"
+          ]
+        },
+        {
+          "value": "semi_261_262",
+          "label": "반도체 및 전자부품 제조(261, 262)",
+          "majors": [
+            "elec"
+          ]
+        },
+        {
+          "value": "medical_27",
+          "label": "의료·정밀·광학기기 및 시계 제조(27)",
+          "majors": [
+            "bio",
+            "elec"
+          ]
+        },
+        {
+          "value": "other_mfg",
+          "label": "기타 제조업",
+          "majors": [
+            "elec",
+            "mach",
+            "bio",
+            "food",
+            "chem"
+          ]
+        },
+        {
+          "value": "retail_45_47",
+          "label": "도매 및 소매업(45~47)",
+          "majors": [
+            "trade"
+          ]
+        },
+        {
+          "value": "telecom_61",
+          "label": "통신업(61)",
+          "majors": [
+            "ict"
+          ]
+        },
+        {
+          "value": "software_582",
+          "label": "소프트웨어 개발 및 공급업(582)",
+          "majors": [
+            "ict"
+          ]
+        },
+        {
+          "value": "programming_62",
+          "label": "컴퓨터 프로그래밍, 시스템 통합 및 관리업(62)",
+          "majors": [
+            "ict"
+          ]
+        },
+        {
+          "value": "info_63",
+          "label": "정보서비스업(63)",
+          "majors": [
+            "ict"
+          ]
+        },
+        {
+          "value": "internet",
+          "label": "인터넷산업",
+          "majors": [
+            "ict",
+            "trade",
+            "culture"
+          ]
+        },
+        {
+          "value": "other",
+          "label": "기타 산업(서비스·건설·농업 등)",
+          "majors": [
+            "pro",
+            "constr",
+            "agri",
+            "culture",
+            "svc",
+            "trade"
+          ]
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [VEN]",
+      "show_when": "biz_status in [individual, corporation, unknown]",
+      "evidence_examples": [
+        "사업자등록증 업태·종목",
+        "부가가치세 신고서 업종코드"
+      ],
+      "rule_refs": [
+        "VEN-RD-RATIO",
+        "RNDD-SPACE"
+      ],
+      "source_refs": [
+        "S-VEN-B-RATIO"
+      ],
+      "privacy_level": "low",
+      "help_text": "괄호 안 숫자는 한국표준산업분류 코드예요.",
+      "validation": {}
+    },
+    {
+      "question_id": "product_categories",
+      "version": 1,
+      "scheme_id": null,
+      "group": "export",
+      "label_plain_ko": "판매하려는 제품은 어떤 종류인가요? (여러 개 선택 가능)",
+      "why_this_matters": "해외 규제는 제품 종류마다 법이 달라요. 제품 종류를 모르면 어떤 규제가 적용되는지 판단할 수 없어요.",
+      "data_type": "multi",
+      "response_options": [
+        {
+          "value": "electrical",
+          "label": "전기·전자제품"
+        },
+        {
+          "value": "radio",
+          "label": "무선통신 기능 포함(블루투스·Wi-Fi 등)"
+        },
+        {
+          "value": "medical",
+          "label": "의료기기"
+        },
+        {
+          "value": "food",
+          "label": "식품·건강기능식품"
+        },
+        {
+          "value": "cosmetics",
+          "label": "화장품"
+        },
+        {
+          "value": "machinery",
+          "label": "기계류"
+        },
+        {
+          "value": "chemical",
+          "label": "화학제품"
+        },
+        {
+          "value": "toy_child",
+          "label": "어린이제품·완구"
+        },
+        {
+          "value": "software",
+          "label": "소프트웨어·서비스(실물 제품 없음)"
+        },
+        {
+          "value": "unknown",
+          "label": "모름·아직 정하지 않음"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "target in [product, both]",
+      "show_when": "target in [product, both, unknown]",
+      "evidence_examples": [
+        "제품 사양서",
+        "카탈로그"
+      ],
+      "rule_refs": [],
+      "source_refs": [
+        "S-EU-CE",
+        "S-FDA-DEV",
+        "S-FCC"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "trade_role",
+      "version": 1,
+      "scheme_id": null,
+      "group": "export",
+      "label_plain_ko": "해외 판매에서 우리 회사의 역할은 무엇인가요?",
+      "why_this_matters": "제조자·수입자·유통자에 따라 지는 의무가 달라요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "manufacturer",
+          "label": "제조자(우리 이름으로 판매)"
+        },
+        {
+          "value": "oem",
+          "label": "주문자상표(OEM)로 납품"
+        },
+        {
+          "value": "distributor",
+          "label": "현지 수입자·유통사를 통해 판매"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "markets has [EU, US, OTHER]",
+      "show_when": "markets has [EU, US, OTHER]",
+      "evidence_examples": [
+        "수출 계약서",
+        "현지 대리인 계약서"
+      ],
+      "rule_refs": [],
+      "source_refs": [],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "intended_use",
+      "version": 1,
+      "scheme_id": null,
+      "group": "export",
+      "label_plain_ko": "제품의 사용 목적을 한 줄로 적어 주세요 (선택)",
+      "why_this_matters": "같은 기기라도 '진단·치료용'이라고 표시하면 의료기기 규제를 받을 수 있어요. 사용 목적(intended use)은 규제 분류의 출발점이에요.",
+      "data_type": "text",
+      "response_options": [],
+      "unknown_allowed": true,
+      "required_when": "never",
+      "show_when": "markets has [EU, US, OTHER]",
+      "evidence_examples": [
+        "제품 설명서",
+        "라벨 문구"
+      ],
+      "rule_refs": [],
+      "source_refs": [
+        "S-FDA-DEV"
+      ],
+      "privacy_level": "medium",
+      "help_text": "예: 가정용 혈압 측정 / 사무실용 무선 이어폰",
+      "validation": {
+        "max_length": 120
+      }
+    },
+    {
+      "question_id": "ven_excluded_industry",
+      "version": 1,
+      "scheme_id": "VEN",
+      "group": "scheme",
+      "label_plain_ko": "아래 업종에 해당하나요? (유흥·무도 주점업, 카지노·사행시설·무도장 운영업)",
+      "why_this_matters": "「벤처기업육성에 관한 특별법 시행령」 별표 1의 업종은 벤처기업이 될 수 없어요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "해당하지 않아요"
+        },
+        {
+          "value": "yes",
+          "label": "해당해요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [VEN]",
+      "show_when": "scheme in [VEN]",
+      "evidence_examples": [
+        "사업자등록증 업종코드"
+      ],
+      "rule_refs": [
+        "VEN-EXCL"
+      ],
+      "source_refs": [
+        "S-VEN-EXCL"
+      ],
+      "privacy_level": "low",
+      "help_text": "분류코드: 56211, 56212, 56219, 91242, 91249, 91291",
+      "validation": {}
+    },
+    {
+      "question_id": "ven_invest_total",
+      "version": 2,
+      "scheme_id": "VEN",
+      "group": "scheme",
+      "label_plain_ko": "적격투자기관(벤처캐피탈 등)에서 받은 투자금 합계",
+      "why_this_matters": "벤처투자유형은 적격투자기관으로부터 5천만원 이상 투자를 받아야 해요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "r:0:0",
+          "label": "받은 적 없음"
+        },
+        {
+          "value": "r:1:5000",
+          "label": "5천만원 미만"
+        },
+        {
+          "value": "r:5000:",
+          "label": "5천만원 이상"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [VEN]",
+      "show_when": "scheme in [VEN] and biz_status != pre",
+      "evidence_examples": [
+        "투자계약서",
+        "투자금 입금내역",
+        "주주명부",
+        "투자유치사항 등기 완료 법인등기부등본"
+      ],
+      "rule_refs": [
+        "VEN-INV-AMT"
+      ],
+      "source_refs": [
+        "S-VEN-A"
+      ],
+      "privacy_level": "medium",
+      "help_text": "벤처투자유형 기준은 5천만원 이상이에요.",
+      "validation": {}
+    },
+    {
+      "question_id": "ven_capital",
+      "version": 1,
+      "scheme_id": "VEN",
+      "group": "scheme",
+      "label_plain_ko": "자본금 (만원)",
+      "why_this_matters": "자본금 중 투자금 비율이 10% 이상이어야 해요(문화산업 제작자 법인은 7%).",
+      "data_type": "number",
+      "units": "만원",
+      "response_options": [],
+      "unknown_allowed": true,
+      "required_when": "never",
+      "show_when": "never",
+      "evidence_examples": [
+        "법인등기부등본(자본금)",
+        "재무제표"
+      ],
+      "rule_refs": [
+        "VEN-INV-RATIO"
+      ],
+      "source_refs": [
+        "S-VEN-A"
+      ],
+      "privacy_level": "medium",
+      "help_text": "(v2부터 화면에서 묻지 않음 — 자본금 대비 투자금 비율 질문으로 대체. 숫자 입력 호환용)",
+      "validation": {
+        "min": 0,
+        "max": 100000000
+      }
+    },
+    {
+      "question_id": "ven_invest_ratio",
+      "version": 1,
+      "scheme_id": "VEN",
+      "group": "scheme",
+      "label_plain_ko": "그 투자금이 자본금의 몇 %인가요?",
+      "why_this_matters": "자본금 중 투자금 비율이 10% 이상이어야 해요(문화산업 제작자 법인은 7%).",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "r:0:7",
+          "label": "7% 미만"
+        },
+        {
+          "value": "r:7:10",
+          "label": "7%~10% 미만"
+        },
+        {
+          "value": "r:10:",
+          "label": "10% 이상"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "ven_invest_total in [r:5000:]",
+      "show_when": "scheme in [VEN] and ven_invest_total in [r:5000:]",
+      "evidence_examples": [
+        "법인등기부등본(자본금)",
+        "투자계약서"
+      ],
+      "rule_refs": [
+        "VEN-INV-RATIO"
+      ],
+      "source_refs": [
+        "S-VEN-A"
+      ],
+      "privacy_level": "low",
+      "help_text": "투자금 ÷ 법인등기부등본의 자본금 × 100",
+      "validation": {}
+    },
+    {
+      "question_id": "ven_culture_producer",
+      "version": 1,
+      "scheme_id": "VEN",
+      "group": "scheme",
+      "label_plain_ko": "「문화산업진흥 기본법」상 제작자인 법인인가요?",
+      "why_this_matters": "문화산업 제작자 법인은 투자금 비율 기준이 10%가 아니라 7%예요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "아니요"
+        },
+        {
+          "value": "yes",
+          "label": "네"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "never",
+      "show_when": "scheme in [VEN] and ven_invest_total > 0",
+      "evidence_examples": [],
+      "rule_refs": [
+        "VEN-INV-RATIO"
+      ],
+      "source_refs": [
+        "S-VEN-A"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "ven_qualified_investor",
+      "version": 1,
+      "scheme_id": "VEN",
+      "group": "scheme",
+      "label_plain_ko": "투자자가 모두 '적격투자기관'인가요?",
+      "why_this_matters": "창업투자회사·벤처투자조합·액셀러레이터·개인투자조합·전문엔젤 등 공식 목록의 기관 투자만 인정돼요. 기관별로 인정 시작일이 다른 경우도 있어요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "yes",
+          "label": "네, 적격투자기관이에요"
+        },
+        {
+          "value": "no",
+          "label": "아니요 (일반 개인·일반 법인 등)"
+        },
+        {
+          "value": "unknown",
+          "label": "모름·확인 필요"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "ven_invest_total > 0",
+      "show_when": "scheme in [VEN] and ven_invest_total > 0",
+      "evidence_examples": [
+        "투자계약서상 투자자 정보",
+        "벤처확인시스템 적격투자기관 상세조회"
+      ],
+      "rule_refs": [
+        "VEN-INV-QUAL"
+      ],
+      "source_refs": [
+        "S-VEN-A"
+      ],
+      "privacy_level": "low",
+      "help_text": "크라우드펀딩은 지분증권(보통주·우선주) 투자만 인정돼요.",
+      "validation": {}
+    },
+    {
+      "question_id": "rnd_unit",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "인정받은 연구조직이 있나요?",
+      "why_this_matters": "벤처 연구개발유형은 기업부설연구소·연구개발전담부서 등 인정받은 연구조직이 있어야 해요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "institute",
+          "label": "기업부설연구소 인정서 있음"
+        },
+        {
+          "value": "dept",
+          "label": "연구개발전담부서 인정서 있음"
+        },
+        {
+          "value": "creative",
+          "label": "기업부설창작연구소·기업창작전담부서 있음"
+        },
+        {
+          "value": "none",
+          "label": "없어요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [VEN]",
+      "show_when": "scheme in [VEN] and biz_status != pre",
+      "evidence_examples": [
+        "연구개발조직 인정서"
+      ],
+      "rule_refs": [
+        "VEN-RD-UNIT"
+      ],
+      "source_refs": [
+        "S-VEN-B"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "ven_rd_spend",
+      "version": 2,
+      "scheme_id": "VEN",
+      "group": "scheme",
+      "label_plain_ko": "직전 4개 분기 연구개발비 합계",
+      "why_this_matters": "벤처 연구개발유형은 신청일이 속한 분기의 직전 4개 분기 연구개발비가 5천만원 이상이어야 해요.",
+      "data_type": "single",
+      "as_of_required": true,
+      "response_options": [
+        {
+          "value": "r:0:5000",
+          "label": "5천만원 미만"
+        },
+        {
+          "value": "r:5000:",
+          "label": "5천만원 이상"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "rnd_unit in [institute, dept, creative]",
+      "show_when": "scheme in [VEN] and biz_status != pre",
+      "evidence_examples": [
+        "인건비 산정내역서",
+        "인건비 외 개발비용 산정내역서",
+        "재무제표"
+      ],
+      "rule_refs": [
+        "VEN-RD-AMT"
+      ],
+      "source_refs": [
+        "S-VEN-B"
+      ],
+      "privacy_level": "medium",
+      "help_text": "연구개발유형 기준은 5천만원 이상이에요. 공식 '연구개발비 산정기준'에 맞는 비용(연구요원 인건비, 연구용 재료비, 위탁·공동개발비 등)만 세요.",
+      "validation": {}
+    },
+    {
+      "question_id": "ven_revenue",
+      "version": 2,
+      "scheme_id": "VEN",
+      "group": "scheme",
+      "label_plain_ko": "같은 기간(직전 4개 분기) 총매출액",
+      "why_this_matters": "매출 대비 연구개발비 비율과, 비율 기준을 정하는 매출 규모(50억 미만 등)를 계산해요. 창업 3년 미만이면 비율 기준이 적용되지 않아요.",
+      "data_type": "single",
+      "as_of_required": true,
+      "response_options": [
+        {
+          "value": "r:0:0",
+          "label": "매출 없음"
+        },
+        {
+          "value": "r:1:500000",
+          "label": "50억원 미만"
+        },
+        {
+          "value": "r:500000:1000000",
+          "label": "50억~100억원 미만"
+        },
+        {
+          "value": "r:1000000:",
+          "label": "100억원 이상"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "rnd_unit in [institute, dept, creative]",
+      "show_when": "scheme in [VEN] and biz_status != pre",
+      "evidence_examples": [
+        "부가가치세 과세표준증명원",
+        "매출원장"
+      ],
+      "rule_refs": [
+        "VEN-RD-RATIO"
+      ],
+      "source_refs": [
+        "S-VEN-B",
+        "S-VEN-B-RATIO"
+      ],
+      "privacy_level": "medium",
+      "help_text": "연구개발비 비율 기준표의 매출 구간(50억·100억)과 같게 나눴어요.",
+      "validation": {}
+    },
+    {
+      "question_id": "ven_rd_ratio",
+      "version": 1,
+      "scheme_id": "VEN",
+      "group": "scheme",
+      "label_plain_ko": "매출 대비 연구개발비 비율",
+      "why_this_matters": "연구개발유형은 업종·매출 규모별 기준 비율(5~10%) 이상이어야 해요. 창업 3년 미만이면 비율 기준을 적용하지 않아요.",
+      "data_type": "single",
+      "dynamic": "rd_ratio",
+      "response_options": [
+        {
+          "value": "r:0:5",
+          "label": "5% 미만"
+        },
+        {
+          "value": "r:5:6",
+          "label": "5~6%"
+        },
+        {
+          "value": "r:6:7",
+          "label": "6~7%"
+        },
+        {
+          "value": "r:7:8",
+          "label": "7~8%"
+        },
+        {
+          "value": "r:8:10",
+          "label": "8~10%"
+        },
+        {
+          "value": "r:10:",
+          "label": "10% 이상"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "rnd_unit in [institute, dept, creative]",
+      "show_when": "scheme in [VEN] and biz_status != pre",
+      "evidence_examples": [
+        "인건비 산정내역서",
+        "부가가치세 과세표준증명원"
+      ],
+      "rule_refs": [
+        "VEN-RD-RATIO"
+      ],
+      "source_refs": [
+        "S-VEN-B",
+        "S-VEN-B-RATIO"
+      ],
+      "privacy_level": "low",
+      "help_text": "업종과 매출 구간을 고르면 우리 회사 기준 비율로 바로 물어봐요.",
+      "validation": {}
+    },
+    {
+      "question_id": "x_credit",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "연체·국세체납 등으로 신용정보원에 체납정보가 등록돼 있나요?",
+      "why_this_matters": "이노비즈·메인비즈 모두 체납정보 등이 등록된 기업은 신청할 수 없어요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "등록돼 있지 않아요"
+        },
+        {
+          "value": "yes",
+          "label": "등록돼 있어요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [INNO, MAIN]",
+      "show_when": "scheme in [INNO, MAIN]",
+      "evidence_examples": [
+        "국세·지방세 납세증명서",
+        "신용정보조회서"
+      ],
+      "rule_refs": [
+        "INNO-X-CREDIT",
+        "MAIN-X-CREDIT"
+      ],
+      "source_refs": [
+        "S-INNO-RULE",
+        "S-MAIN-GUIDE"
+      ],
+      "privacy_level": "high",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "x_dishonor",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "어음교환소로부터 거래정지처분을 받은 적이 있나요? (현재 처분 중)",
+      "why_this_matters": "거래정지처분을 받은 기업은 이노비즈·메인비즈를 신청할 수 없어요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "아니요"
+        },
+        {
+          "value": "yes",
+          "label": "네"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [INNO, MAIN]",
+      "show_when": "scheme in [INNO, MAIN]",
+      "evidence_examples": [],
+      "rule_refs": [
+        "INNO-X-DISHONOR",
+        "MAIN-X-DISHONOR"
+      ],
+      "source_refs": [
+        "S-INNO-RULE",
+        "S-MAIN-GUIDE"
+      ],
+      "privacy_level": "high",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "x_insolvency",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "파산·회생절차 개시 신청이나 청산 중인 상태인가요?",
+      "why_this_matters": "도산 절차 중인 기업은 신청할 수 없어요. 다만 법원의 회생인가 후 계획을 정상 이행 중이면 예외예요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "none",
+          "label": "해당 없어요"
+        },
+        {
+          "value": "rehab_ok",
+          "label": "회생인가를 받고 계획을 정상 이행 중이에요"
+        },
+        {
+          "value": "yes",
+          "label": "절차 진행 중이에요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [INNO, MAIN]",
+      "show_when": "scheme in [INNO, MAIN]",
+      "evidence_examples": [
+        "법원 회생인가결정문(해당 시)"
+      ],
+      "rule_refs": [
+        "INNO-X-INSOLV",
+        "MAIN-X-INSOLV"
+      ],
+      "source_refs": [
+        "S-INNO-RULE",
+        "S-MAIN-GUIDE"
+      ],
+      "privacy_level": "high",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "x_violation",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "최근 3년 안에 회사나 대표자가 아래 중 하나에 해당하나요?",
+      "why_this_matters": "체불사업주 명단 공개, 산업재해 발생건수 공표, 공정거래 관련 시정명령, 보조금법 위반 참여제한이 있으면 신청할 수 없어요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "해당 없어요"
+        },
+        {
+          "value": "yes",
+          "label": "해당해요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [INNO, MAIN]",
+      "show_when": "scheme in [INNO, MAIN]",
+      "evidence_examples": [],
+      "rule_refs": [
+        "INNO-X-VIOL",
+        "MAIN-X-VIOL"
+      ],
+      "source_refs": [
+        "S-INNO-RULE",
+        "S-MAIN-GUIDE"
+      ],
+      "privacy_level": "high",
+      "help_text": "① 체불사업주 명단 공개 ② 산업재해 발생건수 등 공표 ③ 전자상거래·하도급 등 공정거래 법령 위반 시정명령 ④ 보조금법 위반 참여제한",
+      "validation": {}
+    },
+    {
+      "question_id": "main_excluded_industry",
+      "version": 1,
+      "scheme_id": "MAIN",
+      "group": "scheme",
+      "label_plain_ko": "아래 업종에 해당하나요? (숙박·주점업, 주류·담배 도매, 담배중개, 불건전 게임기·게임SW·도박게임장비 제조)",
+      "why_this_matters": "메인비즈 평가 제외 업종이에요. 단, 관광진흥법상 관광숙박업은 신청할 수 있어요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "해당하지 않아요"
+        },
+        {
+          "value": "yes",
+          "label": "해당해요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [MAIN]",
+      "show_when": "scheme in [MAIN]",
+      "evidence_examples": [
+        "사업자등록증 업종코드"
+      ],
+      "rule_refs": [
+        "MAIN-EXCL"
+      ],
+      "source_refs": [
+        "S-MAIN-GUIDE"
+      ],
+      "privacy_level": "low",
+      "help_text": "코드: C33402 중, C33409 중, G46102 중, G46331, G46333, I55~56(관광숙박업 예외), J5821 중",
+      "validation": {}
+    },
+    {
+      "question_id": "main_debt_ratio",
+      "version": 2,
+      "scheme_id": "MAIN",
+      "group": "scheme",
+      "label_plain_ko": "직전 사업연도 말 부채비율",
+      "why_this_matters": "직전 사업연도 말 재무상태표 기준 부채비율이 1,000% 이상이면 메인비즈를 신청할 수 없어요.",
+      "data_type": "single",
+      "as_of_required": true,
+      "response_options": [
+        {
+          "value": "r:0:1000",
+          "label": "1,000% 미만"
+        },
+        {
+          "value": "r:1000:",
+          "label": "1,000% 이상"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [MAIN]",
+      "show_when": "scheme in [MAIN]",
+      "evidence_examples": [
+        "표준재무제표증명원"
+      ],
+      "rule_refs": [
+        "MAIN-X-DEBT"
+      ],
+      "source_refs": [
+        "S-MAIN-GUIDE"
+      ],
+      "privacy_level": "medium",
+      "help_text": "부채비율 = 부채총계 ÷ 자본총계 × 100. 자본총계가 0 이하(완전자본잠식)면 아래 질문에서 따로 답해 주세요.",
+      "validation": {}
+    },
+    {
+      "question_id": "main_capital_impaired",
+      "version": 1,
+      "scheme_id": "MAIN",
+      "group": "scheme",
+      "label_plain_ko": "직전 사업연도 말 '완전자본잠식' 상태인가요?",
+      "why_this_matters": "자본총계가 0 이하인 완전자본잠식 기업은 메인비즈를 신청할 수 없어요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "아니요"
+        },
+        {
+          "value": "yes",
+          "label": "네"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [MAIN]",
+      "show_when": "scheme in [MAIN]",
+      "evidence_examples": [
+        "표준재무제표증명원"
+      ],
+      "rule_refs": [
+        "MAIN-X-IMPAIRED"
+      ],
+      "source_refs": [
+        "S-MAIN-GUIDE"
+      ],
+      "privacy_level": "medium",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "rnd_researchers",
+      "version": 2,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "연구만 전담하는 자격 있는 직원 수",
+      "why_this_matters": "연구전담요원은 자격(자연계 학사 이상, 기사 이상 등)을 갖추고 생산·영업 등 다른 업무를 겸하지 않아야 해요. 4대보험 등으로 직원임이 증명돼야 해요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "r:0:1",
+          "label": "0명"
+        },
+        {
+          "value": "r:1:2",
+          "label": "1명"
+        },
+        {
+          "value": "r:2:3",
+          "label": "2명"
+        },
+        {
+          "value": "r:3:5",
+          "label": "3~4명"
+        },
+        {
+          "value": "r:5:7",
+          "label": "5~6명"
+        },
+        {
+          "value": "r:7:10",
+          "label": "7~9명"
+        },
+        {
+          "value": "r:10:",
+          "label": "10명 이상"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [RNDI, RNDD]",
+      "show_when": "scheme in [RNDI, RNDD]",
+      "evidence_examples": [
+        "학위증명서·자격증 사본",
+        "4대보험 가입자 명부",
+        "연구개발인력 현황(별지 제4호서식)"
+      ],
+      "rule_refs": [
+        "RNDI-STAFF",
+        "RNDD-STAFF"
+      ],
+      "source_refs": [
+        "S-RND-DEC",
+        "S-RND-RULE"
+      ],
+      "privacy_level": "medium",
+      "help_text": "구간 경계는 법정 기준 인원(2·3·5·7·10명)과 같아요. 대표자·감사는 원칙적으로 제외(창업 3년 미만 소기업 대표자는 포함 가능).",
+      "validation": {}
+    },
+    {
+      "question_id": "rnd_is_venture",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "현재 벤처기업 확인을 받은 상태인가요?",
+      "why_this_matters": "벤처기업이 설립하는 기업부설연구소는 연구전담요원 2명이면 돼요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "yes",
+          "label": "네"
+        },
+        {
+          "value": "no",
+          "label": "아니요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [RNDI]",
+      "show_when": "scheme in [RNDI] or scheme in [RNDD] and rnd_space == partition",
+      "evidence_examples": [
+        "벤처기업확인서"
+      ],
+      "rule_refs": [
+        "RNDI-STAFF",
+        "RNDI-SPACE"
+      ],
+      "source_refs": [
+        "S-RND-DEC"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "rnd_founder_researcher",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "대학·정부출연연구기관 등의 연구원·교원이 창업한 회사인가요?",
+      "why_this_matters": "연구원·교원이 휴직·겸직 등으로 창업했거나 퇴직 후 3년 이내 창업한 연구개발형 중소기업은 연구전담요원 2명이면 돼요. 연구개발전담부서의 칸막이 예외 대상인지 판단할 때도 쓰여요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "아니요"
+        },
+        {
+          "value": "yes",
+          "label": "네"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "never",
+      "show_when": "scheme in [RNDI] or scheme in [RNDD] and rnd_space == partition",
+      "evidence_examples": [
+        "연구원·교원 창업 증명 서류"
+      ],
+      "rule_refs": [
+        "RNDI-STAFF"
+      ],
+      "source_refs": [
+        "S-RND-RULE"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "rnd_became_medium_1y",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "소기업에서 중기업이 된 지 1년이 안 됐나요?",
+      "why_this_matters": "소기업에서 중기업이 된 날부터 1년까지는 연구전담요원 기준이 5명이 아니라 3명이에요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "아니요"
+        },
+        {
+          "value": "yes",
+          "label": "네"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "company_size == medium",
+      "show_when": "scheme in [RNDI] and company_size == medium",
+      "evidence_examples": [
+        "중소기업확인서 발급 이력"
+      ],
+      "rule_refs": [
+        "RNDI-STAFF"
+      ],
+      "source_refs": [
+        "S-RND-DEC"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "rnd_space",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "연구공간은 어떻게 마련돼 있나요?",
+      "why_this_matters": "원칙은 고정 벽체와 별도 출입문으로 구분된 독립 공간이에요. 중소기업·벤처 등이 50㎡ 넘는 면적을 확보할 수 없으면 칸막이 구분도 인정돼요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "independent",
+          "label": "벽체·별도 출입문이 있는 독립 공간"
+        },
+        {
+          "value": "partition",
+          "label": "칸막이로 구분한 공간"
+        },
+        {
+          "value": "partial_wall",
+          "label": "바닥에서 2m 이상 벽체 + 별도 출입문(천장까지는 막지 못함)"
+        },
+        {
+          "value": "none",
+          "label": "아직 없어요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [RNDI, RNDD]",
+      "show_when": "scheme in [RNDI, RNDD]",
+      "evidence_examples": [
+        "연구공간이 있는 층 전체 도면·내부 도면",
+        "전용 출입구 현판·내부 사진"
+      ],
+      "rule_refs": [
+        "RNDI-SPACE",
+        "RNDD-SPACE"
+      ],
+      "source_refs": [
+        "S-RND-RULE"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "rnd_space_over50_impossible",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "50㎡를 넘는 연구공간을 따로 확보하기 어려운 상황인가요?",
+      "why_this_matters": "칸막이 구분은 50㎡ 초과 면적을 확보할 수 없는 경우에만 인정돼요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "yes",
+          "label": "네, 확보하기 어려워요"
+        },
+        {
+          "value": "no",
+          "label": "아니요, 확보할 수 있어요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "rnd_space == partition",
+      "show_when": "scheme in [RNDI, RNDD] and rnd_space == partition",
+      "evidence_examples": [
+        "사업장 임대차계약서·도면"
+      ],
+      "rule_refs": [
+        "RNDI-SPACE",
+        "RNDD-SPACE"
+      ],
+      "source_refs": [
+        "S-RND-RULE"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "rnd_equipment",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "연구에 직접 쓰는 기자재가 연구공간 안에 있나요?",
+      "why_this_matters": "연구 기자재는 연구전담요원 등이 연구개발에 직접 쓰는 기계·기구·재료로, 연구공간 안에 있어야 해요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "yes",
+          "label": "네"
+        },
+        {
+          "value": "no",
+          "label": "아니요"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [RNDI, RNDD]",
+      "show_when": "scheme in [RNDI, RNDD]",
+      "evidence_examples": [
+        "연구 기자재 현황(별지 제3호서식)"
+      ],
+      "rule_refs": [
+        "RNDI-EQUIP",
+        "RNDD-EQUIP"
+      ],
+      "source_refs": [
+        "S-RND-RULE"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    },
+    {
+      "question_id": "rnd_excluded_field",
+      "version": 1,
+      "scheme_id": null,
+      "group": "scheme",
+      "label_plain_ko": "연구 분야가 유흥·사행 등 시행령 별표 1의 '유흥 등 관련 분야'인가요?",
+      "why_this_matters": "유흥 등 관련 분야는 연구개발활동으로 인정되지 않아요.",
+      "data_type": "single",
+      "response_options": [
+        {
+          "value": "no",
+          "label": "아니요"
+        },
+        {
+          "value": "yes",
+          "label": "네"
+        },
+        {
+          "value": "unknown",
+          "label": "모름"
+        }
+      ],
+      "unknown_allowed": true,
+      "required_when": "scheme in [RNDI, RNDD]",
+      "show_when": "scheme in [RNDI, RNDD]",
+      "evidence_examples": [
+        "연구개발활동 개요서(별지 제2호서식)"
+      ],
+      "rule_refs": [
+        "RNDI-FIELD",
+        "RNDD-FIELD"
+      ],
+      "source_refs": [
+        "S-RND-DEC"
+      ],
+      "privacy_level": "low",
+      "help_text": "",
+      "validation": {}
+    }
+  ]
+}

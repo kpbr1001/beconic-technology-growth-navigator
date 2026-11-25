@@ -1,0 +1,183 @@
+{
+  "rule_pack_id": "RP-INNO",
+  "scheme_id": "INNO",
+  "rule_version": "2026.11.22-1",
+  "review_status": "VERIFIED",
+  "verification_basis": "공식 원문 대조 완료(이노비즈 제도 운영규정 고시 제2026-44호). 전문가 검토 절차 제외 — 운영사 대표 검토 대상",
+  "reviewer": "운영사 대표 검토 완료 (2026-11-23)",
+  "valid_from": "2026-06-22",
+  "valid_to": null,
+  "review_due_at": "2027-05-22",
+  "last_verified_at": "2026-11-22",
+  "combine": "OR",
+  "pathways": [
+    {
+      "pathway_id": "INNO-NEW",
+      "name": "신규 신청",
+      "evaluator": "기술보증기금 (현장평가: 기술혁신시스템 700점 이상 + 개별기술수준 B등급 이상)",
+      "source_refs": [
+        "S-INNO-RULE",
+        "S-INNO-PROC"
+      ],
+      "root": {
+        "type": "WHEN",
+        "id": "INNO-WHEN",
+        "label": "사업자(개인·법인) 대상 제도",
+        "cond": {
+          "type": "LEAF",
+          "id": "INNO-OPERATING",
+          "check": "enum",
+          "args": {
+            "q": "biz_status",
+            "pass": [
+              "individual",
+              "corporation"
+            ],
+            "fail": [
+              "pre"
+            ]
+          },
+          "label": "사업자등록 완료",
+          "source_refs": [
+            "S-INNO-RULE"
+          ]
+        },
+        "then": {
+          "type": "AND",
+          "id": "INNO-AND",
+          "label": "이노비즈 신청대상 요건(운영규정 제3조, 모두 충족)",
+          "children": [
+            {
+              "type": "LEAF",
+              "id": "INNO-SME",
+              "label": "「중소기업기본법」 제2조 중소기업",
+              "check": "yes",
+              "args": {
+                "q": "is_sme"
+              },
+              "source_refs": [
+                "S-INNO-RULE"
+              ],
+              "action_fail": "중소기업 해당 여부(중소기업확인서)를 확인하세요."
+            },
+            {
+              "type": "LEAF",
+              "id": "INNO-AGE",
+              "label": "업력 3년 이상(휴업기간 제외)",
+              "check": "biz_age_gte",
+              "args": {
+                "years": 3,
+                "conversion": true,
+                "suspension": true
+              },
+              "source_refs": [
+                "S-INNO-RULE"
+              ],
+              "action_fail": "업력 3년이 되는 날 이후에 신청할 수 있어요. 그 전에는 벤처 등 다른 제도를 먼저 검토하세요.",
+              "quote": "업력 3년 이상"
+            },
+            {
+              "type": "LEAF",
+              "id": "INNO-X-CREDIT",
+              "label": "체납정보 등 신용정보 등록 기업이 아님",
+              "check": "no",
+              "args": {
+                "q": "x_credit"
+              },
+              "source_refs": [
+                "S-INNO-RULE"
+              ],
+              "action_fail": "체납·연체를 먼저 해소하고 신용정보 등록 해제 여부를 확인하세요."
+            },
+            {
+              "type": "LEAF",
+              "id": "INNO-X-DISHONOR",
+              "label": "어음교환소 거래정지처분 기업이 아님",
+              "check": "no",
+              "args": {
+                "q": "x_dishonor"
+              },
+              "source_refs": [
+                "S-INNO-RULE"
+              ],
+              "action_fail": "거래정지처분 해소 전에는 신청할 수 없어요."
+            },
+            {
+              "type": "LEAF",
+              "id": "INNO-X-INSOLV",
+              "label": "파산·회생·청산 절차 중이 아님(회생인가 후 정상이행 예외)",
+              "check": "enum",
+              "args": {
+                "q": "x_insolvency",
+                "pass": [
+                  "none",
+                  "rehab_ok"
+                ],
+                "fail": [
+                  "yes"
+                ]
+              },
+              "source_refs": [
+                "S-INNO-RULE"
+              ],
+              "action_fail": "도산 절차 진행 중에는 신청할 수 없어요. 회생인가 후 정상 이행 중이면 예외예요."
+            },
+            {
+              "type": "LEAF",
+              "id": "INNO-X-VIOL",
+              "label": "최근 3년 법령위반 공표·처분(4종) 해당 없음",
+              "check": "no",
+              "args": {
+                "q": "x_violation"
+              },
+              "source_refs": [
+                "S-INNO-RULE"
+              ],
+              "action_fail": "해당 처분일로부터 3년이 지난 뒤 신청할 수 있어요."
+            },
+            {
+              "type": "LEAF",
+              "id": "INNO-X-INDUSTRY",
+              "label": "운영규정 별표 2 업종(신청 불가 업종)이 아님",
+              "check": "unverified",
+              "review_status": "UNVERIFIED",
+              "args": {},
+              "unverified_note": "운영규정 별표 2 업종표를 원문으로 확보하지 못했어요. 이노비즈넷(innobiz.net) 또는 협회(031-628-9600)에서 해당 여부를 확인하세요.",
+              "source_refs": [
+                "S-INNO-RULE"
+              ]
+            },
+            {
+              "type": "LEAF",
+              "id": "INNO-SELF",
+              "label": "온라인 자가진단 650점 이상(운영규정 제7조②)",
+              "check": "assessment",
+              "kind": "assessment",
+              "args": {},
+              "source_refs": [
+                "S-INNO-RULE",
+                "S-INNO-PROC"
+              ]
+            },
+            {
+              "type": "LEAF",
+              "id": "INNO-FIELD",
+              "label": "기술보증기금 현장평가(기술혁신시스템 700점 이상·개별기술수준 B등급 이상)",
+              "check": "assessment",
+              "kind": "assessment",
+              "args": {},
+              "source_refs": [
+                "S-INNO-PROC"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "test_case_ids": [
+    "T-INNO-01",
+    "T-INNO-02",
+    "T-INNO-03"
+  ]
+}

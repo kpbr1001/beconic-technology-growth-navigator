@@ -71,12 +71,39 @@ jobs:
         run: node grants/tests/eval-accuracy.mjs --all --check
       - name: IR 진단 단위 (문항 모델·점수·재무 추출·표현·이스케이프)
         run: node --test ir/tests/*.test.mjs
+      - name: CI E2E 대상 고르기 규칙
+        run: node --test scripts/ci/changed-apps.test.mjs
 
-  e2e:
-    name: E2E · 사용자 플로우 · PDF QA
+  # ── E2E: 바뀐 앱만, 앱별 병렬 ──────────────────────────────────────────
+  # 이전에는 한 작업에서 앱 QA를 차례로 돌려 앱이 늘수록 길어졌고(약 9.5분), 설치(apt)가 느린 날 시간 초과.
+  # PR은 바뀐 폴더의 앱만(scripts/ci/changed-apps.mjs), main push·수동 실행은 전체. 공통 파일이 바뀌면 전체.
+  changes:
+    name: E2E 대상 고르기
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      apps: ${{ steps.pick.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - id: pick
+        run: node scripts/ci/changed-apps.mjs >> "$GITHUB_OUTPUT"
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+  e2e-app:
+    name: E2E · ${{ matrix.app }}
+    needs: changes
+    if: needs.changes.outputs.apps != '[]'
     # ubuntu-latest가 26.04로 바뀐 뒤 Playwright 1.56.1이 Chromium 설치를 거부(지원 OS 아님) → 지원되는 24.04로 고정
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.changes.outputs.apps) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -84,60 +111,69 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: npm ci
+      # 브라우저·폰트는 캐시해 두고 다시 쓴다(apt 미러가 느린 날 설치만 15분 넘게 걸린 사례)
+      - name: Chromium 캐시
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - name: Chromium 설치
-        run: npx playwright install --with-deps chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+      - name: Chromium 실행 확인(필요할 때만 시스템 라이브러리 설치)
+        run: node -e "require('playwright').chromium.launch().then(b=>b.close())" || npx playwright install-deps chromium
+      - name: 한글 폰트 캐시
+        id: font-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/fonts-noto-cjk
+          key: fonts-noto-cjk-ubuntu-24.04-v1
       - name: 한글 폰트 설치 (PDF 검수용)
-        run: sudo apt-get install -y fonts-noto-cjk
-      - run: pip install pymupdf
-      - run: npm run build
-      - name: 스모크 E2E (6개 화면 크기·전부 모름·PDF 섹션)
-        run: node tests/e2e/smoke.mjs
-      - name: v0.9 대비 사용자 플로우 동등성 (실제 클릭)
-        run: node tests/e2e/flow-parity.mjs
-      - name: A4 PDF 페이지별 검수 (7종)
-        run: npm run test:pdf
-      - name: HR 진단 QA (규칙 엔진·플로우·모바일·레드팀 회귀·A4 PDF)
         run: |
-          (cd hr && python3 -m http.server 8791 --bind 127.0.0.1 >/dev/null 2>&1 &)
-          sleep 1
-          node hr/tests/qa.mjs http://127.0.0.1:8791/
-      - name: HR 진단 AI 함수 계약 (모의 API·카나리 키)
+          if [ -d ~/fonts-noto-cjk ] && [ -n "$(ls -A ~/fonts-noto-cjk)" ]; then
+            sudo mkdir -p /usr/share/fonts/opentype/noto && sudo cp ~/fonts-noto-cjk/* /usr/share/fonts/opentype/noto/
+          else
+            sudo apt-get update -o Acquire::Retries=3
+            sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 fonts-noto-cjk
+            mkdir -p ~/fonts-noto-cjk && cp /usr/share/fonts/opentype/noto/NotoSansCJK* /usr/share/fonts/opentype/noto/NotoSerifCJK* ~/fonts-noto-cjk/ 2>/dev/null || true
+          fi
+          fc-cache -f >/dev/null
+      - name: PDF 도구 (기술진단·성장·PSF pymupdf, IR·재무 poppler)
         run: |
-          (cd hr && npm run build)
-          node hr/tests/ai-contract.mjs
-      - name: 성장진단(12번) QA (규칙 엔진 원칙·플로우·재진단·모바일·A4 PDF·레드팀 회귀·전수 조합)
-        run: |
-          (cd growth && npm run build)
-          (cd growth/dist && python3 -m http.server 8792 --bind 127.0.0.1 >/dev/null 2>&1 &)
-          sleep 1
-          node growth/tests/qa.mjs http://127.0.0.1:8792/
-          node growth/tests/sweep.mjs http://127.0.0.1:8792/
-      - name: 지원사업 MATCH QA (판정 엔진·플로우·레드팀 회귀·실시간 모의·모바일·PDF·데모 단일본)
-        run: |
-          (cd grants && npm run build && npm run build:demo)
-          (cd grants/dist && python3 -m http.server 8793 --bind 127.0.0.1 >/dev/null 2>&1 &)
-          sleep 1
-          node grants/tests/qa.mjs http://127.0.0.1:8793/
-          node grants/tests/eval-precision.mjs http://127.0.0.1:8793/
-      - name: IR 진단 QA (레이아웃·36문항 흐름·표준재무제표 PDF 업로드·결과·보고서 PDF·OG)
-        run: |
-          sudo apt-get install -y poppler-utils
-          (cd ir && npm run build)
-          (cd ir/dist && python3 -m http.server 8794 --bind 127.0.0.1 >/dev/null 2>&1 &)
-          sleep 1
-          node ir/tests/qa.mjs http://127.0.0.1:8794/
+          case "${{ matrix.app }}" in
+            tech|growth|psf) pip install pymupdf ;;
+            ir|finance|certification) sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 poppler-utils ;;
+          esac
+      - name: QA
+        run: bash scripts/ci/app-qa.sh ${{ matrix.app }}
       - name: 검수 결과물 업로드
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-output
+          name: e2e-${{ matrix.app }}
           path: |
             tests/e2e/out/
-            hr/tests/out/
-            growth/tests/out/
-            grants/tests/out/
-            ir/tests/out/
+            ${{ matrix.app }}/tests/out/
+            ${{ matrix.app }}/qa-out/
+          if-no-files-found: ignore
           retention-days: 14
+
+  # main 보호 규칙의 필수 검사 이름을 그대로 유지하는 요약 작업 — 앱별 작업이 모두 통과(또는 대상 없음)해야 통과
+  e2e:
+    name: E2E · 사용자 플로우 · PDF QA
+    needs: [changes, e2e-app]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: 앱별 E2E 결과
+        run: |
+          echo "대상: ${{ needs.changes.outputs.apps }} · 결과: ${{ needs.e2e-app.result }}"
+          case "${{ needs.changes.result }}/${{ needs.e2e-app.result }}" in
+            success/success|success/skipped) exit 0 ;;
+            *) echo "앱별 E2E 실패 또는 취소"; exit 1 ;;
+          esac
 
   db:
     name: DB · 로드맵 KB 마이그레이션

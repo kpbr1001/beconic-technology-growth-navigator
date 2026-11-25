@@ -1,0 +1,15 @@
+{
+  "name": "beconic-bm-navigator",
+  "version": "5.1.2",
+  "private": true,
+  "type": "module",
+  "description": "BECONIC BM Navigator — 단일 HTML 화면 + 잠금된 AI 프록시(같은 사이트 출처 + 화면 요청 형식만 중계 + 사용량 한도)",
+  "scripts": {
+    "build": "node scripts/sync-prompts.mjs && node --test tests/proxy.test.mjs && rm -rf dist && mkdir -p dist && cp index.html og-image.png favicon.ico dist/",
+    "sync-prompts": "node scripts/sync-prompts.mjs",
+    "test": "node scripts/sync-prompts.mjs --check && node --test tests/proxy.test.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.3"
+  }
+}

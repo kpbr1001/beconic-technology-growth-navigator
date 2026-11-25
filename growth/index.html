@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>기업 성장활동 진단 내비게이터 | 그로스벤처스</title>
-<meta name="description" content="9개 영역 27개 행동 기준 문항으로 성숙도를 진단하고, 업종·창업연차 기대수준과 비교해 지금 먼저 할 과제·90일 실행계획·KPI를 공개 산식으로 제시하는 규칙 기반 자가진단 도구입니다. (참고용)">
+<meta name="description" content="10개 영역 30개 행동 기준 문항으로 성숙도를 진단하고, 업종·창업연차 기대수준과 비교해 지금 먼저 할 과제·90일 실행계획·KPI를 공개 산식으로 제시하는 규칙 기반 자가진단 도구입니다. (참고용)">
 <!-- Open Graph / 카카오톡 · 페이스북 공유 -->
 <meta property="og:title" content="기업 성장활동 진단 내비게이터">
-<meta property="og:description" content="진단에서 실행까지 — 9개 영역 27문항 행동 기준 진단으로 우리 회사의 강점·병목을 찾고, 90일 실행계획과 12개월 로드맵을 제안합니다. 자가진단 참고용입니다.">
-<meta property="og:image" content="https://beconic-diagnosis-business-growth.netlify.app/og-business-growth.jpg?v=2">
-<meta property="og:image:secure_url" content="https://beconic-diagnosis-business-growth.netlify.app/og-business-growth.jpg?v=2">
+<meta property="og:description" content="진단에서 실행까지 — 10개 영역 30문항 행동 기준 진단으로 우리 회사의 강점·병목을 찾고, 90일 실행계획과 12개월 로드맵을 제안합니다. 자가진단 참고용입니다.">
+<meta property="og:image" content="https://beconic-diagnosis-business-growth.netlify.app/og-business-growth.jpg?v=3">
+<meta property="og:image:secure_url" content="https://beconic-diagnosis-business-growth.netlify.app/og-business-growth.jpg?v=3">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="632">
@@ -20,8 +20,8 @@
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="기업 성장활동 진단 내비게이터">
-<meta name="twitter:description" content="진단에서 실행까지 — 9개 영역 27문항 행동 기준 진단으로 우리 회사의 강점·병목을 찾고, 90일 실행계획과 12개월 로드맵을 제안합니다. 자가진단 참고용입니다.">
-<meta name="twitter:image" content="https://beconic-diagnosis-business-growth.netlify.app/og-business-growth.jpg?v=2">
+<meta name="twitter:description" content="진단에서 실행까지 — 10개 영역 30문항 행동 기준 진단으로 우리 회사의 강점·병목을 찾고, 90일 실행계획과 12개월 로드맵을 제안합니다. 자가진단 참고용입니다.">
+<meta name="twitter:image" content="https://beconic-diagnosis-business-growth.netlify.app/og-business-growth.jpg?v=3">
 <meta name="twitter:image:alt" content="기업 성장활동 진단 내비게이터 — 그로스벤처스">
 <meta name="theme-color" content="#2563EB">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 104'%3E%3Cpath d='M50 2 L93 11 Q94 11 94 13 L94 56 Q94 78 73 92 L52 101 Q50 102 48 101 L27 92 Q6 78 6 56 L6 13 Q6 11 7 11 Z' fill='%231f3a5f'/%3E%3C/svg%3E">
@@ -577,6 +577,10 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 .kpi-cards{display:none;}
 
 /* 리스크 박스 */
+.hr-guide{margin-top:14px;border:1px solid #d4e6f7;border-left:4px solid var(--blue);border-radius:var(--r-md);background:#f7fbff;padding:14px 16px;}
+.hr-guide b{color:var(--navy);}
+.hr-guide p{margin:6px 0 0;font-size:13.8px;color:var(--ink-soft);line-height:1.6;}
+.qa-hint{margin:2px 0 10px;font-size:13px;color:var(--ink-soft);background:#f7fbff;border:1px dashed #cfe0f5;border-radius:10px;padding:8px 12px;}
 .risk-box{background:linear-gradient(180deg,#fffaf0,#fff);border:1px solid #f6e2b6;border-radius:var(--r-md);
   padding:22px 24px;box-shadow:var(--sh-sm);}
 .risk-box h4{font-size:15px;font-weight:900;color:var(--amber-deep);display:flex;align-items:center;gap:9px;margin-bottom:14px;}
@@ -790,7 +794,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   .result-top{background:#eef4ff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#0e1a30;
     box-shadow:none;border-radius:12px;border:1px solid #cfe0f3;}
   .card,.act,.phase,.exec .col,.radar-box,.matrix-wrap,.kpi-table,.risk-box,.rq ul,
-  .swot .b,.kpi-c,.target-box{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;}
+  .swot .b,.kpi-c,.target-box,.hr-guide{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;}
   .r-sec{break-inside:auto;box-shadow:none!important;}
   .r-sec{margin-top:16px;}
   .kpi-cards{display:none!important;}
@@ -1102,6 +1106,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   .src{font-size:7.5pt!important;}
   .act .reason li{font-size:8.5pt!important;}
   .ev-q,.ev-now,.ev-next{font-size:8.5pt!important;}
+  .ev{gap:7px!important;} .ev-area{padding:8px 11px!important;} .ev-row{padding:4px 0!important;} .ev-h{padding-bottom:5px!important;}   /* v6.4: 10개 영역이 응답 근거 쪽을 넘지 않도록 */
+  .ev-now,.ev-next{margin-top:3px!important;} .ev-next{padding:4px 8px!important;}
+  .risk-box{padding:12px 16px!important;} .risk-box li{padding:3px 0!important;}
 }
 </style>
 </head>
@@ -1126,9 +1133,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
     <div class="wrap hero-in">
       <span class="eyebrow"><span data-cnt="areas"></span>개 영역 · <span data-cnt="q"></span>문항 · 단계 기대수준 비교</span>
       <h1>지금 우리 회사가<br><span class="hl">무엇을 먼저</span> 해야 하는지<br>한눈에 확인하세요</h1>
-      <p class="lede">회사 규모가 아니라 <b>지금 실제로 하고 있는 일</b>로 진단합니다. 행동 기준 문항에 답하면 업종·창업 연차의 기대수준과 비교해 먼저 할 과제, 90일 실행계획, 12개월 KPI 로드맵을 제시합니다.</p>
+      <p class="lede">회사 규모가 아니라 <b>지금 실제로 하고 있는 일</b>로 진단합니다. 행동 기준 문항에 답하면 업종·창업 연차의 기대수준과 비교해 먼저 할 과제, <span data-cnt="cycle"></span>일 실행계획, 12개월 KPI 로드맵을 제시합니다.</p>
       <div class="hero-cta">
-        <button class="btn btn-amber" onclick="GAN.go('diagnose')">무료로 성장활동 진단하기</button>
+        <button class="btn btn-amber" onclick="GAN.go('diagnose')">성장활동 진단 시작하기</button>
         <button class="btn btn-line no-print" onclick="GAN.loadSample()">샘플 결과 보기</button>
       </div>
       <div class="resume-bar no-print" id="resumeBar" style="display:none">
@@ -1208,19 +1215,19 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#16C2A3" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
           <div class="num">STEP 02</div>
           <h4>성숙도 문항 응답</h4>
-          <p>영역마다 "지금 무엇을 하고 있는가"를 4단계 행동 기준으로 고릅니다. 모르면 '모름'.</p>
+          <p>영역마다 "지금 무엇을 하고 있는가"를 <span data-cnt="lv"></span>단계 행동 기준으로 고릅니다. 모르면 '모름'.</p>
         </div>
         <div class="step">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></div>
           <div class="num">STEP 03</div>
           <h4>우선순위·KPI 확인</h4>
-          <p>단계 기대수준과의 차이로 우선과제·90일 계획·KPI를 공개 산식으로 받습니다.</p>
+          <p>단계 기대수준과의 차이로 우선과제·<span data-cnt="cycle"></span>일 계획·KPI를 공개 산식으로 받습니다.</p>
         </div>
         <div class="step">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#16C2A3" stroke-width="2"><path d="M12 17V3"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg></div>
           <div class="num">STEP 04</div>
           <h4>저장·재진단</h4>
-          <p>PDF 보고서·링크로 공유하고, 결과 파일로 90일 후 같은 문항으로 재진단합니다.</p>
+          <p>PDF 보고서·링크로 공유하고, 결과 파일로 <span data-cnt="cycle"></span>일 후 같은 문항으로 재진단합니다.</p>
         </div>
       </div>
     </div>
@@ -1276,7 +1283,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
       <div class="step-card" id="fstep-1">
         <div class="q-no">STEP 01 · 기본 정보</div>
         <h3>회사를 알려주세요</h3>
-        <p class="help">입력값은 이 브라우저 안에서만 계산되고 외부로 전송되지 않습니다. 90일 전 결과 파일이 있다면 <label class="inline-file">불러와서 재진단<input type="file" class="file-in" accept=".json,application/json" hidden></label>할 수 있어요.</p>
+        <p class="help">입력값은 이 브라우저 안에서만 계산되고 외부로 전송되지 않습니다. <span data-cnt="cycle"></span>일 전 결과 파일이 있다면 <label class="inline-file">불러와서 재진단<input type="file" class="file-in" accept=".json,application/json" hidden></label>할 수 있어요.</p>
 
         <div class="field" data-k="depth">
           <label>진단 깊이<span class="req">*</span></label>
@@ -1339,7 +1346,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
         </div>
 
         <div class="field" data-k="concern">
-          <label>현재 가장 큰 고민 <span class="opt">최대 3개</span><span class="req">*</span></label>
+          <label>현재 가장 큰 고민 <span class="opt">최대 <span data-cnt="maxConcern"></span>개</span><span class="req">*</span></label>
           <div class="chips" id="c-concern"></div>
           <div class="err-tip">⚠ 가장 큰 고민을 1개 이상 선택해 주세요.</div>
         </div>
@@ -1533,9 +1540,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.3.1";
-const APP_UPDATED = "2026-10-26";
-const APP_BUILD   = "2026.10.26.5";  // 배포 빌드 식별자
+const APP_VERSION = "v6.4.1";
+const APP_UPDATED = "2026-11-25";
+const APP_BUILD   = "2026.11.25.2";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
 const LEGAL_BASIS_DATE = "2026-10-26";  // 법령·제도 출처를 마지막으로 확인한 날(도구 버전 날짜와 별개)
 
@@ -1551,12 +1558,15 @@ const copyYears = ()=>{ const y=new Date().getFullYear(); return y>COMPANY.since
 
 /* 산식 상수 — 엔진 계산과 '진단 방법·공개 산식' 설명문이 같은 값을 쓴다(설명과 계산이 어긋나지 않도록) */
 const RULES = {
-  minutes:{quick:5, standard:12},                // 화면 안내용 예상 소요 시간
+  minutes:{quick:5, standard:13},                // 화면 안내용 예상 소요 시간
   expect:{indMin:0.6, indMax:1.1, cap:75},       // 기대수준 = 단계 기준값 × 업종 보정(indMin~indMax), 상한 cap(정례화 67~체계화 사이)
-  priority:{concern:15, unknownArea:10, gapToAct:0.15, focus:8, doneCut:100, halfCut:67, half:0.5,
+  priority:{concern:15, unknownArea:10, legal:20, gapToAct:0.15, focus:8, doneCut:100, halfCut:67, half:0.5,
             relExclude:0.22, relFloor:0.6, nowGap:-15, nowRel:0.8, maxNow:3, acts:6, perArea:{early:3, other:2},
             fillNext:12, fillKeep:6},
   strong:{min:60, margin:10},                    // 강점 = max(min, 기대+margin) 이상
+  people:{bylawEmp:["e1029","e3049","e50"], bylawMin:10, soloEmp:"e1", deepMin:"15~25분"},   // 조직·인력: 취업규칙 과제는 상시 10인 이상만(근로기준법 제93조), 1인 기업은 직원 관련 과제 제외 — 점수·기대수준에는 인원 미사용
+  plan:{cycleDays:90, perPhase:2},                // 실행계획 기간(=재진단 주기, BECONIC 31 브랜드 약속 90일)·구간별 과제 수
+  input:{maxConcern:3, maxCustom:6},              // 고민 최대 선택 수 · 컨설턴트 직접 추가 과제/KPI 최대 수
   conf:{flagPenalty:8, straightCap:60, quickCap:70, straightMin:9, high:75, mid:50, minCoverage:0.5}
 };
 const STORE_KEY = "gan_state_v6";   // v5 이하 저장값(구조 다름)은 읽지 않음
@@ -1601,7 +1611,7 @@ const OPT = {
   concern:[
     {v:"setup",t:"사업자등록·법인설립"},{v:"customer",t:"고객발굴"},{v:"revenue",t:"매출확대"},
     {v:"cert",t:"인증"},{v:"fund",t:"자금"},{v:"rnd",t:"R&D"},{v:"export",t:"수출"},
-    {v:"mkt",t:"마케팅·브랜딩"},{v:"org",t:"조직관리"},{v:"fin",t:"재무관리"},{v:"dx",t:"디지털전환·AI"}
+    {v:"mkt",t:"마케팅·브랜딩"},{v:"org",t:"조직·인력(채용·노무)"},{v:"fin",t:"재무관리"},{v:"dx",t:"디지털전환·AI"}
   ]
 };
 
@@ -1636,8 +1646,8 @@ const PREP = {
 };
 const PREP_ALL = [...PREP.basic,...PREP.rnd,...PREP.ops];
 
-/* ---------- 2. 9개 영역 메타 ---------- */
-const AREA_KEYS = ["foundation","bm","sales","marketing","rnd","cert","finance","export","digital"];
+/* ---------- 2. 10개 영역 메타 (v6.4: 조직·인력 추가) ---------- */
+const AREA_KEYS = ["foundation","bm","sales","marketing","rnd","cert","finance","export","digital","people"];
 const AREA = {
   foundation:{nm:"창업기초·경영체계", short:"기초·체계"},
   bm:{nm:"사업모델·고객가치", short:"사업모델"},
@@ -1647,21 +1657,22 @@ const AREA = {
   cert:{nm:"인증·규격·품질", short:"인증·품질"},
   finance:{nm:"자금·재무·정책지원", short:"자금·재무"},
   export:{nm:"수출·글로벌", short:"수출·글로벌"},
-  digital:{nm:"디지털전환·AI 활용", short:"디지털·AI"}
+  digital:{nm:"디지털전환·AI 활용", short:"디지털·AI"},
+  people:{nm:"조직·인력(HR)", short:"조직·인력"}
 };
-const BASE_W = {foundation:10,bm:15,sales:15,marketing:10,rnd:10,cert:10,finance:10,export:10,digital:10};
+const BASE_W = {foundation:10,bm:15,sales:15,marketing:10,rnd:10,cert:10,finance:10,export:10,digital:10,people:10};
 
 /* 업종별 가중치 배수 (종합점수 가중평균에만 사용) */
 const IND_MULT = {
-  mfg:   {rnd:1.6,cert:1.6,export:1.5,foundation:1.1},
-  svc:   {marketing:1.5,sales:1.3,digital:1.3,bm:1.2},
+  mfg:   {rnd:1.6,cert:1.6,export:1.5,foundation:1.1,people:1.2},
+  svc:   {marketing:1.5,sales:1.3,digital:1.3,bm:1.2,people:1.2},
   retail:{sales:1.5,digital:1.4,marketing:1.2,finance:1.2},
-  food:  {foundation:1.5,marketing:1.4,sales:1.3,cert:1.2},
+  food:  {foundation:1.5,marketing:1.4,sales:1.3,cert:1.2,people:1.3},
   it:    {bm:1.5,rnd:1.4,digital:1.5,sales:1.2},
   platform:{bm:1.5,digital:1.5,rnd:1.3,finance:1.2},
   content:{marketing:1.5,bm:1.3,digital:1.3,sales:1.2},
   edu:   {marketing:1.4,bm:1.3,sales:1.2,digital:1.2},
-  pro:   {bm:1.4,sales:1.3,marketing:1.1,finance:1.2},
+  pro:   {bm:1.4,sales:1.3,marketing:1.1,finance:1.2,people:1.2},
   trade: {export:1.8,cert:1.3,sales:1.2,finance:1.1},
   etc:   {}
 };
@@ -1717,6 +1728,10 @@ const SRC = {
   P_UNIPASS:{k:"공공",s:"관세청 UNI-PASS",f:"관세청 UNI-PASS 품목분류(HS)·FTA 포털 — 품목분류·원산지 정보."},
   P_SMART:{k:"공공",s:"스마트제조혁신추진단",f:"스마트제조혁신추진단(smart-factory.kr) — 스마트공장 수준확인·지원사업."},
   P_KISA:{k:"공공",s:"KISA",f:"한국인터넷진흥원 KISA — 중소기업 정보보호·개인정보 보호 지원."},
+  S_HU:{k:"학술",s:"Huselid 1995",f:"Huselid, M. A. (1995). The Impact of Human Resource Management Practices on Turnover, Productivity, and Corporate Financial Performance. Academy of Management Journal, 38(3) — 채용·평가·보상 등 HR 관행과 이직·생산성."},
+  L_LSA:{k:"법령",s:"근로기준법 제11·17·48·93조",f:"근로기준법 제11조(적용 범위: 상시 5명 이상 사업장)·제17조(근로조건의 명시·서면 교부)·제48조(임금대장 및 임금명세서)·제93조(취업규칙의 작성·신고: 상시 10명 이상)."},
+  P_NOSA:{k:"공공",s:"노사발전재단 일터혁신",f:"노사발전재단(nosa.or.kr) 일터혁신 상생컨설팅 — 중소기업 일터혁신 컨설팅. 지원 대상·내용·모집 시기는 해당 연도 공고 확인."},
+  P_WORK24:{k:"공공",s:"고용24",f:"고용노동부 고용24(work24.go.kr) — 채용 공고·인재 검색과 고용 지원 제도 통합 창구."},
   B_RULE:{k:"실무",s:"BECONIC 실무기준 v6",f:"그로스벤처스(중기부 인증 중소기업상담회사 "+COMPANY.certNo+") 컨설팅 실무 기준 v6.0 — 단계 기대수준·적합도·권장 목표값. 통계 표본이 아닌 실무 판단 모델이며 실사용 데이터로 보정 예정."}
 };
 function srcChips(ids){
@@ -1725,7 +1740,7 @@ function srcChips(ids){
   return `<div class="src-row">${list.map(id=>`<span class="src src-${SRC[id].k==="법령"?"law":SRC[id].k==="공공"?"pub":SRC[id].k==="실무"?"prac":"acad"}" title="${esc(SRC[id].f)}">${esc(SRC[id].s)}</span>`).join("")}</div>`;
 }
 
-/* ---------- 2-2. 성숙도 문항 (9개 영역 × 3문항, 행동 기준 4단계) ----------
+/* ---------- 2-2. 성숙도 문항 (10개 영역 × 3문항, 행동 기준 4단계) ----------
    lv[0~3] = 0·33·67·100점. '모름'은 0점이 아닌 결측, '해당 없음'(na)은 영역 계산에서 제외.
    core:true = 간이 진단 문항(영역별 1개). 회사 규모·업력과 무관하게 '무엇을 하고 있는가'만 묻는다. */
 const LV_SCORE = [0,33,67,100];
@@ -1811,7 +1826,16 @@ const QUESTIONS = [
    src:["B_RULE"]},
   {id:"D3",area:"digital",t:"정보보안·개인정보 보호는 어떻게 하나요?",
    lv:["점검한 적 없음","비밀번호 등 기본만 지킴","접근 권한·백업·개인정보 처리방침을 갖춤","정기 점검·교육을 하고 사고 대응 절차가 있음"],
-   src:["L_PIPA","S_ISO27"]}
+   src:["L_PIPA","S_ISO27"]},
+  {id:"H1",area:"people",core:true,t:"필요한 사람을 어떻게 확보하고 적응시키나요?",
+   lv:["필요한 인력·역할을 따로 계획하지 않음","필요할 때 지인 소개·급한 공고로 뽑음","직무별 역할·채용 기준(직무기술서·면접 기준)을 정해 뽑음","연간 인력계획을 세우고 채용 후 적응(온보딩) 절차까지 운영"],
+   src:["S_HU","S_GR"]},
+  {id:"H2",area:"people",t:"근로계약·임금 등 노무 기본을 갖췄나요?",
+   lv:["점검한 적 없음","근로계약서를 일부 직원과만 작성","모든 직원과 서면 근로계약·임금명세서 교부·4대보험 가입을 갖춤","갖춘 데 더해 취업규칙(해당 시)·정기 노무 점검으로 법 개정까지 반영"],
+   na:"직원 없음(대표 1인)", src:["L_LSA"]},
+  {id:"H3",area:"people",t:"직원의 성과 평가·보상·성장은 어떻게 관리하나요?",
+   lv:["평가·보상 기준이 없음","대표 판단으로 가끔(연 1회 정도) 결정","목표·평가 기준과 보상 원칙을 문서로 정해 직원과 공유","정기 면담·교육을 운영하고 핵심인재 유지(이직률 등)를 측정"],
+   na:"직원 없음(대표 1인)", src:["S_HU","B_RULE"]}
 ];
 const Q_BY_ID = {}; QUESTIONS.forEach(q=>{ Q_BY_ID[q.id]=q; });
 function askedQuestions(depth){ return depth==="quick" ? QUESTIONS.filter(q=>q.core) : QUESTIONS; }
@@ -1829,35 +1853,35 @@ const STAGE = {
    33=시작 · 67=정례화 수준. 점수 계산에는 들어가지 않고, 갭(점수−기대수준)으로 우선순위를 정하는 데만 사용.
    출처: BECONIC 실무기준 v6(B_RULE), 성장단계 개념 Churchill·Lewis(1983)·Greiner(1972). 통계 평균이 아님. */
 const EXPECT = {
-  pre: {foundation:30,bm:40,sales:20,marketing:25,rnd:25,cert:15,finance:25,export:5, digital:20},
-  y1:  {foundation:50,bm:50,sales:35,marketing:40,rnd:30,cert:25,finance:35,export:10,digital:30},
-  y13: {foundation:60,bm:60,sales:50,marketing:50,rnd:40,cert:35,finance:50,export:15,digital:40},
-  y35: {foundation:67,bm:65,sales:60,marketing:55,rnd:50,cert:50,finance:60,export:25,digital:50},
-  y57: {foundation:72,bm:70,sales:65,marketing:60,rnd:55,cert:60,finance:67,export:35,digital:60},
-  y7:  {foundation:75,bm:70,sales:67,marketing:60,rnd:60,cert:65,finance:70,export:40,digital:65}
+  pre: {foundation:30,bm:40,sales:20,marketing:25,rnd:25,cert:15,finance:25,export:5, digital:20,people:10},
+  y1:  {foundation:50,bm:50,sales:35,marketing:40,rnd:30,cert:25,finance:35,export:10,digital:30,people:25},
+  y13: {foundation:60,bm:60,sales:50,marketing:50,rnd:40,cert:35,finance:50,export:15,digital:40,people:40},
+  y35: {foundation:67,bm:65,sales:60,marketing:55,rnd:50,cert:50,finance:60,export:25,digital:50,people:55},
+  y57: {foundation:72,bm:70,sales:65,marketing:60,rnd:55,cert:60,finance:67,export:35,digital:60,people:62},
+  y7:  {foundation:75,bm:70,sales:67,marketing:60,rnd:60,cert:65,finance:70,export:40,digital:65,people:67}
 };
 /* 업종별 활동 영역 적합도(relevance) 배수 — 1.0=보통, >1 우선, <1 후순위 */
 const IND_RELEVANCE = {
-  mfg:   {rnd:1.4,cert:1.4,export:1.2,foundation:1.1,digital:1.1,marketing:.8},
-  svc:   {marketing:1.4,sales:1.3,digital:1.2,bm:1.2,cert:.7,export:.3,rnd:.7},
+  mfg:   {rnd:1.4,cert:1.4,export:1.2,foundation:1.1,digital:1.1,marketing:.8,people:1.1},
+  svc:   {marketing:1.4,sales:1.3,digital:1.2,bm:1.2,cert:.7,export:.3,rnd:.7,people:1.2},
   retail:{sales:1.4,digital:1.3,marketing:1.2,finance:1.1,export:.5,rnd:.5,cert:.7},
-  food:  {foundation:1.4,marketing:1.3,sales:1.2,cert:1.0,export:.3,rnd:.4},
+  food:  {foundation:1.4,marketing:1.3,sales:1.2,cert:1.0,export:.3,rnd:.4,people:1.3},
   it:    {bm:1.4,rnd:1.3,digital:1.4,sales:1.1,export:.6,cert:.8},
   platform:{bm:1.4,digital:1.4,rnd:1.2,finance:1.1,export:.5,cert:.7},
   content:{marketing:1.4,bm:1.3,digital:1.2,sales:1.1,export:.3,cert:.4,rnd:.6},
   edu:   {marketing:1.3,bm:1.2,sales:1.2,digital:1.1,export:.3,cert:.5,rnd:.6},
-  pro:   {bm:1.3,sales:1.3,marketing:1.2,finance:1.1,digital:1.0,export:.2,cert:.6,rnd:.7},
+  pro:   {bm:1.3,sales:1.3,marketing:1.2,finance:1.1,digital:1.0,export:.2,cert:.6,rnd:.7,people:1.1},
   trade: {export:1.6,cert:1.2,sales:1.2,finance:1.1,foundation:1.0,rnd:.7},
   etc:   {}
 };
 /* 창업연차별 영역 적합도 배수 — 업종 적합도와 곱해 우선순위에 반영 */
 const STAGE_RELEVANCE = {
-  pre: {foundation:1.5,bm:1.5,sales:1.3,marketing:1.1,digital:.9,finance:.45,cert:.3,rnd:.5,export:.15},
-  y1:  {foundation:1.4,bm:1.3,sales:1.4,marketing:1.3,digital:1.0,finance:.6,cert:.45,rnd:.6,export:.2},
-  y13: {foundation:1.0,bm:1.1,sales:1.3,marketing:1.2,digital:1.1,finance:.9,cert:.85,rnd:.9,export:.45},
-  y35: {foundation:.85,bm:1.0,sales:1.1,marketing:1.0,digital:1.1,finance:1.2,cert:1.1,rnd:1.1,export:.8},
-  y57: {foundation:.8,bm:.95,sales:1.0,marketing:.95,digital:1.1,finance:1.2,cert:1.15,rnd:1.15,export:1.1},
-  y7:  {foundation:.8,bm:1.0,sales:.95,marketing:.9,digital:1.15,finance:1.15,cert:1.1,rnd:1.15,export:1.2}
+  pre: {foundation:1.5,bm:1.5,sales:1.3,marketing:1.1,digital:.9,finance:.45,cert:.3,rnd:.5,export:.15,people:.4},
+  y1:  {foundation:1.4,bm:1.3,sales:1.4,marketing:1.3,digital:1.0,finance:.6,cert:.45,rnd:.6,export:.2,people:.7},
+  y13: {foundation:1.0,bm:1.1,sales:1.3,marketing:1.2,digital:1.1,finance:.9,cert:.85,rnd:.9,export:.45,people:1.0},
+  y35: {foundation:.85,bm:1.0,sales:1.1,marketing:1.0,digital:1.1,finance:1.2,cert:1.1,rnd:1.1,export:.8,people:1.15},
+  y57: {foundation:.8,bm:.95,sales:1.0,marketing:.95,digital:1.1,finance:1.2,cert:1.15,rnd:1.15,export:1.1,people:1.15},
+  y7:  {foundation:.8,bm:1.0,sales:.95,marketing:.9,digital:1.15,finance:1.15,cert:1.1,rnd:1.15,export:1.2,people:1.1}
 };
 function stageRelevanceOf(stage, area){ const m = STAGE_RELEVANCE[stage]||{}; return m[area] ?? 1.0; }
 function relevanceOf(ind, area, stage){
@@ -1872,9 +1896,9 @@ function expectedOf(stage, ind, area){
   const m = Math.max(E.indMin, Math.min(E.indMax, (IND_RELEVANCE[ind]||{})[area] ?? 1.0));
   return Math.min(E.cap, Math.round(base*m));
 }
-/* 고민 → 영역 (v5 오류 수정: 조직관리→디지털 ✕ → 경영체계(기초·체계) ○) */
+/* 고민 → 영역 (v6.4: 조직·인력 고민 → 조직·인력 영역. v5의 조직관리→디지털 오매핑은 v6에서 수정) */
 const CONCERN_AREA = {setup:"foundation",customer:"sales",revenue:"sales",cert:"cert",
-  fund:"finance",rnd:"rnd",export:"export",mkt:"marketing",org:"foundation",fin:"finance",dx:"digital"};
+  fund:"finance",rnd:"rnd",export:"export",mkt:"marketing",org:"people",fin:"finance",dx:"digital"};
 
 /* ---------- 4. 추천활동 라이브러리 ----------
    q: 이 활동이 끌어올리는 문항(응답 수준이 높으면 추천 후순위·체계화 수준이면 제외)
@@ -2095,7 +2119,7 @@ const LIB = [
    when:"데이터 축적기",docs:"보유 데이터 목록, 접근권한 현황",dur:"2~4주",
    kpi:"기본 보안 체크리스트 이행률",caution:"개인정보보호법 등 관련 법령 준수 여부는 전문가 확인이 필요합니다.",expert:false,
    stages:["y1","y13","y35","y57","y7"]},
-  {id:"o1",area:"foundation",q:["F3"],own:"",src:["S_GR"],title:"조직체계·직무·권한 정비",
+  {id:"o1",area:"people",q:["F3","H1"],own:"",src:["S_GR"],title:"조직체계·직무·권한 정비",
    why:"인원이 늘면 대표 중심 운영이 한계에 옵니다(Greiner의 '리더십 위기'). 직무·권한·프로세스를 정리해야 대표 부재에도 사업이 돌아갑니다.",
    when:"조직 확대기",docs:"조직도(안), 직무기술 초안",dur:"4~8주",
    kpi:"핵심 직무·권한 문서화율",caution:"근로·인사 관련 사항은 노무 전문가 검토가 필요합니다.",expert:false,
@@ -2109,7 +2133,38 @@ const LIB = [
    why:"장수기업으로 가려면 승계·지분 구조를 미리 설계해야 세제·경영권 리스크를 줄일 수 있습니다.",
    when:"성숙기",docs:"주주 현황, 자산 구조 자료",dur:"검토 4~8주",
    kpi:"승계·지분 구조 검토서 작성 여부",caution:"승계·증여 세제는 매우 복잡해 세무·법률 전문가 검토가 반드시 필요합니다.",expert:true,
-   stages:["y7"]}
+   stages:["y7"]},
+  /* 조직·인력(HR) — v6.4. needsStaff: 직원이 없으면(대표 1인 또는 H2 '해당 없음') 제외, emp: 해당 인원 구간에서만 추천 */
+  {id:"h6",area:"people",q:["H1"],own:"",src:["S_GR","P_WORK24"],title:"첫 인력 확보 계획(공동창업·외주·채용) 세우기",
+   why:"대표 혼자 모든 일을 하면 대표의 시간이 곧 성장 한계가 됩니다. 어떤 일을 누구에게(공동창업·외주·채용) 맡길지 먼저 정하면 채용 실패 비용을 줄일 수 있어요.",
+   when:"착수 전 ~ 첫 채용 전",docs:"업무 목록, 맡길 업무와 필요 역량 메모",dur:"1~2주",
+   kpi:"위임 업무 목록·인력 확보 방식 확정 여부",caution:"공동창업자와는 역할·지분·이탈 시 조건을 문서로 남기세요.",expert:false,
+   stages:["pre","y1"]},
+  {id:"h1",area:"people",needsStaff:true,legal:true,q:["H2"],own:"",src:["L_LSA"],title:"근로계약서·임금명세서 등 노무 기본 서류 정비",
+   why:"서면 근로계약 교부와 임금명세서 교부는 법정 의무입니다. 빠지면 과태료와 분쟁 위험이 생기고, 지원사업·인증 심사에서도 기본 확인 항목이 됩니다.",
+   when:"첫 직원 채용 시 ~ 상시",docs:"표준근로계약서, 임금명세서 양식, 4대보험 가입 현황",dur:"1~2주",
+   kpi:"서면 근로계약·임금명세서 교부율",caution:"근로시간·휴일·수당 규정은 상시 5명 이상 여부에 따라 적용 범위가 달라 노무 전문가 확인이 필요합니다.",expert:false,
+   stages:["y1","y13","y35","y57","y7"]},
+  {id:"h2",area:"people",needsStaff:true,legal:true,emp:["e1029","e3049","e50"],q:["H2"],own:"",src:["L_LSA"],title:"취업규칙 작성·신고(상시 10명 이상)",
+   why:"상시 10명 이상 사업장은 취업규칙을 만들어 신고해야 합니다. 근무·휴가·징계 기준을 문서로 정해 두면 인원이 늘어도 같은 기준으로 운영할 수 있어요.",
+   when:"상시 10명 도달 시",docs:"현행 근무·휴가·급여 운영 방식, 표준 취업규칙",dur:"3~6주",
+   kpi:"취업규칙 신고 여부 / 직원 공지 여부",caution:"불리하게 바꿀 때는 직원 과반 동의 등 절차가 필요해 노무 전문가 검토가 필요합니다.",expert:true,
+   stages:["y1","y13","y35","y57","y7"]},
+  {id:"h3",area:"people",needsStaff:true,q:["H1"],own:"",src:["S_HU","P_WORK24"],title:"직무기술서·채용 기준·온보딩 체계 만들기",
+   why:"뽑을 때 기준이 없으면 맞지 않는 사람을 뽑고 빨리 떠나는 일이 반복됩니다. 직무기술서·면접 기준·첫 30일 적응 계획을 갖추면 채용 실패를 줄일 수 있어요.",
+   when:"채용 확대기",docs:"핵심 직무 목록, 기존 채용 공고, 퇴사 사유 기록",dur:"2~4주",
+   kpi:"수습 기간 내 이탈률(기준선 대비) / 채용 소요일",caution:"채용 공고·면접에서 차별 금지 규정을 확인하세요.",expert:false,
+   stages:["y13","y35","y57","y7"]},
+  {id:"h4",area:"people",needsStaff:true,q:["H3"],own:"",src:["S_HU","P_NOSA"],title:"평가·보상 원칙 수립과 정기 면담",
+   why:"평가·보상 기준이 대표의 감에만 있으면 공정성 불만과 핵심 인력 이탈로 이어집니다. 목표·평가 기준과 보상 원칙을 문서로 공유하고 정기 면담을 시작하세요.",
+   when:"직원 5명 전후 ~ 성장기",docs:"직무별 목표(안), 현행 급여·인상 기준",dur:"4~8주",
+   kpi:"평가 기준 공유 여부 / 정기 면담 실시율",caution:"임금 체계 변경은 근로조건 변경 절차가 필요할 수 있어 노무 전문가 검토가 필요합니다.",expert:false,
+   stages:["y13","y35","y57","y7"]},
+  {id:"h5",area:"people",needsStaff:true,q:["H3"],own:"",src:["S_HU","B_RULE"],title:"핵심인재 유지·육성 계획",
+   why:"성장기에는 핵심 인력 한 명이 빠져도 사업이 흔들립니다. 핵심 인재를 정하고 이직률을 측정하며 교육·보상으로 붙잡는 계획이 필요합니다.",
+   when:"성장·확장기",docs:"핵심 인재 목록, 최근 1년 퇴사 현황",dur:"4~6주",
+   kpi:"핵심인력 이직률(기준선 대비)",caution:"보상 제도는 재원과 세무 처리를 함께 검토하세요.",expert:true,
+   stages:["y35","y57","y7"]}
 ];
 
 /* 활동별 정량 산출물 & 진척 측정 방식 */
@@ -2159,11 +2214,17 @@ const ACT_METRIC = {
   d5:{target:"기본 보안 체크리스트 100% 이행",measure:"보안 점검 항목 중 이행 수 / 전체"},
   o1:{target:"핵심 직무·권한 문서화",measure:"문서화된 직무 수 / 전체 핵심 직무"},
   o2:{target:"신사업 후보 3건 타당성 검토",measure:"검토 완료 후보 수"},
-  o3:{target:"승계·지분 구조 검토서 1건",measure:"검토 항목 작성 완료=100%"}
+  o3:{target:"승계·지분 구조 검토서 1건",measure:"검토 항목 작성 완료=100%"},
+  h6:{target:"위임 업무 목록 + 인력 확보 방식 결정",measure:"위임 대상 업무 중 확보 방식이 정해진 비율"},
+  h1:{target:"전 직원 서면 근로계약·임금명세서 교부",measure:"교부 완료 직원 수 / 전체 직원 수"},
+  h2:{target:"취업규칙 작성·신고 완료",measure:"단계(작성→의견청취→신고→공지) / 4"},
+  h3:{target:"핵심 직무기술서 + 면접 기준 + 30일 적응 계획",measure:"갖춘 문서 수 / 3"},
+  h4:{target:"평가 기준 문서 공유 + 분기 1회 면담",measure:"면담 실시 직원 수 / 전체 직원 수"},
+  h5:{target:"핵심 인재 목록 + 유지 계획 1건",measure:"이직률 측정 시작 여부 · 계획 작성 완료=100%"}
 };
 
 /* ---------- 4-1. 공공 지원과 함께 쓰기 (영역별) ----------
-   이 진단은 공공 무료 진단·지원사업을 대체하지 않고, 신청 전 준비도 점검 + 이후 실행과제로 쓴다 */
+   이 진단은 공공 진단·지원사업을 대체하지 않고, 신청 전 준비도 점검 + 이후 실행과제로 쓴다 */
 const PUBLIC = {
   foundation:[{src:"P_HT",use:"사업자등록·업종코드 확인",fit:"등록 전 업종·업태 구조를 이 진단의 '기초·체계' 과제로 먼저 정리"}],
   bm:[{src:"P_KS",use:"예비·초기창업 지원사업 공고",fit:"신청서의 문제정의·시장검증 항목을 사업모델 3문항 결과로 준비"}],
@@ -2171,8 +2232,9 @@ const PUBLIC = {
   marketing:[{src:"P_KIPRIS",use:"상표 선행 검색",fit:"브랜드 노출 전 상표 출원 여부 판단"}],
   rnd:[{src:"P_IRIS",use:"정부 R&D 공고",fit:"과제 신청 전 개발 체계·지식재산 준비도 점검"},{src:"P_KOITA",use:"연구소·전담부서 신고",fit:"인력·공간 요건 충족 전후 확인"}],
   cert:[{src:"P_SME24",use:"벤처기업 확인 신청",fit:"요건 자가 점검 후 신청"},{src:"P_INNO",use:"이노비즈·메인비즈 온라인 자가진단",fit:"공식 자가진단 전에 품질·경영체계 준비도를 먼저 정리"}],
-  finance:[{src:"P_KOSME",use:"정책자금 신청 전 자가진단",fit:"자금계획(I2)·손익관리(I1) 수준을 먼저 갖추면 상담이 구체화됨"},{src:"P_GUAR",use:"보증 상담",fit:"BECONIC 01번 재무진단으로 재무 수치를 함께 준비"},{src:"P_BIZ",use:"지원사업 통합 공고",fit:"분기별 공고 확인을 90일 계획에 포함"}],
+  finance:[{src:"P_KOSME",use:"정책자금 신청 전 자가진단",fit:"자금계획(I2)·손익관리(I1) 수준을 먼저 갖추면 상담이 구체화됨"},{src:"P_GUAR",use:"보증 상담",fit:"결산 재무제표·자금계획(I2)을 함께 준비하면 상담이 빨라짐"},{src:"P_BIZ",use:"지원사업 통합 공고",fit:"분기별 공고 확인을 90일 계획에 포함"}],
   export:[{src:"P_KOTRA",use:"해외시장 정보·바이어 매칭",fit:"대상 국가 조사(E1) 근거로 활용"},{src:"P_VOUCHER",use:"수출바우처",fit:"바이어 발굴(E2) 비용 지원 검토"},{src:"P_UNIPASS",use:"품목분류·FTA 정보",fit:"HS코드·원산지(E3) 확인"}],
+  people:[{src:"P_WORK24",use:"채용 공고·고용 지원 제도",fit:"채용 기준(H1)을 정한 뒤 공고·지원 제도 검토"},{src:"P_NOSA",use:"일터혁신 상생컨설팅",fit:"평가·보상(H3)이 낮으면 해당 연도 공고에서 대상 여부 확인"}],
   digital:[{src:"P_SMART",use:"스마트공장 수준확인·지원(제조)",fit:"공식 수준확인 전 데이터 관리 수준 점검"},{src:"P_KISA",use:"정보보호·개인정보 지원",fit:"보안 기초(D3) 과제와 연결"}]
 };
 
@@ -2267,6 +2329,9 @@ function consistencyFlags(d){
   if(exNA && p.has("export_rec")) f("X17","E1","수출실적 보유로 체크했지만 수출을 '해당 없음'으로 응답");
   if(a.S3==="na" && asked.has("S3") && d.revenue && d.revenue!=="r0") f("X18","S3","매출이 있는데 기존 고객 관리를 '아직 고객이 없음'으로 응답");
   if(a.F2==="na" && asked.has("F2") && d.revenue && d.revenue!=="r0") f("X19","F2","매출이 있는데 거래서류를 '아직 거래 전'으로 응답");
+  const solo = d.emp===RULES.people.soloEmp;
+  if(d.emp && !solo && (a.H2==="na"||a.H3==="na") && (asked.has("H2")||asked.has("H3"))) f("X20",a.H2==="na"?"H2":"H3","직원이 있다고(2명 이상) 골랐지만 노무·평가 문항을 '직원 없음'으로 응답");
+  if(solo && v("H2")!=null && v("H2")>=2) f("X21","H2","직원 수를 '1명(대표만)'으로 골랐지만 전 직원 근로계약·임금명세서를 갖췄다고 응답");
   if(d.stage!=="pre" && !p.has("biz_reg") && v("F1")!=null && v("F1")>=2 && (d.prep||[]).length>0) f("X14","F1","인허가를 모두 갖췄다고 응답했지만 보유 현황의 '사업자등록'은 체크되지 않음");
   return out;
 }
@@ -2332,12 +2397,21 @@ function areaComment(a, s, e, isStrong){
     cert:["인증·품질 기반이 있어 거래·입찰 신뢰도가 높습니다.","업종 인증·품질 기록이 약해 우선 검토가 필요합니다."],
     finance:["손익·자금 관리 체계가 잡혀 성장 자금 조달에 유리합니다.","월별 손익·자금계획부터 잡아야 자금 조달 시점을 놓치지 않습니다."],
     export:["수출 기반이 형성돼 글로벌 확장을 노릴 수 있습니다.","수출 준비도가 낮아 HS코드·바이어 발굴부터 검토하세요."],
-    digital:["데이터·시스템 활용도가 높아 자동화로 효율을 높이기 좋습니다.","데이터가 개인 파일에 흩어져 있어 공유·시스템화가 필요합니다."]
+    digital:["데이터·시스템 활용도가 높아 자동화로 효율을 높이기 좋습니다.","데이터가 개인 파일에 흩어져 있어 공유·시스템화가 필요합니다."],
+    people:["채용·노무·평가 기준이 잡혀 있어 인원이 늘어도 같은 방식으로 운영할 수 있습니다.","채용 기준·노무 기본·평가 원칙이 약해 인력 이탈과 노무 분쟁에 대비가 필요합니다."]
   };
   const txt = (tips[a]||["",""])[isStrong?0:1];
   return {txt, tag:`기대 ${e}점 대비 ${gapTxt(s-e)}`};
 }
 
+/* 직원 관련 과제 조건 — 인원은 점수·기대수준에 넣지 않고, 해당 없는 과제를 거르는 데만 쓴다 */
+function staffOk(d, a){
+  const ans=d.ans||{}, P=RULES.people, asked=new Set(askedQuestions(d.depth).map(q=>q.id));
+  const naStaff = ["H2","H3"].some(id=>asked.has(id) && ans[id]==="na");   // 간이 진단으로 바꿨을 때 남아 있는 표준 응답은 보지 않음
+  if(a.needsStaff && (d.emp===P.soloEmp || naStaff)) return false;
+  if(a.emp && !a.emp.includes(d.emp)) return false;
+  return true;
+}
 /* ---------- 7. 추천활동 선정 (응답 근거 연결) ---------- */
 function pickActivities(d, sc){
   const st = d.stage;
@@ -2357,6 +2431,7 @@ function pickActivities(d, sc){
     if(a.stages && !a.stages.includes(st)) return;
     if(sc.status[a.area]==="na") return;                              // 해당 없음 영역(예: 내수 전용 → 수출)
     if(a.needsDev && ans.R3==="na") return;                           // '제품·기술 개발이 필요 없는 사업'이면 개발 체계 과제 제외
+    if(!staffOk(d, a)) return;                                        // 직원 관련 과제: 대표 1인·인원 구간 조건(점수에는 인원 미사용)
     const rel = relevanceOf(d.industry, a.area, st);
     const con = concernAreas.includes(a.area);
     if(rel <= P.relExclude && !con) return;
@@ -2366,6 +2441,7 @@ function pickActivities(d, sc){
     const ap = areaPriority(d, sc, a.area);
     const areaSc = sc.areaScore[a.area];
     let p = ap.p + (100-(qs!=null?qs:(areaSc!=null?areaSc:50)))*P.gapToAct*rel + (focus.includes(a.area)?P.focus*rel:0);
+    if(a.legal && (qs==null || qs<P.halfCut)) p+=P.legal;              // 법정 의무 과제(근로계약·취업규칙)는 관련 응답이 정례화 미만이면 가점
     if(qs!=null && qs>=P.halfCut) p*=P.half;
     const g = sc.gap[a.area];
     let tag="plan";
@@ -2387,7 +2463,7 @@ function pickActivities(d, sc){
     const KEYS=["pre","y1","y13","y35","y57","y7"]; const nx=KEYS[Math.min(5,KEYS.indexOf(st)+1)];
     const have=new Set(cand.map(c=>c.id));
     const extra=(filterFn, reason, base)=>LIB.forEach(a=>{
-      if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own)) || (a.needsDev && ans.R3==="na")) return;
+      if(have.has(a.id) || (a.ind && !a.ind.includes(d.industry)) || sc.status[a.area]==="na" || (a.own && prep.has(a.own)) || (a.needsDev && ans.R3==="na") || !staffOk(d, a)) return;
       const rel=relevanceOf(d.industry, a.area, st); if(rel<=P.relExclude || !filterFn(a)) return;
       have.add(a.id);
       cand.push({...a, _p:base*rel, _tag:"plan", _areaSc:sc.areaScore[a.area], _qSc:qScoreOf(a.q), _rel:rel,
@@ -2415,17 +2491,19 @@ function pickActivities(d, sc){
   return out;
 }
 
-/* ---------- 8. 90일 / 12개월 / KPI ---------- */
+/* ---------- 8. 실행계획(RULES.plan.cycleDays) / 12개월 / KPI ---------- */
+function planPhaseDays(){ const c=RULES.plan.cycleDays, t=Math.round(c/3); return [t, 2*t, c]; }
 function plan90(acts){
   const sorted = [...acts];                       // pickActivities가 정한 실행 순서 그대로
   const item = a=>({t:a.title, sub:`산출물: ${(ACT_METRIC[a.id]||{target:a.kpi}).target}`});
-  const ph = [sorted.slice(0,2).map(item), sorted.slice(2,4).map(item), sorted.slice(4,6).map(item)];
+  const k = RULES.plan.perPhase, [d1,d2,d3] = planPhaseDays();
+  const ph = [sorted.slice(0,k).map(item), sorted.slice(k,2*k).map(item), sorted.slice(2*k,3*k).map(item)];
   ph[2].push({t:"같은 문항으로 중간 재진단 · KPI 기록 점검", sub:"산출물: 영역별 점수 변화표(재진단 비교)"});
   const aux = [{t:"현황 자료·서류 정비",sub:"산출물: 기본 서류 목록"},{t:"1순위 활동 실행·중간 점검",sub:"산출물: 진척 기록"}];
   return [
-    {d:"0~30일",t:"착수·기반 정비",items: ph[0].length?ph[0]:[aux[0]]},
-    {d:"31~60일",t:"핵심활동 실행",items: ph[1].length?ph[1]:[aux[1]]},
-    {d:"61~90일",t:"확장·성과 점검",items: ph[2]}
+    {d:`0~${d1}일`,t:"착수·기반 정비",items: ph[0].length?ph[0]:[aux[0]]},
+    {d:`${d1+1}~${d2}일`,t:"핵심활동 실행",items: ph[1].length?ph[1]:[aux[1]]},
+    {d:`${d2+1}~${d3}일`,t:"확장·성과 점검",items: ph[2]}
   ];
 }
 function roadmap(d, sc, acts, sw){
@@ -2441,7 +2519,7 @@ function roadmap(d, sc, acts, sw){
     {q:"Q1",span:"1~3개월",theme:"정비",sub:A?`${A.nm} 병목 해소`:"현황 점검과 기반 정리",
      items:[line(A,"기본 서류·데이터 정비"), A&&A.acts[1]?A.acts[1]:"모름 응답 문항 현황 확인", "KPI 기준선(현재값) 측정"]},
     {q:"Q2",span:"4~6개월",theme:"실행",sub:B?`${B.nm} 보강`:"핵심활동 본격 착수",
-     items:[line(B,"90일 실행계획 2차"), B&&B.acts[1]?B.acts[1]:"90일 실행계획 결과 점검", "중간 재진단(같은 문항)"]},
+     items:[line(B,`${RULES.plan.cycleDays}일 실행계획 2차`), B&&B.acts[1]?B.acts[1]:`${RULES.plan.cycleDays}일 실행계획 결과 점검`, "중간 재진단(같은 문항)"]},
     {q:"Q3",span:"7~9개월",theme:"확장",sub:C?`${C.nm} 확장·외부자원`:"외부자원·채널 확장",
      items:[line(C,"채널·고객 다변화"), pc?`${SRC[pc.src].s}: ${pc.use}`:"외부자원(지원·판로) 검토", "성과 지표 2분기 추이 점검"]},
     {q:"Q4",span:"10~12개월",theme:"고도화",sub:"재진단과 차년도 계획",
@@ -2465,35 +2543,40 @@ const KPI_LIB = {
     {name:"월 고객 문의",area:"marketing",unit:"건",g3:"기준선 측정",g12:"기준선 ×2",how:"문의 채널 합산",eg:"예: 5건",cyc:"월간",basis:"기준선 대비"},
     {name:"월 신규고객",area:"sales",unit:"명",g3:"기준선 측정",g12:"기준선 ×2",how:"신규 거래처 수",eg:"예: 1명",cyc:"월간",basis:"기준선 대비"},
     {name:"온라인 채널 구축",area:"marketing",unit:"개",g3:"홈페이지+1",g12:"3개 채널",how:"운영 채널 수",eg:"예: 0개",cyc:"분기",basis:"실무 권장"},
-    {name:"기본서류 준비율",area:"foundation",unit:"%",g3:"70%",g12:"100%",how:"표준서류 보유율",eg:"예: 50%",cyc:"분기",basis:"실무 권장"}
+    {name:"기본서류 준비율",area:"foundation",unit:"%",g3:"70%",g12:"100%",how:"표준서류 보유율",eg:"예: 50%",cyc:"분기",basis:"실무 권장"},
+    {name:"서면 근로계약·임금명세서 교부율",area:"people",staff:true,unit:"%",g3:"100%",g12:"100% 유지",how:"교부 직원 수/전체 직원 수",eg:"예: 50%",cyc:"분기",basis:"법정 의무"}
   ],
   y13:[
     {name:"월 매출 성장률",area:"sales",unit:"%",g3:"기준선 측정",g12:"전년 동기 대비 개선",how:"(당월−전년 동월)/전년 동월",eg:"예: +2%",cyc:"월간",basis:"기준선 대비"},
     {name:"반복구매율",area:"sales",unit:"%",g3:"기준선 측정",g12:"기준선 +10%p",how:"재구매 고객/전체 고객",eg:"예: 10%",cyc:"분기",basis:"기준선 대비"},
     {name:"채널별 문의→계약 전환율",area:"sales",unit:"%",g3:"채널별 측정 시작",g12:"기준선 +5%p",how:"계약 건수/문의 건수",eg:"예: 측정 전",cyc:"월간",basis:"기준선 대비"},
     {name:"지식재산·인증 검토",area:"cert",unit:"건",g3:"2건+",g12:"4건+",how:"출원·신청 건수",eg:"예: 0건",cyc:"분기",basis:"실무 권장"},
-    {name:"정부지원·제안 신청",area:"finance",unit:"건",g3:"2건+",g12:"6건+",how:"신청 건수",eg:"예: 1건",cyc:"분기",basis:"실무 권장"}
+    {name:"정부지원·제안 신청",area:"finance",unit:"건",g3:"2건+",g12:"6건+",how:"신청 건수",eg:"예: 1건",cyc:"분기",basis:"실무 권장"},
+    {name:"수습 기간 내 이탈률",area:"people",staff:true,unit:"%",g3:"기준선 측정",g12:"기준선 대비 감소",how:"수습 중 퇴사자/신규 입사자",eg:"예: 측정 전",cyc:"분기",basis:"기준선 대비"}
   ],
   y35:[
     {name:"연 매출 성장률",area:"sales",unit:"%",g3:"기준선 측정",g12:"전년 대비 개선",how:"(당기−전기)/전기",eg:"예: +5%",cyc:"분기",basis:"기준선 대비"},
     {name:"영업이익률",area:"finance",unit:"%",g3:"월별 측정",g12:"전년 대비 +2%p",how:"영업이익/매출",eg:"예: 5%",cyc:"분기",basis:"기준선 대비"},
     {name:"정책자금·보증 검토",area:"finance",unit:"건",g3:"2건+",g12:"4건+",how:"검토·신청 건수",eg:"예: 0건",cyc:"분기",basis:"실무 권장"},
     {name:"R&D 과제 신청",area:"rnd",unit:"건",g3:"1건+",g12:"3건+",how:"과제 신청 수",eg:"예: 0건",cyc:"반기",basis:"실무 권장"},
-    {name:"신규 채널 매출 비중",area:"sales",unit:"%",g3:"기준선 측정",g12:"기준선 +10%p",how:"신규채널/총매출",eg:"예: 5%",cyc:"분기",basis:"기준선 대비"}
+    {name:"신규 채널 매출 비중",area:"sales",unit:"%",g3:"기준선 측정",g12:"기준선 +10%p",how:"신규채널/총매출",eg:"예: 5%",cyc:"분기",basis:"기준선 대비"},
+    {name:"핵심인력 이직률",area:"people",staff:true,unit:"%",g3:"기준선 측정",g12:"기준선 대비 감소",how:"핵심인력 퇴사자/핵심인력 수(연환산)",eg:"예: 측정 전",cyc:"분기",basis:"기준선 대비"}
   ],
   y57:[
     {name:"수출 매출 비중",area:"export",unit:"%",g3:"기준선 측정",g12:"기준선 +5%p",how:"수출액/총매출",eg:"예: 0%",cyc:"분기",basis:"기준선 대비"},
     {name:"생산성 개선율",area:"digital",unit:"%",g3:"기준선 측정",g12:"기준선 대비 +10%",how:"산출/투입 비교",eg:"예: 측정 전",cyc:"분기",basis:"기준선 대비"},
     {name:"고객 유지율",area:"sales",unit:"%",g3:"기준선 측정",g12:"기준선 +5%p",how:"유지고객/전체",eg:"예: 70%",cyc:"분기",basis:"기준선 대비"},
     {name:"영업이익률",area:"finance",unit:"%",g3:"월별 측정",g12:"전년 대비 +2%p",how:"영업이익/매출",eg:"예: 5%",cyc:"분기",basis:"기준선 대비"},
-    {name:"신제품·서비스 출시",area:"rnd",unit:"건",g3:"1건+",g12:"3건+",how:"출시 건수",eg:"예: 0건",cyc:"반기",basis:"실무 권장"}
+    {name:"신제품·서비스 출시",area:"rnd",unit:"건",g3:"1건+",g12:"3건+",how:"출시 건수",eg:"예: 0건",cyc:"반기",basis:"실무 권장"},
+    {name:"핵심인력 이직률",area:"people",staff:true,unit:"%",g3:"기준선 측정",g12:"기준선 대비 감소",how:"핵심인력 퇴사자/핵심인력 수(연환산)",eg:"예: 측정 전",cyc:"분기",basis:"기준선 대비"}
   ],
   y7:[
     {name:"신규사업 매출 비중",area:"bm",unit:"%",g3:"기준선 측정",g12:"기준선 +5%p",how:"신규사업/총매출",eg:"예: 3%",cyc:"분기",basis:"기준선 대비"},
     {name:"사업부별 영업이익",area:"finance",unit:"",g3:"사업부별 측정",g12:"적자 사업부 개선안 실행",how:"부서별 손익",eg:"예: 일부 적자",cyc:"분기",basis:"실무 권장"},
     {name:"업무 자동화율",area:"digital",unit:"%",g3:"자동화 후보 목록화",g12:"기준선 +20%p",how:"자동화 업무 비율",eg:"예: 20%",cyc:"분기",basis:"기준선 대비"},
     {name:"고객생애가치(LTV)",area:"sales",unit:"",g3:"기준선 측정",g12:"기준선 +20%",how:"평균 거래액×거래기간",eg:"예: 미측정",cyc:"반기",basis:"기준선 대비"},
-    {name:"해외매출 비중",area:"export",unit:"%",g3:"기준선 측정",g12:"기준선 +5%p",how:"해외/총매출",eg:"예: 0%",cyc:"분기",basis:"기준선 대비"}
+    {name:"해외매출 비중",area:"export",unit:"%",g3:"기준선 측정",g12:"기준선 +5%p",how:"해외/총매출",eg:"예: 0%",cyc:"분기",basis:"기준선 대비"},
+    {name:"핵심인력 이직률",area:"people",staff:true,unit:"%",g3:"기준선 측정",g12:"기준선 대비 감소",how:"핵심인력 퇴사자/핵심인력 수(연환산)",eg:"예: 측정 전",cyc:"분기",basis:"기준선 대비"}
   ]
 };
 /* KPI: 컨설턴트 선택이 있으면 그대로, 없으면 단계 표준 KPI를 병목 영역 순으로 정렬 */
@@ -2502,7 +2585,7 @@ function kpiBoard(d, sc){
   const sw = strengthsWeak(sc, d);
   const rank = {}; (sw.weak.length?sw.weak:sw.weakAll).forEach((x,i)=>{ rank[x.a]=i; });
   const lib = [...(KPI_LIB[d.stage]||KPI_LIB.y13)]
-    .filter(k=>sc.status[k.area]!=="na")
+    .filter(k=>sc.status[k.area]!=="na" && !(k.staff && !staffOk(d, {needsStaff:true})))
     .sort((x,y)=>(rank[x.area]??9)-(rank[y.area]??9));
   const libByName = {}; (KPI_LIB[d.stage]||[]).forEach(k=>{ libByName[k.name]=k; });
   const kpiData = (memo.edited && Array.isArray(memo.kpiData)) ? memo.kpiData : null;   // 기본 체크만 두고 넘긴 경우 = 표준 KPI
@@ -2519,7 +2602,7 @@ function kpiBoard(d, sc){
       else out.push({name:item.name, cur: hasReal? item.cur : "현재값 미입력", isReal:hasReal, g3:m3, g3Real:m3Real, g6:m6, g6Real:m6Real, g12:"상담 시 협의", how:"내부 데이터·기록", cyc:"분기", basis:"컨설턴트", custom:true});
       used.add(item.name);
     });
-    lib.forEach(k=>{ if(out.length<6 && !used.has(k.name)) out.push({...std(k), ref:true}); });
+    lib.forEach(k=>{ if(out.length<RULES.input.maxCustom && !used.has(k.name)) out.push({...std(k), ref:true}); });
     return out;
   }
   return lib.map(std);
@@ -2663,7 +2746,7 @@ function buildDiagnosisNarrative(diag){
     + `${strongTxt}, ${botTxt}. ${confTxt}`;
   const first = diag.activities[0];
   const para2 = first
-    ? `우선 착수할 활동은 '${first.title}'(${first.areaName})입니다. ${first.why} 90일 동안 착수→실행→점검 순으로 진행하고, 12개월에 걸쳐 ${diag.roadmap.map(r=>r.theme).join("→")} 흐름으로 확장한 뒤 같은 문항으로 재진단해 변화를 확인하는 것을 권장합니다.`
+    ? `우선 착수할 활동은 '${first.title}'(${first.areaName})입니다. ${first.why} ${RULES.plan.cycleDays}일 동안 착수→실행→점검 순으로 진행하고, 12개월에 걸쳐 ${diag.roadmap.map(r=>r.theme).join("→")} 흐름으로 확장한 뒤 같은 문항으로 재진단해 변화를 확인하는 것을 권장합니다.`
     : "";
   const b0 = diag.bottlenecks[0];
   const core = b0 ? (b0.gap<0
@@ -2690,12 +2773,12 @@ function buildCTA(diag){
       + "무엇을 먼저, 어떤 순서로 실행할지 중기부 인증 상담회사가 함께 정리해 드립니다.";
   } else {
     headline = "이 결과, 실행 계획으로 바꾸고 싶다면";
-    body = `${p.stageNm} 단계에 맞는 우선순위와 90일 실행 계획을 전문가와 함께 구체화할 수 있습니다.`;
+    body = `${p.stageNm} 단계에 맞는 우선순위와 ${RULES.plan.cycleDays}일 실행 계획을 전문가와 함께 구체화할 수 있습니다.`;
   }
   const benefits = [
     `${topBot?topBot.name+" 등 ":""}우선 과제의 구체적 실행 순서`,
     "우리 기업에 맞는 정부지원사업·인증 방향 검토",
-    expertActs.length? `전문가 검토가 필요한 ${expertActs.length}개 과제 상담` : "90일 실행계획 점검"
+    expertActs.length? `전문가 검토가 필요한 ${expertActs.length}개 과제 상담` : `${RULES.plan.cycleDays}일 실행계획 점검`
   ];
   return {headline, body, benefits, hasExpert:expertActs.length};
 }
@@ -2813,6 +2896,16 @@ function renderResult(d, isSample, baseline){
 
   // 응답 점검
   const flagList = conf.flags.map(f=>`<li><b>${esc(f.q)}</b> ${esc(f.msg)}</li>`).join("");
+  // 노무 법정 의무 알림(점수·신뢰도에 넣지 않음) — 상시 10명 이상인데 노무 기본(H2)이 낮은 경우
+  const h2 = (sc.detail.people||[]).find(r=>r.q.id==="H2");          // 이번 진단 깊이에서 실제로 물은 응답만(간이로 바꾼 뒤 남은 표준 응답 제외)
+  const legalNote = (RULES.people.bylawEmp.includes(d.emp) && h2 && typeof h2.v==="number" && h2.v<=2)
+    ? `<li><b>H2</b> 직원 수를 상시 ${RULES.people.bylawMin}명 이상 구간으로 골랐습니다. 상시 ${RULES.people.bylawMin}명 이상 사업장은 취업규칙 작성·신고 의무가 있으니(근로기준법 제93조) 현황을 확인하세요.</li>` : "";
+  // 조직·인력 심화 진단 안내 — 링크·입력값 전달 없이 문구로만(외부 도구 연결 금지 원칙 유지)
+  const pg = sc.gap.people, pCon = (d.concern||[]).includes("org");
+  const hrGuide = hrDeepNeeded(diag) ? `<div class="hr-guide">
+      <b>조직·인력 심화 진단 안내</b>
+      <p>조직·인력 ${sc.areaScore.people==null?"응답 없음":sc.areaScore.people+"점"} · 단계 기대 ${sc.expected.people}점(${gapTxt(pg)})${pCon?" · 가장 큰 고민으로 선택":""}. 이 진단은 조직·인력의 병목 여부만 ${QUESTIONS.filter(q=>q.area==="people").length}문항으로 걸러냅니다. 원인(조직 상태·인사 제도·노무)을 확정하려면 상담 때 <b>HR 심화 진단(약 ${RULES.people.deepMin})</b>을 요청하세요. 이 화면은 다른 진단으로 연결하거나 입력값을 보내지 않습니다.</p>
+    </div>` : "";
   const unkList = AREA_KEYS.flatMap(a=>sc.detail[a].filter(x=>x.v==="u").map(x=>x.q.id)).join(", ");
 
   // 재진단 비교
@@ -2894,7 +2987,7 @@ function renderResult(d, isSample, baseline){
         ${bottleneck.length?bottleneck.map((b,i)=>`<li><span class="n">${i+1}</span><div>${esc(AREA[b.a].nm)} <b style="color:var(--bad)">${b.s}점</b> <span style="font-size:11.5px;color:var(--muted)">· 기대 ${b.e}점 (${gapTxt(b.gap)})</span></div></li>`).join(""):`<li><span class="n">✓</span><div>기대수준에 못 미치는 영역이 없습니다.</div></li>`}
         ${sw.nodata.length?`<li><span class="n">?</span><div>응답 없음: ${sw.nodata.map(a=>esc(AREA[a].short)).join("·")} — 현황 확인 필요</div></li>`:""}
       </ol></div>
-      <div class="col priority"><h4><span class="pl"></span>90일 우선과제</h4><ol>
+      <div class="col priority"><h4><span class="pl"></span>${RULES.plan.cycleDays}일 우선과제</h4><ol>
         ${acts.slice(0,5).map((a,i)=>`<li><span class="n">${i+1}</span><div>${esc(a.title)} <span style="font-size:11.5px;color:var(--muted)">· ${tagTxt[a._tag]}</span></div></li>`).join("")}
       </ol></div>
       <div class="col kpi5"><h4><span class="pl"></span>12개월 핵심 KPI</h4><ol>
@@ -2997,8 +3090,8 @@ function renderResult(d, isSample, baseline){
   </div>
 
   <div class="r-sec pbreak">
-    <h3><span class="ix">6</span>90일 실행계획</h3>
-    <p class="sub">우선도 순으로 30·60·90일에 두 과제씩 배치하고, 90일 차에 같은 문항으로 중간 재진단합니다.</p>
+    <h3><span class="ix">6</span>${RULES.plan.cycleDays}일 실행계획</h3>
+    <p class="sub">우선도 순으로 ${planPhaseDays().join("·")}일에 ${RULES.plan.perPhase}개 과제씩 배치하고, ${RULES.plan.cycleDays}일 차에 같은 문항으로 중간 재진단합니다.</p>
     <div class="plan90">${phases}</div>
   </div>
 
@@ -3010,7 +3103,7 @@ function renderResult(d, isSample, baseline){
 
   <div class="r-sec pbreak pb-before">
     <h3><span class="ix">8</span>KPI 대시보드</h3>
-    <p class="sub">병목 영역 지표를 앞에 두었습니다. '현재값'은 예시이며 STEP 5에서 실제 수치를 넣으면 <b style="color:#0d9b82">초록색 실제값</b>으로 바뀝니다. 목표 근거: <b>실무 권장</b>(활동량, BECONIC 실무기준 — 통계 아님) · <b>기준선 대비</b>(비율 지표는 자기 현재값과 비교). <b style="color:var(--blue)">'제시'</b>는 컨설턴트가 정한 목표입니다.</p>
+    <p class="sub">병목 영역 지표를 앞에 두었습니다. '현재값'은 예시이며 STEP 5에서 실제 수치를 넣으면 <b style="color:#0d9b82">초록색 실제값</b>으로 바뀝니다. 목표 근거: <b>실무 권장</b>(활동량, BECONIC 실무기준 — 통계 아님) · <b>기준선 대비</b>(비율 지표는 자기 현재값과 비교) · <b>법정 의무</b>(근로기준법상 교부 의무). <b style="color:var(--blue)">'제시'</b>는 컨설턴트가 정한 목표입니다.</p>
     <table class="kpi-table"><thead><tr>
       <th>핵심 지표(KPI)</th><th>현재값</th><th>3개월 목표</th><th>6개월 목표</th><th>12개월 목표</th><th>측정방법(산식)</th><th>점검주기</th>
     </tr></thead><tbody>${kpiRows}</tbody></table>
@@ -3019,8 +3112,9 @@ function renderResult(d, isSample, baseline){
 
   <div class="r-sec pbreak pb-before">
     <h3><span class="ix">9</span>공공 지원과 함께 쓰기</h3>
-    <p class="sub">이 진단은 공공 무료 진단·지원사업을 대신하지 않습니다. <b>신청 전 준비도 점검</b>과 <b>이후 실행과제</b>로 함께 쓰세요. 지원 여부·요건은 각 기관의 최신 공고를 확인해야 합니다.</p>
+    <p class="sub">이 진단은 공공 진단·지원사업을 대신하지 않습니다. <b>신청 전 준비도 점검</b>과 <b>이후 실행과제</b>로 함께 쓰세요. 지원 여부·요건은 각 기관의 최신 공고를 확인해야 합니다.</p>
     ${pubRows?`<div class="pub"><div class="pub-row pub-h"><div>영역</div><div>공공 창구</div><div>이 진단과 함께 쓰는 법</div></div>${pubRows}</div>`:""}
+    ${hrGuide}
   </div>
 
   <div class="r-sec pbreak">
@@ -3029,6 +3123,7 @@ function renderResult(d, isSample, baseline){
       ${flagList || "<li>보유 현황과 성숙도 응답 사이에 불일치가 없습니다.</li>"}
       ${unkList?`<li>'모름' 문항: ${esc(unkList)} — 현황 확인 후 재응답하면 판정이 바뀔 수 있습니다.</li>`:""}
       ${conf.straight?"<li>모든 문항을 같은 단계로 응답했습니다. 문항별로 실제 행동을 다시 확인해 주세요.</li>":""}
+      ${legalNote}
     </ul></div>
     <div class="risk-box" style="margin-top:14px"><h4>⚠ 진단 활용 시 유의사항</h4><ul>
       <li>법률·세무·노무·인증·지원사업 관련 내용은 단정이 아니며, 적용 전 전문가 검토가 필요합니다.</li>
@@ -3046,13 +3141,13 @@ function renderResult(d, isSample, baseline){
       <div class="cbody">
         <p>이 도구는 공개된 규칙으로만 계산합니다(규칙 기반 진단). 같은 입력에는 항상 같은 결과가 나오며, 입력값은 서버로 전송되지 않습니다.</p>
         <h5>1) 성숙도 점수</h5>
-        ${AREA_KEYS.length}개 영역 × ${QUESTIONS.length/AREA_KEYS.length}문항(간이 진단은 영역별 1문항, 총 ${QUESTIONS.filter(q=>q.core).length}문항)에 대해 행동 기준 4단계로 응답합니다: ${LV_NM.map((n,i)=>`<code>${i} ${n}=${LV_SCORE[i]}</code>`).join(" · ")}. 영역점수 = 응답 문항 평균. <b>'모름'과 미응답은 0점이 아닌 결측</b>으로 계산에서 빼고 신뢰도에 반영하며, '해당 없음'(예: 내수 전용 사업의 수출)은 그 영역을 종합점수에서 제외합니다. <b>매출·인원·업력은 점수에 넣지 않습니다.</b>
+        ${AREA_KEYS.length}개 영역 × ${QUESTIONS.length/AREA_KEYS.length}문항(간이 진단은 영역별 1문항, 총 ${QUESTIONS.filter(q=>q.core).length}문항)에 대해 행동 기준 ${LV_NM.length}단계로 응답합니다: ${LV_NM.map((n,i)=>`<code>${i} ${n}=${LV_SCORE[i]}</code>`).join(" · ")}. 영역점수 = 응답 문항 평균. <b>'모름'과 미응답은 0점이 아닌 결측</b>으로 계산에서 빼고 신뢰도에 반영하며, '해당 없음'(예: 내수 전용 사업의 수출)은 그 영역을 종합점수에서 제외합니다. <b>매출·인원·업력은 점수에 넣지 않습니다.</b>
         <h5>2) 종합점수</h5>
         영역점수 × 업종 가중치(기본 배점 ${AREA_KEYS.map(a=>`${AREA[a].short} ${BASE_W[a]}`).join("·")}에 업종 배수 적용, 합 100 — 현재 ${esc(indNm)}: ${AREA_KEYS.map(a=>`${AREA[a].short} <code>${sc.w[a]}</code>`).join(" · ")})의 가중평균. 점수가 없는 영역은 빼고 가중치를 재정규화합니다.
         <h5>3) 단계 기대수준</h5>
         기대수준 = 단계 기준값 × 업종 보정(업종 적합도 ${RULES.expect.indMin}~${RULES.expect.indMax} 범위), 상한 ${RULES.expect.cap}. 현재 ${esc(stageNm)} · ${esc(indNm)} 기준: ${AREA_KEYS.map(a=>`${AREA[a].short} <code>${sc.expected[a]}</code>`).join(" · ")}. 통계 평균이 아닌 BECONIC 실무 기준이며, 실사용 데이터가 쌓이면 보정합니다.
         <h5>4) 우선순위</h5>
-        영역 우선도 = max(0, 기대수준 − 점수) × 적합도(업종×단계) + 고민 선택 시 ${RULES.priority.concern}. 활동 우선도 = 영역 우선도 + (100 − 관련 문항 점수) × ${RULES.priority.gapToAct} × 적합도 + 단계 핵심영역 ${RULES.priority.focus} × 적합도. 관련 문항이 '체계화'면 제외, '정례화' 이상이면 ×${RULES.priority.half}, 이미 보유한 과제(보유 현황)는 제외합니다. 우선도 상위 ${RULES.priority.acts}개를 추천하고, '지금 착수'는 그중 상위 ${RULES.priority.maxNow}개까지 표시합니다. <b>고민은 점수를 깎지 않고 우선순위에만 반영</b>합니다(조직관리 → 기초·체계 영역).
+        영역 우선도 = max(0, 기대수준 − 점수) × 적합도(업종×단계) + 고민 선택 시 ${RULES.priority.concern}. 활동 우선도 = 영역 우선도 + (100 − 관련 문항 점수) × ${RULES.priority.gapToAct} × 적합도 + 단계 핵심영역 ${RULES.priority.focus} × 적합도 + 법정 의무 과제(근로계약·취업규칙, 관련 응답이 정례화 미만) ${RULES.priority.legal}. 관련 문항이 '체계화'면 제외, '정례화' 이상이면 ×${RULES.priority.half}, 이미 보유한 과제(보유 현황)는 제외합니다. 우선도 상위 ${RULES.priority.acts}개를 추천하고, '지금 착수'는 그중 상위 ${RULES.priority.maxNow}개까지 표시합니다. <b>고민은 점수를 깎지 않고 우선순위에만 반영</b>합니다(조직관리 → 기초·체계 영역).
         <h5>5) 진단 신뢰도 (점수와 분리)</h5>
         신뢰도 = 응답률(모름·미응답 제외) − 응답·보유현황 불일치 1건당 ${RULES.conf.flagPenalty}. 일률 응답은 최대 ${RULES.conf.straightCap}, 간이 진단은 최대 ${RULES.conf.quickCap}이며, 응답률 ${RULES.conf.minCoverage*100}% 미만이면 성숙도 구간을 판정하지 않습니다. ${RULES.conf.high} 이상 높음 · ${RULES.conf.mid} 이상 보통 · 그 미만 낮음. 보유 현황은 점수에 더하지 않고 이 교차 확인과 추천 제외에만 씁니다.
         <h5>6) 근거·출처 (${esc(LEGAL_BASIS_DATE)} 확인 기준)</h5>
@@ -3087,6 +3182,11 @@ function renderResult(d, isSample, baseline){
   return diag;
 }
 /* 상담 요청 메일 — 회사명은 넣지 않고 진단 요약만 (사용자가 직접 보내기 전까지 아무것도 전송되지 않음) */
+/* HR 심화 진단 안내 조건 — 결과 화면 안내와 상담 메일이 같은 기준을 쓴다 */
+function hrDeepNeeded(diag){
+  const pa = diag.areas.find(a=>a.key==="people"); if(!pa || pa.status==="na") return false;
+  return (pa.gap!=null && pa.gap<0) || (diag.profile.concern||[]).includes("org");
+}
 function mailtoHref(diag){
   const s=diag.score, p=diag.profile;
   const lines=[
@@ -3095,6 +3195,7 @@ function mailtoHref(diag){
     `종합 성숙도: ${s.total==null?"판정 보류":s.total+"점"} (단계 기대 ${s.expected==null?"–":s.expected}점) · 신뢰도 ${s.confidence.label}`,
     `핵심 병목: ${diag.bottlenecks.map(b=>`${b.name} ${b.score}점(기대 ${b.expected})`).join(", ")||"없음"}`,
     `우선과제: ${diag.activities.slice(0,3).map(a=>a.title).join(" / ")}`,
+    ...(hrDeepNeeded(diag) ? [`조직·인력: ${diag.areas.find(a=>a.key==="people").score??"응답 없음"}점(기대 ${diag.areas.find(a=>a.key==="people").expected}) — HR 심화 진단 안내 희망`] : []),
     "", "상담 희망 내용:", ""
   ];
   return "mailto:"+COMPANY.mail+"?subject="+encodeURIComponent("[성장진단] 결과 상담 요청")+"&body="+encodeURIComponent(lines.join("\n"));
@@ -3117,7 +3218,7 @@ const GAN = (function(){
         if(multi){
           let arr=state.data[key];
           if(arr.includes(v)){ arr=arr.filter(x=>x!==v); }
-          else { if(key==="concern" && arr.length>=3){ toast("고민은 최대 3개까지 선택할 수 있어요"); return;} arr=[...arr,v]; }
+          else { if(key==="concern" && arr.length>=RULES.input.maxConcern){ toast(`고민은 최대 ${RULES.input.maxConcern}개까지 선택할 수 있어요`); return;} arr=[...arr,v]; }
           state.data[key]=arr;
           btn.classList.toggle("sel"); btn.setAttribute("aria-pressed", btn.classList.contains("sel"));
         } else {
@@ -3158,6 +3259,7 @@ const GAN = (function(){
     AREA_KEYS.forEach((a,ai)=>{
       const qs=asked.filter(q=>q.area===a); if(!qs.length) return;
       html+=`<div class="qa-area"><div class="qa-ah"><span class="qa-ix">${ai+1}</span><b>${esc(AREA[a].nm)}</b>${d.stage?`<small>${esc(STAGE[d.stage].nm)} 기대 ${expectedOf(d.stage,d.industry||"etc",a)}점</small>`:""}</div>`;
+      if(a==="people" && d.emp===RULES.people.soloEmp) html+=`<p class="qa-hint">직원 수를 '1명(대표만)'으로 골랐어요. 직원이 없으면 노무·평가 문항은 <b>'해당 없음'</b>을 고르세요. 채용 계획(H1)은 그대로 답하면 됩니다.</p>`;
       qs.forEach(q=>{
         const v=d.ans[q.id];
         html+=`<div class="qa-card${v===undefined?"":" done"}" data-q="${q.id}"><div class="qa-t"><span class="qa-id">${q.id}</span>${esc(q.t)}</div>
@@ -3369,7 +3471,7 @@ const GAN = (function(){
   function bindAdd(inputId, btnId, arr, after){
     const inp=document.getElementById(inputId), btn=document.getElementById(btnId);
     if(!inp||!btn||inp._bound) return; inp._bound=true;
-    const add=()=>{ const v=inp.value.trim(); if(!v) return; if(arr.length>=6){ toast("최대 6개까지 추가할 수 있어요"); return; }
+    const add=()=>{ const v=inp.value.trim(); if(!v) return; if(arr.length>=RULES.input.maxCustom){ toast(`최대 ${RULES.input.maxCustom}개까지 추가할 수 있어요`); return; }
       if(!arr.includes(v)) arr.push(v); inp.value=""; after(); save(); };
     btn.addEventListener("click",add);
     inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); add(); } });
@@ -3495,7 +3597,7 @@ const GAN = (function(){
       stage: pickV(OPT.stage, raw.stage||raw.s), ctype: pickV(OPT.ctype, raw.ctype||raw.c),
       industry: pickV(OPT.industry, raw.industry||raw.i), revenue: pickV(OPT.revenue, raw.revenue||raw.r),
       emp: pickV(OPT.emp, raw.emp||raw.e), customer: pickV(OPT.customer, raw.customer||raw.cu),
-      concern: (Array.isArray(raw.concern||raw.co)?(raw.concern||raw.co):[]).filter(v=>OPT.concern.some(o=>o.v===v)).slice(0,3),
+      concern: (Array.isArray(raw.concern||raw.co)?(raw.concern||raw.co):[]).filter(v=>OPT.concern.some(o=>o.v===v)).slice(0,RULES.input.maxConcern),
       prep: (Array.isArray(raw.prep||raw.p)?(raw.prep||raw.p):[]).filter(v=>prepOk.has(v)),
       ans, memo:{overview:"",risk:"",kpiData:[]}
     };
@@ -3536,7 +3638,7 @@ const GAN = (function(){
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
     a.download=`성장진단_${(d.name||"결과").replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,30)}_${new Date().toISOString().slice(0,10)}.json`;
     document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
-    toast("결과 파일을 저장했습니다 · 90일 후 '재진단'에서 불러오세요");
+    toast(`결과 파일을 저장했습니다 · ${RULES.plan.cycleDays}일 후 '재진단'에서 불러오세요`);
   }
   function importFile(file){
     if(!file) return;
@@ -3598,7 +3700,7 @@ const GAN = (function(){
     const d=state.data;
     const indNm=nmOf(OPT.industry,d.industry), stageNm=(STAGE[d.stage]||{}).nm||"-";
     const sc=scoreEngine(d);
-    const toc=["핵심 요약 (Executive Summary)", state.baseline?"재진단 비교":null, `${AREA_KEYS.length}개 영역 진단 결과 (단계 기대수준 비교)`,"영역별 응답 근거와 다음 단계","업종·단계 맞춤 추천활동","우선순위 매트릭스","90일 실행 계획","12개월 성장 로드맵","핵심 지표(KPI) 관리 대시보드","공공 지원과 함께 쓰기","응답 점검 · 리스크 및 유의사항","진단 방법 · 공개 산식 · 근거 출처"].filter(Boolean);
+    const toc=["핵심 요약 (Executive Summary)", state.baseline?"재진단 비교":null, `${AREA_KEYS.length}개 영역 진단 결과 (단계 기대수준 비교)`,"영역별 응답 근거와 다음 단계","업종·단계 맞춤 추천활동","우선순위 매트릭스",`${RULES.plan.cycleDays}일 실행 계획`,"12개월 성장 로드맵","핵심 지표(KPI) 관리 대시보드","공공 지원과 함께 쓰기","응답 점검 · 리스크 및 유의사항","진단 방법 · 공개 산식 · 근거 출처"].filter(Boolean);
     const shell=document.createElement("div");
     shell.id="reportShell"; shell.className="report-shell print-only-block";
     shell.innerHTML=`
@@ -3672,7 +3774,7 @@ const GAN = (function(){
   const SAMPLE = {name:"그로스샘플 제조 (가상 예시)",depth:"standard",stage:"y13",ctype:"small",industry:"mfg",biztype:"정밀부품 가공·조립",
     revenue:"r15",emp:"e59",customer:"b2b",concern:["cert","customer","rnd"],
     prep:["biz_reg","corp","contracts","bizplan","introdoc","website"],
-    ans:{F1:2,F2:2,F3:1,B1:2,B2:1,B3:1,S1:1,S2:1,S3:2,M2:2,M1:1,M3:1,R1:1,R2:0,R3:1,C1:1,C2:2,C3:0,I1:2,I2:1,I3:1,E1:1,E2:0,E3:"u",D1:1,D2:1,D3:1},
+    ans:{F1:2,F2:2,F3:1,B1:2,B2:1,B3:1,S1:1,S2:1,S3:2,M2:2,M1:1,M3:1,R1:1,R2:0,R3:1,C1:1,C2:2,C3:0,I1:2,I2:1,I3:1,E1:1,E2:0,E3:"u",D1:1,D2:1,D3:1,H1:1,H2:2,H3:0},
     memo:{overview:"",risk:"",kpiData:[]}};
   function loadSample(){
     if(!state.isSample) state.prevData=state.data;     // 사용자가 입력하던 값은 따로 보관(예시가 덮어쓰지 않음)
@@ -3705,7 +3807,8 @@ const GAN = (function(){
       years:copyYears(), brandLine:`${COMPANY.short.replace("㈜","")} · ${COMPANY.brand}`,
       certShort:`중기부 인증 중소기업상담회사 ${COMPANY.certNo}`, certFull:`${COMPANY.certLabel} ${COMPANY.certNo}`};
     const cnt = {areas:AREA_KEYS.length, q:QUESTIONS.length, qQuick:askedQuestions("quick").length, qPer:QUESTIONS.length/AREA_KEYS.length,
-      lv:LV_NM.length, ind:OPT.industry.length, src:Object.keys(SRC).length, minQuick:RULES.minutes.quick, minStd:RULES.minutes.standard};
+      lv:LV_NM.length, ind:OPT.industry.length, src:Object.keys(SRC).length, minQuick:RULES.minutes.quick, minStd:RULES.minutes.standard,
+      cycle:RULES.plan.cycleDays, maxConcern:RULES.input.maxConcern};
     $$("[data-co]").forEach(el=>{ const v=co[el.dataset.co]; if(v!=null) el.textContent=v; });
     $$("[data-cnt]").forEach(el=>{ const v=cnt[el.dataset.cnt]; if(v!=null) el.textContent=v; });
     $$("a[data-tel]").forEach(a=>{ a.href=telHref(); });
@@ -3752,7 +3855,7 @@ window.GAN = GAN;
 
 /* ===== 메인 성장 시각화 (단계별 우선영역 프로파일) ===== */
 const GVIZ = (function(){
-  const STAGE_NM={pre:"예비창업",y1:"1년 미만",y13:"1~3년",y35:"3~5년",y57:"5~7년",y7:"7년 이상"};
+  const STAGE_NM=Object.fromEntries(OPT.stage.map(o=>[o.v, o.t.replace(/^창업 /,"").replace(/년차$/,"년")]));   // 단계 이름은 OPT.stage 한곳에서
   // 단계별 영역 우선도 = STAGE_RELEVANCE(단계 고유 우선도 신호)를 0~100 정규화
   // BASE_W를 곱하지 않는 이유: 사업모델·고객 base가 높아 단계별 차이가 가려짐. 단계 고유 형태를 그대로 보여줌.
   function profile(st){

@@ -25,3 +25,10 @@ hr/node_modules/
 hr/dist/
 growth/tests/out/
 growth/dist/
+prestartup/dist/
+prestartup/tests/out/
+psf/tests/out/
+psf/dist/
+psf/node_modules/
+bm/node_modules/
+bm/dist/
