@@ -794,7 +794,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   .result-top{background:#eef4ff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#0e1a30;
     box-shadow:none;border-radius:12px;border:1px solid #cfe0f3;}
   .card,.act,.phase,.exec .col,.radar-box,.matrix-wrap,.kpi-table,.risk-box,.rq ul,
-  .swot .b,.kpi-c,.target-box{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;}
+  .swot .b,.kpi-c,.target-box,.hr-guide{break-inside:avoid;page-break-inside:avoid;box-shadow:none!important;}
   .r-sec{break-inside:auto;box-shadow:none!important;}
   .r-sec{margin-top:16px;}
   .kpi-cards{display:none!important;}
@@ -1106,6 +1106,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   .src{font-size:7.5pt!important;}
   .act .reason li{font-size:8.5pt!important;}
   .ev-q,.ev-now,.ev-next{font-size:8.5pt!important;}
+  .ev{gap:7px!important;} .ev-area{padding:8px 11px!important;} .ev-row{padding:4px 0!important;} .ev-h{padding-bottom:5px!important;}   /* v6.4: 10개 영역이 응답 근거 쪽을 넘지 않도록 */
+  .ev-now,.ev-next{margin-top:3px!important;} .ev-next{padding:4px 8px!important;}
+  .risk-box{padding:12px 16px!important;} .risk-box li{padding:3px 0!important;}
 }
 </style>
 </head>
@@ -1130,9 +1133,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
     <div class="wrap hero-in">
       <span class="eyebrow"><span data-cnt="areas"></span>개 영역 · <span data-cnt="q"></span>문항 · 단계 기대수준 비교</span>
       <h1>지금 우리 회사가<br><span class="hl">무엇을 먼저</span> 해야 하는지<br>한눈에 확인하세요</h1>
-      <p class="lede">회사 규모가 아니라 <b>지금 실제로 하고 있는 일</b>로 진단합니다. 행동 기준 문항에 답하면 업종·창업 연차의 기대수준과 비교해 먼저 할 과제, 90일 실행계획, 12개월 KPI 로드맵을 제시합니다.</p>
+      <p class="lede">회사 규모가 아니라 <b>지금 실제로 하고 있는 일</b>로 진단합니다. 행동 기준 문항에 답하면 업종·창업 연차의 기대수준과 비교해 먼저 할 과제, <span data-cnt="cycle"></span>일 실행계획, 12개월 KPI 로드맵을 제시합니다.</p>
       <div class="hero-cta">
-        <button class="btn btn-amber" onclick="GAN.go('diagnose')">무료로 성장활동 진단하기</button>
+        <button class="btn btn-amber" onclick="GAN.go('diagnose')">성장활동 진단 시작하기</button>
         <button class="btn btn-line no-print" onclick="GAN.loadSample()">샘플 결과 보기</button>
       </div>
       <div class="resume-bar no-print" id="resumeBar" style="display:none">
@@ -1212,19 +1215,19 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#16C2A3" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
           <div class="num">STEP 02</div>
           <h4>성숙도 문항 응답</h4>
-          <p>영역마다 "지금 무엇을 하고 있는가"를 4단계 행동 기준으로 고릅니다. 모르면 '모름'.</p>
+          <p>영역마다 "지금 무엇을 하고 있는가"를 <span data-cnt="lv"></span>단계 행동 기준으로 고릅니다. 모르면 '모름'.</p>
         </div>
         <div class="step">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></div>
           <div class="num">STEP 03</div>
           <h4>우선순위·KPI 확인</h4>
-          <p>단계 기대수준과의 차이로 우선과제·90일 계획·KPI를 공개 산식으로 받습니다.</p>
+          <p>단계 기대수준과의 차이로 우선과제·<span data-cnt="cycle"></span>일 계획·KPI를 공개 산식으로 받습니다.</p>
         </div>
         <div class="step">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#16C2A3" stroke-width="2"><path d="M12 17V3"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg></div>
           <div class="num">STEP 04</div>
           <h4>저장·재진단</h4>
-          <p>PDF 보고서·링크로 공유하고, 결과 파일로 90일 후 같은 문항으로 재진단합니다.</p>
+          <p>PDF 보고서·링크로 공유하고, 결과 파일로 <span data-cnt="cycle"></span>일 후 같은 문항으로 재진단합니다.</p>
         </div>
       </div>
     </div>
@@ -1280,7 +1283,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
       <div class="step-card" id="fstep-1">
         <div class="q-no">STEP 01 · 기본 정보</div>
         <h3>회사를 알려주세요</h3>
-        <p class="help">입력값은 이 브라우저 안에서만 계산되고 외부로 전송되지 않습니다. 90일 전 결과 파일이 있다면 <label class="inline-file">불러와서 재진단<input type="file" class="file-in" accept=".json,application/json" hidden></label>할 수 있어요.</p>
+        <p class="help">입력값은 이 브라우저 안에서만 계산되고 외부로 전송되지 않습니다. <span data-cnt="cycle"></span>일 전 결과 파일이 있다면 <label class="inline-file">불러와서 재진단<input type="file" class="file-in" accept=".json,application/json" hidden></label>할 수 있어요.</p>
 
         <div class="field" data-k="depth">
           <label>진단 깊이<span class="req">*</span></label>
@@ -1343,7 +1346,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
         </div>
 
         <div class="field" data-k="concern">
-          <label>현재 가장 큰 고민 <span class="opt">최대 3개</span><span class="req">*</span></label>
+          <label>현재 가장 큰 고민 <span class="opt">최대 <span data-cnt="maxConcern"></span>개</span><span class="req">*</span></label>
           <div class="chips" id="c-concern"></div>
           <div class="err-tip">⚠ 가장 큰 고민을 1개 이상 선택해 주세요.</div>
         </div>
@@ -1537,9 +1540,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.4.0";
+const APP_VERSION = "v6.4.1";
 const APP_UPDATED = "2026-11-25";
-const APP_BUILD   = "2026.11.25.1";  // 배포 빌드 식별자
+const APP_BUILD   = "2026.11.25.2";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
 const LEGAL_BASIS_DATE = "2026-10-26";  // 법령·제도 출처를 마지막으로 확인한 날(도구 버전 날짜와 별개)
 
@@ -1561,7 +1564,9 @@ const RULES = {
             relExclude:0.22, relFloor:0.6, nowGap:-15, nowRel:0.8, maxNow:3, acts:6, perArea:{early:3, other:2},
             fillNext:12, fillKeep:6},
   strong:{min:60, margin:10},                    // 강점 = max(min, 기대+margin) 이상
-  people:{bylawEmp:["e1029","e3049","e50"], soloEmp:"e1"},   // 조직·인력: 취업규칙 과제는 상시 10인 이상만(근로기준법 제93조), 1인 기업은 직원 관련 과제 제외 — 점수·기대수준에는 인원 미사용
+  people:{bylawEmp:["e1029","e3049","e50"], bylawMin:10, soloEmp:"e1", deepMin:"15~25분"},   // 조직·인력: 취업규칙 과제는 상시 10인 이상만(근로기준법 제93조), 1인 기업은 직원 관련 과제 제외 — 점수·기대수준에는 인원 미사용
+  plan:{cycleDays:90, perPhase:2},                // 실행계획 기간(=재진단 주기, BECONIC 31 브랜드 약속 90일)·구간별 과제 수
+  input:{maxConcern:3, maxCustom:6},              // 고민 최대 선택 수 · 컨설턴트 직접 추가 과제/KPI 최대 수
   conf:{flagPenalty:8, straightCap:60, quickCap:70, straightMin:9, high:75, mid:50, minCoverage:0.5}
 };
 const STORE_KEY = "gan_state_v6";   // v5 이하 저장값(구조 다름)은 읽지 않음
@@ -2219,7 +2224,7 @@ const ACT_METRIC = {
 };
 
 /* ---------- 4-1. 공공 지원과 함께 쓰기 (영역별) ----------
-   이 진단은 공공 무료 진단·지원사업을 대체하지 않고, 신청 전 준비도 점검 + 이후 실행과제로 쓴다 */
+   이 진단은 공공 진단·지원사업을 대체하지 않고, 신청 전 준비도 점검 + 이후 실행과제로 쓴다 */
 const PUBLIC = {
   foundation:[{src:"P_HT",use:"사업자등록·업종코드 확인",fit:"등록 전 업종·업태 구조를 이 진단의 '기초·체계' 과제로 먼저 정리"}],
   bm:[{src:"P_KS",use:"예비·초기창업 지원사업 공고",fit:"신청서의 문제정의·시장검증 항목을 사업모델 3문항 결과로 준비"}],
@@ -2227,7 +2232,7 @@ const PUBLIC = {
   marketing:[{src:"P_KIPRIS",use:"상표 선행 검색",fit:"브랜드 노출 전 상표 출원 여부 판단"}],
   rnd:[{src:"P_IRIS",use:"정부 R&D 공고",fit:"과제 신청 전 개발 체계·지식재산 준비도 점검"},{src:"P_KOITA",use:"연구소·전담부서 신고",fit:"인력·공간 요건 충족 전후 확인"}],
   cert:[{src:"P_SME24",use:"벤처기업 확인 신청",fit:"요건 자가 점검 후 신청"},{src:"P_INNO",use:"이노비즈·메인비즈 온라인 자가진단",fit:"공식 자가진단 전에 품질·경영체계 준비도를 먼저 정리"}],
-  finance:[{src:"P_KOSME",use:"정책자금 신청 전 자가진단",fit:"자금계획(I2)·손익관리(I1) 수준을 먼저 갖추면 상담이 구체화됨"},{src:"P_GUAR",use:"보증 상담",fit:"BECONIC 01번 재무진단으로 재무 수치를 함께 준비"},{src:"P_BIZ",use:"지원사업 통합 공고",fit:"분기별 공고 확인을 90일 계획에 포함"}],
+  finance:[{src:"P_KOSME",use:"정책자금 신청 전 자가진단",fit:"자금계획(I2)·손익관리(I1) 수준을 먼저 갖추면 상담이 구체화됨"},{src:"P_GUAR",use:"보증 상담",fit:"결산 재무제표·자금계획(I2)을 함께 준비하면 상담이 빨라짐"},{src:"P_BIZ",use:"지원사업 통합 공고",fit:"분기별 공고 확인을 90일 계획에 포함"}],
   export:[{src:"P_KOTRA",use:"해외시장 정보·바이어 매칭",fit:"대상 국가 조사(E1) 근거로 활용"},{src:"P_VOUCHER",use:"수출바우처",fit:"바이어 발굴(E2) 비용 지원 검토"},{src:"P_UNIPASS",use:"품목분류·FTA 정보",fit:"HS코드·원산지(E3) 확인"}],
   people:[{src:"P_WORK24",use:"채용 공고·고용 지원 제도",fit:"채용 기준(H1)을 정한 뒤 공고·지원 제도 검토"},{src:"P_NOSA",use:"일터혁신 상생컨설팅",fit:"평가·보상(H3)이 낮으면 해당 연도 공고에서 대상 여부 확인"}],
   digital:[{src:"P_SMART",use:"스마트공장 수준확인·지원(제조)",fit:"공식 수준확인 전 데이터 관리 수준 점검"},{src:"P_KISA",use:"정보보호·개인정보 지원",fit:"보안 기초(D3) 과제와 연결"}]
@@ -2401,8 +2406,9 @@ function areaComment(a, s, e, isStrong){
 
 /* 직원 관련 과제 조건 — 인원은 점수·기대수준에 넣지 않고, 해당 없는 과제를 거르는 데만 쓴다 */
 function staffOk(d, a){
-  const ans=d.ans||{}, P=RULES.people;
-  if(a.needsStaff && (d.emp===P.soloEmp || ans.H2==="na" || ans.H3==="na")) return false;
+  const ans=d.ans||{}, P=RULES.people, asked=new Set(askedQuestions(d.depth).map(q=>q.id));
+  const naStaff = ["H2","H3"].some(id=>asked.has(id) && ans[id]==="na");   // 간이 진단으로 바꿨을 때 남아 있는 표준 응답은 보지 않음
+  if(a.needsStaff && (d.emp===P.soloEmp || naStaff)) return false;
   if(a.emp && !a.emp.includes(d.emp)) return false;
   return true;
 }
@@ -2485,17 +2491,19 @@ function pickActivities(d, sc){
   return out;
 }
 
-/* ---------- 8. 90일 / 12개월 / KPI ---------- */
+/* ---------- 8. 실행계획(RULES.plan.cycleDays) / 12개월 / KPI ---------- */
+function planPhaseDays(){ const c=RULES.plan.cycleDays, t=Math.round(c/3); return [t, 2*t, c]; }
 function plan90(acts){
   const sorted = [...acts];                       // pickActivities가 정한 실행 순서 그대로
   const item = a=>({t:a.title, sub:`산출물: ${(ACT_METRIC[a.id]||{target:a.kpi}).target}`});
-  const ph = [sorted.slice(0,2).map(item), sorted.slice(2,4).map(item), sorted.slice(4,6).map(item)];
+  const k = RULES.plan.perPhase, [d1,d2,d3] = planPhaseDays();
+  const ph = [sorted.slice(0,k).map(item), sorted.slice(k,2*k).map(item), sorted.slice(2*k,3*k).map(item)];
   ph[2].push({t:"같은 문항으로 중간 재진단 · KPI 기록 점검", sub:"산출물: 영역별 점수 변화표(재진단 비교)"});
   const aux = [{t:"현황 자료·서류 정비",sub:"산출물: 기본 서류 목록"},{t:"1순위 활동 실행·중간 점검",sub:"산출물: 진척 기록"}];
   return [
-    {d:"0~30일",t:"착수·기반 정비",items: ph[0].length?ph[0]:[aux[0]]},
-    {d:"31~60일",t:"핵심활동 실행",items: ph[1].length?ph[1]:[aux[1]]},
-    {d:"61~90일",t:"확장·성과 점검",items: ph[2]}
+    {d:`0~${d1}일`,t:"착수·기반 정비",items: ph[0].length?ph[0]:[aux[0]]},
+    {d:`${d1+1}~${d2}일`,t:"핵심활동 실행",items: ph[1].length?ph[1]:[aux[1]]},
+    {d:`${d2+1}~${d3}일`,t:"확장·성과 점검",items: ph[2]}
   ];
 }
 function roadmap(d, sc, acts, sw){
@@ -2511,7 +2519,7 @@ function roadmap(d, sc, acts, sw){
     {q:"Q1",span:"1~3개월",theme:"정비",sub:A?`${A.nm} 병목 해소`:"현황 점검과 기반 정리",
      items:[line(A,"기본 서류·데이터 정비"), A&&A.acts[1]?A.acts[1]:"모름 응답 문항 현황 확인", "KPI 기준선(현재값) 측정"]},
     {q:"Q2",span:"4~6개월",theme:"실행",sub:B?`${B.nm} 보강`:"핵심활동 본격 착수",
-     items:[line(B,"90일 실행계획 2차"), B&&B.acts[1]?B.acts[1]:"90일 실행계획 결과 점검", "중간 재진단(같은 문항)"]},
+     items:[line(B,`${RULES.plan.cycleDays}일 실행계획 2차`), B&&B.acts[1]?B.acts[1]:`${RULES.plan.cycleDays}일 실행계획 결과 점검`, "중간 재진단(같은 문항)"]},
     {q:"Q3",span:"7~9개월",theme:"확장",sub:C?`${C.nm} 확장·외부자원`:"외부자원·채널 확장",
      items:[line(C,"채널·고객 다변화"), pc?`${SRC[pc.src].s}: ${pc.use}`:"외부자원(지원·판로) 검토", "성과 지표 2분기 추이 점검"]},
     {q:"Q4",span:"10~12개월",theme:"고도화",sub:"재진단과 차년도 계획",
@@ -2594,7 +2602,7 @@ function kpiBoard(d, sc){
       else out.push({name:item.name, cur: hasReal? item.cur : "현재값 미입력", isReal:hasReal, g3:m3, g3Real:m3Real, g6:m6, g6Real:m6Real, g12:"상담 시 협의", how:"내부 데이터·기록", cyc:"분기", basis:"컨설턴트", custom:true});
       used.add(item.name);
     });
-    lib.forEach(k=>{ if(out.length<6 && !used.has(k.name)) out.push({...std(k), ref:true}); });
+    lib.forEach(k=>{ if(out.length<RULES.input.maxCustom && !used.has(k.name)) out.push({...std(k), ref:true}); });
     return out;
   }
   return lib.map(std);
@@ -2738,7 +2746,7 @@ function buildDiagnosisNarrative(diag){
     + `${strongTxt}, ${botTxt}. ${confTxt}`;
   const first = diag.activities[0];
   const para2 = first
-    ? `우선 착수할 활동은 '${first.title}'(${first.areaName})입니다. ${first.why} 90일 동안 착수→실행→점검 순으로 진행하고, 12개월에 걸쳐 ${diag.roadmap.map(r=>r.theme).join("→")} 흐름으로 확장한 뒤 같은 문항으로 재진단해 변화를 확인하는 것을 권장합니다.`
+    ? `우선 착수할 활동은 '${first.title}'(${first.areaName})입니다. ${first.why} ${RULES.plan.cycleDays}일 동안 착수→실행→점검 순으로 진행하고, 12개월에 걸쳐 ${diag.roadmap.map(r=>r.theme).join("→")} 흐름으로 확장한 뒤 같은 문항으로 재진단해 변화를 확인하는 것을 권장합니다.`
     : "";
   const b0 = diag.bottlenecks[0];
   const core = b0 ? (b0.gap<0
@@ -2765,12 +2773,12 @@ function buildCTA(diag){
       + "무엇을 먼저, 어떤 순서로 실행할지 중기부 인증 상담회사가 함께 정리해 드립니다.";
   } else {
     headline = "이 결과, 실행 계획으로 바꾸고 싶다면";
-    body = `${p.stageNm} 단계에 맞는 우선순위와 90일 실행 계획을 전문가와 함께 구체화할 수 있습니다.`;
+    body = `${p.stageNm} 단계에 맞는 우선순위와 ${RULES.plan.cycleDays}일 실행 계획을 전문가와 함께 구체화할 수 있습니다.`;
   }
   const benefits = [
     `${topBot?topBot.name+" 등 ":""}우선 과제의 구체적 실행 순서`,
     "우리 기업에 맞는 정부지원사업·인증 방향 검토",
-    expertActs.length? `전문가 검토가 필요한 ${expertActs.length}개 과제 상담` : "90일 실행계획 점검"
+    expertActs.length? `전문가 검토가 필요한 ${expertActs.length}개 과제 상담` : `${RULES.plan.cycleDays}일 실행계획 점검`
   ];
   return {headline, body, benefits, hasExpert:expertActs.length};
 }
@@ -2889,14 +2897,14 @@ function renderResult(d, isSample, baseline){
   // 응답 점검
   const flagList = conf.flags.map(f=>`<li><b>${esc(f.q)}</b> ${esc(f.msg)}</li>`).join("");
   // 노무 법정 의무 알림(점수·신뢰도에 넣지 않음) — 상시 10명 이상인데 노무 기본(H2)이 낮은 경우
-  const ansD = d.ans||{};
-  const legalNote = (RULES.people.bylawEmp.includes(d.emp) && typeof ansD.H2==="number" && ansD.H2<=2)
-    ? `<li><b>H2</b> 직원 수를 상시 10명 이상 구간으로 골랐습니다. 상시 10명 이상 사업장은 취업규칙 작성·신고 의무가 있으니(근로기준법 제93조) 현황을 확인하세요.</li>` : "";
+  const h2 = (sc.detail.people||[]).find(r=>r.q.id==="H2");          // 이번 진단 깊이에서 실제로 물은 응답만(간이로 바꾼 뒤 남은 표준 응답 제외)
+  const legalNote = (RULES.people.bylawEmp.includes(d.emp) && h2 && typeof h2.v==="number" && h2.v<=2)
+    ? `<li><b>H2</b> 직원 수를 상시 ${RULES.people.bylawMin}명 이상 구간으로 골랐습니다. 상시 ${RULES.people.bylawMin}명 이상 사업장은 취업규칙 작성·신고 의무가 있으니(근로기준법 제93조) 현황을 확인하세요.</li>` : "";
   // 조직·인력 심화 진단 안내 — 링크·입력값 전달 없이 문구로만(외부 도구 연결 금지 원칙 유지)
   const pg = sc.gap.people, pCon = (d.concern||[]).includes("org");
-  const hrGuide = (sc.status.people!=="na" && ((pg!=null && pg<0) || pCon)) ? `<div class="hr-guide">
+  const hrGuide = hrDeepNeeded(diag) ? `<div class="hr-guide">
       <b>조직·인력 심화 진단 안내</b>
-      <p>조직·인력 ${sc.areaScore.people==null?"응답 없음":sc.areaScore.people+"점"} · 단계 기대 ${sc.expected.people}점(${gapTxt(pg)})${pCon?" · 가장 큰 고민으로 선택":""}. 이 진단은 조직·인력의 병목 여부만 3문항으로 걸러냅니다. 원인(조직 상태·인사 제도·노무)을 확정하려면 상담 때 <b>HR 심화 진단(약 15~25분)</b>을 요청하세요. 이 화면은 다른 진단으로 연결하거나 입력값을 보내지 않습니다.</p>
+      <p>조직·인력 ${sc.areaScore.people==null?"응답 없음":sc.areaScore.people+"점"} · 단계 기대 ${sc.expected.people}점(${gapTxt(pg)})${pCon?" · 가장 큰 고민으로 선택":""}. 이 진단은 조직·인력의 병목 여부만 ${QUESTIONS.filter(q=>q.area==="people").length}문항으로 걸러냅니다. 원인(조직 상태·인사 제도·노무)을 확정하려면 상담 때 <b>HR 심화 진단(약 ${RULES.people.deepMin})</b>을 요청하세요. 이 화면은 다른 진단으로 연결하거나 입력값을 보내지 않습니다.</p>
     </div>` : "";
   const unkList = AREA_KEYS.flatMap(a=>sc.detail[a].filter(x=>x.v==="u").map(x=>x.q.id)).join(", ");
 
@@ -2979,7 +2987,7 @@ function renderResult(d, isSample, baseline){
         ${bottleneck.length?bottleneck.map((b,i)=>`<li><span class="n">${i+1}</span><div>${esc(AREA[b.a].nm)} <b style="color:var(--bad)">${b.s}점</b> <span style="font-size:11.5px;color:var(--muted)">· 기대 ${b.e}점 (${gapTxt(b.gap)})</span></div></li>`).join(""):`<li><span class="n">✓</span><div>기대수준에 못 미치는 영역이 없습니다.</div></li>`}
         ${sw.nodata.length?`<li><span class="n">?</span><div>응답 없음: ${sw.nodata.map(a=>esc(AREA[a].short)).join("·")} — 현황 확인 필요</div></li>`:""}
       </ol></div>
-      <div class="col priority"><h4><span class="pl"></span>90일 우선과제</h4><ol>
+      <div class="col priority"><h4><span class="pl"></span>${RULES.plan.cycleDays}일 우선과제</h4><ol>
         ${acts.slice(0,5).map((a,i)=>`<li><span class="n">${i+1}</span><div>${esc(a.title)} <span style="font-size:11.5px;color:var(--muted)">· ${tagTxt[a._tag]}</span></div></li>`).join("")}
       </ol></div>
       <div class="col kpi5"><h4><span class="pl"></span>12개월 핵심 KPI</h4><ol>
@@ -3082,8 +3090,8 @@ function renderResult(d, isSample, baseline){
   </div>
 
   <div class="r-sec pbreak">
-    <h3><span class="ix">6</span>90일 실행계획</h3>
-    <p class="sub">우선도 순으로 30·60·90일에 두 과제씩 배치하고, 90일 차에 같은 문항으로 중간 재진단합니다.</p>
+    <h3><span class="ix">6</span>${RULES.plan.cycleDays}일 실행계획</h3>
+    <p class="sub">우선도 순으로 ${planPhaseDays().join("·")}일에 ${RULES.plan.perPhase}개 과제씩 배치하고, ${RULES.plan.cycleDays}일 차에 같은 문항으로 중간 재진단합니다.</p>
     <div class="plan90">${phases}</div>
   </div>
 
@@ -3104,7 +3112,7 @@ function renderResult(d, isSample, baseline){
 
   <div class="r-sec pbreak pb-before">
     <h3><span class="ix">9</span>공공 지원과 함께 쓰기</h3>
-    <p class="sub">이 진단은 공공 무료 진단·지원사업을 대신하지 않습니다. <b>신청 전 준비도 점검</b>과 <b>이후 실행과제</b>로 함께 쓰세요. 지원 여부·요건은 각 기관의 최신 공고를 확인해야 합니다.</p>
+    <p class="sub">이 진단은 공공 진단·지원사업을 대신하지 않습니다. <b>신청 전 준비도 점검</b>과 <b>이후 실행과제</b>로 함께 쓰세요. 지원 여부·요건은 각 기관의 최신 공고를 확인해야 합니다.</p>
     ${pubRows?`<div class="pub"><div class="pub-row pub-h"><div>영역</div><div>공공 창구</div><div>이 진단과 함께 쓰는 법</div></div>${pubRows}</div>`:""}
     ${hrGuide}
   </div>
@@ -3133,7 +3141,7 @@ function renderResult(d, isSample, baseline){
       <div class="cbody">
         <p>이 도구는 공개된 규칙으로만 계산합니다(규칙 기반 진단). 같은 입력에는 항상 같은 결과가 나오며, 입력값은 서버로 전송되지 않습니다.</p>
         <h5>1) 성숙도 점수</h5>
-        ${AREA_KEYS.length}개 영역 × ${QUESTIONS.length/AREA_KEYS.length}문항(간이 진단은 영역별 1문항, 총 ${QUESTIONS.filter(q=>q.core).length}문항)에 대해 행동 기준 4단계로 응답합니다: ${LV_NM.map((n,i)=>`<code>${i} ${n}=${LV_SCORE[i]}</code>`).join(" · ")}. 영역점수 = 응답 문항 평균. <b>'모름'과 미응답은 0점이 아닌 결측</b>으로 계산에서 빼고 신뢰도에 반영하며, '해당 없음'(예: 내수 전용 사업의 수출)은 그 영역을 종합점수에서 제외합니다. <b>매출·인원·업력은 점수에 넣지 않습니다.</b>
+        ${AREA_KEYS.length}개 영역 × ${QUESTIONS.length/AREA_KEYS.length}문항(간이 진단은 영역별 1문항, 총 ${QUESTIONS.filter(q=>q.core).length}문항)에 대해 행동 기준 ${LV_NM.length}단계로 응답합니다: ${LV_NM.map((n,i)=>`<code>${i} ${n}=${LV_SCORE[i]}</code>`).join(" · ")}. 영역점수 = 응답 문항 평균. <b>'모름'과 미응답은 0점이 아닌 결측</b>으로 계산에서 빼고 신뢰도에 반영하며, '해당 없음'(예: 내수 전용 사업의 수출)은 그 영역을 종합점수에서 제외합니다. <b>매출·인원·업력은 점수에 넣지 않습니다.</b>
         <h5>2) 종합점수</h5>
         영역점수 × 업종 가중치(기본 배점 ${AREA_KEYS.map(a=>`${AREA[a].short} ${BASE_W[a]}`).join("·")}에 업종 배수 적용, 합 100 — 현재 ${esc(indNm)}: ${AREA_KEYS.map(a=>`${AREA[a].short} <code>${sc.w[a]}</code>`).join(" · ")})의 가중평균. 점수가 없는 영역은 빼고 가중치를 재정규화합니다.
         <h5>3) 단계 기대수준</h5>
@@ -3174,6 +3182,11 @@ function renderResult(d, isSample, baseline){
   return diag;
 }
 /* 상담 요청 메일 — 회사명은 넣지 않고 진단 요약만 (사용자가 직접 보내기 전까지 아무것도 전송되지 않음) */
+/* HR 심화 진단 안내 조건 — 결과 화면 안내와 상담 메일이 같은 기준을 쓴다 */
+function hrDeepNeeded(diag){
+  const pa = diag.areas.find(a=>a.key==="people"); if(!pa || pa.status==="na") return false;
+  return (pa.gap!=null && pa.gap<0) || (diag.profile.concern||[]).includes("org");
+}
 function mailtoHref(diag){
   const s=diag.score, p=diag.profile;
   const lines=[
@@ -3182,6 +3195,7 @@ function mailtoHref(diag){
     `종합 성숙도: ${s.total==null?"판정 보류":s.total+"점"} (단계 기대 ${s.expected==null?"–":s.expected}점) · 신뢰도 ${s.confidence.label}`,
     `핵심 병목: ${diag.bottlenecks.map(b=>`${b.name} ${b.score}점(기대 ${b.expected})`).join(", ")||"없음"}`,
     `우선과제: ${diag.activities.slice(0,3).map(a=>a.title).join(" / ")}`,
+    ...(hrDeepNeeded(diag) ? [`조직·인력: ${diag.areas.find(a=>a.key==="people").score??"응답 없음"}점(기대 ${diag.areas.find(a=>a.key==="people").expected}) — HR 심화 진단 안내 희망`] : []),
     "", "상담 희망 내용:", ""
   ];
   return "mailto:"+COMPANY.mail+"?subject="+encodeURIComponent("[성장진단] 결과 상담 요청")+"&body="+encodeURIComponent(lines.join("\n"));
@@ -3204,7 +3218,7 @@ const GAN = (function(){
         if(multi){
           let arr=state.data[key];
           if(arr.includes(v)){ arr=arr.filter(x=>x!==v); }
-          else { if(key==="concern" && arr.length>=3){ toast("고민은 최대 3개까지 선택할 수 있어요"); return;} arr=[...arr,v]; }
+          else { if(key==="concern" && arr.length>=RULES.input.maxConcern){ toast(`고민은 최대 ${RULES.input.maxConcern}개까지 선택할 수 있어요`); return;} arr=[...arr,v]; }
           state.data[key]=arr;
           btn.classList.toggle("sel"); btn.setAttribute("aria-pressed", btn.classList.contains("sel"));
         } else {
@@ -3457,7 +3471,7 @@ const GAN = (function(){
   function bindAdd(inputId, btnId, arr, after){
     const inp=document.getElementById(inputId), btn=document.getElementById(btnId);
     if(!inp||!btn||inp._bound) return; inp._bound=true;
-    const add=()=>{ const v=inp.value.trim(); if(!v) return; if(arr.length>=6){ toast("최대 6개까지 추가할 수 있어요"); return; }
+    const add=()=>{ const v=inp.value.trim(); if(!v) return; if(arr.length>=RULES.input.maxCustom){ toast(`최대 ${RULES.input.maxCustom}개까지 추가할 수 있어요`); return; }
       if(!arr.includes(v)) arr.push(v); inp.value=""; after(); save(); };
     btn.addEventListener("click",add);
     inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); add(); } });
@@ -3583,7 +3597,7 @@ const GAN = (function(){
       stage: pickV(OPT.stage, raw.stage||raw.s), ctype: pickV(OPT.ctype, raw.ctype||raw.c),
       industry: pickV(OPT.industry, raw.industry||raw.i), revenue: pickV(OPT.revenue, raw.revenue||raw.r),
       emp: pickV(OPT.emp, raw.emp||raw.e), customer: pickV(OPT.customer, raw.customer||raw.cu),
-      concern: (Array.isArray(raw.concern||raw.co)?(raw.concern||raw.co):[]).filter(v=>OPT.concern.some(o=>o.v===v)).slice(0,3),
+      concern: (Array.isArray(raw.concern||raw.co)?(raw.concern||raw.co):[]).filter(v=>OPT.concern.some(o=>o.v===v)).slice(0,RULES.input.maxConcern),
       prep: (Array.isArray(raw.prep||raw.p)?(raw.prep||raw.p):[]).filter(v=>prepOk.has(v)),
       ans, memo:{overview:"",risk:"",kpiData:[]}
     };
@@ -3624,7 +3638,7 @@ const GAN = (function(){
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
     a.download=`성장진단_${(d.name||"결과").replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,30)}_${new Date().toISOString().slice(0,10)}.json`;
     document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
-    toast("결과 파일을 저장했습니다 · 90일 후 '재진단'에서 불러오세요");
+    toast(`결과 파일을 저장했습니다 · ${RULES.plan.cycleDays}일 후 '재진단'에서 불러오세요`);
   }
   function importFile(file){
     if(!file) return;
@@ -3686,7 +3700,7 @@ const GAN = (function(){
     const d=state.data;
     const indNm=nmOf(OPT.industry,d.industry), stageNm=(STAGE[d.stage]||{}).nm||"-";
     const sc=scoreEngine(d);
-    const toc=["핵심 요약 (Executive Summary)", state.baseline?"재진단 비교":null, `${AREA_KEYS.length}개 영역 진단 결과 (단계 기대수준 비교)`,"영역별 응답 근거와 다음 단계","업종·단계 맞춤 추천활동","우선순위 매트릭스","90일 실행 계획","12개월 성장 로드맵","핵심 지표(KPI) 관리 대시보드","공공 지원과 함께 쓰기","응답 점검 · 리스크 및 유의사항","진단 방법 · 공개 산식 · 근거 출처"].filter(Boolean);
+    const toc=["핵심 요약 (Executive Summary)", state.baseline?"재진단 비교":null, `${AREA_KEYS.length}개 영역 진단 결과 (단계 기대수준 비교)`,"영역별 응답 근거와 다음 단계","업종·단계 맞춤 추천활동","우선순위 매트릭스",`${RULES.plan.cycleDays}일 실행 계획`,"12개월 성장 로드맵","핵심 지표(KPI) 관리 대시보드","공공 지원과 함께 쓰기","응답 점검 · 리스크 및 유의사항","진단 방법 · 공개 산식 · 근거 출처"].filter(Boolean);
     const shell=document.createElement("div");
     shell.id="reportShell"; shell.className="report-shell print-only-block";
     shell.innerHTML=`
@@ -3793,7 +3807,8 @@ const GAN = (function(){
       years:copyYears(), brandLine:`${COMPANY.short.replace("㈜","")} · ${COMPANY.brand}`,
       certShort:`중기부 인증 중소기업상담회사 ${COMPANY.certNo}`, certFull:`${COMPANY.certLabel} ${COMPANY.certNo}`};
     const cnt = {areas:AREA_KEYS.length, q:QUESTIONS.length, qQuick:askedQuestions("quick").length, qPer:QUESTIONS.length/AREA_KEYS.length,
-      lv:LV_NM.length, ind:OPT.industry.length, src:Object.keys(SRC).length, minQuick:RULES.minutes.quick, minStd:RULES.minutes.standard};
+      lv:LV_NM.length, ind:OPT.industry.length, src:Object.keys(SRC).length, minQuick:RULES.minutes.quick, minStd:RULES.minutes.standard,
+      cycle:RULES.plan.cycleDays, maxConcern:RULES.input.maxConcern};
     $$("[data-co]").forEach(el=>{ const v=co[el.dataset.co]; if(v!=null) el.textContent=v; });
     $$("[data-cnt]").forEach(el=>{ const v=cnt[el.dataset.cnt]; if(v!=null) el.textContent=v; });
     $$("a[data-tel]").forEach(a=>{ a.href=telHref(); });
@@ -3840,7 +3855,7 @@ window.GAN = GAN;
 
 /* ===== 메인 성장 시각화 (단계별 우선영역 프로파일) ===== */
 const GVIZ = (function(){
-  const STAGE_NM={pre:"예비창업",y1:"1년 미만",y13:"1~3년",y35:"3~5년",y57:"5~7년",y7:"7년 이상"};
+  const STAGE_NM=Object.fromEntries(OPT.stage.map(o=>[o.v, o.t.replace(/^창업 /,"").replace(/년차$/,"년")]));   // 단계 이름은 OPT.stage 한곳에서
   // 단계별 영역 우선도 = STAGE_RELEVANCE(단계 고유 우선도 신호)를 0~100 정규화
   // BASE_W를 곱하지 않는 이유: 사업모델·고객 base가 높아 단계별 차이가 가려짐. 단계 고유 형태를 그대로 보여줌.
   function profile(st){
