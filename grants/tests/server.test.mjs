@@ -305,6 +305,44 @@ test('K-Startup: page·perPage로 요청(numOfRows만 보내면 10건만 옴)', 
   assert.ok(urls.every((u) => /[?&]perPage=100/.test(u)) && urls.some((u) => /[?&]page=5/.test(u)));
 });
 
+test('K-Startup 2.0: Service02 먼저 호출, 모든 페이지 같은 버전', async () => {
+  const urls = [];
+  globalThis.fetch = async (u) => { urls.push(String(u)); return { ok: true, status: 200, json: async () => ({ data: [] }) }; };
+  const ks = await import('../netlify/lib/kstartup.mjs');
+  await ks.collectKstartup('k', { max: 500 });
+  assert.ok(urls.every((u) => u.includes('kisedKstartupService02/getAnnouncementInformation02')));
+  assert.equal(ks.kstartupApiVersion(), 'v2');
+});
+
+test('K-Startup 2.0 실패(미승인 키 등) → 1.0으로 자동 전환', async () => {
+  const urls = [];
+  globalThis.fetch = async (u) => {
+    u = String(u); urls.push(u);
+    if (u.includes('Service02')) return { ok: true, status: 200, json: async () => ({ OpenAPI_ServiceResponse: { cmmMsgHeader: { errMsg: 'SERVICE_KEY_IS_NOT_REGISTERED_ERROR' } } }) };
+    return { ok: true, status: 200, json: async () => ({ data: u.includes('page=1&') ? [{ pbanc_sn: 9, biz_pbanc_nm: '창업 공고', pbanc_rcpt_end_dt: '20261231' }] : [] }) };
+  };
+  const ks = await import('../netlify/lib/kstartup.mjs');
+  const out = await ks.collectKstartup('k', { max: 200 });
+  assert.equal(ks.kstartupApiVersion(), 'v1');
+  assert.equal(out.length, 1);
+  assert.ok(urls.filter((u) => u.includes('Service02')).length === 1, '2.0 실패 후 나머지 페이지는 1.0만');
+});
+
+test('K-Startup: 둘 다 실패하면 오류(조용히 0건 아님)', async () => {
+  globalThis.fetch = async () => ({ ok: false, status: 503 });
+  const ks = await import('../netlify/lib/kstartup.mjs');
+  await assert.rejects(ks.collectKstartup('k', { max: 100 }), /HTTP 503/);
+});
+
+test('K-Startup 2.0: biz_trgt_age(대상 연령)로 대표자 나이 상한', () => {
+  const p = normalizeKstartup({ pbanc_sn: 1, biz_pbanc_nm: '청년창업', biz_trgt_age: '만 20세 이상 ~ 만 39세 이하' });
+  assert.equal(p.representativeAgeMax, 39);
+  // 목록형: 가장 큰 상한, 상한 없는 구간이 있으면 제한 없음
+  assert.equal(normalizeKstartup({ pbanc_sn: 2, biz_pbanc_nm: 'a', biz_trgt_age: '만 20세 미만,만 20세 이상 ~ 만 39세 이하' }).representativeAgeMax, 39);
+  assert.equal(normalizeKstartup({ pbanc_sn: 3, biz_pbanc_nm: 'a', biz_trgt_age: '만 20세 미만,만 20세 이상 ~ 만 39세 이하,만 40세 이상' }).representativeAgeMax, null);
+  assert.equal(normalizeKstartup({ pbanc_sn: 4, biz_pbanc_nm: 'a', biz_trgt_age: '전체' }).representativeAgeMax, null);
+});
+
 test('programs: 스냅샷 없으면 직접 수집·저장, 마감 제외·본문 원문 없음, 이후 외부 API 재호출 없음', async () => {
   _resetCache(); const st = memStore(); _setStore(st);
   const calls = stubFetch({ bizinfo: BIZ, kstartup: KS });

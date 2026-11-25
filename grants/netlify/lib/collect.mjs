@@ -5,7 +5,7 @@
 // programs는 저장된 스냅샷을 읽어 바로 응답한다.
 // ============================================================================
 import { collectBizinfo } from './bizinfo.mjs';
-import { collectKstartup } from './kstartup.mjs';
+import { collectKstartup, kstartupApiVersion } from './kstartup.mjs';
 import { extractEligibility, mergeEligibility } from './eligibility-ai.mjs';
 import { dedupe, isPastKst, detectCities, detectGus } from './normalize.mjs';
 import { applyRules } from './rule-extract.mjs';
@@ -120,6 +120,7 @@ export async function build(env, { now = Date.now(), sourceTimeoutMs = 7000, aiT
     fetchedAt: new Date(now).toISOString(),
     sourceCounts,
     errors,
+    apiVersions: { kstartup: ksKey ? kstartupApiVersion() : null },
     totalCollected,
     dedupeRemoved: totalCollected - deduped.length,
     aliveCount: alive.length,

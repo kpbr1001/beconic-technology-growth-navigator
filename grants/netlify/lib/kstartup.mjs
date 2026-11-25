@@ -1,8 +1,9 @@
 // ============================================================================
 // K-Startup 어댑터 — 창업진흥원 지원사업 공고 API
-// 공공데이터포털 dataset 15125364, operation: getAnnouncementInformation01
-// 공식: https://apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01
-//        ?serviceKey=...&returnType=json&numOfRows=...&pageNo=...
+// 공공데이터포털 dataset 15125364
+// 2026-11 기준 포털 안내 주소는 2.0: https://apis.data.go.kr/B552735/kisedKstartupService02/getAnnouncementInformation02
+//   (?serviceKey=...&returnType=json&page=...&perPage=...). 1.0(Service01/…01)은 아직 응답하지만 종료 대비로
+//   2.0을 먼저 부르고, 2.0이 실패(키 미승인·HTTP 오류·오류 응답)하면 1.0으로 자동 전환한다.
 // 실제 응답 필드(확인): biz_pbanc_nm(공고명) pbanc_sn(공고ID) pbanc_ctnt(내용)
 //   pbanc_rcpt_bgng_dt/pbanc_rcpt_end_dt(접수 시작/종료 YYYYMMDD) supt_regin(지역)
 //   aply_trgt(대상) aply_trgt_ctnt(신청대상 상세) biz_enyy(대상 업력) supt_biz_clsfc(분야)
@@ -12,7 +13,13 @@
 // ============================================================================
 import { regionsFromText, stripTags, parseYmd } from './normalize.mjs';
 
-const KSTARTUP_URL = 'https://apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01';
+export const KSTARTUP_ENDPOINTS = [
+  { v: 'v2', url: 'https://apis.data.go.kr/B552735/kisedKstartupService02/getAnnouncementInformation02' },
+  { v: 'v1', url: 'https://apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01' },
+];
+let lastVersion = null;
+/** 마지막 수집에 쓰인 API 버전('v2'|'v1'|null) — 응답 메타로 노출해 운영에서 확인 */
+export const kstartupApiVersion = () => lastVersion;
 
 const FIELD_MAP = {
   '사업화':'사업화','정책자금':'정책자금/금융','R&D':'R&D/기술','기술개발':'R&D/기술',
@@ -60,6 +67,24 @@ export function mapAge(ageStr) {
   return m[2] === '미만' ? +m[1] - 1 : +m[1];
 }
 
+/**
+ * biz_trgt_age(대상 연령, 2.0 필터 항목) 해석. 업력처럼 목록('만 20세 미만,만 20세 이상 ~ 만 39세 이하,만 40세 이상')일 수 있어
+ * 가장 큰 상한을 쓰고, 상한 없는 'N세 이상' 구간이 있으면 제한 없음(null). 형식을 모르면 null(기존 본문 해석으로).
+ */
+export function mapTargetAge(v) {
+  const s = String(v || '').trim();
+  if (!s || /전체|제한\s*없|무관/.test(s)) return null;
+  const parts = s.split(/[,/|]/).map((x) => x.trim()).filter(Boolean);
+  let max = null;
+  for (const part of parts) {
+    const up = part.match(/(\d+)\s*세\s*(이하|미만)/);
+    if (!up) { if (/\d+\s*세\s*이상/.test(part)) return null; continue; }
+    const n = up[2] === '미만' ? +up[1] - 1 : +up[1];
+    max = max == null ? n : Math.max(max, n);
+  }
+  return max;
+}
+
 function mapPurposes(clsfc) {
   const out = new Set();
   const s = String(clsfc || '');
@@ -95,7 +120,7 @@ export function normalizeKstartup(item) {
     businessAgeMin: age.min,
     preStartupAllowed: age.preStartupAllowed,
     preStartupOnly: age.preStartupOnly,
-    representativeAgeMax: mapAge(item.aply_trgt_ctnt),
+    representativeAgeMax: mapTargetAge(item.biz_trgt_age) ?? mapAge(item.aply_trgt_ctnt),
     recruitInProgress: item.rcrt_prgs_yn === 'Y' ? true : item.rcrt_prgs_yn === 'N' ? false : null,
     supportAmountMax: null,
     supportAmountText: null,
@@ -108,31 +133,47 @@ export function normalizeKstartup(item) {
   };
 }
 
-export async function callKstartup(key, { count = 100, page = 1, signal } = {}) {
-  // 모집 진행 중 공고만 요청(cond 필터). 지원하지 않는 환경이면 무시되고, isAlive가 한 번 더 거른다.
+async function fetchPage(url, key, { count, page, signal }) {
   // 이 API는 page·perPage를 쓴다(numOfRows·pageNo는 무시돼 기본 10건만 옴 — 운영에서 확인). 두 이름을 함께 보낸다.
-  const url = `${KSTARTUP_URL}?serviceKey=${encodeURIComponent(key)}&returnType=json&page=${page}&perPage=${count}&pageNo=${page}&numOfRows=${count}&${encodeURIComponent('cond[rcrt_prgs_yn::EQ]')}=Y`;
-  const res = await fetch(url, { headers: { accept: 'application/json' }, signal });
+  // 모집 진행 중 공고만 요청(cond 필터). 무시돼도 isAlive가 한 번 더 거른다.
+  const q = `${url}?serviceKey=${encodeURIComponent(key)}&returnType=json&page=${page}&perPage=${count}&pageNo=${page}&numOfRows=${count}&${encodeURIComponent('cond[rcrt_prgs_yn::EQ]')}=Y`;
+  const res = await fetch(q, { headers: { accept: 'application/json' }, signal });
   if (!res.ok) throw new Error(`kstartup HTTP ${res.status}`);
   const data = await res.json();
-  let arr = [];
-  if (Array.isArray(data.data)) arr = data.data;
-  else if (data.response?.body?.items) arr = [].concat(data.response.body.items.item || data.response.body.items);
-  else if (Array.isArray(data.items)) arr = data.items;
-  return arr.map(normalizeKstartup).filter((p) => p.programName && p.sourceProgramId);
+  const head = data.OpenAPI_ServiceResponse?.cmmMsgHeader;
+  if (head) throw new Error(`kstartup ${head.errMsg || head.returnAuthMsg || 'error'}`);
+  if (Array.isArray(data.data)) return data.data;
+  if (data.response?.body?.items) return [].concat(data.response.body.items.item || data.response.body.items);
+  if (Array.isArray(data.items)) return data.items;
+  throw new Error('kstartup 응답 형식 불일치');
+}
+
+/** 한 페이지 수집. version을 주면 그 버전만, 없으면 2.0 → 1.0 순서로 시도 */
+export async function callKstartup(key, { count = 100, page = 1, signal, version } = {}) {
+  const eps = version ? KSTARTUP_ENDPOINTS.filter((e) => e.v === version) : KSTARTUP_ENDPOINTS;
+  let lastErr;
+  for (const ep of eps) {
+    try {
+      const arr = await fetchPage(ep.url, key, { count, page, signal });
+      return { v: ep.v, list: arr.map(normalizeKstartup).filter((p) => p.programName && p.sourceProgramId) };
+    } catch (e) { lastErr = e; if (signal?.aborted) break; }
+  }
+  throw lastErr;
 }
 
 export async function collectKstartup(key, { max = 500, perPage = 100, signal } = {}) {
   const pages = Math.min(Math.ceil(max / perPage), 5);
+  // 1페이지로 쓸 버전을 정하고(2.0 우선), 나머지 페이지는 같은 버전으로 받는다(버전이 섞이면 중복·누락 위험)
+  const first = await callKstartup(key, { count: perPage, page: 1, signal });
+  lastVersion = first.v;
   const tasks = [];
-  for (let i = 1; i <= pages; i++) tasks.push(callKstartup(key, { count: perPage, page: i, signal }));
-  const settled = await Promise.allSettled(tasks);
-  if (settled.every((s) => s.status === 'rejected')) throw settled[0].reason;
+  for (let i = 2; i <= pages; i++) tasks.push(callKstartup(key, { count: perPage, page: i, signal, version: first.v }));
+  const settled = [{ status: 'fulfilled', value: first }, ...(await Promise.allSettled(tasks))];
   const seen = new Set();
   const out = [];
   for (const s of settled) {
     if (s.status !== 'fulfilled') continue;
-    for (const p of s.value) if (!seen.has(p.sourceProgramId)) { seen.add(p.sourceProgramId); out.push(p); }
+    for (const p of s.value.list) if (!seen.has(p.sourceProgramId)) { seen.add(p.sourceProgramId); out.push(p); }
   }
   return out;
 }
