@@ -213,7 +213,7 @@ console.log("5. 모델 실측 모드 · 사용량 기록 · 하루 한도");
   let refused = null; try { await realCall.call(providers.claude, { system: "s", user: "u", maxTokens: 100, model: "claude-sonnet-5-5" }); } catch (e) { refused = e.message; }
   ok(refused === "LLM_REFUSAL", "안전 거절은 오류로 올려 폴백 모델로 재시도되게");
   globalThis.fetch = orig;
-  ok(JSON.stringify(API_CONFIG.modelAExperiment) === JSON.stringify(["claude-sonnet-5-5", "claude-haiku-5-5"]), "실측 후보: Sonnet 5.5 ↔ Haiku 5.5");
+  ok(API_CONFIG.modelAExperiment.length === 0 && API_CONFIG.modelA === "claude-sonnet-5-5" && API_CONFIG.modelAFallback.startsWith("claude-haiku-4-5"), "실측 종료: CALL A = Sonnet 5.5 고정, 폴백 Haiku 4.5");
   // orchestrate 결과에 사용량 기록
   calls = [];
   const R7 = await orchestrate(INPUT);

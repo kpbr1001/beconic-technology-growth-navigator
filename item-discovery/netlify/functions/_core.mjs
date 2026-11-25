@@ -25,8 +25,8 @@ import { fetchSearchSignals, fetchShopping, meaningfulTypes, SHOP_CATS } from ".
 // ------------------------------------------------------------
 const APP_META = {
   productName: "K-ITEM FINDER",
-  appVersion: "v0.9.6",
-  promptVersion: "v1.9.2",
+  appVersion: "v0.9.7",
+  promptVersion: "v1.9.3",
   updatedAt: "2026.11.24",
   schemaVersion: "kif-opportunity-dna/v1",
 };
@@ -52,11 +52,13 @@ const FILTER_CONFIG = {
 
 const API_CONFIG = {
   model: "claude-sonnet-4-6",
-  modelA: "claude-haiku-4-5-20251001",  // 구조화=빠른 Haiku (속도 개선)
+  // 실측(2026-11-25, 각 3회)으로 확정: Sonnet 5.5(effort low) — 문제 문장·검색어 품질↑, 네이버 추이 연결 8/15(Haiku 5.5 3/15)
+  modelA: "claude-sonnet-5-5",
+  modelAFallback: "claude-haiku-4-5-20251001",
   modelB: "claude-opus-4-8",             // 서술=Opus 4.8 (고차원 인사이트·해석 품질). 입력$5/출력$25, 느리지만 서술 우수
   maxTokensA: 9000,          // 생각(thinking) 토큰 포함 여유
   // CALL A 모델 실측(대표 결정 2026-11-25): 요청마다 번갈아 사용 → 측정 후 하나로 고정
-  modelAExperiment: ["claude-sonnet-5-5", "claude-haiku-5-5"],
+  modelAExperiment: [],   // 실측 종료(빈 배열 = modelA 고정). 다시 비교할 때만 후보를 넣는다
   // 생각 기능이 기본으로 켜지는 모델은 effort low 로 고정(구조화 작업 — 속도·비용 우선)
   lowEffortModels: ["claude-sonnet-5-5", "claude-haiku-5-5"],
   maxTokensB: 7000,
@@ -1151,8 +1153,8 @@ async function orchestrate(input) {
   } catch (e) {
     console.warn("[CALL A] modelA failed, fallback:", modelA, String(e.message||e).slice(0,80));
     try {
-      const r = unwrap(await providers.claude.call({ system: SYSTEM_A, user: buildUserA(input), maxTokens: API_CONFIG.maxTokensA, model: API_CONFIG.modelA, withMeta: true }));
-      rawA = r.text; usage.A = { ...(r.usage || { model: API_CONFIG.modelA }), fallbackFrom: modelA };
+      const r = unwrap(await providers.claude.call({ system: SYSTEM_A, user: buildUserA(input), maxTokens: API_CONFIG.maxTokensA, model: API_CONFIG.modelAFallback, withMeta: true }));
+      rawA = r.text; usage.A = { ...(r.usage || { model: API_CONFIG.modelAFallback }), fallbackFrom: modelA };
     } catch (e2) {
       const r = unwrap(await providers.claude.call({ system: SYSTEM_A, user: buildUserA(input), maxTokens: API_CONFIG.maxTokensA, model: API_CONFIG.model, withMeta: true }));
       rawA = r.text; usage.A = { ...(r.usage || { model: API_CONFIG.model }), fallbackFrom: modelA };
