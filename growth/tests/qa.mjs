@@ -1,4 +1,4 @@
-/* global kpiBoard, COMPANY, RULES, OPT, renderResult, scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB, buildDiagnosisData, buildDiagnosisNarrative, buildCTA, Q_BY_ID, ACT_METRIC -- page.evaluate 안에서 앱 전역을 호출 */
+/* global kpiBoard, hrDeepNeeded, mailtoHref, planPhaseDays, COMPANY, RULES, OPT, renderResult, scoreEngine, pickActivities, strengthsWeak, consistencyFlags, QUESTIONS, CONCERN_AREA, GAN, SRC, LIB, KPI_LIB, buildDiagnosisData, buildDiagnosisNarrative, buildCTA, Q_BY_ID, ACT_METRIC -- page.evaluate 안에서 앱 전역을 호출 */
 // BECONIC 성장진단(12번) QA — 실제 Chromium으로 규칙 엔진 원칙·사용자 플로우·모바일·재진단·A4 PDF를 확인한다.
 // 실행: (growth 폴더를 정적 서버로 띄운 뒤) node growth/tests/qa.mjs [baseUrl]
 import { chromium } from 'playwright';
@@ -371,6 +371,32 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   check('조직·인력 기대 미달 → HR 심화 진단 문구 안내(링크 없음), 충분하면 미표시', h.guide && h.noGuide);
   check('구버전(27문항) 결과 파일 기준 재진단 비교 정상', h.oldOk);
   check('레이더 10축 라벨 렌더', h.radar >= 10, String(h.radar));
+}
+
+// 11. v6.4.1 고객여정·레드팀 회귀
+{
+  const html = readFileSync(path.join(here, '..', 'index.html'), 'utf8');
+  check("'무료' 표기 없음(화면·보고서·소스 전체)", !html.includes('무료'));
+  const r = await page.evaluate((b) => {
+    const A = (v) => Object.fromEntries(QUESTIONS.map((q) => [q.id, v]));
+    // 표준에서 H2·H3 '해당 없음'으로 답한 뒤 간이로 바꿔도, 묻지 않은 문항 때문에 과제가 빠지거나 법정 알림이 뜨지 않음
+    const stale = { ...b, depth: 'quick', stage: 'y35', emp: 'e1029', concern: ['org'], ans: { ...A(1), H2: 'na', H3: 'na' } };
+    const staleActs = pickActivities(stale, scoreEngine(stale)).filter((a) => a.needsStaff).length;
+    const stale2 = { ...b, depth: 'quick', emp: 'e1029', ans: { ...A(1), H2: 0 } };
+    renderResult(stale2, false); const legalQuick = document.getElementById('resultRoot').innerText.includes('취업규칙 작성·신고 의무');
+    // 상담 메일과 화면 안내가 같은 조건
+    const low = { ...b, concern: ['org'], ans: { ...A(2), H1: 0, H2: 1, H3: 0 } };
+    const diag = buildDiagnosisData(low, false); renderResult(low, false);
+    const same = hrDeepNeeded(diag) === !!document.querySelector('.hr-guide') && decodeURIComponent(mailtoHref(diag)).includes('HR 심화');
+    const txt = document.getElementById('resultRoot').innerText;
+    const [d1, d2, d3] = planPhaseDays();
+    return { staleActs, legalQuick, same, plan: txt.includes(`${d1}·${d2}·${d3}일에 ${RULES.plan.perPhase}개 과제씩`) && txt.includes(`0~${d1}일`),
+      concernLbl: document.querySelector('[data-cnt="maxConcern"]')?.textContent === String(RULES.input.maxConcern) };
+  }, base);
+  check('간이로 바꾼 뒤 남은 표준 응답(H2·H3 해당 없음)으로 직원 과제가 빠지지 않음', r.staleActs > 0, String(r.staleActs));
+  check('간이 진단에서는 묻지 않은 H2로 취업규칙 알림을 띄우지 않음', !r.legalQuick);
+  check('HR 심화 진단: 화면 안내 = 상담 메일 문구(같은 조건)', r.same);
+  check('실행계획 구간·과제 수 = RULES.plan, 고민 최대 수 = RULES.input', r.plan && r.concernLbl);
 }
 
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));
