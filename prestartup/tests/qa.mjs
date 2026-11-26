@@ -80,7 +80,7 @@ await page.goto(BASE);
 {
   await page.goto(BASE + '#/guide/cafe'); await page.evaluate(() => localStorage.clear()); await page.reload();
   check('기본 = 읽기 모드(체크박스·진행률 없음, 순서·서류 목록 표시)', (await page.locator('.chk').count()) === 0 && (await page.locator('.prog').count()) === 0 && (await page.locator('#sec-steps .rrow').count()) === 4 && (await page.locator('#sec-docs .dgrp').count()) >= 2);
-  check('결과 요약: 업종코드·인허가·서류·세금·PDF 받기', await page.isVisible('.rsum') && (await page.locator('.rsum').innerText()).includes('552303') && (await page.locator('.rsum [data-act="print"]').count()) === 1);
+  check('결과 요약: 업종코드·인허가·서류·세금 — 중간의 PDF 받기·지원사업 찾기 버튼 없음(하단 바·저장·상담 탭에서 제공)', await page.isVisible('.rsum') && (await page.locator('.rsum').innerText()).includes('552303') && (await page.locator('.rsum [data-act="print"], .rsum a[href*="grant-matching"]').count()) === 0 && (await page.locator('.stepnav [data-act="print"]').count()) === 1);
   await page.click('[data-track]');
   check('체크하며 관리 켜기 → 체크박스·진행률·지금 할 일', (await page.locator('.chk').count()) > 5 && (await page.locator('.prog').count()) === 1);
   const first = await page.locator('.next .nt').innerText();

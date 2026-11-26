@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.6.4';
+const VERSION = '1.6.5';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -626,7 +626,6 @@ function resultSummary(it, notes){
       <div><span>내 상황 · 맞춤 안내</span><b>${hasMe()?`${chips.slice(0,3).map(esc).join(' · ')}${chips.length>3?' 외':''}<br>안내 ${notes.length}개 <button type="button" class="link-btn" data-go="sec-me">보기</button> · <a class="link-btn" href="#/me?next=${it.id}">수정</a>`:`<a class="link-btn" href="#/me?next=${it.id}">내 상황 넣기</a>`}</b></div>
     </div>
     <p class="rs-m">📅 자료 기준일 <b>${BASE}</b> · 세제 ${TAX_BASE} 법령 · 업종코드 ${CODE_Y}년 귀속 연계표 · <span title="BECONIC 내부 정리 자료">${reviewed?'✓ 전문가 검수':'내부 정리·검수 전'}</span></p>
-    <div class="rs-a"><button class="btn btn-primary" type="button" data-act="print">${IN_APP?'체크리스트 복사':'PDF 받기'}</button><a class="btn btn-gray" href="${esc(matchUrl(it))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a></div>
   </section>`;
 }
 function stepNav(G, id){
