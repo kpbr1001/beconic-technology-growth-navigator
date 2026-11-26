@@ -578,9 +578,9 @@ function renderGuide(id, step){
         <p><b>개인정보</b> 입력한 상황·체크·메모는 이 기기 브라우저에만 저장되고 서버로 보내지 않아요. '내 준비함'에서 언제든 지울 수 있어요.</p>
       </section>
 
+      ${stepNav(G, id)}
     </div>
   </div>
-  ${stepNav(G, id)}
   `, 'home', `${it.name} · ${G.l}`);
   document.body.classList.add('has-cta','wizard');
   document.querySelectorAll('.gbody .sec').forEach(el=>{ if(!G.secs.includes(el.id.replace('sec-',''))) el.classList.add('stepoff'); });
@@ -631,7 +631,7 @@ function resultSummary(it, notes){
 function stepNav(G, id){
   const i=GSTEPS.indexOf(G), prev=GSTEPS[i-1], next=GSTEPS[i+1];
   return `<nav class="stepnav no-print" aria-label="결과 이동">
-    <button class="btn btn-gray" type="button" data-act="print">${IN_APP?'요약 복사':'PDF 받기'}</button>
+    <button class="btn btn-line" type="button" data-act="print"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IN_APP?'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>':'<path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/>'}</svg>${IN_APP?'요약 복사':'PDF 받기'}</button>
     ${next?`<a class="btn btn-primary" href="#/guide/${id}/${next.k}">다음 탭: ${next.l} ›</a>`:`<a class="btn btn-primary" href="${esc(matchUrl(BY_ID[id]))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a>`}
   </nav>${prev?'':''}`;
 }
