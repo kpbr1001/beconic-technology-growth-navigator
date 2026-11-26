@@ -215,6 +215,7 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   await page.evaluate(() => GAN.loadSample());
   await page.evaluate(() => { document.getElementById('rep-client').value = '그로스샘플 제조'; });
   await page.evaluate(() => { window.print = () => {}; GAN.openReportDialog(); document.getElementById('repGenerate').click(); document.querySelectorAll('#v-result details').forEach((x) => (x.open = true)); });
+  const ttlAtPrint = await page.title();   // 인쇄(저장) 창이 열리는 시점의 제목 = 저장 파일 이름
   await page.waitForTimeout(100);
   await page.emulateMedia({ media: 'print' });
   await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(300);
@@ -228,6 +229,11 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   const pdfTxt = py.status === 0 ? py.stdout : await page.evaluate(() => document.getElementById('resultRoot').textContent);
   check('PDF: 표지·응답 근거·공개 산식·근거 출처 포함', ['기업 성장활동 진단 보고서', '영역별 응답 근거와 다음 단계', '영역 우선도 = max(0', '근거·출처', 'Churchill'].every((s) => pdfTxt.includes(s)), py.status === 0 ? 'PDF 텍스트 검사' : 'DOM 대체 검사');
   check('PDF: AI 표기 없음', !/AI 사전 분석|AI 요약|AI 기반/.test(pdfTxt));
+  const today = await page.evaluate(() => { const d = new Date(); return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`; });
+  const ttl = ttlAtPrint;
+  check('PDF 저장 파일 이름 = 상담기업_기업성장진단_저장일자', ttl === `그로스샘플 제조_기업성장진단_${today}`, ttl);
+  const nCo = (pdfTxt.match(/기업 성장활동 진단 보고서 · 그로스샘플 제조/g) || []).length, nDate = (pdfTxt.match(/저장일 \d{4}\.\d{2}\.\d{2}/g) || []).length;
+  check('PDF 본문 각 쪽 머리글·바닥글에 상담기업·저장일자(표지 제외)', py.status !== 0 || (nCo >= pages - 2 && nDate >= pages - 2), `기업 ${nCo} · 날짜 ${nDate} / ${pages}쪽`);
   await page.emulateMedia({ media: 'screen' });
 }
 
@@ -532,6 +538,25 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   check('해석 상담 끄면(RULES.consult.enabled=false) 기존 안내로 대체', r.off);
   const home = await page.evaluate(() => { const el = document.querySelector('.with-pub'); return el ? el.innerText : ''; });
   check("홈 '공공 진단과 함께 쓰는 법': 기관명·'무료' 없음", home.includes('공공 진단과 함께 쓰는 법') && !/무료|중진공|신보|기보|소상공인시장진흥공단/.test(home));
+}
+
+// 15. v6.8.0 문항 진행 — 남은 문항 버튼·영역 바로가기·다 풀면 다음 단계
+{
+  await page.emulateMedia({ media: 'screen' });
+  await page.evaluate(() => localStorage.clear()); await page.goto(BASE);
+  await page.click('.hero-cta .btn-amber'); await page.fill('#f-name', '진행');
+  await page.click('#c-depth .chip-btn[data-v="standard"]'); await page.click('#c-stage .chip-btn[data-v="y13"]');
+  await page.click('#c-ctype .chip-btn[data-v="small"]'); await page.click('#c-industry .chip-btn[data-v="svc"]'); await page.click('#btnNext');
+  await page.click('#c-revenue .chip-btn[data-v="r15"]'); await page.click('#c-emp .chip-btn[data-v="e59"]'); await page.click('#c-customer .chip-btn[data-v="b2b"]');
+  await page.click('#c-concern .chip-btn[data-v="revenue"]'); await page.click('#btnNext');
+  const g0 = await page.locator('#q-go').innerText(); const nArea = await page.locator('#q-areas button').count();
+  check('문항 진행 버튼: 남은 문항 수 표시, 영역 바로가기 10개', /남은 30문항/.test(g0) && nArea === 10, `${g0} · ${nArea}`);
+  const cards = page.locator('.qa-card'); const n = await cards.count();
+  for (let i = 0; i < n; i++) await cards.nth(i).locator('.qa-opt').nth(1).click();
+  const g1 = await page.locator('#q-go').innerText(); const doneAreas = await page.locator('#q-areas button.done').count();
+  check('다 풀면 진행 버튼 = 다음 단계, 영역 바로가기 모두 완료 표시', /다음 단계/.test(g1) && doneAreas === 10, `${g1} · ${doneAreas}`);
+  await page.click('#q-go');
+  check('진행 버튼으로 맨 아래까지 내려가지 않고 다음 단계(보유 현황)로 이동', await page.locator('#fstep-4').isVisible());
 }
 
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));
