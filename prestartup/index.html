@@ -316,8 +316,13 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
 .step-h span{font-size:12.5px;font-weight:800;color:var(--primary-strong);letter-spacing:.04em}
 .step-h h2{font-size:24px;font-weight:800;margin:2px 0 2px}
 .step-h p{font-size:14.5px;color:var(--sub)}
-.stepnav{display:flex;gap:8px;margin:16px 0 4px}
-.stepnav .btn:last-child{flex:1}
+.stepnav{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:10px;margin:18px 0 4px}   /* 보조(PDF) 1 : 주(다음 탭·지원사업) 2 */
+.stepnav .btn{width:100%;min-height:52px;padding:0 14px;white-space:nowrap}
+.btn-line{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn-line:hover{border-color:var(--primary-vivid);color:var(--primary-strong)}
+.btn-line .ic{width:18px;height:18px}
+@media(max-width:767px){.stepnav{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}.stepnav .btn{padding:0 10px;font-size:15px}}
+@media(max-width:420px){.stepnav .btn-line .ic{display:none}}
 @media(max-width:767px){
   body.wizard .tabbar{display:none}
   body.wizard{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
@@ -371,9 +376,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
 .rs-g span{display:block;font-size:12.5px;color:var(--muted);font-weight:700}
 .rs-g b{display:block;font-size:14.5px;line-height:1.45;margin-top:2px}
 .rs-g .mono{font-size:18px;color:var(--primary-strong)}
-.rs-a{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.rs-a .btn{flex:1;min-width:120px}
-@media(max-width:767px){.rs-g{grid-template-columns:1fr 1fr}.rs-a .btn-primary{flex-basis:100%}}
+@media(max-width:767px){.rs-g{grid-template-columns:1fr 1fr}}
 @media(max-width:340px){.rs-g{grid-template-columns:1fr}}
 .rtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#fff;border-radius:16px;padding:6px;margin:4px 0 12px;position:sticky;top:calc(var(--hdr) + 8px);z-index:40;box-shadow:0 2px 10px rgba(0,27,55,.06)}
 .rtabs a{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:12px;padding:10px 6px;text-decoration:none;color:var(--sub);min-height:48px}

@@ -1,6 +1,6 @@
 {
   "name": "beconic-pre-startup-guide",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "private": true,
   "type": "module",
   "description": "BECONIC 창업 준비 가이드 — 업종별 서류·인허가 순서·업종코드·세금 혜택(정적 웹앱, 입력값 서버 전송 없음)",

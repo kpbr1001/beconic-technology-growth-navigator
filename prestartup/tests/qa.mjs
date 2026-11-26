@@ -80,7 +80,7 @@ await page.goto(BASE);
 {
   await page.goto(BASE + '#/guide/cafe'); await page.evaluate(() => localStorage.clear()); await page.reload();
   check('기본 = 읽기 모드(체크박스·진행률 없음, 순서·서류 목록 표시)', (await page.locator('.chk').count()) === 0 && (await page.locator('.prog').count()) === 0 && (await page.locator('#sec-steps .rrow').count()) === 4 && (await page.locator('#sec-docs .dgrp').count()) >= 2);
-  check('결과 요약: 업종코드·인허가·서류·세금·PDF 받기', await page.isVisible('.rsum') && (await page.locator('.rsum').innerText()).includes('552303') && (await page.locator('.rsum [data-act="print"]').count()) === 1);
+  check('결과 요약: 업종코드·인허가·서류·세금 — 중간의 PDF 받기·지원사업 찾기 버튼 없음(하단 바·저장·상담 탭에서 제공)', await page.isVisible('.rsum') && (await page.locator('.rsum').innerText()).includes('552303') && (await page.locator('.rsum [data-act="print"], .rsum a[href*="grant-matching"]').count()) === 0 && (await page.locator('.stepnav [data-act="print"]').count()) === 1);
   await page.click('[data-track]');
   check('체크하며 관리 켜기 → 체크박스·진행률·지금 할 일', (await page.locator('.chk').count()) > 5 && (await page.locator('.prog').count()) === 1);
   const first = await page.locator('.next .nt').innerText();
@@ -438,6 +438,23 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   await page.goto(BASE + '#/guide/cafe/prepare'); await page.waitForTimeout(100);
   const t = await page.locator('#sec-license').innerText();
   check('인허가 화면: "근거 법령" 표기 · 세부 조문은 관할 기관 확인 안내', t.includes('근거 법령') && t.includes('식품위생법') && t.includes('관할 기관 확인'));
+}
+
+// 11-13. 하단 버튼 바 — 체크리스트 PDF(박스) : 주 버튼, 마지막 탭 주 버튼은 예비/기창업에 따라
+{
+  await page.goto(BASE); await page.evaluate(() => localStorage.removeItem('beconic_prestartup_v1'));
+  await page.goto(BASE + '#/guide/cafe/finish'); await page.waitForTimeout(120);
+  const a = await page.evaluate(() => { const b = [...document.querySelectorAll('.stepnav .btn')]; return { t: b.map((x) => x.innerText.trim()), href: b[1].getAttribute('href'), w: b.map((x) => Math.round(x.getBoundingClientRect().width)), clip: b.some((x) => x.scrollWidth > x.clientWidth + 1) }; });
+  check('하단 바: "체크리스트 PDF" 박스 버튼 + 예비창업자 마지막 탭은 지원사업 찾기(1:2)', a.t[0] === '체크리스트 PDF' && a.t[1].startsWith('지원사업 찾기') && a.href.includes('grant-matching') && a.w[1] > a.w[0] * 1.8 && !a.clip, JSON.stringify(a));
+  await page.click('[data-biz="own"]'); await page.waitForTimeout(80);
+  const o = await page.evaluate(() => { const b = document.querySelector('#finalCta'); return { t: b.innerText.trim(), href: b.getAttribute('href') }; });
+  check('기창업자로 바꾸면 마지막 탭 주 버튼 = 기업성장 종합진단', o.t.startsWith('기업성장 종합진단') && o.href.includes('business-growth'), JSON.stringify(o));
+  const m = await newPage({ viewport: { width: 360, height: 740 } });
+  for (const biz of ['pre', 'own']) { await m.goto(BASE); await m.evaluate((b) => localStorage.setItem('beconic_prestartup_v1', JSON.stringify({ me: { biz: b } })), biz); await m.goto('about:blank'); await m.goto(BASE + '#/guide/cafe/finish'); await m.waitForTimeout(150);
+    const r = await m.evaluate(() => [...document.querySelectorAll('.stepnav .btn')].map((x) => [x.innerText.trim(), x.scrollWidth <= x.clientWidth + 1]));
+    check(`360px 하단 바 글자 잘림 없음(${biz})`, r.length === 2 && r.every((x) => x[1]) && r[1][0].startsWith(biz === 'own' ? '기업성장' : '지원사업'), JSON.stringify(r)); }
+  await m.context().close();
+  await page.evaluate(() => localStorage.removeItem('beconic_prestartup_v1'));
 }
 
 // 12. 앱(PWA) 구성
