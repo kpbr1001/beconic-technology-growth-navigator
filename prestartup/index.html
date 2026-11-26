@@ -321,6 +321,8 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 40px}
 .btn-line{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
 .btn-line:hover{border-color:var(--primary-vivid);color:var(--primary-strong)}
 .btn-line .ic{width:18px;height:18px}
+@media(max-width:767px){.stepnav{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}.stepnav .btn{padding:0 10px;font-size:15px}}
+@media(max-width:420px){.stepnav .btn-line .ic{display:none}}
 @media(max-width:767px){
   body.wizard .tabbar{display:none}
   body.wizard{padding-bottom:calc(84px + env(safe-area-inset-bottom))}

@@ -590,6 +590,7 @@ function renderGuide(id, step){
     S.me.biz=b.dataset.biz; save();   // 내 상황에도 저장 — 지원사업 유형·맞춤 안내가 함께 바뀜
     document.querySelectorAll('[data-biz]').forEach(x=>x.setAttribute('aria-pressed', x===b?'true':'false'));
     $('#nxl').innerHTML=nextHTML(it, bizOf()); const w=document.querySelector('.nx-who'); if(w) w.textContent=`${B31.paths[bizOf()].l} · ${B31.paths[bizOf()].s}`;
+    const fc=$('#finalCta'); if(fc) fc.outerHTML=finalCta(it);
     const mc=document.querySelector('#sec-finish a.fcard[href^="'+MATCH_URL+'"]'); if(mc){ mc.href=matchUrl(it); mc.querySelector('span').textContent=`${PERSONA_L[matchPersona(it)]}·이 업종${S.me.region?'·'+S.me.region:''} 조건으로 접수 중 공고 확인`; }
   }));
   const memo=$('#memo');
@@ -628,11 +629,16 @@ function resultSummary(it, notes){
     <p class="rs-m">📅 자료 기준일 <b>${BASE}</b> · 세제 ${TAX_BASE} 법령 · 업종코드 ${CODE_Y}년 귀속 연계표 · <span title="BECONIC 내부 정리 자료">${reviewed?'✓ 전문가 검수':'내부 정리·검수 전'}</span></p>
   </section>`;
 }
+// 마지막 탭의 주 버튼: 예비창업자 → 지원사업 찾기 · 기창업자 → 추천 연계 진단의 첫 단계(기업성장 종합진단)
+function finalCta(it){
+  const own=bizOf()==='own', href=own?B31.tools.G.url:matchUrl(it);
+  return `<a class="btn btn-primary" id="finalCta" href="${esc(href)}" target="_blank" rel="noopener">${own?esc(B31.tools.G.n):'지원사업 찾기'} ↗</a>`;
+}
 function stepNav(G, id){
   const i=GSTEPS.indexOf(G), prev=GSTEPS[i-1], next=GSTEPS[i+1];
   return `<nav class="stepnav no-print" aria-label="결과 이동">
-    <button class="btn btn-line" type="button" data-act="print"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IN_APP?'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>':'<path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/>'}</svg>${IN_APP?'요약 복사':'PDF 받기'}</button>
-    ${next?`<a class="btn btn-primary" href="#/guide/${id}/${next.k}">다음 탭: ${next.l} ›</a>`:`<a class="btn btn-primary" href="${esc(matchUrl(BY_ID[id]))}" target="_blank" rel="noopener">지원사업 찾기 ↗</a>`}
+    <button class="btn btn-line" type="button" data-act="print"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IN_APP?'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>':'<path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/>'}</svg>${IN_APP?'요약 복사':'체크리스트 PDF'}</button>
+    ${next?`<a class="btn btn-primary" href="#/guide/${id}/${next.k}">다음 탭: ${next.l} ›</a>`:finalCta(BY_ID[id])}
   </nav>${prev?'':''}`;
 }
 function printSummary(it, pr, screen){
