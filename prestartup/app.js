@@ -4,7 +4,7 @@
 'use strict';
 (function(){
 const D = window.PS_DATA;
-const VERSION = '1.6.3';
+const VERSION = '1.6.4';
 const CONTACT = {tel:'02-6124-5960', email:'start@gven.kr', kakao:'https://pf.kakao.com/_WjMxeG/chat', web:'https://www.beconic.kr/',
   addr:'서울시 구로구 디지털로27길 24, 209호', cert:'제2025-684호', company:'그로스벤처스 주식회사'};
 const MATCH_URL = 'https://beconic-grant-matching.netlify.app/';
@@ -494,7 +494,8 @@ function renderGuide(id, step){
       </section>
 
       <section class="card sec" id="sec-license">${secHead('license', `<span class="cnt">${it.license.length}건</span>`)}
-        ${it.license.map(l=>`<div class="box"><div class="bt"><b>${esc(l.name)}</b>${l.org&&l.org!=='-'?`<span class="bo">${esc(l.org)}</span>`:''}</div>${l.note&&l.note!=='-'?`<p>${esc(l.note)}</p>`:''}</div>`).join('')}
+        ${it.license.map(l=>`<div class="box"><div class="bt"><b>${esc(l.name)}</b>${l.org&&l.org!=='-'?`<span class="bo">${esc(l.org)}</span>`:''}</div>${l.note&&l.note!=='-'?`<p>${esc(l.note)}</p>`:''}${l.law?`<p class="lawl"><span>근거 법령</span>${esc(l.law)}</p>`:''}</div>`).join('')}
+        ${it.license.some(l=>l.law)?`<p class="note">${esc(D.meta.licenseLawNote)}</p>`:''}
       </section>
 
       <section class="card sec" id="sec-code">${secHead('code')}
