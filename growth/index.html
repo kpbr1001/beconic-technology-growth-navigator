@@ -132,6 +132,13 @@ p{margin:0;}
 /* ===== 섹션 일반 ===== */
 section.block{padding:60px 0;}
 .sec-head{max-width:720px;}
+.with-pub{margin-top:34px;}
+.with-pub h3{font-size:18px;font-weight:900;color:var(--navy);}
+.wp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px;}
+.wp{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;}
+.wp b{font-size:14.5px;color:var(--navy);}
+.wp p{font-size:13.5px;color:var(--ink-soft);margin-top:6px;line-height:1.55;}
+@media(max-width:720px){ .wp-grid{grid-template-columns:1fr;} }
 
 /* ===== 성장 시각화 ===== */
 .growth-viz{background:linear-gradient(180deg,#fff 0%,#f4f8fd 100%);}
@@ -616,6 +623,13 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   padding:30px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;box-shadow:var(--sh-md);}
 .expert-cta h3{font-size:19px;font-weight:800;}
 .expert-cta p{color:#bcd0f0;font-size:14px;margin-top:6px;max-width:460px;}
+.cta-tracks{margin-top:14px;background:rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;max-width:520px;}
+.cta-tracks b{font-size:13.5px;color:#fff;}
+.cta-tracks .ct{margin-top:8px;}
+.cta-tracks .ct span{display:block;font-size:13.5px;font-weight:800;color:#fff;}
+.cta-tracks .ct em{font-style:normal;font-size:11px;font-weight:800;color:var(--amber);border:1px solid var(--amber);border-radius:6px;padding:0 5px;margin-left:4px;}
+.cta-tracks .ct small{display:block;font-size:12.5px;color:#bcd0f0;line-height:1.45;}
+.cta-tracks .ct-note{font-size:12px!important;color:#9fb1d6!important;margin-top:8px!important;}
 .expert-cta .ph{font-size:13px;color:#9fb1d6;margin-top:9px;}
 .expert-cta .ph b{color:var(--amber);font-size:16px;letter-spacing:.01em;}
 
@@ -1259,6 +1273,15 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
         <span class="chip">R&D·인증·자금 준비 기업</span>
       </div>
 
+      <div class="with-pub">
+        <h3>공공 진단과 함께 쓰는 법</h3>
+        <div class="wp-grid">
+          <div class="wp"><b>공공 진단·지원사업</b><p>제도와 자금을 신청하는 출발점이에요. 신청 대상인지, 요건이 무엇인지 확인할 때 써요.</p></div>
+          <div class="wp"><b>이 진단</b><p>신청 전에 우리 회사의 준비 상태, 먼저 할 일, 막히는 원인을 정리해요.</p></div>
+          <div class="wp"><b data-co="consultTitle">결과 해석 상담</b><p>담당 컨설턴트가 결과를 함께 보고 실행 순서와 다음 진단을 정해요.</p></div>
+        </div>
+      </div>
+
       <div class="sample-banner">
         <div>
           <h3>입력 없이 먼저 둘러보고 싶다면</h3>
@@ -1551,9 +1574,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.6.0";
-const APP_UPDATED = "2026-11-25";
-const APP_BUILD   = "2026.11.25.4";  // 배포 빌드 식별자
+const APP_VERSION = "v6.7.0";
+const APP_UPDATED = "2026-11-26";
+const APP_BUILD   = "2026.11.26.1";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
 const LEGAL_BASIS_DATE = "2026-10-26";  // 법령·제도 출처를 마지막으로 확인한 날(도구 버전 날짜와 별개)
 
@@ -1580,7 +1603,10 @@ const RULES = {
   input:{maxConcern:3, maxCustom:6},
   recallMonths:3,                                // 문항 응답 기준 기간: 최근 N개월 동안 실제로 한 행동
   maxCauses:2,                                    // 원인 가설 최대 표시 수              // 고민 최대 선택 수 · 컨설턴트 직접 추가 과제/KPI 최대 수
-  conf:{flagPenalty:8, straightCap:60, quickCap:70, straightMin:9, high:75, mid:50, minCoverage:0.5}
+  /* 결과 해석 상담(운영 조건) — enabled:false면 상담 박스는 전화·메일 안내만 */
+  consult:{enabled:true, replyDays:2, methods:["전화","방문"], assigned:true},
+  tracks:{max:2},                                 // 결과에 안내하는 BECONIC 31 다음 진단 최대 수(링크 없이 상담에서 연결)
+  conf:{fastSecPerQ:2, fastCap:60, flagPenalty:8, straightCap:60, quickCap:70, straightMin:9, high:75, mid:50, minCoverage:0.5}
 };
 const STORE_KEY = "gan_state_v6";   // v5 이하 저장값(구조 다름)은 읽지 않음
 const FILE_SCHEMA = "beconic-growth/6";
@@ -2446,6 +2472,10 @@ function scoreEngine(d){
   let cs = Math.round(coverage*100) - flags.length*C.flagPenalty;
   if(straight) cs = Math.min(cs, C.straightCap);      // 전 문항 같은 단계는 실제 행동 재확인 전까지 '보통' 이하
   if(d.depth==="quick") cs = Math.min(cs, C.quickCap);
+  // 응답 속도: 이 화면에서 직접 답한 경우만(결과 파일·공유 링크·예시는 기록 없음). 진행은 막지 않고 해석 강도만 낮춤
+  const tn = d._tn||0, fastBase = Math.max(5, Math.round(asked.length*0.8));
+  const fast = !!(d._t0 && d._t1 && tn>=fastBase && ((d._t1-d._t0)/1000/Math.max(1,tn-1)) < C.fastSecPerQ);
+  if(fast) cs = Math.min(cs, C.fastCap);
   cs = Math.max(0, Math.min(100, cs));
   const reasons=[];
   if(d.depth==="quick") reasons.push("간이 진단(영역별 1문항)");
@@ -2453,10 +2483,11 @@ function scoreEngine(d){
   if(coverage<C.minCoverage) reasons.push(`응답률 ${C.minCoverage*100}% 미만 — 성숙도 구간 판정 보류`);
   if(flags.length) reasons.push(`응답·보유현황 불일치 ${flags.length}건`);
   if(straight) reasons.push("모든 문항을 같은 단계로 응답");
+  if(fast) reasons.push("응답 속도가 매우 빨라 해석 강도를 낮춤");
   let tier, label;
   if(cs>=C.high){ tier="high"; label="높음"; } else if(cs>=C.mid){ tier="mid"; label="보통"; } else { tier="low"; label="낮음"; }
   const desc = reasons.length ? reasons.join(" · ")+" — 해석 강도를 조절하세요." : "표준 문항을 모두 응답했고 응답 점검에서 불일치가 없습니다.";
-  const confidence = {score:cs, tier, label, desc, reasons, coverage:Math.round(coverage*100), nAns, nUnk, nNa, asked:asked.length, straight, flags};
+  const confidence = {score:cs, tier, label, desc, reasons, coverage:Math.round(coverage*100), nAns, nUnk, nNa, asked:asked.length, straight, fast, flags};
   const dataDepth = Math.round(coverage*100);
 
   const held = total!=null && coverage<C.minCoverage;            // 일부 문항만 답해 점수가 부풀거나 줄 수 있음
@@ -2527,6 +2558,82 @@ function lvlWord(s){ return s==null?"–":s<17?LV_NM[0]:s<50?LV_NM[1]:s<84?LV_NM
 function gapTxt(g){ return g==null?"–":(g>=0?"+"+g:String(g)); }
 function gapCls(g){ return g==null?"gp-na":g>=0?"gp-ok":g>=-15?"gp-mid":"gp-bad"; }
 
+/* ---------- 5-0. BECONIC 31 다음 진단 안내 ----------
+   병목 영역에 맞는 진단을 업종·업태·창업 단계·기업 유형·인원·주요 고객으로 걸러 최대 RULES.tracks.max개 안내한다.
+   링크·입력값 전달 없이 '상담에서 안내'로만 표시(입력 정보 보호). isNew = 신규(준비 중) 진단 */
+const TRACKS = [
+  {id:"S1",nm:"아이템 발굴",areas:["bm"],stages:["pre"],desc:"창업 아이템 후보를 비교해 하나로 좁혀요"},
+  {id:"S2",nm:"AI 아이템 진단(PMF)",areas:["bm","sales"],stages:["pre","y1","y13"],notCtype:["sosang","sogong"],notInd:["food"],desc:"아이템이 시장에서 통할지 증거로 확인해요"},
+  {id:"S3",nm:"창업·재무 시뮬레이션",areas:["finance","bm"],stages:["pre","y1"],desc:"원가·손익분기·자금 흐름을 숫자로 미리 따져 봐요"},
+  {id:"S4",nm:"AI 사업계획서 진단",areas:["bm","finance"],stages:["pre","y1","y13"],desc:"지원사업 사업계획서의 보완점을 찾아요"},
+  {id:"S5",nm:"창업 준비 가이드",areas:["foundation"],stages:["pre"],desc:"업종별 등록·인허가·서류를 한 번에 정리해요"},
+  {id:"F1",nm:"AI 기업 재무진단",areas:["finance"],stages:["y13","y35","y57","y7"],notCtype:["solo"],desc:"결산 재무제표로 수익성·안정성을 진단해요"},
+  {id:"F2",nm:"대출·보증 진단",areas:["finance"],stages:["y1","y13","y35","y57","y7"],desc:"정책자금·보증 신청 가능성과 준비 서류를 확인해요"},
+  {id:"F3",nm:"IR 진단",areas:["finance","bm"],stages:["y13","y35","y57"],ind:["it","platform","mfg","content","edu"],notCtype:["sosang","sogong","solo"],needConcern:["fund"],notForms:{mfg:["parts"]},boost:.8,desc:"투자자 관점의 준비도를 점검해요"},
+  {id:"F4",nm:"원가·수익성(BEP) 진단",areas:["finance","bm"],ind:["food","mfg","retail"],isNew:true,desc:"품목별 원가와 손익분기점을 계산해요"},
+  {id:"F5",spec:true,nm:"판매채널·배달앱 수익성 진단",areas:["sales","finance"],ind:["food","retail"],forms:{food:["hall","delivery","franchisee"],retail:["online","offline"]},isNew:true,desc:"채널별 수수료를 빼고 실제 남는 돈을 비교해요"},
+  {id:"F6",nm:"경영위기 조기경보·재기 진단",areas:["finance"],stages:["y1","y13","y35","y57","y7"],minGap:-30,isNew:true,desc:"위기 신호와 지원 경로를 확인해요"},
+  {id:"L1",nm:"AI HR 진단",areas:["people"],notEmp:["e1"],desc:"조직 상태·인사 제도·노무를 깊게 진단해요"},
+  {id:"L2",nm:"중대재해·산업안전 준비도 진단",areas:["people","cert"],ind:["mfg"],notEmp:["e1","e24"],isNew:true,desc:"안전보건 의무 이행 수준을 점검해요"},
+  {id:"L3",nm:"개인정보·정보보호 진단",areas:["digital"],ind:["it","platform","edu","retail","svc","pro","content"],isNew:true,desc:"고객 정보 관리 수준과 위험을 점검해요"},
+  {id:"L4",nm:"사장님 필수의무 체크",areas:["foundation","people"],ctype:["solo","sosang"],stages:["pre","y1","y13"],isNew:true,desc:"세금·노무·신고 의무를 10분 안에 점검해요"},
+  {id:"M1",nm:"AI BM 진단",areas:["bm"],stages:["y1","y13","y35","y57","y7"],desc:"수익 구조와 검증할 과제를 정리해요"},
+  {id:"M2",nm:"AI Sales·GTM 진단",areas:["sales","marketing"],stages:["y1","y13","y35","y57","y7"],notInd:["food"],desc:"영업·시장 진입의 막힌 곳을 찾아요"},
+  {id:"M3",nm:"수출 준비도 진단",areas:["export"],stages:["y13","y35","y57","y7"],desc:"수출 준비 수준과 목표 시장을 점검해요"},
+  {id:"M4",nm:"공공조달 진입 진단",areas:["sales","cert"],customer:["b2b","b2g","mix"],ind:["mfg","it","pro","svc"],notCtype:["solo"],isNew:true,desc:"조달 등록·인증 요건과 진입 경로를 확인해요"},
+  {id:"M5",nm:"상권·상가 진단",areas:["sales","foundation"],ind:["food","retail","svc","edu"],stages:["pre","y1","y13"],customer:["b2c","mix"],notForms:{retail:["online","wholesale"]},desc:"매장 계약 전 입지·권리 위험을 점검해요"},
+  {id:"M6",spec:true,nm:"AI 외식업 성장진단",areas:["sales","marketing","finance","foundation","cert"],ind:["food"],notForms:{food:["franchisor"]},desc:"메뉴·원가·인력·마케팅을 외식업 기준으로 깊게 봐요"},
+  {id:"T1",nm:"AI 기술진단",areas:["rnd"],ind:["mfg","it","platform"],stages:["y13","y35","y57","y7"],notCtype:["sosang","sogong","solo"],desc:"핵심 기술 수준과 기술 로드맵을 진단해요"},
+  {id:"T2",nm:"지식재산(IP) 진단",areas:["rnd","marketing"],ind:["mfg","it","platform","content"],notForms:{food:["franchisee"]},isNew:true,desc:"특허·상표 공백과 활용 방법을 점검해요"},
+  {id:"T3",nm:"기업 AI/DX 진단",areas:["digital"],desc:"업무별 디지털·AI 도입 우선순위를 정해요"},
+  {id:"T4",spec:true,nm:"스마트팩토리 수준진단",areas:["digital","cert"],ind:["mfg"],stages:["y13","y35","y57","y7"],desc:"공장 스마트화 수준과 다음 단계를 확인해요"},
+  {id:"T5",nm:"ESG 경영준비도 진단",areas:["cert","export"],boost:.8,ind:["mfg","trade","it"],stages:["y35","y57","y7"],notCtype:["sosang","sogong","solo"],desc:"거래처·수출에서 요구하는 ESG 수준을 점검해요"},
+  {id:"T6",nm:"기업인증 진단",areas:["cert"],stages:["y13","y35","y57","y7"],notCtype:["sosang","sogong","solo"],desc:"벤처·이노비즈 등 인증 적합성과 순서를 정해요"},
+  {id:"P1",nm:"창업자·CEO 역량진단",areas:["foundation","people"],stages:["pre","y1","y13"],boost:.8,desc:"대표의 역할 전환과 성장 병목을 진단해요"},
+  {id:"P2",nm:"브랜드 진단",areas:["marketing"],ind:["svc","pro","content","edu","food","retail"],notForms:{food:["franchisee"]},desc:"공개된 자료로 브랜드 신뢰도를 점검해요"},
+  {id:"P3",nm:"가업승계·기업가치 준비 진단",areas:["foundation"],stages:["y7"],notCtype:["solo","sosang"],isNew:true,desc:"승계 계획과 기업가치 준비 수준을 점검해요"}
+];
+function trackFits(t, d){
+  if(t.ind && !t.ind.includes(d.industry)) return false;
+  if(t.notInd && t.notInd.includes(d.industry)) return false;
+  if(t.stages && !t.stages.includes(d.stage)) return false;
+  if(t.ctype && !t.ctype.includes(d.ctype)) return false;
+  if(t.notCtype && t.notCtype.includes(d.ctype)) return false;
+  if(t.notEmp && t.notEmp.includes(d.emp)) return false;
+  if(t.needConcern && !t.needConcern.some(c=>(d.concern||[]).includes(c))) return false;
+  if(t.customer && d.customer && !t.customer.includes(d.customer)) return false;
+  const f = formOf(d);
+  if(f && t.forms && t.forms[d.industry] && !t.forms[d.industry].includes(f)) return false;
+  if(f && t.notForms && (t.notForms[d.industry]||[]).includes(f)) return false;
+  return true;
+}
+/* 병목(기대 미달) → 원인 가설 → 고민 순으로 영역 비중을 매기고, 맞는 진단을 고른다. 업종 전용 진단을 일반 진단보다 우선 */
+function recommendTracks(d, sc, sw, causes, exclude){
+  const w = {};
+  (sw.weakAll||[]).filter(x=>x.gap!=null && x.gap<0).forEach((x,i)=>{ w[x.a]=(w[x.a]||0)+Math.max(.5, 3-i*.5); });   // 기대 미달 영역 전체(큰 순)
+  (causes||[]).forEach(c=>{ w[c.cause]=(w[c.cause]||0)+2; });
+  (d.concern||[]).forEach(c=>{ const a=CONCERN_AREA[c]; if(a) w[a]=(w[a]||0)+2; });   // 고민으로 고른 영역
+  const out=[];
+  TRACKS.forEach(t=>{
+    if(!trackFits(t, d) || (exclude||[]).includes(t.id)) return;
+    const hit = t.areas.filter(a=>w[a] && sc.status[a]!=="na");
+    if(!hit.length) return;
+    if(t.minGap!=null && !(t.areas.some(a=>sc.gap[a]!=null && sc.gap[a]<=t.minGap))) return;
+    // 주 영역(첫 번째) 중심 + 보조 영역 일부. 업종 전용 진단 우선, 준비 중·보조 진단은 낮게(여러 영역에 걸친 진단이 점수만 쌓이지 않도록)
+    const score = ((w[t.areas[0]]||0) + 0.3*t.areas.slice(1).reduce((v,a)=>v+(w[a]||0),0) + (t.spec?1:0)) * (t.boost||1) * (t.isNew?0.6:1);
+    out.push({id:t.id, nm:t.nm, desc:t.desc, isNew:!!t.isNew, areas:hit, score});
+  });
+  out.sort((x,y)=>y.score-x.score);
+  // 사용자가 고른 고민 영역의 진단이 하나는 들어가도록(고민과 무관한 안내만 나오지 않게)
+  const conAreas=(d.concern||[]).map(c=>CONCERN_AREA[c]).filter(Boolean);
+  const pick=out.slice(0, RULES.tracks.max);
+  if(conAreas.length && !pick.some(x=>conAreas.includes(TRACKS.find(t=>t.id===x.id).areas[0]))){
+    const c=out.find(x=>conAreas.includes(TRACKS.find(t=>t.id===x.id).areas[0]));
+    if(c){ pick[pick.length-1 < 1 ? 0 : Math.min(pick.length, RULES.tracks.max)-1]=c; }
+  }
+  return pick;
+}
+
 /* ---------- 5-1. 원인 가설 (B1) ----------
    원인 문항이 '시작' 이하이고, 그 영향을 받는 영역이 단계 기대수준보다 낮으면 '가능성'으로 연결한다.
    확정이 아니라 가설이며, 원인 확정은 상담(심화 진단)에서 한다. 원인 영역은 우선순위 가점(RULES.priority.rootCause) */
@@ -2540,6 +2647,10 @@ const CAUSE_LINKS = [
   {q:"B2", effects:["finance"], msg:"가격·수익 구조(B2)가 정리되지 않아, 외부 자금 심사에서 설명 근거가 약할 가능성"},
   {q:"C2", effects:["sales"], msg:"품질 점검 기록(C2)이 없어, 재구매·이탈 관리가 흔들릴 가능성"}
 ];
+/* '정례화' 이상으로 답한 문항 — 상담 때 실제 자료로 확인할 목록(사용자 입력은 늘리지 않는다) */
+function proofQuestions(sc){
+  return AREA_KEYS.flatMap(a=>(sc.detail[a]||[]).filter(r=>typeof r.v==="number" && r.v>=2).map(r=>({id:r.q.id, t:r.q.t, v:r.v})));
+}
 function rootCauses(d, sc){
   const asked = new Set(askedQuestions(d.depth, d.stage).map(q=>q.id)), ans=d.ans||{};
   const out=[];
@@ -2909,7 +3020,7 @@ function buildDiagnosisData(d, isSample){
   const areas = AREA_KEYS.map(a=>({ key:a, name:AREA[a].short, fullName:AREA[a].nm,
     score:sc.areaScore[a], expected:sc.expected[a], gap:sc.gap[a], status:sc.status[a] }));
   const bottleneckSrc = sw.weak.length ? sw.weak : [];
-  return {
+  const diag = {
     meta:{ version:APP_VERSION, generatedAt:new Date().toISOString(), isSample:!!isSample },
     profile,
     score:{ total:sc.total, expected:sc.expTotal, band:band.nm, bandKey:band.key, bandDesc:band.desc,
@@ -2923,8 +3034,12 @@ function buildDiagnosisData(d, isSample){
     plan90:  p90, roadmap: road, kpis,
     consultantMemo: d.memo || null,
     causes: rootCauses(d, sc).map(c=>({q:c.q, cause:c.cause, effects:c.effects, msg:c.msg})),
+    tracks: [],
+    proof: proofQuestions(sc),
     _internal:{ sc, band, acts, sw, p90, road, kpis }
   };
+  diag.tracks = recommendTracks(d, sc, sw, rootCauses(d, sc), hrDeepNeeded(diag)?["L1"]:[]);   // HR 안내가 이미 있으면 L1은 중복 안내하지 않음
+  return diag;
 }
 
 /* 규칙 기반 서술 요약 — 점수·갭·병목에서 결정론적으로 생성(같은 입력 = 같은 문장) */
@@ -3052,7 +3167,7 @@ function renderResult(d, isSample, baseline){
       <div class="docs"><b>준비서류</b> · ${esc(a.docs)}</div>
       <div class="caution">${esc(a.caution)}</div>
       ${srcChips(a.src)}
-      ${a.expert?`<a class="expert expert-link no-print" href="${telHref()}" onclick="try{GAN._track&&GAN._track('cta_expert')}catch(e){}">👤 전문가 검토 권장 · 상담 문의 →</a><div class="expert print-only">👤 전문가 검토 권장</div>`:""}
+      ${a.expert?`<div class="expert">👤 전문가 검토 권장 — 아래 '결과 해석 상담'에서 함께 봐요</div>`:""}
     </div>`;}).join("");
 
   // 우선순위 매트릭스: y=우선도 순위, x=실행 용이성(연결 문항의 현재 수준)
@@ -3181,7 +3296,7 @@ function renderResult(d, isSample, baseline){
     <h3><span class="ix">1</span>핵심 요약 (Executive Summary)</h3>
     <p class="sub">지금 가장 먼저 봐야 할 것들을 한 페이지로 정리했습니다.</p>
     <div class="core-line"><span>핵심 문제</span><b>${esc(narrative.core)}</b></div>
-    ${causes.length?`<div class="cause-box"><b>원인 가설 — 병목끼리의 연결</b><ul>${causes.map(c=>`<li>${esc(c.msg)} <span style="color:var(--muted)">(영향: ${c.effects.map(a=>esc(AREA[a].short)).join(", ")})</span></li>`).join("")}</ul><small>응답 조합으로 세운 가설입니다. 실제 원인 확정과 해결 순서는 상담에서 함께 진단합니다.</small></div>`:""}
+    ${causes.length?`<div class="cause-box"><b>왜 막히는지 — 응답으로 본 원인(추정)</b><ul>${causes.map(c=>`<li>${esc(c.msg)} <span style="color:var(--muted)">(영향: ${c.effects.map(a=>esc(AREA[a].short)).join(", ")})</span></li>`).join("")}</ul><small>응답을 조합해 추정한 원인이에요(가설). 실제 원인과 해결 순서는 상담에서 함께 확인해요.</small></div>`:""}
     <div class="ai-summary">
       <div class="ai-sum-lab">진단 요약 <span class="ai-sum-src">규칙 기반 자동 생성</span></div>
       ${narrative.paragraphs.map(t=>`<p>${esc(t)}</p>`).join("")}
@@ -3328,6 +3443,8 @@ function renderResult(d, isSample, baseline){
       ${unkList?`<li>'모름' 문항: ${esc(unkList)} — 현황 확인 후 재응답하면 판정이 바뀔 수 있습니다.</li>`:""}
       ${conf.straight?"<li>모든 문항을 같은 단계로 응답했습니다. 문항별로 실제 행동을 다시 확인해 주세요.</li>":""}
       ${legalNote}
+      ${diag.proof.length?`<li>정해서 하고 있다고 답한 문항 ${diag.proof.length}개(${esc(diag.proof.map(x=>x.id).join(", "))})는 양식·기록 같은 실제 자료로 확인하면 진단이 더 정확해져요.</li>`:""}
+      ${conf.fast?"<li>응답 속도가 매우 빨라 해석 강도를 낮췄습니다. 시간이 될 때 문항별로 다시 확인해 보세요.</li>":""}
     </ul></div>
     <div class="risk-box" style="margin-top:14px"><h4>⚠ 진단 활용 시 유의사항</h4><ul>
       <li>법률·세무·노무·인증·지원사업 관련 내용은 단정이 아니며, 적용 전 전문가 검토가 필요합니다.</li>
@@ -3362,18 +3479,24 @@ function renderResult(d, isSample, baseline){
     </details>
   </div>
 
-  <div class="expert-cta no-print">
+  <div class="expert-cta no-print" id="consultBox">
     <div>
-      <h3>이 결과, 전문가와 함께 실행 계획으로</h3>
-      <p>진단 결과를 바탕으로 상담하면 다음을 함께 정리합니다. 중기부 인증 중소기업상담회사가 함께합니다.</p>
+      <h3>${RULES.consult.enabled?"결과 해석 상담":"이 결과, 전문가와 함께 실행 계획으로"}</h3>
+      <p>${RULES.consult.enabled
+        ? `담당 컨설턴트를 정해 <b>영업일 ${RULES.consult.replyDays}일 안에</b> 연락드려요. 상담은 <b>${RULES.consult.methods.join(" 또는 ")}</b>으로 진행해요.`
+        : "진단 결과를 바탕으로 상담하면 다음을 함께 정리합니다."} ${esc(COMPANY.certLabel)}가 함께합니다.</p>
       <ul class="cta-benefits">
         ${cta.benefits.map(b=>`<li>${esc(b)}</li>`).join("")}
+        ${diag.proof.length?`<li>정해서 하고 있다고 답한 ${diag.proof.length}개 문항을 실제 자료(양식·기록)로 함께 확인</li>`:""}
       </ul>
-      <p class="ph">전화 상담 · <b>${esc(COMPANY.tel)}</b> · 상담료 없이 방향 안내</p>
+      ${diag.tracks.length?`<div class="cta-tracks"><b>상담 때 함께 안내할 진단</b>
+        ${diag.tracks.map(t=>`<div class="ct"><span>${esc(t.id)} ${esc(t.nm)}${t.isNew?" <em>준비 중</em>":""}</span><small>${esc(t.desc)} · 관련: ${t.areas.slice(0,2).map(a=>esc(AREA[a].short)).join(", ")}</small></div>`).join("")}
+        <p class="ct-note">다른 진단은 입력 정보 보호를 위해 링크 없이 상담에서 연결해 드려요.</p></div>`:""}
     </div>
     <div class="cta-btns">
-      <a class="btn btn-amber" href="${telHref()}">전문가 검토가 필요해요</a>
-      <a class="btn btn-line" href="${esc(mailtoHref(diag))}">✉ 결과 요약으로 상담 요청</a>
+      <a class="btn btn-amber" href="${esc(mailtoHref(diag))}">✉ 결과 요약으로 상담 신청</a>
+      <a class="btn btn-line" href="${telHref()}">📞 전화 ${esc(COMPANY.tel)}</a>
+      <button type="button" class="btn btn-line" onclick="GAN.copySummary()">📋 결과 요약 복사</button>
     </div>
   </div>
 
@@ -3391,18 +3514,30 @@ function hrDeepNeeded(diag){
   const pa = diag.areas.find(a=>a.key==="people"); if(!pa || pa.status==="na") return false;
   return (pa.gap!=null && pa.gap<0) || (diag.profile.concern||[]).includes("org");
 }
-function mailtoHref(diag){
+/* 결과 해석 상담 요약 — 상담 신청 메일과 '요약 복사'가 같은 내용. 회사명·연락처는 넣지 않음(사용자가 직접 적음) */
+function consultSummary(diag){
   const s=diag.score, p=diag.profile;
-  const lines=[
+  const worst = diag.bottlenecks.length ? diag.bottlenecks[0] : null;
+  const qs=[];
+  if(worst) qs.push(`${worst.name} 영역에서 다음 단계로 못 가는 가장 큰 이유는?`);
+  if(diag.causes.length) qs.push(`원인 가설 확인: ${diag.causes[0].msg}`);
+  if(diag.proof.length) qs.push(`근거 자료 확인: ${diag.proof.slice(0,5).map(x=>x.id).join("·")}${diag.proof.length>5?` 외 ${diag.proof.length-5}개`:""}`);
+  return [
     "[기업 성장활동 진단 결과 요약]",
-    `업종·단계: ${p.industryNm} · ${p.stageNm} · ${p.ctypeNm}`,
+    `업종·단계: ${p.industryNm}${p.formNm?" · "+p.formNm:""} · ${p.stageNm} · ${p.ctypeNm} · 직원 ${p.empNm||"-"}`,
     `종합 성숙도: ${s.total==null?"판정 보류":s.total+"점"} (단계 기대 ${s.expected==null?"–":s.expected}점) · 신뢰도 ${s.confidence.label}`,
     `핵심 병목: ${diag.bottlenecks.map(b=>`${b.name} ${b.score}점(기대 ${b.expected})`).join(", ")||"없음"}`,
     `우선과제: ${diag.activities.slice(0,3).map(a=>a.title).join(" / ")}`,
     ...(diag.causes.length ? [`원인 가설: ${diag.causes.map(c=>c.msg).join(" / ")}`] : []),
     ...(hrDeepNeeded(diag) ? [`조직·인력: ${diag.areas.find(a=>a.key==="people").score??"응답 없음"}점(기대 ${diag.areas.find(a=>a.key==="people").expected}) — HR 심화 진단 안내 희망`] : []),
-    "", "상담 희망 내용:", ""
-  ];
+    ...(diag.tracks.length ? [`안내받을 진단: ${diag.tracks.map(t=>`${t.id} ${t.nm}`).join(", ")}`] : []),
+    `근거 확인 문항(정례화 이상 응답): ${diag.proof.length}개`,
+    "", "[컨설턴트 확인 질문]", ...qs.map((q,i)=>`${i+1}. ${q}`)
+  ].join("\n");
+}
+function mailtoHref(diag){
+  const C=RULES.consult;
+  const lines=[consultSummary(diag), "", "연락받을 전화번호: ", C.enabled?`희망 상담 방식(${C.methods.join("·")}): `:"상담 희망 내용: ", ""];
   return "mailto:"+COMPANY.mail+"?subject="+encodeURIComponent("[성장진단] 결과 상담 요청")+"&body="+encodeURIComponent(lines.join("\n"));
 }
 
@@ -3495,6 +3630,7 @@ const GAN = (function(){
     box.querySelectorAll(".qa-opt,.qa-x").forEach(b=>b.addEventListener("click",()=>{
       const id=b.dataset.q, raw=b.dataset.v; const v = (raw==="u"||raw==="na") ? raw : +raw;
       state.data.ans[id]=v;
+      const now=Date.now(); state.data._t0=state.data._t0||now; state.data._t1=now; state.data._tn=(state.data._tn||0)+1;   // 응답 속도(신뢰도 참고용, 서버 전송 없음)
       const card=b.closest(".qa-card"); const first=!card.classList.contains("done");
       card.classList.add("done"); card.classList.remove("miss");
       if(first){ const nx=[...box.querySelectorAll(".qa-card:not(.done)")].find(c=>c.compareDocumentPosition(card)&Node.DOCUMENT_POSITION_PRECEDING);
@@ -3984,6 +4120,15 @@ const GAN = (function(){
     try{ localStorage.removeItem(STORE_KEY); }catch(e){}
     go("diagnose");
   }
+  /* 결과 요약 복사 — 메일 프로그램이 없는 PC에서도 상담 신청할 수 있게 */
+  function copySummary(){
+    const diag = buildDiagnosisData(state.data, state.isSample);
+    const txt = consultSummary(diag);
+    const done = ()=>toast(`결과 요약을 복사했어요 · ${COMPANY.mail}로 보내거나 ${COMPANY.tel}로 전화 주세요`);
+    try{ navigator.clipboard.writeText(txt).then(done, ()=>fallback()); }catch(e){ fallback(); }
+    function fallback(){ const t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select();
+      try{ document.execCommand("copy"); done(); }catch(e){ toast("복사하지 못했어요. 전화로 문의해 주세요"); } t.remove(); }
+  }
   function clearSaved(){
     try{ localStorage.removeItem(STORE_KEY); }catch(e){}
     toast("이 브라우저에 임시 저장된 입력을 지웠습니다");
@@ -4069,7 +4214,7 @@ const GAN = (function(){
   function resumeDismiss(){ const b=document.getElementById("resumeBar"); if(b) b.style.display="none"; }
   return {init,go,nextStep,prevStep,skipToResult,toConsult,toggleCol,setMode,share,printPDF,restart,loadSample,clearSaved,resumeDismiss,
           exportFile,importFile,runDiagnosis,getDiagnosisData,getDiagnosisJSON,getNarrative,_track,openReportDialog,
-          _state:()=>state, _sanitize:sanitize, _sanitizeSummary:sanitizeSummary, _buildShareURL:buildShareURL};
+          copySummary, _state:()=>state, _sanitize:sanitize, _sanitizeSummary:sanitizeSummary, _buildShareURL:buildShareURL};
 })();
 window.GAN = GAN;
 

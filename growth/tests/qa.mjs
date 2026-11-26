@@ -485,6 +485,55 @@ const run = (d) => page.evaluate((d) => { const sc = scoreEngine(d); return JSON
   check('모든 업종에 업태 목록 정의', r.formsOk);
 }
 
+// 14. v6.7.0 1차 묶음 — 응답 속도·근거 확인 문항·트랙 안내·결과 해석 상담
+{
+  const r = await page.evaluate((b) => {
+    const A = (v) => Object.fromEntries(QUESTIONS.map((q) => [q.id, v]));
+    // 트랙: 소상인·소공인·1인에게 투자·기술·ESG·기업인증·가업승계 진단 안내 안 함(전 업종·단계·고민 조합)
+    const bad = []; let maxN = 0;
+    for (const ind of OPT.industry.map((o) => o.v)) for (const st of OPT.stage.map((o) => o.v)) for (const ct of ['solo', 'sosang', 'sogong']) for (const con of [['fund'], ['rnd', 'cert'], ['export']]) {
+      const d = { ...b, industry: ind, stage: st, ctype: ct, emp: ct === 'solo' ? 'e1' : 'e24', concern: con, ans: A(0) };
+      const t = buildDiagnosisData(d, false).tracks; maxN = Math.max(maxN, t.length);
+      t.forEach((x) => { if (['F3', 'T1', 'T5', 'T6', 'P3'].includes(x.id)) bad.push(`${ind}/${st}/${ct}:${x.id}`); });
+    }
+    const tr = (x) => buildDiagnosisData({ ...b, ans: A(0), ...x }, false).tracks.map((t) => t.id);
+    const food = tr({ industry: 'food', ctype: 'sosang', stage: 'y13', form: 'hall', customer: 'b2c', concern: ['revenue'] });
+    const mfgParts = tr({ industry: 'mfg', ctype: 'small', stage: 'y35', form: 'parts', emp: 'e1029', concern: ['cert', 'fund'] });
+    const itFund = tr({ industry: 'it', ctype: 'small', stage: 'y13', form: 'saas', concern: ['fund', 'customer'] });
+    const svcOrg = tr({ industry: 'svc', ctype: 'sosang', stage: 'y7', emp: 'e24', customer: 'b2c', concern: ['org'] });
+    // 응답 속도: 30문항을 20초에 → 신뢰도 상한·사유, 보통 속도면 없음
+    const t0 = Date.now() - 20000;
+    const fast = scoreEngine({ ...b, ans: A(2), _t0: t0, _t1: t0 + 20000, _tn: 30 }).confidence;
+    const slow = scoreEngine({ ...b, ans: A(2), _t0: t0, _t1: t0 + 300000, _tn: 30 }).confidence;
+    // 근거 확인 문항 · 상담 박스
+    renderResult({ ...b, ans: { ...A(1), F1: 2, B1: 3, H2: 2 }, concern: ['org'] }, false);
+    const box = document.getElementById('consultBox'); const root = document.getElementById('resultRoot').innerText;
+    const mail = decodeURIComponent(box.querySelector('a[href^="mailto:"]').getAttribute('href'));
+    const out = { bad: bad.slice(0, 5), maxN, food, mfgParts, itFund, svcOrg, fastOk: fast.fast && fast.score <= RULES.conf.fastCap && fast.reasons.some((x) => /응답 속도/.test(x)), slowOk: !slow.fast,
+      proof: /정해서 하고 있다고 답한 문항 3개\(F1, B1, H2\)/.test(root),
+      box: box.innerText.includes(`영업일 ${RULES.consult.replyDays}일`) && box.innerText.includes('전화 또는 방문') && box.querySelectorAll('.cta-tracks a').length === 0 && !!box.querySelector('button[onclick*="copySummary"]'),
+      mail: mail.includes('연락받을 전화번호') && mail.includes('[컨설턴트 확인 질문]') && mail.includes('근거 확인 문항'),
+      noCardLink: document.querySelectorAll('.expert-link').length === 0, noL1dup: !buildDiagnosisData({ ...b, ans: { ...A(1), H1: 0, H2: 0, H3: 0 }, concern: ['org'] }, false).tracks.some((t) => t.id === 'L1') };
+    RULES.consult.enabled = false; renderResult({ ...b, ans: A(1) }, false);
+    out.off = document.getElementById('consultBox').innerText.includes('전문가와 함께 실행 계획으로') && !document.getElementById('consultBox').innerText.includes('영업일');
+    RULES.consult.enabled = true;
+    return out;
+  }, base);
+  check('트랙 안내: 소상인·소공인·1인에게 IR·기술·ESG·기업인증·가업승계 진단 미안내(전 조합), 최대 2개', r.bad.length === 0 && r.maxN <= 2, r.bad.join(' '));
+  check('트랙 안내: 외식 소상인 → 외식업 성장진단 우선', r.food[0] === 'M6', r.food.join(','));
+  check('트랙 안내: 제조 부품 협력사(인증·자금 고민) → 기업인증 진단, IR 미안내', r.mfgParts.includes('T6') && !r.mfgParts.includes('F3'), r.mfgParts.join(','));
+  check('트랙 안내: 고른 고민 영역의 진단이 1개 이상(IT 자금·고객발굴 → Sales·GTM 또는 IR)', r.itFund.some((id) => ['M2', 'F3', 'F2', 'F1'].includes(id)), r.itFund.join(','));
+  check('트랙 안내: HR 안내가 있으면 L1 중복 없이 2개 채움', r.noL1dup && r.svcOrg.length === 2, r.svcOrg.join(','));
+  check('응답 속도: 매우 빠르면 신뢰도 상한·사유 표시(진행 차단 없음), 보통이면 없음', r.fastOk && r.slowOk);
+  check('근거 확인 문항: 정해서 하고 있다고 답한 문항 목록 표시(쉬운 말)', r.proof);
+  check('결과 해석 상담: 영업일 2일·전화 또는 방문 표기, 트랙은 링크 없음, 요약 복사 버튼', r.box);
+  check('상담 메일: 연락처 칸·컨설턴트 확인 질문·근거 확인 문항 포함', r.mail);
+  check('상담 유도 통합: 과제 카드별 상담 링크 없음', r.noCardLink);
+  check('해석 상담 끄면(RULES.consult.enabled=false) 기존 안내로 대체', r.off);
+  const home = await page.evaluate(() => { const el = document.querySelector('.with-pub'); return el ? el.innerText : ''; });
+  check("홈 '공공 진단과 함께 쓰는 법': 기관명·'무료' 없음", home.includes('공공 진단과 함께 쓰는 법') && !/무료|중진공|신보|기보|소상공인시장진흥공단/.test(home));
+}
+
 check('콘솔·페이지 오류 없음', errors.length === 0, errors.slice(0, 3).join(' | '));
 await browser.close();
 const fail = results.filter((r) => !r.pass);
