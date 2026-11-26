@@ -429,6 +429,17 @@ for (const [w, h] of [[320, 640], [375, 812], [768, 1024], [1280, 900]]) {
   check('추천 이유: 근거 없는 단정 없음 · 아이템 발굴은 "아직 구체적이지 않다면" 조건', r.assert === 0 && r.sw1.includes('아직 구체적이지 않다면'));
 }
 
+// 11-12. 인허가 항목별 근거 법령(법률 이름) — 일반 항목은 비움
+{
+  const r = await page.evaluate(() => { const B = window.PS.BY_ID, all = Object.values(B).flatMap((i) => i.license);
+    const lw = (id, re) => (B[id].license.find((l) => re.test(l.name)) || {}).law;
+    return { cafe: lw('cafe', /휴게음식점/), cos: lw('cosmetic_mfg', /제조업/), beauty: lw('beauty', /미용업/), generic: all.filter((l) => /^\(품목별\)|품목별 인허가|없음|불요|업종별/.test(l.name) && l.law).length, n: all.filter((l) => l.law).length, total: all.length, bad: all.filter((l) => l.law && !/법/.test(l.law)).length }; });
+  check('인허가 근거 법령: 카페 식품위생법 · 화장품 화장품법 · 미용 공중위생관리법, 일반 항목은 비움', r.cafe === '식품위생법' && r.cos === '화장품법' && r.beauty === '공중위생관리법' && r.generic === 0 && r.bad === 0 && r.n >= 95, JSON.stringify(r));
+  await page.goto(BASE + '#/guide/cafe/prepare'); await page.waitForTimeout(100);
+  const t = await page.locator('#sec-license').innerText();
+  check('인허가 화면: "근거 법령" 표기 · 세부 조문은 관할 기관 확인 안내', t.includes('근거 법령') && t.includes('식품위생법') && t.includes('관할 기관 확인'));
+}
+
 // 12. 앱(PWA) 구성
 {
   const m = await page.evaluate(async () => (await fetch('assets/manifest.webmanifest')).json());
