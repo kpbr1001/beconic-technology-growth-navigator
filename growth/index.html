@@ -803,7 +803,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
     @bottom-center{ content:"— " counter(page) " —"; font-size:8.5pt; font-family:"Pretendard Variable",Pretendard,sans-serif; color:#66748c; }
   }
   @page cover{ margin:0; @top-left{content:none;} @top-right{content:none;}
-    @bottom-center{content:none;} @bottom-right{content:none;} }
+    @bottom-center{content:none;} @bottom-right{content:none;} @bottom-left{content:none;} }
   body{background:#fff;font-size:11pt;color:#000;}
   .top,.foot,.result-actions,.view-toggle,.expert-cta .btn,.no-print,.toast,
   .hero,.criteria summary::after{display:none!important;}
@@ -986,7 +986,14 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 .file-btn{cursor:pointer;}
 .inline-file{color:var(--blue);font-weight:800;text-decoration:underline;cursor:pointer;}
 .nav-r{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
-.q-prog{position:sticky;top:132px;z-index:5;display:flex;align-items:center;gap:12px;background:#fff;padding:8px 0 12px;margin-bottom:4px;}
+.q-prog{position:sticky;top:132px;z-index:5;background:#fff;padding:8px 0 10px;margin-bottom:4px;}
+.q-prog-row{display:flex;align-items:center;gap:12px;}
+.q-go{flex:none;font-size:13px;font-weight:800;color:#fff;background:var(--blue);border:none;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap;}
+.q-go.done{background:#0d9b82;}
+.q-areas{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px;scrollbar-width:none;}
+.q-areas::-webkit-scrollbar{display:none;}
+.q-areas button{flex:none;font-size:12px;font-weight:700;color:var(--ink-soft);background:#f3f6fb;border:1px solid var(--line);border-radius:999px;padding:4px 10px;cursor:pointer;white-space:nowrap;}
+.q-areas button.done{color:#0d9b82;border-color:#bfe9df;background:#effaf6;}
 .q-bar{flex:1;height:6px;border-radius:6px;background:var(--bg-2);overflow:hidden;}
 .q-fill{height:100%;width:0;background:linear-gradient(90deg,var(--mint),var(--blue));transition:width .25s;}
 #q-count{font-size:12.5px;font-weight:800;color:var(--muted);white-space:nowrap;}
@@ -999,6 +1006,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
   display:grid;place-items:center;font-size:12px;font-weight:900;flex:none;}
 .qa-card{border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;background:#fff;transition:border .15s;}
 .qa-card.done{border-color:#cfe0f5;background:#fbfdff;}
+.qa-card.flash{box-shadow:0 0 0 3px rgba(37,99,235,.25);border-color:var(--blue);}
 .qa-card.miss{border-color:var(--bad);box-shadow:0 0 0 3px rgba(220,79,79,.10);}
 .qa-t{font-size:14.5px;font-weight:800;color:var(--ink);margin-bottom:10px;line-height:1.45;}
 .qa-id{display:inline-block;font-size:11px;font-weight:900;color:var(--blue);background:#eef4ff;border-radius:6px;padding:1px 7px;margin-right:7px;vertical-align:1px;}
@@ -1391,7 +1399,11 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
         <div class="q-no">STEP 03 · 성숙도 진단</div>
         <h3>지금 실제로 하고 있는 것에 가장 가까운 단계를 골라 주세요</h3>
         <p class="help">회사 규모와 상관없이 <b>최근 <span data-cnt="recall"></span>개월 동안 실제로 한 행동</b>만 봅니다(계획·예정은 제외). 0 미착수 · 1 시작 · 2 정례화 · 3 체계화. 잘 모르면 <b>'모름'</b>을 누르세요 — 0점이 아니라 '응답 없음'으로 처리되고 신뢰도에만 반영됩니다. 영역 옆 숫자는 같은 단계 기업의 기대수준입니다.</p>
-        <div class="q-prog"><div class="q-bar"><div class="q-fill" id="q-fill"></div></div><span id="q-count"></span></div>
+        <div class="q-prog">
+          <div class="q-prog-row"><div class="q-bar"><div class="q-fill" id="q-fill"></div></div><span id="q-count"></span>
+            <button type="button" class="q-go" id="q-go" onclick="GAN.qGo()">다음 문항 ▸</button></div>
+          <div class="q-areas" id="q-areas" aria-label="영역 바로가기"></div>
+        </div>
         <div id="q-list"></div>
         <div class="err-tip" id="q-err"></div>
       </div>
@@ -1508,8 +1520,12 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
     <h4>보고서 PDF 생성</h4>
     <p class="sm-note">기업·기관 제출용 보고서 표지에 반영할 정보를 입력하세요. 비워두면 진단 입력값으로 자동 채워집니다.</p>
     <div class="rep-fields">
-      <label>수신 기업/기관명
-        <input type="text" id="rep-client" maxlength="40" placeholder="예: 대한정밀 주식회사"></label>
+      <div class="rep-row">
+        <label>상담기업(수신 기업·기관명)
+          <input type="text" id="rep-client" maxlength="40" placeholder="예: 대한정밀 주식회사"></label>
+        <label>저장일자
+          <input type="date" id="rep-date"></label>
+      </div>
       <label>수신 담당자 <span class="ropt">선택</span>
         <input type="text" id="rep-manager" maxlength="30" placeholder="예: 홍길동 대표이사"></label>
       <label>수신 부서/기관 <span class="ropt">선택</span>
@@ -1574,9 +1590,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);bo
 "use strict";
 
 /* ---------- 버전 정보 ---------- */
-const APP_VERSION = "v6.7.0";
+const APP_VERSION = "v6.8.0";
 const APP_UPDATED = "2026-11-26";
-const APP_BUILD   = "2026.11.26.1";  // 배포 빌드 식별자
+const APP_BUILD   = "2026.11.26.2";  // 배포 빌드 식별자
 let GAN_LOGO = "";  // 표지용 로고(헤더 이미지에서 런타임 해석)
 const LEGAL_BASIS_DATE = "2026-10-26";  // 법령·제도 출처를 마지막으로 확인한 날(도구 버전 날짜와 별개)
 
@@ -3610,7 +3626,7 @@ const GAN = (function(){
     let html="";
     AREA_KEYS.forEach((a,ai)=>{
       const qs=asked.filter(q=>q.area===a); if(!qs.length) return;
-      html+=`<div class="qa-area"><div class="qa-ah"><span class="qa-ix">${ai+1}</span><b>${esc(AREA[a].nm)}</b>${d.stage?`<small>${esc(STAGE[d.stage].nm)} 기대 ${expectedOf(d.stage,d.industry||"etc",a)}점</small>`:""}</div>`;
+      html+=`<div class="qa-area" id="qa-area-${a}"><div class="qa-ah"><span class="qa-ix">${ai+1}</span><b>${esc(AREA[a].nm)}</b>${d.stage?`<small>${esc(STAGE[d.stage].nm)} 기대 ${expectedOf(d.stage,d.industry||"etc",a)}점</small>`:""}</div>`;
       if(a==="people" && d.emp===RULES.people.soloEmp) html+=`<p class="qa-hint">직원 수를 '1명(대표만)'으로 골랐어요. 직원이 없으면 노무·평가 문항은 <b>'해당 없음'</b>을 고르세요. 채용 계획(H1)은 그대로 답하면 됩니다.</p>`;
       qs.forEach(q=>{
         const v=d.ans[q.id];
@@ -3634,17 +3650,34 @@ const GAN = (function(){
       const card=b.closest(".qa-card"); const first=!card.classList.contains("done");
       card.classList.add("done"); card.classList.remove("miss");
       if(first){ const nx=[...box.querySelectorAll(".qa-card:not(.done)")].find(c=>c.compareDocumentPosition(card)&Node.DOCUMENT_POSITION_PRECEDING);
-        if(nx) setTimeout(()=>nx.scrollIntoView({behavior:"smooth",block:"center"}),180); }
+        if(nx) setTimeout(()=>nx.scrollIntoView({behavior:"smooth",block:"center"}),180);
+        else if(askedQuestions(state.data.depth, state.data.stage).every(q=>state.data.ans[q.id]!==undefined)) setTimeout(()=>toast("모두 응답했어요 · 위쪽 '다음 단계' 버튼을 누르세요"),200); }
       card.querySelectorAll(".qa-opt,.qa-x").forEach(x=>{ const on = x.dataset.v===String(v); x.classList.toggle("on",on); x.setAttribute("aria-checked",on); });
       // 같은 영역 다른 문항에도 해당 없음을 바로 적용할지 제안하지 않음(문항별 판단)
       updateQCount(); save();
     }));
     updateQCount();
   }
+  /* 진행 버튼 — 남은 문항이 있으면 다음 미응답 문항으로, 다 풀었으면 다음 단계로 */
+  function qGo(){
+    const asked=askedQuestions(state.data.depth, state.data.stage);
+    const next=asked.find(q=>state.data.ans[q.id]===undefined);
+    if(!next){ nextStep(); return; }
+    const c=document.querySelector(`.qa-card[data-q="${next.id}"]`); if(c){ c.scrollIntoView({behavior:"smooth",block:"center"}); c.classList.add("flash"); setTimeout(()=>c.classList.remove("flash"),900); }
+  }
   function updateQCount(){
     const asked=askedQuestions(state.data.depth, state.data.stage);
     const done=asked.filter(q=>state.data.ans[q.id]!==undefined).length;
     const el=document.getElementById("q-count"); if(el) el.innerHTML=`<b>${done}</b> / ${asked.length} 응답`;
+    // 진행 버튼: 남은 문항이 있으면 '다음 문항', 다 풀면 '다음 단계'(맨 아래까지 내려가지 않아도 됨)
+    const go=document.getElementById("q-go");
+    if(go){ const all = asked.length>0 && done===asked.length;
+      go.textContent = all ? "✓ 모두 응답 · 다음 단계 ▸" : `남은 ${asked.length-done}문항 ▸`; go.classList.toggle("done", all); }
+    const ar=document.getElementById("q-areas");
+    if(ar){ ar.innerHTML = AREA_KEYS.filter(a=>asked.some(q=>q.area===a)).map(a=>{
+        const qs=asked.filter(q=>q.area===a), ok=qs.every(q=>state.data.ans[q.id]!==undefined);
+        return `<button type="button" class="${ok?"done":""}" data-a="${a}">${ok?"✓ ":""}${esc(AREA[a].short)}</button>`; }).join("");
+      ar.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ const t=document.getElementById("qa-area-"+b.dataset.a); if(t) t.scrollIntoView({behavior:"smooth",block:"start"}); })); }
     const fl=document.getElementById("q-fill"); if(fl) fl.style.width=(asked.length?done/asked.length*100:0)+"%";
   }
 
@@ -4021,14 +4054,16 @@ const GAN = (function(){
     if(!ov){ printPDF(); return; }
     const cl=document.getElementById("rep-client");
     if(cl && !cl.value && state.data.name) cl.value=state.data.name;
+    const dt=document.getElementById("rep-date"); if(dt && !dt.value) dt.value=isoDate(new Date());
     ov.classList.add("on"); ov.setAttribute("aria-hidden","false");
   }
   function collectReportInfo(){
     const g=id=>{const e=document.getElementById(id);return e?e.value.trim():"";};
     const client=g("rep-client")||state.data.name||"수신처 미지정";
+    const dv=g("rep-date"); const day = /^\d{4}-\d{2}-\d{2}$/.test(dv) ? new Date(dv+"T00:00:00") : new Date();
     return { client, manager:g("rep-manager"), dept:g("rep-dept"),
       confid:g("rep-confid")||"대외 참고용", purpose:g("rep-purpose")||"경영 진단 참고",
-      docNo: makeDocNo(), date: fmtDate(new Date()) };
+      docNo: makeDocNo(), date: fmtDate(day), dateIso: isoDate(day) };
   }
   function makeDocNo(){
     const d=new Date(); const y=d.getFullYear();
@@ -4036,6 +4071,7 @@ const GAN = (function(){
     return `GVEN-${y}-${seq}`;
   }
   function fmtDate(d){ return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`; }
+  function isoDate(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
   function bindReportDialog(){
     const ov=document.getElementById("reportOv"); if(!ov||ov._bound) return; ov._bound=true;
     const close=()=>{ ov.classList.remove("on"); ov.setAttribute("aria-hidden","true"); };
@@ -4098,11 +4134,19 @@ const GAN = (function(){
     root.insertBefore(shell, root.firstChild);
     document.body.classList.add("reportmode");
   }
+  /* PDF 저장 — 파일 이름과 본문 각 쪽 머리·바닥글에 상담기업·저장일자(표지를 떼어도 어느 회사 보고서인지 보이게) */
   function printPDF(){
+    const ri=state.reportInfo||collectReportInfo();
+    const clean=x=>String(x||"").replace(/[\\/:*?"<>|\n\r]+/g," ").trim().slice(0,40);
+    const cssTxt=x=>String(x||"").replace(/["\\\n\r]/g,"").slice(0,40);
+    const oldTitle=document.title;
+    document.title=`${clean(ri.client)}_기업성장진단_${(ri.dateIso||isoDate(new Date())).replace(/-/g,"")}`;
+    let rs=document.getElementById("pageRunCfg"); if(!rs){ rs=document.createElement("style"); rs.id="pageRunCfg"; document.head.appendChild(rs); }
+    rs.textContent=`@media print{@page{@top-left{content:"기업 성장활동 진단 보고서 · ${cssTxt(ri.client)}"}@bottom-left{content:"저장일 ${cssTxt((ri.dateIso||"").replace(/-/g,"."))}";font-size:7.5pt;font-family:"Pretendard Variable",Pretendard,sans-serif;color:#8895ab}}@page cover{@top-left{content:none}@bottom-left{content:none}}}`;
     const m=state.mode; state.mode="all"; applyMode();
     const dets=[...document.querySelectorAll("#v-result details")]; const was=dets.map(x=>x.open); dets.forEach(x=>x.open=true);
     // 인쇄창이 닫힌 뒤(afterprint) 화면 상태 복원 — 모바일처럼 print()가 즉시 반환돼도 보고서가 온전히 인쇄되도록
-    const restore=()=>{ state.mode=m; applyMode(); dets.forEach((x,i)=>x.open=was[i]); document.body.classList.remove("reportmode"); };
+    const restore=()=>{ state.mode=m; applyMode(); dets.forEach((x,i)=>x.open=was[i]); document.body.classList.remove("reportmode"); document.title=oldTitle; };
     window.addEventListener("afterprint", restore, {once:true});
     setTimeout(()=>{ window.print(); },200);
   }
@@ -4214,7 +4258,7 @@ const GAN = (function(){
   function resumeDismiss(){ const b=document.getElementById("resumeBar"); if(b) b.style.display="none"; }
   return {init,go,nextStep,prevStep,skipToResult,toConsult,toggleCol,setMode,share,printPDF,restart,loadSample,clearSaved,resumeDismiss,
           exportFile,importFile,runDiagnosis,getDiagnosisData,getDiagnosisJSON,getNarrative,_track,openReportDialog,
-          copySummary, _state:()=>state, _sanitize:sanitize, _sanitizeSummary:sanitizeSummary, _buildShareURL:buildShareURL};
+          copySummary, qGo, _state:()=>state, _sanitize:sanitize, _sanitizeSummary:sanitizeSummary, _buildShareURL:buildShareURL};
 })();
 window.GAN = GAN;
 
